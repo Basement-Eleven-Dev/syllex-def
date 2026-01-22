@@ -6,9 +6,10 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faSignIn, faSpinnerThird } from '@fortawesome/pro-solid-svg-icons';
+import { Auth } from '../../services/auth';
 
 @Component({
   selector: 'app-login-form',
@@ -28,12 +29,29 @@ export class LoginForm {
     ]),
   });
 
-  loggingIn: boolean = false;
+  hasResult: { success: boolean; message: string } | null = null;
+
+  loading: boolean = false;
+
+  constructor(
+    private router: Router,
+    private authService: Auth,
+  ) {}
 
   onSingIn() {
-    this.loggingIn = true;
-    setTimeout(() => {
-      this.loggingIn = false;
-    }, 2000);
+    this.loading = true;
+    const credentials = {
+      username: this.loginForm.value.email || '',
+      password: this.loginForm.value.password || '',
+    };
+    this.authService.login(credentials).then((result) => {
+      this.hasResult = result;
+      this.loading = false;
+      if (result.success) {
+        setTimeout(() => {
+          this.router.navigate(['/dashboard']);
+        }, 1000);
+      }
+    });
   }
 }

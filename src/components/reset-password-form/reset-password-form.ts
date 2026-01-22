@@ -1,21 +1,32 @@
 import { DatePipe } from '@angular/common';
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, OnDestroy, DestroyRef } from '@angular/core';
 import {
+  AbstractControl,
   FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
   Validators,
 } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faPaperPlane,
   faSpinnerThird,
   faCheck,
+  faSave,
 } from '@fortawesome/pro-solid-svg-icons';
 import { CodeInputComponent, CodeInputModule } from 'angular-code-input';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
+import {
+  hasMinLenghthValidator,
+  hasNumberValidator,
+  hasSpecialCharValidator,
+  passwordMatchValidator,
+} from './form-validators';
+import { Auth } from '../../services/auth';
 
 @Component({
   selector: 'app-reset-password-form',
@@ -30,17 +41,25 @@ import { BehaviorSubject } from 'rxjs';
   templateUrl: './reset-password-form.html',
   styleUrl: './reset-password-form.scss',
 })
-export class ResetPasswordForm {
+export class ResetPasswordForm implements OnDestroy {
   SpinnerIcon = faSpinnerThird;
   PaperPlaneIcon = faPaperPlane;
   CheckIcon = faCheck;
+  SaveIcon = faSave;
 
   hasResult: { success: boolean; message: string } | null = null;
   codeValiditySeconds: number = 0;
 
+  currentStepIndex = new BehaviorSubject<number>(0);
+
   @ViewChild('codeInput') codeInput!: CodeInputComponent;
 
-  constructor() {
+  constructor(
+    private authService: Auth,
+    private router: Router,
+    private destroyRef: DestroyRef,
+  ) {
+    // Possiamo mantenere questo Observable perché è un BehaviorSubject interno
     this.currentStepIndex.subscribe((index) => {
       this.hasResult = null;
     });
@@ -57,31 +76,70 @@ export class ResetPasswordForm {
     code: new FormControl('', [Validators.required, Validators.minLength(5)]),
   });
 
-  resetPasswordForm = new FormGroup({
-    newPassword: new FormControl('', [
-      Validators.required,
-      Validators.minLength(8),
-    ]),
-    confirmPassword: new FormControl('', [Validators.required]),
-  });
+  resetPasswordForm = new FormGroup(
+    {
+      newPassword: new FormControl('123$Ciao', [
+        Validators.required,
+        hasMinLenghthValidator(8),
+        hasSpecialCharValidator(),
+        hasNumberValidator(),
+      ]),
+      confirmPassword: new FormControl('123$Ciao', [Validators.required]),
+    },
+    { validators: passwordMatchValidator('newPassword', 'confirmPassword') },
+  );
 
-  currentStepIndex = new BehaviorSubject<number>(2);
+  isValidMinLength(): boolean {
+    const control = this.resetPasswordForm.get('newPassword');
+    if (!control || !control.value) return false;
+    return !control.hasError('hasMinLength') && control.value.length >= 8;
+  }
+
+  isValidSpecialChar(): boolean {
+    const control = this.resetPasswordForm.get('newPassword');
+    if (!control || !control.value) return false;
+    return !control.hasError('hasSpecialChar');
+  }
+
+  isValidNumber(): boolean {
+    const control = this.resetPasswordForm.get('newPassword');
+    if (!control || !control.value) return false;
+    return !control.hasError('hasNumber');
+  }
+
+  isValidPasswordMatch(): boolean {
+    const password = this.resetPasswordForm.get('newPassword')?.value;
+    const confirm = this.resetPasswordForm.get('confirmPassword')?.value;
+    if (!password || !confirm) return false;
+    return !this.resetPasswordForm.hasError('passwordsMatch');
+  }
 
   loading: boolean = false;
-  onSendEmail() {
-    this.loading = true;
-    setTimeout(() => {
-      this.loading = false;
+  async onSendEmail() {
+    try {
+      this.loading = true;
+      const result = await firstValueFrom(
+        this.authService.sendResetPasswordCode(
+          this.sendEmailForm.controls['email'].value!,
+        ),
+      );
+      console.log(result);
+      this.hasResult = result;
+      if (result.success) {
+        setTimeout(() => {
+          this.currentStepIndex.next(1);
+          this.startCodeCountdown(result.codeValiditySeconds);
+        }, 1500);
+      }
+    } catch (error) {
+      console.error('Error sending reset code:', error);
       this.hasResult = {
-        success: true,
-        message: 'Email inviata con successo!',
+        success: false,
+        message: "Errore durante l'invio del codice",
       };
-
-      setTimeout(() => {
-        this.currentStepIndex.next(1);
-        this.startCodeCountdown(5 * 60);
-      }, 1500);
-    }, 3000);
+    } finally {
+      this.loading = false;
+    }
   }
 
   countdownInterval: any;
@@ -94,7 +152,7 @@ export class ResetPasswordForm {
       } else {
         clearInterval(this.countdownInterval);
       }
-    }, 1000);
+    }, 500);
   }
 
   sendingNewCode: boolean = false;
@@ -107,14 +165,62 @@ export class ResetPasswordForm {
     }, 500);
   }
 
-  checkingCode: boolean = false;
-  onCheckCode() {
-    // Placeholder for code verification logic
+  async onCheckCode() {
+    try {
+      this.loading = true;
+      const result = await firstValueFrom(
+        this.authService.checkResetPasswordCode(
+          this.sendEmailForm.controls['email'].value!,
+          this.checkCodeForm.controls['code'].value!,
+        ),
+      );
+      console.log(result);
+      this.hasResult = result;
+      if (result.success) {
+        setTimeout(() => {
+          this.currentStepIndex.next(2);
+        }, 500);
+      }
+    } catch (error) {
+      console.error('Error checking code:', error);
+      this.hasResult = {
+        success: false,
+        message: 'Errore durante la verifica del codice',
+      };
+    } finally {
+      this.loading = false;
+    }
   }
 
-  resettingPassword: boolean = false;
-  onResetPassword() {
-    // Placeholder for password reset logic
+  async onResetPassword() {
+    try {
+      this.loading = true;
+      const result = await firstValueFrom(
+        this.authService.resetPassword(
+          this.sendEmailForm.controls['email'].value!,
+          this.resetPasswordForm.controls['newPassword'].value!,
+        ),
+      );
+      console.log(result);
+      this.hasResult = result;
+      if (result.success) {
+        setTimeout(() => {
+          this.router.navigate(['/']);
+        }, 500);
+      }
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      this.hasResult = {
+        success: false,
+        message: 'Errore durante il reset della password',
+      };
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  ngOnDestroy() {
+    clearInterval(this.countdownInterval);
   }
 
   /* CODE INPUT HANDLERS */

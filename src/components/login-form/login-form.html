@@ -32,15 +32,21 @@
   <button
     type="submit"
     class="btn btn-secondary btn-lg w-100"
-    [disabled]="loginForm.invalid"
+    [disabled]="loginForm.invalid || loading"
   >
     <fa-icon
-      [icon]="loggingIn ? SpinnerIcon : LoginIcon"
-      [animation]="loggingIn ? 'spin' : undefined"
+      [icon]="loading ? SpinnerIcon : LoginIcon"
+      [animation]="loading ? 'spin' : undefined"
     ></fa-icon>
     Login
   </button>
-  <div class="alert alert-danger text-center">
-    Invalid username or password.
+  @if(hasResult){
+  <div
+    class="alert text-center mt-4"
+    [class.alert-success]="hasResult.success"
+    [class.alert-danger]="!hasResult.success"
+  >
+    {{ hasResult.message }}
   </div>
+  }
 </form>
