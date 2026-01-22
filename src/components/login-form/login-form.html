@@ -1,0 +1,46 @@
+<form
+  [formGroup]="loginForm"
+  (ngSubmit)="onSingIn()"
+  class="d-flex flex-column gap-3"
+>
+  <h5 class="text-primary fw-bold">👋 Bentornato</h5>
+  <div>
+    <label for="email" class="form-label fw-semibold text-primary">Email</label>
+    <input
+      type="text"
+      class="form-control custom-input"
+      placeholder="Email"
+      formControlName="email"
+    />
+  </div>
+  <div>
+    <label for="password" class="form-label fw-semibold text-primary"
+      >Password</label
+    >
+    <input
+      formControlName="password"
+      type="password"
+      class="form-control custom-input"
+      placeholder="Password"
+    />
+  </div>
+  <div class="text-end mb-4">
+    <a href="#" class="text-primary fw-semibold" routerLink="/password-reset"
+      >Hai dimenticato la password?</a
+    >
+  </div>
+  <button
+    type="submit"
+    class="btn btn-secondary btn-lg w-100"
+    [disabled]="loginForm.invalid"
+  >
+    <fa-icon
+      [icon]="loggingIn ? SpinnerIcon : LoginIcon"
+      [animation]="loggingIn ? 'spin' : undefined"
+    ></fa-icon>
+    Login
+  </button>
+  <div class="alert alert-danger text-center">
+    Invalid username or password.
+  </div>
+</form>
