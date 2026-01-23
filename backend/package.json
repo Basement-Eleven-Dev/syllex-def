@@ -12,7 +12,6 @@
     "fix:pdfparse": "rm node_modules/pdf-parse/index.js && cp index.js node_modules/pdf-parse/index.js",
     "deploy": "npm run fix:pdfparse && npm run bootstrap && npm run build && cdk deploy",
     "deploy:local": "npm run fix:pdfparse && cdk bootstrap --profile=pathway && cdk synth && cdk deploy --profile=pathway",
-    "create:function": "npx ts-node routines/createFunction.ts",
     "create:user": "npx ts-node routines/createUser.ts",
     "test": "jest"
   },
