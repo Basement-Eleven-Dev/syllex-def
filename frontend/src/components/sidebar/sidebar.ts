@@ -4,7 +4,12 @@ import {
   FontAwesomeModule,
   IconDefinition,
 } from '@fortawesome/angular-fontawesome';
-import { faChartLine } from '@fortawesome/pro-solid-svg-icons';
+import {
+  faBallotCheck,
+  faChartLine,
+  faFile,
+  faUsers,
+} from '@fortawesome/pro-solid-svg-icons';
 
 interface SidebarRoute {
   path: string;
@@ -24,6 +29,21 @@ export class Sidebar {
       path: '/dashboard',
       label: 'Dashboard',
       icon: faChartLine,
+    },
+    {
+      path: '/materiali',
+      label: 'Materiali',
+      icon: faFile,
+    },
+    {
+      path: '/test',
+      label: 'Test',
+      icon: faBallotCheck,
+    },
+    {
+      path: '/classi',
+      label: 'Classi',
+      icon: faUsers,
     },
   ];
 }
