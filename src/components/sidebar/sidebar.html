@@ -1,0 +1,10 @@
+<div class="bg-primary h-100 p-3">
+  <div class="bg-primary w-100 p-3">
+    @for(route of sidebarRoutes; track $index){
+    <div class="sidebarRoute w-100" [routerLink]="route.path">
+      <fa-icon [icon]="route.icon"></fa-icon>
+      {{route.label}}
+    </div>
+    }
+  </div>
+</div>
