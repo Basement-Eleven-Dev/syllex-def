@@ -1,7 +1,11 @@
 <div class="bg-primary h-100 p-3">
-  <div class="bg-primary w-100 p-3">
+  <div class="bg-primary w-100 px-2 pb-2 gap-2 d-flex flex-column">
     @for(route of sidebarRoutes; track $index){
-    <div class="sidebarRoute w-100" [routerLink]="route.path">
+    <div
+      class="sidebarRoute w-100 rounded-3 gap-2 d-flex align-items-center"
+      [routerLink]="route.path"
+      routerLinkActive="active"
+    >
       <fa-icon [icon]="route.icon"></fa-icon>
       {{route.label}}
     </div>

@@ -4,4 +4,18 @@
 .sidebarRoute {
   background-color: #5883f9;
   width: 100%;
+  color: white;
+  padding: 0.7rem 1.5rem;
+  transition: all 0.3s ease;
+  &:hover {
+    cursor: pointer;
+    background-color: var(--bs-secondary);
+    color: var(--bs-primary);
+    font-weight: bold;
+  }
+  &.active {
+    background-color: var(--bs-secondary);
+    color: var(--bs-primary);
+    font-weight: bold;
+  }
 }
