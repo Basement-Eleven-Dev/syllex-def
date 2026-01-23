@@ -138,10 +138,13 @@ export class RouteConstruct extends NestedStack {
   }
   private createMethods(methodDescriptions: AppRoute, resource: IResource) {
     let subResource = resource.addResource(methodDescriptions.routeName)
-    if (methodDescriptions.integration) {
+    if (methodDescriptions.integrations && methodDescriptions.integrations.length > 0) {
 
       this.addOptionsMethod(subResource);
-      this.addMethod(subResource, methodDescriptions.integration.functionPath, methodDescriptions.integration.method)
+      methodDescriptions.integrations.forEach(int => {
+
+        this.addMethod(subResource, int.functionPath, int.method)
+      })
     }
     methodDescriptions.subRoutes?.forEach(a => this.createMethods(a, subResource))
   }
