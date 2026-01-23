@@ -5,14 +5,13 @@ import {
   ServicePrincipal,
 } from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
-import { LAMBDA_ROLE_NAME } from "../../environment";
 
 export class DefaultLambdaRole extends Construct {
   role: Role;
   constructor(scope: Construct, name: string) {
     super(scope, name);
-    this.role = new Role(scope, LAMBDA_ROLE_NAME, {
-      roleName: LAMBDA_ROLE_NAME,
+    this.role = new Role(scope, name + 'Resource', {
+      roleName: name,
       assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
     });
     this.addPolicies();
