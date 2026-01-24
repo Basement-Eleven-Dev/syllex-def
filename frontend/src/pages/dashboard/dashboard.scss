@@ -1,0 +1,43 @@
+.cardLink,
+.cardValue,
+.cardDescription {
+  color: var(--bs-dark);
+}
+
+.linkCard {
+  &.alert {
+    background-color: #ffe8d3;
+    border: none;
+    color: #7f3900 !important;
+
+    .cardLink,
+    .cardValue,
+    .cardDescription {
+      color: #7f3900 !important;
+    }
+  }
+}
+
+.cardValue {
+  font-size: 3rem;
+  font-weight: bold;
+}
+
+.cardDescription {
+  font-size: 1.2rem;
+}
+
+.actionButton {
+  padding: 0.5rem 1rem;
+}
+
+#startWorkingCard {
+  background-color: #ebf0ff;
+}
+
+.ellipsis-3-lines {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

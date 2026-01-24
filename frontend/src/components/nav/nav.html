@@ -1,1 +1,19 @@
-<div class="bg-primary w-100 p-3">ciao</div>
+<div class="bg-primary w-100 py-2 d-flex flex-row align-items-center">
+  <div style="width: 250px" class="text-center">
+    <img src="/images/logo_white.png" alt="Syllex Logo" height="40" />
+  </div>
+  <div class="flex-fill d-flex flex-row align-items-center gap-3 pe-4">
+    <span class="text-white">{{ now | date: 'dd MMMM, HH:mm' | titlecase }} </span>
+    <div class="flex-fill">
+      <input
+        type="text"
+        class="form-control form-control-sm w-25 custom-input"
+        placeholder="Search..."
+      />
+    </div>
+
+    <span class="float-end">
+      <button class="btn btn-light">Scienze Nautiche</button>
+    </span>
+  </div>
+</div>

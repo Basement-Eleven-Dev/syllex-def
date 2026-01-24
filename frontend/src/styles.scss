@@ -10,7 +10,7 @@ $success: #16ca76;
 $warning: #ebc634;
 $danger: #cf1729;
 $light: #f8f9fa;
-$dark: #212529;
+$dark: #1f3571;
 $min-contrast-ratio: 4.5;
 $font-size-base: 0.85rem;
 $enable-gradients: false;
@@ -43,9 +43,8 @@ $btn-font-weight: 700;
 }
 
 .custom-input {
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 1rem;
   border-bottom: 2px solid $primary;
-  background-color: rgba(var(--bs-primary-rgb), 0.05);
   color: $primary;
   &::placeholder {
     color: rgba(var(--bs-primary-rgb), 0.5);

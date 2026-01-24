@@ -6,6 +6,7 @@ import {
   SignInInput,
   fetchAuthSession,
   getCurrentUser,
+  signOut,
 } from 'aws-amplify/auth';
 import { HttpClient } from '@angular/common/http';
 
@@ -53,7 +54,7 @@ export class Auth {
       await fetchAuthSession({ forceRefresh: true });
 
       const user = await firstValueFrom(
-        this.http.post<User | null>('profile', null),
+        this.http.post<User | null>('getMyProfile', null),
       );
 
       if (user) {
@@ -156,5 +157,18 @@ export class Auth {
         observer.complete();
       }, 1500);
     });
+  }
+
+  async logout(): Promise<{ success: boolean; message: string }> {
+    try {
+      await signOut();
+      this.user$.next(null);
+      return { success: true, message: 'Logout riuscito' };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message || 'Errore durante il logout',
+      };
+    }
   }
 }
