@@ -8,7 +8,7 @@ import {
 import { Db, ObjectId } from "mongodb";
 import { User } from "../../functions/profile/getMyProfile";
 
-const COGNITO_POOL_ID = "eu-south-1_eH7c9zDXM";
+const COGNITO_POOL_ID = "eu-south-1_xuHdZQr2t";
 const COGNITO_REGION = "eu-south-1";
 
 export const createAndLinkUser = async (

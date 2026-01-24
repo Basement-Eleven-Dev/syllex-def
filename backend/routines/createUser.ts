@@ -14,7 +14,7 @@ config();
 process.env.AWS_PROFILE = "pathway";
 
 const mongoConnectionString = process.env.DBCONNECTION as string;
-const cognitoPoolId = "eu-south-1_eH7c9zDXM";
+const cognitoPoolId = "eu-south-1_xuHdZQr2t";
 const MASTER_ADMIN_EMAIL = "admin@syllex.com";
 
 export interface Organization {

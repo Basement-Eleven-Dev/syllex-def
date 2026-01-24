@@ -5,6 +5,7 @@ import { LambdaConstruct } from "./lambda";
 import { Role } from "aws-cdk-lib/aws-iam";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import { Duration } from "aws-cdk-lib";
+import { BACKGROUND_CORRECTION_QUEUE_NAME, BACKGROUND_INDEXING_QUEUE_NAME } from "../../environment";
 
 export class BackgroundFunctions extends Construct {
   sqs: Queue;
@@ -17,13 +18,13 @@ export class BackgroundFunctions extends Construct {
 
   constructor(scope: Construct, name: string, role: Role) {
     super(scope, name);
-    this.sqs = new Queue(this, "correction-background", {
-      queueName: "background-ai-correction",
+    this.sqs = new Queue(this, "correction-background-v2", {
+      queueName: BACKGROUND_CORRECTION_QUEUE_NAME,
       visibilityTimeout: Duration.seconds(600),
     });
     this.lambda = new LambdaConstruct(
       this,
-      "correction-background-lambda",
+      "correction-background-lambda-v2",
       "src/background/processAIGrading.ts",
       role,
       {}
@@ -38,13 +39,13 @@ export class BackgroundFunctions extends Construct {
     this.queueUrl = this.sqs.queueUrl;
 
     //BLOCCO PER LA FUNZIONE DI INDICIZZAZIONE
-    this.indexingQueue = new Queue(this, "IndexingQueue", {
-      queueName: "material-indexing-queue",
+    this.indexingQueue = new Queue(this, "IndexingQueueV2", {
+      queueName: BACKGROUND_INDEXING_QUEUE_NAME,
       visibilityTimeout: Duration.seconds(600),
     });
     this.indexingLambda = new LambdaConstruct(
       this,
-      "indexing-background-lambda",
+      "indexing-background-lambda-v2",
       "src/background/indexMaterial.ts",
       role,
       {}
@@ -56,5 +57,7 @@ export class BackgroundFunctions extends Construct {
       })
     );
     this.indexingQueueUrl = this.indexingQueue.queueUrl;
+    this.sqs.grantSendMessages(role)
+    this.indexingQueue.grantSendMessages(role)
   }
 }

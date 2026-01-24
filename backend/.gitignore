@@ -1,1 +1,25 @@
+node_modules*.js
+!scripts/*
+!jest.config.js
+!jest.local.config.js
+!jest.setup.js
+!jest.teardown.js
+*.d.ts
 node_modules
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
+*.log
+
+# Add this for the people with beautiful computers 🌸🌼 (and questionable file management)  
+.DS_Store
+profile.info
+scripts/schemas.json
+local.ts
+q.csv
+data.csv
+
+# Kiro
+.kiro/
+.env
