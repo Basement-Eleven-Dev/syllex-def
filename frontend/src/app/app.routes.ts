@@ -6,6 +6,8 @@ import { Dashboard } from '../pages/dashboard/dashboard';
 import { Test } from '../pages/test/test';
 import { authGuard, guestGuard } from '../guards/auth.guard';
 import { Materiali } from '../pages/materiali/materiali';
+import { TestDetail } from '../pages/test-detail/test-detail';
+import { CreateEditTest } from '../pages/create-edit-test/create-edit-test';
 
 export const routes: Routes = [
   {
@@ -33,8 +35,16 @@ export const routes: Routes = [
         component: Dashboard,
       },
       {
-        path: 'test',
+        path: 'tests',
         component: Test,
+      },
+      {
+        path: 'tests/new',
+        component: CreateEditTest,
+      },
+      {
+        path: 'tests/:testId',
+        component: TestDetail,
       },
       {
         path: 'materiali',

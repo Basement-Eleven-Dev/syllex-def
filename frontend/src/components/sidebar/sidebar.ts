@@ -48,8 +48,8 @@ export class Sidebar {
       icon: faFile,
     },
     {
-      path: 'test',
-      label: 'Test',
+      path: 'tests',
+      label: 'Tests',
       icon: faBallotCheck,
     },
     {

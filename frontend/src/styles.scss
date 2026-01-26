@@ -12,7 +12,7 @@ $danger: #cf1729;
 $light: #f8f9fa;
 $dark: #1f3571;
 $min-contrast-ratio: 4.5;
-$font-size-base: 0.8rem;
+$font-size-base: 0.85rem;
 $enable-gradients: false;
 $font-family-sans-serif: "DM Sans", sans-serif;
 $border-radius: 0.75rem;
@@ -62,4 +62,21 @@ a {
 .fa-stack-primary > svg > defs > mask > g > g > path {
   stroke: black;
   stroke-width: 100;
+}
+
+.status-pill {
+  border-radius: 10px;
+  padding: 0.25rem 0.75rem;
+  color: var(--bs-dark);
+  font-weight: 600;
+  &.pubblicato {
+    background-color: #6ff68c;
+  }
+
+  &.bozza {
+    background-color: #ffb861;
+  }
+  &.archiviato {
+    background-color: #d3d3d3;
+  }
 }

@@ -1,0 +1,13 @@
+.inGridView {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+.inTableView {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}

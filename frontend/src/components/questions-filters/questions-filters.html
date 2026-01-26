@@ -1,0 +1,57 @@
+<form [formGroup]="searchForm">
+  <div class="row">
+    <div class="col-7">
+      <label for="search-term" class="form-label fw-semibold text-dark"
+        >Testo nella domanda</label
+      >
+      <input
+        type="text"
+        class="form-control custom-input"
+        placeholder="Cerca..."
+        id="search-term"
+        formControlName="searchTerm"
+      />
+    </div>
+    <div class="col-5">
+      <label for="search-term" class="form-label fw-semibold text-dark"
+        >Tipologia</label
+      >
+      <select class="form-select custom-input" formControlName="type">
+        <option value="">Tutte le tipologie</option>
+        @for(type of ['scelta multipla', 'vero falso', 'risposta aperta']; track
+        $index) {
+        <option value="{{ type }}">{{ type | titlecase }}</option>
+        }
+      </select>
+    </div>
+  </div>
+</form>
+
+<div class="questions-list mt-4">
+  <h6 class="mb-3 text-muted">Risultati ({{ filteredQuestions.length }})</h6>
+
+  @if (filteredQuestions.length === 0) {
+  <div class="alert alert-info" role="alert">
+    Nessuna domanda trovata con i filtri selezionati. Prova a modificare i
+    criteri di ricerca.
+  </div>
+  }
+
+  <div
+    cdkDropList
+    [cdkDropListData]="filteredQuestions"
+    [cdkDropListConnectedTo]="['test-drop-list']"
+    cdkDropListSortingDisabled
+  >
+    @for (question of filteredQuestions; track question.id; let last = $last) {
+    <div
+      app-question-card
+      cdkDrag
+      [cdkDragData]="question"
+      [showIndex]="false"
+      [question]="question"
+      [class.mb-3]="!last"
+    ></div>
+    }
+  </div>
+</div>

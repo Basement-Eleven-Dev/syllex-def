@@ -1,0 +1,30 @@
+tbody > tr > td {
+  color: var(--bs-dark);
+}
+
+tr {
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.view-test-button {
+  background-color: var(--bs-primary);
+  color: white;
+  &:hover {
+    background-color: color-mix(in srgb, var(--bs-primary) 90%, black);
+  }
+  &.has-pending-corrections {
+    background-color: #ffb861;
+    color: var(--bs-dark);
+    &:hover {
+      background-color: #ffc793;
+    }
+  }
+}
+
+.row-with-pending-corrections {
+  td {
+    background-color: #ffb8615c !important;
+  }
+}

@@ -1,0 +1,64 @@
+<div class="d-flex align-items-start gap-2 card p-3 question-card">
+  <div class="flex-grow-1 w-100">
+    <div class="d-flex align-items-start gap-2 mb-2">
+      @if(showIndex){<span class="badge bg-dark"># {{ index + 1 }}</span>}
+      <span class="badge bg-primary">{{ question.type }}</span>
+    </div>
+    @if(question.img) {
+    <div class="mb-3 w-100 text-center">
+      <img
+        [src]="question.img"
+        alt="Immagine della domanda"
+        class="img-fluid"
+        (click)="onExpandImage(question.img)"
+        style="max-height: 100px"
+      />
+    </div>
+    }
+    <p class="mb-0 fw-medium">{{ question.text }}</p>
+
+    <ol type="A">
+      @for (option of question.options; track $index) {
+      <li [class.correct]="option.isCorrect">
+        {{ option.label }} @if(option.isCorrect) {
+        <fa-icon [icon]="CheckIcon"></fa-icon>
+        }
+      </li>
+      }
+    </ol>
+  </div>
+
+  <!-- Azioni -->
+  @if(showActions) {
+  <div class="d-flex flex-row gap-1 justify-content-end w-100">
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-danger"
+      (click)="removeMe.emit(question.id)"
+      title="Rimuovi"
+    >
+      <fa-icon [icon]="TrashIcon"></fa-icon> Rimuovi
+    </button>
+    <!-- <button
+      type="button"
+      class="btn btn-sm btn-outline-primary"
+      (click)="removeMe.emit(question.id)"
+      title="Rimuovi"
+    >
+      <fa-icon [icon]="ExpandIcon"></fa-icon> Espandi
+    </button> -->
+    <input
+      type="number"
+      class="form-control form-control-sm custom-input"
+      style="width: 150px"
+      [(ngModel)]="points"
+      min="0"
+      max="100"
+      placeholder="Punti se corretta"
+    />
+  </div>
+  }
+
+  <!-- Placeholder durante il drag -->
+  <div class="drag-placeholder" *cdkDragPlaceholder></div>
+</div>
