@@ -59,3 +59,20 @@ $card-border-radius: 1.5rem;
 a {
   cursor: pointer;
 }
+
+.status-pill {
+  border-radius: 10px;
+  padding: 0.25rem 0.75rem;
+  color: var(--bs-dark);
+  font-weight: 600;
+  &.pubblicato {
+    background-color: #6ff68c;
+  }
+
+  &.bozza {
+    background-color: #ffb861;
+  }
+  &.archiviato {
+    background-color: #d3d3d3;
+  }
+}

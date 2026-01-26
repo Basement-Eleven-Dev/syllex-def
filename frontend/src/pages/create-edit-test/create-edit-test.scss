@@ -1,0 +1,16 @@
+.classBadge {
+  background-color: transparent;
+  border: 1px solid var(--bs-primary);
+  color: var(--bs-primary);
+
+  &:hover {
+    cursor: pointer;
+    background-color: var(--bs-secondary);
+    color: var(--bs-dark);
+  }
+  &.selected {
+    background-color: var(--bs-secondary);
+    border: none;
+    color: var(--bs-dark);
+  }
+}

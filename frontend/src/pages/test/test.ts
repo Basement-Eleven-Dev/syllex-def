@@ -5,9 +5,13 @@ import { faGrid, faList, faPlus } from '@fortawesome/pro-solid-svg-icons';
 import { TestCard } from '../../components/test-card/test-card';
 import { TestTable } from '../../components/test-table/test-table';
 import { RouterModule } from '@angular/router';
+import { TestsService } from '../../services/tests-service';
+import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
+import { FormsModule } from '@angular/forms';
 
 type StatusType = 'bozza' | 'pubblicato' | 'archiviato';
 export interface TestData {
+  id: string;
   title: string;
   status: StatusType;
   availableDate: [Date, Date] | null; // null means always available
@@ -26,6 +30,8 @@ export interface TestData {
     TestTable,
     RouterModule,
     TitleCasePipe,
+    NgbPagination,
+    FormsModule,
   ],
   templateUrl: './test.html',
   styleUrl: './test.scss',
@@ -36,8 +42,11 @@ export class Test {
   ListIcon = faList;
   GridIcon = faGrid;
 
+  constructor(private testsService: TestsService) {}
+
   tests: TestData[] = [
     {
+      id: '1',
       title: 'Math Test 1',
       status: 'bozza',
       availableDate: [new Date('2024-01-01'), new Date('2024-01-31')],
@@ -47,6 +56,7 @@ export class Test {
       hasPendingCorrections: 5,
     },
     {
+      id: '2',
       title: 'Math Test 1',
       status: 'pubblicato',
       availableDate: [new Date('2024-01-01'), new Date('2024-01-31')],
@@ -57,8 +67,27 @@ export class Test {
     },
   ];
 
-  viewType: 'list' | 'grid' = 'grid';
-  onChangeViewType(value: 'list' | 'grid') {
+  loading: boolean = false;
+  onNewPageRequested() {
+    this.testsService.getPaginatedTests(this.page, this.pageSize).subscribe({
+      next: (response) => {
+        this.tests = response.tests;
+        this.collectionSize = response.total;
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+      },
+    });
+    this.loading = true;
+  }
+
+  collectionSize = 10;
+  page = 1;
+  pageSize = 5;
+
+  viewType: 'table' | 'grid' = 'grid';
+  onChangeViewType(value: 'table' | 'grid') {
     this.viewType = value;
   }
 }

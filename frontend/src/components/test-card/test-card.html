@@ -1,48 +1,61 @@
-<div
-  class="card p-3 shadow-sm"
-  [class.has-pending-corrections]="test.hasPendingCorrections"
->
-  <fa-icon [icon]="BackgroundIcon" class="background-icon"></fa-icon>
-  <div class="card-body d-flex flex-column gap-4 align-items-start">
-    <span [class]="'status-pill ' + test.status">{{ test.status }}</span>
-    <h4 class="card-title text-dark fw-bold">{{ test.title }}</h4>
-    <section class="d-flex flex-column gap-2">
-      <div class="text-dark">
-        <fa-icon [icon]="ClockIcon" class="me-1"></fa-icon>
-        @if(test.availableDate && test.availableDate.length > 0) { {{
-        test.availableDate[0] | date: 'd MMM y' }} - {{ test.availableDate[1] |
-        date:'d MMM y' }} } @else {
-        <p>Sempre disponibile</p>
-        }
+<div class="position-relative">
+  <div
+    class="card p-3 shadow-sm"
+    [class.has-pending-corrections]="test.hasPendingCorrections"
+  >
+    <fa-icon [icon]="BackgroundIcon" class="background-icon"></fa-icon>
+    <div class="card-body d-flex flex-column gap-4 align-items-start">
+      <span [class]="'status-pill ' + test.status">{{ test.status }}</span>
+      <h4 class="card-title text-dark fw-bold">{{ test.title }}</h4>
+      <section class="d-flex flex-column gap-2">
+        <div class="text-dark">
+          <fa-icon [icon]="ClockIcon" class="me-1"></fa-icon>
+          @if(test.availableDate && test.availableDate.length > 0) { {{
+          test.availableDate[0] | date: 'd MMM y' }} - {{ test.availableDate[1]
+          | date:'d MMM y' }} } @else {
+          <p>Sempre disponibile</p>
+          }
+        </div>
+        <div class="text-dark">
+          <fa-icon [icon]="QuestionsIcon" class="me-1"></fa-icon>
+          {{ test.questionsCount }} Domande - {{ test.maxScore }} pt.
+        </div>
+        <div class="text-dark">
+          <fa-icon [icon]="UsersIcon" class="me-1"></fa-icon>
+          @if(test.classesAssigned && test.classesAssigned.length > 0) {
+          @for(class of test.classesAssigned.slice(0, 2); track $index; let last
+          = $last) { {{ class }}@if(!last && test.classesAssigned.length > 1){
+          <span>, </span> } } @if(test.classesAssigned.length > 2) {
+          <span> e altre {{ test.classesAssigned.length - 2 }}</span>
+          } } @else {
+          <span>Nessuna classe assegnata</span>
+          }
+        </div>
+      </section>
+      <div class="d-flex flex-row align-items-center w-100 gap-2">
+        <button
+          class="btn flex-fill"
+          [routerLink]="'/t/tests/' + test.id"
+          id="view-test-button"
+          [class.has-pending-corrections]="test.hasPendingCorrections"
+        >
+          {{ test.hasPendingCorrections ? 'Visualizza e correggi' + ' (' +
+          test.hasPendingCorrections + ')' : 'Visualizza Test' }}
+        </button>
+        <div class="position-relative">
+          <button
+            class="btn btn-primary circle-btn"
+            (click)="toggleMenu($event)"
+          >
+            <fa-icon [icon]="ThreeDotsIcon"></fa-icon>
+          </button>
+        </div>
       </div>
-      <div class="text-dark">
-        <fa-icon [icon]="QuestionsIcon" class="me-1"></fa-icon>
-        {{ test.questionsCount }} Domande - {{ test.maxScore }} pt.
-      </div>
-      <div class="text-dark">
-        <fa-icon [icon]="UsersIcon" class="me-1"></fa-icon>
-        @if(test.classesAssigned && test.classesAssigned.length > 0) {
-        @for(class of test.classesAssigned.slice(0, 2); track $index; let last =
-        $last) { {{ class }}@if(!last && test.classesAssigned.length > 1){
-        <span>, </span> } } @if(test.classesAssigned.length > 2) {
-        <span> e altre {{ test.classesAssigned.length - 2 }}</span>
-        } } @else {
-        <span>Nessuna classe assegnata</span>
-        }
-      </div>
-    </section>
-    <div class="d-flex flex-row align-items-center w-100 gap-2">
-      <button
-        class="btn flex-fill"
-        id="view-test-button"
-        [class.has-pending-corrections]="test.hasPendingCorrections"
-      >
-        {{ test.hasPendingCorrections ? 'Visualizza e correggi' + ' (' +
-        test.hasPendingCorrections + ')' : 'Visualizza Test' }}
-      </button>
-      <button class="btn btn-primary circle-btn">
-        <fa-icon [icon]="ThreeDotsIcon"></fa-icon>
-      </button>
     </div>
   </div>
+  @if(isMenuOpen) {
+  <div class="contextual-menu-wrapper">
+    <app-test-contextual-menu></app-test-contextual-menu>
+  </div>
+  }
 </div>

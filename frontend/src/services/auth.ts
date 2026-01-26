@@ -53,9 +53,7 @@ export class Auth {
       await signIn(credentials);
       await fetchAuthSession({ forceRefresh: true });
 
-      const user = await firstValueFrom(
-        this.http.post<User | null>('getMyProfile', null),
-      );
+      const user = await firstValueFrom(this.http.get<User | null>('profile'));
 
       if (user) {
         this.user$.next(user);
@@ -84,7 +82,7 @@ export class Auth {
   }
 
   private fetchAndSetUser(): void {
-    this.http.post<User | null>('getMyProfile', null).subscribe({
+    this.http.get<User | null>('profile').subscribe({
       next: (user) => this.user$.next(user || null),
       error: () => this.user$.next(null),
     });

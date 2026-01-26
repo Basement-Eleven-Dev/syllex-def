@@ -19,23 +19,6 @@
   color: rgba(0, 0, 0, 0.05);
 }
 
-.status-pill {
-  border-radius: 10px;
-  padding: 0.25rem 0.75rem;
-  color: var(--bs-dark);
-  font-weight: 600;
-  &.pubblicato {
-    background-color: #6ff68c;
-  }
-
-  &.bozza {
-    background-color: #ffb861;
-  }
-  &.archiviato {
-    background-color: #d3d3d3;
-  }
-}
-
 .circle-btn {
   border-radius: 50%;
   width: 2rem;
@@ -58,4 +41,11 @@
       background-color: #ffc793;
     }
   }
+}
+
+.contextual-menu-wrapper {
+  position: absolute;
+  right: 25px;
+  top: 90%;
+  z-index: 1050;
 }
