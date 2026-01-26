@@ -12,7 +12,7 @@ $danger: #cf1729;
 $light: #f8f9fa;
 $dark: #1f3571;
 $min-contrast-ratio: 4.5;
-$font-size-base: 0.85rem;
+$font-size-base: 0.8rem;
 $enable-gradients: false;
 $font-family-sans-serif: "DM Sans", sans-serif;
 $border-radius: 0.75rem;
@@ -23,6 +23,7 @@ $border-radius-xxl: 2rem;
 $border-radius-pill: 50rem;
 
 $btn-font-weight: 700;
+$card-border-radius: 1.5rem;
 
 @import "bootstrap/scss/bootstrap";
 

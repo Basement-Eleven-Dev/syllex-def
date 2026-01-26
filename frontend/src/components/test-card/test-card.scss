@@ -1,0 +1,61 @@
+.card {
+  overflow: hidden;
+  .card-body {
+    z-index: 1;
+  }
+
+  &.has-pending-corrections {
+    background-color: #ffe8d3 !important;
+  }
+}
+
+.background-icon {
+  position: absolute;
+  font-size: 10rem;
+  top: -15%;
+  right: -10%;
+  transform: translate(0, 0) !important;
+  transform: translate(-50%, -50%);
+  color: rgba(0, 0, 0, 0.05);
+}
+
+.status-pill {
+  border-radius: 10px;
+  padding: 0.25rem 0.75rem;
+  color: var(--bs-dark);
+  font-weight: 600;
+  &.pubblicato {
+    background-color: #6ff68c;
+  }
+
+  &.bozza {
+    background-color: #ffb861;
+  }
+  &.archiviato {
+    background-color: #d3d3d3;
+  }
+}
+
+.circle-btn {
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#view-test-button {
+  background-color: var(--bs-primary);
+  color: white;
+  &:hover {
+    background-color: color-mix(in srgb, var(--bs-primary) 90%, black);
+  }
+  &.has-pending-corrections {
+    background-color: #ffb861;
+    color: var(--bs-dark);
+    &:hover {
+      background-color: #ffc793;
+    }
+  }
+}

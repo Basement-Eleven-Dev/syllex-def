@@ -5,6 +5,7 @@ import { TeacherLayout } from '../pages/teacher-layout/teacher-layout';
 import { Dashboard } from '../pages/dashboard/dashboard';
 import { Test } from '../pages/test/test';
 import { authGuard, guestGuard } from '../guards/auth.guard';
+import { Materiali } from '../pages/materiali/materiali';
 
 export const routes: Routes = [
   {
@@ -34,6 +35,10 @@ export const routes: Routes = [
       {
         path: 'test',
         component: Test,
+      },
+      {
+        path: 'materiali',
+        component: Materiali,
       },
       {
         path: 'comunicazioni',
