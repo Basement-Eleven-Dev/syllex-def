@@ -1,14 +1,42 @@
 <div class="bg-primary h-100 p-3">
-  <div class="bg-primary w-100 px-2 pb-2 gap-2 d-flex flex-column">
-    @for(route of sidebarRoutes; track $index){
-    <div
-      class="sidebarRoute w-100 rounded-3 gap-2 d-flex align-items-center"
-      [routerLink]="route.path"
-      routerLinkActive="active"
-    >
-      <fa-icon [icon]="route.icon"></fa-icon>
-      {{route.label}}
+  <div class="bg-primary w-100 px-2 pb-2 d-flex flex-column h-100">
+    <div id="mainRoutes" class="d-flex flex-column gap-2 flex-fill">
+      @for(route of mainRoutes; track $index){
+      <div
+        class="sidebarRoute w-100 rounded-3 gap-2 d-flex align-items-center"
+        [routerLink]="route.path"
+        routerLinkActive="active"
+      >
+        <fa-icon [icon]="route.icon"></fa-icon>
+        {{route.label}}
+      </div>
+      }
     </div>
-    }
+
+    <div id="otherRoutes" class="d-flex flex-column gap-2">
+      @for(route of otherRoutes; track $index){
+      <div
+        class="sidebarRoute w-100 rounded-3 gap-2 d-flex align-items-center"
+        [routerLink]="route.path"
+        routerLinkActive="active"
+      >
+        <fa-icon [icon]="route.icon"></fa-icon>
+        {{route.label}}
+      </div>
+      }
+    </div>
+
+    <div id="footerSection" class="d-flex flex-row align-items-center mt-4">
+      <div class="d-flex flex-column flex-fill text-white">
+        <p class="mb-0 fw-bold">Mario Bianchi</p>
+        <small class="text-trunacate">{{"mario.bianchi@example.com"}}</small>
+      </div>
+      <button
+        class="btn btn-sm d-flex align-items-center justify-content-center"
+        id="logoutButton"
+      >
+        <fa-icon [icon]="LogoutIcon"></fa-icon>
+      </button>
+    </div>
   </div>
 </div>

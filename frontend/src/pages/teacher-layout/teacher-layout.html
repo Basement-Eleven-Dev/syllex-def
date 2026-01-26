@@ -1,10 +1,12 @@
 <div class="w-100 dvh-100 d-flex flex-column">
   <app-nav></app-nav>
-  <div id="content" class="flex-fill">
-    <div class="h-100 overflow-scroll d-flex flex-row">
+  <div id="content" class="flex-fill overflow-hidden">
+    <div class="h-100 d-flex flex-row">
       <app-sidebar></app-sidebar>
-      <div class="flex-grow-1 p-4">
-        <router-outlet></router-outlet>
+      <div class="flex-grow-1 overflow-auto">
+        <div class="p-4 container">
+          <router-outlet></router-outlet>
+        </div>
       </div>
     </div>
   </div>

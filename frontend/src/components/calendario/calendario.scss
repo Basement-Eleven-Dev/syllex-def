@@ -1,0 +1,34 @@
+#dayBoxesContainer {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+.day-box {
+  aspect-ratio: 1 / 0.8;
+  background-color: color-mix(in srgb, var(--bs-primary) 20%, white);
+  border-radius: 15%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10%;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    cursor: pointer;
+    background-color: color-mix(in srgb, var(--bs-primary) 50%, white);
+  }
+  &.selected {
+    outline: 2px solid var(--bs-dark);
+    color: var(--bs-dark);
+  }
+}
+
+#calendarDayDetailCard {
+  &.no-date-selected {
+    border: none;
+    background-color: #f1f1f1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+}

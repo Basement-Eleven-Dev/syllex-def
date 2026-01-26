@@ -7,9 +7,17 @@ import {
 import {
   faBallotCheck,
   faChartLine,
+  faClipboardQuestion,
   faFile,
+  faGauge,
+  faGear,
+  faMailboxOpenLetter,
+  faMicrochipAi,
+  faRightFromBracket,
+  faUserCircle,
   faUsers,
 } from '@fortawesome/pro-solid-svg-icons';
+import { Auth } from '../../services/auth';
 
 interface SidebarRoute {
   path: string;
@@ -24,26 +32,63 @@ interface SidebarRoute {
   styleUrl: './sidebar.scss',
 })
 export class Sidebar {
-  sidebarRoutes: SidebarRoute[] = [
+  LogoutIcon = faRightFromBracket;
+
+  constructor(private authService: Auth) {}
+
+  mainRoutes: SidebarRoute[] = [
     {
-      path: '/dashboard',
+      path: 'dashboard',
       label: 'Dashboard',
-      icon: faChartLine,
+      icon: faGauge,
     },
     {
-      path: '/materiali',
+      path: 'materiali',
       label: 'Materiali',
       icon: faFile,
     },
     {
-      path: '/test',
+      path: 'test',
       label: 'Test',
       icon: faBallotCheck,
     },
     {
-      path: '/classi',
+      path: 'classi',
       label: 'Classi',
       icon: faUsers,
     },
+    {
+      path: 'domande',
+      label: 'Banca Domande',
+      icon: faClipboardQuestion,
+    },
+    {
+      path: 'comunicazioni',
+      label: 'Comunicazioni',
+      icon: faMailboxOpenLetter,
+    },
+    {
+      path: 'lab-ai',
+      label: 'Laboratorio AI',
+      icon: faMicrochipAi,
+    },
   ];
+  otherRoutes: SidebarRoute[] = [
+    {
+      path: '/profile',
+      label: 'Profilo',
+      icon: faUserCircle,
+    },
+    {
+      path: '/settings',
+      label: 'Impostazioni',
+      icon: faGear,
+    },
+  ];
+
+  onLogout() {
+    this.authService.logout().then(() => {
+      window.location.reload();
+    });
+  }
 }
