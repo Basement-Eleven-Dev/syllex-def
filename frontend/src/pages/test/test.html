@@ -6,7 +6,7 @@
     </p>
   </div>
   <button class="btn btn-primary ms-auto py-3" routerLink="/t/tests/new">
-    <fa-icon [icon]="PlusIcon" class="me-2"></fa-icon>
+    <fa-icon [icon]="PlusIcon"></fa-icon>
     Nuovo test
   </button>
 </div>
@@ -44,9 +44,21 @@
 
 @if(viewType === 'table'){
 <app-test-table [tests]="tests"></app-test-table>
+} @else {
+<div class="row">
+  @for(test of tests; track $index){
+  <div class="col-12 col-lg-6 col-xl-4 mb-3">
+    <app-test-card [test]="test"></app-test-card>
+  </div>
+  }
+</div>
 }
 
-<div class="d-flex justify-content-between align-items-center">
+<div
+  [class.inTableView]="viewType === 'table'"
+  [class.inGridView]="viewType === 'grid'"
+  class="mt-5"
+>
   <ngb-pagination
     [collectionSize]="collectionSize"
     [(page)]="page"
@@ -56,7 +68,7 @@
   </ngb-pagination>
 
   <select
-    class="form-select"
+    class="form-select form-select-sm"
     style="width: auto"
     [(ngModel)]="pageSize"
     (ngModelChange)="onNewPageRequested()"
@@ -66,13 +78,3 @@
     <option [ngValue]="20">20 per pagina</option>
   </select>
 </div>
-
-@if(viewType === 'grid'){
-<div class="row">
-  @for(test of tests; track $index){
-  <div class="col-12 col-lg-6 col-xl-4 mb-3">
-    <app-test-card [test]="test"></app-test-card>
-  </div>
-  }
-</div>
-}

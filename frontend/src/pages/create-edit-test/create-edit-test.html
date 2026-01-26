@@ -2,7 +2,7 @@
 <p class="text-dark mb-5">Prepara il prossimo test per le tue classi</p>
 
 <form [formGroup]="testForm" class="d-flex flex-column gap-5">
-  <section class="d-flex flex-column gap-4">
+  <section class="d-flex flex-column gap-4 card p-4">
     <h4 class="text-dark fw-semibold mb-3">Informazioni Generali</h4>
     <div class="row">
       <div class="col-6">
@@ -112,9 +112,9 @@
             [placeholder]="time === null ? 'Tempo illimitato' : 'Imposta il tempo massimo per il test'"
           />
           <button
-            class="btn"
-            [class.btn-primary]="time === null"
-            [class.btn-outline-primary]="time !== null"
+            class="btn text-dark"
+            id="infiniteButton"
+            [class.selected]="time === null"
             (click)="onToggleUnlimitedTime()"
           >
             <fa-icon [icon]="InfinityIcon"></fa-icon>
@@ -125,12 +125,29 @@
   </section>
 </form>
 
-<h4 class="text-dark fw-bold mb-0 mt-5">Domande</h4>
-<p class="text-dark">
-  Cerca nella tua banca domande di Scienze natuiche e sceglile per comporre il
-  test
-</p>
+<section class="card p-4 mt-5">
+  <h4 class="text-dark fw-bold mb-0">Domande</h4>
+  <p class="text-dark">
+    Cerca nella tua banca domande di Scienze natuiche e sceglile per comporre il
+    test
+  </p>
 
-<div class="card">
-  <div class="card-body"></div>
+  <div class="row">
+    <div class="col-6">
+      <app-questions-filters></app-questions-filters>
+    </div>
+    <div class="col-6">
+      <app-questions-droppable-list></app-questions-droppable-list>
+    </div>
+  </div>
+</section>
+
+<div class="d-flex flex-row justify-content-end mt-5 gap-3">
+  <button class="btn btn-light btn-lg fs-3" (click)="onSaveTest(true)">
+    <fa-icon [icon]="DraftIcon"></fa-icon>
+    Salva Bozza
+  </button>
+  <button class="btn btn-success text-white btn-lg fs-3" (click)="onSaveTest()">
+    <fa-icon [icon]="SaveIcon"></fa-icon> Salva
+  </button>
 </div>

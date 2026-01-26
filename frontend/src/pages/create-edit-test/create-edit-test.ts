@@ -6,7 +6,14 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faInfinity, faKey } from '@fortawesome/pro-solid-svg-icons';
+import {
+  faInfinity,
+  faKey,
+  faPenRuler,
+  faSave,
+} from '@fortawesome/pro-solid-svg-icons';
+import { QuestionsFilters } from '../../components/questions-filters/questions-filters';
+import { QuestionsDroppableList } from '../../components/questions-droppable-list/questions-droppable-list';
 
 interface ClassOption {
   id: string;
@@ -15,13 +22,21 @@ interface ClassOption {
 
 @Component({
   selector: 'app-create-edit-test',
-  imports: [FormsModule, ReactiveFormsModule, FontAwesomeModule],
+  imports: [
+    FormsModule,
+    ReactiveFormsModule,
+    FontAwesomeModule,
+    QuestionsFilters,
+    QuestionsDroppableList,
+  ],
   templateUrl: './create-edit-test.html',
   styleUrl: './create-edit-test.scss',
 })
 export class CreateEditTest {
   InfinityIcon = faInfinity;
   GenPasswordIcon = faKey;
+  DraftIcon = faPenRuler;
+  SaveIcon = faSave;
 
   testForm: FormGroup = new FormGroup({
     title: new FormControl(''),
@@ -77,6 +92,15 @@ export class CreateEditTest {
     } else {
       timeControl?.setValue(0);
       timeControl?.enable();
+    }
+  }
+
+  onSaveTest(asDraft: boolean = false) {
+    const testData = this.testForm.value;
+    if (asDraft) {
+      console.log('Saving test as draft:', testData);
+    } else {
+      console.log('Saving test:', testData);
     }
   }
 }
