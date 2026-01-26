@@ -1,17 +1,16 @@
-export type AppRoute = {
-    routeName: string,
-    subRoutes?: AppRoute[],
-    integrations?: {
-        method: 'POST' | 'PUT' | 'OPTIONS' | 'GET' | 'DELETE' | 'PATCH',
-        functionPath: string
-    }[]
+/**
+ * functionPath is the relative path from FUNCTIONS_PATH (in environments.ts)
+ */
+export type FunctionIntegration = {
+    apiRoute: string,
+    functionPath: string,
+    method: 'POST' | 'PUT' | 'OPTIONS' | 'GET' | 'DELETE' | 'PATCH'
 }
-export const FUNCTION_DECLARATIONS: AppRoute[] = [
+
+export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     {
-        routeName: 'profile',
-        integrations: [{
-            method: 'GET',
-            functionPath: 'functions-refactoring/profile/getMyProfile.ts'
-        }]
+        apiRoute: 'profile',
+        functionPath: 'profile/getMyProfile.ts',
+        method: 'GET'
     }
-];
+]

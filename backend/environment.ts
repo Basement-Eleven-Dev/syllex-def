@@ -6,3 +6,4 @@ export const API_NAME: string = "SyllexRestV2" + STAGE_NAME;
 export const LAMBDA_ROLE_NAME: string = "SyllexRoleV2" + STAGE_NAME;
 export const BACKGROUND_CORRECTION_QUEUE_NAME: string = 'background-ai-correction-v2'
 export const BACKGROUND_INDEXING_QUEUE_NAME: string = 'material-indexing-queue-v2'
+export const FUNCTIONS_PATH = 'src/functions-refactoring/'

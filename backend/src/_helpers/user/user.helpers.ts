@@ -6,7 +6,7 @@ import {
   AdminSetUserPasswordCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { Db, ObjectId } from "mongodb";
-import { User } from "../../functions-refactoring/getMyProfile";
+import { User } from "../getAuthCognitoUser";
 
 const COGNITO_POOL_ID = "eu-south-1_xuHdZQr2t";
 const COGNITO_REGION = "eu-south-1";

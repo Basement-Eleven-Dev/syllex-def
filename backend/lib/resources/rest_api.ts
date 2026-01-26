@@ -1,7 +1,6 @@
 import { Construct } from "constructs";
 import {
   AuthorizationType,
-  Authorizer,
   CfnMethod,
   CognitoUserPoolsAuthorizer,
   EndpointType,
@@ -20,7 +19,17 @@ import { Role } from "aws-cdk-lib/aws-iam";
 import { Duration, NestedStack, NestedStackProps } from "aws-cdk-lib";
 import { API_GATEWAY_TIMEOUT } from "../../src/_helpers/config/env";
 import { DefaultLambdaRole } from "./roles";
-import { FUNCTION_DECLARATIONS, AppRoute } from "../../src/functions-declarations";
+import { FUNCTION_INTEGRATIONS, FunctionIntegration } from "../../src/functions-declarations";
+import { FUNCTIONS_PATH } from "../../environment";
+
+type AppRoute = {
+  routeName: string,
+  subRoutes?: AppRoute[],
+  integrations?: {
+    method: 'POST' | 'PUT' | 'OPTIONS' | 'GET' | 'DELETE' | 'PATCH',
+    functionPath: string
+  }[]
+}
 
 export class RestApiGateway extends Construct {
   apiGateway: RestApi;
@@ -29,12 +38,14 @@ export class RestApiGateway extends Construct {
   timeout: Duration = Duration.seconds(API_GATEWAY_TIMEOUT)
   createApiMethods() {
     this.apiGateway.root.addMethod('GET');
-    FUNCTION_DECLARATIONS.forEach((declarations: AppRoute) => {
-      let nestedStack = new RouteConstruct(this, declarations.routeName, {
+    const routes: string[] = [...new Set(FUNCTION_INTEGRATIONS.map(el => el.apiRoute.toLowerCase().split('/')[0]))]
+    routes.forEach((route: string) => {
+      const integrations = FUNCTION_INTEGRATIONS.filter(el => el.apiRoute.split('/')[0] == route)
+      let nestedStack = new RouteConstruct(this, route, {
         apiId: this.apiGateway.restApiId,
         rootResourceId: this.apiGateway.restApiRootResourceId,
         authorizer: this.authorizer,
-        routeDeclaration: declarations,
+        integrations: integrations,
         queueUrl: this.queueUrl,
         indexingQueueUrl: this.indexingQueueUrl
       })
@@ -70,7 +81,7 @@ export class RestApiGateway extends Construct {
 export interface RouteConstructProps extends NestedStackProps {
   apiId: string,
   rootResourceId: string,
-  routeDeclaration: AppRoute,
+  integrations: FunctionIntegration[],
   authorizer?: CognitoUserPoolsAuthorizer,
   validator?: RequestValidator,
   queueUrl: string,
@@ -119,7 +130,7 @@ export class RouteConstruct extends NestedStack {
     let apiMethod = resource.addMethod(
       method,
       new LambdaIntegration(
-        new LambdaConstruct(this, functionName, 'src/' + functionPath, this.role, {
+        new LambdaConstruct(this, functionName, FUNCTIONS_PATH + functionPath, this.role, {
           AI_GRADING_QUEUE_URL: this.props.queueUrl,
           INDEXING_QUEUE_URL: this.props.indexingQueueUrl,
         }).lambda,
@@ -136,17 +147,18 @@ export class RouteConstruct extends NestedStack {
     )
     this.methods.push(apiMethod)
   }
-  private createMethods(methodDescriptions: AppRoute, resource: IResource) {
-    let subResource = resource.addResource(methodDescriptions.routeName)
-    if (methodDescriptions.integrations && methodDescriptions.integrations.length > 0) {
-
-      this.addOptionsMethod(subResource);
-      methodDescriptions.integrations.forEach(int => {
-
-        this.addMethod(subResource, int.functionPath, int.method)
-      })
-    }
-    methodDescriptions.subRoutes?.forEach(a => this.createMethods(a, subResource))
+  private createMethods(integrations: FunctionIntegration[]) {
+    let uniqueRoutes = [...new Set(integrations.map(el => el.apiRoute))];
+    uniqueRoutes.forEach(int => {
+      let resource = this.api.root;
+      int.split('/').forEach(piece => resource = resource.getResource(piece) || resource.addResource(piece));
+      this.addOptionsMethod(resource)
+    })
+    integrations.forEach(int => {
+      let resource = this.api.root;
+      int.apiRoute.split('/').forEach(piece => resource = resource.getResource(piece) || resource.addResource(piece));
+      this.addMethod(resource, int.functionPath, int.method)
+    })
   }
   constructor(scope: Construct, private name: string, public props: RouteConstructProps) {
     super(scope, name);
@@ -155,6 +167,6 @@ export class RouteConstruct extends NestedStack {
       restApiId: this.props.apiId,
       rootResourceId: this.props.rootResourceId,
     });
-    this.createMethods(this.props.routeDeclaration, this.api.root)
+    this.createMethods(this.props.integrations)
   }
 }

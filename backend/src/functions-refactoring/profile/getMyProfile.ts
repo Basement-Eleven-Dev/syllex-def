@@ -1,12 +1,7 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
-import {
-  CorsEnabledAPIGatewayProxyResult,
-  CustomHandler,
-  generateLambdaResponse,
-  Res,
-} from "../_helpers/_types/lambdaProxyResponse";
-import { getCurrentUser } from "../_helpers/getAuthCognitoUser";
 import { ObjectId } from "mongodb";
+import { CorsEnabledAPIGatewayProxyResult, CustomHandler, generateLambdaResponse, Res } from "../../_helpers/_types/lambdaProxyResponse";
+import { getCurrentUser } from "../../_helpers/getAuthCognitoUser";
 
 export interface User {
   _id: ObjectId;
