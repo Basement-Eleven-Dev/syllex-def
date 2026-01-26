@@ -4,8 +4,8 @@ import {
   CustomHandler,
   generateLambdaResponse,
   Res,
-} from "../../_helpers/_types/lambdaProxyResponse";
-import { getCurrentUser } from "../../_helpers/getAuthCognitoUser";
+} from "../_helpers/_types/lambdaProxyResponse";
+import { getCurrentUser } from "../_helpers/getAuthCognitoUser";
 import { ObjectId } from "mongodb";
 
 export interface User {

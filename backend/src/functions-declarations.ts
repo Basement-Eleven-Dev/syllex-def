@@ -11,7 +11,7 @@ export const FUNCTION_DECLARATIONS: AppRoute[] = [
         routeName: 'profile',
         integrations: [{
             method: 'GET',
-            functionPath: 'functions/profile/getMyProfile.ts'
+            functionPath: 'functions-refactoring/profile/getMyProfile.ts'
         }]
     }
 ];
