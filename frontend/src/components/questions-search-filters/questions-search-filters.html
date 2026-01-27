@@ -1,0 +1,37 @@
+<form [formGroup]="searchForm" class="d-flex flex-row gap-3">
+  <div class="flex-fill">
+    <label for="search-term" class="form-label fw-semibold text-dark"
+      >Testo nella domanda</label
+    >
+    <input
+      type="text"
+      class="form-control custom-input"
+      placeholder="Cerca..."
+      id="search-term"
+      formControlName="searchTerm"
+    />
+  </div>
+  <div>
+    <label for="search-term" class="form-label fw-semibold text-dark"
+      >Tipologia risposta</label
+    >
+    <select class="form-select custom-input" formControlName="type">
+      <option value="">Tutte le tipologie</option>
+      @for(type of ['scelta multipla', 'vero falso', 'risposta aperta']; track
+      $index) {
+      <option value="{{ type }}">{{ type | titlecase }}</option>
+      }
+    </select>
+  </div>
+  <div>
+    <label for="search-term" class="form-label fw-semibold text-dark"
+      >Argomento</label
+    >
+    <select class="form-select custom-input" formControlName="type">
+      <option value="">Argomento</option>
+      @for(type of ['geografia', 'navigazione', 'meteorologia']; track $index) {
+      <option value="{{ type }}">{{ type | titlecase }}</option>
+      }
+    </select>
+  </div>
+</form>

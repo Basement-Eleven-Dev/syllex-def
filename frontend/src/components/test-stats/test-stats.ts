@@ -9,44 +9,92 @@ import {
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { Question } from '../questions-filters/questions-filters';
 import { QuestionCard } from '../question-card/question-card';
+import { faEye } from '@fortawesome/pro-solid-svg-icons';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 
 // Register Chart.js components
 Chart.register(...registerables);
 
+interface QuestionStats extends Question {
+  correctCount: number;
+  blankCount: number;
+  errorCount: number;
+  totalResponses: number;
+}
+
 @Component({
   selector: 'app-test-stats',
-  imports: [QuestionCard],
+  imports: [
+    QuestionCard,
+    FontAwesomeModule,
+    FormsModule,
+    NgbPagination,
+    FormsModule,
+    ReactiveFormsModule,
+  ],
   templateUrl: './test-stats.html',
   styleUrl: './test-stats.scss',
 })
-export class TestStats implements OnInit, AfterViewInit, OnDestroy {
+export class TestStats implements OnInit, AfterViewInit {
   @ViewChild('scoreChart', { static: false })
   scoreChartRef!: ElementRef<HTMLCanvasElement>;
 
-  // Mock data - sostituire con chiamata al servizio
-  availableQuestions: Question[] = [
+  @ViewChild('topicChart', { static: false })
+  topicChartRef!: ElementRef<HTMLCanvasElement>;
+
+  EyeIcon = faEye;
+
+  selectedTopic: string = '';
+  availableTopics: string[] = [];
+
+  collectionSize: number = 5;
+  page: number = 1;
+  pageSize: number = 2;
+
+  classSelected: string = '';
+
+  availableQuestions: QuestionStats[] = [
     {
       id: '1',
       img: 'https://t4.ftcdn.net/jpg/06/57/37/01/360_F_657370150_pdNeG5pjI976ZasVbKN9VqH1rfoykdYU.jpg',
       text: "Qual è la capitale dell'Italia?",
       type: 'scelta multipla',
-      subject: 'Geografia',
+      topic: 'Geografia',
       options: [
         { label: 'Milano', isCorrect: false },
         { label: 'Roma', isCorrect: true },
       ],
+      explanation: "La capitale dell'Italia è Roma.",
+      correctCount: 80,
+      blankCount: 10,
+      errorCount: 10,
+      totalResponses: 100,
     },
     {
       id: '2',
       text: 'Il sole sorge a est',
       type: 'vero falso',
-      subject: 'Scienze',
+      topic: 'Scienze',
+      explanation:
+        'Il sole sorge effettivamente a est a causa della rotazione della Terra.',
+      correctCount: 70,
+      blankCount: 20,
+      errorCount: 10,
+      totalResponses: 100,
     },
     {
       id: '3',
       text: "Descrivi il ciclo dell'acqua",
       type: 'risposta aperta',
-      subject: 'Scienze',
+      topic: 'Scienze',
+      explanation:
+        "Il ciclo dell'acqua include evaporazione, condensazione, precipitazione e raccolta.",
+      correctCount: 50,
+      blankCount: 30,
+      errorCount: 10,
+      totalResponses: 100,
     },
   ];
 
@@ -57,21 +105,26 @@ export class TestStats implements OnInit, AfterViewInit, OnDestroy {
   ];
 
   private chart?: Chart;
+  private topicChart?: Chart;
 
   ngOnInit(): void {
-    // Chart will be created after view is initialized
+    this.availableTopics = Array.from(
+      new Set(this.availableQuestions.map((q) => q.topic).filter((t) => t)),
+    ) as string[];
   }
 
   ngAfterViewInit(): void {
+    // Increased timeout to ensure DOM is fully rendered
     setTimeout(() => {
-      this.createScoreDistributionChart();
-    }, 0);
-  }
-
-  ngOnDestroy(): void {
-    if (this.chart) {
-      this.chart.destroy();
-    }
+      console.log(this.scoreChartRef);
+      if (this.scoreChartRef?.nativeElement) {
+        this.createScoreDistributionChart();
+      }
+      console.log(this.topicChartRef);
+      if (this.topicChartRef?.nativeElement) {
+        this.createTopicPerformanceChart();
+      }
+    }, 500);
   }
 
   private createScoreDistributionChart(): void {
@@ -165,5 +218,91 @@ export class TestStats implements OnInit, AfterViewInit, OnDestroy {
     });
 
     return { labels, data: bins };
+  }
+
+  onRequestQuestionDetails(stat: any) {
+    // Implement the logic to handle the request for question details
+    console.log('Requesting details for question:', stat);
+  }
+
+  onTopicChange(): void {
+    this.createTopicPerformanceChart();
+  }
+
+  onNewPageRequested(): void {}
+
+  private createTopicPerformanceChart(): void {
+    if (!this.topicChartRef?.nativeElement) return;
+
+    const ctx = this.topicChartRef.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    // Filter questions by selected topic
+    const filteredQuestions = this.selectedTopic
+      ? this.availableQuestions.filter((q) => q.topic === this.selectedTopic)
+      : this.availableQuestions;
+
+    // Calculate totals
+    const correctTotal = filteredQuestions.reduce(
+      (sum, q) => sum + q.correctCount,
+      0,
+    );
+    const errorTotal = filteredQuestions.reduce(
+      (sum, q) => sum + q.errorCount,
+      0,
+    );
+    const blankTotal = filteredQuestions.reduce(
+      (sum, q) => sum + q.blankCount,
+      0,
+    );
+
+    // Destroy existing chart if it exists
+    if (this.topicChart) {
+      this.topicChart.destroy();
+    }
+
+    const config: ChartConfiguration = {
+      type: 'pie',
+      data: {
+        labels: ['Corrette', 'Errate', 'Vuote'],
+        datasets: [
+          {
+            data: [correctTotal, errorTotal, blankTotal],
+            backgroundColor: ['#28a745', '#dc3545', '#6c757d'],
+            borderWidth: 2,
+            borderColor: '#fff',
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 20,
+              font: {
+                size: 14,
+              },
+            },
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const label = context.label || '';
+                const value = context.parsed;
+                const total = correctTotal + errorTotal + blankTotal;
+                const percentage =
+                  total > 0 ? ((value / total) * 100).toFixed(1) : '0';
+                return `${label}: ${value} (${percentage}%)`;
+              },
+            },
+          },
+        },
+      },
+    };
+
+    this.topicChart = new Chart(ctx, config);
   }
 }

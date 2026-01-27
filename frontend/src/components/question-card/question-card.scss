@@ -1,11 +1,20 @@
 .question-card {
-  cursor: move;
   transition: all 0.2s ease;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
-  &:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    transform: translateY(-2px);
+  transition: max-height 0.5s linear;
+  overflow: hidden;
+  max-height: 2000px;
+
+  &.moveable {
+    cursor: move;
+    &:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      transform: translateY(-2px);
+    }
+  }
+  &.collapsed {
+    max-height: 200px;
   }
 
   &.cdk-drag-preview {
@@ -27,11 +36,40 @@
     color: #2c3e50;
     line-height: 1.5;
   }
+
+  .collapse-banner {
+    display: none;
+  }
+  &:hover {
+    .collapse-banner {
+      display: flex;
+    }
+  }
 }
 
 li {
   &.correct {
     font-weight: bold;
     color: green;
+  }
+}
+
+.collapse-banner {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    to top,
+    rgb(161, 161, 161),
+    rgba(161, 161, 161, 0)
+  );
+  color: var(--bs-dark);
+  width: 100%;
+  &:hover {
+    cursor: pointer;
   }
 }

@@ -8,6 +8,7 @@ import { authGuard, guestGuard } from '../guards/auth.guard';
 import { Materiali } from '../pages/materiali/materiali';
 import { TestDetail } from '../pages/test-detail/test-detail';
 import { CreateEditTest } from '../pages/create-edit-test/create-edit-test';
+import { Banca } from '../pages/banca/banca';
 
 export const routes: Routes = [
   {
@@ -33,6 +34,10 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         component: Dashboard,
+      },
+      {
+        path: 'banca',
+        component: Banca,
       },
       {
         path: 'tests',

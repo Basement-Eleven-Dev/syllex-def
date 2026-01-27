@@ -58,7 +58,7 @@ export class Sidebar {
       icon: faUsers,
     },
     {
-      path: 'domande',
+      path: 'banca',
       label: 'Banca Domande',
       icon: faClipboardQuestion,
     },

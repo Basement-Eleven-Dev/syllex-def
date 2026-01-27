@@ -1,31 +1,6 @@
-<form [formGroup]="searchForm">
-  <div class="row">
-    <div class="col-7">
-      <label for="search-term" class="form-label fw-semibold text-dark"
-        >Testo nella domanda</label
-      >
-      <input
-        type="text"
-        class="form-control custom-input"
-        placeholder="Cerca..."
-        id="search-term"
-        formControlName="searchTerm"
-      />
-    </div>
-    <div class="col-5">
-      <label for="search-term" class="form-label fw-semibold text-dark"
-        >Tipologia</label
-      >
-      <select class="form-select custom-input" formControlName="type">
-        <option value="">Tutte le tipologie</option>
-        @for(type of ['scelta multipla', 'vero falso', 'risposta aperta']; track
-        $index) {
-        <option value="{{ type }}">{{ type | titlecase }}</option>
-        }
-      </select>
-    </div>
-  </div>
-</form>
+<app-questions-search-filters
+  (filtersChanged)="onFiltersChanged($event)"
+></app-questions-search-filters>
 
 <div class="questions-list mt-4">
   <h6 class="mb-3 text-muted">Risultati ({{ filteredQuestions.length }})</h6>

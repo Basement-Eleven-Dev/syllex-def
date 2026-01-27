@@ -33,9 +33,4 @@ export class TestTable {
   @Input() tests: TestData[] = [];
 
   constructor(private testsService: TestsService) {}
-
-  onMenuAction(action: string, test: TestData) {
-    console.log(`Action "${action}" triggered for test:`, test);
-    // Implement action handling logic here
-  }
 }

@@ -62,7 +62,7 @@ export class TestAssignments {
   ];
 
   page: number = 1;
-  pageSize: number = 10;
+  pageSize: number = 5;
   collectionSize: number = this.testAssignments.length;
   onNewPageRequested() {}
 }
