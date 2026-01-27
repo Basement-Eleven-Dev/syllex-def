@@ -7,7 +7,7 @@ $primary: #375ec9;
 $secondary: #d6ff79;
 $info: #0dcaf0;
 $success: #16ca76;
-$warning: #ebc634;
+$warning: #eb9634;
 $danger: #cf1729;
 $light: #f8f9fa;
 $dark: #1f3571;
@@ -48,7 +48,7 @@ $card-border-radius: 1.5rem;
   border-bottom: 2px solid $primary;
   color: $primary;
   &::placeholder {
-    color: rgba(var(--bs-primary-rgb), 0.5);
+    color: rgba(var(--bs-primary-rgb), 0.4);
   }
   &:focus {
     color: $primary;
@@ -79,4 +79,8 @@ a {
   &.archiviato {
     background-color: #d3d3d3;
   }
+}
+
+tr {
+  cursor: pointer;
 }
