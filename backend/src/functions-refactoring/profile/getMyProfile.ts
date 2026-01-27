@@ -25,10 +25,7 @@ export const handler: CustomHandler = async (
         .status(404)
         .json({ message: "Utente non trovato nel database" });
     }
-    return generateLambdaResponse({
-      statusCode: 200,
-      body: JSON.stringify(user),
-    });
+    return res.status(200).json(user);
   } catch (error) {
     return res.status(500).json({
       message: "Errore del server durante il recupero del profilo",
