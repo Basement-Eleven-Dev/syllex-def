@@ -72,6 +72,8 @@ export class CdkStack extends cdk.Stack {
       this,
       API_NAME,
       cognito.cognitoPool,
+      cognito.cognitoPoolClient,
+      role,
       queueUrl,
       indexingQueueUrl
     );
