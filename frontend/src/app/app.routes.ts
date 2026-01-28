@@ -8,6 +8,8 @@ import { authGuard, guestGuard } from '../guards/auth.guard';
 import { Materiali } from '../pages/materiali/materiali';
 import { TestDetail } from '../pages/test-detail/test-detail';
 import { CreateEditTest } from '../pages/create-edit-test/create-edit-test';
+import { Banca } from '../pages/banca/banca';
+import { CreateEditQuestion } from '../pages/create-edit-question/create-edit-question';
 
 export const routes: Routes = [
   {
@@ -33,6 +35,18 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         component: Dashboard,
+      },
+      {
+        path: 'banca',
+        component: Banca,
+      },
+      {
+        path: 'create-question',
+        component: CreateEditQuestion,
+      },
+      {
+        path: 'edit-question/:id',
+        component: CreateEditQuestion,
       },
       {
         path: 'tests',

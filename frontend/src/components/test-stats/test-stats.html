@@ -1,27 +1,110 @@
-<div class="container-fluid">
-  <h4 class="text-dark fw-semibold my-4">Statistiche di risposta</h4>
+<h4 class="text-dark fw-semibold my-4">Statistiche di risposta</h4>
+<label for="required-score" class="form-label fw-semibold text-dark"
+  >Filtra</label
+>
+<select
+  class="form-select mb-5 custom-input"
+  [(ngModel)]="classSelected"
+  style="max-width: 200px"
+>
+  <option [ngValue]="''">Classe</option>
+  <option value="1A">Classe 1A</option>
+  <option value="2B">Classe 1A</option>
+  <option value="3C">Classe 1A</option>
+</select>
 
-  <h5 class="text-dark fw-semibold mb-3">Distribuzione dei punteggi</h5>
+<div class="row">
+  <div class="col-6">
+    <h5 class="text-dark fw-semibold mb-3">Distribuzione dei punteggi</h5>
 
-  <div class="card shadow-sm mb-4">
-    <div class="card-body">
-      <canvas #scoreChart style="width: 100%; height: 400px"></canvas>
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <canvas #scoreChart style="width: 100%; height: 400px"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 d-flex flex-column">
+    <h5 class="text-dark fw-semibold mb-3">Performance per argomento</h5>
+    <div class="mb-3">
+      <select
+        class="form-select custom-input"
+        [(ngModel)]="selectedTopic"
+        (change)="onTopicChange()"
+      >
+        <option value="">Tutti gli argomenti</option>
+        @for (topic of availableTopics; track topic) {
+        <option [value]="topic">{{ topic }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="card shadow-sm mb-4 flex-fill">
+      <div class="card-body h-100">
+        <canvas #topicChart style="width: 100%; height: 200px"></canvas>
+      </div>
     </div>
   </div>
 </div>
 
 <h5 class="text-dark fw-semibold mb-3">Performance singole domande</h5>
+<div class="table-responsive">
+  <table class="table table-striped table-hover">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th class="text-muted fw-light">Domanda</th>
+        <th class="text-center text-muted fw-light">Risposte corrette</th>
+        <th class="text-center text-muted fw-light">Risposte errate</th>
+        <th class="text-center text-muted fw-light">Vuote</th>
+        <th class="text-center text-muted fw-light">
+          Percentuale di correttezza
+        </th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (stat of availableQuestions; track $index; let index = $index) {
+      <tr>
+        <td><span class="badge bg-dark fs-6"># {{ index + 1 }}</span></td>
+        <td>{{ stat.text }}</td>
+        <td class="text-center">{{ stat.correctCount }}</td>
+        <td class="text-center">{{ stat.errorCount }}</td>
+        <td class="text-center">{{ stat.blankCount }}</td>
+        <td class="text-center">
+          @if (stat.totalResponses && stat.totalResponses > 0) {
+          {{((stat.correctCount / stat.totalResponses) * 100)+'%'}} } @else {
+          N/A }
+        </td>
+        <td>
+          <button
+            class="btn btn-sm btn-outline-primary"
+            (click)="onRequestQuestionDetails(stat)"
+          >
+            <fa-icon [icon]="EyeIcon"></fa-icon> Dettagli
+          </button>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</div>
+<div class="mt-5 d-flex flex-row justify-content-between align-items-center">
+  <ngb-pagination
+    [collectionSize]="collectionSize"
+    [(page)]="page"
+    [pageSize]="pageSize"
+    (pageChange)="onNewPageRequested()"
+  >
+  </ngb-pagination>
 
-<div class="row">
-  <div class="col-8">
-    @for(question of availableQuestions; track $index) {
-    <div
-      app-question-card
-      [question]="question"
-      [showIndex]="true"
-      [showActions]="false"
-      [index]="$index + 1"
-    ></div>
-    }
-  </div>
+  <select
+    class="form-select form-select-sm"
+    style="width: auto"
+    [(ngModel)]="pageSize"
+    (ngModelChange)="onNewPageRequested()"
+  >
+    <option [ngValue]="5">5 per pagina</option>
+    <option [ngValue]="10">10 per pagina</option>
+    <option [ngValue]="20">20 per pagina</option>
+  </select>
 </div>

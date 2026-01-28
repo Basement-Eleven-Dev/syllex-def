@@ -1,0 +1,46 @@
+<div class="offcanvas-body">
+  <div class="row">
+    <div class="col-4">
+      <div
+        class="card typeCard p-1 h-100 d-flex flex-column align-items-center justify-content-center"
+      >
+        <div class="typeIconWrapper">
+          <fa-icon [icon]="MultipleChoiceIcon"></fa-icon>
+        </div>
+        <p class="mb-0 text-center">Scelta multipla</p>
+      </div>
+    </div>
+    <div class="col-4">
+      <div
+        class="card typeCard p-1 h-100 d-flex flex-column align-items-center justify-content-center"
+      >
+        <div class="typeIconWrapper">
+          <fa-icon [icon]="TrueFalseIcon"></fa-icon>
+        </div>
+        <p class="mb-0 text-center">Vero Falso</p>
+      </div>
+    </div>
+    <div class="col-4">
+      <div
+        class="card typeCard p-1 h-100 d-flex flex-column align-items-center justify-content-center"
+      >
+        <div class="typeIconWrapper">
+          <fa-icon [icon]="OpenAnswerIcon"></fa-icon>
+        </div>
+
+        <p class="mb-0 text-center">Risposta aperta</p>
+      </div>
+    </div>
+  </div>
+  <label class="form-label fw-semibold text-dark mt-5">Argomento</label>
+  <select
+    class="form-select form-select-lg mb-4 custom-input w-auto"
+    formControlName="topic"
+    aria-label="Seleziona argomento"
+  >
+    <option value="" disabled selected>Seleziona argomento</option>
+    @for(topic of topics; track topic) {
+    <option [value]="topic">{{ topic }}</option>
+    }
+  </select>
+</div>

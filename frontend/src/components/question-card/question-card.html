@@ -1,8 +1,40 @@
-<div class="d-flex align-items-start gap-2 card p-3 question-card">
-  <div class="flex-grow-1 w-100">
+<div
+  class="d-flex align-items-start gap-2 card p-3 question-card"
+  [class.moveable]="showTestCompositionActions"
+  [class.collapsed]="collapsed"
+  [class.]
+  id="questionCard"
+>
+  @if(true){
+  <div class="collapse-banner gap-0" (click)="this.collapsed = !this.collapsed">
+    <fa-icon [icon]="collapsed ?  CollapseIcon : UnCollapseIcon "></fa-icon>
+  </div>
+  }
+  <div class="flex-grow-1 w-100 d-flex flex-column gap-2">
     <div class="d-flex align-items-start gap-2 mb-2">
       @if(showIndex){<span class="badge bg-dark"># {{ index + 1 }}</span>}
       <span class="badge bg-primary">{{ question.type }}</span>
+
+      @if(showBancaActions) {
+      <div class="d-flex flex-row gap-1 justify-content-end w-100">
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-primary"
+          (click)="removeMe.emit(question.id)"
+          title="Modifica"
+        >
+          <fa-icon [icon]="EditIcon"></fa-icon> Modifica
+        </button>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-danger"
+          (click)="removeMe.emit(question.id)"
+          title="Rimuovi"
+        >
+          <fa-icon [icon]="TrashIcon"></fa-icon> Elimina
+        </button>
+      </div>
+      }
     </div>
     @if(question.img) {
     <div class="mb-3 w-100 text-center">
@@ -17,36 +49,29 @@
     }
     <p class="mb-0 fw-medium">{{ question.text }}</p>
 
-    <ol type="A">
-      @for (option of question.options; track $index) {
-      <li [class.correct]="option.isCorrect">
-        {{ option.label }} @if(option.isCorrect) {
-        <fa-icon [icon]="CheckIcon"></fa-icon>
+    <section>
+      <ol type="A" class="mb-0">
+        @for (option of question.options; track $index) {
+        <li [class.correct]="option.isCorrect">
+          {{ option.label }} @if(option.isCorrect) {
+          <fa-icon [icon]="CheckIcon"></fa-icon>
+          }
+        </li>
         }
-      </li>
-      }
-    </ol>
+      </ol>
+    </section>
+
+    @if(showExplanation) {
+    <section>
+      <p class="mb-0 fw-bold">Correzione</p>
+      <p>{{ question.explanation }}</p>
+    </section>
+    }
   </div>
 
   <!-- Azioni -->
-  @if(showActions) {
-  <div class="d-flex flex-row gap-1 justify-content-end w-100">
-    <button
-      type="button"
-      class="btn btn-sm btn-outline-danger"
-      (click)="removeMe.emit(question.id)"
-      title="Rimuovi"
-    >
-      <fa-icon [icon]="TrashIcon"></fa-icon> Rimuovi
-    </button>
-    <!-- <button
-      type="button"
-      class="btn btn-sm btn-outline-primary"
-      (click)="removeMe.emit(question.id)"
-      title="Rimuovi"
-    >
-      <fa-icon [icon]="ExpandIcon"></fa-icon> Espandi
-    </button> -->
+  @if(showTestCompositionActions) {
+  <div class="d-flex flex-row gap-1 justify-content-between w-100">
     <input
       type="number"
       class="form-control form-control-sm custom-input"
@@ -56,6 +81,14 @@
       max="100"
       placeholder="Punti se corretta"
     />
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-danger"
+      (click)="removeMe.emit(question.id)"
+      title="Rimuovi"
+    >
+      <fa-icon [icon]="TrashIcon"></fa-icon> Rimuovi
+    </button>
   </div>
   }
 

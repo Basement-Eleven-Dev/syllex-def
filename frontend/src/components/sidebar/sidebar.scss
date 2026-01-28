@@ -1,10 +1,14 @@
 :host {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100dvh;
   width: 250px;
 }
 .sidebarRoute {
-  background-color: #5883f9;
+  background-color: #94b0fd72;
   width: 100%;
-  color: white;
+  color: var(--bs-dark);
   padding: 0.65rem 1.25rem;
   transition: all 0.3s ease;
   &:hover,

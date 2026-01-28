@@ -31,6 +31,10 @@ $card-border-radius: 1.5rem;
   height: 100dvh;
 }
 
+body {
+  background-color: #f2f2f288;
+}
+
 #authRightColumn {
   background: url("/images/auth_right.png");
   background-size: cover;
@@ -44,7 +48,6 @@ $card-border-radius: 1.5rem;
 }
 
 .custom-input {
-  padding: 0.5rem 1rem;
   border-bottom: 2px solid $primary;
   color: $primary;
   &::placeholder {
@@ -83,4 +86,35 @@ a {
 
 tr {
   cursor: pointer;
+}
+
+.typeIconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
+  padding: 0.5rem;
+  background-color: #375ec975;
+  color: var(--bs-dark);
+}
+.typeCard {
+  transition: all 0.2s;
+  &:hover {
+    transform: translateY(-2px);
+    cursor: pointer;
+  }
+
+  &.selected {
+    background-color: #6a8be5;
+    color: white;
+    font-weight: bold;
+    .typeIconWrapper {
+      background-color: var(--bs-dark);
+      color: #fff;
+    }
+  }
+}
+
+label {
+  font-size: 1rem;
 }

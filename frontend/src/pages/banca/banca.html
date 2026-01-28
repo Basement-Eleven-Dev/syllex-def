@@ -1,0 +1,34 @@
+<div class="d-flex flex-row align-items-center mb-5">
+  <div>
+    <h1 class="text-dark fw-bold mb-0 display-6">Banca Domande</h1>
+    <p class="text-dark mb-0">
+      Qui puoi trovare tutte le domande con cui comporre i test di Scienze
+      Nautiche
+    </p>
+  </div>
+  <button class="btn btn-primary ms-auto py-3" routerLink="/t/create-question">
+    <fa-icon [icon]="PlusIcon"></fa-icon>
+    Nuova domanda
+  </button>
+</div>
+
+<h4 class="text-dark fw-bold my-4">Hai 50 domande per questa materia</h4>
+<div style="max-width: 600px">
+  <app-questions-search-filters
+    (filtersChanged)="onFiltersChanged($event)"
+  ></app-questions-search-filters>
+</div>
+
+@for(question of questions; track $index; let last = $last) {
+<div class="mt-4">
+  <div
+    app-question-card
+    [question]="question"
+    [showIndex]="true"
+    [showTestCompositionActions]="false"
+    [showBancaActions]="true"
+    [showExplanation]="true"
+    [showIndex]="false"
+  ></div>
+</div>
+}

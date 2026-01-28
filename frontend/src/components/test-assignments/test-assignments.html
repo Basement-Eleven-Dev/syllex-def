@@ -1,4 +1,7 @@
 <h4 class="text-dark fw-semibold my-4">Tabella Assegnazioni</h4>
+<label for="required-score" class="form-label fw-semibold text-dark"
+  >Filtra</label
+>
 <form [formGroup]="filtersForm" class="d-flex flex-row gap-3 mb-4">
   <input
     type="text"
@@ -33,11 +36,11 @@
     <thead>
       <tr>
         <th></th>
-        <th>Nome</th>
-        <th>Cognome</th>
-        <th>Classe</th>
-        <th>Punteggio</th>
-        <th>Consegnato il</th>
+        <th class="text-muted fw-light">Nome</th>
+        <th class="text-muted fw-light">Cognome</th>
+        <th class="text-muted fw-light">Classe</th>
+        <th class="text-muted fw-light">Punteggio</th>
+        <th class="text-muted fw-light">Consegnato il</th>
         <th></th>
       </tr>
     </thead>

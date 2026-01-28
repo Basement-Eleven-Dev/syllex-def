@@ -1,0 +1,41 @@
+#imageDropArea {
+  border: 2px dashed var(--bs-primary);
+  color: var(--bs-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--bs-dark);
+    background-color: rgba(var(--bs-primary-rgb), 0.05);
+  }
+
+  &.dragging {
+    border-color: var(--bs-success);
+    background-color: rgba(var(--bs-success-rgb), 0.1);
+    border-width: 3px;
+  }
+
+  .image-drop-zone {
+    min-height: 100px;
+    width: 100%;
+  }
+
+  .image-preview-container {
+    width: 100%;
+
+    img {
+      width: 100%;
+      height: auto;
+      max-height: 300px;
+      object-fit: contain;
+    }
+
+    .image-actions {
+      button {
+        font-size: 0.875rem;
+      }
+    }
+  }
+}
