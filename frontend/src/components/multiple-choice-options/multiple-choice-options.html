@@ -1,0 +1,42 @@
+<div class="d-flex flex-column gap-3">
+  <div class="d-flex justify-content-between align-items-center">
+    <span class="fw-semibold">Opzioni di Risposta</span>
+    <button
+      type="button"
+      class="btn btn-outline-primary btn-sm"
+      (click)="onAddOption()"
+    >
+      <fa-icon [icon]="AddIcon"></fa-icon> Aggiungi Opzione
+    </button>
+  </div>
+  @for(option of options; track $index){
+  <div class="d-flex flex-row gap-3 align-items-center">
+    <span class="optionLabel">{{ $index + 1 }}</span>
+    <input
+      type="text"
+      class="form-control custom-input"
+      [(ngModel)]="option.label"
+      (ngModelChange)="onOptionsChange()"
+      placeholder="Testo dell'opzione"
+    />
+    <button
+      class="btn btn-sm d-flex flex-row align-items-center gap-1"
+      [class.btn-success]="option.isCorrect"
+      [class.btn-outline-success]="!option.isCorrect"
+      (click)="onSetCorrectOption($index)"
+    >
+      <fa-icon [icon]="CheckIcon"></fa-icon> Corretta
+    </button>
+    @if(options.length > 2) {
+    <button
+      type="button"
+      class="btn btn-outline-danger btn-sm"
+      (click)="onRemoveOption($index)"
+      [disabled]="options.length <= 2"
+    >
+      <fa-icon [icon]="RemoveIcon"></fa-icon>
+    </button>
+    }
+  </div>
+  }
+</div>

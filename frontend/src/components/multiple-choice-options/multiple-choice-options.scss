@@ -1,0 +1,12 @@
+.optionLabel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bs-dark);
+  border-radius: 50%;
+  aspect-ratio: 1 / 1;
+  width: 2rem;
+  height: 2rem;
+  color: white;
+  font-size: 1rem;
+}

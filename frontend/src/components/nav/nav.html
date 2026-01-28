@@ -1,9 +1,17 @@
-<div class="bg-primary w-100 py-2 d-flex flex-row align-items-center">
-  <div style="width: 250px" class="text-center">
-    <img src="/images/logo_white.png" alt="Syllex Logo" height="40" />
-  </div>
+<div
+  class="bg-primary w-100 py-2 d-flex flex-row align-items-center container mt-3 gap-3 rounded-4"
+>
+  <img
+    src="/images/logo_white.png"
+    alt="Syllex Logo"
+    height="40"
+    class="mx-3"
+    routerLink="/t/dashboard"
+  />
   <div class="flex-fill d-flex flex-row align-items-center gap-3 pe-4">
-    <span class="text-white">{{ now | date: 'dd MMMM, HH:mm' | titlecase }} </span>
+    <span class="text-white"
+      >{{ now | date: 'dd MMMM, HH:mm' | titlecase }}
+    </span>
     <div class="flex-fill">
       <input
         type="text"

@@ -1,9 +1,10 @@
 import { DatePipe, TitleCasePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-nav',
-  imports: [DatePipe, TitleCasePipe],
+  imports: [DatePipe, TitleCasePipe, RouterModule],
   templateUrl: './nav.html',
   styleUrl: './nav.scss',
 })
