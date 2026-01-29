@@ -1,17 +1,25 @@
 import { Component, inject } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import {
   FontAwesomeModule,
   IconDefinition,
 } from '@fortawesome/angular-fontawesome';
 import {
+  faCheck,
   faGraduationCap,
   faImage,
   faMarker,
   faPlus,
   faRobot,
   faSave,
+  faSparkles,
   faSpellCheck,
   faSpinnerThird,
   faUsers,
@@ -19,12 +27,12 @@ import {
 import { MultipleChoiceOptions } from '../../components/multiple-choice-options/multiple-choice-options';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { GenAiQuestion } from '../../components/gen-ai-question/gen-ai-question';
-
-interface QuestionType {
-  label: string;
-  icon: IconDefinition;
-  value: 'scelta multipla' | 'vero falso' | 'risposta aperta';
-}
+import {
+  QuestionType,
+  QuestionTypeSelectors,
+} from '../../components/question-type-selectors/question-type-selectors';
+import { JsonPipe } from '@angular/common';
+import { TopicsService } from '../../services/topics-service';
 
 export interface AnswerOption {
   label: string;
@@ -38,6 +46,10 @@ export interface AnswerOption {
     FontAwesomeModule,
     MultipleChoiceOptions,
     GenAiQuestion,
+    QuestionTypeSelectors,
+    FormsModule,
+    ReactiveFormsModule,
+    JsonPipe,
   ],
   templateUrl: './create-edit-question.html',
   styleUrl: './create-edit-question.scss',
@@ -45,41 +57,22 @@ export interface AnswerOption {
 export class CreateEditQuestion {
   questionId: string | null = null;
 
-  MultipleChoiceIcon = faSpellCheck;
-  TrueFalseIcon = faPlus;
-  OpenAnswerIcon = faMarker;
-  RobotIcon = faRobot;
+  SparklesIcon = faSparkles;
   ImageIcon = faImage;
   UsersIcon = faUsers;
   GraduationIcon = faGraduationCap;
   SaveIcon = faSave;
   SpinnerIcon = faSpinnerThird;
 
-  topics: string[] = [
-    'Matematica',
-    'Scienze',
-    'Storia',
-    'Geografia',
-    'Letteratura',
-    'Informatica',
-  ];
-
-  questionTypes: QuestionType[] = [
-    {
-      label: 'Scelta multipla',
-      icon: this.MultipleChoiceIcon,
-      value: 'scelta multipla',
-    },
-    { label: 'Vero o falso', icon: this.TrueFalseIcon, value: 'vero falso' },
-    {
-      label: 'Risposta aperta',
-      icon: this.OpenAnswerIcon,
-      value: 'risposta aperta',
-    },
-  ];
-
-  constructor(private activatedRoute: ActivatedRoute) {
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    public topicsService: TopicsService,
+  ) {
     this.questionId = this.activatedRoute.snapshot.paramMap.get('id');
+  }
+
+  ngOnInit(): void {
+    this.onRequestAIGeneration();
   }
 
   questionForm: FormGroup = new FormGroup({
@@ -119,7 +112,7 @@ export class CreateEditQuestion {
   imagePreview: string | null = null;
   isDragging = false;
 
-  onSelectQuestionType(type: string): void {
+  onSelectQuestionType(type: QuestionType): void {
     this.questionForm.patchValue({ type });
   }
 
@@ -127,8 +120,8 @@ export class CreateEditQuestion {
     this.questionForm.patchValue({ policy });
   }
 
-  get selectedQuestionType(): string {
-    return this.questionForm.get('type')?.value;
+  get selectedQuestionType(): QuestionType {
+    return this.questionForm.get('type')!.value;
   }
 
   get selectedPolicyType(): string {
@@ -137,9 +130,32 @@ export class CreateEditQuestion {
 
   private offcanvasService = inject(NgbOffcanvas);
   onRequestAIGeneration(): void {
-    this.offcanvasService.open(GenAiQuestion, {
+    let offCanvasRef = this.offcanvasService.open(GenAiQuestion, {
       ariaLabelledBy: 'offcanvas-basic-title',
       position: 'end',
+    });
+
+    offCanvasRef.componentInstance.selectedType = this.selectedQuestionType;
+    offCanvasRef.dismissed.subscribe((result) => {
+      if (result) {
+        console.log('Risultato generazione AI:', result);
+        // Popola il form con i dati generati
+        this.questionForm.patchValue({
+          topic: result.topic,
+          type: result.type,
+          text: result.content,
+          explanation: result.explanation,
+        });
+        if (result.type === 'scelta multipla' && result.choices) {
+          const options: AnswerOption[] = result.choices.map(
+            (choice: AnswerOption) => ({
+              label: choice.label,
+              isCorrect: choice.isCorrect,
+            }),
+          );
+          this.questionForm.patchValue({ options });
+        }
+      }
     });
   }
 

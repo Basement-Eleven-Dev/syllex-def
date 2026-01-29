@@ -1,5 +1,12 @@
 <div class="h-100 rounded-5">
   <div class="w-100 p-4 d-flex flex-column h-100 rounded-4">
+    <div
+      class="rounded-3 bg-dark text-light p-3 d-flex flex-column justify-content-center fw-bold"
+    >
+      <fa-icon [icon]="BookIcon" [size]="'lg'"></fa-icon>
+      <h4 class="fw-bold mb-0">Scienze Nautiche</h4>
+    </div>
+    <hr />
     <div id="mainRoutes" class="d-flex flex-column gap-2 flex-fill">
       @for(route of mainRoutes; track $index){
       <div
@@ -11,32 +18,12 @@
         {{route.label}}
       </div>
       }
-    </div>
-
-    <div id="otherRoutes" class="d-flex flex-column gap-2">
-      @for(route of otherRoutes; track $index){
       <div
-        class="sidebarRoute w-100 rounded-3 gap-2 d-flex align-items-center"
-        [routerLink]="route.path"
-        routerLinkActive="active"
+        class="rounded-3 ai d-flex flex-column justify-content-center fw-bold p-3 rouneded-4"
       >
-        <fa-icon [icon]="route.icon"></fa-icon>
-        {{route.label}}
+        <fa-icon [icon]="SparklesIcon"></fa-icon>
+        <h5 class="fw-bold mb-0">Laboratorio AI</h5>
       </div>
-      }
-    </div>
-
-    <div id="footerSection" class="d-flex flex-row align-items-center mt-4">
-      <div class="d-flex flex-column flex-fill text-white">
-        <p class="mb-0 fw-bold">Mario Bianchi</p>
-        <small class="text-trunacate">{{"mario.bianchi@example.com"}}</small>
-      </div>
-      <button
-        class="btn btn-sm d-flex align-items-center justify-content-center"
-        id="logoutButton"
-      >
-        <fa-icon [icon]="LogoutIcon"></fa-icon>
-      </button>
     </div>
   </div>
 </div>

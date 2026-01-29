@@ -1,46 +1,88 @@
-<div class="offcanvas-body">
-  <div class="row">
-    <div class="col-4">
-      <div
-        class="card typeCard p-1 h-100 d-flex flex-column align-items-center justify-content-center"
-      >
-        <div class="typeIconWrapper">
-          <fa-icon [icon]="MultipleChoiceIcon"></fa-icon>
-        </div>
-        <p class="mb-0 text-center">Scelta multipla</p>
+<form [formGroup]="genAiQuestionForm" (ngSubmit)="onGenerate()">
+  <div class="offcanvas-body dvh-100 p-4">
+    <div class="h-100 d-flex flex-column gap-2 justify-content-between">
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Close"
+        (click)="offcanvas.dismiss('Cross click')"
+      ></button>
+      <div class="text-center text-dark">
+        <fa-icon [icon]="RobotIcon" [size]="'2x'"></fa-icon>
+        <h4 class="form-label text-center">
+          Genera utilizzando l'AI di Syllex
+        </h4>
       </div>
-    </div>
-    <div class="col-4">
-      <div
-        class="card typeCard p-1 h-100 d-flex flex-column align-items-center justify-content-center"
-      >
-        <div class="typeIconWrapper">
-          <fa-icon [icon]="TrueFalseIcon"></fa-icon>
-        </div>
-        <p class="mb-0 text-center">Vero Falso</p>
-      </div>
-    </div>
-    <div class="col-4">
-      <div
-        class="card typeCard p-1 h-100 d-flex flex-column align-items-center justify-content-center"
-      >
-        <div class="typeIconWrapper">
-          <fa-icon [icon]="OpenAnswerIcon"></fa-icon>
-        </div>
 
-        <p class="mb-0 text-center">Risposta aperta</p>
-      </div>
+      <section>
+        <label class="form-label fw-semibold text-dark"
+          >Tipologia di risposta:
+          <span class="fw-normal">{{ selectedType | titlecase }}</span></label
+        >
+        <app-question-type-selectors
+          (typeSelected)="onSelectQuestionType($event)"
+          [selectedType]="selectedType"
+          direction="column"
+        ></app-question-type-selectors>
+        <hr />
+      </section>
+      <section>
+        <label class="form-label fw-semibold text-dark">Argomento</label>
+        <select
+          class="form-select mb-4 custom-input w-auto"
+          formControlName="topic"
+          aria-label="Seleziona argomento"
+        >
+          <option value="" disabled selected>Seleziona argomento</option>
+          @for(topic of topicsService.topics; track topic) {
+          <option [value]="topic">{{ topic }}</option>
+          }
+        </select>
+        <hr />
+      </section>
+
+      <section>
+        <label class="form-label fw-semibold text-dark">Dettagli domanda</label>
+        <textarea
+          class="form-control mb-4 custom-input"
+          formControlName="details"
+          rows="8"
+          style="resize: none"
+          placeholder="Fornisci dettagli aggiuntivi per la domanda in merito allo stile, al contesto o ad altri aspetti rilevanti."
+        ></textarea>
+        <hr />
+      </section>
+
+      <section>
+        <label class="form-label fw-semibold text-dark mb-2">Allega file</label>
+        <input
+          type="file"
+          class="form-control custom-input w-auto"
+          (change)="onFileSelected($event)"
+          accept=".txt,.pdf"
+        />
+        @if (attachedFileName) {
+        <small class="text-muted mt-2"
+          >File allegato: {{ attachedFileName }}</small
+        >
+        }
+      </section>
+
+      <section class="flex-fill d-flex flex-column justify-content-end">
+        <button
+          class="btn btn-xl w-100 btn-lg ai"
+          [disabled]="loading || genAiQuestionForm.invalid"
+          type="submit"
+          (click)="onGenerate()"
+        >
+          <fa-icon
+            [icon]="loading ? SpinnerIcon : SparklesIcon"
+            class="me-2"
+            [animation]="loading ? 'spin' : undefined"
+          ></fa-icon>
+          Genera Domanda
+        </button>
+      </section>
     </div>
   </div>
-  <label class="form-label fw-semibold text-dark mt-5">Argomento</label>
-  <select
-    class="form-select form-select-lg mb-4 custom-input w-auto"
-    formControlName="topic"
-    aria-label="Seleziona argomento"
-  >
-    <option value="" disabled selected>Seleziona argomento</option>
-    @for(topic of topics; track topic) {
-    <option [value]="topic">{{ topic }}</option>
-    }
-  </select>
-</div>
+</form>

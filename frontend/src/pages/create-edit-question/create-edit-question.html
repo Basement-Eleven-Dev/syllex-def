@@ -1,211 +1,218 @@
-<h1 class="text-dark fw-bold mb-0 display-6">
-  {{ questionId ? 'Modifica domanda' : 'Crea nuova domanda' }}
-</h1>
-<p class="text-dark mb-5">
-  @if(questionId) { Modifica i dettagli della domanda selezionata. } @else {
-  Compila il modulo sottostante per creare una nuova domanda. }
-</p>
-
-<label class="form-label fw-semibold text-dark">Tipologia di risposta</label>
-<div class="row">
-  @for(type of questionTypes; track $index) {
-  <div class="col-3">
-    <div
-      class="card shadow-sm typeCard p-1"
-      (click)="onSelectQuestionType(type.value)"
-      [class.selected]="selectedQuestionType === type.value"
-    >
-      <div class="card-body d-flex flex-row align-items-center gap-3">
-        <input
-          type="radio"
-          class="form-check-input"
-          [checked]="selectedQuestionType === type.value"
-        />
-        <h5 class="mb-0 flex-fill">{{ type.label }}</h5>
-        <span class="typeIconWrapper rounded-2">
-          <fa-icon [icon]="type.icon" [size]="'2x'"></fa-icon>
-        </span>
-      </div>
-    </div>
-  </div>
-  }
-</div>
-
-<label class="form-label fw-semibold text-dark mt-5">Argomento</label>
-<select
-  class="form-select form-select-lg mb-4 custom-input w-auto"
-  formControlName="topic"
-  aria-label="Seleziona argomento"
+<form
+  [formGroup]="questionForm"
+  (ngSubmit)="onSaveQuestion()"
+  class="d-flex flex-column gap-4"
 >
-  <option value="" disabled selected>Seleziona argomento</option>
-  @for(topic of topics; track topic) {
-  <option [value]="topic">{{ topic }}</option>
-  }
-</select>
-
-<div class="d-flex flex-row justify-content-between align-items-center">
-  <div>
-    <label class="form-label fw-semibold text-dark mt-5"
-      >Contenuto della domanda</label
-    >
-    <p class="text-dark mb-5">
-      Scrivi la domanda, le risposte e una spiegazione riguardante la risposta
-      corretta. Puoi sempre usare l’AI per aiutarti nella generazione.
+  <section>
+    <h1 class="text-dark fw-bold mb-0 display-6">
+      {{ questionId ? 'Modifica domanda' : 'Crea nuova domanda' }}
+    </h1>
+    <p class="text-dark">
+      @if(questionId) { Modifica i dettagli della domanda selezionata. } @else {
+      Compila il modulo sottostante per creare una nuova domanda. }
     </p>
-  </div>
-  <button
-    class="btn btn-primary"
-    type="button"
-    (click)="onRequestAIGeneration()"
-  >
-    <fa-icon [icon]="RobotIcon" class="me-2"></fa-icon>
-    Genera con AI
-  </button>
-</div>
+  </section>
 
-<div class="row">
-  <div class="col-md-8 d-flex flex-column">
-    <label class="form-label fw-semibold text-dark">Testo</label>
-    <textarea
-      class="form-control custom-input flex-fill"
-      formControlName="content"
-      rows="4"
-      placeholder="Inserisci il testo della domanda qui..."
-    ></textarea>
-  </div>
-  <div class="col-md-4 d-flex flex-column">
-    <label class="form-label fw-semibold text-dark">Allega immagine</label>
-    <div
-      id="imageDropArea"
-      class="rounded-4 p-3"
-      [class.dragging]="isDragging"
-      (dragover)="onDragOver($event)"
-      (dragleave)="onDragLeave($event)"
-      (drop)="onDrop($event)"
-      (click)="fileInput?.click()"
+  <section>
+    <label class="form-label fw-semibold text-dark"
+      >Tipologia di risposta</label
     >
-      @if(!imagePreview) {
-      <div
-        class="image-drop-zone d-flex flex-column justify-content-center align-items-center rounded-3 p-3"
-      >
-        <fa-icon [icon]="ImageIcon" class="mb-3" size="3x"></fa-icon>
-        <p class="text-muted mb-0 text-center">
-          Trascina qui un'immagine o clicca per caricare
+    <app-question-type-selectors
+      (typeSelected)="onSelectQuestionType($event)"
+      [selectedType]="selectedQuestionType"
+      direction="row"
+    ></app-question-type-selectors>
+  </section>
+
+  <section>
+    <label class="form-label fw-semibold text-dark">Argomento</label>
+    <select
+      class="form-select form-select-lg custom-input w-auto"
+      formControlName="topic"
+      aria-label="Seleziona argomento"
+    >
+      <option value="" disabled selected>Seleziona argomento</option>
+      @for(topic of topicsService.topics; track topic) {
+      <option [value]="topic">{{ topic }}</option>
+      }
+    </select>
+  </section>
+
+  <section>
+    <div class="d-flex flex-row justify-content-between align-items-center">
+      <div>
+        <label class="form-label fw-semibold text-dark">
+          Contenuto della domanda</label
+        >
+        <p class="text-dark mb-5">
+          Scrivi la domanda, le risposte e una spiegazione riguardante la
+          risposta corretta. Puoi sempre usare l’AI per aiutarti nella
+          generazione.
         </p>
       </div>
-      } @else {
-      <div class="image-preview-container position-relative">
-        <img [src]="imagePreview" alt="Preview" class="img-fluid rounded-3" />
-        <div class="image-actions d-flex gap-2 mt-2">
-          <button
-            type="button"
-            class="btn btn-sm btn-outline-primary flex-fill"
-            (click)="fileInput?.click(); $event.stopPropagation()"
+      <button
+        class="btn btn-lg ai"
+        type="button"
+        (click)="onRequestAIGeneration()"
+      >
+        <fa-icon [icon]="SparklesIcon" class="me-2"></fa-icon>
+        Genera con AI
+      </button>
+    </div>
+
+    <section class="row">
+      <div class="col-md-8 d-flex flex-column">
+        <label class="form-label fw-semibold text-dark">Testo</label>
+        <textarea
+          class="form-control custom-input flex-fill"
+          formControlName="text"
+          rows="4"
+          placeholder="Inserisci il testo della domanda qui..."
+        ></textarea>
+      </div>
+      <div class="col-md-4 d-flex flex-column">
+        <label class="form-label fw-semibold text-dark">Allega immagine</label>
+        <div
+          id="imageDropArea"
+          class="rounded-4 p-3"
+          [class.dragging]="isDragging"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+          (drop)="onDrop($event)"
+          (click)="fileInput?.click()"
+        >
+          @if(!imagePreview) {
+          <div
+            class="image-drop-zone d-flex flex-column justify-content-center align-items-center rounded-3 p-3"
           >
-            Cambia immagine
-          </button>
-          <button
-            type="button"
-            class="btn btn-sm btn-outline-danger flex-fill"
-            (click)="removeImage(); $event.stopPropagation()"
-          >
-            Rimuovi
-          </button>
+            <fa-icon [icon]="ImageIcon" class="mb-3" size="3x"></fa-icon>
+            <p class="text-muted mb-0 text-center">
+              Trascina qui un'immagine o clicca per caricare
+            </p>
+          </div>
+          } @else {
+          <div class="image-preview-container position-relative">
+            <img
+              [src]="imagePreview"
+              alt="Preview"
+              class="img-fluid rounded-3"
+            />
+            <div class="image-actions d-flex gap-2 mt-2">
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-primary flex-fill"
+                (click)="fileInput?.click(); $event.stopPropagation()"
+              >
+                Cambia immagine
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-danger flex-fill"
+                (click)="removeImage(); $event.stopPropagation()"
+              >
+                Rimuovi
+              </button>
+            </div>
+          </div>
+          }
+          <input
+            type="file"
+            id="fileInput"
+            #fileInput
+            class="d-none"
+            accept="image/*"
+            (change)="onFileSelected($event)"
+          />
         </div>
       </div>
-      }
-      <input
-        type="file"
-        id="fileInput"
-        #fileInput
-        class="d-none"
-        accept="image/*"
-        (change)="onFileSelected($event)"
-      />
+    </section>
+  </section>
+
+  @if(selectedQuestionType === 'scelta multipla') {
+  <div class="row">
+    <div class="col-8">
+      <app-multiple-choice-options
+        [options]="questionOptions"
+        (optionsChange)="onOptionsChange($event)"
+      ></app-multiple-choice-options>
     </div>
   </div>
-</div>
+  }
 
-@if(selectedQuestionType === 'scelta multipla') {
-<div class="row mt-5">
-  <div class="col-8">
-    <app-multiple-choice-options
-      [options]="questionOptions"
-      (optionsChange)="onOptionsChange($event)"
-    ></app-multiple-choice-options>
-  </div>
-</div>
-}
-
-<label class="form-label fw-semibold text-dark mt-5"
-  >Spiegazione della risposta corretta</label
->
-<textarea
-  class="form-control custom-input flex-fill"
-  formControlName="content"
-  rows="4"
-  placeholder="Inserisci una commento sulla risposta corretta..."
-></textarea>
-
-<label class="form-label fw-semibold text-dark mt-5"
-  >Visibilità della domanda e politiche di utilizzo</label
->
-<p>
-  Scegli se permettere ai tuoi studenti di Scienze Nautiche di utilizzare questa
-  domanda per creare dei test di autovalutazione
-</p>
-
-<div class="row">
-  <div class="col-3">
-    <div
-      class="card shadow-sm typeCard p-1"
-      (click)="onSelectPolicyType('public')"
-      [class.selected]="selectedPolicyType === 'public'"
+  <section>
+    <label class="form-label fw-semibold text-dark"
+      >Spiegazione della risposta corretta</label
     >
-      <div class="card-body d-flex flex-row align-items-center gap-3">
-        <input
-          type="radio"
-          class="form-check-input"
-          [checked]="selectedPolicyType === 'public'"
-        />
-        <h5 class="mb-0 flex-fill">Disponibile agli studenti</h5>
-        <span class="typeIconWrapper rounded-2">
-          <fa-icon [icon]="UsersIcon" [size]="'2x'"></fa-icon>
-        </span>
-      </div>
-    </div>
-  </div>
-  <div class="col-3">
-    <div
-      class="card shadow-sm typeCard p-1"
-      (click)="onSelectPolicyType('private')"
-      [class.selected]="selectedPolicyType === 'private'"
-    >
-      <div class="card-body d-flex flex-row align-items-center gap-3">
-        <input
-          type="radio"
-          class="form-check-input"
-          [checked]="selectedPolicyType === 'private'"
-        />
-        <h5 class="mb-0 flex-fill">Disponibile solo al docente</h5>
-        <span class="typeIconWrapper rounded-2">
-          <fa-icon [icon]="GraduationIcon" [size]="'2x'"></fa-icon>
-        </span>
-      </div>
-    </div>
-  </div>
-</div>
+    <textarea
+      class="form-control custom-input flex-fill"
+      formControlName="explanation"
+      rows="4"
+      placeholder="Inserisci una commento sulla risposta corretta..."
+    ></textarea>
+  </section>
 
-<div class="d-flex flex-row justify-content-end mt-5 gap-3">
-  <button
-    class="btn btn-success text-white btn-lg fs-3"
-    (click)="onSaveQuestion()"
-    [disabled]="questionForm.invalid || loading"
-  >
-    <fa-icon
-      [icon]="loading ? SpinnerIcon : SaveIcon"
-      [animation]="loading ? 'spin' : undefined"
-    ></fa-icon>
-    Salva
-  </button>
-</div>
+  <section>
+    <label class="form-label fw-semibold text-dark"
+      >Visibilità della domanda e politiche di utilizzo</label
+    >
+    <p>
+      Scegli se permettere ai tuoi studenti di Scienze Nautiche di utilizzare
+      questa domanda per creare dei test di autovalutazione
+    </p>
+
+    <section class="row">
+      <div class="col-3">
+        <div
+          class="card shadow-sm typeCard p-1"
+          (click)="onSelectPolicyType('public')"
+          [class.selected]="selectedPolicyType === 'public'"
+        >
+          <div class="card-body d-flex flex-row align-items-center gap-3">
+            <input
+              type="radio"
+              class="form-check-input"
+              [checked]="selectedPolicyType === 'public'"
+            />
+            <h5 class="mb-0 flex-fill">Disponibile agli studenti</h5>
+            <span class="typeIconWrapper rounded-2">
+              <fa-icon [icon]="UsersIcon" [size]="'2x'"></fa-icon>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="col-3">
+        <div
+          class="card shadow-sm typeCard p-1"
+          (click)="onSelectPolicyType('private')"
+          [class.selected]="selectedPolicyType === 'private'"
+        >
+          <div class="card-body d-flex flex-row align-items-center gap-3">
+            <input
+              type="radio"
+              class="form-check-input"
+              [checked]="selectedPolicyType === 'private'"
+            />
+            <h5 class="mb-0 flex-fill">Disponibile solo al docente</h5>
+            <span class="typeIconWrapper rounded-2">
+              <fa-icon [icon]="GraduationIcon" [size]="'2x'"></fa-icon>
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <section class="d-flex flex-row justify-content-end mt-5 gap-3">
+    <button
+      class="btn btn-success text-white btn-lg fs-3"
+      type="submit"
+      [disabled]="questionForm.invalid || loading"
+    >
+      <fa-icon
+        [icon]="loading ? SpinnerIcon : SaveIcon"
+        [animation]="loading ? 'spin' : undefined"
+      ></fa-icon>
+      Salva
+    </button>
+  </section>
+</form>
