@@ -12,13 +12,13 @@ import {
     RequestValidator,
     RestApi,
 } from "aws-cdk-lib/aws-apigateway";
-import { LambdaConstruct } from "./lambda";
-import { Role } from "aws-cdk-lib/aws-iam";
 import { Duration, NestedStack, NestedStackProps } from "aws-cdk-lib";
-import { API_GATEWAY_TIMEOUT } from "../../src/_helpers/config/env";
-import { DefaultLambdaRole } from "./roles";
-import { AppRole, FunctionIntegration } from "../../src/functions-declarations";
-import { FUNCTIONS_PATH } from "../../environment";
+import { AppRole, FunctionIntegration } from "../../../src/functions-declarations";
+import { Role } from "aws-cdk-lib/aws-iam";
+import { FUNCTIONS_PATH } from "../../../environment";
+import { LambdaConstruct } from "../lambda";
+import { DefaultLambdaRole } from "../roles";
+import { API_GATEWAY_TIMEOUT } from "../../../src/_helpers/config/env";
 
 export interface RouteConstructProps extends NestedStackProps {
     apiId: string,
