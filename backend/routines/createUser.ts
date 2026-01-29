@@ -6,6 +6,7 @@ import {
   AdminCreateUserCommandInput,
   AdminSetUserPasswordCommandInput,
   AdminSetUserPasswordCommand,
+  AdminAddUserToGroupCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { Db, MongoClient, ObjectId } from "mongodb";
 import { DB_NAME } from "../src/_helpers/config/env";
@@ -59,6 +60,13 @@ export const createAndLinkUser = async (
   const createUserResult = await client.send(
     new AdminCreateUserCommand(createUserInput)
   );
+  const addToGroupCommand = new AdminAddUserToGroupCommand({
+    UserPoolId: cognitoPoolId,
+    Username: email.trim(),
+    GroupName: role == 'teacher' ? 'teachers' : 'students',
+  });
+
+  await client.send(addToGroupCommand);
   const cognitoSub = createUserResult.User?.Attributes?.find(
     (attr) => attr.Name === "sub"
   )?.Value;

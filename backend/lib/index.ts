@@ -1,19 +1,17 @@
 import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
-import { RestApiGateway } from "./resources/rest_api";
+import { RestApiGateway } from "./resources/api/rest_api";
 import { CognitoUserPool } from "./resources/cognito";
 import { Bucket, HttpMethods } from "aws-cdk-lib/aws-s3";
 import {
   API_NAME,
   BUCKET_NAME,
   POOL_NAME,
-  STAGE_NAME,
 } from "../environment";
 import { DefaultLambdaRole } from "./resources/roles";
 import { BackgroundFunctions } from "./resources/sqs";
-import { AccessLogFormat, Deployment, LogGroupLogDestination, Method, MethodLoggingLevel, RestApi, Stage } from "aws-cdk-lib/aws-apigateway";
-import * as crypto from 'crypto';
-import { LogGroup } from "aws-cdk-lib/aws-logs";
+import { DeployStack } from "./resources/api/api_stage";
+
 
 //se non funziona in produzione la funzione di background prova questa: const queueUrl = `https://sqs.${this.region}.amazonaws.com/${this.account}/${backgroundFunctions.sqs.queueName}`;
 
@@ -72,6 +70,8 @@ export class CdkStack extends cdk.Stack {
       this,
       API_NAME,
       cognito.cognitoPool,
+      cognito.cognitoPoolClient,
+      role,
       queueUrl,
       indexingQueueUrl
     );
@@ -80,44 +80,3 @@ export class CdkStack extends cdk.Stack {
   }
 }
 
-interface DeployStackProps extends cdk.NestedStackProps {
-  readonly restApiId: string;
-
-  readonly methods: Method[];
-}
-
-class DeployStack extends cdk.NestedStack {
-  constructor(scope: Construct, props: DeployStackProps) {
-    super(scope, 'integ-restapi-import-DeployStack', props);
-    const apiDefinitionHash = crypto.createHash('md5').update(Date.now().toString()).digest('hex');
-    const deployment = new Deployment(this, 'Deployment' + apiDefinitionHash, {
-      api: RestApi.fromRestApiId(this, 'RestApi', props.restApiId),
-    });
-    for (const method of props.methods) {
-      //nested stack
-      deployment.node.addDependency(method);
-    }
-    //roba strana
-    new Stage(this, STAGE_NAME, {
-      deployment: deployment,
-      loggingLevel: MethodLoggingLevel.INFO, // Enable Execution Logs (INFO for details, ERROR for errors only)
-
-      // Enable Access Logging
-      accessLogDestination: new LogGroupLogDestination(new LogGroup(this, 'ApiAccessLogs')),
-      // Define the format for your access logs (JSON is highly recommended)
-      accessLogFormat: AccessLogFormat.jsonWithStandardFields({
-        ip: true,
-        caller: true,
-        user: true,
-        requestTime: true,
-        httpMethod: true,
-        resourcePath: true,
-        status: true,
-        protocol: true,
-        responseLength: true
-      }),
-      // Data tracing gives full request/response bodies in Execution Logs, use with caution in production due to cost/security
-      dataTraceEnabled: true,
-    });
-  }
-}
