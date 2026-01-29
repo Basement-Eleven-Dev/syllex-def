@@ -34,7 +34,7 @@ export class CognitoUserPool extends Construct {
         new CfnUserPoolGroup(this, 'TeacherGroup', {
             userPoolId: this.cognitoPool.userPoolId,
             groupName: 'teachers',
-            description: 'Users with techer privileges'
+            description: 'Users with teacher privileges'
         });
     }
 }
