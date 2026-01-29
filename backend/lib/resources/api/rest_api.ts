@@ -7,11 +7,11 @@ import {
   TokenAuthorizer,
 } from "aws-cdk-lib/aws-apigateway";
 import { UserPool, UserPoolClient } from "aws-cdk-lib/aws-cognito";
-import { LambdaConstruct } from "./lambda";
+import { LambdaConstruct } from "../lambda";
 import { Role } from "aws-cdk-lib/aws-iam";
 import { Duration } from "aws-cdk-lib";
-import { API_GATEWAY_TIMEOUT } from "../../src/_helpers/config/env";
-import { AppRole, FUNCTION_INTEGRATIONS } from "../../src/functions-declarations";
+import { API_GATEWAY_TIMEOUT } from "../../../src/_helpers/config/env";
+import { AppRole, FUNCTION_INTEGRATIONS } from "../../../src/functions-declarations";
 import { RouteConstruct } from "./api_route";
 
 
