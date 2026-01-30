@@ -16,5 +16,11 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
         functionPath: 'profile/getMyProfile.ts',
         method: 'GET',
         role: 'logged'
-    }
+    },
+    {
+        apiRoute: 'status',
+        functionPath: 'status.ts',
+        method: 'GET',
+        role: 'open'
+    },
 ]

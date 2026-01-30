@@ -2,7 +2,7 @@ import {
   CorsEnabledAPIGatewayProxyResult,
   CustomHandler,
   Res,
-} from "../../_helpers/_types/lambdaProxyResponse";
+} from "../../_helpers/_lambda/lambdaProxyResponse";
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { getCurrentUser } from "../../_helpers/getAuthCognitoUser";
 import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
@@ -82,8 +82,8 @@ export const handler: CustomHandler = async (
       s3ImageKeys.length > 0
         ? await Promise.all(imagePreviewsPromises)
         : [
-            '<p style="font-style: italic; color: #555;">Nessuna immagine fornita.</p>',
-          ];
+          '<p style="font-style: italic; color: #555;">Nessuna immagine fornita.</p>',
+        ];
 
     const imagePreviews = imagePreviewsArray.join("");
 
@@ -112,8 +112,8 @@ export const handler: CustomHandler = async (
             <tr>
               <td style="padding: 10px; font-weight: bold; background-color: #fcfcfc;">Quando:</td>
               <td style="padding: 10px;">${new Date().toLocaleString(
-                "it-IT"
-              )}</td>
+      "it-IT"
+    )}</td>
             </tr>
           </tbody>
         </table>

@@ -2,7 +2,7 @@ import { getCurrentUser } from "../../_helpers/getAuthCognitoUser";
 import { Db, ObjectId } from "mongodb";
 import { DB_NAME } from "../../_helpers/config/env";
 import * as bcrypt from "bcryptjs";
-import { CorsEnabledAPIGatewayProxyResult, CustomHandler, Res } from "../../_helpers/_types/lambdaProxyResponse";
+import { CorsEnabledAPIGatewayProxyResult, CustomHandler, Res } from "../../_helpers/_lambda/lambdaProxyResponse";
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { mongoClient } from "../../_helpers/getDatabase";
 import { Test } from "../tests/createTest";
@@ -104,12 +104,12 @@ export const handler: CustomHandler = async (req: APIGatewayProxyEvent, $, $$, r
 
     const questionsForStudent = test.questions
       ? test.questions.map((q: any) => ({
-          _id: q._id?.toString(),
-          questionText: q.questionText,
-          questionType: q.questionType,
-          options: q.options || [],
-          points: q.points
-        }))
+        _id: q._id?.toString(),
+        questionText: q.questionText,
+        questionType: q.questionType,
+        options: q.options || [],
+        points: q.points
+      }))
       : [];
 
     return res.status(200).json({

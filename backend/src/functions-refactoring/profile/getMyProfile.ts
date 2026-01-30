@@ -1,7 +1,8 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { ObjectId } from "mongodb";
-import { CorsEnabledAPIGatewayProxyResult, CustomHandler, generateLambdaResponse, Res } from "../../_helpers/_types/lambdaProxyResponse";
 import { getCurrentUser } from "../../_helpers/getAuthCognitoUser";
+import { lambdaRequest } from "../../_helpers/_lambda/lambdaProxyResponse";
+
 
 export interface User {
   _id: ObjectId;
@@ -12,24 +13,10 @@ export interface User {
   organizationIds?: ObjectId[];
 }
 
-export const handler: CustomHandler = async (
-  req: APIGatewayProxyEvent,
-  $,
-  $$,
-  res: Res = new Res()
-): Promise<CorsEnabledAPIGatewayProxyResult> => {
-  try {
-    const user = await getCurrentUser(req);
-    if (!user) {
-      return res
-        .status(404)
-        .json({ message: "Utente non trovato nel database" });
-    }
-    return res.status(200).json(user);
-  } catch (error) {
-    return res.status(500).json({
-      message: "Errore del server durante il recupero del profilo",
-      error: error instanceof Error ? error.message : "Errore in getMyProfile",
-    });
-  }
-};
+
+const getProfile = async (event: APIGatewayProxyEvent) => {
+  return (await getCurrentUser(event)) || { message: "Utente non trovato nel database" };
+}
+
+
+export const handler = lambdaRequest(getProfile)

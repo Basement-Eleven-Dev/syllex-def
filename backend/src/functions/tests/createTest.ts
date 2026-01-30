@@ -6,7 +6,7 @@ import {
   CorsEnabledAPIGatewayProxyResult,
   CustomHandler,
   Res,
-} from "../../_helpers/_types/lambdaProxyResponse";
+} from "../../_helpers/_lambda/lambdaProxyResponse";
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { mongoClient } from "../../_helpers/getDatabase";
 
@@ -72,8 +72,8 @@ export const handler: CustomHandler = async (
     const materialIds = Array.isArray(materialIdsInput)
       ? materialIdsInput
       : materialIdsInput
-      ? [materialIdsInput]
-      : [];
+        ? [materialIdsInput]
+        : [];
 
     // Validazioni aggiornate
     if (!title || typeof title !== "string" || title.trim() === "") {

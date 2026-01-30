@@ -5,7 +5,7 @@ import {
   CorsEnabledAPIGatewayProxyResult,
   CustomHandler,
   Res,
-} from "../../_helpers/_types/lambdaProxyResponse";
+} from "../../_helpers/_lambda/lambdaProxyResponse";
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { mongoClient } from "../../_helpers/getDatabase";
 
@@ -70,39 +70,39 @@ export const handler: CustomHandler = async (
     const formattedTests = selfAssessmentTests.map((test: any) => {
       const totalPoints = Array.isArray(test.questions)
         ? test.questions.reduce(
-            (sum: number, question: any) => sum + (question?.points ?? 0),
-            0
-          )
+          (sum: number, question: any) => sum + (question?.points ?? 0),
+          0
+        )
         : 0;
 
       const attempts = Array.isArray(test.attempts)
         ? test.attempts.map((attempt: any) => {
-            const startedAt = ensureIsoString(attempt.startedAt);
-            const submittedAt = ensureIsoString(attempt.submittedAt);
+          const startedAt = ensureIsoString(attempt.startedAt);
+          const submittedAt = ensureIsoString(attempt.submittedAt);
 
-            let durationSeconds: number | null = null;
-            if (startedAt && submittedAt) {
-              const deltaMs =
-                new Date(submittedAt).getTime() - new Date(startedAt).getTime();
-              if (!Number.isNaN(deltaMs) && deltaMs > 0) {
-                durationSeconds = Math.round(deltaMs / 1000);
-              } else {
-                durationSeconds = 0;
-              }
+          let durationSeconds: number | null = null;
+          if (startedAt && submittedAt) {
+            const deltaMs =
+              new Date(submittedAt).getTime() - new Date(startedAt).getTime();
+            if (!Number.isNaN(deltaMs) && deltaMs > 0) {
+              durationSeconds = Math.round(deltaMs / 1000);
+            } else {
+              durationSeconds = 0;
             }
+          }
 
-            return {
-              submissionId: attempt._id?.toString() ?? null,
-              status: attempt.status ?? "in-progress",
-              startedAt,
-              submittedAt,
-              totalScoreAwarded:
-                typeof attempt.totalScoreAwarded === "number"
-                  ? attempt.totalScoreAwarded
-                  : null,
-              durationSeconds,
-            };
-          })
+          return {
+            submissionId: attempt._id?.toString() ?? null,
+            status: attempt.status ?? "in-progress",
+            startedAt,
+            submittedAt,
+            totalScoreAwarded:
+              typeof attempt.totalScoreAwarded === "number"
+                ? attempt.totalScoreAwarded
+                : null,
+            durationSeconds,
+          };
+        })
         : [];
 
       return {

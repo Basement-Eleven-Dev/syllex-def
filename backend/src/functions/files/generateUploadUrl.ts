@@ -4,7 +4,7 @@ import {
   CorsEnabledAPIGatewayProxyResult,
   CustomHandler,
   Res,
-} from "../../_helpers/_types/lambdaProxyResponse";
+} from "../../_helpers/_lambda/lambdaProxyResponse";
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { AWS_REGION } from "../../_helpers/config/env";
 import { getCurrentUser } from "../../_helpers/getAuthCognitoUser";

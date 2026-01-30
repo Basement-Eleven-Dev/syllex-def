@@ -5,7 +5,7 @@ import {
   CorsEnabledAPIGatewayProxyResult,
   CustomHandler,
   Res,
-} from "../../_helpers/_types/lambdaProxyResponse";
+} from "../../_helpers/_lambda/lambdaProxyResponse";
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { mongoClient } from "../../_helpers/getDatabase";
 
@@ -149,15 +149,15 @@ export const handler: CustomHandler = async (
         },
         ...(referenceRange
           ? [
-              {
-                $match: {
-                  completionDate: {
-                    $gte: referenceRange.start,
-                    $lte: referenceRange.end,
-                  },
+            {
+              $match: {
+                completionDate: {
+                  $gte: referenceRange.start,
+                  $lte: referenceRange.end,
                 },
               },
-            ]
+            },
+          ]
           : []),
         {
           $project: {
@@ -258,10 +258,10 @@ export const handler: CustomHandler = async (
 
     const studentsInfo = studentIdsForNames.length
       ? await db
-          .collection("users")
-          .find({ _id: { $in: studentIdsForNames } })
-          .project({ firstName: 1, lastName: 1, username: 1 })
-          .toArray()
+        .collection("users")
+        .find({ _id: { $in: studentIdsForNames } })
+        .project({ firstName: 1, lastName: 1, username: 1 })
+        .toArray()
       : [];
 
     const studentNamesMap = new Map<string, string>();
@@ -286,11 +286,11 @@ export const handler: CustomHandler = async (
     const overallAverage =
       studentPerformance.length > 0
         ? Math.round(
-            studentPerformance.reduce(
-              (sum, student) => sum + student.averageScore,
-              0
-            ) / studentPerformance.length
-          )
+          studentPerformance.reduce(
+            (sum, student) => sum + student.averageScore,
+            0
+          ) / studentPerformance.length
+        )
         : 0;
 
     const studentsAboveThreshold = studentPerformance.filter(
@@ -299,8 +299,8 @@ export const handler: CustomHandler = async (
 
     const assignmentsInRange = referenceRange
       ? assignments.filter((assignment) =>
-          isDateWithinRange(assignment.availableFrom, referenceRange)
-        )
+        isDateWithinRange(assignment.availableFrom, referenceRange)
+      )
       : assignments;
 
     const denominatorTests = Math.max(
@@ -325,7 +325,7 @@ export const handler: CustomHandler = async (
     const averageCompletionTimeMinutes = roundOrNull(
       durationsMinutes.length > 0
         ? durationsMinutes.reduce((sum, value) => sum + value, 0) /
-            durationsMinutes.length
+        durationsMinutes.length
         : null
     );
 
