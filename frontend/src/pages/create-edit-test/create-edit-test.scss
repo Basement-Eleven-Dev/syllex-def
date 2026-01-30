@@ -1,7 +1,7 @@
 .classBadge,
 #infiniteButton {
   background-color: transparent;
-  border: 1px solid var(--bs-primary);
+  outline: 1px solid var(--bs-primary);
   color: var(--bs-primary);
 
   &:hover {
@@ -11,7 +11,6 @@
   }
   &.selected {
     background-color: var(--bs-secondary);
-    border: none;
     color: var(--bs-dark);
   }
 }

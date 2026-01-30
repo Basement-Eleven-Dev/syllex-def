@@ -71,9 +71,7 @@ export class CreateEditQuestion {
     this.questionId = this.activatedRoute.snapshot.paramMap.get('id');
   }
 
-  ngOnInit(): void {
-    this.onRequestAIGeneration();
-  }
+  ngOnInit(): void {}
 
   questionForm: FormGroup = new FormGroup({
     type: new FormControl('scelta multipla', Validators.required),

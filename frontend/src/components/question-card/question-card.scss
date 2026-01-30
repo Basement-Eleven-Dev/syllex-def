@@ -2,19 +2,12 @@
   transition: all 0.2s ease;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
-  transition: max-height 0.5s linear;
-  overflow: hidden;
-  max-height: 2000px;
-
   &.moveable {
     cursor: move;
     &:hover {
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
       transform: translateY(-2px);
     }
-  }
-  &.collapsed {
-    max-height: 200px;
   }
 
   &.cdk-drag-preview {
@@ -37,13 +30,31 @@
     line-height: 1.5;
   }
 
-  .collapse-banner {
-    display: none;
+  .question-preview {
+    font-size: 0.9rem;
+    font-style: italic;
+    cursor: pointer;
   }
-  &:hover {
-    .collapse-banner {
-      display: flex;
+
+  .collapse-banner {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    color: #6c757d;
+    border: none;
+    text-decoration: none;
+
+    &:hover {
+      color: #495057;
     }
+
+    &:focus {
+      outline: none;
+      box-shadow: none;
+    }
+  }
+
+  &:hover .collapse-banner {
+    opacity: 1;
   }
 }
 

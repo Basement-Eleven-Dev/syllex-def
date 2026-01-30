@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import {
   FontAwesomeModule,
@@ -8,6 +8,8 @@ import {
   faBallotCheck,
   faBook,
   faChartLine,
+  faChevronDown,
+  faChevronUp,
   faClipboardQuestion,
   faFile,
   faGauge,
@@ -19,7 +21,10 @@ import {
   faUserCircle,
   faUsers,
 } from '@fortawesome/pro-solid-svg-icons';
+import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
 import { Auth } from '../../services/auth';
+import { FormsModule } from '@angular/forms';
+import { Materia, MateriaObject } from '../../services/materia';
 
 interface SidebarRoute {
   path: string;
@@ -27,9 +32,14 @@ interface SidebarRoute {
   icon: IconDefinition;
 }
 
+interface Subject {
+  id: string;
+  name: string;
+}
+
 @Component({
   selector: 'app-sidebar',
-  imports: [FontAwesomeModule, RouterModule],
+  imports: [FontAwesomeModule, RouterModule, NgbCollapseModule, FormsModule],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.scss',
 })
@@ -37,8 +47,27 @@ export class Sidebar {
   LogoutIcon = faRightFromBracket;
   SparklesIcon = faSparkles;
   BookIcon = faBook;
+  ChevronDownIcon = faChevronDown;
+  ChevronUpIcon = faChevronUp;
 
-  constructor(private authService: Auth) {}
+  isSubjectsCollapsed = signal(true);
+
+  constructor(
+    private authService: Auth,
+    public materiaService: Materia,
+  ) {}
+
+  toggleSubjectsCollapse(): void {
+    this.isSubjectsCollapsed.set(!this.isSubjectsCollapsed());
+  }
+
+  selectSubject(subject: MateriaObject): void {
+    this.materiaService.switchMateria(subject);
+  }
+
+  get selectedSubject(): MateriaObject {
+    return this.materiaService.materiaSelected.value!;
+  }
 
   mainRoutes: SidebarRoute[] = [
     {

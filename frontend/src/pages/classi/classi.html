@@ -1,0 +1,133 @@
+<h1 class="text-dark fw-bold mb-0 display-6">
+  Le tue classi di {{ materiaService.materiaSelected.value?.label }}
+</h1>
+<p class="text-dark mb-0">Gestisci e visualizza le tue classi da qui.</p>
+
+<section class="form-section d-flex flex-row align-items-center my-5">
+  <div>
+    <label for="search-term" class="form-label fw-semibold text-dark"
+      >Nome classe</label
+    >
+    <input
+      type="text"
+      class="form-control me-3 custom-input"
+      id="search-term"
+      placeholder="Cerca classi..."
+      style="min-width: 400px"
+    />
+  </div>
+  <div class="ms-4">
+    <label for="year-filter" class="form-label fw-semibold text-dark"
+      >Anno di riferimento</label
+    >
+    <select id="year-filter" class="form-select custom-input">
+      <option value="">Tutti gli anni</option>
+      <option value="1">2023</option>
+      <option value="2">2024</option>
+      <option value="3">2025</option>
+      <option value="4">2026</option>
+      <option value="5">2027</option>
+    </select>
+  </div>
+  <div class="btn-group ms-auto">
+    <button
+      class="btn"
+      [ngClass]="{'btn-outline-primary': viewType !== 'table', 'btn-secondary border-dark': viewType === 'table'}"
+      (click)="onChangeViewType('table')"
+    >
+      <fa-icon [icon]="ListIcon"></fa-icon>
+    </button>
+    <button
+      class="btn"
+      [ngClass]="{'btn-outline-primary': viewType !== 'grid', 'btn-secondary border-dark': viewType == 'grid'}"
+      (click)="onChangeViewType('grid')"
+    >
+      <fa-icon [icon]="GridIcon"></fa-icon>
+    </button>
+  </div>
+</section>
+
+@if(viewType === 'grid') {
+<div class="row">
+  @for(classe of classiService.classi; track $index){
+  <div class="col-12 col-md-6 col-lg-4 mb-4">
+    <div class="card p-3 h-100 shadow-sm overflow-hidden position-relative">
+      <fa-icon [icon]="UsersIcon" class="background-icon"></fa-icon>
+      <div class="card-body d-flex flex-column gap-4 align-items-start">
+        <h4 class="card-title text-dark fw-bold">{{ classe.nome }}</h4>
+        <div>
+          <p class="mb-1 text-dark">
+            <fa-icon [icon]="UserIcon"></fa-icon> {{ classe.studentsCount }}
+            studenti
+          </p>
+          <p class="text-dark">
+            <fa-icon [icon]="CalendarIcon"></fa-icon> anno di riferimento {{
+            classe.annoScolastico }}
+          </p>
+        </div>
+        <a
+          [routerLink]="['/t/classi', classe.id]"
+          class="btn btn-primary mt-auto w-100"
+        >
+          <fa-icon [icon]="EyeIcon"></fa-icon> Visualizza Dettagli</a
+        >
+      </div>
+    </div>
+  </div>
+  }
+</div>
+} @else {
+<table class="table table-hover align-middle">
+  <thead>
+    <tr>
+      <th class="text-muted fw-light" scope="col">Nome Classe</th>
+      <th class="text-muted fw-light" scope="col">Numero di Studenti</th>
+      <th class="text-muted fw-light" scope="col">Anno di riferimento</th>
+      <th class="text-muted fw-light" scope="col" class="text-end">Azioni</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for(classe of classiService.classi; track classe.id){
+    <tr>
+      <td class="fw-bold text-dark">{{ classe.nome }}</td>
+      <td class="text-dark">
+        <fa-icon [icon]="UserIcon"></fa-icon> {{ classe.studentsCount }}
+      </td>
+      <td class="text-dark">{{ classe.annoScolastico }}</td>
+      <td class="text-end">
+        <a
+          [routerLink]="['/t/classi', classe.id]"
+          class="btn btn-sm btn-primary"
+          ><fa-icon [icon]="EyeIcon"></fa-icon> Visualizza Dettagli</a
+        >
+      </td>
+    </tr>
+    }
+  </tbody>
+</table>
+}
+
+<div
+  [class.inTableView]="viewType === 'table'"
+  [class.inGridView]="viewType === 'grid'"
+  class="mt-5"
+>
+  <ngb-pagination
+    [collectionSize]="collectionSize"
+    [(page)]="page"
+    [pageSize]="pageSize"
+    (pageChange)="onNewPageRequested()"
+  >
+  </ngb-pagination>
+
+  <select
+    class="form-select form-select-sm"
+    style="width: auto"
+    [(ngModel)]="pageSize"
+    (ngModelChange)="onNewPageRequested()"
+  >
+    <option [ngValue]="5">5 per pagina</option>
+    <option [ngValue]="10">10 per pagina</option>
+    <option [ngValue]="20">20 per pagina</option>
+  </select>
+</div>

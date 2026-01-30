@@ -1,12 +1,28 @@
 <div class="w-100 dvh-100 d-flex flex-column">
+  @if (showLoading()) {
+  <div id="loadingOverlay" animate.enter="fade-in">
+    <h2>
+      Carico i dati di
+      <span class="fw-bold">{{ materia.materiaSelected.value?.label }}</span>
+    </h2>
+    <fa-icon [icon]="SpinnerIcon" [animation]="'spin'" size="3x"></fa-icon>
+  </div>
+  }
   <app-nav></app-nav>
   <div id="content" class="flex-fill overflow-hidden">
     <div class="h-100 d-flex flex-row">
       <app-sidebar></app-sidebar>
       <div class="flex-grow-1 overflow-auto">
+        @if (showLoading()) {
+        <div class="containe text-center pt-5">
+          <fa-icon [icon]="SpinnerIcon" [animation]="'spin'"></fa-icon>
+        </div>
+        } @else {
+
         <div class="py-4 px-0 container">
           <router-outlet></router-outlet>
         </div>
+        }
       </div>
     </div>
   </div>

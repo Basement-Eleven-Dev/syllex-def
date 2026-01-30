@@ -4,7 +4,9 @@ import {
   EventEmitter,
   Input,
   Output,
-  ViewChild,
+  computed,
+  input,
+  signal,
 } from '@angular/core';
 import { Question } from '../questions-filters/questions-filters';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -19,7 +21,7 @@ import {
   faTrash,
 } from '@fortawesome/pro-solid-svg-icons';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCollapse, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'div[app-question-card]',
@@ -29,21 +31,34 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
     FontAwesomeModule,
     FormsModule,
     ReactiveFormsModule,
+    NgbCollapse,
   ],
   templateUrl: './question-card.html',
   styleUrl: './question-card.scss',
 })
 export class QuestionCard {
-  TrashIcon = faTrash;
-  CheckIcon = faCheck;
-  ExpandIcon = faExpand;
-  EditIcon = faPencilAlt;
-  CollapseIcon = faCircleChevronDown;
-  UnCollapseIcon = faCircleChevronUp;
+  readonly TrashIcon = faTrash;
+  readonly CheckIcon = faCheck;
+  readonly ExpandIcon = faExpand;
+  readonly EditIcon = faPencilAlt;
+  readonly CollapseIcon = faCircleChevronDown;
+  readonly UnCollapseIcon = faCircleChevronUp;
 
   points?: number;
 
-  collapsed: boolean = true;
+  // Signal-based collapse state
+  collapsed = input<boolean>(true); // Input signal
+  readonly isCollapsed = computed(() => this.collapsed());
+  readonly collapseIcon = computed(() =>
+    this.isCollapsed() ? this.CollapseIcon : this.UnCollapseIcon,
+  );
+  readonly questionPreview = computed(() => {
+    const maxLength = 80;
+    const text = this.question?.text || '';
+    return text.length > maxLength
+      ? text.substring(0, maxLength) + '...'
+      : text;
+  });
 
   constructor(private modalServ: NgbModal) {}
 
@@ -54,6 +69,18 @@ export class QuestionCard {
   @Input() showBancaActions: boolean = false;
   @Input() showExplanation: boolean = false;
   @Output() removeMe = new EventEmitter<string>();
+  @Output() onExpand = new EventEmitter<string>(); // Notifica espansione
+
+  toggleCollapse(): void {
+    // Notifica il parent per toggle (parent gestisce lo stato)
+    const willExpand = this.isCollapsed();
+    if (willExpand) {
+      this.onExpand.emit(this.question.id);
+    } else {
+      // Richiude la card corrente
+      this.onExpand.emit(''); // Empty string = chiudi tutte
+    }
+  }
 
   onExpandImage(img: string): void {
     const modalRef = this.modalServ.open(ImageModalContent, {

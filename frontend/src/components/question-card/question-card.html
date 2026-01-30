@@ -1,19 +1,24 @@
 <div
   class="d-flex align-items-start gap-2 card p-3 question-card"
   [class.moveable]="showTestCompositionActions"
-  [class.collapsed]="collapsed"
-  [class.]
+  [class.collapsed]="isCollapsed()"
   id="questionCard"
 >
-  @if(true){
-  <div class="collapse-banner gap-0" (click)="this.collapsed = !this.collapsed">
-    <fa-icon [icon]="collapsed ?  CollapseIcon : UnCollapseIcon "></fa-icon>
-  </div>
-  }
+  <button
+    type="button"
+    class="collapse-banner btn btn-link p-0"
+    (click)="toggleCollapse()"
+    [attr.aria-expanded]="!isCollapsed()"
+    aria-label="Toggle card content"
+  >
+    <fa-icon [icon]="collapseIcon()"></fa-icon>
+  </button>
+
   <div class="flex-grow-1 w-100 d-flex flex-column gap-2">
     <div class="d-flex align-items-start gap-2 mb-2">
       @if(showIndex){<span class="badge bg-dark"># {{ index + 1 }}</span>}
       <span class="badge bg-primary">{{ question.type }}</span>
+      <span class="badge bg-primary">{{ question.topic }}</span>
 
       @if(showBancaActions) {
       <div class="d-flex flex-row gap-1 justify-content-end w-100">
@@ -36,37 +41,51 @@
       </div>
       }
     </div>
-    @if(question.img) {
-    <div class="mb-3 w-100 text-center">
-      <img
-        [src]="question.img"
-        alt="Immagine della domanda"
-        class="img-fluid"
-        (click)="onExpandImage(question.img)"
-        style="max-height: 100px"
-      />
-    </div>
-    }
-    <p class="mb-0 fw-medium">{{ question.text }}</p>
 
-    <section>
-      <ol type="A" class="mb-0">
-        @for (option of question.options; track $index) {
-        <li [class.correct]="option.isCorrect">
-          {{ option.label }} @if(option.isCorrect) {
-          <fa-icon [icon]="CheckIcon"></fa-icon>
-          }
-        </li>
+    <!-- Preview sempre visibile quando collassata -->
+    @if(isCollapsed()) {
+    <p class="mb-0 text-muted question-preview">{{ questionPreview() }}</p>
+    }
+
+    <!-- Contenuto completo espanso -->
+    <div [ngbCollapse]="isCollapsed()">
+      <div class="d-flex flex-column gap-3">
+        @if(question.img) {
+        <div class="mb-3 w-100 text-center">
+          <img
+            [src]="question.img"
+            alt="Immagine della domanda"
+            class="img-fluid"
+            (click)="onExpandImage(question.img)"
+            style="max-height: 100px"
+          />
+        </div>
         }
-      </ol>
-    </section>
+        <section>
+          <p class="mb-0 fw-light text-muted">Domanda</p>
+          <p class="mb-0 fw-medium">{{ question.text }}</p>
+        </section>
 
-    @if(showExplanation) {
-    <section>
-      <p class="mb-0 fw-bold">Correzione</p>
-      <p>{{ question.explanation }}</p>
-    </section>
-    }
+        <section>
+          <ol type="A" class="mb-0">
+            @for (option of question.options; track $index) {
+            <li [class.correct]="option.isCorrect">
+              {{ option.label }} @if(option.isCorrect) {
+              <fa-icon [icon]="CheckIcon"></fa-icon>
+              }
+            </li>
+            }
+          </ol>
+        </section>
+
+        @if(showExplanation) {
+        <section>
+          <p class="mb-0 fw-light text-muted">Correzione</p>
+          <p>{{ question.explanation }}</p>
+        </section>
+        }
+      </div>
+    </div>
   </div>
 
   <!-- Azioni -->

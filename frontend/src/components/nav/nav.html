@@ -1,11 +1,12 @@
 <div
-  class="bg-primary w-100 py-2 d-flex flex-row align-items-center container mt-3 gap-1 rounded-4"
+  class="bg-dark w-100 py-3 d-flex flex-row align-items-center container mt-4 gap-1 rounded-4"
 >
   <img
     src="/images/logo_white.png"
     alt="Syllex Logo"
     height="40"
     class="mx-3"
+    style="opacity: 0.5; cursor: pointer"
     routerLink="/t/dashboard"
   />
   <div class="flex-fill d-flex flex-row align-items-center gap-3 pe-4">
@@ -15,7 +16,7 @@
     <div class="flex-fill">
       <input
         type="text"
-        class="form-control form-control-sm w-25 custom-input"
+        class="form-control w-25 custom-input"
         placeholder="Search..."
       />
     </div>
@@ -25,7 +26,7 @@
         id="dropdownBasic1"
         ngbDropdownToggle
         style="cursor: pointer"
-        class="d-flex flex-row align-items-center gap-2 text-white"
+        class="d-flex flex-row align-items-center gap-2 btn btn-dark"
       >
         <p class="text-white mb-0 fw-bold">{{"Mario Rossi"}}</p>
         <a

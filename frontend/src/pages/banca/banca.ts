@@ -22,7 +22,22 @@ export class Banca {
   PlusIcon = faPlus;
 
   questions: Question[] = mockQuestions;
+  expandedQuestionId: string | null = null; // Track della card espansa
+
   onFiltersChanged(filters: { searchTerm: string; type: string }): void {
     // Logica per gestire i cambiamenti dei filtri
+  }
+
+  onQuestionExpanded(questionId: string): void {
+    // Se questionId è vuoto, chiudi tutte. Se è l'ID già espanso, chiudi tutte
+    if (questionId === '' || this.expandedQuestionId === questionId) {
+      this.expandedQuestionId = null;
+    } else {
+      this.expandedQuestionId = questionId;
+    }
+  }
+
+  isQuestionCollapsed(questionId: string): boolean {
+    return this.expandedQuestionId !== questionId;
   }
 }

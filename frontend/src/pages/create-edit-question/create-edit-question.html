@@ -13,7 +13,7 @@
     </p>
   </section>
 
-  <section>
+  <section class="form-section">
     <label class="form-label fw-semibold text-dark"
       >Tipologia di risposta</label
     >
@@ -24,7 +24,7 @@
     ></app-question-type-selectors>
   </section>
 
-  <section>
+  <section class="form-section">
     <label class="form-label fw-semibold text-dark">Argomento</label>
     <select
       class="form-select form-select-lg custom-input w-auto"
@@ -38,13 +38,15 @@
     </select>
   </section>
 
-  <section>
-    <div class="d-flex flex-row justify-content-between align-items-center">
+  <section class="form-section">
+    <div
+      class="d-flex flex-row justify-content-between align-items-center mb-3"
+    >
       <div>
-        <label class="form-label fw-semibold text-dark">
-          Contenuto della domanda</label
-        >
-        <p class="text-dark mb-5">
+        <h5 class="form-label fw-semibold text-dark">
+          Contenuto della domanda
+        </h5>
+        <p class="text-dark mb-0">
           Scrivi la domanda, le risposte e una spiegazione riguardante la
           risposta corretta. Puoi sempre usare l’AI per aiutarti nella
           generazione.
@@ -129,17 +131,17 @@
   </section>
 
   @if(selectedQuestionType === 'scelta multipla') {
-  <div class="row">
+  <section class="row form-section">
     <div class="col-8">
       <app-multiple-choice-options
         [options]="questionOptions"
         (optionsChange)="onOptionsChange($event)"
       ></app-multiple-choice-options>
     </div>
-  </div>
+  </section>
   }
 
-  <section>
+  <section class="form-section">
     <label class="form-label fw-semibold text-dark"
       >Spiegazione della risposta corretta</label
     >
@@ -151,7 +153,7 @@
     ></textarea>
   </section>
 
-  <section>
+  <section class="form-section">
     <label class="form-label fw-semibold text-dark"
       >Visibilità della domanda e politiche di utilizzo</label
     >

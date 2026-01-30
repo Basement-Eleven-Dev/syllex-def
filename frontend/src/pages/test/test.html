@@ -5,42 +5,58 @@
       Gestisci i test di valutazione da assegnare alle tue classi
     </p>
   </div>
-  <button class="btn btn-primary ms-auto py-3" routerLink="/t/tests/new">
+  <button class="btn btn-primary btn-lg ms-auto py-3" routerLink="/t/tests/new">
     <fa-icon [icon]="PlusIcon"></fa-icon>
     Nuovo test
   </button>
 </div>
 
-<div class="d-flex flex-row align-items-center mb-5">
-  <input
-    type="text"
-    class="form-control me-3 custom-input"
-    placeholder="Cerca test..."
-    style="max-width: 300px"
-  />
-  <select class="form-select custom-input" style="max-width: 200px">
-    <option value="">Stato</option>
-    @for(status of ['bozza', 'pubblicato', 'archiviato']; track $index) {
-    <option value="{{ status }}">{{ status | titlecase }}</option>
-    }
-  </select>
+<section class="form-section d-flex flex-row align-items-center mb-5 gap-3">
+  <div>
+    <label for="search-term" class="form-label fw-semibold text-dark"
+      >Nome del test</label
+    >
+    <input
+      type="text"
+      class="form-control me-3 custom-input"
+      id="search-term"
+      placeholder="Cerca test..."
+      style="min-width: 400px"
+    />
+  </div>
+
+  <div>
+    <label for="publication-status" class="form-label fw-semibold text-dark"
+      >Stato di pubblicazione</label
+    >
+    <select
+      class="form-select custom-input"
+      style="max-width: 200px"
+      id="publication-status"
+    >
+      <option value="">Stato</option>
+      @for(status of ['bozza', 'pubblicato', 'archiviato']; track $index) {
+      <option value="{{ status }}">{{ status | titlecase }}</option>
+      }
+    </select>
+  </div>
   <div class="btn-group ms-auto">
     <button
       class="btn"
-      [ngClass]="{'btn-outline-primary': viewType !== 'table', 'btn-primary': viewType === 'table'}"
+      [ngClass]="{'btn-outline-primary': viewType !== 'table', 'btn-secondary border-dark': viewType === 'table'}"
       (click)="onChangeViewType('table')"
     >
       <fa-icon [icon]="ListIcon"></fa-icon>
     </button>
     <button
       class="btn"
-      [ngClass]="{'btn-outline-primary': viewType !== 'grid', 'btn-primary': viewType == 'grid'}"
+      [ngClass]="{'btn-outline-primary': viewType !== 'grid', 'btn-secondary border-dark': viewType == 'grid'}"
       (click)="onChangeViewType('grid')"
     >
       <fa-icon [icon]="GridIcon"></fa-icon>
     </button>
   </div>
-</div>
+</section>
 
 @if(viewType === 'table'){
 <app-test-table [tests]="tests"></app-test-table>
