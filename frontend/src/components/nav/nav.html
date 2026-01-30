@@ -1,5 +1,5 @@
 <div
-  class="bg-primary w-100 py-2 d-flex flex-row align-items-center container mt-3 gap-3 rounded-4"
+  class="bg-primary w-100 py-2 d-flex flex-row align-items-center container mt-3 gap-1 rounded-4"
 >
   <img
     src="/images/logo_white.png"
@@ -20,8 +20,27 @@
       />
     </div>
 
-    <span class="float-end">
-      <button class="btn btn-light">Scienze Nautiche</button>
-    </span>
+    <div ngbDropdown class="d-inline-block">
+      <div
+        id="dropdownBasic1"
+        ngbDropdownToggle
+        style="cursor: pointer"
+        class="d-flex flex-row align-items-center gap-2 text-white"
+      >
+        <p class="text-white mb-0 fw-bold">{{"Mario Rossi"}}</p>
+        <a
+          class="d-flex align-items-center justify-content-center text-white p-0"
+        >
+          <fa-icon [icon]="UserProfileIcon" [size]="'xl'"></fa-icon>
+        </a>
+      </div>
+      <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+        <button ngbDropdownItem>Profilo</button>
+        <button ngbDropdownItem>Impostazioni</button>
+        <button ngbDropdownItem class="text-danger" (click)="onLogout()">
+          <fa-icon [icon]="LogoutIcon"></fa-icon> Logout
+        </button>
+      </div>
+    </div>
   </div>
 </div>

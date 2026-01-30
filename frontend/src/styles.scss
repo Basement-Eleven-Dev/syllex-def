@@ -94,7 +94,7 @@ tr {
   justify-content: center;
   aspect-ratio: 1 / 1;
   padding: 0.5rem;
-  background-color: #375ec975;
+  background-color: #375ec92f;
   color: var(--bs-dark);
 }
 .typeCard {
@@ -105,16 +105,48 @@ tr {
   }
 
   &.selected {
-    background-color: #6a8be5;
-    color: white;
+    background-color: #befd59;
+    color: var(--bs-dark);
     font-weight: bold;
     .typeIconWrapper {
-      background-color: var(--bs-dark);
-      color: #fff;
+      background-color: white;
+      color: var(--bs-dark);
     }
   }
 }
 
 label {
   font-size: 1rem;
+}
+
+textarea.custom-input {
+  padding: 1rem;
+}
+
+.ai {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  color: white;
+  border: none;
+  overflow: hidden;
+  transition: all 0.3s ease;
+
+  box-shadow: 0 4px 15px 0 rgba(102, 126, 234, 0.4);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px 0 rgba(102, 126, 234, 0.6);
+    color: white;
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px 0 rgba(102, 126, 234, 0.5);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 4px 15px 0 rgba(102, 126, 234, 0.2);
+  }
 }

@@ -6,6 +6,7 @@ import {
 } from '@fortawesome/angular-fontawesome';
 import {
   faBallotCheck,
+  faBook,
   faChartLine,
   faClipboardQuestion,
   faFile,
@@ -14,6 +15,7 @@ import {
   faMailboxOpenLetter,
   faMicrochipAi,
   faRightFromBracket,
+  faSparkles,
   faUserCircle,
   faUsers,
 } from '@fortawesome/pro-solid-svg-icons';
@@ -33,6 +35,8 @@ interface SidebarRoute {
 })
 export class Sidebar {
   LogoutIcon = faRightFromBracket;
+  SparklesIcon = faSparkles;
+  BookIcon = faBook;
 
   constructor(private authService: Auth) {}
 
@@ -67,28 +71,5 @@ export class Sidebar {
       label: 'Comunicazioni',
       icon: faMailboxOpenLetter,
     },
-    {
-      path: 'lab-ai',
-      label: 'Laboratorio AI',
-      icon: faMicrochipAi,
-    },
   ];
-  otherRoutes: SidebarRoute[] = [
-    {
-      path: '/profile',
-      label: 'Profilo',
-      icon: faUserCircle,
-    },
-    {
-      path: '/settings',
-      label: 'Impostazioni',
-      icon: faGear,
-    },
-  ];
-
-  onLogout() {
-    this.authService.logout().then(() => {
-      window.location.reload();
-    });
-  }
 }

@@ -3,3 +3,14 @@ img {
     cursor: pointer;
   }
 }
+
+#logoutButton {
+  background-color: rgb(255, 192, 192);
+  color: var(--bs-danger);
+  border: 1px solid var(--bs-danger);
+  &:hover {
+    background-color: var(--bs-danger);
+    color: white;
+    cursor: pointer;
+  }
+}
