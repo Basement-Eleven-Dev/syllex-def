@@ -7,7 +7,7 @@ import {
   CorsEnabledAPIGatewayProxyResult,
   CustomHandler,
   Res,
-} from "../../_helpers/_types/lambdaProxyResponse";
+} from "../../_helpers/_lambda/lambdaProxyResponse";
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { mongoClient } from "../../_helpers/getDatabase";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
@@ -623,9 +623,8 @@ function generateStaticMermaidSvg(
           const textWidth = Math.max(node.label.length * 8, 100);
           const rectWidth = textWidth + 20;
           svgContent += `
-  <rect x="${pos.x - rectWidth / 2}" y="${
-            pos.y - 25
-          }" width="${rectWidth}" height="50" rx="8" class="node-rect" />`;
+  <rect x="${pos.x - rectWidth / 2}" y="${pos.y - 25
+            }" width="${rectWidth}" height="50" rx="8" class="node-rect" />`;
         }
 
         // ⭐ TESTO OTTIMIZZATO CON WRAP INTELLIGENTE
@@ -910,11 +909,11 @@ async function completeMaterialGeneration(
     // Logica dinamica per il prompt
     const topicInstruction =
       params.focusTopics &&
-      Array.isArray(params.focusTopics) &&
-      params.focusTopics.length > 0
+        Array.isArray(params.focusTopics) &&
+        params.focusTopics.length > 0
         ? `Focus EXCLUSIVELY on the following topics: ${params.focusTopics.join(
-            ", "
-          )}.`
+          ", "
+        )}.`
         : "Base your work on the entire provided context.";
 
     switch (params.generationType) {

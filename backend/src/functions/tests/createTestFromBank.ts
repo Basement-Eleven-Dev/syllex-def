@@ -2,7 +2,7 @@ import {
   CorsEnabledAPIGatewayProxyResult,
   CustomHandler,
   Res,
-} from "../../_helpers/_types/lambdaProxyResponse";
+} from "../../_helpers/_lambda/lambdaProxyResponse";
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { getCurrentUser } from "../../_helpers/getAuthCognitoUser";
 import { DB_NAME } from "../../_helpers/config/env";

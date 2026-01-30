@@ -5,7 +5,7 @@ import {
   CorsEnabledAPIGatewayProxyResult,
   CustomHandler,
   Res,
-} from "../../_helpers/_types/lambdaProxyResponse";
+} from "../../_helpers/_lambda/lambdaProxyResponse";
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { mongoClient } from "../../_helpers/getDatabase";
 import { Test } from "./createTest";
