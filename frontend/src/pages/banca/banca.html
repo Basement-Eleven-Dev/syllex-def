@@ -29,11 +29,10 @@
     app-question-card
     [question]="question"
     [collapsed]="isQuestionCollapsed(question.id)"
-    [showIndex]="true"
-    [index]="i"
     [showTestCompositionActions]="false"
     [showBancaActions]="true"
     [showExplanation]="true"
+    [showPolicy]="true"
     (onExpand)="onQuestionExpanded($event)"
   ></div>
 </div>

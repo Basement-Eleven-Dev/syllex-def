@@ -101,4 +101,11 @@ export class Sidebar {
       icon: faMailboxOpenLetter,
     },
   ];
+
+  availableSubjects(): MateriaObject[] {
+    // Exclude the currently selected subject from the list
+    return this.materiaService.allMaterie.filter(
+      (subject) => subject.id !== this.selectedSubject.id,
+    );
+  }
 }

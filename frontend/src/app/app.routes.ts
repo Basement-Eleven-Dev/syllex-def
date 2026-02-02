@@ -13,6 +13,8 @@ import { CreateEditQuestion } from '../pages/create-edit-question/create-edit-qu
 import { Classi } from '../pages/classi/classi';
 import { Comunicazioni } from '../pages/comunicazioni/comunicazioni';
 import { ClasseDettaglio } from '../pages/classe-dettaglio/classe-dettaglio';
+import { LaboratorioAi } from '../pages/laboratorio-ai/laboratorio-ai';
+import { CreateEditComunicazione } from '../pages/create-edit-comunicazione/create-edit-comunicazione';
 
 export const routes: Routes = [
   {
@@ -81,7 +83,19 @@ export const routes: Routes = [
       },
       {
         path: 'comunicazioni',
-        component: Test,
+        component: Comunicazioni,
+      },
+      {
+        path: 'comunicazioni/new',
+        component: CreateEditComunicazione,
+      },
+      {
+        path: 'comunicazioni/edit/:comunicazioneId',
+        component: CreateEditComunicazione,
+      },
+      {
+        path: 'laboratorio-ai',
+        component: LaboratorioAi,
       },
       {
         path: '**',

@@ -8,7 +8,7 @@ import {
   input,
   signal,
 } from '@angular/core';
-import { Question } from '../questions-filters/questions-filters';
+import { Question } from '../search-questions/search-questions';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faCheck,
@@ -68,6 +68,7 @@ export class QuestionCard {
   @Input() showTestCompositionActions: boolean = false;
   @Input() showBancaActions: boolean = false;
   @Input() showExplanation: boolean = false;
+  @Input() showPolicy: boolean = false;
   @Output() removeMe = new EventEmitter<string>();
   @Output() onExpand = new EventEmitter<string>(); // Notifica espansione
 

@@ -19,13 +19,13 @@
       @if(showIndex){<span class="badge bg-dark"># {{ index + 1 }}</span>}
       <span class="badge bg-primary">{{ question.type }}</span>
       <span class="badge bg-primary">{{ question.topic }}</span>
-
-      @if(showBancaActions) {
+      @if(showPolicy){<span class="badge bg-light text-dark"
+        >{{ question.policy }}</span
+      >} @if(showBancaActions) {
       <div class="d-flex flex-row gap-1 justify-content-end w-100">
         <button
           type="button"
           class="btn btn-sm btn-outline-primary"
-          (click)="removeMe.emit(question.id)"
           title="Modifica"
         >
           <fa-icon [icon]="EditIcon"></fa-icon> Modifica

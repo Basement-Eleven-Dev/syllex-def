@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { QuestionsFilters } from './questions-filters';
+import { TopicsPerformanceChart } from './topics-performance-chart';
 
-describe('QuestionsFilters', () => {
-  let component: QuestionsFilters;
-  let fixture: ComponentFixture<QuestionsFilters>;
+describe('TopicsPerformanceChart', () => {
+  let component: TopicsPerformanceChart;
+  let fixture: ComponentFixture<TopicsPerformanceChart>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [QuestionsFilters]
+      imports: [TopicsPerformanceChart]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(QuestionsFilters);
+    fixture = TestBed.createComponent(TopicsPerformanceChart);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

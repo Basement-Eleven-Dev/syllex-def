@@ -1,1 +1,69 @@
-<p>comunicazioni works!</p>
+<div class="d-flex flex-row align-items-center mb-5">
+  <div>
+    <h1
+      class="text-dark fw-bold mb-0 display-6 align-items-center d-flex gap-3"
+    >
+      Comunicazioni
+    </h1>
+    <p class="text-dark mb-0">
+      Comunica con le tue classi inviando loro comunicazioni importanti e
+      aggiornamenti.
+    </p>
+  </div>
+  <button
+    class="btn btn-primary btn-lg ms-auto py-3"
+    routerLink="/t/comunicazioni/new"
+  >
+    <fa-icon [icon]="PlusIcon"></fa-icon>
+    Nuova comunicazione
+  </button>
+</div>
+
+<section class="form-section d-flex flex-row align-items-center mb-5 gap-3">
+  <div>
+    <label for="search-term" class="form-label fw-semibold text-dark"
+      >Contenuto della comunicazione</label
+    >
+    <input
+      type="text"
+      class="form-control me-3 custom-input"
+      id="search-term"
+      placeholder="Cerca comunicazione tramite parole chiave..."
+      style="min-width: 400px"
+    />
+  </div>
+
+  <div>
+    <label for="class" class="form-label fw-semibold text-dark">Classe</label>
+    <select
+      class="form-select custom-input"
+      style="max-width: 200px"
+      id="class"
+    >
+      <option value="">Classe</option>
+      @for(status of ['3A Informatica', '3B Informatica', '3C Informatica'];
+      track $index) {
+      <option value="{{ status }}">{{ status }}</option>
+      }
+    </select>
+  </div>
+  <div>
+    <label for="attachments" class="form-label fw-semibold text-dark"
+      >Allegati</label
+    >
+    <select
+      class="form-select custom-input"
+      style="max-width: 200px"
+      id="attachments"
+    >
+      <option value="">Stato</option>
+      @for(option of ['Si', 'No']; track $index) {
+      <option value="{{ option }}">{{ option }}</option>
+      }
+    </select>
+  </div>
+</section>
+
+@for(comunicazione of comunicazioni; track comunicazione.id){
+<div class="mb-3" app-comunicazione-card [comunicazione]="comunicazione"></div>
+}

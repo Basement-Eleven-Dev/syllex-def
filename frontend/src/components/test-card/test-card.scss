@@ -33,9 +33,6 @@
   }
 }
 
-.contextual-menu-wrapper {
-  position: absolute;
-  right: 25px;
-  top: 90%;
-  z-index: 1050;
+::ng-deep .circle-btn.dropdown-toggle::after {
+  display: none;
 }

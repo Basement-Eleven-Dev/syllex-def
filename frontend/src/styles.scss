@@ -217,6 +217,7 @@ section {
   transform: translate(0, 0) !important;
   transform: translate(-50%, -50%);
   color: rgba(0, 0, 0, 0.05);
+  z-index: 0;
 }
 
 .inGridView {

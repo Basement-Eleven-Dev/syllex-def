@@ -4,7 +4,7 @@
 
 <div class="row mt-5">
   @for(stat of stats; track $index) {
-  <div class="col-12 col-md-6 col-lg-3">
+  <div class="col-12 col-md-6 col-lg-3 mb-3">
     <div class="card h-100">
       <div class="card-body d-flex flex-column align-items-center p-1">
         <div class="flex-fill d-flex flex-column align-items-center p-4">
@@ -17,7 +17,10 @@
           <p class="mb-0 cardDescription text-dark">{{ stat.label }}</p>
         </div>
         @if(stat.link) {
-        <a [routerLink]="stat.link" class="mb-0 text-dark"
+        <a
+          [routerLink]="stat.link"
+          [queryParams]="stat.queryParams"
+          class="mb-0 text-dark"
           >{{ stat.linkLabel }}</a
         >
         }
@@ -27,21 +30,26 @@
   }
 </div>
 
-<section class="form-section d-flex flex-row align-items-center my-5">
-  <div>
-    <label for="search-term" class="form-label fw-semibold text-dark"
-      >Studente</label
+<div class="card mt-3">
+  <div class="card-header">
+    <ul
+      ngbNav
+      #nav="ngbNav"
+      [(activeId)]="activeSection"
+      [destroyOnHide]="false"
+      class="nav-tabs nav-fill card-header-tabs fs-4 text-dark"
     >
-    <input
-      type="text"
-      class="form-control me-3 custom-input"
-      id="search-term"
-      placeholder="Cerca classi..."
-      style="min-width: 400px"
-    />
+      @for(section of sections; track $index; let first = $first) {
+      <li [ngbNavItem]="$index + 1">
+        <button ngbNavLink class="text-dark">
+          <fa-icon [icon]="section.icon"></fa-icon> {{ section.title }}
+        </button>
+        <ng-template ngbNavContent>
+          <ng-container *ngComponentOutlet="section.component" />
+        </ng-template>
+      </li>
+      }
+    </ul>
   </div>
-</section>
-
-<app-studenti-classe-table
-  [classeId]="classeDettaglio.id"
-></app-studenti-classe-table>
+  <div [ngbNavOutlet]="nav" class="mt-4 p-3"></div>
+</div>

@@ -26,10 +26,11 @@ export interface Question {
   topic: string;
   explanation: string;
   options?: { label: string; isCorrect: boolean }[];
+  policy: 'pubblica' | 'privata';
 }
 
 @Component({
-  selector: 'app-questions-filters',
+  selector: 'app-search-questions',
   imports: [
     FormsModule,
     ReactiveFormsModule,
@@ -39,10 +40,10 @@ export interface Question {
     QuestionCard,
     QuestionsSearchFilters,
   ],
-  templateUrl: './questions-filters.html',
-  styleUrl: './questions-filters.scss',
+  templateUrl: './search-questions.html',
+  styleUrl: './search-questions.scss',
 })
-export class QuestionsFilters implements OnInit, OnDestroy {
+export class SearchQuestions implements OnInit, OnDestroy {
   // Mock data - sostituire con chiamata al servizio
   availableQuestions: Question[] = mockQuestions;
 
@@ -58,7 +59,11 @@ export class QuestionsFilters implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  onFiltersChanged(filters: { searchTerm: string; type: string }): void {
+  onFiltersChanged(filters: {
+    searchTerm: string;
+    type: string;
+    policy: 'pubblica' | 'privata' | '';
+  }): void {
     // Logica di filtraggio delle domande basata sui filtri ricevuti
     // Per ora, resettiamo semplicemente la lista filtrata a tutte le domande
     this.filteredQuestions = [...this.availableQuestions];

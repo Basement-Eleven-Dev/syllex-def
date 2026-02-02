@@ -37,7 +37,7 @@ interface Stats {
   percentageValue?: number;
 }
 
-interface Section {
+export interface Section {
   id: number;
   title: string;
   icon: IconDefinition;

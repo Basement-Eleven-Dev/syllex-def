@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faInfinity,
@@ -12,8 +13,8 @@ import {
   faPenRuler,
   faSave,
 } from '@fortawesome/pro-solid-svg-icons';
-import { QuestionsFilters } from '../../components/questions-filters/questions-filters';
 import { QuestionsDroppableList } from '../../components/questions-droppable-list/questions-droppable-list';
+import { SearchQuestions } from '../../components/search-questions/search-questions';
 
 interface ClassOption {
   id: string;
@@ -26,13 +27,13 @@ interface ClassOption {
     FormsModule,
     ReactiveFormsModule,
     FontAwesomeModule,
-    QuestionsFilters,
+    SearchQuestions,
     QuestionsDroppableList,
   ],
   templateUrl: './create-edit-test.html',
   styleUrl: './create-edit-test.scss',
 })
-export class CreateEditTest {
+export class CreateEditTest implements OnInit {
   InfinityIcon = faInfinity;
   GenPasswordIcon = faKey;
   DraftIcon = faPenRuler;
@@ -49,12 +50,24 @@ export class CreateEditTest {
   });
 
   availableClasses: ClassOption[] = [
-    { id: '1A', name: '1A' },
-    { id: '2B', name: '2B' },
-    { id: '3C', name: '3C' },
-    { id: '4D', name: '4D' },
-    { id: '5E', name: '5E' },
+    { id: '1', name: '1A' },
+    { id: '2', name: '2B' },
+    { id: '3', name: '3C' },
+    { id: '4', name: '4D' },
+    { id: '5', name: '5E' },
   ];
+
+  constructor(private route: ActivatedRoute) {}
+
+  ngOnInit() {
+    // Pre-seleziona la classe dal query param 'assign'
+    this.route.queryParams.subscribe((params) => {
+      const assignClassId = params['assign'];
+      if (assignClassId) {
+        this.testForm.get('classes')?.setValue([assignClassId]);
+      }
+    });
+  }
 
   get assignedClasses() {
     return this.testForm.get('classes')?.value || [];

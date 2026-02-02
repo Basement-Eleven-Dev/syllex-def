@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { QuestionsSearchFilters } from '../../components/questions-search-filters/questions-search-filters';
 import { mockQuestions } from '../../mock_questions';
-import { Question } from '../../components/questions-filters/questions-filters';
+import { Question } from '../../components/search-questions/search-questions';
 import { QuestionCard } from '../../components/question-card/question-card';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPlus } from '@fortawesome/pro-solid-svg-icons';

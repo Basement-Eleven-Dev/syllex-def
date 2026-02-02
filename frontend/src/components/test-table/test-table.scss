@@ -28,3 +28,7 @@ tr {
     background-color: #ffb8615c !important;
   }
 }
+
+::ng-deep .circle-btn.dropdown-toggle::after {
+  display: none;
+}

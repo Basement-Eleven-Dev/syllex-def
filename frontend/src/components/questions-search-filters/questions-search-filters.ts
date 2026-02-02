@@ -17,10 +17,12 @@ export class QuestionsSearchFilters {
   @Output() filtersChanged = new EventEmitter<{
     searchTerm: string;
     type: string;
+    policy: 'pubblica' | 'privata' | '';
   }>();
 
   searchForm: FormGroup = new FormGroup({
     searchTerm: new FormControl(''),
     type: new FormControl(''),
+    policy: new FormControl(''),
   });
 }
