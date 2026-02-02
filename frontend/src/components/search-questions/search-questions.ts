@@ -31,6 +31,7 @@ export interface Question {
 
 @Component({
   selector: 'app-search-questions',
+  standalone: true,
   imports: [
     FormsModule,
     ReactiveFormsModule,

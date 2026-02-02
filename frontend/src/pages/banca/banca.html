@@ -16,7 +16,7 @@
 </div>
 
 <h4 class="text-dark fw-bold my-4">Hai 50 domande per questa materia</h4>
-<section class="form-section" style="max-width: 700px">
+<section class="form-section">
   <app-questions-search-filters
     (filtersChanged)="onFiltersChanged($event)"
   ></app-questions-search-filters>
@@ -37,3 +37,23 @@
   ></div>
 </div>
 }
+<div class="mt-5 d-flex flex-row justify-content-between align-items-center">
+  <ngb-pagination
+    [collectionSize]="collectionSize"
+    [(page)]="page"
+    [pageSize]="pageSize"
+    (pageChange)="onNewPageRequested()"
+  >
+  </ngb-pagination>
+
+  <select
+    class="form-select form-select-sm"
+    style="width: auto"
+    [(ngModel)]="pageSize"
+    (ngModelChange)="onNewPageRequested()"
+  >
+    <option [ngValue]="5">5 per pagina</option>
+    <option [ngValue]="10">10 per pagina</option>
+    <option [ngValue]="20">20 per pagina</option>
+  </select>
+</div>

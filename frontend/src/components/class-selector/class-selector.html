@@ -1,0 +1,13 @@
+<label for="classes-assigned" class="form-label fw-semibold text-dark"
+  >Classi assegnate</label
+>
+<div class="d-flex flex-row gap-2 flex-wrap" id="classes-assigned">
+  @for(classe of classiService.classi; track classe.id) {
+  <span
+    class="badge fs-5 px-3 classBadge"
+    (click)="onToggleClass(classe.id)"
+    [class.selected]="isClassSelected(classe.id)"
+    >{{ classe.nome }}</span
+  >
+  }
+</div>

@@ -25,6 +25,7 @@ import { NgbCollapse, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'div[app-question-card]',
+  standalone: true,
   imports: [
     DragDropModule,
     CdkDrag,

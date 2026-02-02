@@ -18,6 +18,7 @@ import { QuestionCard } from '../question-card/question-card';
 
 @Component({
   selector: 'app-questions-droppable-list',
+  standalone: true,
   imports: [DragDropModule, CommonModule, QuestionCard],
   templateUrl: './questions-droppable-list.html',
   styleUrl: './questions-droppable-list.scss',

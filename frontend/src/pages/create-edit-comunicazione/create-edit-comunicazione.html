@@ -1,1 +1,68 @@
-<p>create-edit-comunicazione works!</p>
+<app-back-to
+  [path]="'/t/comunicazioni'"
+  [label]="'Torna alla lista delle comunicazioni'"
+></app-back-to>
+<div class="d-flex flex-row align-items-center justify-content-between mb-4">
+  <div>
+    <h1
+      class="text-dark fw-bold mb-0 display-6 d-flex align-items-center gap-3"
+    >
+      {{ comunicazioneId ? 'Modifica' : 'Nuova' }} comunicazione
+    </h1>
+    <p class="text-dark mb-0">
+      {{ comunicazioneId ? 'Modifica' : 'Crea una nuova' }} comunicazione ai
+      tuoi studenti.
+    </p>
+  </div>
+  @if(comunicazioneId) {
+  <div>
+    <button
+      class="btn btn-outline-danger py-3"
+      confirmAction
+      (click)="onDelete()"
+    >
+      <fa-icon [icon]="SaveIcon"></fa-icon>
+      Elimina
+    </button>
+  </div>
+  }
+</div>
+<form [formGroup]="comunicazioneForm">
+  <div class="mb-3">
+    <label for="titolo" class="form-label text-dark fw-bold">Titolo</label>
+    <input
+      type="text"
+      id="titolo"
+      class="form-control custom-input"
+      formControlName="title"
+      placeholder="Inserisci il titolo della comunicazione"
+    />
+  </div>
+  <div class="mb-3">
+    <label for="contenuto" class="form-label text-dark fw-bold"
+      >Contenuto</label
+    >
+    <textarea
+      id="contenuto"
+      class="form-control custom-input"
+      formControlName="content"
+      rows="6"
+      placeholder="Inserisci il contenuto della comunicazione"
+    ></textarea>
+  </div>
+  <div class="col-4">
+    <app-class-selector
+      [selectedClassIds]="assignedClasses"
+      (selectedClassIdsChange)="onClassesChange($event)"
+    ></app-class-selector>
+  </div>
+
+  <div>
+    <app-materiali-selector></app-materiali-selector>
+  </div>
+  <div class="d-flex flex-row justify-content-end mt-5 gap-3">
+    <button type="submit" class="btn btn-success text-white btn-lg fs-3">
+      <fa-icon [icon]="SaveIcon"></fa-icon> Salva
+    </button>
+  </div>
+</form>

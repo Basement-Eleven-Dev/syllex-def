@@ -1,0 +1,25 @@
+<div class="materiali-explorer">
+  <!-- Search Bar -->
+  <div class="p-3 border-bottom">
+    <input
+      type="text"
+      class="form-control"
+      placeholder="Cerca materiali..."
+      [(ngModel)]="searchQuery"
+      [ngModelOptions]="{updateOn: 'change'}"
+    />
+  </div>
+
+  <ul class="list-group list-group-flush">
+    @for (item of filteredItems(); track item.id) {
+    <app-materiali-item
+      [item]="item"
+      [expandedFolders]="expandedFolders()"
+      [selectedMaterialIds]="selectedMaterialIds()"
+      [searchQuery]="searchQuery()"
+      (folderToggle)="toggleFolder($event)"
+      (materialSelect)="onMaterialSelect($event)"
+    />
+    }
+  </ul>
+</div>

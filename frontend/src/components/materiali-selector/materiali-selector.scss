@@ -1,0 +1,48 @@
+.materiali-explorer {
+  .cursor-pointer {
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+  }
+
+  .folder-item {
+    user-select: none;
+  }
+
+  .material-item {
+    transition: background-color 0.15s ease;
+
+    &.selected {
+      background-color: var(--bs-primary);
+      color: white;
+
+      &:hover {
+        background-color: var(--bs-primary);
+        opacity: 0.9;
+      }
+    }
+
+    &:hover:not(.selected) {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+  }
+
+  .transition-rotate {
+    transition: transform 0.2s ease;
+
+    &.rotate-90 {
+      transform: rotate(90deg);
+    }
+  }
+
+  .list-group-item {
+    border-left: 0;
+    border-right: 0;
+
+    &:first-child {
+      border-top: 0;
+    }
+  }
+}

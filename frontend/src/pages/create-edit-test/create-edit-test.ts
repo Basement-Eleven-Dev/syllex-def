@@ -15,20 +15,21 @@ import {
 } from '@fortawesome/pro-solid-svg-icons';
 import { QuestionsDroppableList } from '../../components/questions-droppable-list/questions-droppable-list';
 import { SearchQuestions } from '../../components/search-questions/search-questions';
-
-interface ClassOption {
-  id: string;
-  name: string;
-}
+import { ClassSelector } from '../../components/class-selector/class-selector';
+import { ClassiService } from '../../services/classi-service';
+import { BackTo } from '../../components/back-to/back-to';
 
 @Component({
   selector: 'app-create-edit-test',
+  standalone: true,
   imports: [
     FormsModule,
     ReactiveFormsModule,
     FontAwesomeModule,
     SearchQuestions,
     QuestionsDroppableList,
+    ClassSelector,
+    BackTo,
   ],
   templateUrl: './create-edit-test.html',
   styleUrl: './create-edit-test.scss',
@@ -49,15 +50,10 @@ export class CreateEditTest implements OnInit {
     time: new FormControl(0),
   });
 
-  availableClasses: ClassOption[] = [
-    { id: '1', name: '1A' },
-    { id: '2', name: '2B' },
-    { id: '3', name: '3C' },
-    { id: '4', name: '4D' },
-    { id: '5', name: '5E' },
-  ];
-
-  constructor(private route: ActivatedRoute) {}
+  constructor(
+    private route: ActivatedRoute,
+    public classiService: ClassiService,
+  ) {}
 
   ngOnInit() {
     // Pre-seleziona la classe dal query param 'assign'
@@ -77,18 +73,8 @@ export class CreateEditTest implements OnInit {
     return this.testForm.get('time')?.value;
   }
 
-  onToggleAssignedClass(classId: string) {
-    const currentClasses = this.assignedClasses;
-    const updatedClasses = currentClasses.includes(classId)
-      ? currentClasses.filter((id: string) => id !== classId)
-      : [...currentClasses, classId];
-    this.testForm.get('classes')?.setValue(updatedClasses);
-
-    console.log('Assigned Classes:', updatedClasses);
-  }
-
-  isClassSelected(classId: string): boolean {
-    return this.assignedClasses.includes(classId);
+  onClassesChange(classIds: string[]): void {
+    this.testForm.get('classes')?.setValue(classIds);
   }
 
   onGeneratePassword() {

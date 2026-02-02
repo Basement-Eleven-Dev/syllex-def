@@ -3,6 +3,9 @@ import { Materia } from '../../services/materia';
 import { faPlus } from '@fortawesome/pro-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ComunicazioneCard } from '../../components/comunicazione-card/comunicazione-card';
+import { RouterModule } from '@angular/router';
+import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
+import { FormsModule } from '@angular/forms';
 
 interface Attachment {
   id: number;
@@ -21,7 +24,13 @@ export interface Comunicazione {
 }
 @Component({
   selector: 'app-comunicazioni',
-  imports: [FontAwesomeModule, ComunicazioneCard],
+  imports: [
+    FontAwesomeModule,
+    ComunicazioneCard,
+    RouterModule,
+    NgbPagination,
+    FormsModule,
+  ],
   templateUrl: './comunicazioni.html',
   styleUrl: './comunicazioni.scss',
 })
@@ -111,4 +120,11 @@ export class Comunicazioni {
       classes: ['3A', '3B'],
     },
   ];
+
+  page: number = 1;
+  pageSize: number = 5;
+  collectionSize: number = 10;
+  onNewPageRequested() {
+    throw new Error('Method not implemented.');
+  }
 }

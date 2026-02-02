@@ -9,6 +9,7 @@ import {
 
 @Component({
   selector: 'app-questions-search-filters',
+  standalone: true,
   imports: [FormsModule, ReactiveFormsModule, TitleCasePipe],
   templateUrl: './questions-search-filters.html',
   styleUrl: './questions-search-filters.scss',

@@ -67,3 +67,24 @@
 @for(comunicazione of comunicazioni; track comunicazione.id){
 <div class="mb-3" app-comunicazione-card [comunicazione]="comunicazione"></div>
 }
+
+<div class="mt-5 d-flex flex-row justify-content-between align-items-center">
+  <ngb-pagination
+    [collectionSize]="collectionSize"
+    [(page)]="page"
+    [pageSize]="pageSize"
+    (pageChange)="onNewPageRequested()"
+  >
+  </ngb-pagination>
+
+  <select
+    class="form-select form-select-sm"
+    style="width: auto"
+    [(ngModel)]="pageSize"
+    (ngModelChange)="onNewPageRequested()"
+  >
+    <option [ngValue]="5">5 per pagina</option>
+    <option [ngValue]="10">10 per pagina</option>
+    <option [ngValue]="20">20 per pagina</option>
+  </select>
+</div>
