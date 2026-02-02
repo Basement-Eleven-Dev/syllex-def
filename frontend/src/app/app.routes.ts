@@ -10,6 +10,9 @@ import { TestDetail } from '../pages/test-detail/test-detail';
 import { CreateEditTest } from '../pages/create-edit-test/create-edit-test';
 import { Banca } from '../pages/banca/banca';
 import { CreateEditQuestion } from '../pages/create-edit-question/create-edit-question';
+import { Classi } from '../pages/classi/classi';
+import { Comunicazioni } from '../pages/comunicazioni/comunicazioni';
+import { ClasseDettaglio } from '../pages/classe-dettaglio/classe-dettaglio';
 
 export const routes: Routes = [
   {
@@ -51,6 +54,18 @@ export const routes: Routes = [
       {
         path: 'tests',
         component: Test,
+      },
+      {
+        path: 'classi',
+        component: Classi,
+      },
+      {
+        path: 'classi/:classeId',
+        component: ClasseDettaglio,
+      },
+      {
+        path: 'comunicazioni',
+        component: Comunicazioni,
       },
       {
         path: 'tests/new',

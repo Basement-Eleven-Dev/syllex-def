@@ -23,7 +23,7 @@ $border-radius-xxl: 2rem;
 $border-radius-pill: 50rem;
 
 $btn-font-weight: 700;
-$card-border-radius: 1.5rem;
+$card-border-radius: $border-radius-xl;
 
 @import "bootstrap/scss/bootstrap";
 
@@ -32,7 +32,7 @@ $card-border-radius: 1.5rem;
 }
 
 body {
-  background-color: #f2f2f288;
+  background-color: #f2f2f252;
 }
 
 #authRightColumn {
@@ -68,7 +68,7 @@ a {
 }
 
 .status-pill {
-  border-radius: 10px;
+  border-radius: var(--bs-border-radius-lg);
   padding: 0.25rem 0.75rem;
   color: var(--bs-dark);
   font-weight: 600;
@@ -116,7 +116,7 @@ tr {
 }
 
 label {
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 
 textarea.custom-input {
@@ -127,20 +127,51 @@ textarea.custom-input {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
   color: white;
   border: none;
-  overflow: hidden;
+  position: relative;
+  cursor: pointer;
   transition: all 0.3s ease;
-
   box-shadow: 0 4px 15px 0 rgba(102, 126, 234, 0.4);
 
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 3px;
+    background: conic-gradient(
+      from var(--angle),
+      #667eea,
+      #764ba2,
+      #f093fb,
+      #ffd700,
+      #667eea
+    );
+    border-radius: inherit;
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    animation: gradientRotate 2s linear infinite;
+  }
+
   &:hover {
-    transform: translateY(-2px);
     box-shadow: 0 6px 20px 0 rgba(102, 126, 234, 0.6);
     color: white;
+    transform: translateY(-2px);
+
+    &::before {
+      opacity: 1;
+    }
   }
 
   &:active {
-    transform: translateY(0);
     box-shadow: 0 2px 10px 0 rgba(102, 126, 234, 0.5);
+    transform: translateY(0);
   }
 
   &:disabled {
@@ -148,5 +179,78 @@ textarea.custom-input {
     cursor: not-allowed;
     transform: none;
     box-shadow: 0 4px 15px 0 rgba(102, 126, 234, 0.2);
+
+    &::before {
+      display: none;
+    }
   }
+}
+
+@keyframes gradientRotate {
+  0% {
+    --angle: 0deg;
+  }
+  100% {
+    --angle: 360deg;
+  }
+}
+
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+section {
+  &.form-section {
+    background-color: #375ec90e;
+    padding: 1.5rem;
+    border-radius: 1.5rem;
+  }
+}
+
+.background-icon {
+  position: absolute;
+  font-size: 10rem;
+  top: -15%;
+  right: -10%;
+  transform: translate(0, 0) !important;
+  transform: translate(-50%, -50%);
+  color: rgba(0, 0, 0, 0.05);
+}
+
+.inGridView {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+.inTableView {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mainValue {
+  font-size: 3rem;
+  color: var(--bs-dark);
+  font-weight: bold;
+}
+
+.reduced {
+  font-size: 1.5rem;
+  color: var(--bs-muted);
+  font-weight: normal;
+  opacity: 0.5;
+}
+
+.cardValue {
+  font-size: 3rem;
+  font-weight: bold;
+}
+
+.cardDescription {
+  font-size: 1.2rem;
 }

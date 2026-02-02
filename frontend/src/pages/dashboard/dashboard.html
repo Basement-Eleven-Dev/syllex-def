@@ -63,15 +63,15 @@
               >
                 <span>Titolo annuncio</span>
                 @if(c.attachmentCount > 0){
-                <span class="badge bg-secondary ms-2 text-dark fw-bold"
+                <span class="badge bg-primary ms-2 text-white fw-bold"
                   >{{ c.attachmentCount }}
                   <fa-icon [icon]="AttachmentIcon"></fa-icon>
                 </span>
                 }
               </div>
               <p class="ellipsis-3-lines mb-2">{{ c.body }}</p>
-              c
-              <small>{{ c.date | date:'short' }}</small>
+              Creato il
+              <small class="fw-semibold">{{ c.date | date:'short' }}</small>
             </div>
           </div>
           }

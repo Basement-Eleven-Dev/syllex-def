@@ -6,29 +6,35 @@
       Nautiche
     </p>
   </div>
-  <button class="btn btn-primary ms-auto py-3" routerLink="/t/create-question">
+  <button
+    class="btn btn-primary btn-lg ms-auto py-3"
+    routerLink="/t/create-question"
+  >
     <fa-icon [icon]="PlusIcon"></fa-icon>
     Nuova domanda
   </button>
 </div>
 
 <h4 class="text-dark fw-bold my-4">Hai 50 domande per questa materia</h4>
-<div style="max-width: 600px">
+<section class="form-section" style="max-width: 700px">
   <app-questions-search-filters
     (filtersChanged)="onFiltersChanged($event)"
   ></app-questions-search-filters>
-</div>
+</section>
 
-@for(question of questions; track $index; let last = $last) {
+@for(question of questions; track question.id; let last = $last; let i = $index)
+{
 <div class="mt-4">
   <div
     app-question-card
     [question]="question"
+    [collapsed]="isQuestionCollapsed(question.id)"
     [showIndex]="true"
+    [index]="i"
     [showTestCompositionActions]="false"
     [showBancaActions]="true"
     [showExplanation]="true"
-    [showIndex]="false"
+    (onExpand)="onQuestionExpanded($event)"
   ></div>
 </div>
 }

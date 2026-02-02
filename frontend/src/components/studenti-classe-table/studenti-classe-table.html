@@ -1,0 +1,38 @@
+<div class="table-responsive">
+  <table class="table table-hover align-middle">
+    <thead>
+      <tr>
+        <th></th>
+        <th class="text-muted fw-light" scope="col">Nome Studente</th>
+        <th class="text-muted fw-light" scope="col">Email</th>
+        <th class="text-muted fw-light" scope="col">Performance</th>
+        <th class="text-muted fw-light" scope="col">Completed Tests</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for(studente of props.studenti; track $index) {
+      <tr>
+        <td>
+          <img
+            src="https://api.dicebear.com/9.x/initials/svg?backgroundColor=d6ff79&textColor=1f3571&seed={{ studente.nome }} {{ studente.cognome }}"
+            alt="avatar"
+            height="30"
+            class="rounded-circle"
+          />
+        </td>
+        <td class="fw-bold text-dark">
+          {{ studente.nome }} {{ studente.cognome }}
+        </td>
+        <td class="text-dark">{{ studente.email }}</td>
+        <td class="text-dark">{{ studente.performance }}%</td>
+        <td class="text-dark">{{ studente.completedTests }}/12</td>
+        <td>
+          <button class="btn btn-sm btn-primary">
+            <fa-icon [icon]="EyeIcon"></fa-icon>Vedi Dettagli
+          </button>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</div>
