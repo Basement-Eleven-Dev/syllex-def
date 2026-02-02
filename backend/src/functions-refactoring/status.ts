@@ -7,7 +7,8 @@ import createError from 'http-errors'
 
 
 const getStatus = async (event: APIGatewayProxyEvent, context: Context) => {
-    throw new createError.NotFound('Not found')
+    const status: boolean = Math.random() < 0.5;
+    if (!status) throw new createError.ServiceUnavailable('Offline')
     return {
         status: "All Operating"
     };
