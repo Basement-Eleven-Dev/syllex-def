@@ -1,5 +1,5 @@
 <form [formGroup]="genAiQuestionForm" (ngSubmit)="onGenerate()">
-  <div class="offcanvas-body dvh-100 p-4">
+  <div class="offcanvas-body dvh-100 overflow-scroll p-4">
     <div class="h-100 d-flex flex-column gap-2 justify-content-between">
       <button
         type="button"
@@ -14,7 +14,7 @@
         </h4>
       </div>
 
-      <section>
+      <section class="form-section">
         <label class="form-label fw-semibold text-dark"
           >Tipologia di risposta:
           <span class="fw-normal">{{ selectedType | titlecase }}</span></label
@@ -24,9 +24,8 @@
           [selectedType]="selectedType"
           direction="column"
         ></app-question-type-selectors>
-        <hr />
       </section>
-      <section>
+      <section class="form-section">
         <label class="form-label fw-semibold text-dark">Argomento</label>
         <select
           class="form-select mb-4 custom-input w-auto"
@@ -38,10 +37,7 @@
           <option [value]="topic">{{ topic }}</option>
           }
         </select>
-        <hr />
-      </section>
 
-      <section>
         <label class="form-label fw-semibold text-dark">Dettagli domanda</label>
         <textarea
           class="form-control mb-4 custom-input"
@@ -50,14 +46,13 @@
           style="resize: none"
           placeholder="Fornisci dettagli aggiuntivi per la domanda in merito allo stile, al contesto o ad altri aspetti rilevanti."
         ></textarea>
-        <hr />
       </section>
 
-      <section>
+      <section class="form-section">
         <label class="form-label fw-semibold text-dark mb-2">Allega file</label>
         <input
           type="file"
-          class="form-control custom-input w-auto"
+          class="form-control custom-input"
           (change)="onFileSelected($event)"
           accept=".txt,.pdf"
         />
@@ -68,9 +63,11 @@
         }
       </section>
 
-      <section class="flex-fill d-flex flex-column justify-content-end">
+      <app-materiali-selector></app-materiali-selector>
+
+      <section class="flex-fill d-flex flex-column">
         <button
-          class="btn btn-xl w-100 btn-lg ai"
+          class="btn btn-xl w-100 btn-lg ai mb-4"
           [disabled]="loading || genAiQuestionForm.invalid"
           type="submit"
           (click)="onGenerate()"

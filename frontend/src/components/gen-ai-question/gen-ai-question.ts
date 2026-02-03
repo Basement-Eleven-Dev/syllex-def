@@ -19,6 +19,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { TopicsService } from '../../services/topics-service';
+import { MaterialiSelector } from '../materiali-selector/materiali-selector';
 
 @Component({
   selector: 'app-gen-ai-question',
@@ -28,6 +29,7 @@ import { TopicsService } from '../../services/topics-service';
     TitleCasePipe,
     FormsModule,
     ReactiveFormsModule,
+    MaterialiSelector,
   ],
   templateUrl: './gen-ai-question.html',
   styleUrl: './gen-ai-question.scss',

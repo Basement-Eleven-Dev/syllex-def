@@ -2,7 +2,105 @@
 
 /* Importing Bootstrap SCSS file. */
 
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap");
+/* Aeonik Font Faces */
+@font-face {
+  font-family: "Aeonik";
+  src: url("/fonts/Aeonik/Aeonik-Thin.otf") format("opentype");
+  font-weight: 100;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Aeonik";
+  src: url("/fonts/Aeonik/Aeonik-ThinItalic.otf") format("opentype");
+  font-weight: 100;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Aeonik";
+  src: url("/fonts/Aeonik/Aeonik-Air.otf") format("opentype");
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Aeonik";
+  src: url("/fonts/Aeonik/Aeonik-AirItalic.otf") format("opentype");
+  font-weight: 200;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Aeonik";
+  src: url("/fonts/Aeonik/Aeonik-Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Aeonik";
+  src: url("/fonts/Aeonik/Aeonik-LightItalic.otf") format("opentype");
+  font-weight: 300;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Aeonik";
+  src: url("/fonts/Aeonik/Aeonik-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Aeonik";
+  src: url("/fonts/Aeonik/Aeonik-RegularItalic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Aeonik";
+  src: url("/fonts/Aeonik/Aeonik-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Aeonik";
+  src: url("/fonts/Aeonik/Aeonik-MediumItalic.otf") format("opentype");
+  font-weight: 500;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Aeonik";
+  src: url("/fonts/Aeonik/Aeonik-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Aeonik";
+  src: url("/fonts/Aeonik/Aeonik-BoldItalic.otf") format("opentype");
+  font-weight: 700;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Aeonik";
+  src: url("/fonts/Aeonik/Aeonik-Black.otf") format("opentype");
+  font-weight: 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Aeonik";
+  src: url("/fonts/Aeonik/Aeonik-BlackItalic.otf") format("opentype");
+  font-weight: 900;
+  font-style: italic;
+}
+
 $primary: #375ec9;
 $secondary: #d6ff79;
 $info: #0dcaf0;
@@ -14,7 +112,7 @@ $dark: #1f3571;
 $min-contrast-ratio: 4.5;
 $font-size-base: 0.85rem;
 $enable-gradients: false;
-$font-family-sans-serif: "DM Sans", sans-serif;
+$font-family-sans-serif: "Aeonik", sans-serif;
 $border-radius: 0.75rem;
 $border-radius-sm: 0.5rem;
 $border-radius-lg: 0.9rem;

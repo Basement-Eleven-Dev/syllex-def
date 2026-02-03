@@ -7,29 +7,29 @@ import {
 } from '@fortawesome/pro-solid-svg-icons';
 import { getFileIcon, getFolderIcon } from '../../app/_utils/file-icons';
 
-interface Materiale {
-  id: string;
-  filename: string;
-  url: string;
-  extension: string;
-}
-
-interface Folder {
-  id: string;
-  name: string;
-  content: (Materiale | Folder)[];
-}
+import { Materiale, Folder } from './materiali-selector';
 
 @Component({
   selector: 'app-materiali-item',
   standalone: true,
   imports: [NgbCollapse, FontAwesomeModule],
+  styles: `
+    .cursor-pointer {
+      cursor: pointer;
+    }
+    .transition-rotate {
+      transition: transform 0.2s ease;
+    }
+    .rotate-90 {
+      transform: rotate(90deg);
+    }
+  `,
   template: `
     @if (isFolder(item())) {
       <!-- Folder -->
-      <li class="list-group-item p-0">
+      <li class="list-group-item p-2 rounded-3 mb-2">
         <div
-          class="folder-item d-flex align-items-center p-2 cursor-pointer"
+          class="folder-item d-flex align-items-center p-2 cursor-pointer text-dark"
           (click)="folderToggle.emit(item().id)"
           role="button"
           [attr.aria-expanded]="isExpanded()"
@@ -47,7 +47,7 @@ interface Folder {
 
         <!-- Folder Content (Recursive) -->
         <div [id]="'collapse-' + item().id" [ngbCollapse]="!isExpanded()">
-          <ul class="list-group list-group-flush ms-4">
+          <ul class="list-group list-group-flush ms-4 text-dark rounded-3">
             @for (childItem of getFilteredContent(); track childItem.id) {
               <app-materiali-item
                 [item]="childItem"
@@ -64,18 +64,17 @@ interface Folder {
     } @else {
       <!-- File -->
       <li
-        class="list-group-item p-2 d-flex align-items-center cursor-pointer material-item"
-        [class.selected]="isSelected()"
-        (click)="
-          materialSelect.emit({ material: asMateriale(item()), event: $event })
-        "
+        class="list-group-item p-2 d-flex align-items-center cursor-pointer text-dark rounded-3 mb-2"
+        [class.bg-secondary]="isSelected()"
+        [class.border-dark]="isSelected()"
+        (click)="materialSelect.emit(asMateriale(item()))"
         role="button"
       >
         <fa-icon
           [icon]="getFileIcon(asMateriale(item()).extension)"
           class="me-2"
         ></fa-icon>
-        <span class="flex-grow-1">{{ asMateriale(item()).filename }}</span>
+        <span class="flex-grow-1">{{ asMateriale(item()).name }}</span>
       </li>
     }
   `,
@@ -87,7 +86,7 @@ export class MaterialiItemComponent {
   searchQuery = input.required<string>();
 
   folderToggle = output<string>();
-  materialSelect = output<{ material: Materiale; event?: MouseEvent }>();
+  materialSelect = output<Materiale>();
 
   chevronIcon = faChevronRight;
 
@@ -134,7 +133,7 @@ export class MaterialiItemComponent {
         const hasMatchingContent = this.hasMatchInContent(child, query);
         return folderMatch || hasMatchingContent;
       }
-      return child.filename.toLowerCase().includes(query);
+      return child.name.toLowerCase().includes(query);
     });
   }
 
@@ -144,7 +143,7 @@ export class MaterialiItemComponent {
         const folderMatch = item.name.toLowerCase().includes(query);
         return folderMatch || this.hasMatchInContent(item, query);
       }
-      return item.filename.toLowerCase().includes(query);
+      return item.name.toLowerCase().includes(query);
     });
   }
 }
