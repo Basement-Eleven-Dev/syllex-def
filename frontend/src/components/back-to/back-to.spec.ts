@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { QuestionsFilters } from './questions-filters';
+import { BackTo } from './back-to';
 
-describe('QuestionsFilters', () => {
-  let component: QuestionsFilters;
-  let fixture: ComponentFixture<QuestionsFilters>;
+describe('BackTo', () => {
+  let component: BackTo;
+  let fixture: ComponentFixture<BackTo>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [QuestionsFilters]
+      imports: [BackTo]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(QuestionsFilters);
+    fixture = TestBed.createComponent(BackTo);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

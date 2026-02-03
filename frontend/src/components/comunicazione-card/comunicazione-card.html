@@ -1,0 +1,52 @@
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex flex-row text-dark align-items-center mb-3">
+      <h5 class="fw-bold mb-0 flex-fill">{{ comunicazione.titolo }}</h5>
+      <div class="d-flex flex-row gap-1 justify-content-end align-items-center">
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-primary"
+          title="Modifica"
+          [routerLink]="'/t/comunicazioni/edit/' + comunicazione.id"
+        >
+          <fa-icon [icon]="EditIcon"></fa-icon> Modifica
+        </button>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-danger"
+          (click)="onDelete()"
+          title="Rimuovi"
+          confirmAction
+        >
+          <fa-icon [icon]="TrashIcon"></fa-icon> Elimina
+        </button>
+      </div>
+    </div>
+    <p class="card-text text-dark ellipsis-3-lines">
+      {{ comunicazione.contenuto }}
+    </p>
+
+    <div class="d-flex flex-row justify-content-between align-items-end mt-4">
+      <section class="flex-fill">
+        @if(comunicazione.attachments && comunicazione.attachments.length > 0) {
+        <small>{{ comunicazione.attachments.length }} Allegati: </small>
+        <div class="d-flex flex-row mt-2">
+          @for(att of comunicazione.attachments; track $index){
+          <span
+            class="badge p-2 attachment-badge"
+            (click)="onRequestAttachmentView(att.id)"
+          >
+            <fa-icon [icon]="getFileIcon(att.extension)"></fa-icon>
+            {{ att.filename }}</span
+          >
+          }
+        </div>
+        }
+      </section>
+
+      <span class="small"
+        >Ultima modifica: {{ comunicazione.dataCreazione | date:'short' }}</span
+      >
+    </div>
+  </div>
+</div>

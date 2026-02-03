@@ -1,6 +1,20 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { StudentiClasseTable } from '../../components/studenti-classe-table/studenti-classe-table';
+import { Section } from '../test-detail/test-detail';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { StatisticheClasse } from '../../components/statistiche-classe/statistiche-classe';
+import { faChartLine, faUsers } from '@fortawesome/pro-solid-svg-icons';
+import {
+  NgbNav,
+  NgbNavContent,
+  NgbNavItem,
+  NgbNavItemRole,
+  NgbNavLinkBase,
+  NgbNavLinkButton,
+  NgbNavOutlet,
+} from '@ng-bootstrap/ng-bootstrap';
+import { NgComponentOutlet } from '@angular/common';
 
 interface ClasseDettaglioProps {
   id: string;
@@ -16,17 +30,33 @@ interface Stat {
   label: string;
   value: number;
   requirePercentage?: boolean;
-  link?: string;
+  link?: string | string[];
+  queryParams?: { [key: string]: string };
   linkLabel?: string;
 }
 
 @Component({
   selector: 'app-classe-dettaglio',
-  imports: [RouterLink, StudentiClasseTable],
+  imports: [
+    RouterLink,
+    StudentiClasseTable,
+    FontAwesomeModule,
+    StatisticheClasse,
+    NgComponentOutlet,
+    NgbNavContent,
+    NgbNav,
+    NgbNavItem,
+    NgbNavItemRole,
+    NgbNavLinkButton,
+    NgbNavLinkBase,
+    NgbNavOutlet,
+  ],
   templateUrl: './classe-dettaglio.html',
   styleUrl: './classe-dettaglio.scss',
 })
 export class ClasseDettaglio {
+  ChartIcon = faChartLine;
+  UsersIcon = faUsers;
   classeDettaglio: ClasseDettaglioProps = {
     id: '1',
     nomeClasse: '3A Informatica',
@@ -50,7 +80,8 @@ export class ClasseDettaglio {
     {
       label: 'Test Assegnati',
       value: this.classeDettaglio.testAssegnati,
-      link: '/t/classe-dettaglio/test-assegnati',
+      link: '/t/tests/new',
+      queryParams: { assign: this.classeDettaglio.id },
       linkLabel: 'Nuovo test',
     },
     {
@@ -60,4 +91,24 @@ export class ClasseDettaglio {
       linkLabel: 'Vedi tutti',
     },
   ];
+
+  activeSection: number = 1; // 1: Studenti, 2: Statistiche
+  sections: Section[] = [
+    {
+      id: 1,
+      title: 'Studenti',
+      icon: this.UsersIcon,
+      component: StudentiClasseTable,
+    },
+    {
+      id: 2,
+      title: 'Statistiche Classe',
+      icon: this.ChartIcon,
+      component: StatisticheClasse,
+    },
+  ];
+
+  ngOnInit() {
+    this.sections[1].component.classeId = this.classeDettaglio.id;
+  }
 }

@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faInfinity,
@@ -12,27 +13,28 @@ import {
   faPenRuler,
   faSave,
 } from '@fortawesome/pro-solid-svg-icons';
-import { QuestionsFilters } from '../../components/questions-filters/questions-filters';
 import { QuestionsDroppableList } from '../../components/questions-droppable-list/questions-droppable-list';
-
-interface ClassOption {
-  id: string;
-  name: string;
-}
+import { SearchQuestions } from '../../components/search-questions/search-questions';
+import { ClassSelector } from '../../components/class-selector/class-selector';
+import { ClassiService } from '../../services/classi-service';
+import { BackTo } from '../../components/back-to/back-to';
 
 @Component({
   selector: 'app-create-edit-test',
+  standalone: true,
   imports: [
     FormsModule,
     ReactiveFormsModule,
     FontAwesomeModule,
-    QuestionsFilters,
+    SearchQuestions,
     QuestionsDroppableList,
+    ClassSelector,
+    BackTo,
   ],
   templateUrl: './create-edit-test.html',
   styleUrl: './create-edit-test.scss',
 })
-export class CreateEditTest {
+export class CreateEditTest implements OnInit {
   InfinityIcon = faInfinity;
   GenPasswordIcon = faKey;
   DraftIcon = faPenRuler;
@@ -48,13 +50,20 @@ export class CreateEditTest {
     time: new FormControl(0),
   });
 
-  availableClasses: ClassOption[] = [
-    { id: '1A', name: '1A' },
-    { id: '2B', name: '2B' },
-    { id: '3C', name: '3C' },
-    { id: '4D', name: '4D' },
-    { id: '5E', name: '5E' },
-  ];
+  constructor(
+    private route: ActivatedRoute,
+    public classiService: ClassiService,
+  ) {}
+
+  ngOnInit() {
+    // Pre-seleziona la classe dal query param 'assign'
+    this.route.queryParams.subscribe((params) => {
+      const assignClassId = params['assign'];
+      if (assignClassId) {
+        this.testForm.get('classes')?.setValue([assignClassId]);
+      }
+    });
+  }
 
   get assignedClasses() {
     return this.testForm.get('classes')?.value || [];
@@ -64,18 +73,8 @@ export class CreateEditTest {
     return this.testForm.get('time')?.value;
   }
 
-  onToggleAssignedClass(classId: string) {
-    const currentClasses = this.assignedClasses;
-    const updatedClasses = currentClasses.includes(classId)
-      ? currentClasses.filter((id: string) => id !== classId)
-      : [...currentClasses, classId];
-    this.testForm.get('classes')?.setValue(updatedClasses);
-
-    console.log('Assigned Classes:', updatedClasses);
-  }
-
-  isClassSelected(classId: string): boolean {
-    return this.assignedClasses.includes(classId);
+  onClassesChange(classIds: string[]): void {
+    this.testForm.get('classes')?.setValue(classIds);
   }
 
   onGeneratePassword() {

@@ -1,11 +1,13 @@
 import { Component } from '@angular/core';
 import { QuestionsSearchFilters } from '../../components/questions-search-filters/questions-search-filters';
 import { mockQuestions } from '../../mock_questions';
-import { Question } from '../../components/questions-filters/questions-filters';
+import { Question } from '../../components/search-questions/search-questions';
 import { QuestionCard } from '../../components/question-card/question-card';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPlus } from '@fortawesome/pro-solid-svg-icons';
 import { RouterModule } from '@angular/router';
+import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-banca',
@@ -14,6 +16,8 @@ import { RouterModule } from '@angular/router';
     QuestionCard,
     FontAwesomeModule,
     RouterModule,
+    NgbPagination,
+    FormsModule,
   ],
   templateUrl: './banca.html',
   styleUrl: './banca.scss',
@@ -39,5 +43,12 @@ export class Banca {
 
   isQuestionCollapsed(questionId: string): boolean {
     return this.expandedQuestionId !== questionId;
+  }
+
+  page = 1;
+  pageSize = 10;
+  collectionSize = 10;
+  onNewPageRequested() {
+    throw new Error('Method not implemented.');
   }
 }

@@ -33,6 +33,7 @@ import {
 } from '../../components/question-type-selectors/question-type-selectors';
 import { JsonPipe } from '@angular/common';
 import { TopicsService } from '../../services/topics-service';
+import { BackTo } from '../../components/back-to/back-to';
 
 export interface AnswerOption {
   label: string;
@@ -50,6 +51,7 @@ export interface AnswerOption {
     FormsModule,
     ReactiveFormsModule,
     JsonPipe,
+    BackTo,
   ],
   templateUrl: './create-edit-question.html',
   styleUrl: './create-edit-question.scss',

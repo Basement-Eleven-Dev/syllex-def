@@ -1,3 +1,18 @@
+<section class="form-section d-flex flex-row align-items-center mb-5">
+  <div>
+    <label for="search-term" class="form-label fw-semibold text-dark"
+      >Studente</label
+    >
+    <input
+      type="text"
+      class="form-control me-3 custom-input"
+      id="search-term"
+      placeholder="Cerca classi..."
+      style="min-width: 400px"
+    />
+  </div>
+</section>
+
 <div class="table-responsive">
   <table class="table table-hover align-middle">
     <thead>
@@ -7,6 +22,7 @@
         <th class="text-muted fw-light" scope="col">Email</th>
         <th class="text-muted fw-light" scope="col">Performance</th>
         <th class="text-muted fw-light" scope="col">Completed Tests</th>
+        <th scope="col"></th>
       </tr>
     </thead>
     <tbody>
@@ -26,7 +42,7 @@
         <td class="text-dark">{{ studente.email }}</td>
         <td class="text-dark">{{ studente.performance }}%</td>
         <td class="text-dark">{{ studente.completedTests }}/12</td>
-        <td>
+        <td class="text-end">
           <button class="btn btn-sm btn-primary">
             <fa-icon [icon]="EyeIcon"></fa-icon>Vedi Dettagli
           </button>
@@ -35,4 +51,25 @@
       }
     </tbody>
   </table>
+</div>
+
+<div class="mt-5 d-flex flex-row justify-content-between align-items-center">
+  <ngb-pagination
+    [collectionSize]="collectionSize"
+    [(page)]="page"
+    [pageSize]="pageSize"
+    (pageChange)="onNewPageRequested()"
+  >
+  </ngb-pagination>
+
+  <select
+    class="form-select form-select-sm"
+    style="width: auto"
+    [(ngModel)]="pageSize"
+    (ngModelChange)="onNewPageRequested()"
+  >
+    <option [ngValue]="5">5 per pagina</option>
+    <option [ngValue]="10">10 per pagina</option>
+    <option [ngValue]="20">20 per pagina</option>
+  </select>
 </div>

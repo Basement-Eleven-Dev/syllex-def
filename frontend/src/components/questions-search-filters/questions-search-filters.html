@@ -1,4 +1,3 @@
-<label for="search-term" class="form-label fw-semibold text-dark">Filtra</label>
 <form [formGroup]="searchForm" class="d-flex flex-row gap-3">
   <div class="flex-fill">
     <label for="search-term" class="form-label fw-semibold text-dark"
@@ -31,6 +30,17 @@
     <select class="form-select custom-input" formControlName="type">
       <option value="">Argomento</option>
       @for(type of ['geografia', 'navigazione', 'meteorologia']; track $index) {
+      <option value="{{ type }}">{{ type | titlecase }}</option>
+      }
+    </select>
+  </div>
+  <div>
+    <label for="search-term" class="form-label fw-semibold text-dark"
+      >Policy di visualizzazione</label
+    >
+    <select class="form-select custom-input" formControlName="policy">
+      <option value="">Policy</option>
+      @for(type of ['pubblica', 'privata']; track $index) {
       <option value="{{ type }}">{{ type | titlecase }}</option>
       }
     </select>

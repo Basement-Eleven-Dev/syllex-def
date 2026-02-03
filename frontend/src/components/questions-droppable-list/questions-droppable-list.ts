@@ -13,11 +13,12 @@ import {
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
-import { Question } from '../questions-filters/questions-filters';
+import { Question } from '../search-questions/search-questions';
 import { QuestionCard } from '../question-card/question-card';
 
 @Component({
   selector: 'app-questions-droppable-list',
+  standalone: true,
   imports: [DragDropModule, CommonModule, QuestionCard],
   templateUrl: './questions-droppable-list.html',
   styleUrl: './questions-droppable-list.scss',

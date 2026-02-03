@@ -42,20 +42,20 @@
           {{ test.hasPendingCorrections ? 'Visualizza e correggi' + ' (' +
           test.hasPendingCorrections + ')' : 'Visualizza Test' }}
         </button>
-        <div class="position-relative">
-          <button
-            class="btn btn-primary circle-btn"
-            (click)="toggleMenu($event)"
-          >
+        <div
+          ngbDropdown
+          class="d-inline-block"
+          container="body"
+          placement="bottom-end"
+        >
+          <button class="btn btn-primary circle-btn" ngbDropdownToggle>
             <fa-icon [icon]="ThreeDotsIcon"></fa-icon>
           </button>
+          <div ngbDropdownMenu>
+            <app-test-contextual-menu></app-test-contextual-menu>
+          </div>
         </div>
       </div>
     </div>
   </div>
-  @if(isMenuOpen) {
-  <div class="contextual-menu-wrapper">
-    <app-test-contextual-menu></app-test-contextual-menu>
-  </div>
-  }
 </div>

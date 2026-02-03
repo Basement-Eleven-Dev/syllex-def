@@ -1,3 +1,8 @@
+<app-back-to
+  [path]="'/t/tests'"
+  [label]="'Torna alla lista dei test'"
+></app-back-to>
+
 <h1 class="text-dark fw-bold mb-0 display-6">Nuovo Test di valutazione</h1>
 <p class="text-dark mb-5">Prepara il prossimo test per le tue classi</p>
 
@@ -49,19 +54,10 @@
 
     <div class="row">
       <div class="col-4">
-        <label for="classes-assigned" class="form-label fw-semibold text-dark"
-          >Classi assegnate</label
-        >
-        <div class="d-flex flex-row gap-2 flex-wrap" id="classes-assigned">
-          @for(class of availableClasses; track $index) {
-          <span
-            class="badge fs-5 px-3 classBadge"
-            (click)="onToggleAssignedClass(class.id)"
-            [class.selected]="isClassSelected(class.id)"
-            >{{ class.name }}</span
-          >
-          }
-        </div>
+        <app-class-selector
+          [selectedClassIds]="assignedClasses"
+          (selectedClassIdsChange)="onClassesChange($event)"
+        ></app-class-selector>
       </div>
       <div class="col-4">
         <label for="access-password" class="form-label fw-semibold text-dark"
@@ -134,7 +130,7 @@
 
   <div class="row">
     <div class="col-6">
-      <app-questions-filters></app-questions-filters>
+      <app-search-questions></app-search-questions>
     </div>
     <div class="col-6">
       <app-questions-droppable-list></app-questions-droppable-list>

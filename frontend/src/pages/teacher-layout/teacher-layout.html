@@ -1,11 +1,11 @@
 <div class="w-100 dvh-100 d-flex flex-column">
   @if (showLoading()) {
   <div id="loadingOverlay" animate.enter="fade-in">
+    <fa-icon [icon]="SpinnerIcon" [animation]="'spin'" size="3x"></fa-icon>
     <h2>
       Carico i dati di
       <span class="fw-bold">{{ materia.materiaSelected.value?.label }}</span>
     </h2>
-    <fa-icon [icon]="SpinnerIcon" [animation]="'spin'" size="3x"></fa-icon>
   </div>
   }
   <app-nav></app-nav>

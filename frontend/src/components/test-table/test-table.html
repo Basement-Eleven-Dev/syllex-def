@@ -46,16 +46,19 @@
             test.hasPendingCorrections + ')' : 'Visualizza Test' }}
           </button>
 
-          <button
-            class="btn btn-primary btn-sm circle-btn"
-            [ngbPopover]="popContent"
+          <div
+            ngbDropdown
+            class="d-inline-block"
+            container="body"
+            placement="bottom-end"
           >
-            <fa-icon [icon]="ThreeDotsIcon"></fa-icon>
-          </button>
-
-          <ng-template #popContent>
-            <app-test-contextual-menu></app-test-contextual-menu>
-          </ng-template>
+            <button class="btn btn-primary btn-sm circle-btn" ngbDropdownToggle>
+              <fa-icon [icon]="ThreeDotsIcon"></fa-icon>
+            </button>
+            <div ngbDropdownMenu>
+              <app-test-contextual-menu></app-test-contextual-menu>
+            </div>
+          </div>
         </td>
       </tr>
       }

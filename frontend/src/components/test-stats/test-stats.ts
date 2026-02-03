@@ -7,7 +7,7 @@ import {
   ElementRef,
 } from '@angular/core';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
-import { Question } from '../questions-filters/questions-filters';
+import { Question } from '../search-questions/search-questions';
 import { QuestionCard } from '../question-card/question-card';
 import { faEye } from '@fortawesome/pro-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -66,6 +66,7 @@ export class TestStats implements OnInit, AfterViewInit {
         { label: 'Milano', isCorrect: false },
         { label: 'Roma', isCorrect: true },
       ],
+      policy: 'pubblica',
       explanation: "La capitale dell'Italia è Roma.",
       correctCount: 80,
       blankCount: 10,
@@ -79,6 +80,7 @@ export class TestStats implements OnInit, AfterViewInit {
       topic: 'Scienze',
       explanation:
         'Il sole sorge effettivamente a est a causa della rotazione della Terra.',
+      policy: 'pubblica',
       correctCount: 70,
       blankCount: 20,
       errorCount: 10,
@@ -91,6 +93,7 @@ export class TestStats implements OnInit, AfterViewInit {
       topic: 'Scienze',
       explanation:
         "Il ciclo dell'acqua include evaporazione, condensazione, precipitazione e raccolta.",
+      policy: 'pubblica',
       correctCount: 50,
       blankCount: 30,
       errorCount: 10,
