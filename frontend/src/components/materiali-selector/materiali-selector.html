@@ -1,25 +1,100 @@
-<div class="materiali-explorer">
-  <!-- Search Bar -->
-  <div class="p-3 border-bottom">
+<section class="materiali-selector">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <label for="search-term" class="form-label fw-semibold text-dark mb-0">
+      Associa materiali
+    </label>
+    <div class="d-flex gap-2">
+      @if (selectedMaterialIds().size > 0) {
+      <span
+        class="badge bg-secondary shadow-sm text-dark d-flex flex-column justify-content-center ms-2"
+      >
+        {{ selectedMaterialIds().size }} selezionati
+      </span>
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-primary me-4"
+        (click)="deselectAll()"
+      >
+        Deseleziona tutti
+      </button>
+      }
+      <button
+        type="button"
+        class="btn btn-sm btn-primary"
+        (click)="triggerFileUpload()"
+        [disabled]="isUploading()"
+      >
+        @if (isUploading()) {
+        <span class="spinner-border spinner-border-sm me-1"></span>
+        Caricamento... } @else {
+        <fa-icon [icon]="UploadIcon" class="me-1"></fa-icon>
+        Carica nuovo }
+      </button>
+    </div>
+  </div>
+  <!-- Hidden file input -->
+  <input
+    #fileInput
+    type="file"
+    class="d-none"
+    (change)="onFileSelected($event)"
+    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.mp4,.avi,.mov"
+  />
+  <!-- Search input -->
+  <div class="mb-3">
     <input
       type="text"
-      class="form-control"
+      class="form-control custom-input"
       placeholder="Cerca materiali..."
-      [(ngModel)]="searchQuery"
-      [ngModelOptions]="{updateOn: 'change'}"
+      [ngModel]="searchQuery()"
+      (ngModelChange)="updateSearch($event)"
     />
   </div>
 
-  <ul class="list-group list-group-flush">
-    @for (item of filteredItems(); track item.id) {
-    <app-materiali-item
-      [item]="item"
-      [expandedFolders]="expandedFolders()"
-      [selectedMaterialIds]="selectedMaterialIds()"
-      [searchQuery]="searchQuery()"
-      (folderToggle)="toggleFolder($event)"
-      (materialSelect)="onMaterialSelect($event)"
-    />
+  @if (isSearching()) {
+  <!-- Search results (flat list) -->
+  <ul class="list-group list-group-flush rounded-3">
+    @for (material of searchResults(); track material.id) {
+    <li
+      class="list-group-item p-2 cursor-pointer"
+      [class.list-group-item-primary]="selectedMaterialIds().has(material.id)"
+      [class.border-primary]="selectedMaterialIds().has(material.id)"
+      (click)="selectMaterial(material)"
+      role="button"
+    >
+      @if (material.path) {
+      <div class="text-muted small mb-1">
+        <fa-icon [icon]="FolderIcon" size="xs" class="me-1"></fa-icon>
+        {{ material.path }}
+      </div>
+      }
+      <div class="d-flex align-items-center">
+        <fa-icon
+          [icon]="getFileIcon(material.extension)"
+          class="me-2"
+        ></fa-icon>
+        <span>{{ material.name }}</span>
+      </div>
+    </li>
+    } @empty {
+    <li class="list-group-item text-muted">Nessun risultato</li>
     }
   </ul>
-</div>
+  } @else {
+  <!-- Tree list -->
+  <div style="max-height: 300px; overflow-y: auto">
+    <ul class="list-group list-group-flush">
+      @for (item of tree; track item.id) {
+      <app-materiali-item
+        [item]="item"
+        [expandedFolders]="expandedFolders()"
+        [selectedMaterialIds]="selectedMaterialIds()"
+        [searchQuery]="searchQuery()"
+        (folderToggle)="toggleFolder($event)"
+        (materialSelect)="selectMaterial($event)"
+      />
+      }
+    </ul>
+  </div>
+  }
+</section>

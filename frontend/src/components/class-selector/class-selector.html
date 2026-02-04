@@ -1,6 +1,11 @@
-<label for="classes-assigned" class="form-label fw-semibold text-dark"
-  >Classi assegnate</label
->
+<div class="d-flex flex-column mb-3">
+  <label for="classes-assigned" class="form-label fw-semibold text-dark"
+    >Classi assegnate</label
+  >
+  <span class="text-dark"
+    >Quali classi dovranno ricevere la comunicazione?</span
+  >
+</div>
 <div class="d-flex flex-row gap-2 flex-wrap" id="classes-assigned">
   @for(classe of classiService.classi; track classe.id) {
   <span

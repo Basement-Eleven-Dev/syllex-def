@@ -33,6 +33,20 @@ export class ClassiService {
       annoScolastico: 2023,
       subject: 'Scienze',
     },
+    {
+      id: '2',
+      nome: 'Classe B',
+      studentsCount: 30,
+      annoScolastico: 2023,
+      subject: 'Storia',
+    },
+    {
+      id: '3',
+      nome: 'Classe C',
+      studentsCount: 28,
+      annoScolastico: 2023,
+      subject: 'Scienze',
+    },
   ];
 
   constructor() {}

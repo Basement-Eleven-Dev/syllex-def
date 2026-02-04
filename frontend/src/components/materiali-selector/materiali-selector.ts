@@ -1,23 +1,30 @@
-import { Component, computed, inject, output, signal } from '@angular/core';
-import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap';
-import { MaterialiService } from '../../services/materiali-service';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
-  IconDefinition,
-  faChevronRight,
-} from '@fortawesome/pro-solid-svg-icons';
-import { getFileIcon, getFolderIcon } from '../../app/_utils/file-icons';
+  Component,
+  computed,
+  output,
+  signal,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
+import { MaterialiService } from '../../services/materiali-service';
 import { FormsModule } from '@angular/forms';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { IconDefinition } from '@fortawesome/pro-solid-svg-icons';
+import { getFileIcon } from '../../app/_utils/file-icons';
 import { MaterialiItemComponent } from './materiali-item.component';
 
-interface Materiale {
+export interface Materiale {
   id: string;
-  filename: string;
+  name: string;
   url: string;
   extension: string;
 }
 
-interface Folder {
+export interface MaterialeWithPath extends Materiale {
+  path: string;
+}
+
+export interface Folder {
   id: string;
   name: string;
   content: (Materiale | Folder)[];
@@ -25,166 +32,163 @@ interface Folder {
 
 @Component({
   selector: 'app-materiali-selector',
-  imports: [
-    NgbCollapse,
-    FontAwesomeModule,
-    FormsModule,
-    MaterialiItemComponent,
-  ],
+  imports: [FormsModule, FontAwesomeModule, MaterialiItemComponent],
   templateUrl: './materiali-selector.html',
   styleUrl: './materiali-selector.scss',
 })
 export class MaterialiSelector {
-  private materialiService = inject(MaterialiService);
-
-  items = this.materialiService.root;
+  // State
+  FolderIcon = getFileIcon('folder');
+  UploadIcon = getFileIcon('upload');
+  TimesIcon = getFileIcon('times');
   expandedFolders = signal<Set<string>>(new Set());
   selectedMaterialIds = signal<Set<string>>(new Set());
   searchQuery = signal<string>('');
+  isUploading = signal<boolean>(false);
 
-  chevronIcon = faChevronRight;
+  // ViewChild per l'input file
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
-  materialsSelected = output<Materiale[]>();
+  // Output dei materiali selezionati
+  selectionChange = output<Materiale[]>();
 
-  // Computed per ottenere gli oggetti materiali selezionati
-  selectedMaterials = computed(() => {
-    const selectedIds = this.selectedMaterialIds();
-    const materials: Materiale[] = [];
+  constructor(private materialiService: MaterialiService) {}
 
-    const collectMaterials = (items: (Folder | Materiale)[]) => {
-      items.forEach((item) => {
-        if (this.isFolder(item)) {
-          collectMaterials(item.content);
-        } else if (selectedIds.has(item.id)) {
-          materials.push(item);
-        }
-      });
-    };
-
-    collectMaterials(this.items);
-    return materials;
-  });
-
-  filteredItems = computed(() => {
-    const query = this.searchQuery().toLowerCase().trim();
-    if (!query) return this.items;
-
-    const foldersToExpand = new Set<string>();
-
-    // Funzione ricorsiva per verificare se un item o i suoi discendenti matchano
-    const hasMatch = (
-      item: Folder | Materiale,
-      folderPath: string[] = [],
-    ): boolean => {
-      if (this.isFolder(item)) {
-        const folderMatch = item.name.toLowerCase().includes(query);
-        const currentPath = [...folderPath, item.id];
-
-        // Verifica match nei contenuti
-        const contentHasMatch = item.content.some((child) => {
-          const childMatch = hasMatch(child, currentPath);
-          return childMatch;
-        });
-
-        // Se c'è un match nel contenuto, espandi questa folder e tutti i parent
-        if (contentHasMatch) {
-          currentPath.forEach((folderId) => foldersToExpand.add(folderId));
-        }
-
-        return folderMatch || contentHasMatch;
-      }
-      return item.filename.toLowerCase().includes(query);
-    };
-
-    const filtered = this.items.filter((item) => hasMatch(item));
-
-    // Aggiorna le folder espanse
-    if (foldersToExpand.size > 0) {
-      this.expandedFolders.set(foldersToExpand);
-    }
-
-    return filtered;
-  });
-
-  isFolder(item: Folder | Materiale): item is Folder {
-    return 'content' in item;
+  get tree(): (Folder | Materiale)[] {
+    return this.materialiService.root;
   }
+
+  // Computed: materiali selezionati come array
+  selectedMaterials = computed(() => {
+    const ids = this.selectedMaterialIds();
+    return this.flattenMaterials(this.tree).filter((m) => ids.has(m.id));
+  });
+
+  // Computed: risultati di ricerca (lista piatta filtrata)
+  searchResults = computed(() => {
+    const query = this.searchQuery().toLowerCase().trim();
+    if (!query) return [];
+    const materialsWithPath = this.flattenMaterialsWithPath(this.tree);
+    return materialsWithPath.filter((m) =>
+      m.name.toLowerCase().includes(query),
+    );
+  });
+
+  // Flag per sapere se stiamo cercando
+  isSearching = computed(() => this.searchQuery().trim().length > 0);
 
   toggleFolder(folderId: string): void {
-    const expanded = this.expandedFolders();
-    const newSet = new Set(expanded);
-
-    if (newSet.has(folderId)) {
-      newSet.delete(folderId);
-    } else {
-      newSet.add(folderId);
-    }
-
-    this.expandedFolders.set(newSet);
-  }
-
-  isFolderExpanded(folderId: string): boolean {
-    return this.expandedFolders().has(folderId);
-  }
-
-  selectMaterial(materiale: Materiale, event?: MouseEvent): void {
-    const selectedIds = this.selectedMaterialIds();
-    const newSet = new Set(selectedIds);
-
-    // Ctrl/Cmd per selezione multipla
-    if (event?.ctrlKey || event?.metaKey) {
-      if (newSet.has(materiale.id)) {
-        newSet.delete(materiale.id);
+    this.expandedFolders.update((set) => {
+      const newSet = new Set(set);
+      if (newSet.has(folderId)) {
+        newSet.delete(folderId);
       } else {
-        newSet.add(materiale.id);
+        newSet.add(folderId);
       }
-    } else {
-      // Click singolo: toggle se già selezionato, altrimenti seleziona solo questo
-      if (newSet.size === 1 && newSet.has(materiale.id)) {
-        newSet.clear();
+      return newSet;
+    });
+  }
+
+  selectMaterial(material: Materiale): void {
+    this.selectedMaterialIds.update((set) => {
+      const newSet = new Set(set);
+      if (newSet.has(material.id)) {
+        newSet.delete(material.id);
       } else {
-        newSet.clear();
-        newSet.add(materiale.id);
+        newSet.add(material.id);
       }
-    }
-
-    this.selectedMaterialIds.set(newSet);
-    this.materialsSelected.emit(this.selectedMaterials());
+      return newSet;
+    });
+    this.selectionChange.emit(this.selectedMaterials());
   }
 
-  onMaterialSelect(event: { material: Materiale; event?: MouseEvent }): void {
-    this.selectMaterial(event.material, event.event);
+  updateSearch(query: string): void {
+    this.searchQuery.set(query);
   }
 
-  isSelected(materiale: Materiale): boolean {
-    return this.selectedMaterialIds().has(materiale.id);
-  }
-
-  clearSelection(): void {
+  deselectAll(): void {
     this.selectedMaterialIds.set(new Set());
-    this.materialsSelected.emit([]);
+    this.selectionChange.emit([]);
   }
 
   getFileIcon(extension: string): IconDefinition {
     return getFileIcon(extension);
   }
 
-  getFolderIcon(isOpen: boolean): IconDefinition {
-    return getFolderIcon(isOpen);
+  triggerFileUpload(): void {
+    this.fileInput.nativeElement.click();
   }
 
-  filterMaterials(folder: Folder): (Materiale | Folder)[] {
-    const query = this.searchQuery().toLowerCase().trim();
-    if (!query) return folder.content;
+  async onFileSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
 
-    // Filtra ricorsivamente
-    return folder.content.filter((item) => {
-      if (this.isFolder(item)) {
-        const folderMatch = item.name.toLowerCase().includes(query);
-        const hasMatchingContent = this.filterMaterials(item).length > 0;
-        return folderMatch || hasMatchingContent;
+    this.isUploading.set(true);
+
+    try {
+      // Simula upload (in produzione qui andrà la chiamata API)
+      await this.simulateUpload(file);
+
+      // Estrae estensione dal nome file
+      const extension = file.name.split('.').pop() || '';
+
+      // Crea il nuovo materiale
+      const newMaterial: Materiale = {
+        id: `file-${Date.now()}`,
+        name: file.name,
+        url: `/materials/${file.name}`, // URL temporaneo
+        extension: extension,
+      };
+
+      // Aggiunge alla root del tree
+      this.materialiService.root.push(newMaterial);
+
+      // Seleziona automaticamente il materiale appena caricato
+      this.selectMaterial(newMaterial);
+
+      // Reset input
+      input.value = '';
+    } catch (error) {
+      console.error("Errore durante l'upload:", error);
+      // TODO: Gestire errore con notifica utente
+    } finally {
+      this.isUploading.set(false);
+    }
+  }
+
+  private simulateUpload(file: File): Promise<void> {
+    // Simula un delay di upload
+    return new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+
+  private flattenMaterials(items: (Folder | Materiale)[]): Materiale[] {
+    const result: Materiale[] = [];
+    for (const item of items) {
+      if ('content' in item) {
+        result.push(...this.flattenMaterials(item.content));
+      } else {
+        result.push(item);
       }
-      return item.filename.toLowerCase().includes(query);
-    });
+    }
+    return result;
+  }
+
+  private flattenMaterialsWithPath(
+    items: (Folder | Materiale)[],
+    currentPath: string = '',
+  ): MaterialeWithPath[] {
+    const result: MaterialeWithPath[] = [];
+    for (const item of items) {
+      if ('content' in item) {
+        const newPath = currentPath
+          ? `${currentPath} / ${item.name}`
+          : item.name;
+        result.push(...this.flattenMaterialsWithPath(item.content, newPath));
+      } else {
+        result.push({ ...item, path: currentPath });
+      }
+    }
+    return result;
   }
 }
