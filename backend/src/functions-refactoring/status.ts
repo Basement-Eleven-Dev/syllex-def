@@ -4,11 +4,11 @@ import createError from 'http-errors'
 
 
 const getStatus = async (event: APIGatewayProxyEvent, context: Context) => {
-    console.log(context.user);
     const status: boolean = Math.random() < 0.5;
     if (!status) throw new createError.ServiceUnavailable('Offline')
     return {
-        status: "All Operating"
+        status: "All Operating",
+        currentUser: context.user
     };
 }
 export const handler = lambdaRequest(getStatus)
