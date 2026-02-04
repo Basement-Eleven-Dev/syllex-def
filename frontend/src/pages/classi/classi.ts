@@ -5,8 +5,6 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faCalendar,
   faEye,
-  faGrid,
-  faList,
   faUser,
   faUsers,
 } from '@fortawesome/pro-solid-svg-icons';
@@ -14,6 +12,10 @@ import { ClassiService } from '../../services/classi-service';
 import { RouterModule } from '@angular/router';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
+import {
+  ViewTypeToggle,
+  ViewType,
+} from '../../components/view-type-toggle/view-type-toggle';
 
 @Component({
   selector: 'app-classi',
@@ -24,25 +26,24 @@ import { FormsModule } from '@angular/forms';
     RouterModule,
     NgbPagination,
     FormsModule,
+    ViewTypeToggle,
   ],
   templateUrl: './classi.html',
   styleUrl: './classi.scss',
 })
 export class Classi {
-  ListIcon = faList;
-  GridIcon = faGrid;
   UserIcon = faUser;
   UsersIcon = faUsers;
   EyeIcon = faEye;
   CalendarIcon = faCalendar;
 
-  viewType: 'grid' | 'table' = 'grid';
+  viewType: ViewType = 'grid';
   constructor(
     public materiaService: Materia,
     public classiService: ClassiService,
   ) {}
-  onChangeViewType(view: 'grid' | 'table'): void {
-    this.viewType = view;
+  onChangeViewType(type: ViewType): void {
+    this.viewType = type;
   }
 
   page: number = 1;

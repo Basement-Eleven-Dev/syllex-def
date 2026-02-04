@@ -1,0 +1,17 @@
+<small class="dropdown-header">{{ item.name }}</small>
+<small class="dropdown-header"
+  >Creato il {{ item.createdAt | date:'short' }}</small
+>
+<button ngbDropdownItem (click)="onRequestRenameItem()">Rinomina</button>
+<button ngbDropdownItem>Assegna</button>
+<div class="dropdown-divider"></div>
+<button
+  ngbDropdownItem
+  class="text-danger"
+  confirmAction
+  [confirmMessage]="'Sei sicuro di voler eliminare ' + item.name + '?'"
+  confirmTitle="Conferma eliminazione"
+  (confirmed)="onRequestDeleteItem()"
+>
+  Elimina
+</button>

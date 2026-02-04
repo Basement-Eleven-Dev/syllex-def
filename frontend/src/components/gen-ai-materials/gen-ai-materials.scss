@@ -1,0 +1,23 @@
+.materialTypeIcon {
+  background-color: var(--bs-primary);
+  color: white;
+  padding: 10px;
+  border-radius: 15px;
+}
+
+.card {
+  transition: all 0.3s ease;
+  &:hover {
+    cursor: pointer;
+    background-color: var(--bs-light);
+  }
+  &.selected {
+    background-color: var(--bs-secondary);
+    color: var(--bs-dark);
+
+    .materialTypeIcon {
+      background-color: var(--bs-dark);
+      color: white;
+    }
+  }
+}

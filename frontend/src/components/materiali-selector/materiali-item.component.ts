@@ -6,8 +6,7 @@ import {
   faChevronRight,
 } from '@fortawesome/pro-solid-svg-icons';
 import { getFileIcon, getFolderIcon } from '../../app/_utils/file-icons';
-
-import { Materiale, Folder } from './materiali-selector';
+import { Folder, Materiale } from '../../services/materiali-service';
 
 @Component({
   selector: 'app-materiali-item',

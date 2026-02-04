@@ -6,28 +6,19 @@ import {
   ViewChild,
   ElementRef,
 } from '@angular/core';
-import { MaterialiService } from '../../services/materiali-service';
+import {
+  Folder,
+  Materiale,
+  MaterialiService,
+} from '../../services/materiali-service';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { IconDefinition } from '@fortawesome/pro-solid-svg-icons';
 import { getFileIcon } from '../../app/_utils/file-icons';
 import { MaterialiItemComponent } from './materiali-item.component';
 
-export interface Materiale {
-  id: string;
-  name: string;
-  url: string;
-  extension: string;
-}
-
 export interface MaterialeWithPath extends Materiale {
   path: string;
-}
-
-export interface Folder {
-  id: string;
-  name: string;
-  content: (Materiale | Folder)[];
 }
 
 @Component({
@@ -139,6 +130,7 @@ export class MaterialiSelector {
         name: file.name,
         url: `/materials/${file.name}`, // URL temporaneo
         extension: extension,
+        createdAt: new Date(),
       };
 
       // Aggiunge alla root del tree

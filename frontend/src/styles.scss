@@ -227,8 +227,21 @@ textarea.custom-input {
   border: none;
   position: relative;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.8s ease;
   box-shadow: 0 4px 15px 0 rgba(102, 126, 234, 0.4);
+
+  &.not-selected {
+    background: transparent;
+    color: rgb(160, 1, 157);
+    box-shadow: none;
+  }
+
+  &.selected {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 6px 20px 0 rgba(102, 126, 234, 0.6);
+  }
 
   &::before {
     content: "";
@@ -352,4 +365,12 @@ section {
 
 .cardDescription {
   font-size: 1.2rem;
+}
+.circle-btn {
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

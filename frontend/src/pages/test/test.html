@@ -40,22 +40,11 @@
       }
     </select>
   </div>
-  <div class="btn-group ms-auto">
-    <button
-      class="btn"
-      [ngClass]="{'btn-outline-primary': viewType !== 'table', 'btn-secondary border-dark': viewType === 'table'}"
-      (click)="onChangeViewType('table')"
-    >
-      <fa-icon [icon]="ListIcon"></fa-icon>
-    </button>
-    <button
-      class="btn"
-      [ngClass]="{'btn-outline-primary': viewType !== 'grid', 'btn-secondary border-dark': viewType == 'grid'}"
-      (click)="onChangeViewType('grid')"
-    >
-      <fa-icon [icon]="GridIcon"></fa-icon>
-    </button>
-  </div>
+  <app-view-type-toggle
+    class="ms-auto"
+    [viewType]="viewType"
+    (viewTypeChange)="onChangeViewType($event)"
+  />
 </section>
 
 @if(viewType === 'table'){

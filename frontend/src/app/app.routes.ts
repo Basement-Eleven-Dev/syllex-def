@@ -78,7 +78,7 @@ export const routes: Routes = [
         component: TestDetail,
       },
       {
-        path: 'materiali',
+        path: 'risorse',
         component: Materiali,
       },
       {
