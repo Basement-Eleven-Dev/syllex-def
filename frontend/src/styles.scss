@@ -186,33 +186,6 @@ tr {
   cursor: pointer;
 }
 
-.typeIconWrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  aspect-ratio: 1 / 1;
-  padding: 0.5rem;
-  background-color: #375ec92f;
-  color: var(--bs-dark);
-}
-.typeCard {
-  transition: all 0.2s;
-  &:hover {
-    transform: translateY(-2px);
-    cursor: pointer;
-  }
-
-  &.selected {
-    background-color: #befd59;
-    color: var(--bs-dark);
-    font-weight: bold;
-    .typeIconWrapper {
-      background-color: white;
-      color: var(--bs-dark);
-    }
-  }
-}
-
 label {
   font-size: 0.9rem;
 }
@@ -322,7 +295,7 @@ section {
 
 .background-icon {
   position: absolute;
-  font-size: 10rem;
+  font-size: 10em;
   top: -15%;
   right: -10%;
   transform: translate(0, 0) !important;
@@ -370,6 +343,15 @@ section {
   border-radius: 50%;
   width: 2rem;
   height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-circle {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { QuestionTypeSelectors } from './question-type-selectors';
+import { QuestionCorrection } from './question-correction';
 
-describe('QuestionTypeSelectors', () => {
-  let component: QuestionTypeSelectors;
-  let fixture: ComponentFixture<QuestionTypeSelectors>;
+describe('QuestionCorrection', () => {
+  let component: QuestionCorrection;
+  let fixture: ComponentFixture<QuestionCorrection>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [QuestionTypeSelectors]
+      imports: [QuestionCorrection]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(QuestionTypeSelectors);
+    fixture = TestBed.createComponent(QuestionCorrection);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

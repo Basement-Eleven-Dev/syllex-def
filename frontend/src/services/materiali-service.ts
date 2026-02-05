@@ -6,6 +6,7 @@ export interface Materiale {
   url: string;
   extension: string;
   createdAt: Date;
+  aiGenerated?: boolean;
 }
 
 export interface Folder {
@@ -222,6 +223,7 @@ export class MaterialiService {
       url: '/materials/Regolamento.pdf',
       extension: 'pdf',
       createdAt: new Date('2023-01-15'),
+      aiGenerated: true,
     },
   ];
 

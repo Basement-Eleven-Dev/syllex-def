@@ -7,11 +7,11 @@ import {
   faSparkles,
 } from '@fortawesome/pro-solid-svg-icons';
 import { GenAiQuestions } from '../../components/gen-ai-questions/gen-ai-questions';
-import { GenAiMaterials } from '../../components/gen-ai-materials/gen-ai-materials';
+import { GenAiContents } from '../../components/gen-ai-contents/gen-ai-contents';
 
 @Component({
   selector: 'app-laboratorio-ai',
-  imports: [FontAwesomeModule, GenAiQuestions, GenAiMaterials],
+  imports: [FontAwesomeModule, GenAiQuestions, GenAiContents],
   templateUrl: './laboratorio-ai.html',
   styleUrl: './laboratorio-ai.scss',
 })

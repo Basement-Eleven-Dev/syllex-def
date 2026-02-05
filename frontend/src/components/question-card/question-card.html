@@ -21,12 +21,15 @@
       <span class="badge bg-primary">{{ question.topic }}</span>
       @if(showPolicy){<span class="badge bg-light text-dark"
         >{{ question.policy }}</span
-      >} @if(showBancaActions) {
+      >} @if(question.aiGenerated){
+      <fa-icon [icon]="RobotIcon" class="ms-2" style="color: #9664c8"></fa-icon>
+      } @if(showBancaActions) {
       <div class="d-flex flex-row gap-1 justify-content-end w-100">
         <button
           type="button"
           class="btn btn-sm btn-outline-primary"
           title="Modifica"
+          [routerLink]="'/t/edit-question/' + question.id"
         >
           <fa-icon [icon]="EditIcon"></fa-icon> Modifica
         </button>
@@ -35,6 +38,7 @@
           class="btn btn-sm btn-outline-danger"
           (click)="removeMe.emit(question.id)"
           title="Rimuovi"
+          confirmAction
         >
           <fa-icon [icon]="TrashIcon"></fa-icon> Elimina
         </button>

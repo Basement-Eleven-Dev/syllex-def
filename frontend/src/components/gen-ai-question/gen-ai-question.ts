@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input, signal } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faMarker,
@@ -9,7 +9,10 @@ import {
   faSpinnerThird,
 } from '@fortawesome/pro-solid-svg-icons';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
-import { QuestionTypeSelectors } from '../question-type-selectors/question-type-selectors';
+import {
+  QuestionType,
+  QUESTION_TYPE_OPTIONS,
+} from '../../types/question.types';
 import { TitleCasePipe } from '@angular/common';
 import { AiService } from '../../services/ai-service';
 import {
@@ -20,12 +23,13 @@ import {
 } from '@angular/forms';
 import { TopicsService } from '../../services/topics-service';
 import { MaterialiSelector } from '../materiali-selector/materiali-selector';
+import { TypeSelector } from '../type-selector/type-selector';
 
 @Component({
   selector: 'app-gen-ai-question',
   imports: [
     FontAwesomeModule,
-    QuestionTypeSelectors,
+    TypeSelector,
     TitleCasePipe,
     FormsModule,
     ReactiveFormsModule,
@@ -37,6 +41,11 @@ import { MaterialiSelector } from '../materiali-selector/materiali-selector';
 export class GenAiQuestion {
   RobotIcon = faRobot;
   SpinnerIcon = faSpinnerThird;
+  SparklesIcon = faSparkles;
+
+  questionTypeOptions = QUESTION_TYPE_OPTIONS;
+  selectedType = signal<string>('scelta multipla');
+  topic = input<string>('');
 
   genAiQuestionForm: FormGroup = new FormGroup({
     type: new FormControl('scelta multipla'),
@@ -51,33 +60,16 @@ export class GenAiQuestion {
     private aiService: AiService,
     public topicsService: TopicsService,
   ) {}
-  @Input() selectedType: 'scelta multipla' | 'vero falso' | 'risposta aperta' =
-    'scelta multipla';
-  @Input() topic: string = '';
-  @Input() difficulty: 'facile' | 'media' | 'difficile' = 'media';
-  @Input() topics: string[] = [];
-  @Input() topicSelected: string = '';
-  @Input() questionTypes: {
-    label: string;
-    icon: any;
-    value: 'scelta multipla' | 'vero falso' | 'risposta aperta';
-  }[] = [];
 
   ngOnInit() {
-    console.log('Topic input:', this.topic);
-    if (this.topic) {
-      this.genAiQuestionForm.patchValue({ topic: this.topic });
+    const topicValue = this.topic();
+    if (topicValue) {
+      this.genAiQuestionForm.patchValue({ topic: topicValue });
     }
   }
 
-  MultipleChoiceIcon = faSpellCheck;
-  TrueFalseIcon = faPlus;
-  OpenAnswerIcon = faMarker;
-  SparklesIcon = faSparkles;
-
-  onSelectQuestionType(
-    value: 'scelta multipla' | 'vero falso' | 'risposta aperta',
-  ) {
+  onSelectQuestionType(value: string) {
+    this.selectedType.set(value);
     this.genAiQuestionForm.patchValue({ type: value });
   }
 

@@ -67,6 +67,7 @@
           <button
             class="btn"
             [class.btn-warning]="assignment.score === null"
+            [routerLink]="'/t/correzione/' + assignment.id"
             [class.btn-primary]="assignment.score !== null"
           >
             <fa-icon

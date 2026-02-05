@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -29,11 +29,11 @@ import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { GenAiQuestion } from '../../components/gen-ai-question/gen-ai-question';
 import {
   QuestionType,
-  QuestionTypeSelectors,
-} from '../../components/question-type-selectors/question-type-selectors';
-import { JsonPipe } from '@angular/common';
+  QUESTION_TYPE_OPTIONS,
+} from '../../types/question.types';
 import { TopicsService } from '../../services/topics-service';
 import { BackTo } from '../../components/back-to/back-to';
+import { TypeSelector } from '../../components/type-selector/type-selector';
 
 export interface AnswerOption {
   label: string;
@@ -46,11 +46,9 @@ export interface AnswerOption {
     RouterModule,
     FontAwesomeModule,
     MultipleChoiceOptions,
-    GenAiQuestion,
-    QuestionTypeSelectors,
+    TypeSelector,
     FormsModule,
     ReactiveFormsModule,
-    JsonPipe,
     BackTo,
   ],
   templateUrl: './create-edit-question.html',
@@ -59,12 +57,19 @@ export interface AnswerOption {
 export class CreateEditQuestion {
   questionId: string | null = null;
 
+  questionTypeOptions = QUESTION_TYPE_OPTIONS;
   SparklesIcon = faSparkles;
   ImageIcon = faImage;
   UsersIcon = faUsers;
   GraduationIcon = faGraduationCap;
   SaveIcon = faSave;
   SpinnerIcon = faSpinnerThird;
+
+  selectedQuestionType = signal<string>('scelta multipla');
+  selectedPolicyType = signal<string>('public');
+  imagePreview = signal<string | null>(null);
+  isDragging = signal<boolean>(false);
+  loading = signal<boolean>(false);
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -99,33 +104,25 @@ export class CreateEditQuestion {
     this.questionForm.patchValue({ options });
   }
 
-  loading: boolean = false;
   onSaveQuestion(): void {
+    this.loading.set(true);
     const questionData = this.questionForm.value;
     if (questionData.type !== 'scelta multipla') {
       delete questionData.options;
     }
     console.log('Salvataggio domanda:', questionData);
     // Logica per salvare la domanda (chiamata al servizio, ecc.)
+    this.loading.set(false);
   }
 
-  imagePreview: string | null = null;
-  isDragging = false;
-
-  onSelectQuestionType(type: QuestionType): void {
+  onSelectQuestionType(type: string): void {
+    this.selectedQuestionType.set(type);
     this.questionForm.patchValue({ type });
   }
 
   onSelectPolicyType(policy: string): void {
+    this.selectedPolicyType.set(policy);
     this.questionForm.patchValue({ policy });
-  }
-
-  get selectedQuestionType(): QuestionType {
-    return this.questionForm.get('type')!.value;
-  }
-
-  get selectedPolicyType(): string {
-    return this.questionForm.get('policy')?.value;
   }
 
   private offcanvasService = inject(NgbOffcanvas);
@@ -135,7 +132,9 @@ export class CreateEditQuestion {
       position: 'end',
     });
 
-    offCanvasRef.componentInstance.selectedType = this.selectedQuestionType;
+    offCanvasRef.componentInstance.selectedType.set(
+      this.selectedQuestionType(),
+    );
     offCanvasRef.dismissed.subscribe((result) => {
       if (result) {
         console.log('Risultato generazione AI:', result);
@@ -146,6 +145,7 @@ export class CreateEditQuestion {
           text: result.content,
           explanation: result.explanation,
         });
+        this.selectedQuestionType.set(result.type);
         if (result.type === 'scelta multipla' && result.choices) {
           const options: AnswerOption[] = result.choices.map(
             (choice: AnswerOption) => ({
@@ -162,19 +162,19 @@ export class CreateEditQuestion {
   onDragOver(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
-    this.isDragging = true;
+    this.isDragging.set(true);
   }
 
   onDragLeave(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
-    this.isDragging = false;
+    this.isDragging.set(false);
   }
 
   onDrop(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
-    this.isDragging = false;
+    this.isDragging.set(false);
 
     const files = event.dataTransfer?.files;
     if (files && files.length > 0) {
@@ -208,13 +208,13 @@ export class CreateEditQuestion {
     // Crea preview dell'immagine
     const reader = new FileReader();
     reader.onload = (e) => {
-      this.imagePreview = e.target?.result as string;
+      this.imagePreview.set(e.target?.result as string);
     };
     reader.readAsDataURL(file);
   }
 
   removeImage(): void {
-    this.imagePreview = null;
+    this.imagePreview.set(null);
     this.questionForm.patchValue({ image: null });
   }
 }

@@ -9,7 +9,7 @@ import {
   getFolderIcon,
   getIconColor,
 } from '../../app/_utils/file-icons';
-import { faEllipsisVertical } from '@fortawesome/pro-solid-svg-icons';
+import { faEllipsisVertical, faRobot } from '@fortawesome/pro-solid-svg-icons';
 import {
   NgbDropdown,
   NgbDropdownToggle,
@@ -34,6 +34,7 @@ import { Folder, Materiale } from '../../services/materiali-service';
 export class MaterialeCard {
   Icon?: IconDefinition;
   ThreeDotsIcon = faEllipsisVertical;
+  RobotIcon = faRobot;
   color: string = '#4A5568'; // Default color
   isFolder: boolean = false;
   itemsInFolder: number = 0;
@@ -44,6 +45,10 @@ export class MaterialeCard {
 
   get folderContentLength(): number {
     return this.isFolder ? (this.item as Folder).content.length : 0;
+  }
+
+  get isAIGenerated(): boolean {
+    return !this.isFolder && (this.item as Materiale).aiGenerated === true;
   }
 
   @Output() openItem: EventEmitter<Folder | Materiale> = new EventEmitter();

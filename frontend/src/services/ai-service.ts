@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { QuestionType } from '../components/question-type-selectors/question-type-selectors';
+import { QuestionType } from '../types/question.types';
 import { AnswerOption } from '../pages/create-edit-question/create-edit-question';
 
 @Injectable({

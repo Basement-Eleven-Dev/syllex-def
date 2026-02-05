@@ -41,4 +41,8 @@ export class MultipleChoiceOptions {
     }));
     this.onOptionsChange();
   }
+
+  getOptionLabel(index: number): string {
+    return String.fromCharCode(64 + index); // Convert 1 to 'A', 2 to 'B', etc.
+  }
 }

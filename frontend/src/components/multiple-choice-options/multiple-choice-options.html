@@ -11,7 +11,7 @@
   </div>
   @for(option of options; track $index){
   <div class="d-flex flex-row gap-3 align-items-center">
-    <span class="optionLabel">{{ $index + 1 }}</span>
+    <span class="optionLabel">{{ getOptionLabel($index + 1) }}</span>
     <input
       type="text"
       class="form-control custom-input"

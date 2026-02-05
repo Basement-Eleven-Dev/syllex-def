@@ -7,6 +7,7 @@ export const mockQuestions: Question[] = [
     text: "Quale città italiana è stata designata capitale della Repubblica Italiana nel 1871, dopo l'unificazione del paese e la presa di Porta Pia?",
     type: 'scelta multipla',
     topic: 'Geografia',
+    aiGenerated: true,
     explanation:
       "Roma è stata proclamata capitale d'Italia nel 1871, dopo la breccia di Porta Pia del 20 settembre 1870 che sancì la fine del potere temporale dei papi. Prima di Roma, altre città avevano ricoperto il ruolo di capitale: Torino (1861-1865) e Firenze (1865-1871). La scelta di Roma come capitale definitiva era simbolicamente importante per il nuovo stato italiano, rappresentando la continuità con l'antica Roma e l'eredità del Risorgimento.",
     options: [

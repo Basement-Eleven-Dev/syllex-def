@@ -13,7 +13,7 @@ import {
 } from '../../services/materiali-service';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { IconDefinition } from '@fortawesome/pro-solid-svg-icons';
+import { faUpload, IconDefinition } from '@fortawesome/pro-solid-svg-icons';
 import { getFileIcon } from '../../app/_utils/file-icons';
 import { MaterialiItemComponent } from './materiali-item.component';
 
@@ -30,7 +30,7 @@ export interface MaterialeWithPath extends Materiale {
 export class MaterialiSelector {
   // State
   FolderIcon = getFileIcon('folder');
-  UploadIcon = getFileIcon('upload');
+  UploadIcon = faUpload;
   TimesIcon = getFileIcon('times');
   expandedFolders = signal<Set<string>>(new Set());
   selectedMaterialIds = signal<Set<string>>(new Set());

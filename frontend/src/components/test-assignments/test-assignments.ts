@@ -9,6 +9,7 @@ import {
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCheckDouble, faEye } from '@fortawesome/pro-solid-svg-icons';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
+import { RouterLink } from '@angular/router';
 
 interface TestAssignment {
   id: number;
@@ -28,6 +29,7 @@ interface TestAssignment {
     FormsModule,
     ReactiveFormsModule,
     NgbPagination,
+    RouterLink,
   ],
   templateUrl: './test-assignments.html',
   styleUrl: './test-assignments.scss',

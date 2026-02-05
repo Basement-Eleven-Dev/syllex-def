@@ -9,12 +9,22 @@
     <div
       class="d-flex flex-row align-items-center h-100 justify-content-center"
     >
+      @if (isAIGenerated) {
+      <fa-icon
+        [icon]="RobotIcon"
+        class="me-3"
+        style="color: #9664c8"
+        size="2x"
+      ></fa-icon>
+      } @else {
       <fa-icon
         [icon]="Icon"
         class="me-3"
         size="2x"
         [style.color]="color"
       ></fa-icon>
+
+      }
       <div class="d-flex flex-column flex-fill justify-content-center">
         <p
           class="card-title mb-0 text-truncate"
