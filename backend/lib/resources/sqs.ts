@@ -7,6 +7,7 @@ import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import { Duration } from "aws-cdk-lib";
 import { BACKGROUND_CORRECTION_QUEUE_NAME, BACKGROUND_INDEXING_QUEUE_NAME } from "../../environment";
 
+//DEPRECATED
 export class BackgroundFunctions extends Construct {
   sqs: Queue;
   lambda: NodejsFunction;
