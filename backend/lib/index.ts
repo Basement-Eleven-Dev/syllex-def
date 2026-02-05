@@ -9,7 +9,6 @@ import {
   POOL_NAME,
 } from "../environment";
 import { DefaultLambdaRole } from "./resources/roles";
-import { BackgroundFunctions } from "./resources/sqs";
 import { DeployStack } from "./resources/api/api_stage";
 
 
@@ -59,21 +58,12 @@ export class CdkStack extends cdk.Stack {
 
     let cognito = new CognitoUserPool(this, POOL_NAME);
     let role = new DefaultLambdaRole(this, "role_default_v2").role;
-    let backgroundFunctions = new BackgroundFunctions(
-      this,
-      "BackgroundHandlingV2",
-      role
-    );
-    let queueUrl: string = backgroundFunctions.queueUrl;
-    let indexingQueueUrl: string = backgroundFunctions.indexingQueueUrl;
     let apiGatewayInstance = new RestApiGateway(
       this,
       API_NAME,
       cognito.cognitoPool,
       cognito.cognitoPoolClient,
-      role,
-      queueUrl,
-      indexingQueueUrl
+      role
     );
     new DeployStack(this, { restApiId: apiGatewayInstance.apiGateway.restApiId, methods: apiGatewayInstance.methods })
 

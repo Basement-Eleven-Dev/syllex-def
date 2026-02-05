@@ -5,7 +5,8 @@ import {
 } from "aws-lambda";
 import { ObjectId } from "mongodb";
 import { mongoClient } from "./getDatabase";
-import { DB_NAME } from "./config/env";
+import { DB_NAME } from "../env";
+import { User } from "../models/user";
 
 export type LoggedUserClaims = {
   sub: string;
@@ -47,14 +48,7 @@ export const getAuthCognitoUser = (
     claims = retrieveCognitoUserFromIdToken(event.headers.Authorization);
   return claims;
 };
-export interface User {
-  _id: ObjectId;
-  username: string;
-  firstName?: string;
-  lastName?: string;
-  role: "teacher" | "student" | "admin";
-  organizationIds?: ObjectId[];
-}
+
 
 export const getCurrentUser = async (
   request: APIGatewayProxyEvent

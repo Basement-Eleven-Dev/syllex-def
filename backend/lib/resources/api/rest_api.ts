@@ -10,8 +10,8 @@ import { UserPool, UserPoolClient } from "aws-cdk-lib/aws-cognito";
 import { LambdaConstruct } from "../lambda";
 import { Role } from "aws-cdk-lib/aws-iam";
 import { Duration } from "aws-cdk-lib";
-import { API_GATEWAY_TIMEOUT } from "../../../src/_helpers/config/env";
-import { AppRole, FUNCTION_INTEGRATIONS } from "../../../src/functions-declarations";
+import { API_GATEWAY_TIMEOUT } from "../../../src/env";
+import { AppRole, FUNCTION_INTEGRATIONS } from "./functions-declarations.config";
 import { RouteConstruct } from "./api_route";
 
 
@@ -36,9 +36,7 @@ export class RestApiGateway extends Construct {
           teacher: this.teacherAuthorizer,
           student: this.studentAuthorizer
         },
-        integrations: integrations,
-        queueUrl: this.queueUrl,
-        indexingQueueUrl: this.indexingQueueUrl
+        integrations: integrations
       })
       this.methods.concat(nestedStack.methods);
     });
@@ -95,9 +93,7 @@ export class RestApiGateway extends Construct {
     name: string,
     private cognitoPool: UserPool,
     private cognitoClient: UserPoolClient,
-    private defaultRole: Role,
-    private queueUrl: string,
-    private indexingQueueUrl: string
+    private defaultRole: Role
   ) {
     super(scope, name);
     this.apiGateway = new RestApi(this, name + "API", {

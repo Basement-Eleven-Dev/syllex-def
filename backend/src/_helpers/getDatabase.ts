@@ -1,8 +1,9 @@
-import { MongoClient } from "mongodb";
+import { Db, MongoClient } from "mongodb";
 import {
   SecretsManagerClient,
   GetSecretValueCommand,
 } from "@aws-sdk/client-secrets-manager"; // ES Modules import
+import { DB_NAME } from "../env";
 
 const getFreshSecret = async (secretId: string): Promise<string> => {
   const client = new SecretsManagerClient();
@@ -15,7 +16,7 @@ const getFreshSecret = async (secretId: string): Promise<string> => {
 };
 
 export const getSecret = async (secretId: string): Promise<string> => {
-  if (process.env.STAGE == "stg") return await getFreshSecret(secretId);
+  if (process.env.STAGE == "stg" || !!process.env.LOCAL_TESTING) return await getFreshSecret(secretId);
   else {
     let request = await fetch(
       `http://localhost:${process.env.PARAMETERS_SECRETS_EXTENSION_HTTP_PORT}/secretsmanager/get?secretId=${secretId}`,
@@ -44,9 +45,15 @@ export const mongoClient = async (
   if (!client) {
     let connection = process.env.DATABASE_CONNECTION || forceConnection;
     if (!connection) connection = await getDatabaseConnection();
-    console.log(connection, "connection");
     client = new MongoClient(connection);
     await client.connect();
   }
   return client;
 };
+
+export const getDatabase = async (dbName: string): Promise<Db> => {
+  return (await mongoClient()).db(dbName)
+}
+export const getDefaultDatabase = async (): Promise<Db> => {
+  return await getDatabase(DB_NAME)
+}

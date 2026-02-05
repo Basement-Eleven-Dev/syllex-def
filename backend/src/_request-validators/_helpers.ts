@@ -4,33 +4,41 @@ import {
     Context
 } from 'aws-lambda';
 import { CognitoJwtVerifier } from "aws-jwt-verify";
-
-export const checkValidation = async (event: APIGatewayTokenAuthorizerEvent, cognitoGroup?: 'students' | 'teachers'): Promise<APIGatewayAuthorizerResult> => {
+import { CognitoIdTokenPayload } from 'aws-jwt-verify/jwt-model';
+/**
+ * Returns CognitoIdTokenPayload if authorized, null if not
+ * @param token 
+ * @param cognitoGroup 
+ * @returns 
+ */
+export const canInvoke = async (token?: string, cognitoGroup?: 'students' | 'teachers'): Promise<CognitoIdTokenPayload | null> => {
     const verifier = CognitoJwtVerifier.create({
         userPoolId: process.env.COGNITO_POOL_ID!,
         tokenUse: "id", // Use "access" if you are sending the access token
         clientId: process.env.COGNITO_CLIENT_ID!,
     });
-    const token = event.authorizationToken.split(' ')[1];
-    if (!token) {
-        return generatePolicy('anonymous', 'Deny', event.methodArn);
-    }
-
+    if (!token) return null;
     try {
         // 2. This checks the signature against the public JWKS 
         // and verifies expiration/audience/issuer.
         const payload = await verifier.verify(token);
         if (cognitoGroup) {
-            if (payload['cognito:groups']?.includes(cognitoGroup)) return generatePolicy(payload.sub, 'Allow', event.methodArn, payload);
-            else return generatePolicy('unauthorized', 'Deny', event.methodArn);
+            if (payload['cognito:groups']?.includes(cognitoGroup)) return payload
+            else return null
         }
         // 3. If successful, allow access
-        return generatePolicy(payload.sub, 'Allow', event.methodArn, payload);
+        return payload
 
     } catch (err) {
-        console.error("Token verification failed:", err);
-        return generatePolicy('unauthorized', 'Deny', event.methodArn);
+        return null
     }
+}
+
+export const checkValidation = async (event: APIGatewayTokenAuthorizerEvent, cognitoGroup?: 'students' | 'teachers'): Promise<APIGatewayAuthorizerResult> => {
+
+    const token = event.authorizationToken.split(' ')[1];
+    const authorizedPayload = await canInvoke(token, cognitoGroup)
+    return !authorizedPayload ? generatePolicy('unauthorized', 'Deny', event.methodArn) : generatePolicy(authorizedPayload.sub, 'Allow', event.methodArn, authorizedPayload);
 }
 
 const generatePolicy = (

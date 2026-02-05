@@ -13,12 +13,12 @@ import {
     RestApi,
 } from "aws-cdk-lib/aws-apigateway";
 import { Duration, NestedStack, NestedStackProps } from "aws-cdk-lib";
-import { AppRole, FunctionIntegration } from "../../../src/functions-declarations";
+import { AppRole, FunctionIntegration } from "./functions-declarations.config";
 import { Role } from "aws-cdk-lib/aws-iam";
 import { FUNCTIONS_PATH } from "../../../environment";
 import { LambdaConstruct } from "../lambda";
 import { DefaultLambdaRole } from "../roles";
-import { API_GATEWAY_TIMEOUT } from "../../../src/_helpers/config/env";
+import { API_GATEWAY_TIMEOUT } from "../../../src/env";
 
 export interface RouteConstructProps extends NestedStackProps {
     apiId: string,
@@ -29,9 +29,7 @@ export interface RouteConstructProps extends NestedStackProps {
         teacher?: Authorizer,
         student?: Authorizer
     },
-    validator?: RequestValidator,
-    queueUrl: string,
-    indexingQueueUrl: string,
+    validator?: RequestValidator
 
 }
 
@@ -85,10 +83,7 @@ export class RouteConstruct extends NestedStack {
         let apiMethod = resource.addMethod(
             method,
             new LambdaIntegration(
-                new LambdaConstruct(this, functionName, FUNCTIONS_PATH + functionPath, this.role, {
-                    AI_GRADING_QUEUE_URL: this.props.queueUrl,
-                    INDEXING_QUEUE_URL: this.props.indexingQueueUrl,
-                }).lambda,
+                new LambdaConstruct(this, functionName, FUNCTIONS_PATH + functionPath, this.role).lambda,
                 {
                     timeout: Duration.seconds(API_GATEWAY_TIMEOUT),
                 }

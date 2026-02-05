@@ -9,7 +9,7 @@ import {
   AdminAddUserToGroupCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { Db, MongoClient, ObjectId } from "mongodb";
-import { DB_NAME } from "../src/_helpers/config/env";
+import { DB_NAME } from "../src/env";
 
 config();
 process.env.AWS_PROFILE = "pathway";
