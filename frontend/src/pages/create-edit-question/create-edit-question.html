@@ -22,11 +22,12 @@
     <label class="form-label fw-semibold text-dark"
       >Tipologia di risposta</label
     >
-    <app-question-type-selectors
+    <app-type-selector
+      [options]="questionTypeOptions"
+      [(selectedValue)]="selectedQuestionType"
       (typeSelected)="onSelectQuestionType($event)"
-      [selectedType]="selectedQuestionType"
-      direction="row"
-    ></app-question-type-selectors>
+      [direction]="'row'"
+    ></app-type-selector>
   </section>
 
   <section class="form-section">
@@ -82,13 +83,13 @@
         <div
           id="imageDropArea"
           class="rounded-4 p-3"
-          [class.dragging]="isDragging"
+          [class.dragging]="isDragging()"
           (dragover)="onDragOver($event)"
           (dragleave)="onDragLeave($event)"
           (drop)="onDrop($event)"
           (click)="fileInput?.click()"
         >
-          @if(!imagePreview) {
+          @if(!imagePreview()) {
           <div
             class="image-drop-zone d-flex flex-column justify-content-center align-items-center rounded-3 p-3"
           >
@@ -100,7 +101,7 @@
           } @else {
           <div class="image-preview-container position-relative">
             <img
-              [src]="imagePreview"
+              [src]="imagePreview()"
               alt="Preview"
               class="img-fluid rounded-3"
             />
@@ -135,7 +136,7 @@
     </section>
   </section>
 
-  @if(selectedQuestionType === 'scelta multipla') {
+  @if(selectedQuestionType() === 'scelta multipla') {
   <section class="row form-section">
     <div class="col-8">
       <app-multiple-choice-options
@@ -172,13 +173,13 @@
         <div
           class="card shadow-sm typeCard p-1"
           (click)="onSelectPolicyType('public')"
-          [class.selected]="selectedPolicyType === 'public'"
+          [class.selected]="selectedPolicyType() === 'public'"
         >
           <div class="card-body d-flex flex-row align-items-center gap-3">
             <input
               type="radio"
               class="form-check-input"
-              [checked]="selectedPolicyType === 'public'"
+              [checked]="selectedPolicyType() === 'public'"
             />
             <h5 class="mb-0 flex-fill">Disponibile agli studenti</h5>
             <span class="typeIconWrapper rounded-2">
@@ -191,13 +192,13 @@
         <div
           class="card shadow-sm typeCard p-1"
           (click)="onSelectPolicyType('private')"
-          [class.selected]="selectedPolicyType === 'private'"
+          [class.selected]="selectedPolicyType() === 'private'"
         >
           <div class="card-body d-flex flex-row align-items-center gap-3">
             <input
               type="radio"
               class="form-check-input"
-              [checked]="selectedPolicyType === 'private'"
+              [checked]="selectedPolicyType() === 'private'"
             />
             <h5 class="mb-0 flex-fill">Disponibile solo al docente</h5>
             <span class="typeIconWrapper rounded-2">
@@ -213,11 +214,11 @@
     <button
       class="btn btn-success text-white btn-lg fs-3"
       type="submit"
-      [disabled]="questionForm.invalid || loading"
+      [disabled]="questionForm.invalid || loading()"
     >
       <fa-icon
-        [icon]="loading ? SpinnerIcon : SaveIcon"
-        [animation]="loading ? 'spin' : undefined"
+        [icon]="loading() ? SpinnerIcon : SaveIcon"
+        [animation]="loading() ? 'spin' : undefined"
       ></fa-icon>
       Salva
     </button>

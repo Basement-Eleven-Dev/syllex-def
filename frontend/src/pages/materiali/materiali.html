@@ -53,10 +53,10 @@
       } }
     </div>
     <div class="d-flex flex-row align-items-center gap-3">
-      <button class="btn btn-primary" (click)="onCreateNewFolder()">
+      <button class="btn btn-outline-primary" (click)="onCreateNewFolder()">
         <fa-icon [icon]="PlusIcon"></fa-icon> Nuova cartella
       </button>
-      <button class="btn btn-primary" (click)="onRequestUpload()">
+      <button class="btn btn-outline-primary" (click)="onRequestUpload()">
         <fa-icon [icon]="UploadIcon"></fa-icon> Carica file
       </button>
       <button class="btn ai" (click)="onRequestGenerate()">
@@ -133,11 +133,21 @@
           (dragleave)="onDragLeave($event)"
         >
           <td>
+            @if (isAIGenerated(item)) {
+            <fa-icon
+              [icon]="RobotIcon"
+              class="me-3"
+              style="color: #9664c8"
+              size="lg"
+            ></fa-icon>
+            } @else {
             <fa-icon
               [icon]="getItemIcon(item)"
               size="lg"
               [style.color]="getItemColor(item)"
             ></fa-icon>
+
+            }
           </td>
           <td class="fw-medium">{{ item.name }}</td>
           <td class="text-muted">{{ getItemType(item) }}</td>

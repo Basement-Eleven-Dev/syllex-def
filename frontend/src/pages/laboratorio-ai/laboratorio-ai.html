@@ -42,10 +42,10 @@
   </div>
 </div>
 
-<section>
-  @switch (selectedCreationType) { @case ('materials') {
-  <app-gen-ai-materials></app-gen-ai-materials>
-  } @case ('questions') {
-  <app-gen-ai-questions></app-gen-ai-questions>
-  } @default { } }
+<section class="mt-5">
+  @if(selectedCreationType == 'questions'){
+  <app-gen-ai-contents [type]="'questions'"></app-gen-ai-contents>
+  } @else {
+  <app-gen-ai-contents [type]="'materials'"></app-gen-ai-contents>
+  }
 </section>

@@ -6,6 +6,7 @@ import {
 } from '@fortawesome/angular-fontawesome';
 import { faPaperclip, faPlus } from '@fortawesome/pro-solid-svg-icons';
 import { Calendario } from '../../components/calendario/calendario';
+import { RouterModule } from '@angular/router';
 
 interface DashboardQuickLink {
   value: number;
@@ -30,7 +31,7 @@ interface Communication {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [FontAwesomeModule, DatePipe, Calendario],
+  imports: [FontAwesomeModule, DatePipe, Calendario, RouterModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })

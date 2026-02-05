@@ -12,12 +12,15 @@ import {
   faKey,
   faPenRuler,
   faSave,
+  faSparkles,
 } from '@fortawesome/pro-solid-svg-icons';
 import { QuestionsDroppableList } from '../../components/questions-droppable-list/questions-droppable-list';
 import { SearchQuestions } from '../../components/search-questions/search-questions';
 import { ClassSelector } from '../../components/class-selector/class-selector';
 import { ClassiService } from '../../services/classi-service';
 import { BackTo } from '../../components/back-to/back-to';
+import { GenAiContents } from '../../components/gen-ai-contents/gen-ai-contents';
+import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-create-edit-test',
@@ -39,6 +42,7 @@ export class CreateEditTest implements OnInit {
   GenPasswordIcon = faKey;
   DraftIcon = faPenRuler;
   SaveIcon = faSave;
+  SparklesIcon = faSparkles;
 
   testForm: FormGroup = new FormGroup({
     title: new FormControl(''),
@@ -53,6 +57,7 @@ export class CreateEditTest implements OnInit {
   constructor(
     private route: ActivatedRoute,
     public classiService: ClassiService,
+    private offcanvasService: NgbOffcanvas,
   ) {}
 
   ngOnInit() {
@@ -101,5 +106,12 @@ export class CreateEditTest implements OnInit {
     } else {
       console.log('Saving test:', testData);
     }
+  }
+
+  onRequestAIGeneration() {
+    const offcanvasRef = this.offcanvasService.open(GenAiContents, {
+      position: 'end',
+    });
+    offcanvasRef.componentInstance.type = 'questions';
   }
 }

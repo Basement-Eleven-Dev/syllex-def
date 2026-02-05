@@ -1,18 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { GenAiMaterials } from './gen-ai-materials';
+import { GenAiContents } from './gen-ai-contents';
 
-describe('GenAiMaterials', () => {
-  let component: GenAiMaterials;
-  let fixture: ComponentFixture<GenAiMaterials>;
+describe('GenAiContents', () => {
+  let component: GenAiContents;
+  let fixture: ComponentFixture<GenAiContents>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [GenAiMaterials]
-    })
-    .compileComponents();
+      imports: [GenAiContents],
+    }).compileComponents();
 
-    fixture = TestBed.createComponent(GenAiMaterials);
+    fixture = TestBed.createComponent(GenAiContents);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

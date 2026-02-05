@@ -27,6 +27,7 @@ export interface Question {
   explanation: string;
   options?: { label: string; isCorrect: boolean }[];
   policy: 'pubblica' | 'privata';
+  aiGenerated?: boolean;
 }
 
 @Component({

@@ -25,6 +25,7 @@ import {
   faUpload,
   faEllipsisVertical,
   faSparkles,
+  faRobot,
 } from '@fortawesome/pro-solid-svg-icons';
 import {
   NgbDropdown,
@@ -45,7 +46,7 @@ import {
 import { MaterialeDragDropService } from '../../services/materiale-drag-drop.service';
 import { MaterialeSearchService } from '../../services/materiale-search.service';
 import { MaterialeSelectionService } from '../../services/materiale-selection.service';
-import { GenAiMaterials } from '../../components/gen-ai-materials/gen-ai-materials';
+import { GenAiContents } from '../../components/gen-ai-contents/gen-ai-contents';
 
 @Component({
   selector: 'app-materiali',
@@ -69,6 +70,7 @@ export class Materiali {
   UploadIcon = faUpload;
   ThreeDotsIcon = faEllipsisVertical;
   SparklesIcon = faSparkles;
+  RobotIcon = faRobot;
 
   viewType: ViewType = 'grid';
 
@@ -332,9 +334,18 @@ export class Materiali {
   }
 
   onRequestGenerate() {
-    this.offCanvasService.open(GenAiMaterials, {
+    this.offCanvasService.open(GenAiContents, {
       position: 'end',
       backdrop: true,
     });
+  }
+
+  isAIGenerated(item: Folder | Materiale): boolean {
+    if ('content' in item) {
+      return false;
+    } else {
+      if ('aiGenerated' in item) return true;
+    }
+    return false;
   }
 }

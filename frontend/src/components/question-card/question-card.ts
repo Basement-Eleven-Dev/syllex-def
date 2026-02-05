@@ -18,6 +18,7 @@ import {
   faCircleChevronUp,
   faExpand,
   faPencilAlt,
+  faRobot,
   faTrash,
 } from '@fortawesome/pro-solid-svg-icons';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -44,6 +45,7 @@ export class QuestionCard {
   readonly EditIcon = faPencilAlt;
   readonly CollapseIcon = faCircleChevronDown;
   readonly UnCollapseIcon = faCircleChevronUp;
+  readonly RobotIcon = faRobot;
 
   points?: number;
 
