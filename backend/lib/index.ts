@@ -10,9 +10,7 @@ import {
 } from "../environment";
 import { DefaultLambdaRole } from "./resources/roles";
 import { DeployStack } from "./resources/api/api_stage";
-
-
-//se non funziona in produzione la funzione di background prova questa: const queueUrl = `https://sqs.${this.region}.amazonaws.com/${this.account}/${backgroundFunctions.sqs.queueName}`;
+import { MainBucket } from "./resources/bucket";
 
 export class CdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -20,44 +18,9 @@ export class CdkStack extends cdk.Stack {
 
 
 
-    let bucket = new Bucket(this, BUCKET_NAME, {
-      bucketName: BUCKET_NAME,
-      versioned: false, // Per un bucket semplice, non abbiamo bisogno del versioning
-      publicReadAccess: false, // Manteniamo il bucket privato per impostazione predefinita per sicurezza
-      removalPolicy: cdk.RemovalPolicy.RETAIN, // Questo eliminerà il bucket quando lo stack viene distrutto. Usa attenzione in produzione!
-      autoDeleteObjects: false,
-      cors: [
-        {
-          // Specifica i domini che possono accedere al bucket
-          allowedOrigins: ["*"],
-
-          // Specifica i metodi HTTP permessi (PUT è essenziale per gli upload)
-          allowedMethods: [
-            HttpMethods.GET,
-            HttpMethods.PUT,
-            HttpMethods.POST,
-            HttpMethods.DELETE,
-          ],
-
-          // Specifica gli header permessi nelle richieste
-          // L'asterisco (*) permette tutti gli header.
-          allowedHeaders: ["*"],
-
-          // Specifica gli header che il browser può leggere dalla risposta
-          // 'ETag' è utile per verificare l'esito dell'upload
-          exposedHeaders: ["ETag"],
-
-          // Opzionale: ID univoco per la regola
-          id: "my-cors-rule-id-v2",
-
-          // Opzionale: per quanto tempo il browser può mettere in cache la risposta pre-flight
-          maxAge: 3000,
-        },
-      ],
-    });
-
-    let cognito = new CognitoUserPool(this, POOL_NAME);
     let role = new DefaultLambdaRole(this, "role_default_v2").role;
+    let bucket = new MainBucket(this, BUCKET_NAME, role).bucket;
+    let cognito = new CognitoUserPool(this, POOL_NAME);
     let apiGatewayInstance = new RestApiGateway(
       this,
       API_NAME,

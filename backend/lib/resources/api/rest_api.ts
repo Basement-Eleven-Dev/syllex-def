@@ -17,7 +17,6 @@ import { RouteConstruct } from "./api_route";
 
 export class RestApiGateway extends Construct {
   apiGateway: RestApi;
-  //deprecated
   loggedAuthorizer?: Authorizer;
   studentAuthorizer?: Authorizer;
   teacherAuthorizer?: Authorizer;
