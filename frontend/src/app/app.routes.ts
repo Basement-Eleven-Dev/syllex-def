@@ -15,6 +15,7 @@ import { Comunicazioni } from '../pages/comunicazioni/comunicazioni';
 import { ClasseDettaglio } from '../pages/classe-dettaglio/classe-dettaglio';
 import { LaboratorioAi } from '../pages/laboratorio-ai/laboratorio-ai';
 import { CreateEditComunicazione } from '../pages/create-edit-comunicazione/create-edit-comunicazione';
+import { Correzione } from '../pages/correzione/correzione';
 
 export const routes: Routes = [
   {
@@ -80,6 +81,10 @@ export const routes: Routes = [
       {
         path: 'risorse',
         component: Materiali,
+      },
+      {
+        path: 'correzione/:attemptId',
+        component: Correzione,
       },
       {
         path: 'comunicazioni',

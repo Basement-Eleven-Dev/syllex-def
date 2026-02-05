@@ -29,6 +29,7 @@
           type="button"
           class="btn btn-sm btn-outline-primary"
           title="Modifica"
+          [routerLink]="'/t/edit-question/' + question.id"
         >
           <fa-icon [icon]="EditIcon"></fa-icon> Modifica
         </button>
@@ -37,6 +38,7 @@
           class="btn btn-sm btn-outline-danger"
           (click)="removeMe.emit(question.id)"
           title="Rimuovi"
+          confirmAction
         >
           <fa-icon [icon]="TrashIcon"></fa-icon> Elimina
         </button>

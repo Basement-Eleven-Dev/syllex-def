@@ -13,6 +13,7 @@ import { ClassiService } from '../../services/classi-service';
 import { ClassSelector } from '../../components/class-selector/class-selector';
 import { BackTo } from '../../components/back-to/back-to';
 import { MaterialiSelector } from '../../components/materiali-selector/materiali-selector';
+import { ConfirmActionDirective } from '../../directives/confirm-action.directive';
 
 @Component({
   selector: 'app-create-edit-comunicazione',
@@ -25,6 +26,7 @@ import { MaterialiSelector } from '../../components/materiali-selector/materiali
     RouterModule,
     BackTo,
     MaterialiSelector,
+    ConfirmActionDirective,
   ],
   templateUrl: './create-edit-comunicazione.html',
   styleUrl: './create-edit-comunicazione.scss',

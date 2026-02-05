@@ -1,0 +1,51 @@
+<div class="bg-light p-4 rounded-5 d-flex flex-column gap-3">
+  <label class="form-label text-dark fw-bold fs-4"
+    >Domanda {{ index }}
+    <span class="badge" [class]="data.answer.result">
+      {{ getResultLabel(data.answer.result) }}
+    </span>
+  </label>
+  <p>{{ data.question.text }}</p>
+  @if(data.question.img){
+  <img
+    [src]="data.question.img"
+    alt="Immagine domanda {{ index }}"
+    class="img-fluid mb-3"
+  />
+  } @if(data.question.options && data.question.options.length > 0){
+  <div>
+    <label class="form-label text-dark fw-bold">Opzioni:</label>
+    <ol type="A">
+      @for(option of data.question.options; track $index){
+      <li>{{ option.label }}</li>
+      }
+    </ol>
+  </div>
+  }
+
+  <section>
+    <label class="form-label text-dark fw-bold">Risposta</label>
+    <p class="mb-0">{{ data.answer.answer }}</p>
+  </section>
+  <div class="row">
+    <div class="col-12 col-md-8">
+      <label class="form-label text-dark fw-bold">Feedback</label>
+      <textarea
+        class="form-control custom-input"
+        rows="4"
+        value="{{ data.answer.feedback }}"
+        placeholder="Inserisci il feedback per questa risposta..."
+      ></textarea>
+    </div>
+    <div class="col-12 col-md-4">
+      <label class="form-label text-dark fw-bold">Punteggio</label>
+      <div>
+        <input
+          type="number"
+          class="form-control custom-input"
+          value="{{ data.answer.score }}"
+        />/{{ data.answer.maxScore }}
+      </div>
+    </div>
+  </div>
+</div>
