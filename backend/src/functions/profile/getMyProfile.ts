@@ -14,8 +14,8 @@ export interface User {
 }
 
 
-const getProfile = async (event: APIGatewayProxyEvent) => {
-  return (await getCurrentUser(event)) || { message: "Utente non trovato nel database" };
+const getProfile = async (request: APIGatewayProxyEvent) => {
+  return (await getCurrentUser(request)) || { message: "Utente non trovato nel database" };
 }
 
 
