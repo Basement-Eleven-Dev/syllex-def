@@ -1,1 +1,172 @@
-<p>materiali works!</p>
+<h1 class="text-dark fw-bold mb-0 display-6 d-flex align-items-center gap-3">
+  File e Risorse
+</h1>
+<p class="text-dark mb-0">
+  Gestisci e visualizza i tuoi file e le risorse per la materia selezionata.
+</p>
+
+<section class="form-section d-flex flex-row align-items-center my-5">
+  <input
+    #fileInput
+    type="file"
+    class="d-none"
+    (change)="onFileSelected($event)"
+    [accept]="'.pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.gif,.txt'"
+  />
+  <div>
+    <label for="search-term" class="form-label fw-semibold text-dark"
+      >Nome file o cartella</label
+    >
+    <input
+      type="text"
+      class="form-control me-3 custom-input"
+      id="search-term"
+      placeholder="Cerca file o cartella..."
+      style="min-width: 400px"
+      [(ngModel)]="searchTerm"
+    />
+  </div>
+
+  <app-view-type-toggle
+    class="ms-auto"
+    [viewType]="viewType"
+    (viewTypeChange)="onChangeViewType($event)"
+  />
+</section>
+
+<section class="form-section">
+  <div class="d-flex flex-row align-items-center justify-content-between mb-4">
+    <div class="d-flex flex-row align-items-center gap-2">
+      @for(dir of currentPathArray(); track $index; let last = $last){
+      <a
+        (click)="onRequestOpenItem(dir)"
+        class="breadcrumb-link"
+        (dragover)="onDragOver($event)"
+        (drop)="onDrop(dir, $event)"
+        (dragenter)="onDragEnter($event)"
+        (dragleave)="onDragLeave($event)"
+      >
+        <span [class.fw-bold]="last">{{ dir }}</span>
+      </a>
+      @if(!last){
+      <fa-icon [icon]="ChevronRightIcon" class="text-muted"></fa-icon>
+      } }
+    </div>
+    <div class="d-flex flex-row align-items-center gap-3">
+      <button class="btn btn-primary" (click)="onCreateNewFolder()">
+        <fa-icon [icon]="PlusIcon"></fa-icon> Nuova cartella
+      </button>
+      <button class="btn btn-primary" (click)="onRequestUpload()">
+        <fa-icon [icon]="UploadIcon"></fa-icon> Carica file
+      </button>
+      <button class="btn ai" (click)="onRequestGenerate()">
+        <fa-icon [icon]="SparklesIcon"></fa-icon> Genera con AI
+      </button>
+    </div>
+  </div>
+
+  @if(viewType === 'grid') {
+  <div class="row">
+    @for(item of rootFolder().content; track item.id){
+    <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-3">
+      @if('content' in item) {
+      <div
+        (dragover)="onDragOver($event)"
+        (drop)="onDropCard(item, $event)"
+        (dragenter)="onDragEnterCard($event)"
+        (dragleave)="onDragLeaveCard($event)"
+      >
+        <app-materiale-card
+          [item]="item"
+          [highlightedItemId]="highlightedItemId()"
+          [isSelected]="isItemSelected(item.id)"
+          [draggable]="true"
+          (openItem)="onRequestOpenItem(item)"
+          (dragstart)="onDragStart(item, $event)"
+          (renameItem)="onRequestRenameItem(item, $event)"
+          (deleteItem)="onRequestDeleteItem(item)"
+          (selectItemEvent)="onSelectItem(item, $event)"
+        ></app-materiale-card>
+      </div>
+      } @else {
+      <app-materiale-card
+        [item]="item"
+        [highlightedItemId]="highlightedItemId()"
+        [isSelected]="isItemSelected(item.id)"
+        [draggable]="true"
+        (openItem)="onRequestOpenItem(item)"
+        (dragstart)="onDragStart(item, $event)"
+        (renameItem)="onRequestRenameItem(item, $event)"
+        (deleteItem)="onRequestDeleteItem(item)"
+        (selectItemEvent)="onSelectItem(item, $event)"
+      ></app-materiale-card>
+      }
+    </div>
+    }
+  </div>
+  } @else {
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th style="width: 40px"></th>
+          <th>Nome</th>
+          <th style="width: 120px">Tipo</th>
+          <th style="width: 120px">Dimensione</th>
+          <th style="width: 180px">Data modifica</th>
+          <th style="width: 50px"></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for(item of rootFolder().content; track item.id){
+        <tr
+          class="cursor-pointer"
+          [class.table-active]="isItemSelected(item.id)"
+          [class.highlight-row]="highlightedItemId() === item.id"
+          [draggable]="true"
+          (click)="onSelectItem(item, $event)"
+          (dblclick)="onRequestOpenItem(item); $event.stopPropagation()"
+          (dragstart)="onDragStart(item, $event)"
+          (dragover)="onDragOver($event)"
+          (drop)="onDrop(item, $event)"
+          (dragenter)="onDragEnter($event)"
+          (dragleave)="onDragLeave($event)"
+        >
+          <td>
+            <fa-icon
+              [icon]="getItemIcon(item)"
+              size="lg"
+              [style.color]="getItemColor(item)"
+            ></fa-icon>
+          </td>
+          <td class="fw-medium">{{ item.name }}</td>
+          <td class="text-muted">{{ getItemType(item) }}</td>
+          <td class="text-muted">{{ getItemSize(item) }}</td>
+          <td class="text-muted">
+            {{ item.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+          </td>
+          <td>
+            <div ngbDropdown class="d-inline-block">
+              <button
+                class="btn btn-sm btn-light circle-btn"
+                (click)="$event.stopPropagation()"
+                ngbDropdownToggle
+              >
+                <fa-icon [icon]="ThreeDotsIcon"></fa-icon>
+              </button>
+              <div ngbDropdownMenu>
+                <app-materiale-contextual-menu
+                  [item]="item"
+                  (renameItem)="onRequestRenameItem(item, $event)"
+                  (deleteItem)="onRequestDeleteItem(item)"
+                ></app-materiale-contextual-menu>
+              </div>
+            </div>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  }
+</section>

@@ -76,8 +76,8 @@ export class Sidebar {
       icon: faGauge,
     },
     {
-      path: 'materiali',
-      label: 'Materiali',
+      path: 'risorse',
+      label: 'File e Risorse',
       icon: faFile,
     },
     {

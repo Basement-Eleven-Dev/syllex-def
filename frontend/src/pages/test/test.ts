@@ -1,13 +1,17 @@
 import { NgClass, TitleCasePipe } from '@angular/common';
 import { Component } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faGrid, faList, faPlus } from '@fortawesome/pro-solid-svg-icons';
+import { faPlus } from '@fortawesome/pro-solid-svg-icons';
 import { TestCard } from '../../components/test-card/test-card';
 import { TestTable } from '../../components/test-table/test-table';
 import { RouterModule } from '@angular/router';
 import { TestsService } from '../../services/tests-service';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
+import {
+  ViewTypeToggle,
+  ViewType,
+} from '../../components/view-type-toggle/view-type-toggle';
 
 type StatusType = 'bozza' | 'pubblicato' | 'archiviato';
 export interface TestData {
@@ -32,15 +36,13 @@ export interface TestData {
     TitleCasePipe,
     NgbPagination,
     FormsModule,
+    ViewTypeToggle,
   ],
   templateUrl: './test.html',
   styleUrl: './test.scss',
 })
 export class Test {
   PlusIcon = faPlus;
-
-  ListIcon = faList;
-  GridIcon = faGrid;
 
   constructor(private testsService: TestsService) {}
 
@@ -86,8 +88,8 @@ export class Test {
   page = 1;
   pageSize = 5;
 
-  viewType: 'table' | 'grid' = 'grid';
-  onChangeViewType(value: 'table' | 'grid') {
-    this.viewType = value;
+  viewType: ViewType = 'grid';
+  onChangeViewType(type: ViewType): void {
+    this.viewType = type;
   }
 }

@@ -1,1 +1,51 @@
-<p>laboratorio-ai works!</p>
+<h1 class="text-dark fw-bold mb-0 display-6 d-flex align-items-center gap-3">
+  Crea utilizzando l'AI di Syllex
+</h1>
+<p class="text-dark mb-0">
+  Crea e sperimenta con l'intelligenza artificiale di Syllex da qui.
+</p>
+
+<label class="fw-semibold fs-4 text-dark mt-5 mb-3">Cosa vuoi creare?</label>
+<div class="d-flex flex-row align-items-stretch gap-4">
+  <div
+    class="card rounded-5 shadow py-3 ai"
+    [class.not-selected]="!isMaterialsHovered()"
+    [class.selected]="selectedCreationType === 'materials'"
+    (mouseenter)="isMaterialsHovered.set(true)"
+    (mouseleave)="isMaterialsHovered.set(false)"
+    (click)="selectedCreationType = 'materials'"
+  >
+    <fa-icon [icon]="SparklesIcon" id="sparkleIcon"></fa-icon>
+    <div
+      class="card-body d-flex flex-column align-items-center justify-content-center"
+    >
+      <fa-icon [icon]="MaterialsIcon" class="mb-3" size="4x"></fa-icon>
+      <h5 class="card-title fw-bold mb-0">Materiale di studio</h5>
+    </div>
+  </div>
+  <div
+    class="card rounded-5 shadow py-3 ai"
+    [class.not-selected]="!isQuestionsHovered()"
+    [class.selected]="selectedCreationType === 'questions'"
+    (mouseenter)="isQuestionsHovered.set(true)"
+    (mouseleave)="isQuestionsHovered.set(false)"
+    (click)="selectedCreationType = 'questions'"
+  >
+    <fa-icon [icon]="SparklesIcon" id="sparkleIcon"></fa-icon>
+
+    <div
+      class="card-body d-flex flex-column align-items-center justify-content-center"
+    >
+      <fa-icon [icon]="QuestionsIcon" class="mb-3" size="4x"></fa-icon>
+      <h5 class="card-title fw-bold mb-0">Domande dei Test</h5>
+    </div>
+  </div>
+</div>
+
+<section>
+  @switch (selectedCreationType) { @case ('materials') {
+  <app-gen-ai-materials></app-gen-ai-materials>
+  } @case ('questions') {
+  <app-gen-ai-questions></app-gen-ai-questions>
+  } @default { } }
+</section>

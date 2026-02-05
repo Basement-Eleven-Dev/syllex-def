@@ -1,0 +1,47 @@
+<div
+  class="card h-100"
+  [class]="isFolder ? 'folder-card' : 'materiale-card'"
+  [class.selected]="isSelected"
+  (dblclick)="openItem.emit(item)"
+  (click)="selectItem($event)"
+>
+  <div class="card-body">
+    <div
+      class="d-flex flex-row align-items-center h-100 justify-content-center"
+    >
+      <fa-icon
+        [icon]="Icon"
+        class="me-3"
+        size="2x"
+        [style.color]="color"
+      ></fa-icon>
+      <div class="d-flex flex-column flex-fill justify-content-center">
+        <p
+          class="card-title mb-0 text-truncate"
+          [class.highlight]="highlightedItemId === item.id"
+        >
+          {{ item.name }}
+        </p>
+        @if(isFolder){
+        <small class="text-muted">{{ folderContentLength }} elementi</small>
+        }
+      </div>
+      <div ngbDropdown class="d-inline-block">
+        <button
+          class="btn btn-light circle-btn"
+          (click)="$event.stopPropagation()"
+          ngbDropdownToggle
+        >
+          <fa-icon [icon]="ThreeDotsIcon"></fa-icon>
+        </button>
+        <div ngbDropdownMenu>
+          <app-materiale-contextual-menu
+            [item]="item"
+            (renameItem)="renameItem.emit($event)"
+            (deleteItem)="deleteItem.emit()"
+          ></app-materiale-contextual-menu>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

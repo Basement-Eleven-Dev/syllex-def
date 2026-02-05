@@ -1,0 +1,22 @@
+.aiCard {
+  color: rgb(160, 1, 157);
+  border: none;
+  transition: all 0.9s;
+  background: transparent;
+  &:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    color: white;
+  }
+}
+
+.card {
+  overflow: hidden;
+  min-width: 400px;
+}
+#sparkleIcon {
+  position: absolute;
+  font-size: 300px;
+  opacity: 0.2;
+  top: -10px;
+  right: -10px;
+}
