@@ -25,4 +25,8 @@ export class LaboratorioAi {
   isMaterialsHovered = signal(false);
 
   selectedCreationType?: 'questions' | 'materials';
+
+  ngOnInit() {
+    this.selectedCreationType = 'materials';
+  }
 }

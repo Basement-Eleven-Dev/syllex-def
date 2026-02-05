@@ -7,6 +7,9 @@ import {
   faPresentationScreen,
   IconDefinition,
 } from '@fortawesome/pro-solid-svg-icons';
+import { TopicsService } from '../../services/topics-service';
+import { Materia } from '../../services/materia';
+import { MaterialiSelector } from '../materiali-selector/materiali-selector';
 
 interface MaterialType {
   name: string;
@@ -16,7 +19,7 @@ interface MaterialType {
 
 @Component({
   selector: 'app-gen-ai-materials',
-  imports: [FontAwesomeModule],
+  imports: [FontAwesomeModule, MaterialiSelector],
   templateUrl: './gen-ai-materials.html',
   styleUrl: './gen-ai-materials.scss',
 })
@@ -46,7 +49,26 @@ export class GenAiMaterials {
 
   selectedType?: MaterialType;
 
+  constructor(
+    public topicService: TopicsService,
+    public materiaService: Materia,
+  ) {}
+
   onSelectType(type: MaterialType) {
     this.selectedType = type;
+  }
+
+  topicsSelected: string[] = [];
+  onToggleTopic(topic: string) {
+    const index = this.topicsSelected.indexOf(topic);
+    if (index > -1) {
+      this.topicsSelected.splice(index, 1);
+    } else {
+      this.topicsSelected.push(topic);
+    }
+  }
+
+  isTopicSelected(topic: string): boolean {
+    return this.topicsSelected.includes(topic);
   }
 }

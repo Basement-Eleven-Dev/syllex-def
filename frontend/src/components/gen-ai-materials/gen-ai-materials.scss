@@ -21,3 +21,19 @@
     }
   }
 }
+
+.topicBtn {
+  color: var(--bs-primary);
+  border: 1px solid var(--bs-primary);
+  background-color: transparent;
+  &:hover {
+    background-color: var(--bs-dark);
+    border: 1px solid var(--bs-dark);
+    color: white;
+  }
+  &.selected {
+    background-color: var(--bs-secondary);
+    border: 1px solid var(--bs-secondary);
+    color: var(--bs-dark);
+  }
+}
