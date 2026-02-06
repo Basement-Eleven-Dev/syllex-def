@@ -14,12 +14,15 @@
       <app-sidebar></app-sidebar>
       <div class="flex-grow-1 overflow-auto">
         @if (showLoading()) {
-        <div class="containe text-center pt-5">
+        <div class="text-center pt-5">
           <fa-icon [icon]="SpinnerIcon" [animation]="'spin'"></fa-icon>
         </div>
         } @else {
 
-        <div class="py-4 px-0 container">
+        <div
+          class="py-4 px-0 container"
+          [@routeAnimation]="getRouteAnimationState()"
+        >
           <router-outlet></router-outlet>
         </div>
         }
