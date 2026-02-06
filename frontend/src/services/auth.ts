@@ -13,8 +13,8 @@ import { HttpClient } from '@angular/common/http';
 Amplify.configure({
   Auth: {
     Cognito: {
-      userPoolId: 'eu-south-1_xuHdZQr2t',
-      userPoolClientId: '1k1ti85ci1bsvkak8ob683ehi2',
+      userPoolId: 'eu-south-1_IdnpEkSac',
+      userPoolClientId: '7n2b7ueleckpvil3f7834oabsu',
     },
   },
 });
