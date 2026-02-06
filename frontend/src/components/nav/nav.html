@@ -36,8 +36,7 @@
         </a>
       </div>
       <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-        <button ngbDropdownItem>Profilo</button>
-        <button ngbDropdownItem>Impostazioni</button>
+        <button ngbDropdownItem routerLink="/t/profilo">Profilo</button>
         <button ngbDropdownItem class="text-danger" (click)="onLogout()">
           <fa-icon [icon]="LogoutIcon"></fa-icon> Logout
         </button>

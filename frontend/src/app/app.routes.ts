@@ -16,6 +16,7 @@ import { ClasseDettaglio } from '../pages/classe-dettaglio/classe-dettaglio';
 import { LaboratorioAi } from '../pages/laboratorio-ai/laboratorio-ai';
 import { CreateEditComunicazione } from '../pages/create-edit-comunicazione/create-edit-comunicazione';
 import { Correzione } from '../pages/correzione/correzione';
+import { Profile } from '../pages/profile/profile';
 
 export const routes: Routes = [
   {
@@ -26,12 +27,12 @@ export const routes: Routes = [
   {
     path: 'password-reset',
     component: ResetPasswordPage,
-    canActivate: [],
+    canActivate: [guestGuard],
   },
   {
     path: 't',
     component: TeacherLayout,
-    canActivate: [],
+    canActivate: [authGuard],
     children: [
       {
         path: '',
@@ -101,6 +102,10 @@ export const routes: Routes = [
       {
         path: 'laboratorio-ai',
         component: LaboratorioAi,
+      },
+      {
+        path: 'profilo',
+        component: Profile,
       },
       {
         path: '**',

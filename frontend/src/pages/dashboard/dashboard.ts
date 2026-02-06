@@ -7,6 +7,7 @@ import {
 import { faPaperclip, faPlus } from '@fortawesome/pro-solid-svg-icons';
 import { Calendario } from '../../components/calendario/calendario';
 import { RouterModule } from '@angular/router';
+import { Auth } from '../../services/auth';
 
 interface DashboardQuickLink {
   value: number;
@@ -36,6 +37,7 @@ interface Communication {
   styleUrl: './dashboard.scss',
 })
 export class Dashboard {
+  constructor(public authService: Auth) {}
   AttachmentIcon = faPaperclip;
   quickLinks: DashboardQuickLink[] = [
     {
