@@ -12,6 +12,7 @@ LOCAL_TESTING=true
 STAGE=stg
 COGNITO_POOL_ID=eu-south-1_IdnpEkSac
 COGNITO_CLIENT_ID=7n2b7ueleckpvil3f7834oabsu
+DB_CONNECTION={database connection string}
 ```
 2. Lanciare `npm run dev`
 N.B. Assicurarsi di aver fatto l'accesso alla cli di aws tramite l'account di pathway sotto il profilo `pathway`
