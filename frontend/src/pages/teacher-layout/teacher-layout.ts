@@ -19,25 +19,16 @@ export class TeacherLayout {
   showLoading = signal<boolean>(false);
   public materia = inject(Materia);
   private contexts = inject(ChildrenOutletContexts);
-  private isFirstRun = true;
 
   constructor() {
-    // Usa effect per reagire ai cambiamenti di materiaSelected
     effect(() => {
       const selected = this.materia.materiaSelected();
+      const shouldReload = this.materia.shouldReload();
 
-      // Ignora il primo run (caricamento iniziale)
-      if (this.isFirstRun) {
-        this.isFirstRun = false;
-        return;
-      }
-
-      // Solo quando l'utente cambia effettivamente la materia
-      if (selected) {
+      if (selected && shouldReload) {
         this.showLoading.set(true);
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
+        this.materia.shouldReload.set(false);
+        setTimeout(() => window.location.reload(), 2000);
       }
     });
   }

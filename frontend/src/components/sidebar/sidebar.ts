@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, computed } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import {
   FontAwesomeModule,
@@ -102,14 +102,15 @@ export class Sidebar {
     },
   ];
 
-  availableSubjects(): MateriaObject[] {
-    const selected = this.selectedSubject;
+  availableSubjects = computed(() => {
+    const selected = this.materiaService.materiaSelected();
+    const allMaterie = this.materiaService.allMaterie();
+
     if (!selected) {
-      return this.materiaService.allMaterie;
+      return allMaterie;
     }
+
     // Exclude the currently selected subject from the list
-    return this.materiaService.allMaterie.filter(
-      (subject) => subject.id !== selected.id,
-    );
-  }
+    return allMaterie.filter((subject) => subject._id !== selected._id);
+  });
 }

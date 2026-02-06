@@ -20,7 +20,7 @@ import { mockQuestions } from '../../mock_questions';
 
 export interface Question {
   id: string;
-  img?: string;
+  imageUrl?: string;
   text: string;
   type: 'scelta multipla' | 'vero falso' | 'risposta aperta';
   topic: string;

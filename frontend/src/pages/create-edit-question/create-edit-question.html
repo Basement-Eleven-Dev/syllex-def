@@ -34,12 +34,12 @@
     <label class="form-label fw-semibold text-dark">Argomento</label>
     <select
       class="form-select form-select-lg custom-input w-auto"
-      formControlName="topic"
+      formControlName="topicId"
       aria-label="Seleziona argomento"
     >
       <option value="" disabled selected>Seleziona argomento</option>
-      @for(topic of topicsService.topics; track topic) {
-      <option [value]="topic">{{ topic }}</option>
+      @for(topic of materiaService.topics; track topic) {
+      <option [value]="topic._id">{{ topic.name }}</option>
       }
     </select>
   </section>

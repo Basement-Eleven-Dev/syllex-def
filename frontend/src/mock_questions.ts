@@ -3,7 +3,8 @@ import { Question } from './components/search-questions/search-questions';
 export const mockQuestions: Question[] = [
   {
     id: '1',
-    img: 'https://t4.ftcdn.net/jpg/06/57/37/01/360_F_657370150_pdNeG5pjI976ZasVbKN9VqH1rfoykdYU.jpg',
+    imageUrl:
+      'https://t4.ftcdn.net/jpg/06/57/37/01/360_F_657370150_pdNeG5pjI976ZasVbKN9VqH1rfoykdYU.jpg',
     text: "Quale città italiana è stata designata capitale della Repubblica Italiana nel 1871, dopo l'unificazione del paese e la presa di Porta Pia?",
     type: 'scelta multipla',
     topic: 'Geografia',

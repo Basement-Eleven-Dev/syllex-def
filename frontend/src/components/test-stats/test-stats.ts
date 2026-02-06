@@ -58,7 +58,8 @@ export class TestStats implements OnInit, AfterViewInit {
   availableQuestions: QuestionStats[] = [
     {
       id: '1',
-      img: 'https://t4.ftcdn.net/jpg/06/57/37/01/360_F_657370150_pdNeG5pjI976ZasVbKN9VqH1rfoykdYU.jpg',
+      imageUrl:
+        'https://t4.ftcdn.net/jpg/06/57/37/01/360_F_657370150_pdNeG5pjI976ZasVbKN9VqH1rfoykdYU.jpg',
       text: "Qual è la capitale dell'Italia?",
       type: 'scelta multipla',
       topic: 'Geografia',

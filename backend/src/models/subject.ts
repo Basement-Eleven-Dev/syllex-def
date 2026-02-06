@@ -1,7 +1,8 @@
-import { ObjectId } from "mongodb"
+import { ObjectId } from "mongodb";
 
 export type Subject = {
-    _id: ObjectId,
-    name: string,
-    teacherId: ObjectId
-}
+  _id: ObjectId;
+  name: string;
+  teacherId: ObjectId;
+  topics?: string[];
+};

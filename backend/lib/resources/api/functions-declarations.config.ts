@@ -35,4 +35,16 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     method: "post",
     role: "open", //!!!DA RIMETTERE A ROLE:TEACHER
   },
+  {
+    apiRoute: "questions/{questionId}",
+    functionPath: "questions/getQuestionById.ts",
+    method: "get",
+    role: "logged", //!!!DA RIMETTERE A ROLE:TEACHER
+  },
+  {
+    apiRoute: "questions/create",
+    functionPath: "questions/createQuestion.ts",
+    method: "post",
+    role: "teacher",
+  },
 ];

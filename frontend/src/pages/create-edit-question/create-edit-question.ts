@@ -34,6 +34,8 @@ import {
 import { TopicsService } from '../../services/topics-service';
 import { BackTo } from '../../components/back-to/back-to';
 import { TypeSelector } from '../../components/type-selector/type-selector';
+import { Materia } from '../../services/materia';
+import { Questions } from '../../services/questions';
 
 export interface AnswerOption {
   label: string;
@@ -70,10 +72,13 @@ export class CreateEditQuestion {
   imagePreview = signal<string | null>(null);
   isDragging = signal<boolean>(false);
   loading = signal<boolean>(false);
+  uploadedImageFile: File | null = null;
 
   constructor(
     private activatedRoute: ActivatedRoute,
     public topicsService: TopicsService,
+    public materiaService: Materia,
+    private questionsService: Questions,
   ) {
     this.questionId = this.activatedRoute.snapshot.paramMap.get('id');
   }
@@ -82,10 +87,9 @@ export class CreateEditQuestion {
 
   questionForm: FormGroup = new FormGroup({
     type: new FormControl('scelta multipla', Validators.required),
-    text: new FormControl('', Validators.required),
-    topic: new FormControl('', Validators.required),
-    explanation: new FormControl('', Validators.required),
-    image: new FormControl(null),
+    text: new FormControl('testo domanda', Validators.required),
+    topicId: new FormControl('', Validators.required),
+    explanation: new FormControl("spiegazione d'esempio", Validators.required),
     options: new FormControl([
       { label: 'Opzione 1', isCorrect: false },
       { label: 'Opzione 2', isCorrect: false },
@@ -106,13 +110,25 @@ export class CreateEditQuestion {
 
   onSaveQuestion(): void {
     this.loading.set(true);
-    const questionData = this.questionForm.value;
+    const questionData = { ...this.questionForm.value };
     if (questionData.type !== 'scelta multipla') {
       delete questionData.options;
     }
-    console.log('Salvataggio domanda:', questionData);
-    // Logica per salvare la domanda (chiamata al servizio, ecc.)
-    this.loading.set(false);
+
+    questionData.subjectId = this.materiaService.materiaSelected()?._id;
+
+    this.questionsService
+      .createQuestion(questionData, this.uploadedImageFile || undefined)
+      .subscribe({
+        next: (response) => {
+          console.log('Domanda salvata con successo:', response.question);
+          this.loading.set(false);
+        },
+        error: (error) => {
+          console.error('Errore durante il salvataggio della domanda:', error);
+          this.loading.set(false);
+        },
+      });
   }
 
   onSelectQuestionType(type: string): void {
@@ -140,7 +156,7 @@ export class CreateEditQuestion {
         console.log('Risultato generazione AI:', result);
         // Popola il form con i dati generati
         this.questionForm.patchValue({
-          topic: result.topic,
+          topicId: result.topic?._id || result.topic,
           type: result.type,
           text: result.content,
           explanation: result.explanation,
@@ -202,8 +218,8 @@ export class CreateEditQuestion {
       return;
     }
 
-    // Salva il file nel form
-    this.questionForm.patchValue({ image: file });
+    // Salva il file nella proprietà del componente
+    this.uploadedImageFile = file;
 
     // Crea preview dell'immagine
     const reader = new FileReader();
@@ -215,6 +231,6 @@ export class CreateEditQuestion {
 
   removeImage(): void {
     this.imagePreview.set(null);
-    this.questionForm.patchValue({ image: null });
+    this.uploadedImageFile = null;
   }
 }
