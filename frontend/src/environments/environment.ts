@@ -3,4 +3,4 @@ export const environment = {
 };
 
 export const apiUrl =
-  'https://dmzlg313ig.execute-api.eu-south-1.amazonaws.com/prod';
+  'https://bkwshpcns1.execute-api.eu-south-1.amazonaws.com/prod';

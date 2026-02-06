@@ -1,18 +1,23 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 
+export interface TopicObject {
+  id: string;
+  label: string;
+}
 export interface MateriaObject {
   id: string;
   label: string;
+  topics: TopicObject[];
 }
 @Injectable({
   providedIn: 'root',
 })
 export class Materia {
   allMaterie: MateriaObject[] = [
-    { id: '1', label: 'Scienze' },
-    { id: '2', label: 'Geografia' },
-    { id: '3', label: 'Informatica' },
+    { id: '1', label: 'Scienze', topics: [] },
+    { id: '2', label: 'Geografia', topics: [] },
+    { id: '3', label: 'Informatica', topics: [] },
   ];
 
   materiaSelected: BehaviorSubject<MateriaObject>;
@@ -33,5 +38,11 @@ export class Materia {
 
   switchMateria(materia: MateriaObject): void {
     this.materiaSelected.next(materia);
+  }
+
+  getMaterieTeacher(): MateriaObject[] {
+    // In un'applicazione reale, questo metodo potrebbe fare una chiamata HTTP
+    // per ottenere le materie assegnate al docente loggato.
+    return this.allMaterie;
   }
 }

@@ -49,7 +49,7 @@ export class LoginForm {
       this.loading = false;
       if (result.success) {
         setTimeout(() => {
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/t/dashboard']);
         }, 1000);
       }
     });

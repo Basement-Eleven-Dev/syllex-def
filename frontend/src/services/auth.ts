@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
 import { Amplify } from 'aws-amplify';
 import {
@@ -13,8 +13,8 @@ import { HttpClient } from '@angular/common/http';
 Amplify.configure({
   Auth: {
     Cognito: {
-      userPoolId: 'eu-south-1_xuHdZQr2t',
-      userPoolClientId: '1k1ti85ci1bsvkak8ob683ehi2',
+      userPoolId: 'eu-south-1_IdnpEkSac',
+      userPoolClientId: '7n2b7ueleckpvil3f7834oabsu',
     },
   },
 });
@@ -33,6 +33,7 @@ export interface User {
 })
 export class Auth {
   user$ = new BehaviorSubject<User | null>(null);
+  isInitialized = signal(false);
 
   get user(): User | null {
     return this.user$.value;
@@ -75,17 +76,22 @@ export class Auth {
   private async checkCurrentUser(): Promise<void> {
     try {
       await getCurrentUser();
-      this.fetchAndSetUser();
+      await this.fetchAndSetUser();
     } catch (error) {
       this.user$.next(null);
+      this.isInitialized.set(true);
     }
   }
 
-  private fetchAndSetUser(): void {
-    this.http.get<User | null>('profile').subscribe({
-      next: (user) => this.user$.next(user || null),
-      error: () => this.user$.next(null),
-    });
+  private async fetchAndSetUser(): Promise<void> {
+    try {
+      const user = await firstValueFrom(this.http.get<User | null>('profile'));
+      this.user$.next(user || null);
+    } catch (error) {
+      this.user$.next(null);
+    } finally {
+      this.isInitialized.set(true);
+    }
   }
 
   /* 

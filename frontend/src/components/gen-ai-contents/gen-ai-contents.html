@@ -1,5 +1,9 @@
 <div class="offcanvas-body">
-  <section class="d-flex flex-column gap-4">
+  <form
+    [formGroup]="genForm"
+    (ngSubmit)="onSubmit()"
+    class="d-flex flex-column gap-4"
+  >
     <section class="form-section">
       <label class="fw-semibold fs-5 text-dark mb-3"
         >Che tipo di {{ type() == 'questions' ? 'domande' : 'materiale' }} vuoi
@@ -12,6 +16,21 @@
         [showDescription]="true"
       ></app-type-selector>
     </section>
+    @if(type() == 'questions') {
+    <section class="form-section">
+      <label class="fw-semibold fs-5 text-dark mb-3"
+        >Quante domande vuoi generare?</label
+      >
+      <input
+        type="number"
+        class="form-control custom-input"
+        formControlName="numberOfQuestions"
+        min="1"
+        max="20"
+        placeholder="Inserisci il numero di domande da generare..."
+      />
+    </section>
+    }
     <section class="form-section">
       <label class="fw-semibold fs-5 text-dark mb-3"
         >Su che argomento/i di {{ materiaService.materiaSelected.value.label }}
@@ -43,15 +62,20 @@
       >
       <textarea
         class="form-control custom-input"
+        formControlName="prompt"
         rows="4"
         [placeholder]="type() == 'questions' ? 'Ad esempio: argomento specifico, difficoltà, specifiche delle domande...' : 'Ad esempio: stile, tono di voce, punti chiave da trattare...'"
       ></textarea>
     </section>
-    <div class="text-center">
-      <button class="btn btn-lg ai" [disabled]="!selectedType()">
+    <div class="text-end">
+      <button
+        type="submit"
+        class="btn btn-lg fs-3 ai"
+        [disabled]="genForm.invalid"
+      >
         <fa-icon [icon]="SparklesIcon" class="me-2"></fa-icon>
         Genera {{ getSelectedTypeName() }}
       </button>
     </div>
-  </section>
+  </form>
 </div>
