@@ -1,0 +1,220 @@
+openapi: "3.0.1"
+info:
+  title: "SyllexRestV2stgAPI"
+  version: "2026-02-06T09:02:54Z"
+servers:
+- url: "https://bkwshpcns1.execute-api.eu-south-1.amazonaws.com/{basePath}"
+  variables:
+    basePath:
+      default: "prod"
+paths:
+  /status:
+    get:
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:eu-south-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-south-1:851725509686:function:SyllexApiV2-SyllexRestV2stgstatusNe-statusAAE000BA-TRBlLitteXQ1/invocations"
+        httpMethod: "POST"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 59000
+        responseTransferMode: "BUFFERED"
+        type: "aws_proxy"
+    options:
+      responses:
+        "200":
+          description: "200 response"
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+            Access-Control-Allow-Methods:
+              schema:
+                type: "string"
+            Access-Control-Allow-Credentials:
+              schema:
+                type: "string"
+            Access-Control-Allow-Headers:
+              schema:
+                type: "string"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Credentials: "'false'"
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,GET,PUT,POST,DELETE,PATCH'"
+              method.response.header.Access-Control-Allow-Headers: "'*'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
+        passthroughBehavior: "never"
+        type: "mock"
+  /teachers/{teacherId}/subjects:
+    get:
+      parameters:
+      - name: "teacherId"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      security:
+      - SyllexApiV2SyllexRestV2stgCognitoTeacherAuthorizerD665882D: []
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:eu-south-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-south-1:851725509686:function:SyllexApiV2-SyllexRestV2s-teachersgetSubjects8BE51-kIKQKmXdUS8S/invocations"
+        httpMethod: "POST"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 59000
+        responseTransferMode: "BUFFERED"
+        type: "aws_proxy"
+    options:
+      parameters:
+      - name: "teacherId"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+            Access-Control-Allow-Methods:
+              schema:
+                type: "string"
+            Access-Control-Allow-Credentials:
+              schema:
+                type: "string"
+            Access-Control-Allow-Headers:
+              schema:
+                type: "string"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Credentials: "'false'"
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,GET,PUT,POST,DELETE,PATCH'"
+              method.response.header.Access-Control-Allow-Headers: "'*'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
+        passthroughBehavior: "never"
+        type: "mock"
+  /files/upload:
+    post:
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:eu-south-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-south-1:851725509686:function:SyllexApiV2-SyllexRestV2s-filescreateUploadDB10CAF-oeRkFHLiFgDI/invocations"
+        httpMethod: "POST"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 59000
+        responseTransferMode: "BUFFERED"
+        type: "aws_proxy"
+    options:
+      responses:
+        "200":
+          description: "200 response"
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+            Access-Control-Allow-Methods:
+              schema:
+                type: "string"
+            Access-Control-Allow-Credentials:
+              schema:
+                type: "string"
+            Access-Control-Allow-Headers:
+              schema:
+                type: "string"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Credentials: "'false'"
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,GET,PUT,POST,DELETE,PATCH'"
+              method.response.header.Access-Control-Allow-Headers: "'*'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
+        passthroughBehavior: "never"
+        type: "mock"
+  /profile:
+    get:
+      security:
+      - SyllexApiV2SyllexRestV2stgCognitoLoggedAuthorizerE3696C81: []
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:eu-south-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-south-1:851725509686:function:SyllexApiV2-SyllexRestV2s-profilegetMyProfileAB8D4-zARbquIBaECv/invocations"
+        httpMethod: "POST"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 59000
+        responseTransferMode: "BUFFERED"
+        type: "aws_proxy"
+    options:
+      responses:
+        "200":
+          description: "200 response"
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+            Access-Control-Allow-Methods:
+              schema:
+                type: "string"
+            Access-Control-Allow-Credentials:
+              schema:
+                type: "string"
+            Access-Control-Allow-Headers:
+              schema:
+                type: "string"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Credentials: "'false'"
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,GET,PUT,POST,DELETE,PATCH'"
+              method.response.header.Access-Control-Allow-Headers: "'*'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
+        passthroughBehavior: "never"
+        type: "mock"
+  /:
+    get:
+      x-amazon-apigateway-integration:
+        passthroughBehavior: "when_no_match"
+        type: "mock"
+components:
+  schemas:
+    Empty:
+      title: "Empty Schema"
+      type: "object"
+  securitySchemes:
+    SyllexApiV2SyllexRestV2stgCognitoTeacherAuthorizerD665882D:
+      type: "apiKey"
+      name: "Authorization"
+      in: "header"
+      x-amazon-apigateway-authtype: "custom"
+    SyllexApiV2SyllexRestV2stgCognitoLoggedAuthorizerE3696C81:
+      type: "apiKey"
+      name: "Authorization"
+      in: "header"
+      x-amazon-apigateway-authtype: "custom"
+x-amazon-apigateway-security-policy: "TLS_1_0"
