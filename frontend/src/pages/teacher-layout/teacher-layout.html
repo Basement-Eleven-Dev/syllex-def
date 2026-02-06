@@ -4,7 +4,7 @@
     <fa-icon [icon]="SpinnerIcon" [animation]="'spin'" size="3x"></fa-icon>
     <h2>
       Carico i dati di
-      <span class="fw-bold">{{ materia.materiaSelected.value?.label }}</span>
+      <span class="fw-bold">{{ materia.materiaSelected()?.name }}</span>
     </h2>
   </div>
   }

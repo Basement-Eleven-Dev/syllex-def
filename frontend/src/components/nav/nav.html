@@ -28,7 +28,9 @@
         style="cursor: pointer"
         class="d-flex flex-row align-items-center gap-2 btn btn-dark"
       >
-        <p class="text-white mb-0 fw-bold">{{"Mario Rossi"}}</p>
+        <p class="text-white mb-0 fw-bold">
+          {{ authService.user?.firstName }} {{ authService.user?.lastName }}
+        </p>
         <a
           class="d-flex align-items-center justify-content-center text-white p-0"
         >

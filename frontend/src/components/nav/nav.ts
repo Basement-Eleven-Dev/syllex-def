@@ -32,7 +32,7 @@ export class Nav implements OnInit, OnDestroy {
   private intervalId?: number;
   UserProfileIcon = faUserCircle;
 
-  constructor(private authService: Auth) {}
+  constructor(public authService: Auth) {}
 
   ngOnInit() {
     this.intervalId = window.setInterval(() => {

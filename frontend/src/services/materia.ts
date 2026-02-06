@@ -1,48 +1,71 @@
-import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Injectable, signal } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
+import { Auth } from './auth';
 
 export interface TopicObject {
   id: string;
-  label: string;
+  name: string;
 }
 export interface MateriaObject {
   id: string;
-  label: string;
+  name: string;
   topics: TopicObject[];
 }
 @Injectable({
   providedIn: 'root',
 })
 export class Materia {
-  allMaterie: MateriaObject[] = [
-    { id: '1', label: 'Scienze', topics: [] },
-    { id: '2', label: 'Geografia', topics: [] },
-    { id: '3', label: 'Informatica', topics: [] },
-  ];
+  private readonly STORAGE_KEY = 'selectedSubjectId';
+  allMaterie: MateriaObject[] = [];
 
-  materiaSelected: BehaviorSubject<MateriaObject>;
+  materiaSelected = signal<MateriaObject | null>(null);
 
-  constructor() {
-    const savedMateria = localStorage.getItem('materiaSelected');
-    const initialMateria = savedMateria
-      ? JSON.parse(savedMateria)
-      : this.allMaterie[0];
-
-    this.materiaSelected = new BehaviorSubject<MateriaObject>(initialMateria);
-
-    this.materiaSelected.subscribe((materia) => {
-      console.log('Materia selezionata:', materia);
-      localStorage.setItem('materiaSelected', JSON.stringify(materia));
-    });
-  }
-
-  switchMateria(materia: MateriaObject): void {
-    this.materiaSelected.next(materia);
+  constructor(
+    private http: HttpClient,
+    private authService: Auth,
+  ) {
+    this.getMaterieTeacher();
   }
 
   getMaterieTeacher(): MateriaObject[] {
-    // In un'applicazione reale, questo metodo potrebbe fare una chiamata HTTP
-    // per ottenere le materie assegnate al docente loggato.
+    let teacherId = this.authService.user?._id;
+    this.http
+      .get<MateriaObject[]>(`/teachers/${teacherId}/subjects`)
+      .subscribe((materie) => {
+        this.allMaterie = materie;
+        console.log('Materie del teacher:', this.allMaterie);
+        this.loadSavedSubject();
+      });
+
     return this.allMaterie;
+  }
+
+  /**
+   * Carica la materia salvata dal localStorage o seleziona la prima disponibile
+   */
+  private loadSavedSubject(): void {
+    const savedId = localStorage.getItem(this.STORAGE_KEY);
+
+    if (savedId) {
+      const savedSubject = this.allMaterie.find((m) => m.id === savedId);
+      if (savedSubject) {
+        this.materiaSelected.set(savedSubject);
+        return;
+      }
+    }
+
+    // Fallback alla prima materia se non c'è niente salvato o la materia salvata non esiste più
+    if (this.allMaterie.length > 0) {
+      this.setSelectedSubject(this.allMaterie[0]);
+    }
+  }
+
+  /**
+   * Imposta la materia selezionata e la salva nel localStorage
+   */
+  setSelectedSubject(subject: MateriaObject): void {
+    this.materiaSelected.set(subject);
+    localStorage.setItem(this.STORAGE_KEY, subject.id);
   }
 }
