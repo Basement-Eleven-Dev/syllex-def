@@ -1,53 +1,46 @@
-import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Injectable, effect } from '@angular/core';
+import { Auth } from './auth';
+import { Materia } from './materia';
 
-export interface ClasseObject {
-  id: string;
-  nome: string;
-  studentsCount: number;
-  annoScolastico: number;
-  subject: string;
+export interface ClasseInterface {
+  _id: string;
+  name: string;
+  year: number;
+  students: string[];
 }
 @Injectable({
   providedIn: 'root',
 })
 export class ClassiService {
-  classi: ClasseObject[] = [
-    {
-      id: '1',
-      nome: 'Classe A',
-      studentsCount: 25,
-      annoScolastico: 2023,
-      subject: 'Matematica',
-    },
-    {
-      id: '2',
-      nome: 'Classe B',
-      studentsCount: 30,
-      annoScolastico: 2023,
-      subject: 'Storia',
-    },
-    {
-      id: '3',
-      nome: 'Classe C',
-      studentsCount: 28,
-      annoScolastico: 2023,
-      subject: 'Scienze',
-    },
-    {
-      id: '2',
-      nome: 'Classe B',
-      studentsCount: 30,
-      annoScolastico: 2023,
-      subject: 'Storia',
-    },
-    {
-      id: '3',
-      nome: 'Classe C',
-      studentsCount: 28,
-      annoScolastico: 2023,
-      subject: 'Scienze',
-    },
-  ];
+  classi: ClasseInterface[] = [];
 
-  constructor() {}
+  constructor(
+    private http: HttpClient,
+    private authService: Auth,
+    public materiaService: Materia,
+  ) {
+    // Usa effect per reagire ai cambiamenti di materiaSelected
+    effect(() => {
+      const materiaSelezionata = this.materiaService.materiaSelected();
+      if (materiaSelezionata) {
+        this.getClassi();
+      }
+    });
+  }
+
+  getClassi() {
+    let subjectId = this.materiaService.materiaSelected()?._id;
+    if (!subjectId) {
+      console.warn('Nessuna materia selezionata');
+      return;
+    }
+    console.log('Selected subject ID:', subjectId);
+    return this.http
+      .get<ClasseInterface[]>(`teacher/${subjectId}/classes`)
+      .subscribe((classi) => {
+        this.classi = classi;
+        console.log('Classi del teacher:', classi);
+      });
+  }
 }

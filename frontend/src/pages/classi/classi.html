@@ -46,19 +46,19 @@
         class="card-body d-flex flex-column gap-4 align-items-start position-relative"
         style="z-index: 1"
       >
-        <h4 class="card-title text-dark fw-bold">{{ classe.nome }}</h4>
+        <h4 class="card-title text-dark fw-bold">{{ classe.name }}</h4>
         <div>
           <p class="mb-1 text-dark">
-            <fa-icon [icon]="UserIcon"></fa-icon> {{ classe.studentsCount }}
-            studenti
+            <fa-icon [icon]="UserIcon"></fa-icon> {{ classe.students.length }}
+            student{{ classe.students.length > 1 ? 'i' : 'e' }}
           </p>
           <p class="text-dark">
             <fa-icon [icon]="CalendarIcon"></fa-icon> anno di riferimento {{
-            classe.annoScolastico }}
+            classe.year }}
           </p>
         </div>
         <a
-          [routerLink]="['/t/classi', classe.id]"
+          [routerLink]="['/t/classi', classe._id]"
           class="btn btn-primary mt-auto w-100"
         >
           <fa-icon [icon]="EyeIcon"></fa-icon> Visualizza Dettagli</a
@@ -79,16 +79,16 @@
     </tr>
   </thead>
   <tbody>
-    @for(classe of classiService.classi; track classe.id){
+    @for(classe of classiService.classi; track classe._id){
     <tr>
-      <td class="fw-bold text-dark">{{ classe.nome }}</td>
+      <td class="fw-bold text-dark">{{ classe.name }}</td>
       <td class="text-dark">
-        <fa-icon [icon]="UserIcon"></fa-icon> {{ classe.studentsCount }}
+        <fa-icon [icon]="UserIcon"></fa-icon> {{ classe.students.length }}
       </td>
-      <td class="text-dark">{{ classe.annoScolastico }}</td>
+      <td class="text-dark">{{ classe.year }}</td>
       <td class="text-end">
         <a
-          [routerLink]="['/t/classi', classe.id]"
+          [routerLink]="['/t/classi', classe._id]"
           class="btn btn-sm btn-primary"
           ><fa-icon [icon]="EyeIcon"></fa-icon> Visualizza Dettagli</a
         >

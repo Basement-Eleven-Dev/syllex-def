@@ -29,7 +29,7 @@ export class MainBucket extends Construct {
         ignorePublicAcls: false,
         restrictPublicBuckets: false,
       },
-      removalPolicy: RemovalPolicy.DESTROY, // Questo eliminerà il bucket quando lo stack viene distrutto. Usa attenzione in produzione!
+      removalPolicy: RemovalPolicy.DESTROY,
       autoDeleteObjects: false,
       cors: [
         {

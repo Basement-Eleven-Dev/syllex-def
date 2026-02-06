@@ -10,10 +10,6 @@ const getTeacherSubjects = async (
 ) => {
   const teacherId: ObjectId = new ObjectId(request.pathParameters!.teacherId!);
   const db = await getDefaultDatabase();
-  const topics = await db
-    .collection("topics")
-    .find({ teacherId: teacherId })
-    .toArray();
   const subjects = await db
     .collection<Subject>("SUBJECTS")
     .find({ teacherId: teacherId })

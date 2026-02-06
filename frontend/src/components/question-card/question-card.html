@@ -54,13 +54,13 @@
     <!-- Contenuto completo espanso -->
     <div [ngbCollapse]="isCollapsed()">
       <div class="d-flex flex-column gap-3">
-        @if(question.img) {
+        @if(question.imageUrl) {
         <div class="mb-3 w-100 text-center">
           <img
-            [src]="question.img"
+            [src]="question.imageUrl"
             alt="Immagine della domanda"
             class="img-fluid"
-            (click)="onExpandImage(question.img)"
+            (click)="onExpandImage(question.imageUrl)"
             style="max-height: 100px"
           />
         </div>

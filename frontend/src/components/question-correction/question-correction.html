@@ -6,9 +6,9 @@
     </span>
   </label>
   <p>{{ data.question.text }}</p>
-  @if(data.question.img){
+  @if(data.question.imageUrl){
   <img
-    [src]="data.question.img"
+    [src]="data.question.imageUrl"
     alt="Immagine domanda {{ index }}"
     class="img-fluid mb-3"
   />

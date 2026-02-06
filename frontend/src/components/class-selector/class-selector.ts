@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { ClassiService, ClasseObject } from '../../services/classi-service';
+import { ClassiService } from '../../services/classi-service';
 
 @Component({
   selector: 'app-class-selector',

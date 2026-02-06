@@ -1,5 +1,10 @@
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import {
+  ActivatedRoute,
+  Router,
+  RouterLink,
+  RouterModule,
+} from '@angular/router';
 import { StudentiClasseTable } from '../../components/studenti-classe-table/studenti-classe-table';
 import { Section } from '../test-detail/test-detail';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -15,16 +20,7 @@ import {
   NgbNavOutlet,
 } from '@ng-bootstrap/ng-bootstrap';
 import { NgComponentOutlet } from '@angular/common';
-
-interface ClasseDettaglioProps {
-  id: string;
-  nomeClasse: string;
-  numeroStudenti: number;
-  annoScolastico: number;
-  performanceMedia: number;
-  testAssegnati: number;
-  testConsegnati: number;
-}
+import { ClasseInterface, ClassiService } from '../../services/classi-service';
 
 interface Stat {
   label: string;
@@ -50,6 +46,7 @@ interface Stat {
     NgbNavLinkButton,
     NgbNavLinkBase,
     NgbNavOutlet,
+    RouterModule,
   ],
   templateUrl: './classe-dettaglio.html',
   styleUrl: './classe-dettaglio.scss',
@@ -57,42 +54,33 @@ interface Stat {
 export class ClasseDettaglio {
   ChartIcon = faChartLine;
   UsersIcon = faUsers;
-  classeDettaglio: ClasseDettaglioProps = {
-    id: '1',
-    nomeClasse: '3A Informatica',
-    numeroStudenti: 25,
-    annoScolastico: 2025,
-    performanceMedia: 85,
-    testAssegnati: 10,
-    testConsegnati: 8,
-  };
+
+  classe: ClasseInterface | undefined = undefined;
 
   stats: Stat[] = [
     {
       label: 'Numero Studenti',
-      value: this.classeDettaglio.numeroStudenti,
+      value: 0,
     },
     {
       label: 'Performance Media',
       requirePercentage: true,
-      value: this.classeDettaglio.performanceMedia,
+      value: 0,
     },
     {
       label: 'Test Assegnati',
-      value: this.classeDettaglio.testAssegnati,
+      value: 0,
       link: '/t/tests/new',
-      queryParams: { assign: this.classeDettaglio.id },
       linkLabel: 'Nuovo test',
     },
     {
       label: 'Test Consegnati',
-      value: this.classeDettaglio.testConsegnati,
+      value: 0,
       link: '/t/classe-dettaglio/test-consegnati',
       linkLabel: 'Vedi tutti',
     },
   ];
 
-  activeSection: number = 1; // 1: Studenti, 2: Statistiche
   sections: Section[] = [
     {
       id: 1,
@@ -108,7 +96,30 @@ export class ClasseDettaglio {
     },
   ];
 
-  ngOnInit() {
-    this.sections[1].component.classeId = this.classeDettaglio.id;
+  constructor(
+    private route: ActivatedRoute,
+    private classiService: ClassiService,
+    private router: Router,
+  ) {
+    this.route.params.subscribe((params) => {
+      const classeId = params['classeId'];
+      this.classe =
+        this.classiService.classi.find((c) => c._id === classeId) ||
+        this.classe;
+
+      if (!this.classe) {
+        console.warn('Classe non trovata per ID:', classeId);
+        this.router.navigate(['/t/classi']); // Torna alla lista delle classi se non troviamo la classe
+        return;
+      }
+      this.stats[0].value = this.classe.students.length;
+      this.stats[2].queryParams = { assign: this.classe._id };
+      this.sections[0].component.classeId = this.classe._id;
+      this.sections[1].component.classeId = this.classe._id;
+    });
   }
+
+  activeSection: number = 1; // 1: Studenti, 2: Statistiche
+
+  ngOnInit() {}
 }
