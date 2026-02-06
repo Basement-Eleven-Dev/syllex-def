@@ -30,11 +30,10 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
         method: 'get',
         role: 'open'
     },
-    //!!!DA RIMETTERE A ROLE:TEACHER
     {
         apiRoute: 'files/upload',
         functionPath: 'files/createUpload.ts',
         method: 'post',
-        role: 'open'
+        role: 'open' //!!!DA RIMETTERE A ROLE:TEACHER
     },
 ]
