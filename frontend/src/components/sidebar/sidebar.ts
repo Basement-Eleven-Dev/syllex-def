@@ -62,11 +62,11 @@ export class Sidebar {
   }
 
   selectSubject(subject: MateriaObject): void {
-    this.materiaService.switchMateria(subject);
+    this.materiaService.setSelectedSubject(subject);
   }
 
-  get selectedSubject(): MateriaObject {
-    return this.materiaService.materiaSelected.value!;
+  get selectedSubject(): MateriaObject | null {
+    return this.materiaService.materiaSelected();
   }
 
   mainRoutes: SidebarRoute[] = [
@@ -103,9 +103,13 @@ export class Sidebar {
   ];
 
   availableSubjects(): MateriaObject[] {
+    const selected = this.selectedSubject;
+    if (!selected) {
+      return this.materiaService.allMaterie;
+    }
     // Exclude the currently selected subject from the list
     return this.materiaService.allMaterie.filter(
-      (subject) => subject.id !== this.selectedSubject.id,
+      (subject) => subject.id !== selected.id,
     );
   }
 }
