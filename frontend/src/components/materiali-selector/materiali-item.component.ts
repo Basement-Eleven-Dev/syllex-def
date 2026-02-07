@@ -6,7 +6,7 @@ import {
   faChevronRight,
 } from '@fortawesome/pro-solid-svg-icons';
 import { getFileIcon, getFolderIcon } from '../../app/_utils/file-icons';
-import { Folder, Materiale } from '../../services/materiali-service';
+import { MaterialInterface } from '../../services/materiali-service';
 
 @Component({
   selector: 'app-materiali-item',
@@ -29,13 +29,13 @@ import { Folder, Materiale } from '../../services/materiali-service';
       <li class="list-group-item p-2 rounded-3 mb-2">
         <div
           class="folder-item d-flex align-items-center p-2 cursor-pointer text-dark"
-          (click)="folderToggle.emit(item().id)"
+          (click)="folderToggle.emit(item()._id!)"
           role="button"
           [attr.aria-expanded]="isExpanded()"
-          [attr.aria-controls]="'collapse-' + item().id"
+          [attr.aria-controls]="'collapse-' + item()._id"
         >
           <fa-icon [icon]="getFolderIcon(isExpanded())" class="me-2"></fa-icon>
-          <span class="flex-grow-1">{{ asFolder(item()).name }}</span>
+          <span class="flex-grow-1">{{ item().name }}</span>
           <fa-icon
             [icon]="chevronIcon"
             class="transition-rotate"
@@ -45,9 +45,9 @@ import { Folder, Materiale } from '../../services/materiali-service';
         </div>
 
         <!-- Folder Content (Recursive) -->
-        <div [id]="'collapse-' + item().id" [ngbCollapse]="!isExpanded()">
+        <div [id]="'collapse-' + item()._id" [ngbCollapse]="!isExpanded()">
           <ul class="list-group list-group-flush ms-4 text-dark rounded-3">
-            @for (childItem of getFilteredContent(); track childItem.id) {
+            @for (childItem of getFilteredContent(); track childItem._id) {
               <app-materiali-item
                 [item]="childItem"
                 [expandedFolders]="expandedFolders()"
@@ -66,49 +66,38 @@ import { Folder, Materiale } from '../../services/materiali-service';
         class="list-group-item p-2 d-flex align-items-center cursor-pointer text-dark rounded-3 mb-2"
         [class.bg-secondary]="isSelected()"
         [class.border-dark]="isSelected()"
-        (click)="materialSelect.emit(asMateriale(item()))"
+        (click)="materialSelect.emit(item())"
         role="button"
       >
-        <fa-icon
-          [icon]="getFileIcon(asMateriale(item()).extension)"
-          class="me-2"
-        ></fa-icon>
-        <span class="flex-grow-1">{{ asMateriale(item()).name }}</span>
+        <fa-icon [icon]="getFileIcon(item().extension!)" class="me-2"></fa-icon>
+        <span class="flex-grow-1">{{ item().name }}</span>
       </li>
     }
   `,
 })
 export class MaterialiItemComponent {
-  item = input.required<Folder | Materiale>();
+  item = input.required<MaterialInterface>();
   expandedFolders = input.required<Set<string>>();
   selectedMaterialIds = input.required<Set<string>>();
   searchQuery = input.required<string>();
 
   folderToggle = output<string>();
-  materialSelect = output<Materiale>();
+  materialSelect = output<MaterialInterface>();
 
   chevronIcon = faChevronRight;
 
-  isFolder(item: Folder | Materiale): item is Folder {
-    return 'content' in item;
+  isFolder(item: MaterialInterface): boolean {
+    return item.type === 'folder';
   }
 
   isExpanded(): boolean {
     const item = this.item();
-    return this.isFolder(item) && this.expandedFolders().has(item.id);
+    return this.isFolder(item) && this.expandedFolders().has(item._id!);
   }
 
   isSelected(): boolean {
     const item = this.item();
-    return !this.isFolder(item) && this.selectedMaterialIds().has(item.id);
-  }
-
-  asFolder(item: Folder | Materiale): Folder {
-    return item as Folder;
-  }
-
-  asMateriale(item: Folder | Materiale): Materiale {
-    return item as Materiale;
+    return !this.isFolder(item) && this.selectedMaterialIds().has(item._id!);
   }
 
   getFileIcon(extension: string): IconDefinition {
@@ -119,14 +108,14 @@ export class MaterialiItemComponent {
     return getFolderIcon(isOpen);
   }
 
-  getFilteredContent(): (Materiale | Folder)[] {
+  getFilteredContent(): MaterialInterface[] {
     const item = this.item();
     if (!this.isFolder(item)) return [];
 
     const query = this.searchQuery().toLowerCase().trim();
-    if (!query) return item.content;
+    if (!query) return item.content!;
 
-    return item.content.filter((child) => {
+    return item.content!.filter((child: MaterialInterface) => {
       if (this.isFolder(child)) {
         const folderMatch = child.name.toLowerCase().includes(query);
         const hasMatchingContent = this.hasMatchInContent(child, query);
@@ -136,8 +125,8 @@ export class MaterialiItemComponent {
     });
   }
 
-  private hasMatchInContent(folder: Folder, query: string): boolean {
-    return folder.content.some((item) => {
+  private hasMatchInContent(folder: MaterialInterface, query: string): boolean {
+    return folder.content!.some((item: MaterialInterface) => {
       if (this.isFolder(item)) {
         const folderMatch = item.name.toLowerCase().includes(query);
         return folderMatch || this.hasMatchInContent(item, query);

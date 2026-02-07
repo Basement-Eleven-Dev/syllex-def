@@ -39,3 +39,20 @@
     }
   }
 }
+
+.typeCard {
+  &.selected {
+    background-color: var(--bs-secondary);
+    color: var(--bs-dark);
+
+    .typeIconWrapper {
+      background-color: var(--bs-dark);
+      color: white;
+    }
+
+    .materialTypeIcon {
+      background-color: var(--bs-dark);
+      color: white;
+    }
+  }
+}

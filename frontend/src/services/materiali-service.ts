@@ -1,294 +1,169 @@
-import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Injectable, effect, signal } from '@angular/core';
+import { Observable } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
+import { Materia } from './materia';
 
-export interface Materiale {
-  id: string;
+export interface MaterialInterface {
+  _id: string;
   name: string;
-  url: string;
-  extension: string;
-  createdAt: Date;
+  type?: 'file' | 'folder';
+  url?: string;
+  extension?: string;
+  content?: MaterialInterface[];
+  createdAt?: Date;
   aiGenerated?: boolean;
-}
-
-export interface Folder {
-  id: string;
-  name: string;
-  content: (Materiale | Folder)[];
-  createdAt: Date;
+  teacherId?: string;
+  subjectId?: string;
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class MaterialiService {
-  root: (Folder | Materiale)[] = [
-    {
-      id: 'folder-1',
-      name: 'Pdf Lezioni',
-      createdAt: new Date('2023-01-15'),
-      content: [
-        {
-          id: 'file-1',
-          name: 'Lezione_1.pdf',
-          url: '/materials/Lezione_1.pdf',
-          extension: 'pdf',
-          createdAt: new Date('2023-01-15'),
+  root = signal<MaterialInterface[]>([]);
+  currentFolder = signal<MaterialInterface | null>(null);
+
+  constructor(
+    private httpClient: HttpClient,
+    private materiaService: Materia,
+  ) {
+    // Reagisci ai cambiamenti della materia selezionata
+    effect(() => {
+      const selectedSubject = this.materiaService.materiaSelected();
+      if (selectedSubject) {
+        console.log('Materia selezionata:', selectedSubject);
+        this.loadMaterials();
+      }
+    });
+  }
+
+  loadMaterials(): void {
+    const subjectId = this.materiaService.materiaSelected()?._id;
+    if (!subjectId) return;
+
+    this.httpClient
+      .get<{
+        success: boolean;
+        materials: MaterialInterface[];
+      }>(`materials/${subjectId}`)
+      .subscribe({
+        next: (response) => {
+          this.root.set(this.buildTree(response.materials));
+          console.log('Materiali caricati:', this.root());
         },
-        {
-          id: 'file-2',
-          name: 'Lezione_2.pdf',
-          url: '/materials/Lezione_2.pdf',
-          extension: 'pdf',
-          createdAt: new Date('2023-01-15'),
-        },
-        {
-          id: 'file-3',
-          name: 'Lezione_3.pdf',
-          url: '/materials/Lezione_3.pdf',
-          extension: 'pdf',
-          createdAt: new Date('2023-01-15'),
-        },
-        {
-          id: 'folder-2',
-          name: 'Lezioni vecchie',
-          createdAt: new Date('2023-01-15'),
-          content: [
-            {
-              id: 'file-4',
-              name: 'Lezione_vecchia-1.pdf',
-              url: '/materials/Lezione_vecchia-1.pdf',
-              extension: 'pdf',
-              createdAt: new Date('2023-01-15'),
-            },
-            {
-              id: 'file-5',
-              name: 'Lezione_vecchia-2.pdf',
-              url: '/materials/Lezione_vecchia-2.pdf',
-              extension: 'pdf',
-              createdAt: new Date('2023-01-15'),
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: 'folder-3',
-      name: 'Matematica',
-      createdAt: new Date('2023-01-15'),
-      content: [
-        {
-          id: 'folder-4',
-          name: 'Algebra',
-          createdAt: new Date('2023-01-15'),
-          content: [
-            {
-              id: 'file-6',
-              name: 'Equazioni.pdf',
-              url: '/materials/Equazioni.pdf',
-              extension: 'pdf',
-              createdAt: new Date('2023-01-15'),
-            },
-            {
-              id: 'file-7',
-              name: 'Esercizi_Algebra.xlsx',
-              url: '/materials/Esercizi_Algebra.xlsx',
-              extension: 'xlsx',
-              createdAt: new Date('2023-01-15'),
-            },
-            {
-              id: 'file-8',
-              name: 'Soluzioni.docx',
-              url: '/materials/Soluzioni.docx',
-              extension: 'docx',
-              createdAt: new Date('2023-01-15'),
-            },
-          ],
-        },
-        {
-          id: 'folder-5',
-          name: 'Geometria',
-          createdAt: new Date('2023-01-15'),
-          content: [
-            {
-              id: 'file-9',
-              name: 'Teoremi.pdf',
-              url: '/materials/Teoremi.pdf',
-              extension: 'pdf',
-              createdAt: new Date('2023-01-15'),
-            },
-            {
-              id: 'file-10',
-              name: 'Figure_Piane.pptx',
-              url: '/materials/Figure_Piane.pptx',
-              extension: 'pptx',
-              createdAt: new Date('2023-01-15'),
-            },
-          ],
-        },
-        {
-          id: 'file-11',
-          name: 'Programma_Annuale.pdf',
-          url: '/materials/Programma_Annuale.pdf',
-          extension: 'pdf',
-          createdAt: new Date('2023-01-15'),
-        },
-      ],
-    },
-    {
-      id: 'folder-6',
-      name: 'Storia',
-      createdAt: new Date('2023-01-15'),
-      content: [
-        {
-          id: 'file-12',
-          name: 'Rivoluzione_Francese.pdf',
-          url: '/materials/Rivoluzione_Francese.pdf',
-          extension: 'pdf',
-          createdAt: new Date('2023-01-15'),
-        },
-        {
-          id: 'file-13',
-          name: 'Napoleone.docx',
-          url: '/materials/Napoleone.docx',
-          extension: 'docx',
-          createdAt: new Date('2023-01-15'),
-        },
-        {
-          id: 'folder-7',
-          name: 'Documenti storici',
-          createdAt: new Date('2023-01-15'),
-          content: [
-            {
-              id: 'file-14',
-              name: 'Costituzione_1789.pdf',
-              url: '/materials/Costituzione_1789.pdf',
-              extension: 'pdf',
-              createdAt: new Date('2023-01-15'),
-            },
-            {
-              id: 'file-15',
-              name: 'Lettere_Epoca.txt',
-              url: '/materials/Lettere_Epoca.txt',
-              extension: 'txt',
-              createdAt: new Date('2023-01-15'),
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: 'folder-8',
-      name: 'Scienze',
-      createdAt: new Date('2023-01-15'),
-      content: [
-        {
-          id: 'file-16',
-          name: 'Biologia_Cellulare.pdf',
-          url: '/materials/Biologia_Cellulare.pdf',
-          extension: 'pdf',
-          createdAt: new Date('2023-01-15'),
-        },
-        {
-          id: 'file-17',
-          name: 'Esperimenti_Lab.xlsx',
-          url: '/materials/Esperimenti_Lab.xlsx',
-          extension: 'xlsx',
-          createdAt: new Date('2023-01-15'),
-        },
-        {
-          id: 'file-18',
-          name: 'Video_Microscopia.mp4',
-          url: '/materials/Video_Microscopia.mp4',
-          extension: 'mp4',
-          createdAt: new Date('2023-01-15'),
-        },
-      ],
-    },
-    {
-      id: 'file-19',
-      name: 'Appunti_Vacanze.docx',
-      url: '/materials/Appunti_Vacanze.docx',
-      extension: 'docx',
-      createdAt: new Date('2023-01-15'),
-    },
-    {
-      id: 'file-20',
-      name: 'Calendario_Scolastico.pdf',
-      url: '/materials/Calendario_Scolastico.pdf',
-      extension: 'pdf',
-      createdAt: new Date('2023-01-15'),
-    },
-    {
-      id: 'file-21',
-      name: 'Regolamento.pdf',
-      url: '/materials/Regolamento.pdf',
-      extension: 'pdf',
-      createdAt: new Date('2023-01-15'),
-      aiGenerated: true,
-    },
-  ];
+        error: (err) =>
+          console.error('Errore durante il caricamento dei materiali:', err),
+      });
+  }
+
+  private buildTree(materials: MaterialInterface[]): MaterialInterface[] {
+    const itemMap = new Map<string, MaterialInterface>();
+    const childrenMap = new Map<string, Set<string>>();
+
+    // Crea mappa items e mappa relazioni parent-child
+    materials.forEach((material) => {
+      itemMap.set(material._id, {
+        ...material,
+        content: material.type === 'folder' ? [] : undefined,
+      });
+
+      if (material.type === 'folder' && material.content) {
+        const childIds = material.content.map((child) =>
+          typeof child === 'string' ? child : child._id,
+        );
+        childIds.forEach((childId) => {
+          if (!childrenMap.has(childId)) {
+            childrenMap.set(childId, new Set());
+          }
+          childrenMap.get(childId)!.add(material._id);
+        });
+      }
+    });
+
+    // Costruisci albero e identifica root items
+    const rootItems: MaterialInterface[] = [];
+    materials.forEach((material) => {
+      const item = itemMap.get(material._id)!;
+      const parentIds = childrenMap.get(material._id);
+
+      if (parentIds && parentIds.size > 0) {
+        parentIds.forEach((parentId) => {
+          const parent = itemMap.get(parentId);
+          if (parent?.content) {
+            parent.content.push(item);
+          }
+        });
+      } else {
+        rootItems.push(item);
+      }
+    });
+
+    return rootItems;
+  }
 
   getCurrentPath(folderName: string): string[] {
     const path: string[] = ['Home'];
+    const folder = this.findItem(
+      (item) => item.type === 'folder' && item.name === folderName,
+    );
 
-    const findPath = (
-      items: (Folder | Materiale)[],
+    if (!folder) return path;
+
+    const buildPath = (
+      items: MaterialInterface[],
       currentPath: string[],
     ): string[] | null => {
       for (const item of items) {
-        if ('content' in item) {
-          if (item.name === folderName) {
-            return [...currentPath, item.name];
-          }
-          const result = findPath(item.content, [...currentPath, item.name]);
+        if (item._id === folder._id) {
+          return [...currentPath, item.name];
+        }
+        if (item.type === 'folder' && item.content) {
+          const result = buildPath(item.content, [...currentPath, item.name]);
           if (result) return result;
         }
       }
       return null;
     };
 
-    const foundPath = findPath(this.root, path);
-    return foundPath || path;
+    return buildPath(this.root(), path) || path;
   }
 
-  getFolderFromName(folderName: string): Folder | null {
-    const findFolder = (items: (Folder | Materiale)[]): Folder | null => {
+  getFolderFromName(folderName: string): MaterialInterface | null {
+    return this.findItem(
+      (item) => item.type === 'folder' && item.name === folderName,
+    );
+  }
+
+  getFolderById(folderId: string): MaterialInterface | null {
+    return this.findItem(
+      (item) => item._id === folderId && item.type === 'folder',
+    );
+  }
+
+  private findItem(
+    predicate: (item: MaterialInterface) => boolean,
+  ): MaterialInterface | null {
+    const search = (items: MaterialInterface[]): MaterialInterface | null => {
       for (const item of items) {
-        if ('content' in item) {
-          if (item.name === folderName) {
-            return item as Folder;
-          }
-          const result = findFolder(item.content);
+        if (predicate(item)) return item;
+        if (item.type === 'folder' && item.content) {
+          const result = search(item.content);
           if (result) return result;
         }
       }
       return null;
     };
-    return findFolder(this.root);
+    return search(this.root());
   }
 
-  // Backend operations
-  createNewFolder(parentFolder: Folder): Folder {
-    const newFolder: Folder = {
-      id: `folder-${Date.now()}`,
-      name: 'Nuova Cartella',
-      content: [],
-      createdAt: new Date(),
-    };
-
-    // TODO: Chiamata HTTP al backend per creare la cartella
-    if (parentFolder.name === '/') {
-      this.root.push(newFolder);
-    } else {
-      parentFolder.content.push(newFolder);
-    }
-
-    return newFolder;
-  }
-
-  uploadMaterial(file: File, targetFolder: Folder): Materiale {
+  uploadMaterial(
+    file: File,
+    targetFolder: MaterialInterface,
+  ): MaterialInterface {
     const extension = file.name.split('.').pop()?.toLowerCase() || '';
-    const newMaterial: Materiale = {
-      id: `file-${Date.now()}`,
+    const newMaterial: MaterialInterface = {
+      _id: `file-${Date.now()}`,
       name: file.name,
       url: `/materials/${file.name}`,
       extension: extension,
@@ -297,9 +172,9 @@ export class MaterialiService {
 
     // TODO: Chiamata HTTP al backend per caricare il file
     if (targetFolder.name === '/') {
-      this.root.push(newMaterial);
+      this.root.update((current) => [...current, newMaterial]);
     } else {
-      targetFolder.content.push(newMaterial);
+      targetFolder.content!.push(newMaterial);
     }
 
     return newMaterial;
@@ -308,54 +183,153 @@ export class MaterialiService {
   moveItem(
     itemId: string,
     targetFolderId: string,
-    currentFolderId: string,
-  ): boolean {
-    // TODO: Chiamata HTTP al backend per spostare l'elemento
-    // Per ora return true per simulare successo
-    return true;
+  ): Observable<{
+    success: boolean;
+    moved: boolean;
+    removedFromParents: number;
+  }> {
+    return this.moveItems([itemId], targetFolderId).pipe(
+      map((result) => ({
+        success: result.success,
+        moved: result.moved,
+        removedFromParents: result.removedFromParents,
+      })),
+    );
   }
 
-  deleteItem(itemId: string): boolean {
-    // TODO: Chiamata HTTP al backend per eliminare l'elemento
+  moveItems(
+    itemIds: string[],
+    targetFolderId: string,
+  ): Observable<{
+    success: boolean;
+    moved: boolean;
+    movedCount: number;
+    removedFromParents: number;
+  }> {
+    // Invia null al backend se il target è root
+    const backendParentId = targetFolderId === 'root' ? null : targetFolderId;
 
-    const removeFromArray = (items: (Folder | Materiale)[]): boolean => {
-      const index = items.findIndex((i) => i.id === itemId);
+    return this.httpClient
+      .post<{
+        success: boolean;
+        moved: boolean;
+        movedCount: number;
+        removedFromParents: number;
+      }>('materials/move-batch', {
+        materialIds: itemIds,
+        newParentId: backendParentId,
+      })
+      .pipe(
+        tap(() => {
+          // Trova tutti gli item da spostare
+          const items = itemIds
+            .map((id) => this.findItemById(id))
+            .filter((item): item is MaterialInterface => item !== null);
+
+          // Rimuovi tutti gli item dalle posizioni correnti
+          itemIds.forEach((id) => this.removeItemFromAllParents(id));
+
+          // Aggiungi tutti gli item alla nuova posizione
+          if (targetFolderId === 'root') {
+            // Aggiungi al root array
+            const newItems = items.filter(
+              (item) => !this.root().find((i) => i._id === item._id),
+            );
+            if (newItems.length > 0) {
+              this.root.update((current) => [...current, ...newItems]);
+            }
+          } else {
+            // Aggiungi alla cartella target
+            const targetFolder = this.getFolderById(targetFolderId);
+            if (targetFolder?.content) {
+              const newItems = items.filter(
+                (item) =>
+                  !targetFolder.content!.find((i) => i._id === item._id),
+              );
+              targetFolder.content.push(...newItems);
+            }
+          }
+        }),
+      );
+  }
+
+  deleteItem(itemId: string): Observable<{
+    success: boolean;
+    deleted: boolean;
+    removedFromParents: number;
+  }> {
+    return this.httpClient
+      .delete<{
+        success: boolean;
+        deleted: boolean;
+        removedFromParents: number;
+      }>(`materials/${itemId}`)
+      .pipe(tap(() => this.removeItemFromAllParents(itemId)));
+  }
+
+  renameItem(
+    itemId: string,
+    newName: string,
+  ): Observable<{ success: boolean; renamed: boolean }> {
+    return this.httpClient
+      .put<{
+        success: boolean;
+        renamed: boolean;
+      }>(`materials/${itemId}/rename`, { newName })
+      .pipe(
+        tap(() => {
+          const item = this.findItemById(itemId);
+          if (item) {
+            item.name = newName;
+          }
+        }),
+      );
+  }
+
+  createMaterial(
+    material: MaterialInterface,
+    parent: MaterialInterface,
+  ): Observable<{ success: boolean; material: MaterialInterface }> {
+    console.log('Creating material under parent:', parent);
+    const subjectId = this.materiaService.materiaSelected()?._id;
+
+    return this.httpClient
+      .post<{
+        success: boolean;
+        material: MaterialInterface;
+      }>('materials/create', {
+        material: { ...material, subjectId },
+        subjectId,
+        parentId: parent._id === 'root' ? null : parent._id,
+      })
+      .pipe(
+        tap((response) => {
+          if (parent._id === 'root') {
+            this.root.update((current) => [...current, response.material]);
+          } else if (parent.content) {
+            parent.content.push(response.material);
+          }
+        }),
+      );
+  }
+
+  private findItemById(itemId: string): MaterialInterface | null {
+    return this.findItem((item) => item._id === itemId);
+  }
+
+  private removeItemFromAllParents(itemId: string): void {
+    const removeFromArray = (items: MaterialInterface[]): void => {
+      const index = items.findIndex((i) => i._id === itemId);
       if (index !== -1) {
         items.splice(index, 1);
-        return true;
+        return;
       }
-
-      for (const item of items) {
-        if ('content' in item) {
-          if (removeFromArray(item.content)) {
-            return true;
-          }
+      items.forEach((item) => {
+        if (item.type === 'folder' && item.content) {
+          removeFromArray(item.content);
         }
-      }
-      return false;
+      });
     };
-
-    return removeFromArray(this.root);
+    removeFromArray(this.root());
   }
-
-  renameItem(itemId: string, newName: string): boolean {
-    const findAndRename = (items: (Folder | Materiale)[]): boolean => {
-      for (const item of items) {
-        if (item.id === itemId) {
-          item.name = newName;
-          return true;
-        }
-        if ('content' in item) {
-          if (findAndRename((item as Folder).content)) {
-            return true;
-          }
-        }
-      }
-      return false;
-    };
-
-    return findAndRename(this.root);
-  }
-
-  constructor() {}
 }

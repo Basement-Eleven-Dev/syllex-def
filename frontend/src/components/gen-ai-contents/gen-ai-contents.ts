@@ -1,7 +1,6 @@
 import { Component, effect, input, signal } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faSparkles } from '@fortawesome/pro-solid-svg-icons';
-import { TopicsService } from '../../services/topics-service';
 import { Materia } from '../../services/materia';
 import { MaterialiSelector } from '../materiali-selector/materiali-selector';
 import { TypeSelector, TypeOption } from '../type-selector/type-selector';
@@ -35,10 +34,7 @@ export class GenAiContents {
   selectedType = signal<string>('');
   topicsSelected = signal<string[]>([]);
 
-  constructor(
-    public topicService: TopicsService,
-    public materiaService: Materia,
-  ) {}
+  constructor(public materiaService: Materia) {}
 
   genForm: FormGroup = new FormGroup({
     selectedType: new FormControl('', [Validators.required]),

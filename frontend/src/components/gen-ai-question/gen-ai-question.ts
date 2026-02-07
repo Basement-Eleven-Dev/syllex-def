@@ -21,9 +21,9 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { TopicsService } from '../../services/topics-service';
 import { MaterialiSelector } from '../materiali-selector/materiali-selector';
 import { TypeSelector } from '../type-selector/type-selector';
+import { Materia } from '../../services/materia';
 
 @Component({
   selector: 'app-gen-ai-question',
@@ -58,7 +58,7 @@ export class GenAiQuestion {
   constructor(
     public offcanvas: NgbOffcanvas,
     private aiService: AiService,
-    public topicsService: TopicsService,
+    public materiaService: Materia,
   ) {}
 
   ngOnInit() {

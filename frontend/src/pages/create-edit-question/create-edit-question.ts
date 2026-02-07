@@ -31,11 +31,10 @@ import {
   QuestionType,
   QUESTION_TYPE_OPTIONS,
 } from '../../types/question.types';
-import { TopicsService } from '../../services/topics-service';
 import { BackTo } from '../../components/back-to/back-to';
 import { TypeSelector } from '../../components/type-selector/type-selector';
 import { Materia } from '../../services/materia';
-import { Questions } from '../../services/questions';
+import { QuestionsService } from '../../services/questions';
 
 export interface AnswerOption {
   label: string;
@@ -76,9 +75,8 @@ export class CreateEditQuestion {
 
   constructor(
     private activatedRoute: ActivatedRoute,
-    public topicsService: TopicsService,
     public materiaService: Materia,
-    private questionsService: Questions,
+    private questionsService: QuestionsService,
   ) {
     this.questionId = this.activatedRoute.snapshot.paramMap.get('id');
   }

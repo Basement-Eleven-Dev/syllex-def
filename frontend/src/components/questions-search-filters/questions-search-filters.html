@@ -27,10 +27,10 @@
     <label for="search-term" class="form-label fw-semibold text-dark"
       >Argomento</label
     >
-    <select class="form-select custom-input" formControlName="type">
+    <select class="form-select custom-input" formControlName="topicId">
       <option value="">Argomento</option>
-      @for(type of ['geografia', 'navigazione', 'meteorologia']; track $index) {
-      <option value="{{ type }}">{{ type | titlecase }}</option>
+      @for(topic of materiaService.materiaSelected()?.topics; track $index) {
+      <option value="{{ topic._id }}">{{ topic.name | titlecase }}</option>
       }
     </select>
   </div>

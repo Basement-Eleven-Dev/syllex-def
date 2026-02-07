@@ -37,13 +37,13 @@
         che si concentri l'AI?</label
       >
       <div class="d-flex flex-row align-items-center gap-3">
-        @for(t of topicService.topics; track $index) {
+        @for(t of materiaService.materiaSelected()?.topics; track $index) {
         <button
           class="btn rounded-pill h3 topicBtn"
-          [class.selected]="isTopicSelected(t)"
-          (click)="onToggleTopic(t)"
+          [class.selected]="isTopicSelected(t._id)"
+          (click)="onToggleTopic(t._id)"
         >
-          {{t}}
+          {{t.name}}
         </button>
         }
       </div>

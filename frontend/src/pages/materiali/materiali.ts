@@ -12,8 +12,7 @@ import { DatePipe } from '@angular/common';
 import { MaterialeCard } from '../../components/materiale-card/materiale-card';
 import {
   MaterialiService,
-  Folder,
-  Materiale,
+  MaterialInterface,
 } from '../../services/materiali-service';
 import {
   FontAwesomeModule,
@@ -47,6 +46,7 @@ import { MaterialeDragDropService } from '../../services/materiale-drag-drop.ser
 import { MaterialeSearchService } from '../../services/materiale-search.service';
 import { MaterialeSelectionService } from '../../services/materiale-selection.service';
 import { GenAiContents } from '../../components/gen-ai-contents/gen-ai-contents';
+import { FilesService } from '../../services/files-service';
 
 @Component({
   selector: 'app-materiali',
@@ -79,12 +79,13 @@ export class Materiali {
   private searchService = inject(MaterialeSearchService);
   public selectionService = inject(MaterialeSelectionService);
   private offCanvasService = inject(NgbOffcanvas);
+  private fileService = inject(FilesService);
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   searchTerm = signal<string>('');
   highlightedItemId = signal<string | null>(null);
-  private folderBeforeSearch: Folder | null = null;
+  private folderBeforeSearch: MaterialInterface | null = null;
   private isSearchActive = false;
 
   constructor() {
@@ -98,7 +99,7 @@ export class Materiali {
         this.performSearch(term);
       } else if (term.length === 0 && this.isSearchActive) {
         if (this.folderBeforeSearch) {
-          this.rootFolder.set(this.folderBeforeSearch);
+          this.materialiService.currentFolder.set(this.folderBeforeSearch);
           this.folderBeforeSearch = null;
         }
         this.isSearchActive = false;
@@ -120,11 +121,21 @@ export class Materiali {
     'txt',
   ];
 
-  rootFolder = signal<Folder>({
-    id: 'root',
+  private readonly ROOT_FOLDER_CONFIG = {
+    _id: 'root',
     name: '/',
-    content: this.materialiService.root,
+    type: 'folder' as const,
     createdAt: new Date(),
+  };
+
+  rootFolder = computed(() => {
+    const current = this.materialiService.currentFolder();
+    return (
+      current || {
+        ...this.ROOT_FOLDER_CONFIG,
+        content: this.materialiService.root(),
+      }
+    );
   });
 
   currentPathArray = computed(() => {
@@ -136,33 +147,33 @@ export class Materiali {
     this.viewType = type;
   }
 
-  onSelectItem(item: Folder | Materiale, event?: MouseEvent): void {
+  onSelectItem(item: MaterialInterface, event?: MouseEvent): void {
     event?.stopPropagation();
     const isMultiSelect = event?.ctrlKey || event?.metaKey;
-    this.selectionService.toggle(item.id, isMultiSelect);
+    this.selectionService.toggle(item._id!, isMultiSelect);
   }
 
   isItemSelected(itemId: string): boolean {
     return this.selectionService.isSelected(itemId);
   }
 
-  onRequestOpenItem(item: Folder | Materiale | string): void {
+  onRequestOpenItem(item: MaterialInterface | string): void {
     this.folderBeforeSearch = null;
     this.isSearchActive = false;
 
     if (item === 'Home') {
-      this.rootFolder.set(this.searchService.getRootFolder());
+      this.materialiService.currentFolder.set(null);
       return;
     }
 
     if (typeof item === 'string') {
       const folder = this.materialiService.getFolderFromName(item);
-      if (folder) this.rootFolder.set(folder);
+      if (folder) this.materialiService.currentFolder.set(folder);
       return;
     }
 
-    if ('content' in item) {
-      this.rootFolder.set(item as Folder);
+    if (item.type === 'folder') {
+      this.materialiService.currentFolder.set(item);
     }
   }
 
@@ -185,10 +196,24 @@ export class Materiali {
       return;
     }
 
-    this.materialiService.uploadMaterial(file, this.rootFolder());
-    this.rootFolder.set({ ...this.rootFolder() });
-
-    input.value = '';
+    this.fileService.uploadFile(file.name, file).subscribe((url) => {
+      const newMaterial: MaterialInterface = {
+        _id: 'temp-id-' + Date.now(),
+        name: file.name,
+        type: 'file',
+        url: url,
+        extension: extension,
+        createdAt: new Date(),
+      };
+      this.materialiService
+        .createMaterial(newMaterial, this.rootFolder())
+        .subscribe({
+          next: () => {},
+          error: (err) =>
+            console.error('Errore durante la creazione del materiale:', err),
+        });
+      input.value = '';
+    });
   }
 
   private getFileExtension(filename: string): string {
@@ -199,16 +224,29 @@ export class Materiali {
     return this.ALLOWED_EXTENSIONS.includes(extension);
   }
 
-  onCreateNewFolder(): void {
-    this.materialiService.createNewFolder(this.rootFolder());
-    this.rootFolder.set({ ...this.rootFolder() });
+  onCreateNewFolder() {
+    this.materialiService
+      .createMaterial(
+        {
+          _id: 'temp-id-' + Date.now(),
+          name: 'Nuova Cartella',
+          type: 'folder',
+          content: [],
+        } as MaterialInterface,
+        this.rootFolder(),
+      )
+      .subscribe({
+        next: () => {},
+        error: (err) =>
+          console.error('Errore durante la creazione della cartella:', err),
+      });
   }
 
   // Drag and Drop handlers
-  onDragStart(item: Folder | Materiale, event: DragEvent): void {
+  onDragStart(item: MaterialInterface, event: DragEvent): void {
     this.dragDropService.startDrag(item, this.selectionService.getSelection());
     event.dataTransfer!.effectAllowed = 'move';
-    event.dataTransfer!.setData('text/html', item.id);
+    event.dataTransfer!.setData('text/html', item._id!);
   }
 
   onDragOver(event: DragEvent): void {
@@ -221,7 +259,8 @@ export class Materiali {
     event.preventDefault();
     event.stopPropagation();
     const target = event.currentTarget as HTMLElement;
-    target.classList.add('drag-over');
+    const targetClass = target.tagName === 'TR' ? 'drag-over' : 'drag-over';
+    target.classList.add(targetClass);
   }
 
   onDragLeave(event: DragEvent): void {
@@ -229,123 +268,93 @@ export class Materiali {
     const relatedTarget = event.relatedTarget as HTMLElement;
 
     if (!target.contains(relatedTarget)) {
-      target.classList.remove('drag-over');
+      target.classList.remove('drag-over', 'drag-over-wrapper');
     }
   }
 
-  onDrop(targetItem: Folder | Materiale | string, event: DragEvent): void {
+  onDrop(targetItem: MaterialInterface | string, event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
 
     const target = event.currentTarget as HTMLElement;
-    target.classList.remove('drag-over');
+    target.classList.remove('drag-over', 'drag-over-wrapper');
 
-    const success = this.dragDropService.handleDrop(
-      targetItem,
-      this.rootFolder().id,
-    );
+    const success = this.dragDropService.handleDrop(targetItem);
     if (success) {
-      this.rootFolder.set({ ...this.rootFolder() });
       this.selectionService.clear();
     }
   }
 
-  onDragEnterCard(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    const target = event.currentTarget as HTMLElement;
-    target.classList.add('drag-over-wrapper');
+  onRequestDeleteItem(item: MaterialInterface): void {
+    this.materialiService.deleteItem(item._id!).subscribe({
+      next: () => {
+        this.selectionService.clear();
+      },
+      error: (err) => console.error("Errore durante l'eliminazione:", err),
+    });
   }
 
-  onDragLeaveCard(event: DragEvent): void {
-    const target = event.currentTarget as HTMLElement;
-    const relatedTarget = event.relatedTarget as HTMLElement;
-
-    if (!target.contains(relatedTarget)) {
-      target.classList.remove('drag-over-wrapper');
-    }
-  }
-
-  onDropCard(targetItem: Folder, event: DragEvent): void {
-    this.onDrop(targetItem, event);
-  }
-
-  onRequestDeleteItem(item: Materiale | Folder): void {
-    this.materialiService.deleteItem(item.id);
-    this.rootFolder.set({ ...this.rootFolder() });
-  }
-
-  onRequestRenameItem(item: Materiale | Folder, newName: string): void {
-    this.materialiService.renameItem(item.id, newName);
-    this.rootFolder.set({ ...this.rootFolder() });
+  onRequestRenameItem(item: MaterialInterface, newName: string): void {
+    this.materialiService.renameItem(item._id!, newName).subscribe({
+      next: () => {},
+      error: (err) => console.error('Errore durante la rinomina:', err),
+    });
   }
 
   private performSearch(term: string): void {
     const searchResult = this.searchService.search(
       term,
-      this.materialiService.root,
+      this.materialiService.root(),
     );
 
     if (searchResult) {
       if (searchResult.parentPath.length > 0) {
         const parentFolder =
           searchResult.parentPath[searchResult.parentPath.length - 1];
-        this.rootFolder.set(parentFolder);
+        this.materialiService.currentFolder.set(parentFolder);
       } else {
-        this.rootFolder.set(this.searchService.getRootFolder());
+        this.materialiService.currentFolder.set(null);
       }
 
-      this.highlightedItemId.set(searchResult.item.id);
+      this.highlightedItemId.set(searchResult.item._id!);
     } else {
       this.highlightedItemId.set(null);
     }
   }
 
   // Helper methods per visualizzazione tabellare
-  getItemIcon(item: Folder | Materiale): IconDefinition {
-    if ('content' in item) {
-      return getFolderIcon(false);
-    }
-    return getFileIcon(item.name);
+  getItemIcon(item: MaterialInterface): IconDefinition {
+    return item.type === 'folder'
+      ? getFolderIcon(false)
+      : getFileIcon(item.name);
   }
 
-  getItemColor(item: Folder | Materiale): string {
-    if ('content' in item) {
-      return getIconColor('folder');
-    }
-    return getIconColor(this.getFileExtension(item.name));
+  getItemColor(item: MaterialInterface): string {
+    return item.type === 'folder'
+      ? getIconColor('folder')
+      : getIconColor(this.getFileExtension(item.name));
   }
 
-  getItemType(item: Folder | Materiale): string {
-    if ('content' in item) {
-      const folder = item as Folder;
-      return `Cartella (${folder.content.length})`;
+  getItemType(item: MaterialInterface): string {
+    if (item.type === 'folder') {
+      return `Cartella (${item.content?.length || 0})`;
     }
     const ext = this.getFileExtension(item.name);
     return ext ? ext.toUpperCase() : 'File';
   }
 
-  getItemSize(item: Folder | Materiale): string {
-    if ('content' in item) {
-      return '-';
-    }
-    // Placeholder: in futuro si può aggiungere la dimensione reale
-    return '-';
+  getItemSize(item: MaterialInterface): string {
+    return item.type === 'folder' ? '-' : '-';
   }
 
-  onRequestGenerate() {
+  isAIGenerated(item: MaterialInterface): boolean {
+    return item.type !== 'folder' && item.aiGenerated === true;
+  }
+
+  onRequestGenerate(): void {
     this.offCanvasService.open(GenAiContents, {
       position: 'end',
       backdrop: true,
     });
-  }
-
-  isAIGenerated(item: Folder | Materiale): boolean {
-    if ('content' in item) {
-      return false;
-    } else {
-      if ('aiGenerated' in item) return true;
-    }
-    return false;
   }
 }

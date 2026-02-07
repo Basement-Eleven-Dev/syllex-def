@@ -28,8 +28,8 @@
           aria-label="Seleziona argomento"
         >
           <option value="" disabled selected>Seleziona argomento</option>
-          @for(topic of topicsService.topics; track topic) {
-          <option [value]="topic">{{ topic }}</option>
+          @for(topic of materiaService.materiaSelected()?.topics; track topic) {
+          <option [value]="topic._id">{{ topic.name }}</option>
           }
         </select>
 

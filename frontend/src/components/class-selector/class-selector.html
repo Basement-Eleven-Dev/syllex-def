@@ -7,11 +7,11 @@
   >
 </div>
 <div class="d-flex flex-row gap-2 flex-wrap" id="classes-assigned">
-  @for(classe of classiService.classi; track classe.id) {
+  @for(classe of classiService.classi; track classe._id) {
   <span
     class="badge fs-5 px-3 classBadge"
-    (click)="onToggleClass(classe.id)"
-    [class.selected]="isClassSelected(classe.id)"
+    (click)="onToggleClass(classe._id)"
+    [class.selected]="isClassSelected(classe._id)"
     >{{ classe.name }}</span
   >
   }

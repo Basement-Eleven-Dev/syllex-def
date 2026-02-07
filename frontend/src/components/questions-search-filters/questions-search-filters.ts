@@ -6,6 +6,7 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms';
+import { Materia } from '../../services/materia';
 
 @Component({
   selector: 'app-questions-search-filters',
@@ -19,11 +20,15 @@ export class QuestionsSearchFilters {
     searchTerm: string;
     type: string;
     policy: 'pubblica' | 'privata' | '';
+    topicId: string;
   }>();
+
+  constructor(public materiaService: Materia) {}
 
   searchForm: FormGroup = new FormGroup({
     searchTerm: new FormControl(''),
     type: new FormControl(''),
     policy: new FormControl(''),
+    topicId: new FormControl(''),
   });
 }

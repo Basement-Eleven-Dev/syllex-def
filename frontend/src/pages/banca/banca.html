@@ -22,8 +22,8 @@
   ></app-questions-search-filters>
 </section>
 
-@for(question of questions; track question.id; let last = $last; let i = $index)
-{
+@for(question of questions(); track question.id; let last = $last; let i =
+$index) {
 <div class="mt-4">
   <div
     app-question-card
@@ -39,18 +39,18 @@
 }
 <div class="mt-5 d-flex flex-row justify-content-between align-items-center">
   <ngb-pagination
-    [collectionSize]="collectionSize"
-    [(page)]="page"
-    [pageSize]="pageSize"
-    (pageChange)="onNewPageRequested()"
+    [collectionSize]="collectionSize()"
+    [page]="page()"
+    [pageSize]="pageSize()"
+    (pageChange)="page.set($event)"
   >
   </ngb-pagination>
 
   <select
     class="form-select form-select-sm"
     style="width: auto"
-    [(ngModel)]="pageSize"
-    (ngModelChange)="onNewPageRequested()"
+    [ngModel]="pageSize()"
+    (ngModelChange)="pageSize.set($event); page.set(1)"
   >
     <option [ngValue]="5">5 per pagina</option>
     <option [ngValue]="10">10 per pagina</option>

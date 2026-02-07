@@ -67,19 +67,19 @@
 
   @if(viewType === 'grid') {
   <div class="row">
-    @for(item of rootFolder().content; track item.id){
+    @for(item of rootFolder().content; track item._id){
     <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-3">
       @if('content' in item) {
       <div
         (dragover)="onDragOver($event)"
-        (drop)="onDropCard(item, $event)"
-        (dragenter)="onDragEnterCard($event)"
-        (dragleave)="onDragLeaveCard($event)"
+        (drop)="onDrop(item, $event)"
+        (dragenter)="onDragEnter($event)"
+        (dragleave)="onDragLeave($event)"
       >
         <app-materiale-card
           [item]="item"
           [highlightedItemId]="highlightedItemId()"
-          [isSelected]="isItemSelected(item.id)"
+          [isSelected]="isItemSelected(item._id)"
           [draggable]="true"
           (openItem)="onRequestOpenItem(item)"
           (dragstart)="onDragStart(item, $event)"
@@ -92,7 +92,7 @@
       <app-materiale-card
         [item]="item"
         [highlightedItemId]="highlightedItemId()"
-        [isSelected]="isItemSelected(item.id)"
+        [isSelected]="isItemSelected(item._id)"
         [draggable]="true"
         (openItem)="onRequestOpenItem(item)"
         (dragstart)="onDragStart(item, $event)"
@@ -118,11 +118,11 @@
         </tr>
       </thead>
       <tbody>
-        @for(item of rootFolder().content; track item.id){
+        @for(item of rootFolder().content; track item._id){
         <tr
           class="cursor-pointer"
-          [class.table-active]="isItemSelected(item.id)"
-          [class.highlight-row]="highlightedItemId() === item.id"
+          [class.table-active]="isItemSelected(item._id)"
+          [class.highlight-row]="highlightedItemId() === item._id"
           [draggable]="true"
           (click)="onSelectItem(item, $event)"
           (dblclick)="onRequestOpenItem(item); $event.stopPropagation()"

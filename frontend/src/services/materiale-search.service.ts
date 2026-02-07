@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Folder, Materiale, MaterialiService } from './materiali-service';
+import { MaterialiService, MaterialInterface } from './materiali-service';
 
 /**
  * Gestisce la ricerca e navigazione nei materiali
@@ -10,48 +10,30 @@ export class MaterialeSearchService {
 
   search(
     term: string,
-    items: (Folder | Materiale)[],
-  ): { item: Folder | Materiale; parentPath: Folder[] } | null {
+    items: MaterialInterface[],
+  ): { item: MaterialInterface; parentPath: MaterialInterface[] } | null {
     const lowerTerm = term.toLowerCase();
-
-    // Cerca il miglior match nei nomi
-    for (const item of items) {
-      if (item.name.toLowerCase().includes(lowerTerm)) {
-        return { item, parentPath: [] };
-      }
-    }
-
-    // Ricerca ricorsiva nelle sottocartelle
-    for (const item of items) {
-      if ('content' in item) {
-        const folder = item as Folder;
-        const result = this.searchInFolder(term, folder.content, [folder]);
-        if (result) return result;
-      }
-    }
-
-    return null;
+    return this.searchRecursive(lowerTerm, items, []);
   }
 
-  private searchInFolder(
-    term: string,
-    items: (Folder | Materiale)[],
-    parentPath: Folder[],
-  ): { item: Folder | Materiale; parentPath: Folder[] } | null {
-    const lowerTerm = term.toLowerCase();
-
+  private searchRecursive(
+    lowerTerm: string,
+    items: MaterialInterface[],
+    parentPath: MaterialInterface[],
+  ): { item: MaterialInterface; parentPath: MaterialInterface[] } | null {
+    // Cerca nei nomi degli item correnti
     for (const item of items) {
       if (item.name.toLowerCase().includes(lowerTerm)) {
         return { item, parentPath };
       }
     }
 
+    // Ricerca ricorsiva nelle sottocartelle
     for (const item of items) {
-      if ('content' in item) {
-        const folder = item as Folder;
-        const result = this.searchInFolder(term, folder.content, [
+      if (item.type === 'folder' && item.content) {
+        const result = this.searchRecursive(lowerTerm, item.content, [
           ...parentPath,
-          folder,
+          item,
         ]);
         if (result) return result;
       }
@@ -60,11 +42,12 @@ export class MaterialeSearchService {
     return null;
   }
 
-  getRootFolder(): Folder {
+  getRootFolder(): MaterialInterface {
     return {
-      id: 'root',
+      _id: 'root',
       name: '/',
-      content: this.materialiService.root,
+      type: 'folder',
+      content: this.materialiService.root(),
       createdAt: new Date(),
     };
   }

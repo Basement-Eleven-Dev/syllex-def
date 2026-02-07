@@ -7,8 +7,7 @@ import {
   ElementRef,
 } from '@angular/core';
 import {
-  Folder,
-  Materiale,
+  MaterialInterface,
   MaterialiService,
 } from '../../services/materiali-service';
 import { FormsModule } from '@angular/forms';
@@ -17,7 +16,7 @@ import { faUpload, IconDefinition } from '@fortawesome/pro-solid-svg-icons';
 import { getFileIcon } from '../../app/_utils/file-icons';
 import { MaterialiItemComponent } from './materiali-item.component';
 
-export interface MaterialeWithPath extends Materiale {
+export interface MaterialeWithPath extends MaterialInterface {
   path: string;
 }
 
@@ -41,18 +40,18 @@ export class MaterialiSelector {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   // Output dei materiali selezionati
-  selectionChange = output<Materiale[]>();
+  selectionChange = output<MaterialInterface[]>();
 
   constructor(private materialiService: MaterialiService) {}
 
-  get tree(): (Folder | Materiale)[] {
-    return this.materialiService.root;
+  get tree(): MaterialInterface[] {
+    return this.materialiService.root();
   }
 
   // Computed: materiali selezionati come array
   selectedMaterials = computed(() => {
     const ids = this.selectedMaterialIds();
-    return this.flattenMaterials(this.tree).filter((m) => ids.has(m.id));
+    return this.flattenMaterials(this.tree).filter((m) => ids.has(m._id!));
   });
 
   // Computed: risultati di ricerca (lista piatta filtrata)
@@ -80,13 +79,13 @@ export class MaterialiSelector {
     });
   }
 
-  selectMaterial(material: Materiale): void {
+  selectMaterial(material: MaterialInterface): void {
     this.selectedMaterialIds.update((set) => {
       const newSet = new Set(set);
-      if (newSet.has(material.id)) {
-        newSet.delete(material.id);
+      if (newSet.has(material._id!)) {
+        newSet.delete(material._id!);
       } else {
-        newSet.add(material.id);
+        newSet.add(material._id!);
       }
       return newSet;
     });
@@ -125,8 +124,8 @@ export class MaterialiSelector {
       const extension = file.name.split('.').pop() || '';
 
       // Crea il nuovo materiale
-      const newMaterial: Materiale = {
-        id: `file-${Date.now()}`,
+      const newMaterial: MaterialInterface = {
+        _id: `file-${Date.now()}`,
         name: file.name,
         url: `/materials/${file.name}`, // URL temporaneo
         extension: extension,
@@ -134,10 +133,10 @@ export class MaterialiSelector {
       };
 
       // Aggiunge alla root del tree
-      this.materialiService.root.push(newMaterial);
+      this.materialiService.root.update((current) => [...current, newMaterial]);
 
       // Seleziona automaticamente il materiale appena caricato
-      this.selectMaterial(newMaterial);
+      this.selectMaterial(newMaterial as MaterialInterface);
 
       // Reset input
       input.value = '';
@@ -154,20 +153,22 @@ export class MaterialiSelector {
     return new Promise((resolve) => setTimeout(resolve, 1000));
   }
 
-  private flattenMaterials(items: (Folder | Materiale)[]): Materiale[] {
-    const result: Materiale[] = [];
+  private flattenMaterials(items: MaterialInterface[]): MaterialInterface[] {
+    const result: MaterialInterface[] = [];
     for (const item of items) {
       if ('content' in item) {
-        result.push(...this.flattenMaterials(item.content));
+        result.push(
+          ...this.flattenMaterials((item as MaterialInterface).content!),
+        );
       } else {
-        result.push(item);
+        result.push(item as MaterialInterface);
       }
     }
     return result;
   }
 
   private flattenMaterialsWithPath(
-    items: (Folder | Materiale)[],
+    items: MaterialInterface[],
     currentPath: string = '',
   ): MaterialeWithPath[] {
     const result: MaterialeWithPath[] = [];
@@ -176,7 +177,7 @@ export class MaterialiSelector {
         const newPath = currentPath
           ? `${currentPath} / ${item.name}`
           : item.name;
-        result.push(...this.flattenMaterialsWithPath(item.content, newPath));
+        result.push(...this.flattenMaterialsWithPath(item.content!, newPath));
       } else {
         result.push({ ...item, path: currentPath });
       }

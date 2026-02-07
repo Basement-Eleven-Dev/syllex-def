@@ -11,6 +11,7 @@ import {
 } from '@fortawesome/pro-solid-svg-icons';
 
 export function getFileIcon(extension: string): IconDefinition {
+  console.log('Getting icon for extension:', extension);
   switch (extension.toLowerCase()) {
     case 'pdf':
       return faFilePdf;

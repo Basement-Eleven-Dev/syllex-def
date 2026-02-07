@@ -14,33 +14,31 @@
   }
 }
 
-.drag-over-wrapper {
-  ::ng-deep app-materiale-card .card {
-    border: 2px solid #0d6efd !important;
-    background-color: #e7f1ff !important;
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+// Drag over styles consolidati
+.drag-over-wrapper ::ng-deep app-materiale-card .card,
+::ng-deep app-materiale-card .card {
+  transition:
+    transform 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out,
+    border 0.15s ease-in-out,
+    background-color 0.15s ease-in-out;
+  cursor: grab;
+  border: 2px solid transparent;
+
+  &:active {
+    cursor: grabbing;
   }
 }
 
-::ng-deep app-materiale-card {
-  .card {
-    transition:
-      transform 0.15s ease-in-out,
-      box-shadow 0.15s ease-in-out,
-      border 0.15s ease-in-out,
-      background-color 0.15s ease-in-out;
-    cursor: grab;
-    border: 2px solid transparent;
+.drag-over-wrapper ::ng-deep app-materiale-card .card {
+  border: 2px solid #0d6efd !important;
+  background-color: #e7f1ff !important;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+}
 
-    &:active {
-      cursor: grabbing;
-    }
-  }
-
-  &[draggable="true"] .card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
-  }
+::ng-deep app-materiale-card[draggable="true"] .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
 }
 
 // Table view styles
@@ -51,10 +49,7 @@
 
     &.highlight-row > td {
       background-color: #fff3cd !important;
-
-      td {
-        font-weight: 600;
-      }
+      font-weight: 600;
     }
 
     &.table-active > td {

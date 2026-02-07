@@ -3,7 +3,7 @@ import { ConfirmActionDirective } from '../../directives/confirm-action.directiv
 import { NgbDropdownItem, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { RenameModal } from '../rename-modal/rename-modal';
 import { DatePipe } from '@angular/common';
-import { Folder, Materiale } from '../../services/materiali-service';
+import { MaterialInterface } from '../../services/materiali-service';
 
 @Component({
   selector: 'app-materiale-contextual-menu',
@@ -12,7 +12,7 @@ import { Folder, Materiale } from '../../services/materiali-service';
   styleUrl: './materiale-contextual-menu.scss',
 })
 export class MaterialeContextualMenu {
-  @Input() item!: Folder | Materiale;
+  @Input() item!: MaterialInterface;
 
   @Output() renameItem = new EventEmitter<string>();
   @Output() deleteItem = new EventEmitter<void>();

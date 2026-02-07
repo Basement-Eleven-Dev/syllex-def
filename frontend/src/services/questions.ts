@@ -20,7 +20,7 @@ export interface QuestionInterface {
 @Injectable({
   providedIn: 'root',
 })
-export class Questions {
+export class QuestionsService {
   constructor(
     private http: HttpClient,
     private filesService: FilesService,
@@ -49,6 +49,28 @@ export class Questions {
     return this.http.post<{ question: QuestionInterface }>(
       'questions/create',
       q,
+    );
+  }
+
+  loadPagedQuestions(
+    searchTerm: string,
+    type: string,
+    topicId: string,
+    policy: 'pubblica' | 'privata' | '',
+    page: number,
+    pageSize: number,
+  ): Observable<{ questions: QuestionInterface[]; total: number }> {
+    const params = new URLSearchParams();
+
+    if (searchTerm) params.append('searchTerm', searchTerm);
+    if (type) params.append('type', type);
+    if (topicId) params.append('topicId', topicId);
+    if (policy) params.append('policy', policy);
+    params.append('page', page.toString());
+    params.append('pageSize', pageSize.toString());
+
+    return this.http.get<{ questions: QuestionInterface[]; total: number }>(
+      `questions?${params.toString()}`,
     );
   }
 }

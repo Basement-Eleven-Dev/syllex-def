@@ -1,5 +1,11 @@
 import { Injectable, inject } from '@angular/core';
-import { Folder, Materiale, MaterialiService } from './materiali-service';
+import { MaterialiService, MaterialInterface } from './materiali-service';
+
+interface RootFolderInterface extends MaterialInterface {
+  _id: 'root';
+  name: '/';
+  type: 'folder';
+}
 
 /**
  * Gestisce la logica di drag-and-drop per materiali e cartelle
@@ -7,11 +13,11 @@ import { Folder, Materiale, MaterialiService } from './materiali-service';
 @Injectable({ providedIn: 'root' })
 export class MaterialeDragDropService {
   private materialiService = inject(MaterialiService);
-  private draggedItem: Folder | Materiale | null = null;
-  private draggedItems: (Folder | Materiale)[] = [];
+  private draggedItem: MaterialInterface | null = null;
+  private draggedItems: MaterialInterface[] = [];
 
-  startDrag(item: Folder | Materiale, selectedIds: Set<string>): void {
-    if (selectedIds.has(item.id) && selectedIds.size > 1) {
+  startDrag(item: MaterialInterface, selectedIds: Set<string>): void {
+    if (selectedIds.has(item._id!) && selectedIds.size > 1) {
       this.draggedItems = this.getItemsByIds(Array.from(selectedIds));
       this.draggedItem = null;
     } else {
@@ -25,10 +31,7 @@ export class MaterialeDragDropService {
     this.draggedItems = [];
   }
 
-  handleDrop(
-    targetItem: Folder | Materiale | string,
-    currentRootId: string,
-  ): boolean {
+  handleDrop(targetItem: MaterialInterface | string): boolean {
     const targetFolder = this.resolveTargetFolder(targetItem);
     if (!targetFolder) return false;
 
@@ -38,94 +41,80 @@ export class MaterialeDragDropService {
         : this.draggedItem
           ? [this.draggedItem]
           : [];
+
     if (itemsToMove.length === 0) return false;
 
     // Verifica che nessun elemento sia la cartella target o un suo antenato
-    for (const item of itemsToMove) {
-      if (item.id === targetFolder.id) return false;
-      if (
-        'content' in item &&
-        this.isDescendant(item as Folder, targetFolder)
-      ) {
-        return false;
-      }
-    }
+    if (!this.canMoveItems(itemsToMove, targetFolder)) return false;
 
-    // Sposta tutti gli elementi
-    for (const item of itemsToMove) {
-      this.removeItemFromStructure(item.id);
-      if (targetFolder.name === '/') {
-        this.materialiService.root.push(item);
-      } else {
-        targetFolder.content.push(item);
-      }
-
-      this.materialiService.moveItem(item.id, targetFolder.id, currentRootId);
-    }
+    // Sposta tutti gli elementi tramite una singola chiamata batch
+    const itemIds = itemsToMove.map((item) => item._id!);
+    this.materialiService.moveItems(itemIds, targetFolder._id!).subscribe({
+      error: (err) => console.error('Errore durante lo spostamento:', err),
+    });
 
     this.endDrag();
     return true;
   }
 
+  private canMoveItems(
+    items: MaterialInterface[],
+    targetFolder: MaterialInterface,
+  ): boolean {
+    return items.every((item) => {
+      if (item._id === targetFolder._id) return false;
+      if (item.type === 'folder') {
+        return !this.isDescendant(item, targetFolder);
+      }
+      return true;
+    });
+  }
+
   private resolveTargetFolder(
-    targetItem: Folder | Materiale | string,
-  ): Folder | null {
+    targetItem: MaterialInterface | string,
+  ): MaterialInterface | null {
     if (typeof targetItem === 'string') {
       if (targetItem === 'Home') {
         return {
-          id: 'root',
+          _id: 'root',
           name: '/',
-          content: this.materialiService.root,
+          type: 'folder',
+          content: this.materialiService.root(),
           createdAt: new Date(),
-        };
+        } as RootFolderInterface;
       }
       return this.materialiService.getFolderFromName(targetItem);
     }
 
-    return 'content' in targetItem ? (targetItem as Folder) : null;
+    return targetItem.type === 'folder' ? targetItem : null;
   }
 
-  private removeItemFromStructure(itemId: string): boolean {
-    const removeFromArray = (items: (Folder | Materiale)[]): boolean => {
-      const index = items.findIndex((i) => i.id === itemId);
-      if (index !== -1) {
-        items.splice(index, 1);
-        return true;
-      }
+  private isDescendant(
+    parent: MaterialInterface,
+    possibleChild: MaterialInterface,
+  ): boolean {
+    if (parent._id === possibleChild._id) return true;
 
-      for (const item of items) {
-        if ('content' in item) {
-          if (removeFromArray(item.content)) return true;
-        }
-      }
-      return false;
-    };
-
-    return removeFromArray(this.materialiService.root);
-  }
-
-  private isDescendant(parent: Folder, possibleChild: Folder): boolean {
-    if (parent.id === possibleChild.id) return true;
-
-    for (const item of parent.content) {
-      if ('content' in item) {
-        if (this.isDescendant(item as Folder, possibleChild)) return true;
-      }
+    if (parent.type === 'folder' && parent.content) {
+      return parent.content.some(
+        (item) =>
+          item.type === 'folder' && this.isDescendant(item, possibleChild),
+      );
     }
     return false;
   }
 
-  private getItemsByIds(ids: string[]): (Folder | Materiale)[] {
-    const items: (Folder | Materiale)[] = [];
+  private getItemsByIds(ids: string[]): MaterialInterface[] {
+    const items: MaterialInterface[] = [];
 
-    const findItems = (searchItems: (Folder | Materiale)[]): void => {
+    const findItems = (searchItems: MaterialInterface[]): void => {
       for (const item of searchItems) {
-        if (ids.includes(item.id)) items.push(item);
-        if ('content' in item) findItems((item as Folder).content);
+        if (ids.includes(item._id!)) items.push(item);
+        if (item.type === 'folder' && item.content) findItems(item.content);
       }
     };
 
-    findItems(this.materialiService.root);
+    findItems(this.materialiService.root());
     return items;
   }
 }

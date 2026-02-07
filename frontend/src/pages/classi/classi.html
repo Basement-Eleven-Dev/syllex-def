@@ -38,7 +38,7 @@
 
 @if(viewType === 'grid') {
 <div class="row">
-  @for(classe of classiService.classi; track $index){
+  @for(classe of classiService.classi; track classe._id){
   <div class="col-12 col-md-6 col-lg-4 mb-4">
     <div class="card p-3 h-100 shadow-sm overflow-hidden position-relative">
       <fa-icon [icon]="UsersIcon" class="background-icon"></fa-icon>
@@ -105,7 +105,7 @@
   class="mt-5"
 >
   <ngb-pagination
-    [collectionSize]="collectionSize"
+    [collectionSize]="classiService.classi.length"
     [(page)]="page"
     [pageSize]="pageSize"
     (pageChange)="onNewPageRequested()"

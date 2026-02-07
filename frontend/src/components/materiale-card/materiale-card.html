@@ -18,22 +18,27 @@
       ></fa-icon>
       } @else {
       <fa-icon
-        [icon]="Icon"
+        [icon]="icon"
         class="me-3"
         size="2x"
-        [style.color]="color"
+        [style.color]="iconColor"
       ></fa-icon>
 
       }
-      <div class="d-flex flex-column flex-fill justify-content-center">
+      <div
+        class="d-flex flex-column flex-fill justify-content-center text-truncate"
+      >
         <p
           class="card-title mb-0 text-truncate"
-          [class.highlight]="highlightedItemId === item.id"
+          [class.highlight]="highlightedItemId === item._id"
         >
           {{ item.name }}
         </p>
         @if(isFolder){
-        <small class="text-muted">{{ folderContentLength }} elementi</small>
+        <small class="text-muted"
+          >{{ folderContentLength }} element{{ folderContentLength !== 1 ? 'i' :
+          'o' }}</small
+        >
         }
       </div>
       <div ngbDropdown class="d-inline-block">

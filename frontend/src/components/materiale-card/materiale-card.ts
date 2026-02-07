@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  computed,
+  input,
+} from '@angular/core';
 import {
   FaIconComponent,
   FontAwesomeModule,
@@ -16,7 +23,7 @@ import {
   NgbDropdownMenu,
 } from '@ng-bootstrap/ng-bootstrap';
 import { MaterialeContextualMenu } from '../materiale-contextual-menu/materiale-contextual-menu';
-import { Folder, Materiale } from '../../services/materiali-service';
+import { MaterialInterface } from '../../services/materiali-service';
 
 @Component({
   selector: 'app-materiale-card',
@@ -32,47 +39,44 @@ import { Folder, Materiale } from '../../services/materiali-service';
   styleUrl: './materiale-card.scss',
 })
 export class MaterialeCard {
-  Icon?: IconDefinition;
-  ThreeDotsIcon = faEllipsisVertical;
-  RobotIcon = faRobot;
-  color: string = '#4A5568'; // Default color
-  isFolder: boolean = false;
-  itemsInFolder: number = 0;
-  totalItemsCount: number = 0;
-  @Input() item!: Folder | Materiale;
+  @Input() item!: MaterialInterface;
   @Input() highlightedItemId: string | null = null;
   @Input() isSelected: boolean = false;
 
+  @Output() openItem = new EventEmitter<MaterialInterface>();
+  @Output() renameItem = new EventEmitter<string>();
+  @Output() deleteItem = new EventEmitter<void>();
+  @Output() selectItemEvent = new EventEmitter<MouseEvent>();
+
+  readonly ThreeDotsIcon = faEllipsisVertical;
+  readonly RobotIcon = faRobot;
+
+  get isFolder(): boolean {
+    return this.item.type === 'folder';
+  }
+
+  get icon(): IconDefinition {
+    return this.isFolder
+      ? getFolderIcon(false)
+      : getFileIcon(this.item.extension || '');
+  }
+
+  get iconColor(): string {
+    return this.isFolder
+      ? getIconColor('folder')
+      : getIconColor(this.item.extension || '');
+  }
+
   get folderContentLength(): number {
-    return this.isFolder ? (this.item as Folder).content.length : 0;
+    return this.isFolder && this.item.content ? this.item.content.length : 0;
   }
 
   get isAIGenerated(): boolean {
-    return !this.isFolder && (this.item as Materiale).aiGenerated === true;
+    return !this.isFolder && this.item.aiGenerated === true;
   }
-
-  @Output() openItem: EventEmitter<Folder | Materiale> = new EventEmitter();
-  @Output() renameItem = new EventEmitter<string>();
-  @Output() deleteItem = new EventEmitter<void>();
-  @Output() selectItemEvent: EventEmitter<MouseEvent> = new EventEmitter();
 
   selectItem(event: MouseEvent): void {
     event.stopPropagation();
     this.selectItemEvent.emit(event);
-  }
-
-  checkType(): boolean {
-    return 'content' in this.item;
-  }
-
-  ngOnInit() {
-    this.isFolder = this.checkType();
-    if (this.isFolder) {
-      this.Icon = getFolderIcon(false);
-      this.color = getIconColor('folder');
-    } else {
-      this.Icon = getFileIcon((this.item as Materiale).extension!);
-      this.color = getIconColor((this.item as Materiale).extension!);
-    }
   }
 }
