@@ -72,6 +72,12 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
+    apiRoute: "questions/{questionId}/edit",
+    functionPath: "questions/editQuestion.ts",
+    method: "put",
+    role: "teacher",
+  },
+  {
     apiRoute: "materials/{subjectId}",
     functionPath: "materials/getMaterials.ts",
     method: "get",
@@ -105,6 +111,36 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     apiRoute: "materials/{materialId}/rename",
     functionPath: "materials/renameMaterial.ts",
     method: "put",
+    role: "teacher",
+  },
+  {
+    apiRoute: "communications",
+    functionPath: "communications/getCommunications.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "communications",
+    functionPath: "communications/createCommunication.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "communications/{communicationId}",
+    functionPath: "communications/getCommunicationById.ts",
+    method: "get",
+    role: "logged",
+  },
+  {
+    apiRoute: "communications/{communicationId}",
+    functionPath: "communications/editCommunication.ts",
+    method: "put",
+    role: "teacher",
+  },
+  {
+    apiRoute: "communications/{communicationId}",
+    functionPath: "communications/deleteCommunication.ts",
+    method: "delete",
     role: "teacher",
   },
 ];

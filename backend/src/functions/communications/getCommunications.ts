@@ -2,21 +2,19 @@ import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import { getDefaultDatabase } from "../../_helpers/getDatabase";
 import { ObjectId } from "mongodb";
-import { Question } from "../../models/question";
 
-const getQuestions = async (
+const getCommunications = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
   const db = await getDefaultDatabase();
-  const questionsCollection = db.collection<Question>("questions");
+  const communicationsCollection = db.collection("communications");
 
   // Estraggo i parametri dalla query string
   const {
     searchTerm = "",
-    type = "",
-    topicId = "",
-    policy = "",
+    classId = "",
+    hasAttachments = "",
     page = "1",
     pageSize = "10",
   } = request.queryStringParameters || {};
@@ -28,7 +26,7 @@ const getQuestions = async (
   // Costruisco il filtro per MongoDB
   const filter: any = {};
 
-  // Solo domande del teacher loggato (se è autenticato)
+  // Solo comunicazioni del teacher loggato
   if (context.user?._id) {
     filter.teacherId = context.user._id;
   }
@@ -39,36 +37,44 @@ const getQuestions = async (
     filter.subjectId = new ObjectId(subjectId);
   }
 
+  // Ricerca testuale su titolo e contenuto
   if (searchTerm) {
-    filter.text = { $regex: searchTerm, $options: "i" }; // Case-insensitive search
+    filter.$or = [
+      { title: { $regex: searchTerm, $options: "i" } },
+      { content: { $regex: searchTerm, $options: "i" } },
+    ];
   }
 
-  if (type) {
-    filter.type = type;
+  // Filtro per classe specifica
+  if (classId) {
+    filter.classIds = new ObjectId(classId);
   }
 
-  if (topicId) {
-    filter.topicId = new ObjectId(topicId);
+  // Filtro per presenza allegati
+  if (hasAttachments === "true") {
+    filter.materialIds = { $exists: true, $ne: [] };
+  } else if (hasAttachments === "false") {
+    filter.$or = [
+      { materialIds: { $exists: false } },
+      { materialIds: { $size: 0 } },
+    ];
   }
 
-  if (policy && (policy === "public" || policy === "private")) {
-    filter.policy = policy;
-  }
-
-  // Query con paginazione
-  const questions = await questionsCollection
+  // Query con paginazione, ordinata per data (più recenti prima)
+  const communications = await communicationsCollection
     .find(filter)
+    .sort({ createdAt: -1 })
     .skip(skip)
     .limit(currentPageSize)
     .toArray();
 
   // Conto il totale per la paginazione
-  const total = await questionsCollection.countDocuments(filter);
+  const total = await communicationsCollection.countDocuments(filter);
 
   return {
-    questions,
+    communications,
     total,
   };
 };
 
-export const handler = lambdaRequest(getQuestions);
+export const handler = lambdaRequest(getCommunications);

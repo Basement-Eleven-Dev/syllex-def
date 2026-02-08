@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, effect } from '@angular/core';
+import { Injectable, effect, signal } from '@angular/core';
 import { Auth } from './auth';
 import { Materia } from './materia';
 
@@ -13,7 +13,7 @@ export interface ClasseInterface {
   providedIn: 'root',
 })
 export class ClassiService {
-  classi: ClasseInterface[] = [];
+  classi = signal<ClasseInterface[]>([]);
 
   constructor(
     private http: HttpClient,
@@ -39,7 +39,7 @@ export class ClassiService {
     return this.http
       .get<ClasseInterface[]>(`teacher/${subjectId}/classes`)
       .subscribe((classi) => {
-        this.classi = classi;
+        this.classi.set(classi);
         console.log('Classi del teacher:', classi);
       });
   }

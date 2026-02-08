@@ -18,9 +18,11 @@
     <div class="d-flex align-items-start gap-2 mb-2">
       @if(showIndex){<span class="badge bg-dark"># {{ index + 1 }}</span>}
       <span class="badge bg-primary">{{ question.type }}</span>
-      <span class="badge bg-primary">{{ question.topic }}</span>
+      <span class="badge bg-primary"
+        >{{ materiaService.getTopicName(question.topic) }}</span
+      >
       @if(showPolicy){<span class="badge bg-light text-dark"
-        >{{ question.policy }}</span
+        >{{ question.policy == 'public' ? 'Pubblica' : 'Privata' }}</span
       >} @if(question.aiGenerated){
       <fa-icon [icon]="RobotIcon" class="ms-2" style="color: #9664c8"></fa-icon>
       } @if(showBancaActions) {

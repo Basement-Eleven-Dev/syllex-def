@@ -19,15 +19,16 @@
     <button
       class="btn btn-outline-danger py-3"
       confirmAction
-      (click)="onDelete()"
+      (confirmed)="onDelete()"
+      [disabled]="loading()"
     >
-      <fa-icon [icon]="SaveIcon"></fa-icon>
+      <fa-icon [icon]="TrashIcon"></fa-icon>
       Elimina
     </button>
   </div>
   }
 </div>
-<form [formGroup]="comunicazioneForm">
+<form [formGroup]="comunicazioneForm" (ngSubmit)="onSave()">
   <section class="form-section">
     <div class="mb-3">
       <label for="titolo" class="form-label text-dark fw-bold">Titolo</label>
@@ -37,7 +38,15 @@
         class="form-control custom-input"
         formControlName="title"
         placeholder="Inserisci il titolo della comunicazione"
+        [class.is-invalid]="
+          comunicazioneForm.get('title')?.invalid &&
+          comunicazioneForm.get('title')?.touched
+        "
       />
+      @if(comunicazioneForm.get('title')?.invalid &&
+      comunicazioneForm.get('title')?.touched) {
+      <div class="invalid-feedback">Il titolo è obbligatorio</div>
+      }
     </div>
     <div class="mb-3">
       <label for="contenuto" class="form-label text-dark fw-bold"
@@ -49,26 +58,54 @@
         formControlName="content"
         rows="6"
         placeholder="Inserisci il contenuto della comunicazione"
+        [class.is-invalid]="
+          comunicazioneForm.get('content')?.invalid &&
+          comunicazioneForm.get('content')?.touched
+        "
       ></textarea>
+      @if(comunicazioneForm.get('content')?.invalid &&
+      comunicazioneForm.get('content')?.touched) {
+      <div class="invalid-feedback">Il contenuto è obbligatorio</div>
+      }
     </div>
   </section>
   <section class="form-section mt-4 w-100">
     <div class="row">
       <div class="col-4">
+        <label class="form-label text-dark fw-bold mb-3"
+          >Classi destinatarie</label
+        >
         <app-class-selector
           [selectedClassIds]="assignedClasses"
           (selectedClassIdsChange)="onClassesChange($event)"
         ></app-class-selector>
+        @if(comunicazioneForm.get('classes')?.invalid &&
+        comunicazioneForm.get('classes')?.touched) {
+        <div class="text-danger small mt-2">Seleziona almeno una classe</div>
+        }
       </div>
       <div class="col-8">
-        <app-materiali-selector></app-materiali-selector>
+        <label class="form-label text-dark fw-bold mb-3"
+          >Materiali allegati (opzionale)</label
+        >
+        <app-materiali-selector
+          (selectionChange)="onMaterialsChange($event)"
+        ></app-materiali-selector>
       </div>
     </div>
   </section>
 
   <div class="d-flex flex-row justify-content-end mt-5 gap-3">
-    <button type="submit" class="btn btn-success text-white btn-lg fs-3">
-      <fa-icon [icon]="SaveIcon"></fa-icon> Salva
+    <button
+      type="submit"
+      class="btn btn-success text-white btn-lg fs-3"
+      [disabled]="loading()"
+    >
+      @if(loading()) {
+      <span class="spinner-border spinner-border-sm me-2"></span>
+      } @else {
+      <fa-icon [icon]="SaveIcon"></fa-icon>
+      } {{ loading() ? 'Salvataggio...' : 'Salva' }}
     </button>
   </div>
 </form>

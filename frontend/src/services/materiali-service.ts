@@ -57,6 +57,24 @@ export class MaterialiService {
       });
   }
 
+  get filesCount(): number {
+    const countFiles = (items: MaterialInterface[]): number => {
+      return items.reduce((count, item) => {
+        if (item.type === 'file') {
+          return count + 1;
+        } else if (item.type === 'folder' && item.content) {
+          return count + countFiles(item.content);
+        }
+        return count;
+      }, 0);
+    };
+    return countFiles(this.root());
+  }
+
+  countFiles(): number {
+    return this.filesCount;
+  }
+
   private buildTree(materials: MaterialInterface[]): MaterialInterface[] {
     const itemMap = new Map<string, MaterialInterface>();
     const childrenMap = new Map<string, Set<string>>();

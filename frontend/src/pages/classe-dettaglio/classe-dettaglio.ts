@@ -104,7 +104,7 @@ export class ClasseDettaglio {
     this.route.params.subscribe((params) => {
       const classeId = params['classeId'];
       this.classe =
-        this.classiService.classi.find((c) => c._id === classeId) ||
+        this.classiService.classi().find((c) => c._id === classeId) ||
         this.classe;
 
       if (!this.classe) {

@@ -76,14 +76,14 @@ export class Sidebar {
       icon: faGauge,
     },
     {
-      path: 'risorse',
-      label: 'File e Risorse',
-      icon: faFile,
+      path: 'tests',
+      label: 'Test',
+      icon: faBallotCheck,
     },
     {
-      path: 'tests',
-      label: 'Tests',
-      icon: faBallotCheck,
+      path: 'banca',
+      label: 'Banca Domande',
+      icon: faClipboardQuestion,
     },
     {
       path: 'classi',
@@ -91,9 +91,9 @@ export class Sidebar {
       icon: faUsers,
     },
     {
-      path: 'banca',
-      label: 'Banca Domande',
-      icon: faClipboardQuestion,
+      path: 'risorse',
+      label: 'File e Risorse',
+      icon: faFile,
     },
     {
       path: 'comunicazioni',

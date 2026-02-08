@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, computed, effect } from '@angular/core';
 import {
   FontAwesomeModule,
   IconDefinition,
@@ -8,6 +8,8 @@ import { faPaperclip, faPlus } from '@fortawesome/pro-solid-svg-icons';
 import { Calendario } from '../../components/calendario/calendario';
 import { RouterModule } from '@angular/router';
 import { Auth } from '../../services/auth';
+import { ClassiService } from '../../services/classi-service';
+import { MaterialiService } from '../../services/materiali-service';
 
 interface DashboardQuickLink {
   value: number;
@@ -37,7 +39,17 @@ interface Communication {
   styleUrl: './dashboard.scss',
 })
 export class Dashboard {
-  constructor(public authService: Auth) {}
+  constructor(
+    public authService: Auth,
+    public classiService: ClassiService,
+    public materialiService: MaterialiService,
+  ) {
+    // Aggiorna reattivamente i quickLinks quando i dati dei service cambiano
+    effect(() => {
+      this.quickLinks[0].value = this.classiService.classi().length;
+      this.quickLinks[3].value = this.materialiService.countFiles();
+    });
+  }
   AttachmentIcon = faPaperclip;
   quickLinks: DashboardQuickLink[] = [
     {

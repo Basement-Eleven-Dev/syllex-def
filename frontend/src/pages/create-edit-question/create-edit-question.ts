@@ -72,6 +72,7 @@ export class CreateEditQuestion {
   isDragging = signal<boolean>(false);
   loading = signal<boolean>(false);
   uploadedImageFile: File | null = null;
+  currentQuestionId: string | null = null;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -79,6 +80,38 @@ export class CreateEditQuestion {
     private questionsService: QuestionsService,
   ) {
     this.questionId = this.activatedRoute.snapshot.paramMap.get('id');
+    if (this.questionId) {
+      this.questionsService.loadQuestion(this.questionId).subscribe({
+        next: (question) => {
+          console.log('Domanda caricata:', question);
+          this.currentQuestionId = question._id;
+          this.questionForm.patchValue({
+            type: question.type,
+            text: question.text,
+            topicId: question.topicId,
+            explanation: question.explanation,
+            policy: question.policy,
+          });
+          if (question.type === 'scelta multipla' && question.options) {
+            this.questionForm.patchValue({ options: question.options });
+          }
+          if (
+            question.type === 'vero falso' &&
+            question.correctAnswer !== undefined
+          ) {
+            this.questionForm.patchValue({
+              correctAnswer: question.correctAnswer,
+            });
+          }
+          if (question.imageUrl) {
+            this.imagePreview.set(question.imageUrl);
+          }
+        },
+        error: (error) => {
+          console.error('Errore durante il caricamento della domanda:', error);
+        },
+      });
+    }
   }
 
   ngOnInit(): void {}
@@ -96,6 +129,7 @@ export class CreateEditQuestion {
       { label: 'Opzione 5', isCorrect: false },
     ]),
     policy: new FormControl('public'),
+    correctAnswer: new FormControl(null),
   });
 
   get questionOptions(): AnswerOption[] {
@@ -106,27 +140,58 @@ export class CreateEditQuestion {
     this.questionForm.patchValue({ options });
   }
 
+  onSelectCorrectAnswer(value: boolean): void {
+    this.questionForm.patchValue({ correctAnswer: value });
+  }
+
   onSaveQuestion(): void {
     this.loading.set(true);
     const questionData = { ...this.questionForm.value };
+
+    // Pulisco i campi non necessari in base al tipo
     if (questionData.type !== 'scelta multipla') {
       delete questionData.options;
+    }
+    if (questionData.type !== 'vero falso') {
+      delete questionData.correctAnswer;
     }
 
     questionData.subjectId = this.materiaService.materiaSelected()?._id;
 
-    this.questionsService
-      .createQuestion(questionData, this.uploadedImageFile || undefined)
-      .subscribe({
-        next: (response) => {
-          console.log('Domanda salvata con successo:', response.question);
-          this.loading.set(false);
-        },
-        error: (error) => {
-          console.error('Errore durante il salvataggio della domanda:', error);
-          this.loading.set(false);
-        },
-      });
+    // Se esiste già un'immagine (URL) e non c'è un nuovo file, mantieni l'URL esistente
+    if (this.imagePreview() && !this.uploadedImageFile) {
+      questionData.imageUrl = this.imagePreview();
+    }
+
+    // Determina se stiamo creando o modificando
+    const isEdit = !!this.currentQuestionId;
+    const serviceCall = isEdit
+      ? this.questionsService.editQuestion(
+          this.currentQuestionId!,
+          questionData,
+          this.uploadedImageFile || undefined,
+        )
+      : this.questionsService.createQuestion(
+          questionData,
+          this.uploadedImageFile || undefined,
+        );
+
+    serviceCall.subscribe({
+      next: (response) => {
+        console.log(
+          `Domanda ${isEdit ? 'modificata' : 'salvata'} con successo:`,
+          response.question,
+        );
+        this.loading.set(false);
+      },
+      error: (error) => {
+        console.error(
+          `Errore durante ${isEdit ? 'la modifica' : 'il salvataggio'} della domanda:`,
+          error,
+        );
+        this.loading.set(false);
+      },
+    });
   }
 
   onSelectQuestionType(type: string): void {

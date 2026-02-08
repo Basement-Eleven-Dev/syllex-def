@@ -20,7 +20,7 @@ export class QuestionCorrection {
       type: 'risposta aperta',
       topic: 'Matematica',
       explanation: 'Spiegazione della domanda di esempio',
-      policy: 'pubblica',
+      policy: 'public',
     },
     answer: {
       result: 'correct',

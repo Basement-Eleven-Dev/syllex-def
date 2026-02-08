@@ -67,7 +67,7 @@ export class TestStats implements OnInit, AfterViewInit {
         { label: 'Milano', isCorrect: false },
         { label: 'Roma', isCorrect: true },
       ],
-      policy: 'pubblica',
+      policy: 'public',
       explanation: "La capitale dell'Italia è Roma.",
       correctCount: 80,
       blankCount: 10,
@@ -81,7 +81,7 @@ export class TestStats implements OnInit, AfterViewInit {
       topic: 'Scienze',
       explanation:
         'Il sole sorge effettivamente a est a causa della rotazione della Terra.',
-      policy: 'pubblica',
+      policy: 'public',
       correctCount: 70,
       blankCount: 20,
       errorCount: 10,
@@ -94,7 +94,7 @@ export class TestStats implements OnInit, AfterViewInit {
       topic: 'Scienze',
       explanation:
         "Il ciclo dell'acqua include evaporazione, condensazione, precipitazione e raccolta.",
-      policy: 'pubblica',
+      policy: 'public',
       correctCount: 50,
       blankCount: 30,
       errorCount: 10,

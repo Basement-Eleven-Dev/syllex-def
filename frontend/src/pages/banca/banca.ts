@@ -8,6 +8,7 @@ import { RouterModule } from '@angular/router';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
 import { QuestionsService, QuestionInterface } from '../../services/questions';
+import { Materia } from '../../services/materia';
 
 @Component({
   selector: 'app-banca',
@@ -22,7 +23,7 @@ import { QuestionsService, QuestionInterface } from '../../services/questions';
   templateUrl: './banca.html',
   styleUrl: './banca.scss',
 })
-export class Banca implements OnInit {
+export class Banca {
   PlusIcon = faPlus;
 
   // Signals per state management
@@ -35,12 +36,12 @@ export class Banca implements OnInit {
   collectionSize = signal(0);
 
   // Filter signals
-  private filters = signal({
-    searchTerm: '',
-    type: '',
-    policy: '' as 'pubblica' | 'privata' | '',
-    topicId: '',
-  });
+  private filters = signal<{
+    searchTerm?: string;
+    type?: 'scelta multipla' | 'vero falso' | 'risposta aperta';
+    policy?: 'public' | 'private';
+    topicId?: string;
+  }>({});
 
   // Computed per convertire QuestionInterface -> Question
   questions = computed<Question[]>(() => {
@@ -48,14 +49,17 @@ export class Banca implements OnInit {
       id: q._id,
       text: q.text,
       explanation: q.explanation,
-      policy: q.policy as 'pubblica' | 'privata',
-      type: 'scelta multipla' as const, // TODO: mappare correttamente il type dal BE
+      policy: q.policy as 'public' | 'private',
+      type: q.type,
       topic: q.topicId,
       imageUrl: q.imageUrl,
     }));
   });
 
-  constructor(private questionsService: QuestionsService) {
+  constructor(
+    private questionsService: QuestionsService,
+    private materiaService: Materia,
+  ) {
     // Effect che triggera il load quando cambiano filtri o paginazione
     effect(() => {
       const currentFilters = this.filters();
@@ -73,20 +77,25 @@ export class Banca implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-    // Il load iniziale è gestito dall'effect
-  }
-
   private loadQuestions(
-    searchTerm: string,
-    type: string,
-    topicId: string,
-    policy: 'pubblica' | 'privata' | '',
-    page: number,
-    pageSize: number,
+    searchTerm?: string,
+    type?: 'scelta multipla' | 'vero falso' | 'risposta aperta',
+    topicId?: string,
+    policy?: 'public' | 'private',
+    page?: number,
+    pageSize?: number,
   ): void {
+    const subjectId = this.materiaService.materiaSelected()?._id;
     this.questionsService
-      .loadPagedQuestions(searchTerm, type, topicId, policy, page, pageSize)
+      .loadPagedQuestions(
+        searchTerm,
+        type,
+        topicId,
+        policy,
+        page || 1,
+        pageSize || 10,
+        subjectId,
+      )
       .subscribe({
         next: (response) => {
           this.rawQuestions.set(response.questions);
@@ -99,10 +108,10 @@ export class Banca implements OnInit {
   }
 
   onFiltersChanged(filters: {
-    searchTerm: string;
-    type: string;
-    policy: 'pubblica' | 'privata' | '';
-    topicId: string;
+    searchTerm?: string;
+    type?: 'scelta multipla' | 'vero falso' | 'risposta aperta';
+    policy?: 'public' | 'private';
+    topicId?: string;
   }): void {
     this.filters.set(filters);
     this.page.set(1); // Reset pagina quando cambiano i filtri
@@ -119,9 +128,5 @@ export class Banca implements OnInit {
 
   isQuestionCollapsed(questionId: string): boolean {
     return this.expandedQuestionId() !== questionId;
-  }
-
-  onNewPageRequested(): void {
-    // La gestione è automatica tramite il two-way binding di ngModel e l'effect
   }
 }

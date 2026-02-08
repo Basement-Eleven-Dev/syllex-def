@@ -40,8 +40,10 @@
     >
     <select class="form-select custom-input" formControlName="policy">
       <option value="">Policy</option>
-      @for(type of ['pubblica', 'privata']; track $index) {
-      <option value="{{ type }}">{{ type | titlecase }}</option>
+      @for(type of ['public', 'private']; track $index) {
+      <option value="{{ type }}">
+        {{ type == 'public' ? 'Pubblica' : 'Privata' }}
+      </option>
       }
     </select>
   </div>

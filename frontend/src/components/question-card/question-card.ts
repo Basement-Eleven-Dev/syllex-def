@@ -25,6 +25,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbCollapse, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { RouterModule } from '@angular/router';
 import { ConfirmActionDirective } from '../../directives/confirm-action.directive';
+import { Materia } from '../../services/materia';
 
 @Component({
   selector: 'div[app-question-card]',
@@ -67,7 +68,10 @@ export class QuestionCard {
       : text;
   });
 
-  constructor(private modalServ: NgbModal) {}
+  constructor(
+    private modalServ: NgbModal,
+    public materiaService: Materia,
+  ) {}
 
   @Input() question!: Question;
   @Input() index: number = 0;

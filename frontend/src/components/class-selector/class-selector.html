@@ -7,7 +7,7 @@
   >
 </div>
 <div class="d-flex flex-row gap-2 flex-wrap" id="classes-assigned">
-  @for(classe of classiService.classi; track classe._id) {
+  @for(classe of classiService.classi(); track classe._id) {
   <span
     class="badge fs-5 px-3 classBadge"
     (click)="onToggleClass(classe._id)"

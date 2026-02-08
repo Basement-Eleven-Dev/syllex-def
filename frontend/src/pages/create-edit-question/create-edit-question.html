@@ -136,13 +136,52 @@
     </section>
   </section>
 
-  @if(selectedQuestionType() === 'scelta multipla') {
+  @if(selectedQuestionType() === 'scelta multipla' ) {
   <section class="row form-section">
     <div class="col-8">
       <app-multiple-choice-options
         [options]="questionOptions"
         (optionsChange)="onOptionsChange($event)"
       ></app-multiple-choice-options>
+    </div>
+  </section>
+  } @if(selectedQuestionType() === 'vero falso' ) {
+  <section class="form-section">
+    <label class="form-label fw-semibold text-dark">Risposta corretta</label>
+    <p class="text-muted mb-3">Seleziona se l'affermazione è vera o falsa</p>
+    <div class="row">
+      <div class="col-3">
+        <div
+          class="card shadow-sm typeCard p-1 cursor-pointer"
+          (click)="onSelectCorrectAnswer(true)"
+          [class.selected]="questionForm.get('correctAnswer')?.value === true"
+        >
+          <div class="card-body d-flex flex-row align-items-center gap-3">
+            <input
+              type="radio"
+              class="form-check-input"
+              [checked]="questionForm.get('correctAnswer')?.value === true"
+            />
+            <h5 class="mb-0 flex-fill">Vero</h5>
+          </div>
+        </div>
+      </div>
+      <div class="col-3">
+        <div
+          class="card shadow-sm typeCard p-1 cursor-pointer"
+          (click)="onSelectCorrectAnswer(false)"
+          [class.selected]="questionForm.get('correctAnswer')?.value === false"
+        >
+          <div class="card-body d-flex flex-row align-items-center gap-3">
+            <input
+              type="radio"
+              class="form-check-input"
+              [checked]="questionForm.get('correctAnswer')?.value === false"
+            />
+            <h5 class="mb-0 flex-fill">Falso</h5>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
   }
@@ -220,7 +259,7 @@
         [icon]="loading() ? SpinnerIcon : SaveIcon"
         [animation]="loading() ? 'spin' : undefined"
       ></fa-icon>
-      Salva
+      {{ questionId ? 'Salva modifiche' : 'Crea domanda' }}
     </button>
   </section>
 </form>

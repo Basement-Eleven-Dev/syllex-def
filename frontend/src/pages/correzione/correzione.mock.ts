@@ -25,7 +25,7 @@ export const data: CorrezioneData = {
         topic: 'Equazioni lineari',
         explanation:
           'Per risolvere questa equazione, isola la variabile x portando i termini noti a destra.',
-        policy: 'pubblica',
+        policy: 'public',
       },
       answer: {
         result: 'correct',
@@ -44,7 +44,7 @@ export const data: CorrezioneData = {
         topic: 'Prodotti notevoli',
         explanation:
           'Ricorda la formula del quadrato della somma di due termini.',
-        policy: 'pubblica',
+        policy: 'public',
         options: [
           { label: 'a² + b²', isCorrect: false },
           { label: 'a² + 2ab + b²', isCorrect: true },
@@ -68,7 +68,7 @@ export const data: CorrezioneData = {
         type: 'risposta aperta',
         topic: 'Prodotti notevoli',
         explanation: 'Ricorda la formula del quadrato di binomio.',
-        policy: 'pubblica',
+        policy: 'public',
       },
       answer: {
         result: 'correct',
@@ -87,7 +87,7 @@ export const data: CorrezioneData = {
         topic: 'Geometria',
         explanation:
           'Pensa alle condizioni necessarie per applicare il teorema.',
-        policy: 'pubblica',
+        policy: 'public',
         options: [
           { label: 'Vero', isCorrect: true },
           { label: 'Falso', isCorrect: false },
@@ -110,7 +110,7 @@ export const data: CorrezioneData = {
         topic: 'Equazioni di secondo grado',
         explanation:
           'Puoi usare la differenza di quadrati o la formula risolutiva.',
-        policy: 'pubblica',
+        policy: 'public',
       },
       answer: {
         result: 'dubious',
@@ -129,7 +129,7 @@ export const data: CorrezioneData = {
         topic: 'Numeri e proprietà',
         explanation:
           'Il Massimo Comune Divisore è il più grande numero che divide entrambi i numeri.',
-        policy: 'pubblica',
+        policy: 'public',
       },
       answer: {
         result: 'correct',
@@ -147,7 +147,7 @@ export const data: CorrezioneData = {
         topic: 'Operazioni',
         explanation:
           "Ricorda l'ordine delle operazioni: divisione e moltiplicazione hanno la stessa priorità.",
-        policy: 'pubblica',
+        policy: 'public',
         options: [
           { label: '2.5', isCorrect: false },
           { label: '10', isCorrect: true },
@@ -171,7 +171,7 @@ export const data: CorrezioneData = {
         type: 'risposta aperta',
         topic: 'Espressioni algebriche',
         explanation: "Sostituisci i valori delle variabili nell'espressione.",
-        policy: 'pubblica',
+        policy: 'public',
       },
       answer: {
         result: 'empty',
@@ -188,7 +188,7 @@ export const data: CorrezioneData = {
         type: 'vero falso',
         topic: 'Numeri e proprietà',
         explanation: 'Rifletti sulle proprietà dei numeri pari.',
-        policy: 'pubblica',
+        policy: 'public',
         options: [
           { label: 'Vero', isCorrect: true },
           { label: 'Falso', isCorrect: false },
@@ -209,7 +209,7 @@ export const data: CorrezioneData = {
         type: 'risposta aperta',
         topic: 'Geometria',
         explanation: 'La formula coinvolge base e altezza.',
-        policy: 'pubblica',
+        policy: 'public',
       },
       answer: {
         result: 'correct',
@@ -227,7 +227,7 @@ export const data: CorrezioneData = {
         topic: 'Frazioni',
         explanation:
           'Per trovare frazioni equivalenti, moltiplica o dividi numeratore e denominatore per lo stesso numero.',
-        policy: 'pubblica',
+        policy: 'public',
         options: [
           { label: '6/8', isCorrect: true },
           { label: '2/3', isCorrect: false },
@@ -251,7 +251,7 @@ export const data: CorrezioneData = {
         type: 'risposta aperta',
         topic: 'Frazioni',
         explanation: 'Trova il minimo comune multiplo tra i denominatori.',
-        policy: 'pubblica',
+        policy: 'public',
       },
       answer: {
         result: 'correct',
@@ -268,7 +268,7 @@ export const data: CorrezioneData = {
         type: 'vero falso',
         topic: 'Geometria',
         explanation: 'Ricorda la definizione di angolo retto.',
-        policy: 'pubblica',
+        policy: 'public',
         options: [
           { label: 'Vero', isCorrect: true },
           { label: 'Falso', isCorrect: false },
@@ -289,7 +289,7 @@ export const data: CorrezioneData = {
         type: 'scelta multipla',
         topic: 'Operazioni',
         explanation: "Ricorda l'ordine delle operazioni: PEMDAS/BODMAS.",
-        policy: 'pubblica',
+        policy: 'public',
         options: [
           { label: 'Addizione', isCorrect: false },
           { label: 'Moltiplicazione', isCorrect: false },
@@ -313,7 +313,7 @@ export const data: CorrezioneData = {
         type: 'risposta aperta',
         topic: 'Geometria',
         explanation: 'Il perimetro è la somma di tutti i lati.',
-        policy: 'pubblica',
+        policy: 'public',
       },
       answer: {
         result: 'empty',

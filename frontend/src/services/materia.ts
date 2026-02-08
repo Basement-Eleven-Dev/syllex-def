@@ -78,4 +78,9 @@ export class Materia {
   get topics(): TopicObject[] {
     return this.materiaSelected()?.topics || [];
   }
+
+  getTopicName(topicId: string): string {
+    const topic = this.topics.find((t) => t._id === topicId);
+    return topic ? topic.name : 'Sconosciuto';
+  }
 }

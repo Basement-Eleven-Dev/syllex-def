@@ -9,12 +9,15 @@ import { FilesService } from './files-service';
 export interface QuestionInterface {
   _id: string;
   text: string;
+  type: 'scelta multipla' | 'vero falso' | 'risposta aperta';
   explanation: string;
-  policy: string;
+  policy: 'public' | 'private';
   topicId: string;
   subjectId: string;
   teacherId: string;
   imageUrl?: string;
+  options?: { label: string; isCorrect: boolean }[];
+  correctAnswer?: boolean;
 }
 
 @Injectable({
@@ -52,13 +55,42 @@ export class QuestionsService {
     );
   }
 
+  editQuestion(
+    id: string,
+    q: Question,
+    imageFile?: File,
+  ): Observable<{ question: QuestionInterface }> {
+    console.log('Editing question with data:', id, q, imageFile);
+    if (imageFile) {
+      return this.filesService.uploadFile(imageFile.name, imageFile).pipe(
+        switchMap((imageUrl) => {
+          const questionData = { ...q, imageUrl };
+          return this.http.put<{ question: QuestionInterface }>(
+            `questions/${id}/edit`,
+            questionData,
+          );
+        }),
+      );
+    }
+
+    return this.http.put<{ question: QuestionInterface }>(
+      `questions/${id}/edit`,
+      q,
+    );
+  }
+
+  loadQuestion(id: string): Observable<QuestionInterface> {
+    return this.http.get<QuestionInterface>(`questions/${id}`);
+  }
+
   loadPagedQuestions(
-    searchTerm: string,
-    type: string,
-    topicId: string,
-    policy: 'pubblica' | 'privata' | '',
-    page: number,
-    pageSize: number,
+    searchTerm?: string,
+    type?: 'scelta multipla' | 'vero falso' | 'risposta aperta',
+    topicId?: string,
+    policy?: 'public' | 'private',
+    page: number = 1,
+    pageSize: number = 10,
+    subjectId?: string,
   ): Observable<{ questions: QuestionInterface[]; total: number }> {
     const params = new URLSearchParams();
 
@@ -66,6 +98,7 @@ export class QuestionsService {
     if (type) params.append('type', type);
     if (topicId) params.append('topicId', topicId);
     if (policy) params.append('policy', policy);
+    if (subjectId) params.append('subjectId', subjectId);
     params.append('page', page.toString());
     params.append('pageSize', pageSize.toString());
 
