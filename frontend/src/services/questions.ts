@@ -1,8 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { data } from '../pages/correzione/correzione.mock';
-import { Question } from '../components/search-questions/search-questions';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { FilesService } from './files-service';
 
@@ -30,7 +28,7 @@ export class QuestionsService {
   ) {}
 
   createQuestion(
-    q: Question,
+    q: QuestionInterface,
     imageFile?: File,
   ): Observable<{ question: QuestionInterface }> {
     console.log('Creating question with data:', q, imageFile);
@@ -57,7 +55,7 @@ export class QuestionsService {
 
   editQuestion(
     id: string,
-    q: Question,
+    q: QuestionInterface,
     imageFile?: File,
   ): Observable<{ question: QuestionInterface }> {
     console.log('Editing question with data:', id, q, imageFile);

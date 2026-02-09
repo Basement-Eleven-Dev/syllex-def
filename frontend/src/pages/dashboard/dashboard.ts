@@ -10,6 +10,11 @@ import { RouterModule } from '@angular/router';
 import { Auth } from '../../services/auth';
 import { ClassiService } from '../../services/classi-service';
 import { MaterialiService } from '../../services/materiali-service';
+import {
+  ComunicazioneInterface,
+  ComunicazioniService,
+} from '../../services/comunicazioni-service';
+import { Materia } from '../../services/materia';
 
 interface DashboardQuickLink {
   value: number;
@@ -43,11 +48,21 @@ export class Dashboard {
     public authService: Auth,
     public classiService: ClassiService,
     public materialiService: MaterialiService,
+    public comunicazioniService: ComunicazioniService,
+    private materiaService: Materia,
   ) {
     // Aggiorna reattivamente i quickLinks quando i dati dei service cambiano
     effect(() => {
       this.quickLinks[0].value = this.classiService.classi().length;
       this.quickLinks[3].value = this.materialiService.countFiles();
+    });
+
+    // Carica comunicazioni recenti quando viene selezionata una materia
+    effect(() => {
+      const selectedMateria = this.materiaService.materiaSelected();
+      if (selectedMateria) {
+        this.loadRecentCommunications();
+      }
     });
   }
   AttachmentIcon = faPaperclip;
@@ -110,30 +125,13 @@ export class Dashboard {
     },
   ];
 
-  communications: Communication[] = [
-    {
-      title: 'Parent-Teacher Meeting Scheduled',
-      body: 'A parent-teacher meeting has been scheduled for next Friday at 3 PM.',
-      date: new Date('2024-06-10T10:00:00'),
-      attachmentCount: 2,
-    },
-    {
-      title: 'New Assignment Posted',
-      body: 'A new assignment on Algebra has been posted for Class 10 students.',
-      date: new Date('2024-06-09T14:30:00'),
-      attachmentCount: 0,
-    },
-    {
-      title: 'School Annual Day',
-      body: 'The school annual day is scheduled for 20th June. All students are encouraged to participate.',
-      date: new Date('2024-06-08T09:15:00'),
-      attachmentCount: 1,
-    },
-    {
-      title: 'School Annual Day',
-      body: 'The school annual day is scheduled for 20th June. All students are encouraged to participate.',
-      date: new Date('2024-06-08T09:15:00'),
-      attachmentCount: 1,
-    },
-  ];
+  communications: ComunicazioneInterface[] = [];
+
+  loadRecentCommunications() {
+    this.comunicazioniService
+      .getPagedComunicazioni('', '', '', 1, 5)
+      .subscribe((response) => {
+        this.communications = response.communications;
+      });
+  }
 }

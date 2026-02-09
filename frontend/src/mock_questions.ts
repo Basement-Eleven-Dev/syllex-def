@@ -1,4 +1,20 @@
-import { Question } from './components/search-questions/search-questions';
+/**
+ * @deprecated Questo file contiene dati mock obsoleti.
+ * Utilizzare il servizio QuestionsService con QuestionInterface invece.
+ */
+
+// Interfaccia legacy per retrocompatibilità con i mock
+export interface Question {
+  id: string;
+  imageUrl?: string;
+  text: string;
+  type: 'scelta multipla' | 'vero falso' | 'risposta aperta';
+  topic: string;
+  explanation: string;
+  options?: { label: string; isCorrect: boolean }[];
+  policy: 'public' | 'private';
+  aiGenerated?: boolean;
+}
 
 export const mockQuestions: Question[] = [
   {

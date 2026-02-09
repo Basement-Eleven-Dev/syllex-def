@@ -7,8 +7,7 @@ import {
   ElementRef,
 } from '@angular/core';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
-import { Question } from '../search-questions/search-questions';
-import { QuestionCard } from '../question-card/question-card';
+import { QuestionInterface } from '../../services/questions';
 import { faEye } from '@fortawesome/pro-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -17,7 +16,7 @@ import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 // Register Chart.js components
 Chart.register(...registerables);
 
-interface QuestionStats extends Question {
+interface QuestionStats extends QuestionInterface {
   correctCount: number;
   blankCount: number;
   errorCount: number;
@@ -26,14 +25,7 @@ interface QuestionStats extends Question {
 
 @Component({
   selector: 'app-test-stats',
-  imports: [
-    QuestionCard,
-    FontAwesomeModule,
-    FormsModule,
-    NgbPagination,
-    FormsModule,
-    ReactiveFormsModule,
-  ],
+  imports: [FontAwesomeModule, FormsModule, NgbPagination, ReactiveFormsModule],
   templateUrl: './test-stats.html',
   styleUrl: './test-stats.scss',
 })
@@ -57,12 +49,14 @@ export class TestStats implements OnInit, AfterViewInit {
 
   availableQuestions: QuestionStats[] = [
     {
-      id: '1',
+      _id: '1',
       imageUrl:
         'https://t4.ftcdn.net/jpg/06/57/37/01/360_F_657370150_pdNeG5pjI976ZasVbKN9VqH1rfoykdYU.jpg',
       text: "Qual è la capitale dell'Italia?",
       type: 'scelta multipla',
-      topic: 'Geografia',
+      topicId: 'geografia-topic-id',
+      subjectId: 'geografia-subject-id',
+      teacherId: 'teacher-id',
       options: [
         { label: 'Milano', isCorrect: false },
         { label: 'Roma', isCorrect: true },
@@ -75,23 +69,28 @@ export class TestStats implements OnInit, AfterViewInit {
       totalResponses: 100,
     },
     {
-      id: '2',
+      _id: '2',
       text: 'Il sole sorge a est',
       type: 'vero falso',
-      topic: 'Scienze',
+      topicId: 'scienze-topic-id',
+      subjectId: 'scienze-subject-id',
+      teacherId: 'teacher-id',
       explanation:
         'Il sole sorge effettivamente a est a causa della rotazione della Terra.',
       policy: 'public',
+      correctAnswer: true,
       correctCount: 70,
       blankCount: 20,
       errorCount: 10,
       totalResponses: 100,
     },
     {
-      id: '3',
+      _id: '3',
       text: "Descrivi il ciclo dell'acqua",
       type: 'risposta aperta',
-      topic: 'Scienze',
+      topicId: 'scienze-topic-id',
+      subjectId: 'scienze-subject-id',
+      teacherId: 'teacher-id',
       explanation:
         "Il ciclo dell'acqua include evaporazione, condensazione, precipitazione e raccolta.",
       policy: 'public',
@@ -113,7 +112,7 @@ export class TestStats implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.availableTopics = Array.from(
-      new Set(this.availableQuestions.map((q) => q.topic).filter((t) => t)),
+      new Set(this.availableQuestions.map((q) => q.topicId).filter((t) => t)),
     ) as string[];
   }
 
@@ -243,7 +242,7 @@ export class TestStats implements OnInit, AfterViewInit {
 
     // Filter questions by selected topic
     const filteredQuestions = this.selectedTopic
-      ? this.availableQuestions.filter((q) => q.topic === this.selectedTopic)
+      ? this.availableQuestions.filter((q) => q.topicId === this.selectedTopic)
       : this.availableQuestions;
 
     // Calculate totals

@@ -35,6 +35,7 @@ import { BackTo } from '../../components/back-to/back-to';
 import { TypeSelector } from '../../components/type-selector/type-selector';
 import { Materia } from '../../services/materia';
 import { QuestionsService } from '../../services/questions';
+import { FeedbackService } from '../../services/feedback-service';
 
 export interface AnswerOption {
   label: string;
@@ -78,6 +79,7 @@ export class CreateEditQuestion {
     private activatedRoute: ActivatedRoute,
     public materiaService: Materia,
     private questionsService: QuestionsService,
+    private feedbackService: FeedbackService,
   ) {
     this.questionId = this.activatedRoute.snapshot.paramMap.get('id');
     if (this.questionId) {
@@ -178,9 +180,9 @@ export class CreateEditQuestion {
 
     serviceCall.subscribe({
       next: (response) => {
-        console.log(
-          `Domanda ${isEdit ? 'modificata' : 'salvata'} con successo:`,
-          response.question,
+        this.feedbackService.showFeedback(
+          `Domanda ${isEdit ? 'modificata' : 'salvata'} con successo!`,
+          true,
         );
         this.loading.set(false);
       },

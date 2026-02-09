@@ -6,29 +6,29 @@
 <h1 class="text-dark fw-bold mb-0 display-6">Nuovo Test di valutazione</h1>
 <p class="text-dark mb-5">Prepara il prossimo test per le tue classi</p>
 
-<form [formGroup]="testForm" class="d-flex flex-column gap-5">
-  <section class="d-flex flex-column gap-4 p-4 form-section">
-    <h4 class="text-dark fw-semibold mb-3">Informazioni Generali</h4>
-    <div class="row">
-      <div class="col-6">
-        <label for="test-title" class="form-label fw-semibold text-dark"
-          >Titolo del test</label
-        >
-        <input
-          type="text"
-          id="test-title"
-          class="form-control custom-input form-control-lg"
-          formControlName="title"
-          placeholder="Inserisci il titolo del test"
-        />
-      </div>
-    </div>
+<form [formGroup]="testForm" class="d-flex flex-column gap-4">
+  <section class="form-section">
+    <label for="test-title" class="form-label fw-semibold text-dark"
+      >Titolo del test</label
+    >
+    <input
+      type="text"
+      id="test-title"
+      class="form-control custom-input form-control-lg"
+      formControlName="title"
+      placeholder="Inserisci il titolo del test"
+    />
+  </section>
+  <section class="form-section">
+    <label class="form-label fw-light text-dark"
+      >Disponibilità agli studenti</label
+    >
     <div class="row">
       <div class="col-6">
         <div class="row">
           <div class="col-6">
             <label for="available-from" class="form-label fw-semibold text-dark"
-              >Disponibile da</label
+              >Dal giorno</label
             >
             <input
               type="date"
@@ -39,7 +39,7 @@
           </div>
           <div class="col-6">
             <label for="available-to" class="form-label fw-semibold text-dark"
-              >Disponibile fino a</label
+              >Fino al giorno</label
             >
             <input
               type="date"
@@ -51,15 +51,23 @@
         </div>
       </div>
     </div>
+  </section>
 
+  <section class="form-section">
+    <label class="form-label fw-light text-dark"
+      >Assegnazione e politiche di accesso al test</label
+    >
     <div class="row">
-      <div class="col-4">
+      <div class="col-6">
+        <label class="form-label fw-semibold text-dark"
+          >Classi a cui assegnare il test</label
+        >
         <app-class-selector
           [selectedClassIds]="assignedClasses"
           (selectedClassIdsChange)="onClassesChange($event)"
         ></app-class-selector>
       </div>
-      <div class="col-4">
+      <div class="col-6">
         <label for="access-password" class="form-label fw-semibold text-dark"
           >Password d'accesso</label
         >
@@ -77,7 +85,46 @@
         </div>
       </div>
     </div>
+  </section>
 
+  <section class="form-section p-4">
+    <div
+      class="d-flex flex-row justify-content-between align-items-center mb-4"
+    >
+      <div>
+        <h4 class="text-dark fw-bold mb-0">Domande</h4>
+        <p class="text-dark">
+          Cerca nella tua banca domande di
+          <span class="fw-bold"
+            >{{ materiaService.materiaSelected()!.name }}</span
+          >
+          e sceglile per comporre il test
+        </p>
+      </div>
+      <button
+        class="btn btn-lg ai"
+        type="button"
+        (click)="onRequestAIGeneration()"
+      >
+        <fa-icon [icon]="SparklesIcon" class="me-2"></fa-icon>
+        Genera con AI
+      </button>
+    </div>
+
+    <div class="row">
+      <div class="col-6">
+        <app-search-questions></app-search-questions>
+      </div>
+      <div class="col-6">
+        <app-questions-droppable-list></app-questions-droppable-list>
+      </div>
+    </div>
+  </section>
+
+  <section class="form-section">
+    <label class="form-label fw-light text-dark"
+      >Requisiti per superare il test e tempo a disposizione</label
+    >
     <div class="row">
       <div class="col-4">
         <label for="required-score" class="form-label fw-semibold text-dark"
@@ -119,43 +166,17 @@
       </div>
     </div>
   </section>
-</form>
 
-<section class="form-section p-4 mt-5">
-  <div class="d-flex flex-row justify-content-between align-items-center mb-4">
-    <div>
-      <h4 class="text-dark fw-bold mb-0">Domande</h4>
-      <p class="text-dark">
-        Cerca nella tua banca domande di Scienze natuiche e sceglile per
-        comporre il test
-      </p>
-    </div>
+  <div class="d-flex flex-row justify-content-end mt-5 gap-3">
+    <button class="btn btn-light btn-lg fs-3" (click)="onSaveTest(true)">
+      <fa-icon [icon]="DraftIcon"></fa-icon>
+      Salva Bozza
+    </button>
     <button
-      class="btn btn-lg ai"
-      type="button"
-      (click)="onRequestAIGeneration()"
+      class="btn btn-success text-white btn-lg fs-3"
+      (click)="onSaveTest()"
     >
-      <fa-icon [icon]="SparklesIcon" class="me-2"></fa-icon>
-      Genera con AI
+      <fa-icon [icon]="SaveIcon"></fa-icon> Salva
     </button>
   </div>
-
-  <div class="row">
-    <div class="col-6">
-      <app-search-questions></app-search-questions>
-    </div>
-    <div class="col-6">
-      <app-questions-droppable-list></app-questions-droppable-list>
-    </div>
-  </div>
-</section>
-
-<div class="d-flex flex-row justify-content-end mt-5 gap-3">
-  <button class="btn btn-light btn-lg fs-3" (click)="onSaveTest(true)">
-    <fa-icon [icon]="DraftIcon"></fa-icon>
-    Salva Bozza
-  </button>
-  <button class="btn btn-success text-white btn-lg fs-3" (click)="onSaveTest()">
-    <fa-icon [icon]="SaveIcon"></fa-icon> Salva
-  </button>
-</div>
+</form>

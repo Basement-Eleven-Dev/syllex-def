@@ -21,6 +21,7 @@ import { ClassiService } from '../../services/classi-service';
 import { BackTo } from '../../components/back-to/back-to';
 import { GenAiContents } from '../../components/gen-ai-contents/gen-ai-contents';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+import { Materia } from '../../services/materia';
 
 @Component({
   selector: 'app-create-edit-test',
@@ -58,6 +59,7 @@ export class CreateEditTest implements OnInit {
     private route: ActivatedRoute,
     public classiService: ClassiService,
     private offcanvasService: NgbOffcanvas,
+    public materiaService: Materia,
   ) {}
 
   ngOnInit() {
@@ -111,6 +113,8 @@ export class CreateEditTest implements OnInit {
   onRequestAIGeneration() {
     const offcanvasRef = this.offcanvasService.open(GenAiContents, {
       position: 'end',
+      panelClass: 'offcanvas-large',
+      scroll: true,
     });
     offcanvasRef.componentInstance.type = 'questions';
   }

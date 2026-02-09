@@ -32,6 +32,14 @@ const deleteMaterial = async (
     teacherId,
   });
 
+  if (deleteResult.deletedCount > 0) {
+    // eliminiamo la referenza al materiale da tutte le comunicazioni che lo contengonoo
+    const communicationsCollection = db.collection("communications");
+    await communicationsCollection.updateMany({ materialIds: materialId }, {
+      $pull: { materialIds: materialId },
+    } as any);
+  }
+
   // Remove material reference from all parent folders
   const removeFromParentsResult = await materialsCollection.updateMany(
     {

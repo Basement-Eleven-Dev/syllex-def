@@ -1,4 +1,4 @@
-<div class="droppable-container">
+<div class="droppable-container d-flex flex-column">
   <div class="d-flex justify-content-between align-items-center">
     <label class="form-label fw-semibold text-dark">Domande del Test</label>
     @if (selectedQuestions.length > 0) {
@@ -45,39 +45,43 @@
   }
 
   <!-- Drop Zone -->
-  <section
-    class="drop-zone p-4 rounded-5"
-    [class.has-items]="selectedQuestions.length > 0"
-    [class.empty]="selectedQuestions.length === 0"
-    cdkDropList
-    id="test-drop-list"
-    cdkDropListSortingEnabled
-    [cdkDropListData]="selectedQuestions"
-    (cdkDropListDropped)="onDrop($event)"
-  >
-    @if (selectedQuestions.length === 0) {
-    <div class="empty-state text-center py-5">
-      <i class="bi bi-file-earmark-plus display-1 text-muted mb-3"></i>
-      <p class="text-muted mb-0">
-        Trascina qui le domande per aggiungerle al test
-      </p>
-    </div>
-    } @else {
-    <div class="selected-questions-list">
-      @for (question of selectedQuestions; track question.id; let last = $last;
-      let index = $index) {
-      <div
-        app-question-card
-        cdkDrag
-        [question]="question"
-        [index]="index"
-        [showTestCompositionActions]="true"
-        [showIndex]="true"
-        [class.mb-3]="!last"
-        (removeMe)="removeQuestion($event)"
-      ></div>
+  <div class="flex-fill">
+    <section
+      class="drop-zone p-4 rounded-5 h-100 overflow-scroll"
+      [class.has-items]="selectedQuestions.length > 0"
+      [class.empty]="selectedQuestions.length === 0"
+      cdkDropList
+      id="test-drop-list"
+      cdkDropListSortingEnabled
+      [cdkDropListData]="selectedQuestions"
+      (cdkDropListDropped)="onDrop($event)"
+    >
+      @if (selectedQuestions.length === 0) {
+      <div class="empty-state text-center py-5">
+        <i class="bi bi-file-earmark-plus display-1 text-muted mb-3"></i>
+        <p class="text-muted mb-0">
+          Trascina qui le domande per aggiungerle al test
+        </p>
+      </div>
+      } @else {
+      <div class="selected-questions-list">
+        @for (question of selectedQuestions; track question._id; let last =
+        $last; let index = $index) {
+        <div
+          app-question-card
+          [collapsed]="false"
+          [collapsable]="false"
+          cdkDrag
+          [question]="question"
+          [index]="index"
+          [showTestCompositionActions]="true"
+          [showIndex]="true"
+          [class.mb-3]="!last"
+          (removeMe)="removeQuestion($event)"
+        ></div>
+        }
+      </div>
       }
-    </div>
-    }
-  </section>
+    </section>
+  </div>
 </div>

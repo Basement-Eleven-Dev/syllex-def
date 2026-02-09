@@ -44,21 +44,6 @@
       </section>
 
       <section class="form-section">
-        <label class="form-label fw-semibold text-dark mb-2">Allega file</label>
-        <input
-          type="file"
-          class="form-control custom-input"
-          (change)="onFileSelected($event)"
-          accept=".txt,.pdf"
-        />
-        @if (attachedFileName) {
-        <small class="text-muted mt-2"
-          >File allegato: {{ attachedFileName }}</small
-        >
-        }
-      </section>
-
-      <section class="form-section">
         <app-materiali-selector></app-materiali-selector>
       </section>
 

@@ -402,3 +402,19 @@ section {
     border-radius: 15px;
   }
 }
+
+/* Offcanvas customizations */
+.offcanvas-large {
+  width: 600px !important;
+  max-width: 90vw !important;
+}
+
+.toast-success {
+  background-color: var(--bs-success);
+  color: white;
+}
+
+.toast-error {
+  background-color: var(--bs-danger);
+  color: white;
+}

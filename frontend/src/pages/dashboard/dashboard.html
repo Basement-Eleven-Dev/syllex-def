@@ -1,4 +1,6 @@
-<h1 class="text-dark fw-bold mb-0 display-6">Bentornato, {{ authService.user?.firstName }}</h1>
+<h1 class="text-dark fw-bold mb-0 display-6">
+  Bentornato, {{ authService.user?.firstName }}
+</h1>
 <p class="text-dark mb-0">
   Qui puoi gestire i contenuti e i test per la materia Scienze Nautiche
 </p>
@@ -56,22 +58,28 @@
       <div class="card-body">
         <div class="h-100 overflow-scroll">
           @for(c of communications; track $index; let last = $last){
-          <div class="card" [class.mb-3]="!last">
+          <div
+            class="card shadow-sm communicationCard"
+            [class.mb-3]="!last"
+            [routerLink]="'/t/comunicazioni/edit/' + c._id"
+          >
             <div class="card-body">
               <div
                 class="fw-semibold mb-1 d-flex flex-row justify-content-between align-items-center"
               >
-                <span>Titolo annuncio</span>
-                @if(c.attachmentCount > 0){
+                <span>{{ c.title }}</span>
+                @if(c.materialIds && c.materialIds.length > 0){
                 <span class="badge bg-primary ms-2 text-white fw-bold"
-                  >{{ c.attachmentCount }}
+                  >{{ c.materialIds.length }}
                   <fa-icon [icon]="AttachmentIcon"></fa-icon>
                 </span>
                 }
               </div>
-              <p class="ellipsis-3-lines mb-2">{{ c.body }}</p>
+              <p class="ellipsis-3-lines mb-2">{{ c.content }}</p>
               Creato il
-              <small class="fw-semibold">{{ c.date | date:'short' }}</small>
+              <small class="fw-semibold"
+                >{{ c.createdAt | date:'short' }}</small
+              >
             </div>
           </div>
           }

@@ -1,3 +1,8 @@
+.offcanvas-body {
+  overflow-y: auto;
+  flex: 1 1 auto;
+}
+
 .topicBtn {
   color: var(--bs-primary);
   border: 1px solid var(--bs-primary);

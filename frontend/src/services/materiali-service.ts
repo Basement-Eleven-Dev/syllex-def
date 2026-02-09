@@ -350,4 +350,8 @@ export class MaterialiService {
     };
     removeFromArray(this.root());
   }
+
+  getMaterialById(id: string): MaterialInterface | undefined {
+    return this.findItem((item) => item._id === id) || undefined;
+  }
 }

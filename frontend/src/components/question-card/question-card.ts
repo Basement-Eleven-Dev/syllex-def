@@ -8,7 +8,7 @@ import {
   input,
   signal,
 } from '@angular/core';
-import { Question } from '../search-questions/search-questions';
+import { QuestionInterface } from '../../services/questions';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faCheck,
@@ -32,7 +32,6 @@ import { Materia } from '../../services/materia';
   standalone: true,
   imports: [
     DragDropModule,
-    CdkDrag,
     FontAwesomeModule,
     FormsModule,
     ReactiveFormsModule,
@@ -52,10 +51,11 @@ export class QuestionCard {
   readonly UnCollapseIcon = faCircleChevronUp;
   readonly RobotIcon = faRobot;
 
-  points?: number;
+  points: number = 1;
 
   // Signal-based collapse state
   collapsed = input<boolean>(true); // Input signal
+  collapsable = input<boolean>(true); // Input signal
   readonly isCollapsed = computed(() => this.collapsed());
   readonly collapseIcon = computed(() =>
     this.isCollapsed() ? this.CollapseIcon : this.UnCollapseIcon,
@@ -73,7 +73,7 @@ export class QuestionCard {
     public materiaService: Materia,
   ) {}
 
-  @Input() question!: Question;
+  @Input() question!: QuestionInterface;
   @Input() index: number = 0;
   @Input() showIndex: boolean = false;
   @Input() showTestCompositionActions: boolean = false;
@@ -87,7 +87,7 @@ export class QuestionCard {
     // Notifica il parent per toggle (parent gestisce lo stato)
     const willExpand = this.isCollapsed();
     if (willExpand) {
-      this.onExpand.emit(this.question.id);
+      this.onExpand.emit(this.question._id);
     } else {
       // Richiude la card corrente
       this.onExpand.emit(''); // Empty string = chiudi tutte

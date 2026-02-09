@@ -1,59 +1,52 @@
-import { TitleCasePipe } from '@angular/common';
-import {
-  Component,
-  EventEmitter,
-  OnDestroy,
-  OnInit,
-  Output,
-} from '@angular/core';
-import {
-  FormControl,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-} from '@angular/forms';
+import { Component, Input, OnDestroy, OnInit, signal } from '@angular/core';
 import { CdkDrag, DragDropModule } from '@angular/cdk/drag-drop';
-import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, debounceTime } from 'rxjs';
 import { QuestionCard } from '../question-card/question-card';
 import { QuestionsSearchFilters } from '../questions-search-filters/questions-search-filters';
-import { mockQuestions } from '../../mock_questions';
-
-export interface Question {
-  id: string;
-  imageUrl?: string;
-  text: string;
-  type: 'scelta multipla' | 'vero falso' | 'risposta aperta';
-  topic: string;
-  explanation: string;
-  options?: { label: string; isCorrect: boolean }[];
-  policy: 'public' | 'private';
-  aiGenerated?: boolean;
-}
+import { QuestionsService, QuestionInterface } from '../../services/questions';
 
 @Component({
   selector: 'app-search-questions',
   standalone: true,
-  imports: [
-    FormsModule,
-    ReactiveFormsModule,
-    TitleCasePipe,
-    DragDropModule,
-    CdkDrag,
-    QuestionCard,
-    QuestionsSearchFilters,
-  ],
+  imports: [DragDropModule, CdkDrag, QuestionCard, QuestionsSearchFilters],
   templateUrl: './search-questions.html',
   styleUrl: './search-questions.scss',
 })
 export class SearchQuestions implements OnInit, OnDestroy {
-  // Mock data - sostituire con chiamata al servizio
-  availableQuestions: Question[] = mockQuestions;
+  @Input() subjectId?: string;
 
-  filteredQuestions: Question[] = [];
+  filteredQuestions = signal<QuestionInterface[]>([]);
+  totalQuestions = signal<number>(0);
+  isLoading = signal<boolean>(false);
+
+  private currentFilters: {
+    searchTerm?: string;
+    type?: 'scelta multipla' | 'vero falso' | 'risposta aperta';
+    policy?: 'public' | 'private';
+    topicId?: string;
+  } = {};
+
   private destroy$ = new Subject<void>();
+  private filtersChanged$ = new Subject<{
+    searchTerm?: string;
+    type?: 'scelta multipla' | 'vero falso' | 'risposta aperta';
+    policy?: 'public' | 'private';
+    topicId?: string;
+  }>();
+
+  constructor(private questionsService: QuestionsService) {}
 
   ngOnInit(): void {
-    this.filteredQuestions = [...this.availableQuestions];
+    // Setup debounced filter subscription
+    this.filtersChanged$
+      .pipe(debounceTime(500), takeUntil(this.destroy$))
+      .subscribe((filters) => {
+        this.currentFilters = filters;
+        this.loadQuestions();
+      });
+
+    // Initial load
+    this.loadQuestions();
   }
 
   ngOnDestroy(): void {
@@ -62,12 +55,38 @@ export class SearchQuestions implements OnInit, OnDestroy {
   }
 
   onFiltersChanged(filters: {
-    searchTerm: string;
-    type: string;
-    policy: 'pubblica' | 'privata' | '';
+    searchTerm?: string;
+    type?: 'scelta multipla' | 'vero falso' | 'risposta aperta';
+    policy?: 'public' | 'private';
+    topicId?: string;
   }): void {
-    // Logica di filtraggio delle domande basata sui filtri ricevuti
-    // Per ora, resettiamo semplicemente la lista filtrata a tutte le domande
-    this.filteredQuestions = [...this.availableQuestions];
+    this.filtersChanged$.next(filters);
+  }
+
+  private loadQuestions(): void {
+    this.isLoading.set(true);
+
+    this.questionsService
+      .loadPagedQuestions(
+        this.currentFilters.searchTerm,
+        this.currentFilters.type,
+        this.currentFilters.topicId,
+        this.currentFilters.policy,
+        1,
+        5,
+        this.subjectId,
+      )
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.filteredQuestions.set(response.questions);
+          this.totalQuestions.set(response.total);
+          this.isLoading.set(false);
+        },
+        error: (error) => {
+          console.error('Errore nel caricamento delle domande:', error);
+          this.isLoading.set(false);
+        },
+      });
   }
 }

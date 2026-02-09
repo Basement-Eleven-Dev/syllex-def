@@ -51,6 +51,7 @@ export class CreateEditComunicazione {
   comunicazioneId: string | null = null;
   loading = signal<boolean>(false);
   isEdit = signal<boolean>(false);
+  materialIds = signal<string[]>([]);
 
   get assignedClasses(): string[] {
     return this.comunicazioneForm.get('classes')?.value || [];
@@ -83,8 +84,9 @@ export class CreateEditComunicazione {
           title: comunicazione.title,
           content: comunicazione.content,
           classes: comunicazione.classIds,
-          materials: comunicazione.materialIds,
         });
+        // Setta i materialIds per il MaterialiSelector
+        this.materialIds.set(comunicazione.materialIds || []);
         this.loading.set(false);
       },
       error: (error) => {

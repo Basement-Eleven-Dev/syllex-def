@@ -1,6 +1,8 @@
 import {
   Component,
   computed,
+  effect,
+  input,
   output,
   signal,
   ViewChild,
@@ -27,54 +29,52 @@ export interface MaterialeWithPath extends MaterialInterface {
   styleUrl: './materiali-selector.scss',
 })
 export class MaterialiSelector {
-  // State
   FolderIcon = getFileIcon('folder');
   UploadIcon = faUpload;
   TimesIcon = getFileIcon('times');
+
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+
+  initialMaterialIds = input<string[]>([]);
+  selectionChange = output<MaterialInterface[]>();
+
   expandedFolders = signal<Set<string>>(new Set());
   selectedMaterialIds = signal<Set<string>>(new Set());
   searchQuery = signal<string>('');
   isUploading = signal<boolean>(false);
 
-  // ViewChild per l'input file
-  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+  materialsTree = computed(() => this.materialiService.root());
+  allMaterials = computed(() => this.flattenTree(this.materialsTree()));
 
-  // Output dei materiali selezionati
-  selectionChange = output<MaterialInterface[]>();
-
-  constructor(private materialiService: MaterialiService) {}
-
-  get tree(): MaterialInterface[] {
-    return this.materialiService.root();
-  }
-
-  // Computed: materiali selezionati come array
   selectedMaterials = computed(() => {
     const ids = this.selectedMaterialIds();
-    return this.flattenMaterials(this.tree).filter((m) => ids.has(m._id!));
+    return this.allMaterials().filter((m) => ids.has(m._id));
   });
 
-  // Computed: risultati di ricerca (lista piatta filtrata)
   searchResults = computed(() => {
     const query = this.searchQuery().toLowerCase().trim();
     if (!query) return [];
-    const materialsWithPath = this.flattenMaterialsWithPath(this.tree);
-    return materialsWithPath.filter((m) =>
+    return this.flattenTreeWithPath(this.materialsTree()).filter((m) =>
       m.name.toLowerCase().includes(query),
     );
   });
 
-  // Flag per sapere se stiamo cercando
   isSearching = computed(() => this.searchQuery().trim().length > 0);
+
+  constructor(public materialiService: MaterialiService) {
+    effect(() => {
+      const ids = this.initialMaterialIds();
+      if (ids.length > 0) {
+        this.selectedMaterialIds.set(new Set(ids));
+        this.selectionChange.emit(this.selectedMaterials());
+      }
+    });
+  }
 
   toggleFolder(folderId: string): void {
     this.expandedFolders.update((set) => {
       const newSet = new Set(set);
-      if (newSet.has(folderId)) {
-        newSet.delete(folderId);
-      } else {
-        newSet.add(folderId);
-      }
+      newSet.has(folderId) ? newSet.delete(folderId) : newSet.add(folderId);
       return newSet;
     });
   }
@@ -82,11 +82,9 @@ export class MaterialiSelector {
   selectMaterial(material: MaterialInterface): void {
     this.selectedMaterialIds.update((set) => {
       const newSet = new Set(set);
-      if (newSet.has(material._id!)) {
-        newSet.delete(material._id!);
-      } else {
-        newSet.add(material._id!);
-      }
+      newSet.has(material._id)
+        ? newSet.delete(material._id)
+        : newSet.add(material._id);
       return newSet;
     });
     this.selectionChange.emit(this.selectedMaterials());
@@ -117,71 +115,49 @@ export class MaterialiSelector {
     this.isUploading.set(true);
 
     try {
-      // Simula upload (in produzione qui andrà la chiamata API)
       await this.simulateUpload(file);
 
-      // Estrae estensione dal nome file
-      const extension = file.name.split('.').pop() || '';
-
-      // Crea il nuovo materiale
       const newMaterial: MaterialInterface = {
         _id: `file-${Date.now()}`,
         name: file.name,
-        url: `/materials/${file.name}`, // URL temporaneo
-        extension: extension,
+        url: `/materials/${file.name}`,
+        extension: file.name.split('.').pop() || '',
         createdAt: new Date(),
       };
 
-      // Aggiunge alla root del tree
       this.materialiService.root.update((current) => [...current, newMaterial]);
+      this.selectMaterial(newMaterial);
 
-      // Seleziona automaticamente il materiale appena caricato
-      this.selectMaterial(newMaterial as MaterialInterface);
-
-      // Reset input
       input.value = '';
     } catch (error) {
       console.error("Errore durante l'upload:", error);
-      // TODO: Gestire errore con notifica utente
     } finally {
       this.isUploading.set(false);
     }
   }
 
   private simulateUpload(file: File): Promise<void> {
-    // Simula un delay di upload
     return new Promise((resolve) => setTimeout(resolve, 1000));
   }
 
-  private flattenMaterials(items: MaterialInterface[]): MaterialInterface[] {
-    const result: MaterialInterface[] = [];
-    for (const item of items) {
-      if ('content' in item) {
-        result.push(
-          ...this.flattenMaterials((item as MaterialInterface).content!),
-        );
-      } else {
-        result.push(item as MaterialInterface);
-      }
-    }
-    return result;
+  private flattenTree(items: MaterialInterface[]): MaterialInterface[] {
+    return items.flatMap((item) =>
+      item.content?.length ? this.flattenTree(item.content) : [item],
+    );
   }
 
-  private flattenMaterialsWithPath(
+  private flattenTreeWithPath(
     items: MaterialInterface[],
-    currentPath: string = '',
+    currentPath = '',
   ): MaterialeWithPath[] {
-    const result: MaterialeWithPath[] = [];
-    for (const item of items) {
-      if ('content' in item) {
+    return items.flatMap((item) => {
+      if (item.content?.length) {
         const newPath = currentPath
           ? `${currentPath} / ${item.name}`
           : item.name;
-        result.push(...this.flattenMaterialsWithPath(item.content!, newPath));
-      } else {
-        result.push({ ...item, path: currentPath });
+        return this.flattenTreeWithPath(item.content, newPath);
       }
-    }
-    return result;
+      return [{ ...item, path: currentPath }];
+    });
   }
 }

@@ -12,22 +12,6 @@ import {
 } from '../../services/comunicazioni-service';
 import { ClassiService } from '../../services/classi-service';
 
-interface Attachment {
-  id: number;
-  filename: string;
-  url: string;
-  extension: 'pdf' | 'docx' | 'xlsx' | 'png' | 'jpg' | 'txt';
-}
-
-export interface Comunicazione {
-  id: string;
-  titolo: string;
-  contenuto: string;
-  dataCreazione: Date;
-  attachments?: Attachment[];
-  classes: string[];
-}
-
 @Component({
   selector: 'app-comunicazioni',
   imports: [
@@ -56,16 +40,8 @@ export class Comunicazioni {
   selectedClassId = signal('');
   selectedHasAttachments = signal('');
 
-  // Computed per convertire ComunicazioneInterface -> Comunicazione
-  comunicazioni = computed<Comunicazione[]>(() => {
-    return this.rawComunicazioni().map((c) => ({
-      id: c._id || '',
-      titolo: c.title,
-      contenuto: c.content,
-      dataCreazione: c.createdAt ? new Date(c.createdAt) : new Date(),
-      attachments: [], // TODO: mappare correttamente i materiali
-      classes: c.classIds,
-    }));
+  comunicazioni = computed<ComunicazioneInterface[]>(() => {
+    return this.rawComunicazioni();
   });
 
   constructor(

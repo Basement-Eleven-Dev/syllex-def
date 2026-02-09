@@ -3,25 +3,34 @@
 ></app-questions-search-filters>
 
 <div class="questions-list mt-4">
-  <h6 class="mb-3 text-muted">Risultati ({{ filteredQuestions.length }})</h6>
+  <h6 class="mb-3 text-muted">
+    Risultati ({{ isLoading() ? '...' : filteredQuestions().length }})
+  </h6>
 
-  @if (filteredQuestions.length === 0) {
+  @if (isLoading()) {
+  <div class="d-flex justify-content-center align-items-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Caricamento...</span>
+    </div>
+  </div>
+  } @else if (filteredQuestions().length === 0) {
   <div class="alert alert-info" role="alert">
     Nessuna domanda trovata con i filtri selezionati. Prova a modificare i
     criteri di ricerca.
   </div>
-  }
-
+  } @else {
   <div
     cdkDropList
-    [cdkDropListData]="filteredQuestions"
+    [cdkDropListData]="filteredQuestions()"
     [cdkDropListConnectedTo]="['test-drop-list']"
     cdkDropListSortingDisabled
   >
-    @for (question of filteredQuestions; track question.id; let last = $last) {
+    @for (question of filteredQuestions(); track question._id; let last = $last)
+    {
     <div
       app-question-card
       cdkDrag
+      [showPolicy]="true"
       [cdkDragData]="question"
       [showIndex]="false"
       [question]="question"
@@ -29,4 +38,5 @@
     ></div>
     }
   </div>
+  }
 </div>

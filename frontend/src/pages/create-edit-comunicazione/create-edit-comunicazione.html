@@ -89,6 +89,7 @@
           >Materiali allegati (opzionale)</label
         >
         <app-materiali-selector
+          [initialMaterialIds]="materialIds()"
           (selectionChange)="onMaterialsChange($event)"
         ></app-materiali-selector>
       </div>

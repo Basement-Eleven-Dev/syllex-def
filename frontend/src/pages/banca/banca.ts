@@ -1,6 +1,5 @@
 import { Component, signal, computed, OnInit, effect } from '@angular/core';
 import { QuestionsSearchFilters } from '../../components/questions-search-filters/questions-search-filters';
-import { Question } from '../../components/search-questions/search-questions';
 import { QuestionCard } from '../../components/question-card/question-card';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPlus } from '@fortawesome/pro-solid-svg-icons';
@@ -43,17 +42,8 @@ export class Banca {
     topicId?: string;
   }>({});
 
-  // Computed per convertire QuestionInterface -> Question
-  questions = computed<Question[]>(() => {
-    return this.rawQuestions().map((q) => ({
-      id: q._id,
-      text: q.text,
-      explanation: q.explanation,
-      policy: q.policy as 'public' | 'private',
-      type: q.type,
-      topic: q.topicId,
-      imageUrl: q.imageUrl,
-    }));
+  questions = computed<QuestionInterface[]>(() => {
+    return this.rawQuestions();
   });
 
   constructor(

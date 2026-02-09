@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Question } from '../search-questions/search-questions';
+import { QuestionInterface } from '../../services/questions';
 import { AnswerData } from '../../pages/correzione/correzione';
 
 @Component({
@@ -11,14 +11,16 @@ import { AnswerData } from '../../pages/correzione/correzione';
 export class QuestionCorrection {
   @Input() index: number = 1;
   @Input() data: {
-    question: Question;
+    question: QuestionInterface;
     answer: AnswerData;
   } = {
     question: {
-      id: 'q1',
+      _id: 'q1',
       text: 'Domanda di esempio',
       type: 'risposta aperta',
-      topic: 'Matematica',
+      topicId: 'math-topic-id',
+      subjectId: 'math-subject-id',
+      teacherId: 'teacher-id',
       explanation: 'Spiegazione della domanda di esempio',
       policy: 'public',
     },

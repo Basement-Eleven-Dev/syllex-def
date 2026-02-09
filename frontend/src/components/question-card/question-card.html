@@ -4,6 +4,7 @@
   [class.collapsed]="isCollapsed()"
   id="questionCard"
 >
+  @if(collapsable()) {
   <button
     type="button"
     class="collapse-banner btn btn-link p-0"
@@ -13,32 +14,33 @@
   >
     <fa-icon [icon]="collapseIcon()"></fa-icon>
   </button>
+  }
 
   <div class="flex-grow-1 w-100 d-flex flex-column gap-2">
     <div class="d-flex align-items-start gap-2 mb-2">
       @if(showIndex){<span class="badge bg-dark"># {{ index + 1 }}</span>}
-      <span class="badge bg-primary">{{ question.type }}</span>
+      <span class="badge border border-primary text-primary"
+        >{{ question.type }}</span
+      >
       <span class="badge bg-primary"
-        >{{ materiaService.getTopicName(question.topic) }}</span
+        >{{ materiaService.getTopicName(question.topicId) }}</span
       >
       @if(showPolicy){<span class="badge bg-light text-dark"
         >{{ question.policy == 'public' ? 'Pubblica' : 'Privata' }}</span
-      >} @if(question.aiGenerated){
-      <fa-icon [icon]="RobotIcon" class="ms-2" style="color: #9664c8"></fa-icon>
-      } @if(showBancaActions) {
+      >} @if(showBancaActions) {
       <div class="d-flex flex-row gap-1 justify-content-end w-100">
         <button
           type="button"
           class="btn btn-sm btn-outline-primary"
           title="Modifica"
-          [routerLink]="'/t/edit-question/' + question.id"
+          [routerLink]="'/t/edit-question/' + question._id"
         >
           <fa-icon [icon]="EditIcon"></fa-icon> Modifica
         </button>
         <button
           type="button"
           class="btn btn-sm btn-outline-danger"
-          (click)="removeMe.emit(question.id)"
+          (click)="removeMe.emit(question._id)"
           title="Rimuovi"
           confirmAction
         >
@@ -102,14 +104,16 @@
       class="form-control form-control-sm custom-input"
       style="width: 150px"
       [(ngModel)]="points"
-      min="0"
+      value="1"
+      step="1"
+      min="1"
       max="100"
       placeholder="Punti se corretta"
     />
     <button
       type="button"
       class="btn btn-sm btn-outline-danger"
-      (click)="removeMe.emit(question.id)"
+      (click)="removeMe.emit(question._id)"
       title="Rimuovi"
     >
       <fa-icon [icon]="TrashIcon"></fa-icon> Rimuovi

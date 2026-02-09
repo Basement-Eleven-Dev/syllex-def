@@ -1,4 +1,6 @@
-<div class="offcanvas-body">
+<div
+  [class]="isOffcanvasMode() ? 'offcanvas-body dvh-100 overflow-scroll p-4' : ''"
+>
   <form
     [formGroup]="genForm"
     (ngSubmit)="onSubmit()"
@@ -6,8 +8,8 @@
   >
     <section class="form-section">
       <label class="fw-semibold fs-5 text-dark mb-3"
-        >Che tipo di {{ type() == 'questions' ? 'domande' : 'materiale' }} vuoi
-        creare?</label
+        >Che tipo di {{ typeSignal() == 'questions' ? 'domande' : 'materiale' }}
+        vuoi creare?</label
       >
       <app-type-selector
         [options]="types()"
@@ -16,7 +18,7 @@
         [showDescription]="true"
       ></app-type-selector>
     </section>
-    @if(type() == 'questions') {
+    @if(typeSignal() == 'questions') {
     <section class="form-section">
       <label class="fw-semibold fs-5 text-dark mb-3"
         >Quante domande vuoi generare?</label
@@ -64,14 +66,16 @@
         class="form-control custom-input"
         formControlName="prompt"
         rows="4"
-        [placeholder]="type() == 'questions' ? 'Ad esempio: argomento specifico, difficoltà, specifiche delle domande...' : 'Ad esempio: stile, tono di voce, punti chiave da trattare...'"
+        [placeholder]="typeSignal() == 'questions' ? 'Ad esempio: argomento specifico, difficoltà, specifiche delle domande...' : 'Ad esempio: stile, tono di voce, punti chiave da trattare...'"
       ></textarea>
     </section>
+
     <div class="text-end">
       <button
         type="submit"
-        class="btn btn-lg fs-3 ai"
+        class="btn btn-primary ai btn-lg fs-4"
         [disabled]="genForm.invalid"
+        (click)="onSubmit()"
       >
         <fa-icon [icon]="SparklesIcon" class="me-2"></fa-icon>
         Genera {{ getSelectedTypeName() }}

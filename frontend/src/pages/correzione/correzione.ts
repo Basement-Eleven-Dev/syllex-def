@@ -11,7 +11,7 @@ import {
 } from '@fortawesome/pro-solid-svg-icons';
 import { faCircle } from '@fortawesome/pro-regular-svg-icons';
 import { QuestionCorrection } from '../../components/question-correction/question-correction';
-import { Question } from '../../components/search-questions/search-questions';
+import { QuestionInterface } from '../../services/questions';
 import { data } from './correzione.mock';
 
 export interface AnswerData {
@@ -39,7 +39,7 @@ export interface CorrezioneData {
     empty: number;
   };
   questions: {
-    question: Question;
+    question: QuestionInterface;
     answer: AnswerData;
   }[];
 }

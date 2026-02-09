@@ -1,4 +1,11 @@
-import { Component, effect, input, signal } from '@angular/core';
+import {
+  Component,
+  effect,
+  Input,
+  signal,
+  Optional,
+  OnInit,
+} from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faSparkles } from '@fortawesome/pro-solid-svg-icons';
 import { Materia } from '../../services/materia';
@@ -14,6 +21,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { NgbActiveOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-gen-ai-contents',
@@ -26,19 +34,32 @@ import {
   templateUrl: './gen-ai-contents.html',
   styleUrl: './gen-ai-contents.scss',
 })
-export class GenAiContents {
-  type = input<'questions' | 'materials'>('materials');
+export class GenAiContents implements OnInit {
+  @Input() set type(value: 'questions' | 'materials') {
+    this.typeSignal.set(value);
+  }
+
+  typeSignal = signal<'questions' | 'materials'>('materials');
   SparklesIcon = faSparkles;
 
   types = signal<TypeOption[]>([]);
   selectedType = signal<string>('');
   topicsSelected = signal<string[]>([]);
 
-  constructor(public materiaService: Materia) {}
+  // Determina se siamo in modalità offcanvas
+  isOffcanvasMode = signal<boolean>(false);
+
+  constructor(
+    public materiaService: Materia,
+    @Optional() public activeOffcanvas?: NgbActiveOffcanvas,
+  ) {
+    // Siamo in modalità offcanvas se activeOffcanvas è disponibile
+    this.isOffcanvasMode.set(!!activeOffcanvas);
+  }
 
   genForm: FormGroup = new FormGroup({
     selectedType: new FormControl('', [Validators.required]),
-    type: new FormControl(this.type()),
+    type: new FormControl(this.typeSignal()),
     prompt: new FormControl(''),
     topics: new FormControl([]),
     numberOfQuestions: new FormControl(5, [
@@ -49,14 +70,14 @@ export class GenAiContents {
   });
 
   ngOnInit() {
-    if (this.type() === 'materials') {
+    if (this.typeSignal() === 'materials') {
       this.types.set(MATERIAL_TYPE_OPTIONS);
     } else {
       this.types.set(QUESTION_TYPE_OPTIONS);
     }
     this.selectedType.set(this.types()[0].value);
     this.genForm.controls['selectedType'].setValue(this.selectedType());
-    this.genForm.controls['type'].setValue(this.type());
+    this.genForm.controls['type'].setValue(this.typeSignal());
   }
 
   onToggleTopic(topic: string) {

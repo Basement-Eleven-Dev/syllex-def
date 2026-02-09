@@ -13,7 +13,7 @@ import {
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
-import { Question } from '../search-questions/search-questions';
+import { QuestionInterface } from '../../services/questions';
 import { QuestionCard } from '../question-card/question-card';
 
 @Component({
@@ -25,17 +25,17 @@ import { QuestionCard } from '../question-card/question-card';
 })
 export class QuestionsDroppableList {
   @Input() testName: string = 'Nuovo Test';
-  @Output() questionsChanged = new EventEmitter<Question[]>();
+  @Output() questionsChanged = new EventEmitter<QuestionInterface[]>();
   @Output() saveTest = new EventEmitter<{
     name: string;
-    questions: Question[];
+    questions: QuestionInterface[];
   }>();
 
   @ViewChildren(QuestionCard) questionCards!: QuestionCard[];
 
-  selectedQuestions: Question[] = [];
+  selectedQuestions: QuestionInterface[] = [];
 
-  onDrop(event: CdkDragDrop<Question[]>): void {
+  onDrop(event: CdkDragDrop<QuestionInterface[]>): void {
     if (event.previousContainer === event.container) {
       // Riordino all'interno della stessa lista
       moveItemInArray(
@@ -45,11 +45,11 @@ export class QuestionsDroppableList {
       );
     } else {
       // Trasferimento da un'altra lista
-      const droppedQuestion = event.item.data as Question;
+      const droppedQuestion = event.item.data as QuestionInterface;
 
       // Verifica che la domanda non sia già presente
       const exists = this.selectedQuestions.some(
-        (q) => q.id === droppedQuestion.id,
+        (q) => q._id === droppedQuestion._id,
       );
       if (exists) {
         console.warn('Domanda già aggiunta al test');
@@ -67,7 +67,7 @@ export class QuestionsDroppableList {
 
   removeQuestion(questionId: string): void {
     this.selectedQuestions = this.selectedQuestions.filter(
-      (q) => q.id !== questionId,
+      (q) => q._id !== questionId,
     );
     this.emitChanges();
   }

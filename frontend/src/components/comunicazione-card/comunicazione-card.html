@@ -1,13 +1,13 @@
 <div class="card">
   <div class="card-body">
     <div class="d-flex flex-row text-dark align-items-center mb-3">
-      <h5 class="fw-bold mb-0 flex-fill">{{ comunicazione.titolo }}</h5>
+      <h5 class="fw-bold mb-0 flex-fill">{{ comunicazione.title }}</h5>
       <div class="d-flex flex-row gap-1 justify-content-end align-items-center">
         <button
           type="button"
           class="btn btn-sm btn-outline-primary"
           title="Modifica"
-          [routerLink]="'/t/comunicazioni/edit/' + comunicazione.id"
+          [routerLink]="'/t/comunicazioni/edit/' + comunicazione._id"
         >
           <fa-icon [icon]="EditIcon"></fa-icon> Modifica
         </button>
@@ -23,21 +23,21 @@
       </div>
     </div>
     <p class="card-text text-dark ellipsis-3-lines">
-      {{ comunicazione.contenuto }}
+      {{ comunicazione.content }}
     </p>
 
     <div class="d-flex flex-row justify-content-between align-items-end mt-4">
       <section class="flex-fill">
-        @if(comunicazione.attachments && comunicazione.attachments.length > 0) {
-        <small>{{ comunicazione.attachments.length }} Allegati: </small>
+        @if(attachments && attachments.length > 0) {
+        <small>{{ attachments.length }} Allegati: </small>
         <div class="d-flex flex-row mt-2">
-          @for(att of comunicazione.attachments; track $index){
+          @for(att of attachments; track $index){
           <span
             class="badge p-2 attachment-badge"
-            (click)="onRequestAttachmentView(att.id)"
+            (click)="onRequestAttachmentView(att._id)"
           >
-            <fa-icon [icon]="getFileIcon(att.extension)"></fa-icon>
-            {{ att.filename }}</span
+            <fa-icon [icon]="getFileIcon(att.extension!)"></fa-icon>
+            {{ att.name }}</span
           >
           }
         </div>
@@ -45,7 +45,7 @@
       </section>
 
       <span class="small"
-        >Ultima modifica: {{ comunicazione.dataCreazione | date:'short' }}</span
+        >Ultima modifica: {{ comunicazione.createdAt | date:'short' }}</span
       >
     </div>
   </div>
