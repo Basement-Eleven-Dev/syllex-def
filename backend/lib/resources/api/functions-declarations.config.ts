@@ -161,4 +161,34 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     method: "get",
     role: "logged",
   },
+  {
+    apiRoute: "tests",
+    functionPath: "tests/getTests.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "tests",
+    functionPath: "tests/createTest.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "tests/{testId}",
+    functionPath: "tests/getTestById.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "tests/{testId}",
+    functionPath: "tests/editTest.ts",
+    method: "put",
+    role: "teacher",
+  },
+  {
+    apiRoute: "tests/{testId}",
+    functionPath: "tests/deleteTest.ts",
+    method: "delete",
+    role: "teacher",
+  },
 ];

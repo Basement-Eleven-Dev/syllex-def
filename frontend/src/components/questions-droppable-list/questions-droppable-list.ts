@@ -5,6 +5,10 @@ import {
   Output,
   ViewChild,
   ViewChildren,
+  QueryList,
+  OnChanges,
+  SimpleChanges,
+  AfterViewInit,
 } from '@angular/core';
 import {
   CdkDragDrop,
@@ -13,8 +17,9 @@ import {
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
-import { QuestionInterface } from '../../services/questions';
+import { QuestionInterface, QuestionsService } from '../../services/questions';
 import { QuestionCard } from '../question-card/question-card';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-questions-droppable-list',
@@ -23,17 +28,92 @@ import { QuestionCard } from '../question-card/question-card';
   templateUrl: './questions-droppable-list.html',
   styleUrl: './questions-droppable-list.scss',
 })
-export class QuestionsDroppableList {
+export class QuestionsDroppableList implements OnChanges, AfterViewInit {
   @Input() testName: string = 'Nuovo Test';
+  @Input() questionsToLoad?: { questionId: string; points: number }[];
   @Output() questionsChanged = new EventEmitter<QuestionInterface[]>();
   @Output() saveTest = new EventEmitter<{
     name: string;
     questions: QuestionInterface[];
   }>();
 
-  @ViewChildren(QuestionCard) questionCards!: QuestionCard[];
+  @ViewChildren(QuestionCard) questionCards!: QueryList<QuestionCard>;
 
   selectedQuestions: QuestionInterface[] = [];
+  questionPointsMap: Map<string, number> = new Map();
+  isLoadingQuestions = false;
+
+  constructor(private questionsService: QuestionsService) {}
+
+  ngAfterViewInit(): void {
+    // Quando i QuestionCard cambiano, imposta i punteggi
+    this.questionCards.changes.subscribe(() => {
+      this.setQuestionPoints();
+    });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['questionsToLoad'] && this.questionsToLoad) {
+      this.loadQuestionsFromIds(this.questionsToLoad);
+    }
+  }
+
+  loadQuestionsFromIds(
+    questionsData: { questionId: string; points: number }[],
+  ): void {
+    if (!questionsData || questionsData.length === 0) {
+      return;
+    }
+
+    console.log('Loading questions from IDs:', questionsData);
+    this.isLoadingQuestions = true;
+    this.questionPointsMap.clear();
+
+    // Crea array di observables per caricare tutte le domande
+    const loadObservables = questionsData.map((qData) => {
+      this.questionPointsMap.set(qData.questionId, qData.points);
+      return this.questionsService.loadQuestion(qData.questionId);
+    });
+
+    forkJoin(loadObservables).subscribe({
+      next: (questions) => {
+        console.log('Questions loaded successfully:', questions);
+        // Mantieni l'ordinamento originale
+        this.selectedQuestions = questions;
+        this.isLoadingQuestions = false;
+        this.emitChanges();
+
+        // Imposta i punteggi (il subscription ai changes li gestirà automaticamente)
+        this.setQuestionPoints();
+      },
+      error: (error) => {
+        console.error('Errore durante il caricamento delle domande:', error);
+        this.isLoadingQuestions = false;
+      },
+    });
+  }
+
+  setQuestionPoints(): void {
+    const cardsArray = this.questionCards?.toArray() || [];
+    console.log(
+      'Setting points for cards:',
+      cardsArray.length,
+      'Questions:',
+      this.selectedQuestions.length,
+    );
+    cardsArray.forEach((card, index) => {
+      const question = this.selectedQuestions[index];
+      if (question) {
+        const savedPoints = this.questionPointsMap.get(question._id);
+        if (savedPoints !== undefined) {
+          console.log(
+            `Setting ${savedPoints} points for question ${question._id}`,
+          );
+          card.points = savedPoints;
+        }
+      }
+    });
+  }
 
   onDrop(event: CdkDragDrop<QuestionInterface[]>): void {
     if (event.previousContainer === event.container) {
@@ -95,7 +175,8 @@ export class QuestionsDroppableList {
   }
 
   getTotalPoints(): number {
-    return this.questionCards.reduce((total, card) => {
+    if (!this.questionCards) return 0;
+    return this.questionCards.toArray().reduce((total, card) => {
       return total + (card.points || 0);
     }, 0);
   }

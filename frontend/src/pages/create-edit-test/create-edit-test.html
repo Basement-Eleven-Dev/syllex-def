@@ -3,9 +3,19 @@
   [label]="'Torna alla lista dei test'"
 ></app-back-to>
 
-<h1 class="text-dark fw-bold mb-0 display-6">Nuovo Test di valutazione</h1>
+<h1 class="text-dark fw-bold mb-0 display-6">
+  {{ isEditMode() ? 'Modifica Test di valutazione' : 'Nuovo Test di valutazione'
+  }}
+</h1>
 <p class="text-dark mb-5">Prepara il prossimo test per le tue classi</p>
 
+@if (isLoading()) {
+<div class="d-flex justify-content-center align-items-center py-5">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Caricamento...</span>
+  </div>
+</div>
+} @else {
 <form [formGroup]="testForm" class="d-flex flex-column gap-4">
   <section class="form-section">
     <label for="test-title" class="form-label fw-semibold text-dark"
@@ -116,7 +126,9 @@
         <app-search-questions></app-search-questions>
       </div>
       <div class="col-6">
-        <app-questions-droppable-list></app-questions-droppable-list>
+        <app-questions-droppable-list
+          [questionsToLoad]="questionsToLoad()"
+        ></app-questions-droppable-list>
       </div>
     </div>
   </section>
@@ -132,13 +144,18 @@
         >
         <input
           type="number"
-          min="0"
-          max="100"
+          min="1"
+          [max]="maxScore || 100"
           id="required-score"
           class="form-control custom-input"
           formControlName="requiredScore"
-          placeholder="Imposta il punteggio minimo per superare il test"
+          [placeholder]="maxScore > 0 ? 'Max: ' + maxScore + ' punti' : 'Imposta il punteggio minimo per superare il test'"
         />
+        @if (maxScore > 0) {
+        <small class="text-muted"
+          >Punteggio massimo del test: {{ maxScore }} punti</small
+        >
+        }
       </div>
       <div class="col-4">
         <label for="max-time" class="form-label fw-semibold text-dark"
@@ -168,15 +185,23 @@
   </section>
 
   <div class="d-flex flex-row justify-content-end mt-5 gap-3">
-    <button class="btn btn-light btn-lg fs-3" (click)="onSaveTest(true)">
+    <button
+      class="btn btn-light btn-lg fs-3"
+      type="button"
+      (click)="onSaveTest(true)"
+      [disabled]="isLoading() || !canSaveDraft"
+    >
       <fa-icon [icon]="DraftIcon"></fa-icon>
       Salva Bozza
     </button>
     <button
       class="btn btn-success text-white btn-lg fs-3"
+      type="button"
       (click)="onSaveTest()"
+      [disabled]="isLoading() || !canPublish"
     >
       <fa-icon [icon]="SaveIcon"></fa-icon> Salva
     </button>
   </div>
 </form>
+}

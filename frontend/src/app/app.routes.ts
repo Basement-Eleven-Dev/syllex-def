@@ -76,6 +76,10 @@ export const routes: Routes = [
         component: CreateEditTest,
       },
       {
+        path: 'tests/edit/:testId',
+        component: CreateEditTest,
+      },
+      {
         path: 'tests/:testId',
         component: TestDetail,
       },
