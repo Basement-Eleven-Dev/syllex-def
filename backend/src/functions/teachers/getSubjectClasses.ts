@@ -12,7 +12,7 @@ const getSubjectClasses = async (
   let teacherId = context.user?._id;
   const db = await getDefaultDatabase();
   const assignments = await db
-    .collection("class_has_teacher")
+    .collection("teacher_assignments")
     .find({ teacherId: teacherId, subjectId: subjectId })
     .toArray();
 

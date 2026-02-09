@@ -108,7 +108,12 @@ export class Comunicazioni {
     this.page.set(1);
   }
 
-  onNewPageRequested(): void {
-    // La gestione è automatica tramite il two-way binding e l'effect
+  onComunicazioneDeleted($event: string) {
+    // Rimuovi la comunicazione eliminata dalla lista
+    this.rawComunicazioni.set(
+      this.rawComunicazioni().filter((c) => c._id !== $event),
+    );
+    // Aggiorna la dimensione della collezione
+    this.collectionSize.set(this.collectionSize() - 1);
   }
 }

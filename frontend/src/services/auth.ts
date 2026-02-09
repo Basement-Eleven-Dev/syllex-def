@@ -7,6 +7,9 @@ import {
   fetchAuthSession,
   getCurrentUser,
   signOut,
+  updatePassword,
+  updateUserAttribute,
+  confirmUserAttribute,
 } from 'aws-amplify/auth';
 import { HttpClient } from '@angular/common/http';
 
@@ -25,13 +28,19 @@ export interface User {
   firstName?: string;
   lastName?: string;
   role: 'teacher' | 'student' | 'admin';
-  organizationIds?: string[];
+  organizationId: string;
+}
+
+export interface OrganizationInterface {
+  _id: string;
+  name: string;
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class Auth {
+  organizationName$ = new BehaviorSubject<string | null>(null);
   user$ = new BehaviorSubject<User | null>(null);
   isInitialized = signal(false);
 
@@ -42,11 +51,7 @@ export class Auth {
   constructor(private http: HttpClient) {
     this.checkCurrentUser();
   }
-  /*
-    Effettua il login dell'utente
-    @param email L'email dell'utente
-    @param password La password dell'utente
-   */
+
   async login(
     credentials: SignInInput,
   ): Promise<{ success: boolean; message: string }> {
@@ -58,6 +63,7 @@ export class Auth {
 
       if (user) {
         this.user$.next(user);
+        this.getOrganizationById(user!.organizationId);
         return { success: true, message: 'Login riuscito' };
       } else {
         return {
@@ -87,6 +93,7 @@ export class Auth {
     try {
       const user = await firstValueFrom(this.http.get<User | null>('profile'));
       this.user$.next(user || null);
+      this.getOrganizationById(user!.organizationId);
     } catch (error) {
       this.user$.next(null);
     } finally {
@@ -94,12 +101,14 @@ export class Auth {
     }
   }
 
-  /* 
-    @piero
-    Invia email con codice di reset password
-    Invalida il codice precedente se esiste
-    @param email L'email dell'utente a cui inviare il codice
-   */
+  getOrganizationById(organizationId: string) {
+    this.http
+      .get<OrganizationInterface>(`organizations/${organizationId}`)
+      .subscribe((org) => {
+        this.organizationName$.next(org.name);
+      });
+  }
+
   sendResetPasswordCode(email: string): Observable<{
     success: boolean;
     message: string;
@@ -118,12 +127,6 @@ export class Auth {
     });
   }
 
-  /* 
-    @piero
-    Verifica il codice di reset password
-    @param email L'email dell'utente a cui inviare il codice
-    @param code Il codice di reset password da verificare
-   */
   checkResetPasswordCode(
     email: string,
     code: string,
@@ -140,13 +143,6 @@ export class Auth {
     });
   }
 
-  /* 
-    @piero
-    Reimposta la password dell'utente
-    Viene chiamato dopo la verifica del codice
-    @param email L'email dell'utente
-    @param newPassword La nuova password da impostare
-   */
   resetPassword(
     email: string,
     newPassword: string,
@@ -172,6 +168,85 @@ export class Auth {
       return {
         success: false,
         message: error.message || 'Errore durante il logout',
+      };
+    }
+  }
+
+  async changeEmail(
+    newEmail: string,
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      await updateUserAttribute({
+        userAttribute: {
+          attributeKey: 'email',
+          value: newEmail,
+        },
+      });
+      return {
+        success: true,
+        message: 'Codice di verifica inviato alla nuova email',
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message || "Errore durante la modifica dell'email",
+      };
+    }
+  }
+
+  async verifyEmailChange(
+    code: string,
+    newEmail: string,
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      await confirmUserAttribute({
+        userAttributeKey: 'email',
+        confirmationCode: code,
+      });
+
+      // Aggiorna lo user locale
+      const currentUser = this.user$.value;
+      if (currentUser) {
+        this.user$.next({ ...currentUser, username: newEmail });
+      }
+
+      // Sincronizza con il database
+      await firstValueFrom(
+        this.http.patch('profile/email', { email: newEmail }),
+      );
+
+      return {
+        success: true,
+        message: 'Email aggiornata con successo',
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message || 'Codice non valido',
+      };
+    }
+  }
+
+  async changePassword(
+    oldPassword: string,
+    newPassword: string,
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      await updatePassword({ oldPassword, newPassword });
+      return {
+        success: true,
+        message: 'Password aggiornata con successo',
+      };
+    } catch (error: any) {
+      let message = 'Errore durante la modifica della password';
+      if (error.name === 'NotAuthorizedException') {
+        message = 'Password attuale non corretta';
+      } else if (error.name === 'InvalidPasswordException') {
+        message = 'La nuova password non rispetta i requisiti minimi';
+      }
+      return {
+        success: false,
+        message: error.message || message,
       };
     }
   }

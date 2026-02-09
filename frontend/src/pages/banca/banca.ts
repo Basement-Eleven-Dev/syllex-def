@@ -48,7 +48,7 @@ export class Banca {
 
   constructor(
     private questionsService: QuestionsService,
-    private materiaService: Materia,
+    public materiaService: Materia,
   ) {
     // Effect che triggera il load quando cambiano filtri o paginazione
     effect(() => {

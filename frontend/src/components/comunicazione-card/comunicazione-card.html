@@ -14,9 +14,11 @@
         <button
           type="button"
           class="btn btn-sm btn-outline-danger"
-          (click)="onDelete()"
           title="Rimuovi"
           confirmAction
+          [confirmMessage]="'Sei sicuro di voler eliminare la comunicazione dal titolo &quot;' + comunicazione.title + '&quot;?'"
+          confirmTitle="Conferma eliminazione"
+          (confirmed)="onDelete()"
         >
           <fa-icon [icon]="TrashIcon"></fa-icon> Elimina
         </button>

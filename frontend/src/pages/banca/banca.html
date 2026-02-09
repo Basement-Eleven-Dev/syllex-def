@@ -2,8 +2,9 @@
   <div>
     <h1 class="text-dark fw-bold mb-0 display-6">Banca Domande</h1>
     <p class="text-dark mb-0">
-      Qui puoi trovare tutte le domande con cui comporre i test di Scienze
-      Nautiche
+      Qui puoi trovare tutte le domande con cui comporre i test di
+      <span class="fw-bold">{{ materiaService.materiaSelected()?.name }}</span>.
+      Puoi cercare, filtrare e modificare le domande a tuo piacimento.
     </p>
   </div>
   <button
@@ -22,17 +23,18 @@
   ></app-questions-search-filters>
 </section>
 
-@for(question of questions(); track question.id; let last = $last; let i =
+@for(question of questions(); track question._id; let last = $last; let i =
 $index) {
 <div class="mt-4">
   <div
     app-question-card
     [question]="question"
-    [collapsed]="isQuestionCollapsed(question.id)"
+    [collapsed]="isQuestionCollapsed(question._id)"
     [showTestCompositionActions]="false"
     [showBancaActions]="true"
     [showExplanation]="true"
     [showPolicy]="true"
+    [collapsable]="true"
     (onExpand)="onQuestionExpanded($event)"
   ></div>
 </div>

@@ -4,6 +4,7 @@ import {
   Input,
   Output,
   computed,
+  inject,
   input,
 } from '@angular/core';
 import {
@@ -21,9 +22,11 @@ import {
   NgbDropdown,
   NgbDropdownToggle,
   NgbDropdownMenu,
+  NgbModal,
 } from '@ng-bootstrap/ng-bootstrap';
 import { MaterialeContextualMenu } from '../materiale-contextual-menu/materiale-contextual-menu';
 import { MaterialInterface } from '../../services/materiali-service';
+import { FileViewer } from '../file-viewer/file-viewer';
 
 @Component({
   selector: 'app-materiale-card',
@@ -47,6 +50,8 @@ export class MaterialeCard {
   @Output() renameItem = new EventEmitter<string>();
   @Output() deleteItem = new EventEmitter<void>();
   @Output() selectItemEvent = new EventEmitter<MouseEvent>();
+
+  modalService = inject(NgbModal);
 
   readonly ThreeDotsIcon = faEllipsisVertical;
   readonly RobotIcon = faRobot;
@@ -78,5 +83,18 @@ export class MaterialeCard {
   selectItem(event: MouseEvent): void {
     event.stopPropagation();
     this.selectItemEvent.emit(event);
+  }
+
+  requestOpenItem(): void {
+    if (this.isFolder) {
+      this.openItem.emit(this.item);
+    } else {
+      let modalRef = this.modalService.open(FileViewer, {
+        centered: true,
+        size: 'lg',
+      });
+      modalRef.componentInstance.docUrl = this.item.url;
+      modalRef.componentInstance.extension = this.item.extension;
+    }
   }
 }

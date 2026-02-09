@@ -1,4 +1,4 @@
-import { Component, Input, effect } from '@angular/core';
+import { Component, EventEmitter, Input, Output, effect } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import {
   faMarker,
@@ -9,11 +9,15 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ConfirmActionDirective } from '../../directives/confirm-action.directive';
 import { RouterModule } from '@angular/router';
 import { getFileIcon } from '../../app/_utils/file-icons';
-import { ComunicazioneInterface } from '../../services/comunicazioni-service';
+import {
+  ComunicazioneInterface,
+  ComunicazioniService,
+} from '../../services/comunicazioni-service';
 import {
   MaterialInterface,
   MaterialiService,
 } from '../../services/materiali-service';
+import { FeedbackService } from '../../services/feedback-service';
 
 @Component({
   selector: 'div[app-comunicazione-card]',
@@ -28,7 +32,11 @@ export class ComunicazioneCard {
 
   attachments: MaterialInterface[] = [];
 
-  constructor(private materialiService: MaterialiService) {
+  constructor(
+    private materialiService: MaterialiService,
+    private comunicazioniService: ComunicazioniService,
+    private feedbackService: FeedbackService,
+  ) {
     // Reagisci ai cambiamenti del tree dei materiali
     effect(() => {
       const root = this.materialiService.root();
@@ -40,7 +48,31 @@ export class ComunicazioneCard {
     });
   }
 
-  onDelete() {}
+  @Output() deleted = new EventEmitter<string>();
+  onDelete() {
+    this.comunicazioniService
+      .deleteComunicazione(this.comunicazione._id!)
+      .subscribe({
+        next: (response) => {
+          console.log('Comunicazione eliminata con successo:', response);
+          this.feedbackService.showFeedback(
+            'Comunicazione eliminata con successo',
+            true,
+          );
+          this.deleted.emit(this.comunicazione._id!);
+        },
+        error: (error) => {
+          console.error(
+            "Errore durante l'eliminazione della comunicazione:",
+            error,
+          );
+          this.feedbackService.showFeedback(
+            "Errore durante l'eliminazione della comunicazione",
+            false,
+          );
+        },
+      });
+  }
 
   getFileIcon(extension: string): IconDefinition {
     return getFileIcon(extension);

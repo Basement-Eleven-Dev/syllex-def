@@ -24,6 +24,12 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
+    apiRoute: "teacher/classes",
+    functionPath: "teachers/getAllTeacherClasses.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
     apiRoute: "students",
     functionPath: "students/getStudents.ts",
     method: "post",
@@ -39,6 +45,12 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     apiRoute: "profile",
     functionPath: "profile/getMyProfile.ts",
     method: "get",
+    role: "logged",
+  },
+  {
+    apiRoute: "profile/email",
+    functionPath: "profile/updateEmail.ts",
+    method: "patch",
     role: "logged",
   },
   {
@@ -142,5 +154,11 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     functionPath: "communications/deleteCommunication.ts",
     method: "delete",
     role: "teacher",
+  },
+  {
+    apiRoute: "organizations/{organizationId}",
+    functionPath: "organizations/getOrganizationById.ts",
+    method: "get",
+    role: "logged",
   },
 ];

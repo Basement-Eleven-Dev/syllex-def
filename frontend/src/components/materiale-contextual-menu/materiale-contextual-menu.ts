@@ -4,6 +4,7 @@ import { NgbDropdownItem, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { RenameModal } from '../rename-modal/rename-modal';
 import { DatePipe } from '@angular/common';
 import { MaterialInterface } from '../../services/materiali-service';
+import { FileViewer } from '../file-viewer/file-viewer';
 
 @Component({
   selector: 'app-materiale-contextual-menu',
@@ -22,7 +23,7 @@ export class MaterialeContextualMenu {
   onRequestRenameItem() {
     const modalRef = this.modalService.open(RenameModal, {
       centered: true,
-      size: 'sm',
+      size: 'md',
     });
     modalRef.componentInstance.currentName = this.item.name;
 
@@ -34,6 +35,15 @@ export class MaterialeContextualMenu {
         // Modal dismissed
       },
     );
+  }
+
+  onRequestViewItem() {
+    let modalRef = this.modalService.open(FileViewer, {
+      centered: true,
+      size: 'lg',
+    });
+    modalRef.componentInstance.docUrl = this.item.url;
+    modalRef.componentInstance.extension = this.item.extension;
   }
 
   onRequestDeleteItem() {

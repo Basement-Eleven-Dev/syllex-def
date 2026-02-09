@@ -30,13 +30,6 @@ interface DashboardAction {
   action: () => void;
 }
 
-interface Communication {
-  title: string;
-  body: string;
-  date: Date;
-  attachmentCount: number;
-}
-
 @Component({
   selector: 'app-dashboard',
   imports: [FontAwesomeModule, DatePipe, Calendario, RouterModule],

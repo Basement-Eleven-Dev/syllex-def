@@ -3,16 +3,15 @@ import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import { getDefaultDatabase } from "../../_helpers/getDatabase";
 import { Subject } from "../../models/subject";
 import { ObjectId } from "mongodb";
-import { ClassHasTeacher } from "../../models/teacher_assignments";
 
-const getTeacherClasses = async (
+const getAllTeacherClasses = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
   let teacherId = context.user?._id;
   const db = await getDefaultDatabase();
   const assignments = await db
-    .collection<ClassHasTeacher>("teacher_assignments")
+    .collection("teacher_assignments")
     .find({ teacherId: teacherId })
     .toArray();
 
@@ -22,6 +21,18 @@ const getTeacherClasses = async (
     .find({ _id: { $in: classIds } })
     .toArray();
 
-  return classes;
+  const findClass = (classId: ObjectId) => {
+    return classes.find((cls) => cls._id.equals(classId));
+  };
+
+  let result = assignments.map((assignment) => {
+    const classInfo = findClass(assignment.classId);
+    return {
+      class: classInfo,
+      subjectId: assignment.subjectId,
+    };
+  });
+
+  return result;
 };
-export const handler = lambdaRequest(getTeacherClasses);
+export const handler = lambdaRequest(getAllTeacherClasses);

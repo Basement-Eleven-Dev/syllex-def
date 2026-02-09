@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, effect, signal } from '@angular/core';
 import { Auth } from './auth';
 import { Materia } from './materia';
+import { Observable } from 'rxjs/internal/Observable';
 
 export interface ClasseInterface {
   _id: string;
@@ -24,12 +25,12 @@ export class ClassiService {
     effect(() => {
       const materiaSelezionata = this.materiaService.materiaSelected();
       if (materiaSelezionata) {
-        this.getClassi();
+        this.getClassiMateriaSelezionata();
       }
     });
   }
 
-  getClassi() {
+  getClassiMateriaSelezionata() {
     let subjectId = this.materiaService.materiaSelected()?._id;
     if (!subjectId) {
       console.warn('Nessuna materia selezionata');
@@ -42,5 +43,19 @@ export class ClassiService {
         this.classi.set(classi);
         console.log('Classi del teacher:', classi);
       });
+  }
+
+  getAllAssegnazioni(): Observable<
+    {
+      class: ClasseInterface;
+      subjectId: string;
+    }[]
+  > {
+    return this.http.get<
+      {
+        class: ClasseInterface;
+        subjectId: string;
+      }[]
+    >(`teacher/classes`);
   }
 }

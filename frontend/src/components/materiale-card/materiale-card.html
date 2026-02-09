@@ -2,7 +2,7 @@
   class="card h-100"
   [class]="isFolder ? 'folder-card' : 'materiale-card'"
   [class.selected]="isSelected"
-  (dblclick)="openItem.emit(item)"
+  (dblclick)="requestOpenItem()"
   (click)="selectItem($event)"
 >
   <div class="card-body">

@@ -1,0 +1,114 @@
+<div class="modal-header">
+  <h5 class="modal-title">Modifica Email</h5>
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="Close"
+    (click)="onCancel()"
+  ></button>
+</div>
+
+<div class="modal-body">
+  @if (step() === 'email') {
+  <form [formGroup]="emailForm" (ngSubmit)="onSubmitEmail()">
+    <div class="mb-3">
+      <label for="newEmail" class="form-label">Nuova Email</label>
+      <input
+        type="email"
+        class="form-control"
+        id="newEmail"
+        formControlName="newEmail"
+        [class.is-invalid]="emailForm.get('newEmail')?.invalid && emailForm.get('newEmail')?.touched"
+        placeholder="nuova@email.com"
+      />
+      @if (emailForm.get('newEmail')?.invalid &&
+      emailForm.get('newEmail')?.touched) {
+      <div class="invalid-feedback">
+        @if (emailForm.get('newEmail')?.errors?.['required']) { L'email è
+        obbligatoria } @if (emailForm.get('newEmail')?.errors?.['email']) {
+        Inserisci un'email valida }
+      </div>
+      }
+    </div>
+
+    @if (errorMessage()) {
+    <div class="alert alert-danger" role="alert">{{ errorMessage() }}</div>
+    }
+
+    <div class="d-flex gap-2 justify-content-end">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="onCancel()"
+        [disabled]="isLoading()"
+      >
+        Annulla
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="isLoading() || emailForm.invalid"
+      >
+        @if (isLoading()) {
+        <span
+          class="spinner-border spinner-border-sm me-2"
+          role="status"
+          aria-hidden="true"
+        ></span>
+        } Conferma
+      </button>
+    </div>
+  </form>
+  } @if (step() === 'verification') {
+  <form [formGroup]="verificationForm" (ngSubmit)="onSubmitVerification()">
+    <div class="alert alert-info" role="alert">
+      Un codice di verifica è stato inviato alla tua nuova email.
+    </div>
+
+    <div class="mb-3">
+      <label for="code" class="form-label">Codice di Verifica</label>
+      <input
+        type="text"
+        class="form-control"
+        id="code"
+        formControlName="code"
+        [class.is-invalid]="verificationForm.get('code')?.invalid && verificationForm.get('code')?.touched"
+        placeholder="123456"
+        maxlength="6"
+      />
+      @if (verificationForm.get('code')?.invalid &&
+      verificationForm.get('code')?.touched) {
+      <div class="invalid-feedback">Il codice deve essere di 6 caratteri</div>
+      }
+    </div>
+
+    @if (errorMessage()) {
+    <div class="alert alert-danger" role="alert">{{ errorMessage() }}</div>
+    }
+
+    <div class="d-flex gap-2 justify-content-end">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="onCancel()"
+        [disabled]="isLoading()"
+      >
+        Annulla
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="isLoading() || verificationForm.invalid"
+      >
+        @if (isLoading()) {
+        <span
+          class="spinner-border spinner-border-sm me-2"
+          role="status"
+          aria-hidden="true"
+        ></span>
+        } Verifica
+      </button>
+    </div>
+  </form>
+  }
+</div>

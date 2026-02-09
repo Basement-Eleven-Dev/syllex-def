@@ -68,8 +68,13 @@
   </div>
 </section>
 
-@for(comunicazione of comunicazioni(); track comunicazione.id){
-<div class="mb-3" app-comunicazione-card [comunicazione]="comunicazione"></div>
+@for(comunicazione of comunicazioni(); track comunicazione._id){
+<div
+  class="mb-3"
+  app-comunicazione-card
+  [comunicazione]="comunicazione"
+  (deleted)="onComunicazioneDeleted($event)"
+></div>
 }
 
 <div class="mt-5 d-flex flex-row justify-content-between align-items-center">

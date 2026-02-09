@@ -35,13 +35,7 @@ export class TeacherLayout {
     });
   }
 
-  ngOnInit() {
-    this.feedbackService.showFeedback('Materia caricata con successo!', true);
-    this.feedbackService.showFeedback('Materia caricata con successo!', true);
-    this.feedbackService.showFeedback('Materia caricata con successo!', true);
-    this.feedbackService.showFeedback('Materia caricata con successo!', true);
-    this.feedbackService.showFeedback('Materia caricata con successo!', true);
-  }
+  ngOnInit() {}
 
   getRouteAnimationState() {
     return this.contexts
