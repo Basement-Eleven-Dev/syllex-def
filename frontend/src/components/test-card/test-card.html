@@ -1,32 +1,29 @@
 <div class="position-relative">
-  <div
-    class="card p-3 shadow-sm"
-    [class.has-pending-corrections]="test.hasPendingCorrections"
-  >
+  <div class="card p-3 shadow-sm" [class.has-pending-corrections]="false">
     <fa-icon [icon]="BackgroundIcon" class="background-icon"></fa-icon>
     <div class="card-body d-flex flex-column gap-4 align-items-start">
       <span [class]="'status-pill ' + test.status">{{ test.status }}</span>
-      <h4 class="card-title text-dark fw-bold">{{ test.title }}</h4>
+      <h4 class="card-title text-dark fw-bold">{{ test.name }}</h4>
       <section class="d-flex flex-column gap-2">
         <div class="text-dark">
           <fa-icon [icon]="ClockIcon" class="me-1"></fa-icon>
-          @if(test.availableDate && test.availableDate.length > 0) { {{
-          test.availableDate[0] | date: 'd MMM y' }} - {{ test.availableDate[1]
-          | date:'d MMM y' }} } @else {
-          <p>Sempre disponibile</p>
-          }
+          @if(test.availableFrom && test.availableTo) { Disponibile dal {{
+          test.availableFrom | date: 'd MMM y' }} al {{ test.availableTo | date:
+          'd MMM y' }} } @else if(test.availableFrom) { Disponibile dal {{
+          test.availableFrom | date: 'd MMM y' }} }
         </div>
         <div class="text-dark">
           <fa-icon [icon]="QuestionsIcon" class="me-1"></fa-icon>
-          {{ test.questionsCount }} Domande - {{ test.maxScore }} pt.
+          {{ test.questions?.length || 0 }} Domande - {{ getMaxScore() }} pt.
         </div>
         <div class="text-dark">
           <fa-icon [icon]="UsersIcon" class="me-1"></fa-icon>
-          @if(test.classesAssigned && test.classesAssigned.length > 0) {
-          @for(class of test.classesAssigned.slice(0, 2); track $index; let last
-          = $last) { {{ class }}@if(!last && test.classesAssigned.length > 1){
-          <span>, </span> } } @if(test.classesAssigned.length > 2) {
-          <span> e altre {{ test.classesAssigned.length - 2 }}</span>
+          @if(test.classIds && test.classIds.length > 0) { @for(class of
+          test.classIds.slice(0, 2); track $index; let last = $last) { {{
+          classiService.getClassNameById(class) }}@if(!last &&
+          test.classIds.length > 1){
+          <span>, </span> } } @if(test.classIds.length > 2) {
+          <span> e altre {{ test.classIds.length - 2 }}</span>
           } } @else {
           <span>Nessuna classe assegnata</span>
           }
@@ -35,12 +32,11 @@
       <div class="d-flex flex-row align-items-center w-100 gap-2">
         <button
           class="btn flex-fill"
-          [routerLink]="'/t/tests/' + test.id"
+          [routerLink]="'/t/tests/' + test._id"
           id="view-test-button"
-          [class.has-pending-corrections]="test.hasPendingCorrections"
+          [class.has-pending-corrections]="false"
         >
-          {{ test.hasPendingCorrections ? 'Visualizza e correggi' + ' (' +
-          test.hasPendingCorrections + ')' : 'Visualizza Test' }}
+          Visualizza Test
         </button>
         <div
           ngbDropdown
@@ -52,7 +48,7 @@
             <fa-icon [icon]="ThreeDotsIcon"></fa-icon>
           </button>
           <div ngbDropdownMenu>
-            <app-test-contextual-menu></app-test-contextual-menu>
+            <app-test-contextual-menu [test]="test"></app-test-contextual-menu>
           </div>
         </div>
       </div>

@@ -1,4 +1,10 @@
 <button ngbDropdownItem>Modifica</button>
+@if(['draft', 'archived'].includes(test.status!)) {
+<button ngbDropdownItem>Pubblica</button>
+} @else if(['published'].includes(test.status!)) {
+<button ngbDropdownItem>Archivia</button>
+}
+<button ngbDropdownItem>Archivia</button>
 <button ngbDropdownItem>Duplica</button>
 <button ngbDropdownItem>Assegna</button>
 <div class="dropdown-divider"></div>

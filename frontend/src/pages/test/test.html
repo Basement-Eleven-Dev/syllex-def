@@ -22,6 +22,8 @@
       id="search-term"
       placeholder="Cerca test..."
       style="min-width: 400px"
+      [value]="searchTerm()"
+      (input)="onSearchTermChange($any($event.target).value)"
     />
   </div>
 
@@ -33,6 +35,8 @@
       class="form-select custom-input"
       style="max-width: 200px"
       id="publication-status"
+      [value]="status()"
+      (change)="onStatusChange($any($event.target).value)"
     >
       <option value="">Stato</option>
       @for(status of ['bozza', 'pubblicato', 'archiviato']; track $index) {
@@ -48,10 +52,10 @@
 </section>
 
 @if(viewType === 'table'){
-<app-test-table [tests]="tests"></app-test-table>
+<app-test-table [tests]="tests()"></app-test-table>
 } @else {
 <div class="row">
-  @for(test of tests; track $index){
+  @for(test of tests(); track $index){
   <div class="col-12 col-lg-6 col-xl-4 mb-3">
     <app-test-card [test]="test"></app-test-card>
   </div>
@@ -65,18 +69,18 @@
   class="mt-5"
 >
   <ngb-pagination
-    [collectionSize]="collectionSize"
-    [(page)]="page"
-    [pageSize]="pageSize"
-    (pageChange)="onNewPageRequested()"
+    [collectionSize]="collectionSize()"
+    [page]="page()"
+    [pageSize]="pageSize()"
+    (pageChange)="onNewPageRequested($event)"
   >
   </ngb-pagination>
 
   <select
     class="form-select form-select-sm"
     style="width: auto"
-    [(ngModel)]="pageSize"
-    (ngModelChange)="onNewPageRequested()"
+    [value]="pageSize()"
+    (change)="onPageSizeChange(+$any($event.target).value)"
   >
     <option [ngValue]="5">5 per pagina</option>
     <option [ngValue]="10">10 per pagina</option>

@@ -10,11 +10,17 @@ export interface ClasseInterface {
   year: number;
   students: string[];
 }
+
+export interface AssegnazioneInterface {
+  class: ClasseInterface;
+  subjectId: string;
+}
 @Injectable({
   providedIn: 'root',
 })
 export class ClassiService {
   classi = signal<ClasseInterface[]>([]);
+  allAssegnazioni = signal<AssegnazioneInterface[]>([]);
 
   constructor(
     private http: HttpClient,
@@ -26,6 +32,7 @@ export class ClassiService {
       const materiaSelezionata = this.materiaService.materiaSelected();
       if (materiaSelezionata) {
         this.getClassiMateriaSelezionata();
+        this.getAllAssegnazioni();
       }
     });
   }
@@ -45,17 +52,18 @@ export class ClassiService {
       });
   }
 
-  getAllAssegnazioni(): Observable<
-    {
-      class: ClasseInterface;
-      subjectId: string;
-    }[]
-  > {
-    return this.http.get<
-      {
-        class: ClasseInterface;
-        subjectId: string;
-      }[]
-    >(`teacher/classes`);
+  getAllAssegnazioni() {
+    this.http
+      .get<AssegnazioneInterface[]>(`teacher/classes`)
+      .subscribe((assegnazioni) => {
+        this.allAssegnazioni.set(assegnazioni);
+      });
+  }
+
+  getClassNameById(classId: string): string {
+    console.log('Cercando nome per classId:', classId);
+    const classi = this.allAssegnazioni().map((a) => a.class);
+    const classe = classi.find((c) => c._id === classId);
+    return classe ? classe.name : 'Classe sconosciuta';
   }
 }

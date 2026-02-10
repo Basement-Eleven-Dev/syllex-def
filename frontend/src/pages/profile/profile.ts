@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, effect } from '@angular/core';
 import { Auth } from '../../services/auth';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faBuilding, faMarker } from '@fortawesome/pro-solid-svg-icons';
+import { faBook, faBuilding, faMarker } from '@fortawesome/pro-solid-svg-icons';
 import { AsyncPipe } from '@angular/common';
 import { Materia } from '../../services/materia';
 import { ClasseInterface, ClassiService } from '../../services/classi-service';
@@ -18,24 +18,30 @@ import { EditPassword } from '../../app/edit-password/edit-password';
 export class Profile {
   BuildingIcon = faBuilding;
   EditIcon = faMarker;
+  BookIcon = faBook;
   constructor(
     public authService: Auth,
     public materiaService: Materia,
     private classiService: ClassiService,
     private modalService: NgbModal,
-  ) {}
+  ) {
+    effect(() => {
+      const assegnazioni = this.classiService.allAssegnazioni();
+      if (assegnazioni) {
+        (console.log(assegnazioni),
+          (this.assegnazioni = assegnazioni.map((a) => ({
+            class: a.class,
+            subjectId: a.subjectId,
+          }))));
+      }
+    });
+  }
 
   assegnazioni: {
     class: ClasseInterface;
     subjectId: string;
   }[] = [];
-  ngOnInit(): void {
-    this.classiService.getAllAssegnazioni().subscribe((assegnazioni) => {
-      console.log('Assegnazioni ricevute:', assegnazioni);
-      this.assegnazioni = assegnazioni;
-      console.log(this.assegnazioni);
-    });
-  }
+  ngOnInit(): void {}
 
   countClasses(subjectId: string): number {
     return this.assegnazioni.filter(

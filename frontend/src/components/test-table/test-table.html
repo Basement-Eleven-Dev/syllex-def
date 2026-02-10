@@ -12,25 +12,28 @@
     </thead>
     <tbody>
       @for(test of tests; track $index){
-      <tr [class.row-with-pending-corrections]="test.hasPendingCorrections">
-        <td class="fw-bold">{{ test.title }}</td>
+      <tr [class.row-with-pending-corrections]="false">
+        <td class="fw-bold">{{ test.name }}</td>
         <td>
           <span [class]="'status-pill ' + test.status">{{ test.status }}</span>
         </td>
         <td>
-          @if(test.availableDate && test.availableDate.length > 0) { {{
-          test.availableDate[0] | date: 'd MMM y' }} - {{ test.availableDate[1]
-          | date:'d MMM y' }} } @else {
-          <p>Sempre disponibile</p>
-          }
+          @if(test.availableFrom && test.availableTo) { Disponibile dal {{
+          test.availableFrom | date: 'd MMM y' }} al {{ test.availableTo | date:
+          'd MMM y' }} } @else if(test.availableFrom) { Disponibile dal {{
+          test.availableFrom | date: 'd MMM y' }} }
         </td>
-        <td>{{ test.questionsCount }} Domande - {{ test.maxScore }} pt.</td>
         <td>
-          @if(test.classesAssigned && test.classesAssigned.length > 0) {
-          @for(class of test.classesAssigned.slice(0, 2); track $index; let last
-          = $last) { {{ class }}@if(!last && test.classesAssigned.length > 1){
-          <span>, </span> } } @if(test.classesAssigned.length > 2) {
-          <span> e altre {{ test.classesAssigned.length - 2 }}</span>
+          {{ test.questions?.length || 0 }} Domande - {{ getMaxScore(test) }}
+          pt.
+        </td>
+        <td>
+          @if(test.classIds && test.classIds.length > 0) { @for(class of
+          test.classIds.slice(0, 2); track $index; let last = $last) { {{
+          classiService.getClassNameById(class) }}@if(!last &&
+          test.classIds.length > 1){
+          <span>, </span> } } @if(test.classIds.length > 2) {
+          <span> e altre {{ test.classIds.length - 2 }}</span>
           } } @else {
           <span>Nessuna classe assegnata</span>
           }
@@ -38,12 +41,11 @@
         <td class="d-flex flex-row justify-content-end gap-2">
           <button
             class="btn view-test-button btn-sm"
-            [routerLink]="['/t/tests', test.id]"
-            [class.has-pending-corrections]="test.hasPendingCorrections"
+            [routerLink]="['/t/tests', test._id]"
+            [class.has-pending-corrections]="false"
           >
             <fa-icon [icon]="EyeIcon"></fa-icon>
-            {{ test.hasPendingCorrections ? 'Visualizza e correggi' + ' (' +
-            test.hasPendingCorrections + ')' : 'Visualizza Test' }}
+            Visualizza Test
           </button>
 
           <div
@@ -52,11 +54,13 @@
             container="body"
             placement="bottom-end"
           >
-            <button class="btn btn-primary btn-sm circle-btn" ngbDropdownToggle>
+            <button class="btn btn-light btn-sm circle-btn" ngbDropdownToggle>
               <fa-icon [icon]="ThreeDotsIcon"></fa-icon>
             </button>
             <div ngbDropdownMenu>
-              <app-test-contextual-menu></app-test-contextual-menu>
+              <app-test-contextual-menu
+                [test]="test"
+              ></app-test-contextual-menu>
             </div>
           </div>
         </td>

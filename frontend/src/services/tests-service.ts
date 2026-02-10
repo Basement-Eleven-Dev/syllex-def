@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { TestData } from '../pages/test/test';
 
 export interface TestInterface {
   _id?: string;
@@ -18,6 +17,7 @@ export interface TestInterface {
   draft?: boolean;
   status?: 'bozza' | 'pubblicato' | 'archiviato';
   subjectId?: string;
+  hasPendingCorrections?: boolean;
 }
 
 @Injectable({
@@ -26,10 +26,23 @@ export interface TestInterface {
 export class TestsService {
   constructor(private http: HttpClient) {}
 
-  getPaginatedTests(page: number, pageSize: number) {
-    return this.http.get<{ tests: TestData[]; total: number }>(
-      `tests?page=${page}&pageSize=${pageSize}`,
-    );
+  getPaginatedTests(
+    page: number,
+    pageSize: number,
+    searchTerm?: string,
+    status?: 'bozza' | 'pubblicato' | 'archiviato',
+  ) {
+    let url = `tests?page=${page}&pageSize=${pageSize}`;
+
+    if (searchTerm) {
+      url += `&searchTerm=${encodeURIComponent(searchTerm)}`;
+    }
+
+    if (status) {
+      url += `&status=${status}`;
+    }
+
+    return this.http.get<{ tests: TestInterface[]; total: number }>(url);
   }
 
   createTest(testData: TestInterface) {

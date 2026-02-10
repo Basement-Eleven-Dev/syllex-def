@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { TestData } from '../../pages/test/test';
-import { DatePipe, NgClass } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import {
   faCheckDouble,
   faClock,
@@ -17,18 +16,21 @@ import {
   NgbDropdownToggle,
   NgbDropdownMenu,
 } from '@ng-bootstrap/ng-bootstrap';
+import { TestInterface } from '../../services/tests-service';
+import { ClassiService } from '../../services/classi-service';
+import { ɵɵDir } from '@angular/cdk/scrolling';
 
 @Component({
   selector: 'app-test-card',
   imports: [
     DatePipe,
     FontAwesomeModule,
-    NgClass,
     TestContextualMenu,
     RouterModule,
     NgbDropdown,
     NgbDropdownToggle,
     NgbDropdownMenu,
+    ɵɵDir,
   ],
   templateUrl: './test-card.html',
   styleUrl: './test-card.scss',
@@ -40,5 +42,14 @@ export class TestCard {
   QuestionsIcon = faQuestionCircle;
   ThreeDotsIcon = faEllipsisVertical;
 
-  @Input() test!: TestData;
+  @Input() test!: TestInterface;
+
+  constructor(public classiService: ClassiService) {}
+
+  getMaxScore(): number {
+    if (!this.test.questions || this.test.questions.length === 0) {
+      return 0;
+    }
+    return this.test.questions.reduce((total, q) => total + q.points, 0);
+  }
 }
