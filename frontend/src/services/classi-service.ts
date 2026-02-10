@@ -54,7 +54,7 @@ export class ClassiService {
 
   getAllAssegnazioni() {
     this.http
-      .get<AssegnazioneInterface[]>(`teacher/classes`)
+      .get<AssegnazioneInterface[]>(`teacher/classes/all`)
       .subscribe((assegnazioni) => {
         this.allAssegnazioni.set(assegnazioni);
       });

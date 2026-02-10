@@ -36,7 +36,7 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
-    apiRoute: "teacher/classes",
+    apiRoute: "teacher/classes/all",
     functionPath: "teachers/getAllClasses.ts",
     method: "get",
     role: "teacher",
@@ -115,7 +115,7 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
   },
   {
     apiRoute: "materials/move-batch",
-    functionPath: "materials/moveMaterial.ts",
+    functionPath: "materials/moveMaterialsBatch.ts",
     method: "post",
     role: "teacher",
   },
