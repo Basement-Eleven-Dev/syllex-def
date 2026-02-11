@@ -15,9 +15,10 @@ import {
   ComunicazioniService,
 } from '../../services/comunicazioni-service';
 import { Materia } from '../../services/materia';
+import { TestsService } from '../../services/tests-service';
 
 interface DashboardQuickLink {
-  value: number;
+  value: number | undefined;
   description: string;
   route: string;
   routeString: string;
@@ -42,6 +43,7 @@ export class Dashboard {
     public classiService: ClassiService,
     public materialiService: MaterialiService,
     public comunicazioniService: ComunicazioniService,
+    private testService: TestsService,
     private materiaService: Materia,
   ) {
     // Aggiorna reattivamente i quickLinks quando i dati dei service cambiano
@@ -55,32 +57,38 @@ export class Dashboard {
       const selectedMateria = this.materiaService.materiaSelected();
       if (selectedMateria) {
         this.loadRecentCommunications();
+        this.testService.countPublishedTests().subscribe((response) => {
+          this.quickLinks[1].value = response.count;
+        });
+        this.testService.countAssignmentsToGrade().subscribe((response) => {
+          this.quickLinks[2].value = response.count;
+        });
       }
     });
   }
   AttachmentIcon = faPaperclip;
   quickLinks: DashboardQuickLink[] = [
     {
-      value: 42,
+      value: undefined,
       description: 'Classi',
       route: '/classi',
       routeString: 'Vai alle Classi',
     },
     {
-      value: 15,
+      value: undefined,
       description: 'Test pubblicati',
       route: '/test-pubblicati',
       routeString: 'Vai ai test pubblicati',
     },
     {
-      value: 8,
-      description: 'Test da correggere',
+      value: undefined,
+      description: 'Consegne da correggere',
       route: '/assignments',
-      routeString: 'Vai ai Test da correggere',
+      routeString: 'Vai alle consegne da correggere',
       alert: true,
     },
     {
-      value: 5,
+      value: undefined,
       description: 'Materiali',
       route: '/materiali',
       routeString: 'Vai ai materiali',

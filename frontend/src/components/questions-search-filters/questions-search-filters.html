@@ -1,21 +1,18 @@
-<form [formGroup]="searchForm" class="d-flex flex-row flex-wrap gap-3">
+<form
+  [formGroup]="SearchForm"
+  class="d-flex flex-row flex-wrap align-items-center gap-3"
+>
   <div class="flex-fill">
-    <label for="search-term" class="form-label fw-semibold text-dark"
-      >Testo nella domanda</label
-    >
     <input
       type="text"
-      class="form-control custom-input"
-      placeholder="Cerca..."
+      class="form-control custom-input filter"
+      placeholder="Cerca domanda..."
       id="search-term"
       formControlName="searchTerm"
     />
   </div>
   <div>
-    <label for="search-term" class="form-label fw-semibold text-dark"
-      >Tipologia risposta</label
-    >
-    <select class="form-select custom-input" formControlName="type">
+    <select class="form-select custom-input filter" formControlName="type">
       <option value="">Tutte le tipologie</option>
       @for(type of ['scelta multipla', 'vero falso', 'risposta aperta']; track
       $index) {
@@ -24,10 +21,7 @@
     </select>
   </div>
   <div>
-    <label for="search-term" class="form-label fw-semibold text-dark"
-      >Argomento</label
-    >
-    <select class="form-select custom-input" formControlName="topicId">
+    <select class="form-select custom-input filter" formControlName="topicId">
       <option value="">Argomento</option>
       @for(topic of materiaService.materiaSelected()?.topics; track $index) {
       <option value="{{ topic._id }}">{{ topic.name | titlecase }}</option>
@@ -35,10 +29,7 @@
     </select>
   </div>
   <div>
-    <label for="search-term" class="form-label fw-semibold text-dark"
-      >Policy di visualizzazione</label
-    >
-    <select class="form-select custom-input" formControlName="policy">
+    <select class="form-select custom-input filter" formControlName="policy">
       <option value="">Policy</option>
       @for(type of ['public', 'private']; track $index) {
       <option value="{{ type }}">
@@ -47,4 +38,12 @@
       }
     </select>
   </div>
+  <button
+    type="button"
+    class="btn btn-outline-danger btn-sm"
+    (click)="resetFilters()"
+    title="Pulisci filtri"
+  >
+    <fa-icon [icon]="ClearIcon"></fa-icon>
+  </button>
 </form>

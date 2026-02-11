@@ -1,5 +1,5 @@
 import { TitleCasePipe } from '@angular/common';
-import { Component, EventEmitter, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, inject } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -7,11 +7,13 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { Materia } from '../../services/materia';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faXmark } from '@fortawesome/pro-solid-svg-icons';
 
 @Component({
   selector: 'app-questions-search-filters',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, TitleCasePipe],
+  imports: [FormsModule, ReactiveFormsModule, TitleCasePipe, FontAwesomeModule],
   templateUrl: './questions-search-filters.html',
   styleUrl: './questions-search-filters.scss',
 })
@@ -23,9 +25,13 @@ export class QuestionsSearchFilters implements OnInit {
     topicId?: string;
   }>();
 
-  constructor(public materiaService: Materia) {}
+  // Icons
+  protected readonly ClearIcon = faXmark;
 
-  searchForm: FormGroup = new FormGroup({
+  // Dependency Injection
+  protected readonly materiaService = inject(Materia);
+
+  protected SearchForm: FormGroup = new FormGroup({
     searchTerm: new FormControl(''),
     type: new FormControl(''),
     policy: new FormControl(''),
@@ -33,22 +39,29 @@ export class QuestionsSearchFilters implements OnInit {
   });
 
   ngOnInit(): void {
-    // Emetti i filtri ogni volta che il form cambia
-    this.searchForm.valueChanges.subscribe(() => {
+    this.SearchForm.valueChanges.subscribe(() => {
       this.emitFilters();
     });
 
-    // Emetti i filtri iniziali
     this.emitFilters();
+  }
+
+  resetFilters(): void {
+    this.SearchForm.reset({
+      searchTerm: '',
+      type: '',
+      policy: '',
+      topicId: '',
+    });
   }
 
   private emitFilters(): void {
     const filters: any = {};
 
-    const searchTerm = this.searchForm.get('searchTerm')?.value;
-    const type = this.searchForm.get('type')?.value;
-    const policy = this.searchForm.get('policy')?.value;
-    const topicId = this.searchForm.get('topicId')?.value;
+    const searchTerm = this.SearchForm.get('searchTerm')?.value;
+    const type = this.SearchForm.get('type')?.value;
+    const policy = this.SearchForm.get('policy')?.value;
+    const topicId = this.SearchForm.get('topicId')?.value;
 
     if (searchTerm) filters.searchTerm = searchTerm;
     if (type) filters.type = type;

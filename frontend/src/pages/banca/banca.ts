@@ -1,4 +1,11 @@
-import { Component, signal, computed, OnInit, effect } from '@angular/core';
+import {
+  Component,
+  signal,
+  computed,
+  OnInit,
+  effect,
+  inject,
+} from '@angular/core';
 import { QuestionsSearchFilters } from '../../components/questions-search-filters/questions-search-filters';
 import { QuestionCard } from '../../components/question-card/question-card';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -23,38 +30,36 @@ import { Materia } from '../../services/materia';
   styleUrl: './banca.scss',
 })
 export class Banca {
-  PlusIcon = faPlus;
+  // Icons
+  protected readonly PlusIcon = faPlus;
 
-  // Signals per state management
-  private rawQuestions = signal<QuestionInterface[]>([]);
-  private expandedQuestionId = signal<string | null>(null);
+  // Dependency Injection
+  private readonly questionsService = inject(QuestionsService);
+  protected readonly materiaService = inject(Materia);
 
-  // Pagination signals
-  page = signal(1);
-  pageSize = signal(10);
-  collectionSize = signal(0);
+  // Signals
+  private RawQuestions = signal<QuestionInterface[]>([]);
+  private ExpandedQuestionId = signal<string | null>(null);
+  Page = signal(1);
+  PageSize = signal(10);
+  CollectionSize = signal(0);
 
-  // Filter signals
-  private filters = signal<{
+  private Filters = signal<{
     searchTerm?: string;
     type?: 'scelta multipla' | 'vero falso' | 'risposta aperta';
     policy?: 'public' | 'private';
     topicId?: string;
   }>({});
 
-  questions = computed<QuestionInterface[]>(() => {
-    return this.rawQuestions();
+  Questions = computed<QuestionInterface[]>(() => {
+    return this.RawQuestions();
   });
 
-  constructor(
-    private questionsService: QuestionsService,
-    public materiaService: Materia,
-  ) {
-    // Effect che triggera il load quando cambiano filtri o paginazione
+  constructor() {
     effect(() => {
-      const currentFilters = this.filters();
-      const currentPage = this.page();
-      const currentPageSize = this.pageSize();
+      const currentFilters = this.Filters();
+      const currentPage = this.Page();
+      const currentPageSize = this.PageSize();
 
       this.loadQuestions(
         currentFilters.searchTerm,
@@ -65,6 +70,29 @@ export class Banca {
         currentPageSize,
       );
     });
+  }
+
+  onFiltersChanged(filters: {
+    searchTerm?: string;
+    type?: 'scelta multipla' | 'vero falso' | 'risposta aperta';
+    policy?: 'public' | 'private';
+    topicId?: string;
+  }): void {
+    this.Filters.set(filters);
+    this.Page.set(1);
+  }
+
+  onQuestionExpanded(questionId: string): void {
+    const currentExpanded = this.ExpandedQuestionId();
+    if (questionId === '' || currentExpanded === questionId) {
+      this.ExpandedQuestionId.set(null);
+    } else {
+      this.ExpandedQuestionId.set(questionId);
+    }
+  }
+
+  isQuestionCollapsed(questionId: string): boolean {
+    return this.ExpandedQuestionId() !== questionId;
   }
 
   private loadQuestions(
@@ -88,35 +116,12 @@ export class Banca {
       )
       .subscribe({
         next: (response) => {
-          this.rawQuestions.set(response.questions);
-          this.collectionSize.set(response.total);
+          this.RawQuestions.set(response.questions);
+          this.CollectionSize.set(response.total);
         },
         error: (err) => {
           console.error('Errore nel caricamento delle domande:', err);
         },
       });
-  }
-
-  onFiltersChanged(filters: {
-    searchTerm?: string;
-    type?: 'scelta multipla' | 'vero falso' | 'risposta aperta';
-    policy?: 'public' | 'private';
-    topicId?: string;
-  }): void {
-    this.filters.set(filters);
-    this.page.set(1); // Reset pagina quando cambiano i filtri
-  }
-
-  onQuestionExpanded(questionId: string): void {
-    const currentExpanded = this.expandedQuestionId();
-    if (questionId === '' || currentExpanded === questionId) {
-      this.expandedQuestionId.set(null);
-    } else {
-      this.expandedQuestionId.set(questionId);
-    }
-  }
-
-  isQuestionCollapsed(questionId: string): boolean {
-    return this.expandedQuestionId() !== questionId;
   }
 }

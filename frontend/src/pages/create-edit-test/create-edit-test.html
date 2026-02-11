@@ -3,20 +3,17 @@
   [label]="'Torna alla lista dei test'"
 ></app-back-to>
 
-<h1 class="text-dark fw-bold mb-0 display-6">
-  {{ isEditMode() ? 'Modifica Test di valutazione' : 'Nuovo Test di valutazione'
-  }}
-</h1>
+<h1 class="text-dark fw-bold mb-0 display-6">{{ PageTitle() }}</h1>
 <p class="text-dark mb-5">Prepara il prossimo test per le tue classi</p>
 
-@if (isLoading()) {
+@if (IsLoading()) {
 <div class="d-flex justify-content-center align-items-center py-5">
   <div class="spinner-border text-primary" role="status">
     <span class="visually-hidden">Caricamento...</span>
   </div>
 </div>
 } @else {
-<form [formGroup]="testForm" class="d-flex flex-column gap-4">
+<form [formGroup]="TestForm" class="d-flex flex-column gap-4">
   <section class="form-section">
     <label for="test-title" class="form-label fw-semibold text-dark"
       >Titolo del test</label
@@ -127,7 +124,7 @@
       </div>
       <div class="col-6">
         <app-questions-droppable-list
-          [questionsToLoad]="questionsToLoad()"
+          [questionsToLoad]="QuestionsToLoad()"
         ></app-questions-droppable-list>
       </div>
     </div>
@@ -186,19 +183,19 @@
 
   <div class="d-flex flex-row justify-content-end mt-5 gap-3">
     <button
-      class="btn btn-light btn-lg fs-3"
+      class="btn btn-light btn-lg icon-btn"
       type="button"
       (click)="onSaveTest(true)"
-      [disabled]="isLoading() || !canSaveDraft"
+      [disabled]="IsLoading() || !CanSaveDraft()"
     >
       <fa-icon [icon]="DraftIcon"></fa-icon>
       Salva Bozza
     </button>
     <button
-      class="btn btn-success text-white btn-lg fs-3"
+      class="btn btn-success text-white btn-lg icon-btn"
       type="button"
       (click)="onSaveTest()"
-      [disabled]="isLoading() || !canPublish"
+      [disabled]="IsLoading() || !CanPublish()"
     >
       <fa-icon [icon]="SaveIcon"></fa-icon> Salva
     </button>

@@ -18,6 +18,8 @@ import {
   MaterialiService,
 } from '../../services/materiali-service';
 import { FeedbackService } from '../../services/feedback-service';
+import { FileViewer } from '../file-viewer/file-viewer';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'div[app-comunicazione-card]',
@@ -36,8 +38,8 @@ export class ComunicazioneCard {
     private materialiService: MaterialiService,
     private comunicazioniService: ComunicazioniService,
     private feedbackService: FeedbackService,
+    private modalService: NgbModal,
   ) {
-    // Reagisci ai cambiamenti del tree dei materiali
     effect(() => {
       const root = this.materialiService.root();
       if (root.length > 0 && this.comunicazione?.materialIds) {
@@ -78,8 +80,12 @@ export class ComunicazioneCard {
     return getFileIcon(extension);
   }
 
-  onRequestAttachmentView(attachmentId: string) {
-    console.log('Requesting view for attachment ID:', attachmentId);
-    // Implement the logic to view/download the attachment here
+  onRequestAttachmentView(attachment: MaterialInterface) {
+    let modalRef = this.modalService.open(FileViewer, {
+      centered: true,
+      size: 'lg',
+    });
+    modalRef.componentInstance.docUrl = attachment.url;
+    modalRef.componentInstance.extension = attachment.extension;
   }
 }

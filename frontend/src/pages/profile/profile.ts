@@ -1,10 +1,10 @@
-import { Component, effect } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { Auth } from '../../services/auth';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faBook, faBuilding, faMarker } from '@fortawesome/pro-solid-svg-icons';
 import { AsyncPipe } from '@angular/common';
 import { Materia } from '../../services/materia';
-import { ClasseInterface, ClassiService } from '../../services/classi-service';
+import { ClassInterface, ClassiService } from '../../services/classi-service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EditEmail } from '../../app/edit-email/edit-email';
 import { EditPassword } from '../../app/edit-password/edit-password';
@@ -16,35 +16,42 @@ import { EditPassword } from '../../app/edit-password/edit-password';
   styleUrl: './profile.scss',
 })
 export class Profile {
-  BuildingIcon = faBuilding;
-  EditIcon = faMarker;
-  BookIcon = faBook;
-  constructor(
-    public authService: Auth,
-    public materiaService: Materia,
-    private classiService: ClassiService,
-    private modalService: NgbModal,
-  ) {
+  // Dependency Injection
+  public authService = inject(Auth);
+  public materiaService = inject(Materia);
+  private classiService = inject(ClassiService);
+  private modalService = inject(NgbModal);
+
+  // Public Properties
+  public BuildingIcon = faBuilding;
+  public EditIcon = faMarker;
+  public BookIcon = faBook;
+  public Assegnazioni: {
+    class: ClassInterface;
+    subjectId: string;
+  }[] = [];
+
+  constructor() {
     effect(() => {
-      const assegnazioni = this.classiService.allAssegnazioni();
+      const assegnazioni = this.classiService.AllAssignments();
       if (assegnazioni) {
-        (console.log(assegnazioni),
-          (this.assegnazioni = assegnazioni.map((a) => ({
+        console.log(assegnazioni);
+        this.Assegnazioni = assegnazioni.map(
+          (a: { class: ClassInterface; subjectId: string }) => ({
             class: a.class,
             subjectId: a.subjectId,
-          }))));
+          }),
+        );
       }
     });
   }
 
-  assegnazioni: {
-    class: ClasseInterface;
-    subjectId: string;
-  }[] = [];
+  // Lifecycle Hooks
   ngOnInit(): void {}
 
+  // Public Methods
   countClasses(subjectId: string): number {
-    return this.assegnazioni.filter(
+    return this.Assegnazioni.filter(
       (assegnazione) => assegnazione.subjectId === subjectId,
     ).length;
   }

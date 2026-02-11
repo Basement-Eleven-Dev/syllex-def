@@ -1,7 +1,8 @@
 .classBadge {
   cursor: pointer;
-  background-color: var(--bs-gray-300);
-  color: var(--bs-gray-700);
+  border-radius: 8px;
+  font-size: 0.813rem;
+  color: var(--bs-primary);
   transition: all 0.2s ease-in-out;
 
   &:hover {
@@ -9,7 +10,7 @@
   }
 
   &.selected {
-    background-color: var(--bs-secondary);
-    color: var(--bs-dark);
+    background-color: var(--bs-primary);
+    color: var(--bs-white);
   }
 }

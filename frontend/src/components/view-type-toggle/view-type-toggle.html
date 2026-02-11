@@ -1,14 +1,14 @@
 <div class="btn-group">
   <button
     class="btn"
-    [ngClass]="{'btn-outline-primary': viewType() !== 'table', 'btn-secondary border-dark': viewType() === 'table'}"
+    [ngClass]="{'btn-outline-primary': viewType() !== 'table', 'btn-primary': viewType() === 'table'}"
     (click)="onChangeViewType('table')"
   >
     <fa-icon [icon]="ListIcon"></fa-icon>
   </button>
   <button
     class="btn"
-    [ngClass]="{'btn-outline-primary': viewType() !== 'grid', 'btn-secondary border-dark': viewType() === 'grid'}"
+    [ngClass]="{'btn-outline-primary': viewType() !== 'grid', 'btn-primary': viewType() === 'grid'}"
     (click)="onChangeViewType('grid')"
   >
     <fa-icon [icon]="GridIcon"></fa-icon>

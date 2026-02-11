@@ -25,6 +25,7 @@ import {
   faEllipsisVertical,
   faSparkles,
   faRobot,
+  faXmark,
 } from '@fortawesome/pro-solid-svg-icons';
 import {
   NgbDropdown,
@@ -65,49 +66,7 @@ import { FilesService } from '../../services/files-service';
   styleUrl: './materiali.scss',
 })
 export class Materiali {
-  ChevronRightIcon = faChevronRight;
-  PlusIcon = faPlus;
-  UploadIcon = faUpload;
-  ThreeDotsIcon = faEllipsisVertical;
-  SparklesIcon = faSparkles;
-  RobotIcon = faRobot;
-
-  viewType: ViewType = 'grid';
-
-  public materialiService = inject(MaterialiService);
-  private dragDropService = inject(MaterialeDragDropService);
-  private searchService = inject(MaterialeSearchService);
-  public selectionService = inject(MaterialeSelectionService);
-  private offCanvasService = inject(NgbOffcanvas);
-  private fileService = inject(FilesService);
-
-  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
-
-  searchTerm = signal<string>('');
-  highlightedItemId = signal<string | null>(null);
-  private folderBeforeSearch: MaterialInterface | null = null;
-  private isSearchActive = false;
-
-  constructor() {
-    effect(() => {
-      const term = this.searchTerm().trim();
-      if (term.length >= 2) {
-        if (!this.isSearchActive) {
-          this.folderBeforeSearch = { ...this.rootFolder() };
-          this.isSearchActive = true;
-        }
-        this.performSearch(term);
-      } else if (term.length === 0 && this.isSearchActive) {
-        if (this.folderBeforeSearch) {
-          this.materialiService.currentFolder.set(this.folderBeforeSearch);
-          this.folderBeforeSearch = null;
-        }
-        this.isSearchActive = false;
-        this.highlightedItemId.set(null);
-      }
-    });
-  }
-
+  // Costanti statiche
   private readonly ALLOWED_EXTENSIONS = [
     'pdf',
     'docx',
@@ -128,7 +87,32 @@ export class Materiali {
     createdAt: new Date(),
   };
 
-  rootFolder = computed(() => {
+  // ViewChild
+  @ViewChild('fileInput') FileInput!: ElementRef<HTMLInputElement>;
+
+  // Dependency Injection
+  readonly materialiService = inject(MaterialiService);
+  private readonly dragDropService = inject(MaterialeDragDropService);
+  private readonly searchService = inject(MaterialeSearchService);
+  readonly selectionService = inject(MaterialeSelectionService);
+  private readonly offCanvasService = inject(NgbOffcanvas);
+  private readonly fileService = inject(FilesService);
+
+  // Icons (readonly)
+  protected readonly chevronRightIcon = faChevronRight;
+  protected readonly plusIcon = faPlus;
+  protected readonly uploadIcon = faUpload;
+  protected readonly threeDotsIcon = faEllipsisVertical;
+  protected readonly sparklesIcon = faSparkles;
+  protected readonly robotIcon = faRobot;
+  protected readonly ClearIcon = faXmark;
+
+  // Signals
+  protected readonly viewType = signal<ViewType>('grid');
+  protected readonly searchTerm = signal<string>('');
+  protected readonly highlightedItemId = signal<string | null>(null);
+
+  protected readonly rootFolder = computed(() => {
     const current = this.materialiService.currentFolder();
     return (
       current || {
@@ -138,28 +122,63 @@ export class Materiali {
     );
   });
 
-  currentPathArray = computed(() => {
+  protected readonly currentPathArray = computed(() => {
     const folder = this.rootFolder();
     return this.materialiService.getCurrentPath(folder.name);
   });
 
-  onChangeViewType(type: ViewType): void {
-    this.viewType = type;
+  // Proprietà private
+  private FolderBeforeSearch: MaterialInterface | null = null;
+  private IsSearchActive = false;
+
+  constructor() {
+    effect(() => {
+      const term = this.searchTerm().trim();
+      if (term.length >= 2) {
+        if (!this.IsSearchActive) {
+          this.FolderBeforeSearch = { ...this.rootFolder() };
+          this.IsSearchActive = true;
+        }
+        this.performSearch(term);
+      } else if (term.length === 0 && this.IsSearchActive) {
+        if (this.FolderBeforeSearch) {
+          this.materialiService.currentFolder.set(this.FolderBeforeSearch);
+          this.FolderBeforeSearch = null;
+        }
+        this.IsSearchActive = false;
+        this.highlightedItemId.set(null);
+      }
+    });
   }
 
-  onSelectItem(item: MaterialInterface, event?: MouseEvent): void {
+  clearFilters(): void {
+    this.searchTerm.set('');
+    if (this.FolderBeforeSearch) {
+      this.materialiService.currentFolder.set(this.FolderBeforeSearch);
+      this.FolderBeforeSearch = null;
+    }
+    this.IsSearchActive = false;
+    this.highlightedItemId.set(null);
+  }
+
+  // Event Handlers
+  protected onChangeViewType(type: ViewType): void {
+    this.viewType.set(type);
+  }
+
+  protected onSelectItem(item: MaterialInterface, event?: MouseEvent): void {
     event?.stopPropagation();
     const isMultiSelect = event?.ctrlKey || event?.metaKey;
     this.selectionService.toggle(item._id!, isMultiSelect);
   }
 
-  isItemSelected(itemId: string): boolean {
+  protected isItemSelected(itemId: string): boolean {
     return this.selectionService.isSelected(itemId);
   }
 
-  onRequestOpenItem(item: MaterialInterface | string): void {
-    this.folderBeforeSearch = null;
-    this.isSearchActive = false;
+  protected onRequestOpenItem(item: MaterialInterface | string): void {
+    this.FolderBeforeSearch = null;
+    this.IsSearchActive = false;
 
     if (item === 'Home') {
       this.materialiService.currentFolder.set(null);
@@ -177,11 +196,11 @@ export class Materiali {
     }
   }
 
-  onRequestUpload(): void {
-    this.fileInput.nativeElement.click();
+  protected onRequestUpload(): void {
+    this.FileInput.nativeElement.click();
   }
 
-  onFileSelected(event: Event): void {
+  protected onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
 
@@ -216,15 +235,7 @@ export class Materiali {
     });
   }
 
-  private getFileExtension(filename: string): string {
-    return filename.split('.').pop()?.toLowerCase() || '';
-  }
-
-  private isExtensionAllowed(extension: string): boolean {
-    return this.ALLOWED_EXTENSIONS.includes(extension);
-  }
-
-  onCreateNewFolder() {
+  protected onCreateNewFolder(): void {
     this.materialiService
       .createMaterial(
         {
@@ -242,20 +253,19 @@ export class Materiali {
       });
   }
 
-  // Drag and Drop handlers
-  onDragStart(item: MaterialInterface, event: DragEvent): void {
+  protected onDragStart(item: MaterialInterface, event: DragEvent): void {
     this.dragDropService.startDrag(item, this.selectionService.getSelection());
     event.dataTransfer!.effectAllowed = 'move';
     event.dataTransfer!.setData('text/html', item._id!);
   }
 
-  onDragOver(event: DragEvent): void {
+  protected onDragOver(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
     event.dataTransfer!.dropEffect = 'move';
   }
 
-  onDragEnter(event: DragEvent): void {
+  protected onDragEnter(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
     const target = event.currentTarget as HTMLElement;
@@ -263,7 +273,7 @@ export class Materiali {
     target.classList.add(targetClass);
   }
 
-  onDragLeave(event: DragEvent): void {
+  protected onDragLeave(event: DragEvent): void {
     const target = event.currentTarget as HTMLElement;
     const relatedTarget = event.relatedTarget as HTMLElement;
 
@@ -272,7 +282,10 @@ export class Materiali {
     }
   }
 
-  onDrop(targetItem: MaterialInterface | string, event: DragEvent): void {
+  protected onDrop(
+    targetItem: MaterialInterface | string,
+    event: DragEvent,
+  ): void {
     event.preventDefault();
     event.stopPropagation();
 
@@ -285,7 +298,7 @@ export class Materiali {
     }
   }
 
-  onRequestDeleteItem(item: MaterialInterface): void {
+  protected onRequestDeleteItem(item: MaterialInterface): void {
     this.materialiService.deleteItem(item._id!).subscribe({
       next: () => {
         this.selectionService.clear();
@@ -294,13 +307,52 @@ export class Materiali {
     });
   }
 
-  onRequestRenameItem(item: MaterialInterface, newName: string): void {
+  protected onRequestRenameItem(
+    item: MaterialInterface,
+    newName: string,
+  ): void {
     this.materialiService.renameItem(item._id!, newName).subscribe({
       next: () => {},
       error: (err) => console.error('Errore durante la rinomina:', err),
     });
   }
 
+  protected getItemIcon(item: MaterialInterface): IconDefinition {
+    return item.type === 'folder'
+      ? getFolderIcon(false)
+      : getFileIcon(item.name);
+  }
+
+  protected getItemColor(item: MaterialInterface): string {
+    return item.type === 'folder'
+      ? getIconColor('folder')
+      : getIconColor(this.getFileExtension(item.name));
+  }
+
+  protected getItemType(item: MaterialInterface): string {
+    if (item.type === 'folder') {
+      return `Cartella (${item.content?.length || 0})`;
+    }
+    const ext = this.getFileExtension(item.name);
+    return ext ? ext.toUpperCase() : 'File';
+  }
+
+  protected getItemSize(item: MaterialInterface): string {
+    return item.type === 'folder' ? '-' : '-';
+  }
+
+  protected isAIGenerated(item: MaterialInterface): boolean {
+    return item.type !== 'folder' && item.aiGenerated === true;
+  }
+
+  protected onRequestGenerate(): void {
+    this.offCanvasService.open(GenAiContents, {
+      position: 'end',
+      backdrop: true,
+    });
+  }
+
+  // Private Methods
   private performSearch(term: string): void {
     const searchResult = this.searchService.search(
       term,
@@ -322,39 +374,11 @@ export class Materiali {
     }
   }
 
-  // Helper methods per visualizzazione tabellare
-  getItemIcon(item: MaterialInterface): IconDefinition {
-    return item.type === 'folder'
-      ? getFolderIcon(false)
-      : getFileIcon(item.name);
+  private getFileExtension(filename: string): string {
+    return filename.split('.').pop()?.toLowerCase() || '';
   }
 
-  getItemColor(item: MaterialInterface): string {
-    return item.type === 'folder'
-      ? getIconColor('folder')
-      : getIconColor(this.getFileExtension(item.name));
-  }
-
-  getItemType(item: MaterialInterface): string {
-    if (item.type === 'folder') {
-      return `Cartella (${item.content?.length || 0})`;
-    }
-    const ext = this.getFileExtension(item.name);
-    return ext ? ext.toUpperCase() : 'File';
-  }
-
-  getItemSize(item: MaterialInterface): string {
-    return item.type === 'folder' ? '-' : '-';
-  }
-
-  isAIGenerated(item: MaterialInterface): boolean {
-    return item.type !== 'folder' && item.aiGenerated === true;
-  }
-
-  onRequestGenerate(): void {
-    this.offCanvasService.open(GenAiContents, {
-      position: 'end',
-      backdrop: true,
-    });
+  private isExtensionAllowed(extension: string): boolean {
+    return this.ALLOWED_EXTENSIONS.includes(extension);
   }
 }

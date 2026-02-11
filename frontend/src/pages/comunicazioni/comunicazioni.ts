@@ -1,6 +1,6 @@
-import { Component, signal, computed, effect } from '@angular/core';
+import { Component, signal, computed, effect, inject } from '@angular/core';
 import { Materia } from '../../services/materia';
-import { faPlus } from '@fortawesome/pro-solid-svg-icons';
+import { faPlus, faXmark } from '@fortawesome/pro-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ComunicazioneCard } from '../../components/comunicazione-card/comunicazione-card';
 import { RouterModule } from '@angular/router';
@@ -25,37 +25,35 @@ import { ClassiService } from '../../services/classi-service';
   styleUrl: './comunicazioni.scss',
 })
 export class Comunicazioni {
-  PlusIcon = faPlus;
+  // Icons
+  protected readonly PlusIcon = faPlus;
+  protected readonly ClearIcon = faXmark;
 
-  // Signals per state management
-  private rawComunicazioni = signal<ComunicazioneInterface[]>([]);
+  // Dependency Injection
+  protected readonly materiaService = inject(Materia);
+  protected readonly classiService = inject(ClassiService);
+  private readonly comunicazioniService = inject(ComunicazioniService);
 
-  // Pagination signals
-  page = signal(1);
-  pageSize = signal(10);
-  collectionSize = signal(0);
+  // Signals
+  private RawComunicazioni = signal<ComunicazioneInterface[]>([]);
+  Page = signal(1);
+  PageSize = signal(10);
+  CollectionSize = signal(0);
+  SearchTerm = signal('');
+  SelectedClassId = signal('');
+  SelectedHasAttachments = signal('');
 
-  // Filter signals
-  searchTerm = signal('');
-  selectedClassId = signal('');
-  selectedHasAttachments = signal('');
-
-  comunicazioni = computed<ComunicazioneInterface[]>(() => {
-    return this.rawComunicazioni();
+  Comunicazioni = computed<ComunicazioneInterface[]>(() => {
+    return this.RawComunicazioni();
   });
 
-  constructor(
-    public materiaService: Materia,
-    private comunicazioniService: ComunicazioniService,
-    public classiService: ClassiService,
-  ) {
-    // Effect che triggera il load quando cambiano filtri o paginazione
+  constructor() {
     effect(() => {
-      const currentSearchTerm = this.searchTerm();
-      const currentClassId = this.selectedClassId();
-      const currentHasAttachments = this.selectedHasAttachments();
-      const currentPage = this.page();
-      const currentPageSize = this.pageSize();
+      const currentSearchTerm = this.SearchTerm();
+      const currentClassId = this.SelectedClassId();
+      const currentHasAttachments = this.SelectedHasAttachments();
+      const currentPage = this.Page();
+      const currentPageSize = this.PageSize();
 
       this.loadComunicazioni(
         currentSearchTerm,
@@ -65,6 +63,35 @@ export class Comunicazioni {
         currentPageSize,
       );
     });
+  }
+
+  clearFilters(): void {
+    this.SearchTerm.set('');
+    this.SelectedClassId.set('');
+    this.SelectedHasAttachments.set('');
+    this.Page.set(1);
+  }
+
+  onSearchTermChange(term: string): void {
+    this.SearchTerm.set(term);
+    this.Page.set(1);
+  }
+
+  onClassFilterChange(classId: string): void {
+    this.SelectedClassId.set(classId);
+    this.Page.set(1);
+  }
+
+  onAttachmentsFilterChange(value: string): void {
+    this.SelectedHasAttachments.set(value);
+    this.Page.set(1);
+  }
+
+  onComunicazioneDeleted($event: string): void {
+    this.RawComunicazioni.set(
+      this.RawComunicazioni().filter((c) => c._id !== $event),
+    );
+    this.CollectionSize.set(this.CollectionSize() - 1);
   }
 
   private loadComunicazioni(
@@ -84,36 +111,12 @@ export class Comunicazioni {
       )
       .subscribe({
         next: (response) => {
-          this.rawComunicazioni.set(response.communications);
-          this.collectionSize.set(response.total);
+          this.RawComunicazioni.set(response.communications);
+          this.CollectionSize.set(response.total);
         },
         error: (err) => {
           console.error('Errore nel caricamento delle comunicazioni:', err);
         },
       });
-  }
-
-  onSearchTermChange(term: string): void {
-    this.searchTerm.set(term);
-    this.page.set(1);
-  }
-
-  onClassFilterChange(classId: string): void {
-    this.selectedClassId.set(classId);
-    this.page.set(1);
-  }
-
-  onAttachmentsFilterChange(value: string): void {
-    this.selectedHasAttachments.set(value);
-    this.page.set(1);
-  }
-
-  onComunicazioneDeleted($event: string) {
-    // Rimuovi la comunicazione eliminata dalla lista
-    this.rawComunicazioni.set(
-      this.rawComunicazioni().filter((c) => c._id !== $event),
-    );
-    // Aggiorna la dimensione della collezione
-    this.collectionSize.set(this.collectionSize() - 1);
   }
 }

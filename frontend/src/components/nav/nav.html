@@ -1,18 +1,19 @@
 <div
-  class="bg-dark w-100 py-3 d-flex flex-row align-items-center container mt-4 gap-1 rounded-4"
+  class="bg-primary w-100 py-3 px-5 d-flex flex-row align-items-center container mt-4 gap-1 card"
 >
   <img
-    src="/images/logo_white.png"
+    src="/images/logotipo.svg"
     alt="Syllex Logo"
     height="40"
-    class="mx-3"
-    style="opacity: 0.5; cursor: pointer"
+    class="me-5"
+    style="opacity: 1; cursor: pointer"
     routerLink="/t/dashboard"
   />
-  <div class="flex-fill d-flex flex-row align-items-center gap-3 pe-4">
-    <span class="text-white"
-      >{{ now | date: 'dd MMMM, HH:mm' | titlecase }}
-    </span>
+  <div class="flex-fill d-flex flex-row align-items-center gap-3">
+    <button class="btn calendarBtn h-100">
+      <fa-icon [icon]="CalendarIcon"></fa-icon>
+      {{ now | date: 'dd - MM - yy' | titlecase }}
+    </button>
     <div class="flex-fill">
       <input
         type="text"
@@ -28,9 +29,6 @@
         style="cursor: pointer"
         class="d-flex flex-row align-items-center gap-2 btn btn-dark"
       >
-        <p class="text-white mb-0 fw-bold">
-          {{ authService.user?.firstName }} {{ authService.user?.lastName }}
-        </p>
         <a
           class="d-flex align-items-center justify-content-center text-white p-0"
         >

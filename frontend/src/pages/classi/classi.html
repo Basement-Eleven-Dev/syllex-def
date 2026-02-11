@@ -1,34 +1,46 @@
-<h1 class="text-dark fw-bold mb-0 display-6 d-flex align-items-center gap-3">
+<h1 class="text-dark fw-medium mb-3 display-6">
   Le tue classi di {{ materiaService.materiaSelected()!.name }}
 </h1>
-<p class="text-dark mb-0">Gestisci e visualizza le tue classi da qui.</p>
+<h5 class="text-dark mb-0 fw-normal">
+  Gestisci e visualizza le tue classi da qui.
+</h5>
 
-<section class="form-section d-flex flex-row align-items-center my-5">
+<section class="d-flex flex-row align-items-center my-5">
   <div>
-    <label for="search-term" class="form-label fw-semibold text-dark"
-      >Nome classe</label
-    >
     <input
       type="text"
       class="form-control me-3 custom-input"
       id="search-term"
       placeholder="Cerca classi..."
       style="min-width: 400px"
+      [value]="SearchTerm()"
+      (input)="onSearchTermChange($any($event.target).value)"
     />
   </div>
   <div class="ms-4">
-    <label for="year-filter" class="form-label fw-semibold text-dark"
-      >Anno di riferimento</label
+    <select
+      id="year-filter"
+      class="form-select custom-input"
+      style="min-width: 200px"
+      [value]="SelectedYear()"
+      (change)="onYearChange($any($event.target).value)"
     >
-    <select id="year-filter" class="form-select custom-input">
       <option value="">Tutti gli anni</option>
-      <option value="1">2023</option>
-      <option value="2">2024</option>
-      <option value="3">2025</option>
-      <option value="4">2026</option>
-      <option value="5">2027</option>
+      <option value="2026">2026</option>
+      <option value="2027">2027</option>
+      <option value="2028">2028</option>
+      <option value="2029">2029</option>
+      <option value="2030">2030</option>
     </select>
   </div>
+  <button
+    type="button"
+    class="btn btn-outline-danger ms-3 btn-sm"
+    (click)="clearFilters()"
+    title="Pulisci filtri"
+  >
+    <fa-icon [icon]="ClearIcon"></fa-icon>
+  </button>
   <app-view-type-toggle
     class="ms-auto"
     [viewType]="viewType"
@@ -38,9 +50,9 @@
 
 @if(viewType === 'grid') {
 <div class="row">
-  @for(classe of classiService.classi() ; track classe._id){
+  @for(classe of PaginatedClassi() ; track classe._id){
   <div class="col-12 col-md-6 col-lg-4 mb-4">
-    <div class="card p-3 h-100 shadow-sm overflow-hidden position-relative">
+    <div class="card p-3 h-100 overflow-hidden position-relative">
       <fa-icon [icon]="UsersIcon" class="background-icon"></fa-icon>
       <div
         class="card-body d-flex flex-column gap-4 align-items-start position-relative"
@@ -79,7 +91,7 @@
     </tr>
   </thead>
   <tbody>
-    @for(classe of classiService.classi(); track classe._id){
+    @for(classe of PaginatedClassi(); track classe._id){
     <tr>
       <td class="fw-bold text-dark">{{ classe.name }}</td>
       <td class="text-dark">
@@ -105,18 +117,18 @@
   class="mt-5"
 >
   <ngb-pagination
-    [collectionSize]="classiService.classi.length"
-    [(page)]="page"
-    [pageSize]="pageSize"
-    (pageChange)="onNewPageRequested()"
+    [collectionSize]="CollectionSize()"
+    [page]="Page()"
+    [pageSize]="PageSize()"
+    (pageChange)="onNewPageRequested($event)"
   >
   </ngb-pagination>
 
   <select
     class="form-select form-select-sm"
     style="width: auto"
-    [(ngModel)]="pageSize"
-    (ngModelChange)="onNewPageRequested()"
+    [ngModel]="PageSize()"
+    (ngModelChange)="onPageSizeChange($event)"
   >
     <option [ngValue]="5">5 per pagina</option>
     <option [ngValue]="10">10 per pagina</option>

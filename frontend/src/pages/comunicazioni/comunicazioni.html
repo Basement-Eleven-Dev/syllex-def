@@ -11,7 +11,7 @@
     </p>
   </div>
   <button
-    class="btn btn-primary btn-lg ms-auto py-3"
+    class="btn btn-primary btn-lg ms-auto py-3 icon-btn"
     routerLink="/t/comunicazioni/new"
   >
     <fa-icon [icon]="PlusIcon"></fa-icon>
@@ -19,56 +19,57 @@
   </button>
 </div>
 
-<section class="form-section d-flex flex-row align-items-center mb-5 gap-3">
+<section class="d-flex flex-row mb-5 gap-3 align-items-center">
   <div>
-    <label for="search-term" class="form-label fw-semibold text-dark"
-      >Contenuto della comunicazione</label
-    >
     <input
       type="text"
-      class="form-control me-3 custom-input"
+      class="form-control me-3 custom-input filter"
       id="search-term"
       placeholder="Cerca comunicazione tramite parole chiave..."
       style="min-width: 400px"
-      [ngModel]="searchTerm()"
+      [ngModel]="SearchTerm()"
       (ngModelChange)="onSearchTermChange($event)"
     />
   </div>
 
   <div>
-    <label for="class" class="form-label fw-semibold text-dark">Classe</label>
     <select
-      class="form-select custom-input"
-      style="max-width: 200px"
+      class="form-select custom-input filter"
+      style="min-width: 100px"
       id="class"
-      [ngModel]="selectedClassId()"
+      [ngModel]="SelectedClassId()"
       (ngModelChange)="onClassFilterChange($event)"
     >
-      <option value="">Tutte</option>
+      <option value="">Classi</option>
       @for(classe of classiService.classi(); track classe._id) {
       <option [value]="classe._id">{{ classe.name }}</option>
       }
     </select>
   </div>
   <div>
-    <label for="attachments" class="form-label fw-semibold text-dark"
-      >Allegati</label
-    >
     <select
-      class="form-select custom-input"
-      style="max-width: 200px"
+      class="form-select custom-input filter"
+      style="min-width: 100px"
       id="attachments"
-      [ngModel]="selectedHasAttachments()"
+      [ngModel]="SelectedHasAttachments()"
       (ngModelChange)="onAttachmentsFilterChange($event)"
     >
-      <option value="">Tutti</option>
+      <option value="">Allegati</option>
       <option value="true">Si</option>
       <option value="false">No</option>
     </select>
   </div>
+  <button
+    type="button"
+    class="btn btn-outline-danger btn-sm h-100"
+    (click)="clearFilters()"
+    title="Pulisci filtri"
+  >
+    <fa-icon [icon]="ClearIcon"></fa-icon>
+  </button>
 </section>
 
-@for(comunicazione of comunicazioni(); track comunicazione._id){
+@for(comunicazione of Comunicazioni(); track comunicazione._id){
 <div
   class="mb-3"
   app-comunicazione-card
@@ -79,18 +80,18 @@
 
 <div class="mt-5 d-flex flex-row justify-content-between align-items-center">
   <ngb-pagination
-    [collectionSize]="collectionSize()"
-    [page]="page()"
-    [pageSize]="pageSize()"
-    (pageChange)="page.set($event)"
+    [collectionSize]="CollectionSize()"
+    [page]="Page()"
+    [pageSize]="PageSize()"
+    (pageChange)="Page.set($event)"
   >
   </ngb-pagination>
 
   <select
     class="form-select form-select-sm"
     style="width: auto"
-    [ngModel]="pageSize()"
-    (ngModelChange)="pageSize.set($event); page.set(1)"
+    [ngModel]="PageSize()"
+    (ngModelChange)="PageSize.set($event); Page.set(1)"
   >
     <option [ngValue]="5">5 per pagina</option>
     <option [ngValue]="10">10 per pagina</option>

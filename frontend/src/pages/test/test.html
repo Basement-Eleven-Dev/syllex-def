@@ -1,85 +1,95 @@
 <div class="d-flex flex-row align-items-center mb-5">
   <div>
-    <h1 class="text-dark fw-bold mb-0 display-6">Lista dei test</h1>
-    <p class="text-dark mb-0">
+    <h1 class="text-dark fw-medium mb-3 display-6">Lista dei test</h1>
+    <h5 class="text-dark mb-0 fw-normal">
       Gestisci i test di valutazione da assegnare alle tue classi
-    </p>
+    </h5>
   </div>
-  <button class="btn btn-primary btn-lg ms-auto py-3" routerLink="/t/tests/new">
-    <fa-icon [icon]="PlusIcon"></fa-icon>
+  <button
+    class="btn btn-primary btn-lg ms-auto icon-btn py-3"
+    routerLink="/t/tests/new"
+  >
+    <fa-icon [icon]="PlusIcon" />
     Nuovo test
   </button>
 </div>
 
 <section class="form-section d-flex flex-row align-items-center mb-5 gap-3">
   <div>
-    <label for="search-term" class="form-label fw-semibold text-dark"
-      >Nome del test</label
-    >
     <input
       type="text"
-      class="form-control me-3 custom-input"
       id="search-term"
+      class="form-control me-3 custom-input"
       placeholder="Cerca test..."
       style="min-width: 400px"
-      [value]="searchTerm()"
+      [value]="SearchTerm()"
       (input)="onSearchTermChange($any($event.target).value)"
     />
   </div>
 
   <div>
-    <label for="publication-status" class="form-label fw-semibold text-dark"
-      >Stato di pubblicazione</label
-    >
     <select
+      id="publication-status"
       class="form-select custom-input"
       style="max-width: 200px"
-      id="publication-status"
-      [value]="status()"
+      [value]="Status()"
       (change)="onStatusChange($any($event.target).value)"
     >
       <option value="">Stato</option>
       @for(status of ['bozza', 'pubblicato', 'archiviato']; track $index) {
-      <option value="{{ status }}">{{ status | titlecase }}</option>
+      <option [value]="status">{{ status | titlecase }}</option>
       }
     </select>
   </div>
+  <button
+    type="button"
+    class="btn btn-outline-danger"
+    (click)="clearFilters()"
+    title="Pulisci filtri"
+  >
+    <fa-icon [icon]="ClearIcon"></fa-icon>
+  </button>
   <app-view-type-toggle
     class="ms-auto"
-    [viewType]="viewType"
+    [viewType]="ViewType"
     (viewTypeChange)="onChangeViewType($event)"
   />
 </section>
 
-@if(viewType === 'table'){
-<app-test-table [tests]="tests()"></app-test-table>
+@if(ViewType === 'table') {
+<app-test-table [tests]="Tests()" (delete)="onDeleteTest($event)" />
 } @else {
 <div class="row">
-  @for(test of tests(); track $index){
+  @for(test of Tests(); track test._id) {
   <div class="col-12 col-lg-6 col-xl-4 mb-3">
-    <app-test-card [test]="test"></app-test-card>
+    <app-test-card [test]="test" (delete)="onDeleteTest($event)" />
+  </div>
+  } @empty {
+  <div class="col-12">
+    <div class="alert alert-info text-center">
+      Nessun test trovato. Crea il tuo primo test!
+    </div>
   </div>
   }
 </div>
 }
 
 <div
-  [class.inTableView]="viewType === 'table'"
-  [class.inGridView]="viewType === 'grid'"
   class="mt-5"
+  [class.inTableView]="ViewType === 'table'"
+  [class.inGridView]="ViewType === 'grid'"
 >
   <ngb-pagination
-    [collectionSize]="collectionSize()"
-    [page]="page()"
-    [pageSize]="pageSize()"
+    [collectionSize]="CollectionSize()"
+    [page]="Page()"
+    [pageSize]="PageSize()"
     (pageChange)="onNewPageRequested($event)"
-  >
-  </ngb-pagination>
+  />
 
   <select
     class="form-select form-select-sm"
     style="width: auto"
-    [value]="pageSize()"
+    [value]="PageSize()"
     (change)="onPageSizeChange(+$any($event.target).value)"
   >
     <option [ngValue]="5">5 per pagina</option>

@@ -1,69 +1,70 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, effect, signal } from '@angular/core';
-import { Auth } from './auth';
+import { Injectable, effect, inject, signal } from '@angular/core';
 import { Materia } from './materia';
-import { Observable } from 'rxjs/internal/Observable';
 
-export interface ClasseInterface {
+export interface ClassInterface {
   _id: string;
   name: string;
   year: number;
   students: string[];
 }
 
-export interface AssegnazioneInterface {
-  class: ClasseInterface;
+export interface AssignmentInterface {
+  class: ClassInterface;
   subjectId: string;
 }
+
 @Injectable({
   providedIn: 'root',
 })
 export class ClassiService {
-  classi = signal<ClasseInterface[]>([]);
-  allAssegnazioni = signal<AssegnazioneInterface[]>([]);
+  private readonly http = inject(HttpClient);
+  private readonly materiaService = inject(Materia);
 
-  constructor(
-    private http: HttpClient,
-    private authService: Auth,
-    public materiaService: Materia,
-  ) {
-    // Usa effect per reagire ai cambiamenti di materiaSelected
+  readonly Classes = signal<ClassInterface[]>([]);
+  readonly AllAssignments = signal<AssignmentInterface[]>([]);
+
+  constructor() {
     effect(() => {
-      const materiaSelezionata = this.materiaService.materiaSelected();
-      if (materiaSelezionata) {
-        this.getClassiMateriaSelezionata();
-        this.getAllAssegnazioni();
+      const SelectedSubject = this.materiaService.materiaSelected();
+      if (SelectedSubject) {
+        this.loadClassesForSelectedSubject();
+        this.loadAllAssignments();
       }
     });
   }
 
-  getClassiMateriaSelezionata() {
-    let subjectId = this.materiaService.materiaSelected()?._id;
-    if (!subjectId) {
-      console.warn('Nessuna materia selezionata');
+  private loadClassesForSelectedSubject(): void {
+    const SubjectId = this.materiaService.materiaSelected()?._id;
+    if (!SubjectId) {
+      console.warn('No subject selected');
       return;
     }
-    console.log('Selected subject ID:', subjectId);
-    return this.http
-      .get<ClasseInterface[]>(`teacher/${subjectId}/classes`)
-      .subscribe((classi) => {
-        this.classi.set(classi);
-        console.log('Classi del teacher:', classi);
+
+    this.http
+      .get<ClassInterface[]>(`teacher/${SubjectId}/classes`)
+      .subscribe((classes) => {
+        this.Classes.set(classes);
+        console.log('Teacher classes loaded:', classes);
       });
   }
 
-  getAllAssegnazioni() {
+  private loadAllAssignments(): void {
     this.http
-      .get<AssegnazioneInterface[]>(`teacher/classes/all`)
-      .subscribe((assegnazioni) => {
-        this.allAssegnazioni.set(assegnazioni);
+      .get<AssignmentInterface[]>(`teacher/classes/all`)
+      .subscribe((assignments) => {
+        this.AllAssignments.set(assignments);
       });
   }
 
   getClassNameById(classId: string): string {
-    console.log('Cercando nome per classId:', classId);
-    const classi = this.allAssegnazioni().map((a) => a.class);
-    const classe = classi.find((c) => c._id === classId);
-    return classe ? classe.name : 'Classe sconosciuta';
+    const AllClasses = this.AllAssignments().map((a) => a.class);
+    const FoundClass = AllClasses.find((c) => c._id === classId);
+    return FoundClass ? FoundClass.name : 'Unknown class';
+  }
+
+  // Legacy compatibility - can be removed after migration
+  get classi() {
+    return this.Classes;
   }
 }

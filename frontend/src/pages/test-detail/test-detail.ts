@@ -23,6 +23,7 @@ import {
 } from '@fortawesome/angular-fontawesome';
 import { TestAssignments } from '../../components/test-assignments/test-assignments';
 import { TestStats } from '../../components/test-stats/test-stats';
+import { BackTo } from '../../components/back-to/back-to';
 
 interface TestDetailProps {
   title: string;
@@ -59,6 +60,7 @@ export interface Section {
     FontAwesomeModule,
     TestAssignments,
     TestStats,
+    BackTo,
   ],
   templateUrl: './test-detail.html',
   styleUrl: './test-detail.scss',

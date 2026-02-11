@@ -2,7 +2,11 @@ import { DatePipe, TitleCasePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faSignOutAlt, faUserCircle } from '@fortawesome/pro-solid-svg-icons';
+import {
+  faCalendar,
+  faSignOutAlt,
+  faUserCircle,
+} from '@fortawesome/pro-solid-svg-icons';
 import {
   NgbDropdown,
   NgbDropdownToggle,
@@ -28,6 +32,7 @@ import { Auth } from '../../services/auth';
 })
 export class Nav implements OnInit, OnDestroy {
   LogoutIcon = faSignOutAlt;
+  CalendarIcon = faCalendar;
   now: number = Date.now();
   private intervalId?: number;
   UserProfileIcon = faUserCircle;

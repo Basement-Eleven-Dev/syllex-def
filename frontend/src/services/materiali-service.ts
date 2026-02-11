@@ -15,6 +15,7 @@ export interface MaterialInterface {
   aiGenerated?: boolean;
   teacherId?: string;
   subjectId?: string;
+  classIds?: string[];
 }
 
 @Injectable({
@@ -46,7 +47,7 @@ export class MaterialiService {
       .get<{
         success: boolean;
         materials: MaterialInterface[];
-      }>(`materials/${subjectId}`)
+      }>(`materials/subject/${subjectId}`)
       .subscribe({
         next: (response) => {
           this.root.set(this.buildTree(response.materials));
@@ -353,5 +354,15 @@ export class MaterialiService {
 
   getMaterialById(id: string): MaterialInterface | undefined {
     return this.findItem((item) => item._id === id) || undefined;
+  }
+
+  updateClassIds(
+    materialId: string,
+    classIds: string[],
+  ): Observable<{ success: boolean; material: MaterialInterface }> {
+    return this.httpClient.put<{
+      success: boolean;
+      material: MaterialInterface;
+    }>(`materials/${materialId}/classes`, { classIds });
   }
 }

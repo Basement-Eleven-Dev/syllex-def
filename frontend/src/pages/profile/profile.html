@@ -77,7 +77,7 @@
         @for(materia of materiaService.allMaterie(); track $index) {
         <div class="col-4">
           <div class="card overflow-hidden position-relative">
-            <fa-icon [icon]="BookIcon" [size]="'lg'" id="bookIcon"></fa-icon>
+            <fa-icon [icon]="BookIcon" [size]="'lg'" id="bookIcon" />
             <div class="card-body">
               <h5 class="card-title">{{ materia.name }}</h5>
               {{ countClasses(materia._id) || 'Nessuna' }} class{{
@@ -85,6 +85,10 @@
               countClasses(materia._id) > 1 ? 'e' : 'a' }}
             </div>
           </div>
+        </div>
+        } @empty {
+        <div class="col-12">
+          <p class="text-muted">Nessuna materia assegnata</p>
         </div>
         }
       </div>

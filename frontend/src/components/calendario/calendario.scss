@@ -15,11 +15,10 @@
 
   &:hover {
     cursor: pointer;
-    background-color: color-mix(in srgb, var(--bs-primary) 50%, white);
+    background-color: rgba(var(--bs-primary-rgb), 0.5);
   }
   &.selected {
     background-color: var(--bs-secondary);
-    outline: 1px solid var(--bs-dark);
     color: var(--bs-dark);
   }
 }

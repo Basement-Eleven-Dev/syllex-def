@@ -36,7 +36,7 @@
           @for(att of attachments; track $index){
           <span
             class="badge p-2 attachment-badge"
-            (click)="onRequestAttachmentView(att._id)"
+            (dblclick)="onRequestAttachmentView(att)"
           >
             <fa-icon [icon]="getFileIcon(att.extension!)"></fa-icon>
             {{ att.name }}</span

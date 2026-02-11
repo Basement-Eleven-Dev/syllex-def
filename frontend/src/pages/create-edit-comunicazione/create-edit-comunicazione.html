@@ -7,20 +7,17 @@
     <h1
       class="text-dark fw-bold mb-0 display-6 d-flex align-items-center gap-3"
     >
-      {{ comunicazioneId ? 'Modifica' : 'Nuova' }} comunicazione
+      {{ PageTitle() }} comunicazione
     </h1>
-    <p class="text-dark mb-0">
-      {{ comunicazioneId ? 'Modifica' : 'Crea una nuova' }} comunicazione ai
-      tuoi studenti.
-    </p>
+    <p class="text-dark mb-0">{{ PageDescription() }}</p>
   </div>
-  @if(comunicazioneId) {
+  @if(IsEditMode()) {
   <div>
     <button
       class="btn btn-outline-danger py-3"
       confirmAction
       (confirmed)="onDelete()"
-      [disabled]="loading()"
+      [disabled]="IsLoading()"
     >
       <fa-icon [icon]="TrashIcon"></fa-icon>
       Elimina
@@ -28,7 +25,7 @@
   </div>
   }
 </div>
-<form [formGroup]="comunicazioneForm" (ngSubmit)="onSave()">
+<form [formGroup]="ComunicazioneForm" (ngSubmit)="onSave()">
   <section class="form-section">
     <div class="mb-3">
       <label for="titolo" class="form-label text-dark fw-bold">Titolo</label>
@@ -39,12 +36,12 @@
         formControlName="title"
         placeholder="Inserisci il titolo della comunicazione"
         [class.is-invalid]="
-          comunicazioneForm.get('title')?.invalid &&
-          comunicazioneForm.get('title')?.touched
+          ComunicazioneForm.get('title')?.invalid &&
+          ComunicazioneForm.get('title')?.touched
         "
       />
-      @if(comunicazioneForm.get('title')?.invalid &&
-      comunicazioneForm.get('title')?.touched) {
+      @if(ComunicazioneForm.get('title')?.invalid &&
+      ComunicazioneForm.get('title')?.touched) {
       <div class="invalid-feedback">Il titolo è obbligatorio</div>
       }
     </div>
@@ -59,12 +56,12 @@
         rows="6"
         placeholder="Inserisci il contenuto della comunicazione"
         [class.is-invalid]="
-          comunicazioneForm.get('content')?.invalid &&
-          comunicazioneForm.get('content')?.touched
+          ComunicazioneForm.get('content')?.invalid &&
+          ComunicazioneForm.get('content')?.touched
         "
       ></textarea>
-      @if(comunicazioneForm.get('content')?.invalid &&
-      comunicazioneForm.get('content')?.touched) {
+      @if(ComunicazioneForm.get('content')?.invalid &&
+      ComunicazioneForm.get('content')?.touched) {
       <div class="invalid-feedback">Il contenuto è obbligatorio</div>
       }
     </div>
@@ -79,8 +76,8 @@
           [selectedClassIds]="assignedClasses"
           (selectedClassIdsChange)="onClassesChange($event)"
         ></app-class-selector>
-        @if(comunicazioneForm.get('classes')?.invalid &&
-        comunicazioneForm.get('classes')?.touched) {
+        @if(ComunicazioneForm.get('classes')?.invalid &&
+        ComunicazioneForm.get('classes')?.touched) {
         <div class="text-danger small mt-2">Seleziona almeno una classe</div>
         }
       </div>
@@ -89,7 +86,7 @@
           >Materiali allegati (opzionale)</label
         >
         <app-materiali-selector
-          [initialMaterialIds]="materialIds()"
+          [initialMaterialIds]="MaterialIds()"
           (selectionChange)="onMaterialsChange($event)"
         ></app-materiali-selector>
       </div>
@@ -100,13 +97,13 @@
     <button
       type="submit"
       class="btn btn-success text-white btn-lg fs-3"
-      [disabled]="loading()"
+      [disabled]="IsLoading()"
     >
-      @if(loading()) {
+      @if(IsLoading()) {
       <span class="spinner-border spinner-border-sm me-2"></span>
       } @else {
       <fa-icon [icon]="SaveIcon"></fa-icon>
-      } {{ loading() ? 'Salvataggio...' : 'Salva' }}
+      } {{ IsLoading() ? 'Salvataggio...' : 'Salva' }}
     </button>
   </div>
 </form>

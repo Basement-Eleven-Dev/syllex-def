@@ -25,7 +25,7 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
   },
   {
     apiRoute: "teacher/classes",
-    functionPath: "teachers/getAllTeacherClasses.ts",
+    functionPath: "teachers/getAllClasses.ts",
     method: "get",
     role: "teacher",
   },
@@ -37,7 +37,7 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
   },
   {
     apiRoute: "teacher/classes/all",
-    functionPath: "teachers/getAllClasses.ts",
+    functionPath: "teachers/getAllTeacherClasses.ts",
     method: "get",
     role: "teacher",
   },
@@ -90,7 +90,7 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
-    apiRoute: "materials/{subjectId}",
+    apiRoute: "materials/subject/{subjectId}",
     functionPath: "materials/getMaterials.ts",
     method: "get",
     role: "teacher",
@@ -122,6 +122,12 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
   {
     apiRoute: "materials/{materialId}/rename",
     functionPath: "materials/renameMaterial.ts",
+    method: "put",
+    role: "teacher",
+  },
+  {
+    apiRoute: "materials/{materialId}/classes",
+    functionPath: "materials/updateMaterialClasses.ts",
     method: "put",
     role: "teacher",
   },
@@ -189,6 +195,24 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     apiRoute: "tests/{testId}",
     functionPath: "tests/deleteTest.ts",
     method: "delete",
+    role: "teacher",
+  },
+  {
+    apiRoute: "tests/{subjectId}/published/count",
+    functionPath: "tests/countPublishedTests.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "tests/assignments-to-grade/{subjectId}/count",
+    functionPath: "tests/countAssignmentsToGrade.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "tests/{testId}/classes",
+    functionPath: "tests/updateTestClasses.ts",
+    method: "put",
     role: "teacher",
   },
 ];

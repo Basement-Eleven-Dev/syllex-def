@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Materia } from './materia';
 
 export interface TestInterface {
   _id?: string;
@@ -24,7 +25,10 @@ export interface TestInterface {
   providedIn: 'root',
 })
 export class TestsService {
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private materiaService: Materia,
+  ) {}
 
   getPaginatedTests(
     page: number,
@@ -60,6 +64,26 @@ export class TestsService {
   deleteTest(testId: string) {
     return this.http.delete<{ success: boolean; message: string }>(
       `tests/${testId}`,
+    );
+  }
+
+  countAssignmentsToGrade() {
+    let subjectId = this.materiaService.materiaSelected()?._id;
+    return this.http.get<{ count: number }>(
+      `tests/assignments-to-grade/${subjectId}/count`,
+    );
+  }
+  countPublishedTests() {
+    let subjectId = this.materiaService.materiaSelected()?._id;
+    return this.http.get<{ count: number }>(
+      `tests/${subjectId}/published/count`,
+    );
+  }
+
+  updateClassIds(testId: string, classIds: string[]) {
+    return this.http.put<{ success: boolean; test: TestInterface }>(
+      `tests/${testId}/classes`,
+      { classIds },
     );
   }
 }

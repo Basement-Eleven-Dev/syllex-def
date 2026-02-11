@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -7,35 +7,25 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
-  FontAwesomeModule,
-  IconDefinition,
-} from '@fortawesome/angular-fontawesome';
-import {
-  faCheck,
   faGraduationCap,
   faImage,
-  faMarker,
-  faPlus,
-  faRobot,
   faSave,
   faSparkles,
-  faSpellCheck,
   faSpinnerThird,
   faUsers,
 } from '@fortawesome/pro-solid-svg-icons';
 import { MultipleChoiceOptions } from '../../components/multiple-choice-options/multiple-choice-options';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { GenAiQuestion } from '../../components/gen-ai-question/gen-ai-question';
-import {
-  QuestionType,
-  QUESTION_TYPE_OPTIONS,
-} from '../../types/question.types';
+import { QUESTION_TYPE_OPTIONS } from '../../types/question.types';
 import { BackTo } from '../../components/back-to/back-to';
 import { TypeSelector } from '../../components/type-selector/type-selector';
 import { Materia } from '../../services/materia';
 import { QuestionsService } from '../../services/questions';
 import { FeedbackService } from '../../services/feedback-service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export interface AnswerOption {
   label: string;
@@ -57,72 +47,53 @@ export interface AnswerOption {
   styleUrl: './create-edit-question.scss',
 })
 export class CreateEditQuestion {
-  questionId: string | null = null;
+  // Services
+  private readonly activatedRoute = inject(ActivatedRoute);
+  private readonly offcanvasService = inject(NgbOffcanvas);
+  readonly materiaService = inject(Materia);
+  private readonly questionsService = inject(QuestionsService);
+  private readonly feedbackService = inject(FeedbackService);
 
-  questionTypeOptions = QUESTION_TYPE_OPTIONS;
-  SparklesIcon = faSparkles;
-  ImageIcon = faImage;
-  UsersIcon = faUsers;
-  GraduationIcon = faGraduationCap;
-  SaveIcon = faSave;
-  SpinnerIcon = faSpinnerThird;
+  // Icons
+  readonly SparklesIcon = faSparkles;
+  readonly ImageIcon = faImage;
+  readonly UsersIcon = faUsers;
+  readonly GraduationIcon = faGraduationCap;
+  readonly SaveIcon = faSave;
+  readonly SpinnerIcon = faSpinnerThird;
 
-  selectedQuestionType = signal<string>('scelta multipla');
-  selectedPolicyType = signal<string>('public');
-  imagePreview = signal<string | null>(null);
-  isDragging = signal<boolean>(false);
-  loading = signal<boolean>(false);
-  uploadedImageFile: File | null = null;
-  currentQuestionId: string | null = null;
+  // Data
+  readonly QuestionTypeOptions = QUESTION_TYPE_OPTIONS;
+  private readonly QuestionId = this.activatedRoute.snapshot.paramMap.get('id');
+  private CurrentQuestionId = signal<string | null>(null);
 
-  constructor(
-    private activatedRoute: ActivatedRoute,
-    public materiaService: Materia,
-    private questionsService: QuestionsService,
-    private feedbackService: FeedbackService,
-  ) {
-    this.questionId = this.activatedRoute.snapshot.paramMap.get('id');
-    if (this.questionId) {
-      this.questionsService.loadQuestion(this.questionId).subscribe({
-        next: (question) => {
-          console.log('Domanda caricata:', question);
-          this.currentQuestionId = question._id;
-          this.questionForm.patchValue({
-            type: question.type,
-            text: question.text,
-            topicId: question.topicId,
-            explanation: question.explanation,
-            policy: question.policy,
-          });
-          if (question.type === 'scelta multipla' && question.options) {
-            this.questionForm.patchValue({ options: question.options });
-          }
-          if (
-            question.type === 'vero falso' &&
-            question.correctAnswer !== undefined
-          ) {
-            this.questionForm.patchValue({
-              correctAnswer: question.correctAnswer,
-            });
-          }
-          if (question.imageUrl) {
-            this.imagePreview.set(question.imageUrl);
-          }
-        },
-        error: (error) => {
-          console.error('Errore durante il caricamento della domanda:', error);
-        },
-      });
-    }
-  }
+  // UI State
+  readonly SelectedQuestionType = signal<string>('scelta multipla');
+  readonly SelectedPolicyType = signal<string>('public');
+  readonly ImagePreview = signal<string | null>(null);
+  readonly IsDragging = signal<boolean>(false);
+  readonly IsLoading = signal<boolean>(false);
+  private UploadedImageFile = signal<File | null>(null);
 
-  ngOnInit(): void {}
+  // Computed
+  readonly IsEditMode = computed(() => !!this.QuestionId);
+  readonly PageTitle = computed(() =>
+    this.IsEditMode() ? 'Modifica domanda' : 'Crea nuova domanda',
+  );
+  readonly PageDescription = computed(() =>
+    this.IsEditMode()
+      ? 'Modifica i dettagli della domanda selezionata.'
+      : 'Compila il modulo sottostante per creare una nuova domanda.',
+  );
+  readonly SaveButtonLabel = computed(() =>
+    this.IsEditMode() ? 'Salva modifiche' : 'Crea domanda',
+  );
 
-  questionForm: FormGroup = new FormGroup({
+  readonly QuestionForm: FormGroup = new FormGroup({
     type: new FormControl('scelta multipla', Validators.required),
-    text: new FormControl('testo domanda', Validators.required),
+    text: new FormControl('', Validators.required),
     topicId: new FormControl('', Validators.required),
-    explanation: new FormControl("spiegazione d'esempio", Validators.required),
+    explanation: new FormControl('', Validators.required),
     options: new FormControl([
       { label: 'Opzione 1', isCorrect: false },
       { label: 'Opzione 2', isCorrect: false },
@@ -134,23 +105,110 @@ export class CreateEditQuestion {
     correctAnswer: new FormControl(null),
   });
 
+  constructor() {
+    if (this.QuestionId) {
+      this.loadQuestion(this.QuestionId);
+    }
+  }
+
+  private loadQuestion(questionId: string): void {
+    this.questionsService
+      .loadQuestion(questionId)
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: (question) => {
+          this.CurrentQuestionId.set(question._id);
+          this.populateFormWithQuestion(question);
+        },
+        error: (error) => {
+          console.error('Error loading question:', error);
+          this.feedbackService.showFeedback(
+            'Errore durante il caricamento della domanda',
+            false,
+          );
+        },
+      });
+  }
+
+  private populateFormWithQuestion(question: any): void {
+    this.QuestionForm.patchValue({
+      type: question.type,
+      text: question.text,
+      topicId: question.topicId,
+      explanation: question.explanation,
+      policy: question.policy,
+    });
+
+    if (question.type === 'scelta multipla' && question.options) {
+      this.QuestionForm.patchValue({ options: question.options });
+    }
+
+    if (
+      question.type === 'vero falso' &&
+      question.correctAnswer !== undefined
+    ) {
+      this.QuestionForm.patchValue({ correctAnswer: question.correctAnswer });
+    }
+
+    if (question.imageUrl) {
+      this.ImagePreview.set(question.imageUrl);
+    }
+  }
+
   get questionOptions(): AnswerOption[] {
-    return this.questionForm.get('options')?.value || [];
+    return this.QuestionForm.get('options')?.value || [];
   }
 
   onOptionsChange(options: AnswerOption[]): void {
-    this.questionForm.patchValue({ options });
+    this.QuestionForm.patchValue({ options });
   }
 
   onSelectCorrectAnswer(value: boolean): void {
-    this.questionForm.patchValue({ correctAnswer: value });
+    this.QuestionForm.patchValue({ correctAnswer: value });
   }
 
   onSaveQuestion(): void {
-    this.loading.set(true);
-    const questionData = { ...this.questionForm.value };
+    if (this.QuestionForm.invalid) {
+      this.QuestionForm.markAllAsTouched();
+      return;
+    }
 
-    // Pulisco i campi non necessari in base al tipo
+    this.IsLoading.set(true);
+    const questionData = this.prepareQuestionData();
+    const serviceCall = this.CurrentQuestionId()
+      ? this.questionsService.editQuestion(
+          this.CurrentQuestionId()!,
+          questionData,
+          this.UploadedImageFile() || undefined,
+        )
+      : this.questionsService.createQuestion(
+          questionData,
+          this.UploadedImageFile() || undefined,
+        );
+
+    serviceCall.pipe(takeUntilDestroyed()).subscribe({
+      next: () => {
+        const message = this.CurrentQuestionId()
+          ? 'Domanda modificata con successo!'
+          : 'Domanda salvata con successo!';
+        this.feedbackService.showFeedback(message, true);
+        this.IsLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Error saving question:', error);
+        this.feedbackService.showFeedback(
+          'Errore durante il salvataggio della domanda',
+          false,
+        );
+        this.IsLoading.set(false);
+      },
+    });
+  }
+
+  private prepareQuestionData(): any {
+    const questionData = { ...this.QuestionForm.value };
+
+    // Clean unnecessary fields based on type
     if (questionData.type !== 'scelta multipla') {
       delete questionData.options;
     }
@@ -160,102 +218,78 @@ export class CreateEditQuestion {
 
     questionData.subjectId = this.materiaService.materiaSelected()?._id;
 
-    // Se esiste già un'immagine (URL) e non c'è un nuovo file, mantieni l'URL esistente
-    if (this.imagePreview() && !this.uploadedImageFile) {
-      questionData.imageUrl = this.imagePreview();
+    // Preserve existing image URL if no new file
+    if (this.ImagePreview() && !this.UploadedImageFile()) {
+      questionData.imageUrl = this.ImagePreview();
     }
 
-    // Determina se stiamo creando o modificando
-    const isEdit = !!this.currentQuestionId;
-    const serviceCall = isEdit
-      ? this.questionsService.editQuestion(
-          this.currentQuestionId!,
-          questionData,
-          this.uploadedImageFile || undefined,
-        )
-      : this.questionsService.createQuestion(
-          questionData,
-          this.uploadedImageFile || undefined,
-        );
-
-    serviceCall.subscribe({
-      next: (response) => {
-        this.feedbackService.showFeedback(
-          `Domanda ${isEdit ? 'modificata' : 'salvata'} con successo!`,
-          true,
-        );
-        this.loading.set(false);
-      },
-      error: (error) => {
-        console.error(
-          `Errore durante ${isEdit ? 'la modifica' : 'il salvataggio'} della domanda:`,
-          error,
-        );
-        this.loading.set(false);
-      },
-    });
+    return questionData;
   }
 
   onSelectQuestionType(type: string): void {
-    this.selectedQuestionType.set(type);
-    this.questionForm.patchValue({ type });
+    this.SelectedQuestionType.set(type);
+    this.QuestionForm.patchValue({ type });
   }
 
   onSelectPolicyType(policy: string): void {
-    this.selectedPolicyType.set(policy);
-    this.questionForm.patchValue({ policy });
+    this.SelectedPolicyType.set(policy);
+    this.QuestionForm.patchValue({ policy });
   }
 
-  private offcanvasService = inject(NgbOffcanvas);
   onRequestAIGeneration(): void {
-    let offCanvasRef = this.offcanvasService.open(GenAiQuestion, {
+    const offCanvasRef = this.offcanvasService.open(GenAiQuestion, {
       ariaLabelledBy: 'offcanvas-basic-title',
       position: 'end',
     });
 
     offCanvasRef.componentInstance.selectedType.set(
-      this.selectedQuestionType(),
+      this.SelectedQuestionType(),
     );
+
     offCanvasRef.dismissed.subscribe((result) => {
       if (result) {
-        console.log('Risultato generazione AI:', result);
-        // Popola il form con i dati generati
-        this.questionForm.patchValue({
-          topicId: result.topic?._id || result.topic,
-          type: result.type,
-          text: result.content,
-          explanation: result.explanation,
-        });
-        this.selectedQuestionType.set(result.type);
-        if (result.type === 'scelta multipla' && result.choices) {
-          const options: AnswerOption[] = result.choices.map(
-            (choice: AnswerOption) => ({
-              label: choice.label,
-              isCorrect: choice.isCorrect,
-            }),
-          );
-          this.questionForm.patchValue({ options });
-        }
+        this.populateFormFromAI(result);
       }
     });
+  }
+
+  private populateFormFromAI(result: any): void {
+    this.QuestionForm.patchValue({
+      topicId: result.topic?._id || result.topic,
+      type: result.type,
+      text: result.content,
+      explanation: result.explanation,
+    });
+
+    this.SelectedQuestionType.set(result.type);
+
+    if (result.type === 'scelta multipla' && result.choices) {
+      const options: AnswerOption[] = result.choices.map(
+        (choice: AnswerOption) => ({
+          label: choice.label,
+          isCorrect: choice.isCorrect,
+        }),
+      );
+      this.QuestionForm.patchValue({ options });
+    }
   }
 
   onDragOver(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
-    this.isDragging.set(true);
+    this.IsDragging.set(true);
   }
 
   onDragLeave(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
-    this.isDragging.set(false);
+    this.IsDragging.set(false);
   }
 
   onDrop(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
-    this.isDragging.set(false);
+    this.IsDragging.set(false);
 
     const files = event.dataTransfer?.files;
     if (files && files.length > 0) {
@@ -270,32 +304,46 @@ export class CreateEditQuestion {
     }
   }
 
-  handleFile(file: File): void {
-    // Verifica che il file sia un'immagine
+  private handleFile(file: File): void {
+    if (!this.validateFile(file)) {
+      return;
+    }
+
+    this.UploadedImageFile.set(file);
+    this.createImagePreview(file);
+  }
+
+  private validateFile(file: File): boolean {
     if (!file.type.startsWith('image/')) {
-      alert('Per favore carica un file immagine valido');
-      return;
+      this.feedbackService.showFeedback(
+        'Per favore carica un file immagine valido',
+        false,
+      );
+      return false;
     }
 
-    // Verifica dimensione file (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      alert('Il file è troppo grande. Dimensione massima: 5MB');
-      return;
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    if (file.size > MAX_FILE_SIZE) {
+      this.feedbackService.showFeedback(
+        'Il file è troppo grande. Dimensione massima: 5MB',
+        false,
+      );
+      return false;
     }
 
-    // Salva il file nella proprietà del componente
-    this.uploadedImageFile = file;
+    return true;
+  }
 
-    // Crea preview dell'immagine
+  private createImagePreview(file: File): void {
     const reader = new FileReader();
     reader.onload = (e) => {
-      this.imagePreview.set(e.target?.result as string);
+      this.ImagePreview.set(e.target?.result as string);
     };
     reader.readAsDataURL(file);
   }
 
   removeImage(): void {
-    this.imagePreview.set(null);
-    this.uploadedImageFile = null;
+    this.ImagePreview.set(null);
+    this.UploadedImageFile.set(null);
   }
 }

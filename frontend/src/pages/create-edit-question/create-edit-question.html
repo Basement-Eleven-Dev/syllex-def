@@ -4,18 +4,13 @@
 ></app-back-to>
 
 <form
-  [formGroup]="questionForm"
+  [formGroup]="QuestionForm"
   (ngSubmit)="onSaveQuestion()"
   class="d-flex flex-column gap-4"
 >
   <section>
-    <h1 class="text-dark fw-bold mb-0 display-6">
-      {{ questionId ? 'Modifica domanda' : 'Crea nuova domanda' }}
-    </h1>
-    <p class="text-dark">
-      @if(questionId) { Modifica i dettagli della domanda selezionata. } @else {
-      Compila il modulo sottostante per creare una nuova domanda. }
-    </p>
+    <h1 class="text-dark fw-bold mb-0 display-6">{{ PageTitle() }}</h1>
+    <p class="text-dark">{{ PageDescription() }}</p>
   </section>
 
   <section class="form-section">
@@ -23,8 +18,8 @@
       >Tipologia di risposta</label
     >
     <app-type-selector
-      [options]="questionTypeOptions"
-      [(selectedValue)]="selectedQuestionType"
+      [options]="QuestionTypeOptions"
+      [(selectedValue)]="SelectedQuestionType"
       (typeSelected)="onSelectQuestionType($event)"
       [direction]="'row'"
     ></app-type-selector>
@@ -38,7 +33,7 @@
       aria-label="Seleziona argomento"
     >
       <option value="" disabled selected>Seleziona argomento</option>
-      @for(topic of materiaService.topics; track topic) {
+      @for(topic of materiaService.topics; track topic._id) {
       <option [value]="topic._id">{{ topic.name }}</option>
       }
     </select>
@@ -83,13 +78,13 @@
         <div
           id="imageDropArea"
           class="rounded-4 p-3"
-          [class.dragging]="isDragging()"
+          [class.dragging]="IsDragging()"
           (dragover)="onDragOver($event)"
           (dragleave)="onDragLeave($event)"
           (drop)="onDrop($event)"
           (click)="fileInput?.click()"
         >
-          @if(!imagePreview()) {
+          @if(!ImagePreview()) {
           <div
             class="image-drop-zone d-flex flex-column justify-content-center align-items-center rounded-3 p-3"
           >
@@ -101,7 +96,7 @@
           } @else {
           <div class="image-preview-container position-relative">
             <img
-              [src]="imagePreview()"
+              [src]="ImagePreview()"
               alt="Preview"
               class="img-fluid rounded-3"
             />
@@ -136,7 +131,7 @@
     </section>
   </section>
 
-  @if(selectedQuestionType() === 'scelta multipla' ) {
+  @if(SelectedQuestionType() === 'scelta multipla' ) {
   <section class="row form-section">
     <div class="col-8">
       <app-multiple-choice-options
@@ -145,7 +140,7 @@
       ></app-multiple-choice-options>
     </div>
   </section>
-  } @if(selectedQuestionType() === 'vero falso' ) {
+  } @if(SelectedQuestionType() === 'vero falso' ) {
   <section class="form-section">
     <label class="form-label fw-semibold text-dark">Risposta corretta</label>
     <p class="text-muted mb-3">Seleziona se l'affermazione è vera o falsa</p>
@@ -154,13 +149,13 @@
         <div
           class="card shadow-sm typeCard p-1 cursor-pointer"
           (click)="onSelectCorrectAnswer(true)"
-          [class.selected]="questionForm.get('correctAnswer')?.value === true"
+          [class.selected]="QuestionForm.get('correctAnswer')?.value === true"
         >
           <div class="card-body d-flex flex-row align-items-center gap-3">
             <input
               type="radio"
               class="form-check-input"
-              [checked]="questionForm.get('correctAnswer')?.value === true"
+              [checked]="QuestionForm.get('correctAnswer')?.value === true"
             />
             <h5 class="mb-0 flex-fill">Vero</h5>
           </div>
@@ -170,13 +165,13 @@
         <div
           class="card shadow-sm typeCard p-1 cursor-pointer"
           (click)="onSelectCorrectAnswer(false)"
-          [class.selected]="questionForm.get('correctAnswer')?.value === false"
+          [class.selected]="QuestionForm.get('correctAnswer')?.value === false"
         >
           <div class="card-body d-flex flex-row align-items-center gap-3">
             <input
               type="radio"
               class="form-check-input"
-              [checked]="questionForm.get('correctAnswer')?.value === false"
+              [checked]="QuestionForm.get('correctAnswer')?.value === false"
             />
             <h5 class="mb-0 flex-fill">Falso</h5>
           </div>
@@ -212,13 +207,13 @@
         <div
           class="card shadow-sm typeCard p-1"
           (click)="onSelectPolicyType('public')"
-          [class.selected]="selectedPolicyType() === 'public'"
+          [class.selected]="SelectedPolicyType() === 'public'"
         >
           <div class="card-body d-flex flex-row align-items-center gap-3">
             <input
               type="radio"
               class="form-check-input"
-              [checked]="selectedPolicyType() === 'public'"
+              [checked]="SelectedPolicyType() === 'public'"
             />
             <h5 class="mb-0 flex-fill">Disponibile agli studenti</h5>
             <span class="typeIconWrapper rounded-2">
@@ -231,13 +226,13 @@
         <div
           class="card shadow-sm typeCard p-1"
           (click)="onSelectPolicyType('private')"
-          [class.selected]="selectedPolicyType() === 'private'"
+          [class.selected]="SelectedPolicyType() === 'private'"
         >
           <div class="card-body d-flex flex-row align-items-center gap-3">
             <input
               type="radio"
               class="form-check-input"
-              [checked]="selectedPolicyType() === 'private'"
+              [checked]="SelectedPolicyType() === 'private'"
             />
             <h5 class="mb-0 flex-fill">Disponibile solo al docente</h5>
             <span class="typeIconWrapper rounded-2">
@@ -253,13 +248,13 @@
     <button
       class="btn btn-success text-white btn-lg fs-3"
       type="submit"
-      [disabled]="questionForm.invalid || loading()"
+      [disabled]="QuestionForm.invalid || IsLoading()"
     >
       <fa-icon
-        [icon]="loading() ? SpinnerIcon : SaveIcon"
-        [animation]="loading() ? 'spin' : undefined"
+        [icon]="IsLoading() ? SpinnerIcon : SaveIcon"
+        [animation]="IsLoading() ? 'spin' : undefined"
       ></fa-icon>
-      {{ questionId ? 'Salva modifiche' : 'Crea domanda' }}
+      {{ SaveButtonLabel() }}
     </button>
   </section>
 </form>

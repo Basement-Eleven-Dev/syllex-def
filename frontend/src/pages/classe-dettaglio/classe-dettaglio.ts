@@ -20,7 +20,7 @@ import {
   NgbNavOutlet,
 } from '@ng-bootstrap/ng-bootstrap';
 import { NgComponentOutlet } from '@angular/common';
-import { ClasseInterface, ClassiService } from '../../services/classi-service';
+import { ClassInterface, ClassiService } from '../../services/classi-service';
 
 interface Stat {
   label: string;
@@ -55,7 +55,7 @@ export class ClasseDettaglio {
   ChartIcon = faChartLine;
   UsersIcon = faUsers;
 
-  classe: ClasseInterface | undefined = undefined;
+  classe: ClassInterface | undefined = undefined;
 
   stats: Stat[] = [
     {

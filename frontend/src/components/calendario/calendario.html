@@ -3,10 +3,12 @@
     <div
       class="d-flex flex-row justify-content-between align-items-center mb-4"
     >
-      <h5 class="text-dark">
-        <fa-icon [icon]="CalendarIcon"></fa-icon>
-        {{ currentDate$.value | date: 'MMMM yyyy' | titlecase }}
-      </h5>
+      <div>
+        <h4 class="text-dark fw-bold mb-0">Calendario dei test</h4>
+        <p class="text-dark fw-light mb-0">
+          Tieni traccia dei test che hai fissato per i tuoi studenti
+        </p>
+      </div>
       <div class="d-flex flex-row gap-2">
         <button
           class="btn btn-outline-primary btn-sm"

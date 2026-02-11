@@ -1,22 +1,19 @@
 <div class="h-100 bg-light shadow rounded-top-5 rounded-bottom-5">
-  <div class="w-100 p-4 d-flex flex-column h-100 rounded-4">
+  <div class="w-100 px-3 py-4 d-flex flex-column h-100 card">
     <div
-      class="rounded-3 bg-secondary text-dark p-3 d-flex flex-column justify-content-center fw-bold overflow-hidden position-relative"
+      class="card bg-secondary text-dark p-3 d-flex flex-column justify-content-center fw-bold overflow-hidden position-relative"
     >
       <fa-icon [icon]="BookIcon" [size]="'lg'" id="bookIcon"></fa-icon>
-      <h4 class="fw-bold mb-3">{{ selectedSubject?.name }}</h4>
       <div
-        class="text-decoration-underline fw-light cursor-pointer d-flex flex-row justify-content-between align-items-center w-100 z-index-1 position-relative"
+        class="text-decoration-underline fw-light cursor-pointer d-flex flex-row justify-content-between align-items-center w-100 z-index-1 position-relative mb-1"
         style="z-index: 1"
         (click)="toggleSubjectsCollapse()"
         [attr.aria-expanded]="!isSubjectsCollapsed()"
         aria-controls="subjectsCollapse"
       >
         Cambia materia
-        <fa-icon
-          [icon]="isSubjectsCollapsed() ? ChevronDownIcon : ChevronUpIcon"
-        ></fa-icon>
       </div>
+      <h4 class="fw-bold mb-0">{{ selectedSubject?.name }}</h4>
 
       <div
         #collapse="ngbCollapse"
@@ -43,17 +40,24 @@
     <div id="mainRoutes" class="d-flex flex-column gap-2 flex-fill mt-4">
       @for(route of mainRoutes; track $index){
       <div
-        class="sidebarRoute w-100 rounded-3 gap-2 d-flex align-items-center"
+        class="sidebarRoute w-100 gap-2 d-flex align-items-center"
         [routerLink]="route.path"
         routerLinkActive="active"
       >
         <fa-icon [icon]="route.icon"></fa-icon>
-        {{route.label}}
+        <span class="routeLabel">{{route.label}}</span>
       </div>
       }
     </div>
     <div
-      class="rounded-3 ai d-flex flex-column justify-content-center fw-bold px-3 rouneded-4 position-relative py-4"
+      class="btn text-start agent d-flex flex-column justify-content-center position-relative py-4 mb-2"
+      routerLink="/t/laboratorio-ai"
+    >
+      <fa-icon [icon]="HeadSideBrainIcon" id="sparkleIcon"></fa-icon>
+      <h5 class="fw-bold mb-0">Agente AI di {{ selectedSubject?.name }}</h5>
+    </div>
+    <div
+      class="btn text-start ai d-flex flex-column justify-content-center position-relative py-4"
       routerLink="/t/laboratorio-ai"
     >
       <fa-icon [icon]="SparklesIcon" id="sparkleIcon"></fa-icon>

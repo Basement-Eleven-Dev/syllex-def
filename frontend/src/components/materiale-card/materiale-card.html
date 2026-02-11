@@ -34,13 +34,8 @@
         >
           {{ item.name }}
         </p>
-        @if(isFolder){
-        <small class="text-muted"
-          >{{ folderContentLength }} element{{ folderContentLength !== 1 ? 'i' :
-          'o' }}</small
-        >
-        }
       </div>
+
       <div ngbDropdown class="d-inline-block">
         <button
           class="btn btn-light circle-btn"
@@ -51,12 +46,29 @@
         </button>
         <div ngbDropdownMenu>
           <app-materiale-contextual-menu
+            #contextualMenu
             [item]="item"
             (renameItem)="renameItem.emit($event)"
             (deleteItem)="deleteItem.emit()"
           ></app-materiale-contextual-menu>
         </div>
       </div>
+    </div>
+    <div class="d-flex flex-row gap-2 align-items-center mt-2">
+      @if(isFolder){
+      <small class="text-muted"
+        >{{ folderContentLength }} element{{ folderContentLength !== 1 ? 'i' :
+        'o' }}</small
+      >
+      | }
+      <a
+        class="text-muted small"
+        (click)="$event.stopPropagation(); contextualMenu.onRequestAssignToClass()"
+        ><fa-icon [icon]="ShareNodesIcon"></fa-icon>@if(item.classIds?.length
+        === 0 || !item.classIds){ Non condiviso } @else { {{
+        item.classIds?.length }} class{{ item.classIds?.length !== 1 ? 'i' : 'e'
+        }} }</a
+      >
     </div>
   </div>
 </div>

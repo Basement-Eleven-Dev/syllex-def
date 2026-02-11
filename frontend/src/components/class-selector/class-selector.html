@@ -1,7 +1,7 @@
 <div class="d-flex flex-row gap-2 flex-wrap" id="classes-assigned">
-  @for(classe of classiService.classi(); track classe._id) {
+  @for(classe of classiService.Classes(); track classe._id) {
   <span
-    class="badge fs-5 px-3 classBadge"
+    class="btn btn-outline-primary classBadge"
     (click)="onToggleClass(classe._id)"
     [class.selected]="isClassSelected(classe._id)"
     >{{ classe.name }}</span

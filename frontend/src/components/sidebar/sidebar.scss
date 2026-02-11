@@ -7,17 +7,27 @@
   z-index: 1030;
 }
 .sidebarRoute {
-  background-color: #94b0fd72;
   width: 100%;
-  color: var(--bs-dark);
+  border-radius: 8px;
   padding: 0.65rem 1.25rem;
   transition: all 0.3s ease;
+  font-size: 1rem;
+  routeLabel {
+    color: var(--bs-dark);
+  }
+  fa-icon {
+    color: var(--bs-primary);
+  }
   &:hover,
   &.active {
     cursor: pointer;
     background-color: var(--bs-primary);
     color: var(--bs-white);
     font-weight: bold;
+    color: white;
+    fa-icon {
+      color: var(--bs-white);
+    }
   }
 }
 
@@ -40,7 +50,7 @@
   font-size: 3rem;
   opacity: 0.2;
   top: -10px;
-  right: -10px;
+  right: -5px;
 }
 
 .materiaBtn {

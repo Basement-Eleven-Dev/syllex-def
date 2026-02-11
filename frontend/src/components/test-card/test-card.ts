@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { DatePipe, TitleCasePipe } from '@angular/common';
 import {
   faCheckDouble,
   faClock,
@@ -31,6 +31,7 @@ import { ɵɵDir } from '@angular/cdk/scrolling';
     NgbDropdownToggle,
     NgbDropdownMenu,
     ɵɵDir,
+    TitleCasePipe,
   ],
   templateUrl: './test-card.html',
   styleUrl: './test-card.scss',
@@ -43,6 +44,7 @@ export class TestCard {
   ThreeDotsIcon = faEllipsisVertical;
 
   @Input() test!: TestInterface;
+  @Output() delete = new EventEmitter<string>();
 
   constructor(public classiService: ClassiService) {}
 

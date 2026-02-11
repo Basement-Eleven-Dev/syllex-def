@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 import { ClassiService } from '../../services/classi-service';
 
 @Component({
@@ -8,20 +8,20 @@ import { ClassiService } from '../../services/classi-service';
   styleUrl: './class-selector.scss',
 })
 export class ClassSelector {
-  @Input() selectedClassIds: string[] = [];
-  @Output() selectedClassIdsChange = new EventEmitter<string[]>();
+  readonly classiService = inject(ClassiService);
 
-  constructor(public classiService: ClassiService) {}
+  readonly selectedClassIds = input<string[]>([]);
+  readonly selectedClassIdsChange = output<string[]>();
 
   onToggleClass(classId: string): void {
-    const updatedClasses = this.selectedClassIds.includes(classId)
-      ? this.selectedClassIds.filter((id) => id !== classId)
-      : [...this.selectedClassIds, classId];
+    const UpdatedClasses = this.selectedClassIds().includes(classId)
+      ? this.selectedClassIds().filter((id) => id !== classId)
+      : [...this.selectedClassIds(), classId];
 
-    this.selectedClassIdsChange.emit(updatedClasses);
+    this.selectedClassIdsChange.emit(UpdatedClasses);
   }
 
   isClassSelected(classId: string): boolean {
-    return this.selectedClassIds.includes(classId);
+    return this.selectedClassIds().includes(classId);
   }
 }

@@ -5,6 +5,7 @@ import { RenameModal } from '../rename-modal/rename-modal';
 import { DatePipe } from '@angular/common';
 import { MaterialInterface } from '../../services/materiali-service';
 import { FileViewer } from '../file-viewer/file-viewer';
+import { AssignClass } from '../assign-class/assign-class';
 
 @Component({
   selector: 'app-materiale-contextual-menu',
@@ -35,6 +36,15 @@ export class MaterialeContextualMenu {
         // Modal dismissed
       },
     );
+  }
+
+  onRequestAssignToClass() {
+    let modalRef = this.modalService.open(AssignClass, {
+      centered: true,
+      size: 'lg',
+    });
+    modalRef.componentInstance.resourceType = 'material';
+    modalRef.componentInstance.resource = this.item;
   }
 
   onRequestViewItem() {

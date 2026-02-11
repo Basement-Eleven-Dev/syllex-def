@@ -7,6 +7,7 @@ import {
 import {
   faBallotCheck,
   faBook,
+  faBrainCircuit,
   faChartLine,
   faChevronDown,
   faChevronUp,
@@ -14,6 +15,7 @@ import {
   faFile,
   faGauge,
   faGear,
+  faHeadSideBrain,
   faMailboxOpenLetter,
   faMicrochipAi,
   faRightFromBracket,
@@ -49,6 +51,7 @@ export class Sidebar {
   BookIcon = faBook;
   ChevronDownIcon = faChevronDown;
   ChevronUpIcon = faChevronUp;
+  HeadSideBrainIcon = faHeadSideBrain;
 
   isSubjectsCollapsed = signal(true);
 

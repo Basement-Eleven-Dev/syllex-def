@@ -1,4 +1,12 @@
-import { Component, OnInit, ViewChild, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  OnInit,
+  ViewChild,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -24,8 +32,8 @@ import { GenAiContents } from '../../components/gen-ai-contents/gen-ai-contents'
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { Materia } from '../../services/materia';
 import { TestsService, TestInterface } from '../../services/tests-service';
-import { QuestionInterface } from '../../services/questions';
 import { FeedbackService } from '../../services/feedback-service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-create-edit-test',
@@ -43,23 +51,44 @@ import { FeedbackService } from '../../services/feedback-service';
   styleUrl: './create-edit-test.scss',
 })
 export class CreateEditTest implements OnInit {
-  InfinityIcon = faInfinity;
-  GenPasswordIcon = faKey;
-  DraftIcon = faPenRuler;
-  SaveIcon = faSave;
-  SparklesIcon = faSparkles;
+  // Services
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  readonly classiService = inject(ClassiService);
+  private readonly offcanvasService = inject(NgbOffcanvas);
+  readonly materiaService = inject(Materia);
+  private readonly testsService = inject(TestsService);
+  private readonly feedbackService = inject(FeedbackService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  // Icons
+  readonly InfinityIcon = faInfinity;
+  readonly GenPasswordIcon = faKey;
+  readonly DraftIcon = faPenRuler;
+  readonly SaveIcon = faSave;
+  readonly SparklesIcon = faSparkles;
 
   @ViewChild(QuestionsDroppableList)
   questionsComponent!: QuestionsDroppableList;
 
-  testId = signal<string | null>(null);
-  isEditMode = signal<boolean>(false);
-  isLoading = signal<boolean>(false);
-  questionsToLoad = signal<
+  // Data
+  private readonly TestId = signal<string | null>(null);
+
+  // UI State
+  readonly IsLoading = signal<boolean>(false);
+  readonly QuestionsToLoad = signal<
     { questionId: string; points: number }[] | undefined
   >(undefined);
 
-  testForm: FormGroup = new FormGroup({
+  // Computed
+  readonly IsEditMode = computed(() => !!this.TestId());
+  readonly PageTitle = computed(() =>
+    this.IsEditMode()
+      ? 'Modifica Test di valutazione'
+      : 'Nuovo Test di valutazione',
+  );
+
+  readonly TestForm: FormGroup = new FormGroup({
     title: new FormControl('', [Validators.required]),
     availableFrom: new FormControl(''),
     availableTo: new FormControl(''),
@@ -69,80 +98,70 @@ export class CreateEditTest implements OnInit {
     time: new FormControl(0),
   });
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    public classiService: ClassiService,
-    private offcanvasService: NgbOffcanvas,
-    public materiaService: Materia,
-    private testsService: TestsService,
-    private feedbackService: FeedbackService,
-  ) {}
-
   ngOnInit() {
-    // Check se siamo in modalità edit
-    this.route.params.subscribe((params) => {
-      const testId = params['testId'];
-      if (testId) {
-        this.testId.set(testId);
-        this.isEditMode.set(true);
-        this.loadTest(testId);
-      }
-    });
-
-    // Pre-seleziona la classe dal query param 'assign'
-    this.route.queryParams.subscribe((params) => {
-      const assignClassId = params['assign'];
-      if (assignClassId && !this.isEditMode()) {
-        this.testForm.get('classes')?.setValue([assignClassId]);
-      }
-    });
-  }
-
-  loadTest(testId: string): void {
-    this.isLoading.set(true);
-    this.testsService.getTestById(testId).subscribe({
-      next: (response) => {
-        const test = response.test;
-
-        // Popola il form con i dati del test
-        this.testForm.patchValue({
-          title: test.name,
-          availableFrom: test.availableFrom
-            ? this.formatDateForInput(test.availableFrom)
-            : '',
-          availableTo: test.availableTo
-            ? this.formatDateForInput(test.availableTo)
-            : '',
-          classes: test.classIds || [],
-          password: test.password || '',
-          requiredScore: test.fitScore || 0,
-          time: test.timeLimit !== undefined ? test.timeLimit : null,
-        });
-
-        // Carica le domande nel componente questions-droppable-list
-        if (test.questions && test.questions.length > 0) {
-          this.loadQuestionsForTest(test.questions);
+    this.route.params
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        const testId = params['testId'];
+        if (testId) {
+          this.TestId.set(testId);
+          this.loadTest(testId);
         }
+      });
 
-        this.isLoading.set(false);
-      },
-      error: (error) => {
-        console.error('Errore durante il caricamento del test:', error);
-        alert('Impossibile caricare il test');
-        this.router.navigate(['/t/tests']);
-        this.isLoading.set(false);
-      },
+    this.route.queryParams
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        const assignClassId = params['assign'];
+        if (assignClassId && !this.IsEditMode()) {
+          this.TestForm.get('classes')?.setValue([assignClassId]);
+        }
+      });
+  }
+
+  private loadTest(testId: string): void {
+    this.IsLoading.set(true);
+    this.testsService
+      .getTestById(testId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.populateFormWithTest(response.test);
+          this.IsLoading.set(false);
+        },
+        error: (error) => {
+          console.error('Error loading test:', error);
+          this.feedbackService.showFeedback(
+            'Impossibile caricare il test',
+            false,
+          );
+          this.router.navigate(['/t/tests']);
+          this.IsLoading.set(false);
+        },
+      });
+  }
+
+  private populateFormWithTest(test: any): void {
+    this.TestForm.patchValue({
+      title: test.name,
+      availableFrom: test.availableFrom
+        ? this.formatDateForInput(test.availableFrom)
+        : '',
+      availableTo: test.availableTo
+        ? this.formatDateForInput(test.availableTo)
+        : '',
+      classes: test.classIds || [],
+      password: test.password || '',
+      requiredScore: test.fitScore || 0,
+      time: test.timeLimit !== undefined ? test.timeLimit : null,
     });
+
+    if (test.questions && test.questions.length > 0) {
+      this.QuestionsToLoad.set(test.questions);
+    }
   }
 
-  loadQuestionsForTest(
-    questions: { questionId: string; points: number }[],
-  ): void {
-    this.questionsToLoad.set(questions);
-  }
-
-  formatDateForInput(date: Date | string): string {
+  private formatDateForInput(date: Date | string): string {
     const d = new Date(date);
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -150,12 +169,12 @@ export class CreateEditTest implements OnInit {
     return `${year}-${month}-${day}`;
   }
 
-  get assignedClasses() {
-    return this.testForm.get('classes')?.value || [];
+  get assignedClasses(): string[] {
+    return this.TestForm.get('classes')?.value || [];
   }
 
-  get time() {
-    return this.testForm.get('time')?.value;
+  get time(): number | null {
+    return this.TestForm.get('time')?.value;
   }
 
   get maxScore(): number {
@@ -170,8 +189,8 @@ export class CreateEditTest implements OnInit {
     );
   }
 
-  get canPublish(): boolean {
-    const form = this.testForm.value;
+  readonly CanPublish = computed(() => {
+    const form = this.TestForm.value;
     return !!(
       form.title &&
       form.availableFrom &&
@@ -180,24 +199,22 @@ export class CreateEditTest implements OnInit {
       form.requiredScore > 0 &&
       form.requiredScore <= this.maxScore
     );
-  }
+  });
 
-  get canSaveDraft(): boolean {
-    return !!this.testForm.value.title;
-  }
+  readonly CanSaveDraft = computed(() => !!this.TestForm.value.title);
 
   onClassesChange(classIds: string[]): void {
-    this.testForm.get('classes')?.setValue(classIds);
+    this.TestForm.get('classes')?.setValue(classIds);
   }
 
-  onGeneratePassword() {
-    this.testForm.patchValue({
+  onGeneratePassword(): void {
+    this.TestForm.patchValue({
       password: Math.random().toString(36).slice(-8),
     });
   }
 
-  onToggleUnlimitedTime() {
-    const timeControl = this.testForm.get('time');
+  onToggleUnlimitedTime(): void {
+    const timeControl = this.TestForm.get('time');
     if (this.time !== null) {
       timeControl?.setValue(null);
       timeControl?.disable();
@@ -207,12 +224,40 @@ export class CreateEditTest implements OnInit {
     }
   }
 
-  onSaveTest(asDraft: boolean = false) {
-    const formValue = this.testForm.value;
+  onSaveTest(asDraft: boolean = false): void {
     const selectedSubject = this.materiaService.materiaSelected();
+    if (!selectedSubject) {
+      this.feedbackService.showFeedback('Seleziona una materia', false);
+      return;
+    }
 
-    if (!selectedSubject) return;
+    this.IsLoading.set(true);
+    const testData = this.prepareTestData(asDraft, selectedSubject._id);
+    const request = this.IsEditMode()
+      ? this.testsService.editTest(this.TestId()!, testData)
+      : this.testsService.createTest(testData);
 
+    request.pipe(takeUntilDestroyed()).subscribe({
+      next: () => {
+        const message = this.IsEditMode()
+          ? 'Test aggiornato con successo!'
+          : 'Test creato con successo!';
+        this.feedbackService.showFeedback(message, true);
+        this.router.navigate(['/t/tests']);
+      },
+      error: (error) => {
+        console.error('Error saving test:', error);
+        this.feedbackService.showFeedback(
+          'Errore durante il salvataggio del test',
+          false,
+        );
+        this.IsLoading.set(false);
+      },
+    });
+  }
+
+  private prepareTestData(asDraft: boolean, subjectId: string): TestInterface {
+    const formValue = this.TestForm.value;
     const questionsWithPoints = this.questionsComponent.selectedQuestions.map(
       (q, index) => {
         const questionCardsArray =
@@ -229,7 +274,7 @@ export class CreateEditTest implements OnInit {
       questions: questionsWithPoints,
       fitScore: formValue.requiredScore || 0,
       status: asDraft ? 'bozza' : 'pubblicato',
-      subjectId: selectedSubject._id,
+      subjectId: subjectId,
       classIds: formValue.classes || [],
     };
 
@@ -249,33 +294,10 @@ export class CreateEditTest implements OnInit {
       testData.timeLimit = formValue.time;
     }
 
-    this.isLoading.set(true);
-
-    const request = this.isEditMode()
-      ? this.testsService.editTest(this.testId()!, testData)
-      : this.testsService.createTest(testData);
-
-    request.subscribe({
-      next: (response) => {
-        console.log('Test salvato con successo:', response);
-        this.feedbackService.showFeedback(
-          `Test ${this.isEditMode() ? 'aggiornato' : 'creato'} con successo!`,
-          true,
-        );
-        this.router.navigate(['/t/tests']);
-      },
-      error: (error) => {
-        console.error('Errore durante il salvataggio del test:', error);
-        this.feedbackService.showFeedback(
-          'Errore durante il salvataggio del test',
-          false,
-        );
-        this.isLoading.set(false);
-      },
-    });
+    return testData;
   }
 
-  onRequestAIGeneration() {
+  onRequestAIGeneration(): void {
     const offcanvasRef = this.offcanvasService.open(GenAiContents, {
       position: 'end',
       panelClass: 'offcanvas-large',

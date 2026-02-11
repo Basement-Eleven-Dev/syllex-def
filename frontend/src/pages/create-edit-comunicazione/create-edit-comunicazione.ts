@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -8,7 +8,7 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faArrowLeft, faSave, faTrash } from '@fortawesome/pro-solid-svg-icons';
+import { faSave, faTrash } from '@fortawesome/pro-solid-svg-icons';
 import { ClassiService } from '../../services/classi-service';
 import { ClassSelector } from '../../components/class-selector/class-selector';
 import { BackTo } from '../../components/back-to/back-to';
@@ -19,6 +19,7 @@ import {
   ComunicazioneInterface,
 } from '../../services/comunicazioni-service';
 import { MaterialInterface } from '../../services/materiali-service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-create-edit-comunicazione',
@@ -37,144 +38,144 @@ import { MaterialInterface } from '../../services/materiali-service';
   styleUrl: './create-edit-comunicazione.scss',
 })
 export class CreateEditComunicazione {
-  SaveIcon = faSave;
-  ArrowLeftIcon = faArrowLeft;
-  TrashIcon = faTrash;
+  // Services
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  readonly classiService = inject(ClassiService);
+  private readonly comunicazioniService = inject(ComunicazioniService);
 
-  comunicazioneForm: FormGroup = new FormGroup({
+  // Icons
+  readonly SaveIcon = faSave;
+  readonly TrashIcon = faTrash;
+
+  // Data
+  private readonly ComunicazioneId: string | null =
+    this.route.snapshot.paramMap.get('comunicazioneId');
+
+  // UI State
+  readonly IsLoading = signal<boolean>(false);
+  readonly MaterialIds = signal<string[]>([]);
+
+  // Computed
+  readonly IsEditMode = computed(() => !!this.ComunicazioneId);
+  readonly PageTitle = computed(() =>
+    this.IsEditMode() ? 'Modifica' : 'Nuova',
+  );
+  readonly PageDescription = computed(() =>
+    this.IsEditMode()
+      ? 'Modifica comunicazione ai tuoi studenti.'
+      : 'Crea una nuova comunicazione ai tuoi studenti.',
+  );
+
+  readonly ComunicazioneForm: FormGroup = new FormGroup({
     title: new FormControl('', [Validators.required]),
     content: new FormControl('', [Validators.required]),
     classes: new FormControl([], [Validators.required]),
     materials: new FormControl([]),
   });
 
-  comunicazioneId: string | null = null;
-  loading = signal<boolean>(false);
-  isEdit = signal<boolean>(false);
-  materialIds = signal<string[]>([]);
-
   get assignedClasses(): string[] {
-    return this.comunicazioneForm.get('classes')?.value || [];
+    return this.ComunicazioneForm.get('classes')?.value || [];
   }
 
   get selectedMaterials(): MaterialInterface[] {
-    return this.comunicazioneForm.get('materials')?.value || [];
+    return this.ComunicazioneForm.get('materials')?.value || [];
   }
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    public classiService: ClassiService,
-    private comunicazioniService: ComunicazioniService,
-  ) {
-    this.comunicazioneId = this.route.snapshot.paramMap.get('comunicazioneId');
-
-    if (this.comunicazioneId) {
-      this.isEdit.set(true);
-      this.loadComunicazione(this.comunicazioneId);
+  constructor() {
+    if (this.ComunicazioneId) {
+      this.loadComunicazione(this.ComunicazioneId);
     }
   }
 
   private loadComunicazione(id: string): void {
-    this.loading.set(true);
-    this.comunicazioniService.getComunicazioneById(id).subscribe({
-      next: (response) => {
-        const comunicazione = response.communication;
-        this.comunicazioneForm.patchValue({
-          title: comunicazione.title,
-          content: comunicazione.content,
-          classes: comunicazione.classIds,
-        });
-        // Setta i materialIds per il MaterialiSelector
-        this.materialIds.set(comunicazione.materialIds || []);
-        this.loading.set(false);
-      },
-      error: (error) => {
-        console.error(
-          'Errore durante il caricamento della comunicazione:',
-          error,
-        );
-        this.loading.set(false);
-      },
+    this.IsLoading.set(true);
+    this.comunicazioniService
+      .getComunicazioneById(id)
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: (response) => {
+          this.populateFormWithComunicazione(response.communication);
+          this.IsLoading.set(false);
+        },
+        error: (error) => {
+          console.error('Error loading communication:', error);
+          this.IsLoading.set(false);
+        },
+      });
+  }
+
+  private populateFormWithComunicazione(comunicazione: any): void {
+    this.ComunicazioneForm.patchValue({
+      title: comunicazione.title,
+      content: comunicazione.content,
+      classes: comunicazione.classIds,
     });
+    this.MaterialIds.set(comunicazione.materialIds || []);
   }
 
   onClassesChange(classIds: string[]): void {
-    this.comunicazioneForm.get('classes')?.setValue(classIds);
+    this.ComunicazioneForm.get('classes')?.setValue(classIds);
   }
 
   onMaterialsChange(materials: MaterialInterface[]): void {
-    this.comunicazioneForm.get('materials')?.setValue(materials);
+    this.ComunicazioneForm.get('materials')?.setValue(materials);
   }
 
   onDelete(): void {
-    if (!this.comunicazioneId) return;
+    if (!this.ComunicazioneId) return;
 
-    this.loading.set(true);
+    this.IsLoading.set(true);
     this.comunicazioniService
-      .deleteComunicazione(this.comunicazioneId)
+      .deleteComunicazione(this.ComunicazioneId)
+      .pipe(takeUntilDestroyed())
       .subscribe({
         next: () => {
-          console.log('Comunicazione eliminata con successo');
           this.router.navigate(['/t/comunicazioni']);
         },
         error: (error) => {
-          console.error(
-            "Errore durante l'eliminazione della comunicazione:",
-            error,
-          );
-          this.loading.set(false);
+          console.error('Error deleting communication:', error);
+          this.IsLoading.set(false);
         },
       });
   }
 
   onSave(): void {
-    console.log('Form valid:', this.comunicazioneForm.valid);
-    console.log('Form value:', this.comunicazioneForm.value);
-
-    if (this.comunicazioneForm.invalid) {
-      console.log('Form invalid, errors:', this.comunicazioneForm.errors);
-      this.comunicazioneForm.markAllAsTouched();
+    if (this.ComunicazioneForm.invalid) {
+      this.ComunicazioneForm.markAllAsTouched();
       return;
     }
 
-    this.loading.set(true);
-
-    const materials = this.comunicazioneForm.get('materials')?.value || [];
-    const materialIds = materials.map((m: MaterialInterface) => m._id);
-
-    const comunicazioneData: ComunicazioneInterface = {
-      title: this.comunicazioneForm.get('title')?.value,
-      content: this.comunicazioneForm.get('content')?.value,
-      classIds: this.comunicazioneForm.get('classes')?.value || [],
-      materialIds: materialIds,
-      subjectId: '', // Verrà impostato dal service
-    };
-
-    console.log('Invio comunicazione:', comunicazioneData);
-
-    const serviceCall = this.isEdit()
+    this.IsLoading.set(true);
+    const comunicazioneData = this.prepareComunicazioneData();
+    const serviceCall = this.IsEditMode()
       ? this.comunicazioniService.editComunicazione(
-          this.comunicazioneId!,
+          this.ComunicazioneId!,
           comunicazioneData,
         )
       : this.comunicazioniService.createComunicazione(comunicazioneData);
 
-    serviceCall.subscribe({
-      next: (response) => {
-        console.log(
-          `Comunicazione ${this.isEdit() ? 'modificata' : 'creata'} con successo:`,
-          response.communication,
-        );
+    serviceCall.pipe(takeUntilDestroyed()).subscribe({
+      next: () => {
         this.router.navigate(['/t/comunicazioni']);
       },
       error: (error) => {
-        console.error(
-          `Errore durante ${this.isEdit() ? 'la modifica' : 'la creazione'} della comunicazione:`,
-          error,
-        );
-        this.loading.set(false);
+        console.error('Error saving communication:', error);
+        this.IsLoading.set(false);
       },
     });
+  }
+
+  private prepareComunicazioneData(): ComunicazioneInterface {
+    const materials = this.ComunicazioneForm.get('materials')?.value || [];
+    const materialIds = materials.map((m: MaterialInterface) => m._id);
+
+    return {
+      title: this.ComunicazioneForm.get('title')?.value,
+      content: this.ComunicazioneForm.get('content')?.value,
+      classIds: this.ComunicazioneForm.get('classes')?.value || [],
+      materialIds: materialIds,
+      subjectId: '',
+    };
   }
 }

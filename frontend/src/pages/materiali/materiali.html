@@ -5,7 +5,7 @@
   Gestisci e visualizza i tuoi file e le risorse per la materia selezionata.
 </p>
 
-<section class="form-section d-flex flex-row align-items-center my-5">
+<section class="form-section d-flex flex-row align-items-end gap-3 my-5">
   <input
     #fileInput
     type="file"
@@ -26,10 +26,18 @@
       [(ngModel)]="searchTerm"
     />
   </div>
+  <button
+    type="button"
+    class="btn btn-outline-danger"
+    (click)="clearFilters()"
+    title="Pulisci filtri"
+  >
+    <fa-icon [icon]="ClearIcon"></fa-icon>
+  </button>
 
   <app-view-type-toggle
     class="ms-auto"
-    [viewType]="viewType"
+    [viewType]="viewType()"
     (viewTypeChange)="onChangeViewType($event)"
   />
 </section>
@@ -49,23 +57,29 @@
         <span [class.fw-bold]="last">{{ dir }}</span>
       </a>
       @if(!last){
-      <fa-icon [icon]="ChevronRightIcon" class="text-muted"></fa-icon>
+      <fa-icon [icon]="chevronRightIcon" class="text-muted"></fa-icon>
       } }
     </div>
     <div class="d-flex flex-row align-items-center gap-3">
-      <button class="btn btn-outline-primary" (click)="onCreateNewFolder()">
-        <fa-icon [icon]="PlusIcon"></fa-icon> Nuova cartella
+      <button
+        class="btn btn-outline-primary icon-btn"
+        (click)="onCreateNewFolder()"
+      >
+        <fa-icon [icon]="plusIcon"></fa-icon> Nuova cartella
       </button>
-      <button class="btn btn-outline-primary" (click)="onRequestUpload()">
-        <fa-icon [icon]="UploadIcon"></fa-icon> Carica file
+      <button
+        class="btn btn-outline-primary icon-btn"
+        (click)="onRequestUpload()"
+      >
+        <fa-icon [icon]="uploadIcon"></fa-icon> Carica file
       </button>
-      <button class="btn ai" (click)="onRequestGenerate()">
-        <fa-icon [icon]="SparklesIcon"></fa-icon> Genera con AI
+      <button class="btn ai icon-btn" (click)="onRequestGenerate()">
+        <fa-icon [icon]="sparklesIcon"></fa-icon> Genera con AI
       </button>
     </div>
   </div>
 
-  @if(viewType === 'grid') {
+  @if(viewType() === 'grid') {
   <div class="row">
     @for(item of rootFolder().content; track item._id){
     <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-3">
@@ -86,7 +100,7 @@
           (renameItem)="onRequestRenameItem(item, $event)"
           (deleteItem)="onRequestDeleteItem(item)"
           (selectItemEvent)="onSelectItem(item, $event)"
-        ></app-materiale-card>
+        />
       </div>
       } @else {
       <app-materiale-card
@@ -99,8 +113,12 @@
         (renameItem)="onRequestRenameItem(item, $event)"
         (deleteItem)="onRequestDeleteItem(item)"
         (selectItemEvent)="onSelectItem(item, $event)"
-      ></app-materiale-card>
+      />
       }
+    </div>
+    } @empty {
+    <div class="col-12 text-center py-5">
+      <p class="text-muted">Nessun elemento presente</p>
     </div>
     }
   </div>
@@ -135,18 +153,17 @@
           <td>
             @if (isAIGenerated(item)) {
             <fa-icon
-              [icon]="RobotIcon"
+              [icon]="robotIcon"
               class="me-3"
               style="color: #9664c8"
               size="lg"
-            ></fa-icon>
+            />
             } @else {
             <fa-icon
               [icon]="getItemIcon(item)"
               size="lg"
               [style.color]="getItemColor(item)"
-            ></fa-icon>
-
+            />
             }
           </td>
           <td class="fw-medium">{{ item.name }}</td>
@@ -162,16 +179,22 @@
                 (click)="$event.stopPropagation()"
                 ngbDropdownToggle
               >
-                <fa-icon [icon]="ThreeDotsIcon"></fa-icon>
+                <fa-icon [icon]="threeDotsIcon" />
               </button>
               <div ngbDropdownMenu>
                 <app-materiale-contextual-menu
                   [item]="item"
                   (renameItem)="onRequestRenameItem(item, $event)"
                   (deleteItem)="onRequestDeleteItem(item)"
-                ></app-materiale-contextual-menu>
+                />
               </div>
             </div>
+          </td>
+        </tr>
+        } @empty {
+        <tr>
+          <td colspan="6" class="text-center py-5">
+            <p class="text-muted">Nessun elemento presente</p>
           </td>
         </tr>
         }

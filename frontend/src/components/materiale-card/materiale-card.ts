@@ -17,7 +17,11 @@ import {
   getFolderIcon,
   getIconColor,
 } from '../../app/_utils/file-icons';
-import { faEllipsisVertical, faRobot } from '@fortawesome/pro-solid-svg-icons';
+import {
+  faEllipsisVertical,
+  faRobot,
+  faShareNodes,
+} from '@fortawesome/pro-solid-svg-icons';
 import {
   NgbDropdown,
   NgbDropdownToggle,
@@ -42,6 +46,7 @@ import { FileViewer } from '../file-viewer/file-viewer';
   styleUrl: './materiale-card.scss',
 })
 export class MaterialeCard {
+  ShareNodesIcon = faShareNodes;
   @Input() item!: MaterialInterface;
   @Input() highlightedItemId: string | null = null;
   @Input() isSelected: boolean = false;

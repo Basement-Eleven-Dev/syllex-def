@@ -60,6 +60,7 @@
             <div ngbDropdownMenu>
               <app-test-contextual-menu
                 [test]="test"
+                (delete)="delete.emit($event)"
               ></app-test-contextual-menu>
             </div>
           </div>

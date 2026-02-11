@@ -38,6 +38,7 @@ export class TestTable {
   ThreeDotsIcon = faEllipsisVertical;
 
   @Input() tests: TestInterface[] = [];
+  @Output() delete = new EventEmitter<string>();
 
   constructor(
     private testsService: TestsService,
