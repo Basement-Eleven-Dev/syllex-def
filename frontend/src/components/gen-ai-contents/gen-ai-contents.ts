@@ -44,7 +44,6 @@ export class GenAiContents implements OnInit {
 
   types = signal<TypeOption[]>([]);
   selectedType = signal<string>('');
-  topicsSelected = signal<string[]>([]);
 
   // Determina se siamo in modalità offcanvas
   isOffcanvasMode = signal<boolean>(false);
@@ -61,7 +60,7 @@ export class GenAiContents implements OnInit {
     selectedType: new FormControl('', [Validators.required]),
     type: new FormControl(this.typeSignal()),
     prompt: new FormControl(''),
-    topics: new FormControl([]),
+    topicId: new FormControl('', [Validators.required]),
     numberOfQuestions: new FormControl(5, [
       Validators.required,
       Validators.min(1),
@@ -78,21 +77,6 @@ export class GenAiContents implements OnInit {
     this.selectedType.set(this.types()[0].value);
     this.genForm.controls['selectedType'].setValue(this.selectedType());
     this.genForm.controls['type'].setValue(this.typeSignal());
-  }
-
-  onToggleTopic(topic: string) {
-    const currentTopics = this.topicsSelected();
-    const index = currentTopics.indexOf(topic);
-    if (index > -1) {
-      this.topicsSelected.set(currentTopics.filter((t) => t !== topic));
-    } else {
-      this.topicsSelected.set([...currentTopics, topic]);
-    }
-    this.genForm.controls['topics'].setValue(this.topicsSelected());
-  }
-
-  isTopicSelected(topic: string): boolean {
-    return this.topicsSelected().includes(topic);
   }
 
   getSelectedTypeName(): string {

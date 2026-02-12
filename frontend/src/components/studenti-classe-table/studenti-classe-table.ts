@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEye } from '@fortawesome/pro-solid-svg-icons';
-import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
+import { SyllexPagination } from '../syllex-pagination/syllex-pagination';
 
 interface Studente {
   nome: string;
@@ -18,7 +18,7 @@ interface StudentiClasseTableProps {
 
 @Component({
   selector: 'app-studenti-classe-table',
-  imports: [FontAwesomeModule, NgbPagination, FormsModule],
+  imports: [FontAwesomeModule, SyllexPagination, FormsModule],
   templateUrl: './studenti-classe-table.html',
   styleUrl: './studenti-classe-table.scss',
 })

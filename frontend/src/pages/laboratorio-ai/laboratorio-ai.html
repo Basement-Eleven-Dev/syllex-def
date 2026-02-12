@@ -1,14 +1,14 @@
-<h1 class="text-dark fw-bold mb-0 display-6 d-flex align-items-center gap-3">
+<h1 class="text-dark fw-medium mb-3 display-6">
   Crea utilizzando l'AI di Syllex
 </h1>
-<p class="text-dark mb-0">
+<h5 class="text-dark mb-0 fw-normal">
   Crea e sperimenta con l'intelligenza artificiale di Syllex da qui.
-</p>
+</h5>
 
 <label class="fw-semibold fs-4 text-dark mt-5 mb-3">Cosa vuoi creare?</label>
 <div class="d-flex flex-row align-items-stretch gap-4">
   <div
-    class="card rounded-5 shadow py-3 ai"
+    class="card py-3 ai syllex-shadow"
     [class.not-selected]="!isMaterialsHovered()"
     [class.selected]="selectedCreationType === 'materials'"
     (mouseenter)="isMaterialsHovered.set(true)"
@@ -24,7 +24,7 @@
     </div>
   </div>
   <div
-    class="card rounded-5 shadow py-3 ai"
+    class="card py-3 ai"
     [class.not-selected]="!isQuestionsHovered()"
     [class.selected]="selectedCreationType === 'questions'"
     (mouseenter)="isQuestionsHovered.set(true)"

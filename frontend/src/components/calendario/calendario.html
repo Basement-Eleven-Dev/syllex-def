@@ -1,10 +1,12 @@
-<div class="card p-4">
+<div class="p-3">
   <div class="card-body">
     <div
       class="d-flex flex-row justify-content-between align-items-center mb-4"
     >
       <div>
-        <h4 class="text-dark fw-bold mb-0">Calendario dei test</h4>
+        <h4 class="text-dark fw-bold mb-0">
+          Calendario di {{ materiaService.materiaSelected()?.name }}
+        </h4>
         <p class="text-dark fw-light mb-0">
           Tieni traccia dei test che hai fissato per i tuoi studenti
         </p>
@@ -22,7 +24,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-8">
+      <div class="col-6">
         <div class="d-flex flex-row mb-3">
           @for(day of ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom']; track
           $index){
@@ -40,7 +42,11 @@
             [class.opacity-25]="!dayBox.isCurrentMonth"
           >
             @if(dayBox.isCurrentMonth){
-            <div class="fw-bold">{{ dayBox.day }}</div>
+            <div
+              class="d-flex flex-column h-100 justify-content-center align-items-center fs-5"
+            >
+              {{ dayBox.day }}
+            </div>
             @if(getEventCountForDay(dayBox) > 0){
             <h3 class="event-count badge bg-primary fs-5 mt-1">
               {{ getEventCountForDay(dayBox) }}
@@ -50,23 +56,20 @@
           }
         </div>
       </div>
-      <div class="col-4 d-flex flex-column">
-        @if(selectedDate){
-        <h5 class="fw-semibold text-center">
-          {{ selectedDate| date: 'fullDate' | titlecase }}
-        </h5>
-        }
+      <div class="col-6 d-flex flex-column">
         <div
-          class="card flex-fill"
+          class="card flex-fill p-4"
           id="calendarDayDetailCard"
           [class.no-date-selected]="!selectedDate"
         >
-          <div
-            class="card-body d-flex flex-column align-items-center justify-content-center"
-          >
-            <h4 class="text-center text-muted fw-light">
-              Seleziona una data per visualizzare eventuali eventi previsti
-            </h4>
+          <div class="card-body d-flex flex-column">
+            @if(selectedDate){
+            <h4 class="fw-semibold text-primary">Oggi</h4>
+            <h5 class="fw-normal">
+              {{ selectedDate| date: 'fullDate' | titlecase }}
+            </h5>
+            <hr />
+            }
           </div>
         </div>
       </div>

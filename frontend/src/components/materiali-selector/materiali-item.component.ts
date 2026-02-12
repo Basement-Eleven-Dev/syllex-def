@@ -5,7 +5,11 @@ import {
   IconDefinition,
   faChevronRight,
 } from '@fortawesome/pro-solid-svg-icons';
-import { getFileIcon, getFolderIcon } from '../../app/_utils/file-icons';
+import {
+  getFileIcon,
+  getFolderIcon,
+  getIconColor,
+} from '../../app/_utils/file-icons';
 import { MaterialInterface } from '../../services/materiali-service';
 
 @Component({
@@ -26,7 +30,7 @@ import { MaterialInterface } from '../../services/materiali-service';
   template: `
     @if (isFolder(item())) {
       <!-- Folder -->
-      <li class="list-group-item p-2 rounded-3 mb-2">
+      <li class="list-group-item p-2 mb-2" style="border-radius: 8px;">
         <div
           class="folder-item d-flex align-items-center p-2 cursor-pointer text-dark"
           (click)="folderToggle.emit(item()._id!)"
@@ -34,7 +38,11 @@ import { MaterialInterface } from '../../services/materiali-service';
           [attr.aria-expanded]="isExpanded()"
           [attr.aria-controls]="'collapse-' + item()._id"
         >
-          <fa-icon [icon]="getFolderIcon(isExpanded())" class="me-2"></fa-icon>
+          <fa-icon
+            [icon]="getFolderIcon(isExpanded())"
+            [style.color]="getIconColor(item())"
+            class="me-2"
+          ></fa-icon>
           <span class="flex-grow-1">{{ item().name }}</span>
           <fa-icon
             [icon]="chevronIcon"
@@ -46,7 +54,10 @@ import { MaterialInterface } from '../../services/materiali-service';
 
         <!-- Folder Content (Recursive) -->
         <div [id]="'collapse-' + item()._id" [ngbCollapse]="!isExpanded()">
-          <ul class="list-group list-group-flush ms-4 text-dark rounded-3">
+          <ul
+            class="list-group list-group-flush ms-4 text-dark"
+            style="border-radius: 8px;"
+          >
             @for (childItem of getFilteredContent(); track childItem._id) {
               <app-materiali-item
                 [item]="childItem"
@@ -63,13 +74,17 @@ import { MaterialInterface } from '../../services/materiali-service';
     } @else {
       <!-- File -->
       <li
-        class="list-group-item p-2 d-flex align-items-center cursor-pointer text-dark rounded-3 mb-2"
+        class="list-group-item p-2 d-flex align-items-center cursor-pointer text-dark mb-2"
+        style="border-radius: 8px;"
         [class.bg-secondary]="isSelected()"
-        [class.border-dark]="isSelected()"
         (click)="materialSelect.emit(item())"
         role="button"
       >
-        <fa-icon [icon]="getFileIcon(item().extension!)" class="me-2"></fa-icon>
+        <fa-icon
+          [icon]="getFileIcon(item().extension!)"
+          [style.color]="getIconColor(item())"
+          class="me-2"
+        ></fa-icon>
         <span class="flex-grow-1">{{ item().name }}</span>
       </li>
     }
@@ -88,6 +103,10 @@ export class MaterialiItemComponent {
 
   isFolder(item: MaterialInterface): boolean {
     return item.type === 'folder';
+  }
+
+  getIconColor(item: MaterialInterface): string {
+    return getIconColor(item.extension || '');
   }
 
   isExpanded(): boolean {

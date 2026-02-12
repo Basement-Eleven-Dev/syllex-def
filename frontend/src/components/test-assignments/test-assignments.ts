@@ -8,7 +8,7 @@ import {
 } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCheckDouble, faEye } from '@fortawesome/pro-solid-svg-icons';
-import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
+import { SyllexPagination } from '../syllex-pagination/syllex-pagination';
 import { RouterLink } from '@angular/router';
 
 interface TestAssignment {
@@ -28,7 +28,7 @@ interface TestAssignment {
     TitleCasePipe,
     FormsModule,
     ReactiveFormsModule,
-    NgbPagination,
+    SyllexPagination,
     RouterLink,
   ],
   templateUrl: './test-assignments.html',

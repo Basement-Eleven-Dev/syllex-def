@@ -1,11 +1,9 @@
-<h1 class="text-dark fw-bold mb-0 display-6 d-flex align-items-center gap-3">
-  File e Risorse
-</h1>
-<p class="text-dark mb-0">
+<h1 class="text-dark fw-medium mb-3 display-6">File e Risorse</h1>
+<h5 class="text-dark mb-0 fw-normal">
   Gestisci e visualizza i tuoi file e le risorse per la materia selezionata.
-</p>
+</h5>
 
-<section class="form-section d-flex flex-row align-items-end gap-3 my-5">
+<section class="d-flex flex-row align-items-center gap-3 my-5">
   <input
     #fileInput
     type="file"
@@ -14,12 +12,9 @@
     [accept]="'.pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.gif,.txt'"
   />
   <div>
-    <label for="search-term" class="form-label fw-semibold text-dark"
-      >Nome file o cartella</label
-    >
     <input
       type="text"
-      class="form-control me-3 custom-input"
+      class="form-control me-3 custom-input filter"
       id="search-term"
       placeholder="Cerca file o cartella..."
       style="min-width: 400px"
@@ -28,7 +23,7 @@
   </div>
   <button
     type="button"
-    class="btn btn-outline-danger"
+    class="btn btn-outline-danger btn-sm"
     (click)="clearFilters()"
     title="Pulisci filtri"
   >

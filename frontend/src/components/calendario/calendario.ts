@@ -12,6 +12,7 @@ import {
   faChevronRight,
 } from '@fortawesome/pro-solid-svg-icons';
 import { BehaviorSubject, map } from 'rxjs';
+import { Materia } from '../../services/materia';
 
 interface DayBox {
   day: number | null;
@@ -48,6 +49,8 @@ export class Calendario {
       classrooms: ['Classe 1A', 'Classe 2B'],
     },
   ];
+
+  constructor(public materiaService: Materia) {}
 
   currentDate$ = new BehaviorSubject<Date>(new Date());
   firstDayOfMonth$ = this.currentDate$.pipe(

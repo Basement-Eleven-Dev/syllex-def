@@ -1,118 +1,197 @@
-/* You can add global styles to this file, and also import other style files */
+/**
+* @license
+*
+* Font Family: General Sans
+* Designed by: Frode Helland
+* URL: https://www.fontshare.com/fonts/general-sans
+* Â© 2026 Indian Type Foundry
+*
+* General Sans Extralight 
+* General Sans ExtralightItalic 
+* General Sans Light 
+* General Sans LightItalic 
+* General Sans Regular 
+* General Sans Italic 
+* General Sans Medium 
+* General Sans MediumItalic 
+* General Sans Semibold 
+* General Sans SemiboldItalic 
+* General Sans Bold 
+* General Sans BoldItalic 
+* General Sans Variable (Variable font)
+* General Sans VariableItalic (Variable font)
 
-/* Importing Bootstrap SCSS file. */
-
-/* Aeonik Font Faces */
+*
+*/
 @font-face {
-  font-family: "Aeonik";
-  src: url("/fonts/Aeonik/Aeonik-Thin.otf") format("opentype");
-  font-weight: 100;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Aeonik";
-  src: url("/fonts/Aeonik/Aeonik-ThinItalic.otf") format("opentype");
-  font-weight: 100;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "Aeonik";
-  src: url("/fonts/Aeonik/Aeonik-Air.otf") format("opentype");
+  font-family: "GeneralSans-Extralight";
+  src:
+    url("/fonts/GeneralSans-Extralight.woff2") format("woff2"),
+    url("/fonts/GeneralSans-Extralight.woff") format("woff"),
+    url("/fonts/GeneralSans-Extralight.ttf") format("truetype");
   font-weight: 200;
+  font-display: swap;
   font-style: normal;
 }
-
 @font-face {
-  font-family: "Aeonik";
-  src: url("/fonts/Aeonik/Aeonik-AirItalic.otf") format("opentype");
+  font-family: "GeneralSans-ExtralightItalic";
+  src:
+    url("/fonts/GeneralSans-ExtralightItalic.woff2") format("woff2"),
+    url("/fonts/GeneralSans-ExtralightItalic.woff") format("woff"),
+    url("/fonts/GeneralSans-ExtralightItalic.ttf") format("truetype");
   font-weight: 200;
+  font-display: swap;
   font-style: italic;
 }
-
 @font-face {
-  font-family: "Aeonik";
-  src: url("/fonts/Aeonik/Aeonik-Light.otf") format("opentype");
+  font-family: "GeneralSans-Light";
+  src:
+    url("/fonts/GeneralSans-Light.woff2") format("woff2"),
+    url("/fonts/GeneralSans-Light.woff") format("woff"),
+    url("/fonts/GeneralSans-Light.ttf") format("truetype");
   font-weight: 300;
+  font-display: swap;
   font-style: normal;
 }
-
 @font-face {
-  font-family: "Aeonik";
-  src: url("/fonts/Aeonik/Aeonik-LightItalic.otf") format("opentype");
+  font-family: "GeneralSans-LightItalic";
+  src:
+    url("/fonts/GeneralSans-LightItalic.woff2") format("woff2"),
+    url("/fonts/GeneralSans-LightItalic.woff") format("woff"),
+    url("/fonts/GeneralSans-LightItalic.ttf") format("truetype");
   font-weight: 300;
+  font-display: swap;
   font-style: italic;
 }
-
 @font-face {
-  font-family: "Aeonik";
-  src: url("/fonts/Aeonik/Aeonik-Regular.otf") format("opentype");
+  font-family: "GeneralSans-Regular";
+  src:
+    url("/fonts/GeneralSans-Regular.woff2") format("woff2"),
+    url("/fonts/GeneralSans-Regular.woff") format("woff"),
+    url("/fonts/GeneralSans-Regular.ttf") format("truetype");
   font-weight: 400;
+  font-display: swap;
   font-style: normal;
 }
-
 @font-face {
-  font-family: "Aeonik";
-  src: url("/fonts/Aeonik/Aeonik-RegularItalic.otf") format("opentype");
+  font-family: "GeneralSans-Italic";
+  src:
+    url("/fonts/GeneralSans-Italic.woff2") format("woff2"),
+    url("/fonts/GeneralSans-Italic.woff") format("woff"),
+    url("/fonts/GeneralSans-Italic.ttf") format("truetype");
   font-weight: 400;
+  font-display: swap;
   font-style: italic;
 }
-
 @font-face {
-  font-family: "Aeonik";
-  src: url("/fonts/Aeonik/Aeonik-Medium.otf") format("opentype");
+  font-family: "GeneralSans-Medium";
+  src:
+    url("/fonts/GeneralSans-Medium.woff2") format("woff2"),
+    url("/fonts/GeneralSans-Medium.woff") format("woff"),
+    url("/fonts/GeneralSans-Medium.ttf") format("truetype");
   font-weight: 500;
+  font-display: swap;
   font-style: normal;
 }
-
 @font-face {
-  font-family: "Aeonik";
-  src: url("/fonts/Aeonik/Aeonik-MediumItalic.otf") format("opentype");
+  font-family: "GeneralSans-MediumItalic";
+  src:
+    url("/fonts/GeneralSans-MediumItalic.woff2") format("woff2"),
+    url("/fonts/GeneralSans-MediumItalic.woff") format("woff"),
+    url("/fonts/GeneralSans-MediumItalic.ttf") format("truetype");
   font-weight: 500;
+  font-display: swap;
   font-style: italic;
 }
-
 @font-face {
-  font-family: "Aeonik";
-  src: url("/fonts/Aeonik/Aeonik-Bold.otf") format("opentype");
-  font-weight: 700;
+  font-family: "GeneralSans-Semibold";
+  src:
+    url("/fonts/GeneralSans-Semibold.woff2") format("woff2"),
+    url("/fonts/GeneralSans-Semibold.woff") format("woff"),
+    url("/fonts/GeneralSans-Semibold.ttf") format("truetype");
+  font-weight: 600;
+  font-display: swap;
   font-style: normal;
 }
-
 @font-face {
-  font-family: "Aeonik";
-  src: url("/fonts/Aeonik/Aeonik-BoldItalic.otf") format("opentype");
-  font-weight: 700;
+  font-family: "GeneralSans-SemiboldItalic";
+  src:
+    url("/fonts/GeneralSans-SemiboldItalic.woff2") format("woff2"),
+    url("/fonts/GeneralSans-SemiboldItalic.woff") format("woff"),
+    url("/fonts/GeneralSans-SemiboldItalic.ttf") format("truetype");
+  font-weight: 600;
+  font-display: swap;
   font-style: italic;
 }
-
 @font-face {
-  font-family: "Aeonik";
-  src: url("/fonts/Aeonik/Aeonik-Black.otf") format("opentype");
-  font-weight: 900;
+  font-family: "GeneralSans-Bold";
+  src:
+    url("/fonts/GeneralSans-Bold.woff2") format("woff2"),
+    url("/fonts/GeneralSans-Bold.woff") format("woff"),
+    url("/fonts/GeneralSans-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-display: swap;
   font-style: normal;
 }
-
 @font-face {
-  font-family: "Aeonik";
-  src: url("/fonts/Aeonik/Aeonik-BlackItalic.otf") format("opentype");
-  font-weight: 900;
+  font-family: "GeneralSans-BoldItalic";
+  src:
+    url("/fonts/GeneralSans-BoldItalic.woff2") format("woff2"),
+    url("/fonts/GeneralSans-BoldItalic.woff") format("woff"),
+    url("/fonts/GeneralSans-BoldItalic.ttf") format("truetype");
+  font-weight: 700;
+  font-display: swap;
+  font-style: italic;
+}
+/**
+* This is a variable font
+* You can control variable axes as shown below:
+* font-variation-settings: wght 700.0;
+*
+* available axes:
+'wght' (range from 200.0 to 700.0
+*/
+@font-face {
+  font-family: "GeneralSans-Variable";
+  src:
+    url("/fonts/GeneralSans-Variable.woff2") format("woff2"),
+    url("/fonts/GeneralSans-Variable.woff") format("woff"),
+    url("/fonts/GeneralSans-Variable.ttf") format("truetype");
+  font-weight: 200 700;
+  font-display: swap;
+  font-style: normal;
+}
+/**
+* This is a variable font
+* You can control variable axes as shown below:
+* font-variation-settings: wght 700.0;
+*
+* available axes:
+'wght' (range from 200.0 to 700.0
+*/
+@font-face {
+  font-family: "GeneralSans-VariableItalic";
+  src:
+    url("/fonts/GeneralSans-VariableItalic.woff2") format("woff2"),
+    url("/fonts/GeneralSans-VariableItalic.woff") format("woff"),
+    url("/fonts/GeneralSans-VariableItalic.ttf") format("truetype");
+  font-weight: 200 700;
+  font-display: swap;
   font-style: italic;
 }
 
 $primary: #3931ce;
-$secondary: #b2f142;
+$secondary: #c9f321;
 $info: #0dcaf0;
 $success: #8aff8a;
 $warning: #ffbe55;
-$danger: #cf1729;
+$danger: #ff3333;
 $light: #f8f9fa;
 $dark: #262626;
 $min-contrast-ratio: 4.5;
-$font-size-base: 0.85rem;
+$font-size-base: 0.9rem;
 $enable-gradients: false;
-$font-family-sans-serif: "Aeonik", sans-serif;
+$font-family-sans-serif: "GeneralSans", sans-serif;
 $border-radius: 0.75rem;
 $border-radius-sm: 0.5rem;
 $border-radius-lg: 0.9rem;
@@ -127,9 +206,18 @@ $btn-padding-y: 0.575rem !default;
 
 $card-border-radius: $border-radius-xl;
 
-$btn-border-radius: 8px;
-$btn-border-radius-sm: 8px;
-$btn-border-radius-lg: 8px;
+$syllex-radius: 8px;
+$btn-border-radius: $syllex-radius;
+$btn-border-radius-sm: $syllex-radius;
+$btn-border-radius-lg: $syllex-radius;
+$dropdown-border-radius: $syllex-radius;
+$badge-border-radius: $syllex-radius;
+$badge-padding-y: 0.85em !default;
+$badge-padding-x: 0.85em !default;
+$input-focus-box-shadow: none;
+$select-focus-box-shadow: none;
+$input-focus-border-color: $primary;
+$form-select-focus-box-shadow: none;
 
 @import "bootstrap/scss/bootstrap";
 
@@ -155,8 +243,9 @@ body {
 
 .custom-input {
   color: $primary;
-  padding: 0.8rem;
   border-radius: 8px;
+  padding-top: 0.8rem;
+  padding-bottom: 0.8rem;
   &::placeholder {
     color: rgba(var(--bs-primary-rgb), 0.4);
   }
@@ -165,7 +254,8 @@ body {
     border-color: darken($primary, 10%);
   }
   &.filter {
-    border: rgb(173, 173, 173) 1px solid;
+    border: rgb(127, 127, 127) 1px solid;
+    color: rgb(127, 127, 127);
     &::placeholder {
       color: rgb(173, 173, 173);
     }
@@ -202,6 +292,12 @@ a {
   &.archiviato {
     background-color: #d3d3d3;
   }
+  &.public {
+    background-color: var(--bs-success);
+  }
+  &.private {
+    background-color: var(--bs-warning);
+  }
 }
 
 tr {
@@ -210,6 +306,7 @@ tr {
 
 label {
   font-size: 0.9rem;
+  font-weight: 500;
 }
 
 textarea.custom-input {
@@ -292,6 +389,17 @@ textarea.custom-input {
   }
 }
 
+.btn-gradient {
+  background: linear-gradient(135deg, var(--bs-secondary) 0%, #dcffa7 100%);
+  color: var(--bs-dark);
+  transition: all 0.3s ease;
+  &:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, var(--bs-secondary) 0%, #b9ff4f 100%);
+    color: var(--bs-dark);
+  }
+}
+
 .ai {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
   color: white;
@@ -304,7 +412,6 @@ textarea.custom-input {
   &.not-selected {
     background: transparent;
     color: rgb(160, 1, 157);
-    box-shadow: none;
   }
 
   &.selected {

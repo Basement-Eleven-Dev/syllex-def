@@ -4,7 +4,7 @@ import {
   FontAwesomeModule,
   IconDefinition,
 } from '@fortawesome/angular-fontawesome';
-import { faPaperclip, faPlus } from '@fortawesome/pro-solid-svg-icons';
+import { faPaperclip, faPlus, faUsers } from '@fortawesome/pro-solid-svg-icons';
 import { Calendario } from '../../components/calendario/calendario';
 import { RouterModule } from '@angular/router';
 import { Auth } from '../../services/auth';
@@ -38,13 +38,15 @@ interface DashboardAction {
   styleUrl: './dashboard.scss',
 })
 export class Dashboard {
+  UsersIcon = faUsers;
+
   constructor(
     public authService: Auth,
     public classiService: ClassiService,
     public materialiService: MaterialiService,
     public comunicazioniService: ComunicazioniService,
     private testService: TestsService,
-    private materiaService: Materia,
+    public materiaService: Materia,
   ) {
     // Aggiorna reattivamente i quickLinks quando i dati dei service cambiano
     effect(() => {

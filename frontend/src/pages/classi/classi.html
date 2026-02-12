@@ -9,7 +9,7 @@
   <div>
     <input
       type="text"
-      class="form-control me-3 custom-input"
+      class="form-control me-3 custom-input filter"
       id="search-term"
       placeholder="Cerca classi..."
       style="min-width: 400px"
@@ -20,7 +20,7 @@
   <div class="ms-4">
     <select
       id="year-filter"
-      class="form-select custom-input"
+      class="form-select custom-input filter"
       style="min-width: 200px"
       [value]="SelectedYear()"
       (change)="onYearChange($any($event.target).value)"
@@ -116,13 +116,12 @@
   [class.inGridView]="viewType === 'grid'"
   class="mt-5"
 >
-  <ngb-pagination
+  <app-syllex-pagination
     [collectionSize]="CollectionSize()"
     [page]="Page()"
     [pageSize]="PageSize()"
     (pageChange)="onNewPageRequested($event)"
-  >
-  </ngb-pagination>
+  />
 
   <select
     class="form-select form-select-sm"

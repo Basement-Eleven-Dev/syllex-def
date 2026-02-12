@@ -1,8 +1,6 @@
 <section class="form-section d-flex flex-row align-items-center mb-5">
   <div>
-    <label for="search-term" class="form-label fw-semibold text-dark"
-      >Studente</label
-    >
+    <label for="search-term" class="form-label text-dark">Studente</label>
     <input
       type="text"
       class="form-control me-3 custom-input"
@@ -54,13 +52,12 @@
 </div>
 
 <div class="mt-5 d-flex flex-row justify-content-between align-items-center">
-  <ngb-pagination
+  <app-syllex-pagination
     [collectionSize]="collectionSize"
-    [(page)]="page"
+    [page]="page"
     [pageSize]="pageSize"
-    (pageChange)="onNewPageRequested()"
-  >
-  </ngb-pagination>
+    (pageChange)="page = $event; onNewPageRequested()"
+  />
 
   <select
     class="form-select form-select-sm"

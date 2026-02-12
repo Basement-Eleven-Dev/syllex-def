@@ -1,23 +1,34 @@
-<h1 class="text-dark fw-medium mb-0 display-6">
+<h1 class="text-dark fw-medium mb-3 display-6">
   Bentornato, {{ authService.user?.firstName }}
 </h1>
-<p class="text-dark mb-0">
-  Qui puoi gestire i contenuti e i test per la materia Scienze Nautiche
-</p>
+<h5 class="text-dark mb-0 fw-normal">
+  Qui puoi gestire i contenuti e i test per la materia {{
+  materiaService.materiaSelected()?.name }}.
+</h5>
 
 <div class="row mt-5">
   @for(link of quickLinks; track $index){
   <div class="col-12 col-md-6 col-lg-3 mb-4">
-    <div
-      class="card linkCard text-center h-100 py-1 test"
-      [class.alert]="link.alert"
-    >
-      <div class="card-body d-flex flex-column align-items-center">
-        <div class="flex-fill d-flex flex-column justify-content-center my-4">
-          <span class="cardDescription">{{link.description}}</span>
-          <span class="cardValue">{{link.value}}</span>
+    <div class="card linkCard" [class.bg-warning]="link.alert">
+      <div
+        class="card-body d-flex flex-row align-items-center justify-content-center gap-3"
+      >
+        <div
+          class="bg-primary rounded-circle d-flex flex-row justify-content-center align-items-center aspect-ratio-1"
+          style="width: 60px; height: 60px"
+        >
+          <fa-icon
+            [icon]="UsersIcon"
+            class="text-white"
+            style="font-size: 1.5rem"
+          ></fa-icon>
         </div>
-        <a href="{{link.route}}" class="cardLink">{{link.routeString}}</a>
+        <div
+          class="flex-fill d-flex flex-column justify-content-start align-items-start"
+        >
+          <span class="">{{link.description}}</span>
+          <h1 class="fw-bold" style="line-height: 0.8">{{link.value}}</h1>
+        </div>
       </div>
     </div>
   </div>
@@ -29,7 +40,7 @@
     <div class="card p-4 flex-fill" id="startWorkingCard">
       <div class="card-body">
         <span class="display-5 fw-medium text-dark" style="line-height: 1"
-          >Inizia ad usare Syllex</span
+          >Inizia <br />ad usare Syllex</span
         >
         <div class="row mt-3">
           @for(action of quickActions; track $index){
@@ -67,7 +78,8 @@
               >
                 <span>{{ c.title }}</span>
                 @if(c.materialIds && c.materialIds.length > 0){
-                <span class="badge bg-primary ms-2 text-white fw-bold"
+                <span
+                  class="btn btn-sm icon-btn border-1 border-primary text-primary fw-bold"
                   >{{ c.materialIds.length }}
                   <fa-icon [icon]="AttachmentIcon"></fa-icon>
                 </span>
@@ -87,6 +99,6 @@
   </div>
 </div>
 
-<section class="mt-5">
+<section class="mt-5 card">
   <app-calendario></app-calendario>
 </section>

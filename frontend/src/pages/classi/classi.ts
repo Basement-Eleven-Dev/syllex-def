@@ -10,7 +10,7 @@ import {
 } from '@fortawesome/pro-solid-svg-icons';
 import { ClassiService, ClassInterface } from '../../services/classi-service';
 import { RouterModule } from '@angular/router';
-import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
+import { SyllexPagination } from '../../components/syllex-pagination/syllex-pagination';
 import { FormsModule } from '@angular/forms';
 import {
   ViewTypeToggle,
@@ -22,7 +22,7 @@ import {
   imports: [
     FontAwesomeModule,
     RouterModule,
-    NgbPagination,
+    SyllexPagination,
     FormsModule,
     ViewTypeToggle,
   ],

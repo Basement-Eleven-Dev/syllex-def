@@ -1,18 +1,7 @@
 <form [formGroup]="genAiQuestionForm" (ngSubmit)="onGenerate()">
   <div class="offcanvas-body dvh-100 overflow-scroll p-4">
     <div class="h-100 d-flex flex-column gap-2 justify-content-between">
-      <button
-        type="button"
-        class="btn-close"
-        aria-label="Close"
-        (click)="offcanvas.dismiss('Cross click')"
-      ></button>
-
       <section class="form-section">
-        <label class="form-label fw-semibold text-dark"
-          >Tipologia di risposta:
-          <span class="fw-normal">{{ selectedType() | titlecase }}</span></label
-        >
         <app-type-selector
           [options]="questionTypeOptions"
           [(selectedValue)]="selectedType"
@@ -21,7 +10,7 @@
         ></app-type-selector>
       </section>
       <section class="form-section">
-        <label class="form-label fw-semibold text-dark">Argomento</label>
+        <label class="form-label text-dark">Argomento</label>
         <select
           class="form-select mb-4 custom-input w-auto"
           formControlName="topic"
@@ -33,7 +22,7 @@
           }
         </select>
 
-        <label class="form-label fw-semibold text-dark">Dettagli domanda</label>
+        <label class="form-label text-dark">Dettagli domanda</label>
         <textarea
           class="form-control mb-4 custom-input"
           formControlName="details"

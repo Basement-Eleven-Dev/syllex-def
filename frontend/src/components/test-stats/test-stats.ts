@@ -11,7 +11,7 @@ import { QuestionInterface } from '../../services/questions';
 import { faEye } from '@fortawesome/pro-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
+import { SyllexPagination } from '../syllex-pagination/syllex-pagination';
 
 // Register Chart.js components
 Chart.register(...registerables);
@@ -25,7 +25,12 @@ interface QuestionStats extends QuestionInterface {
 
 @Component({
   selector: 'app-test-stats',
-  imports: [FontAwesomeModule, FormsModule, NgbPagination, ReactiveFormsModule],
+  imports: [
+    FontAwesomeModule,
+    FormsModule,
+    SyllexPagination,
+    ReactiveFormsModule,
+  ],
   templateUrl: './test-stats.html',
   styleUrl: './test-stats.scss',
 })

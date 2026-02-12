@@ -12,7 +12,7 @@ export type ViewType = 'grid' | 'table';
   styleUrl: './view-type-toggle.scss',
 })
 export class ViewTypeToggle {
-  readonly ListIcon = faList;
+  readonly TableIcon = faList;
   readonly GridIcon = faGrid;
 
   viewType = input.required<ViewType>();

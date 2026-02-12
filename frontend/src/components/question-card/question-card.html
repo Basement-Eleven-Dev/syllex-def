@@ -1,125 +1,138 @@
 <div
-  class="d-flex align-items-start gap-2 card p-3 question-card"
+  class="d-flex align-items-start gap-2 card question-card p-3"
   [class.moveable]="showTestCompositionActions"
   [class.collapsed]="isCollapsed()"
   id="questionCard"
 >
-  @if(collapsable()) {
-  <button
-    type="button"
-    class="collapse-banner btn btn-link p-0"
-    (click)="toggleCollapse()"
-    [attr.aria-expanded]="!isCollapsed()"
-    aria-label="Toggle card content"
-  >
-    <fa-icon [icon]="collapseIcon()"></fa-icon>
-  </button>
-  }
-
-  <div class="flex-grow-1 w-100 d-flex flex-column gap-2">
-    <div class="d-flex align-items-start gap-2 mb-2">
-      @if(showIndex){<span class="badge bg-dark"># {{ index + 1 }}</span>}
-      <span class="badge border border-primary text-primary"
-        >{{ question.type }}</span
-      >
-      <span class="badge bg-primary"
-        >{{ materiaService.getTopicName(question.topicId) }}</span
-      >
-      @if(showPolicy){<span class="badge bg-light text-dark"
-        >{{ question.policy == 'public' ? 'Pubblica' : 'Privata' }}</span
-      >} @if(showBancaActions) {
-      <div class="d-flex flex-row gap-1 justify-content-end w-100">
-        <button
-          type="button"
-          class="btn btn-sm btn-outline-primary"
-          title="Modifica"
-          [routerLink]="'/t/edit-question/' + question._id"
-        >
-          <fa-icon [icon]="EditIcon"></fa-icon> Modifica
-        </button>
-        <button
-          type="button"
-          class="btn btn-sm btn-outline-danger"
-          (click)="removeMe.emit(question._id)"
-          title="Rimuovi"
-        >
-          <fa-icon [icon]="TrashIcon"></fa-icon> Elimina
-        </button>
-      </div>
-      }
-    </div>
-
-    <!-- Preview sempre visibile quando collassata -->
-    @if(isCollapsed()) {
-    <p class="mb-0 text-muted question-preview">{{ questionPreview() }}</p>
-    }
-
-    <!-- Contenuto completo espanso -->
-    <div [ngbCollapse]="isCollapsed()">
-      <div class="d-flex flex-column gap-3">
-        @if(question.imageUrl) {
-        <div class="mb-3 w-100 text-center">
-          <img
-            [src]="question.imageUrl"
-            alt="Immagine della domanda"
-            class="img-fluid"
-            (click)="onExpandImage(question.imageUrl)"
-            style="max-height: 100px"
-          />
-        </div>
-        }
-        <section>
-          <p class="mb-0 fw-light text-muted">Domanda</p>
-          <p class="mb-0 fw-medium">{{ question.text }}</p>
-        </section>
-
-        <section>
-          <ol type="A" class="mb-0">
-            @for (option of question.options; track $index) {
-            <li [class.correct]="option.isCorrect">
-              {{ option.label }} @if(option.isCorrect) {
-              <fa-icon [icon]="CheckIcon"></fa-icon>
-              }
-            </li>
-            }
-          </ol>
-        </section>
-
-        @if(showExplanation) {
-        <section>
-          <p class="mb-0 fw-light text-muted">Correzione</p>
-          <p>{{ question.explanation }}</p>
-        </section>
-        }
-      </div>
-    </div>
-  </div>
-
-  <!-- Azioni -->
-  @if(showTestCompositionActions) {
-  <div class="d-flex flex-row gap-1 justify-content-between w-100">
-    <input
-      type="number"
-      class="form-control form-control-sm custom-input"
-      style="width: 150px"
-      [(ngModel)]="points"
-      value="1"
-      step="1"
-      min="1"
-      max="100"
-      placeholder="Punti se corretta"
-    />
+  <div class="card-body">
+    @if(collapsable()) {
     <button
       type="button"
-      class="btn btn-sm btn-outline-danger"
-      (click)="removeMe.emit(question._id)"
-      title="Rimuovi"
+      class="collapse-banner btn btn-link p-0"
+      (click)="toggleCollapse()"
+      [attr.aria-expanded]="!isCollapsed()"
+      aria-label="Toggle card content"
     >
-      <fa-icon [icon]="TrashIcon"></fa-icon> Rimuovi
+      <fa-icon [icon]="collapseIcon()"></fa-icon>
     </button>
-  </div>
-  }
+    }
 
-  <!-- Placeholder durante il drag -->
-  <div class="drag-placeholder" *cdkDragPlaceholder></div>
+    <div class="flex-grow-1 w-100 d-flex flex-column gap-2">
+      <div class="d-flex align-items-center gap-2 mb-2">
+        @if(showPolicy){
+        <div class="d-flex flex-row gap-2 align-items-center me-4">
+          <div [class]="'status-pill ' + question.policy"></div>
+          {{ question.policy | titlecase }}
+        </div>
+        } @if(showIndex){<span class="badge bg-dark"># {{ index + 1 }}</span>}
+        <span class="text-primary">{{ question.type }}</span> |
+        <span class="text-muted"
+          >{{ materiaService.getTopicName(question.topicId) }}</span
+        >
+      </div>
+
+      <!-- Preview sempre visibile quando collassata -->
+      @if(isCollapsed()) {
+      <p class="mb-0 text-muted question-preview">{{ questionPreview() }}</p>
+      }
+
+      <!-- Contenuto completo espanso -->
+      <div [ngbCollapse]="isCollapsed()">
+        <div class="d-flex flex-column">
+          @if(question.imageUrl) {
+          <div class="text-center">
+            <img
+              [src]="question.imageUrl"
+              alt="Immagine della domanda"
+              class="rounded-4"
+              (click)="onExpandImage(question.imageUrl)"
+              style="max-height: 200px"
+            />
+          </div>
+          }
+          <section>
+            <p class="mb-0 fw-light text-muted">Domanda</p>
+            <p class="mb-0 fw-normal">
+              {{ question.text }}Sint in ad consequat proident proident dolore
+              enim sint occaecat quis. Et fugiat eiusmod nulla aliqua
+              adipisicing qui excepteur esse cillum sint cupidatat ut id
+              consequat
+            </p>
+          </section>
+
+          <section class="my-3">
+            <ol type="A" class="mb-0 ps-0 gap-2 d-flex flex-column">
+              @for (option of question.options; track $index) {
+              <li
+                [class.correct]="option.isCorrect"
+                class="d-flex align-items-center gap-2"
+              >
+                <input type="radio" name="option-{{ $index }}" />
+                <span>{{ option.label }}</span>
+                @if(option.isCorrect) {
+                <fa-icon [icon]="CheckIcon"></fa-icon>
+                }
+              </li>
+              }
+            </ol>
+          </section>
+
+          @if(showExplanation) {
+          <section>
+            <p class="mb-0 fw-light text-muted">Correzione</p>
+            <p>{{ question.explanation }}</p>
+          </section>
+          }
+        </div>
+      </div>
+    </div>
+    @if(showBancaActions) {
+    <div class="d-flex flex-row gap-1 justify-content-end w-100">
+      <button
+        type="button"
+        class="btn btn-outline-primary"
+        title="Modifica"
+        [routerLink]="'/t/edit-question/' + question._id"
+      >
+        <fa-icon [icon]="EditIcon"></fa-icon>
+      </button>
+      <button
+        type="button"
+        class="btn btn-outline-danger"
+        (click)="removeMe.emit(question._id)"
+        title="Rimuovi"
+      >
+        <fa-icon [icon]="TrashIcon"></fa-icon>
+      </button>
+    </div>
+    }
+
+    <!-- Azioni -->
+    @if(showTestCompositionActions) {
+    <div class="d-flex flex-row gap-1 justify-content-between w-100 mt-4">
+      <input
+        type="number"
+        class="form-control form-control-sm custom-input"
+        style="width: 150px"
+        [(ngModel)]="points"
+        value="1"
+        step="1"
+        min="1"
+        max="100"
+        placeholder="Punti se corretta"
+      />
+      <button
+        type="button"
+        class="btn btn-outline-danger"
+        (click)="removeMe.emit(question._id)"
+        title="Rimuovi"
+      >
+        <fa-icon [icon]="TrashIcon"></fa-icon>
+      </button>
+    </div>
+    }
+
+    <!-- Placeholder durante il drag -->
+    <div class="drag-placeholder" *cdkDragPlaceholder></div>
+  </div>
 </div>

@@ -11,7 +11,7 @@ import { QuestionCard } from '../../components/question-card/question-card';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPlus } from '@fortawesome/pro-solid-svg-icons';
 import { RouterModule } from '@angular/router';
-import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
+import { SyllexPagination } from '../../components/syllex-pagination/syllex-pagination';
 import { FormsModule } from '@angular/forms';
 import { QuestionsService, QuestionInterface } from '../../services/questions';
 import { Materia } from '../../services/materia';
@@ -23,7 +23,7 @@ import { Materia } from '../../services/materia';
     QuestionCard,
     FontAwesomeModule,
     RouterModule,
-    NgbPagination,
+    SyllexPagination,
     FormsModule,
   ],
   templateUrl: './banca.html',

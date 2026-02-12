@@ -86,7 +86,7 @@ export class CreateEditQuestion {
       : 'Compila il modulo sottostante per creare una nuova domanda.',
   );
   readonly SaveButtonLabel = computed(() =>
-    this.IsEditMode() ? 'Salva modifiche' : 'Crea domanda',
+    this.IsEditMode() ? 'Aggiorna domanda' : 'Salva domanda',
   );
 
   readonly QuestionForm: FormGroup = new FormGroup({

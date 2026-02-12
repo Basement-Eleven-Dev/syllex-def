@@ -15,7 +15,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faUpload, IconDefinition } from '@fortawesome/pro-solid-svg-icons';
-import { getFileIcon } from '../../app/_utils/file-icons';
+import { getFileIcon, getIconColor } from '../../app/_utils/file-icons';
 import { MaterialiItemComponent } from './materiali-item.component';
 
 export interface MaterialeWithPath extends MaterialInterface {
@@ -37,6 +37,10 @@ export class MaterialiSelector {
 
   initialMaterialIds = input<string[]>([]);
   selectionChange = output<MaterialInterface[]>();
+
+  getIconColor(item: MaterialInterface): string {
+    return getIconColor(item.extension || '');
+  }
 
   expandedFolders = signal<Set<string>>(new Set());
   selectedMaterialIds = signal<Set<string>>(new Set());

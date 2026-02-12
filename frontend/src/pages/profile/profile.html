@@ -6,7 +6,7 @@
 <div class="row mt-5">
   <div class="col-6">
     <section class="form-section">
-      <label for="name" class="form-label fw-semibold text-dark">
+      <label for="name" class="form-label text-dark">
         <fa-icon [icon]="BuildingIcon"></fa-icon>Organizzazione</label
       >
       <h4 class="fw-light text-dark" id="name">
@@ -19,9 +19,7 @@
 <div class="row mt-5">
   <div class="col-6">
     <section class="form-section">
-      <label for="name" class="form-label fw-semibold text-dark"
-        >Nome e Cognome</label
-      >
+      <label for="name" class="form-label text-dark">Nome e Cognome</label>
       <h4 class="fw-light text-dark" id="name">
         {{ authService.user?.firstName }} {{ authService.user?.lastName }}
       </h4>
@@ -29,7 +27,7 @@
   </div>
   <div class="col-6">
     <section class="form-section">
-      <label for="name" class="form-label fw-semibold text-dark">Ruolo</label>
+      <label for="name" class="form-label text-dark">Ruolo</label>
       <h4 class="fw-light text-dark" id="name">
         @switch(authService.user?.role) { @case('teacher'){Docente}
         @case('admin'){Admin} @default{ {{ authService.user?.role }} } }
@@ -42,7 +40,7 @@
     <section class="form-section">
       <label
         for="name"
-        class="form-label fw-semibold text-dark w-100 d-flex align-items-center justify-content-between"
+        class="form-label text-dark w-100 d-flex align-items-center justify-content-between"
         >Email
         <button class="btn btn-link p-0 ms-2" (click)="onChangeEmail()">
           <fa-icon [icon]="EditIcon"></fa-icon> Modifica email
@@ -57,7 +55,7 @@
     <section class="form-section">
       <label
         for="name"
-        class="form-label fw-semibold text-dark w-100 d-flex align-items-center justify-content-between"
+        class="form-label text-dark w-100 d-flex align-items-center justify-content-between"
         >Password
         <button class="btn btn-link p-0 ms-2" (click)="onChangePassword()">
           <fa-icon [icon]="EditIcon"></fa-icon> Modifica password
@@ -70,7 +68,7 @@
 <div class="row mt-5">
   <div class="col-12">
     <section class="form-section">
-      <label for="name" class="form-label fw-semibold text-dark mb-4"
+      <label for="name" class="form-label text-dark mb-4"
         >Materie di insegnamento</label
       >
       <div class="row">

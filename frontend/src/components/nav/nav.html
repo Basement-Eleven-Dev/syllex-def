@@ -9,15 +9,15 @@
     style="opacity: 1; cursor: pointer"
     routerLink="/t/dashboard"
   />
-  <div class="flex-fill d-flex flex-row align-items-center gap-3">
-    <button class="btn calendarBtn h-100">
+  <div class="flex-fill d-flex flex-row gap-3 align-items-stretch">
+    <button class="btn calendarBtn" (click)="openCalendarioModal()">
       <fa-icon [icon]="CalendarIcon"></fa-icon>
       {{ now | date: 'dd - MM - yy' | titlecase }}
     </button>
-    <div class="flex-fill">
+    <div class="flex-fill d-flex">
       <input
         type="text"
-        class="form-control w-25 custom-input"
+        class="form-control w-auto custom-input"
         placeholder="Search..."
       />
     </div>
@@ -27,17 +27,30 @@
         id="dropdownBasic1"
         ngbDropdownToggle
         style="cursor: pointer"
-        class="d-flex flex-row align-items-center gap-2 btn btn-dark"
+        class="d-flex flex-row align-items-center gap-2 h-100"
       >
         <a
           class="d-flex align-items-center justify-content-center text-white p-0"
         >
-          <fa-icon [icon]="UserProfileIcon" [size]="'xl'"></fa-icon>
+          <fa-icon
+            [icon]="UserProfileIcon"
+            class="text-secondary"
+            [size]="'2x'"
+          ></fa-icon>
         </a>
       </div>
-      <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-        <button ngbDropdownItem routerLink="/t/profilo">Profilo</button>
-        <button ngbDropdownItem class="text-danger" (click)="onLogout()">
+      <div
+        ngbDropdownMenu
+        aria-labelledby="dropdownBasic1"
+        class="p-3 dropdown-menu"
+      >
+        <h4>
+          {{ authService.user?.firstName }} {{ authService.user?.lastName }}
+        </h4>
+        <button routerLink="/t/profilo" class="btn btn-outline-primary w-100">
+          Profilo
+        </button>
+        <button class="btn btn-outline-danger w-100" (click)="onLogout()">
           <fa-icon [icon]="LogoutIcon"></fa-icon> Logout
         </button>
       </div>

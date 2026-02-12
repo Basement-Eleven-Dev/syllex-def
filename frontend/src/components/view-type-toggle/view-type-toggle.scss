@@ -1,3 +1,53 @@
 .btn-group {
   border-radius: 8px;
 }
+.wrapper {
+  position: relative;
+  width: 100px;
+  border-radius: 8px;
+  outline: 1px solid var(--bs-primary);
+  .icon-wrapper {
+    width: 50%;
+    aspect-ratio: 1/0.85;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  #selector {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    background-color: var(--bs-primary);
+    border-radius: 8px;
+    transition: left 0.3s ease;
+    z-index: 1;
+  }
+
+  &.grid-view {
+    #selector {
+      left: 50%;
+    }
+    #table-icon {
+      color: var(--bs-primary);
+    }
+    #grid-icon {
+      color: var(--bs-white);
+    }
+  }
+  &.table-view {
+    #selector {
+      left: 0;
+    }
+    #table-icon {
+      color: var(--bs-white);
+    }
+    #grid-icon {
+      color: var(--bs-primary);
+    }
+  }
+}

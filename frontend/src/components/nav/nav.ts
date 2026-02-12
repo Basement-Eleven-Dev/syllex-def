@@ -12,8 +12,10 @@ import {
   NgbDropdownToggle,
   NgbDropdownMenu,
   NgbDropdownItem,
+  NgbModal,
 } from '@ng-bootstrap/ng-bootstrap';
 import { Auth } from '../../services/auth';
+import { Calendario } from '../calendario/calendario';
 
 @Component({
   selector: 'app-nav',
@@ -37,7 +39,10 @@ export class Nav implements OnInit, OnDestroy {
   private intervalId?: number;
   UserProfileIcon = faUserCircle;
 
-  constructor(public authService: Auth) {}
+  constructor(
+    public authService: Auth,
+    private modalService: NgbModal,
+  ) {}
 
   ngOnInit() {
     this.intervalId = window.setInterval(() => {
@@ -54,6 +59,13 @@ export class Nav implements OnInit, OnDestroy {
   onLogout() {
     this.authService.logout().then(() => {
       window.location.reload();
+    });
+  }
+
+  openCalendarioModal() {
+    const modalRef = this.modalService.open(Calendario, {
+      size: 'xl',
+      centered: true,
     });
   }
 }

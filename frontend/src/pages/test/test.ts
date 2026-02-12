@@ -6,7 +6,7 @@ import { TestCard } from '../../components/test-card/test-card';
 import { TestTable } from '../../components/test-table/test-table';
 import { RouterModule } from '@angular/router';
 import { TestInterface, TestsService } from '../../services/tests-service';
-import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
+import { SyllexPagination } from '../../components/syllex-pagination/syllex-pagination';
 import { FormsModule } from '@angular/forms';
 import {
   ViewTypeToggle,
@@ -24,7 +24,7 @@ type TestStatus = 'bozza' | 'pubblicato' | 'archiviato' | '';
     TestTable,
     RouterModule,
     TitleCasePipe,
-    NgbPagination,
+    SyllexPagination,
     FormsModule,
     ViewTypeToggle,
   ],

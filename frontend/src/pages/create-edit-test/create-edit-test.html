@@ -15,9 +15,7 @@
 } @else {
 <form [formGroup]="TestForm" class="d-flex flex-column gap-4">
   <section class="form-section">
-    <label for="test-title" class="form-label fw-semibold text-dark"
-      >Titolo del test</label
-    >
+    <label for="test-title" class="form-label text-dark">Titolo del test</label>
     <input
       type="text"
       id="test-title"
@@ -34,7 +32,7 @@
       <div class="col-6">
         <div class="row">
           <div class="col-6">
-            <label for="available-from" class="form-label fw-semibold text-dark"
+            <label for="available-from" class="form-label text-dark"
               >Dal giorno</label
             >
             <input
@@ -45,7 +43,7 @@
             />
           </div>
           <div class="col-6">
-            <label for="available-to" class="form-label fw-semibold text-dark"
+            <label for="available-to" class="form-label text-dark"
               >Fino al giorno</label
             >
             <input
@@ -66,7 +64,7 @@
     >
     <div class="row">
       <div class="col-6">
-        <label class="form-label fw-semibold text-dark"
+        <label class="form-label text-dark"
           >Classi a cui assegnare il test</label
         >
         <app-class-selector
@@ -75,7 +73,7 @@
         ></app-class-selector>
       </div>
       <div class="col-6">
-        <label for="access-password" class="form-label fw-semibold text-dark"
+        <label for="access-password" class="form-label text-dark"
           >Password d'accesso</label
         >
         <div class="d-flex flex-row gap-3">
@@ -136,7 +134,7 @@
     >
     <div class="row">
       <div class="col-4">
-        <label for="required-score" class="form-label fw-semibold text-dark"
+        <label for="required-score" class="form-label text-dark"
           >Punteggio minimo per idoneità</label
         >
         <input
@@ -155,7 +153,7 @@
         }
       </div>
       <div class="col-4">
-        <label for="max-time" class="form-label fw-semibold text-dark"
+        <label for="max-time" class="form-label text-dark"
           >Tempo massimo (minuti)</label
         >
         <div class="d-flex flex-row gap-3">

@@ -1,0 +1,39 @@
+<div class="pagination-container">
+  <button
+    class="nav-button"
+    [disabled]="page() === 1"
+    (click)="onPrevious()"
+    type="button"
+  >
+    <fa-icon [icon]="ChevronLeft"></fa-icon>
+  </button>
+
+  <div class="pages-wrapper">
+    <div
+      class="selector"
+      [style.left.%]="selectorPosition()"
+      [style.width.%]="selectorWidth()"
+    ></div>
+    <div class="pages-container">
+      @for (p of visiblePages(); track p) {
+      <button
+        class="page-button"
+        [class.active]="p === page()"
+        (click)="onPageClick(p)"
+        type="button"
+      >
+        {{ p }}
+      </button>
+      }
+    </div>
+  </div>
+
+  <button
+    class="nav-button"
+    [disabled]="page() === totalPages()"
+    (click)="onNext()"
+    type="button"
+  >
+    <fa-icon [icon]="ChevronRight"></fa-icon>
+  </button>
+</div>

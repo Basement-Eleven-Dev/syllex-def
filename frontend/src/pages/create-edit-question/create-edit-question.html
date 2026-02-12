@@ -9,14 +9,12 @@
   class="d-flex flex-column gap-4"
 >
   <section>
-    <h1 class="text-dark fw-bold mb-0 display-6">{{ PageTitle() }}</h1>
-    <p class="text-dark">{{ PageDescription() }}</p>
+    <h1 class="text-dark fw-medium mb-3 display-6">{{ PageTitle() }}</h1>
+    <h5 class="text-dark mb-0 fw-normal">{{ PageDescription() }}</h5>
   </section>
 
   <section class="form-section">
-    <label class="form-label fw-semibold text-dark"
-      >Tipologia di risposta</label
-    >
+    <label class="form-label text-dark">Tipologia di risposta</label>
     <app-type-selector
       [options]="QuestionTypeOptions"
       [(selectedValue)]="SelectedQuestionType"
@@ -26,9 +24,9 @@
   </section>
 
   <section class="form-section">
-    <label class="form-label fw-semibold text-dark">Argomento</label>
+    <label class="form-label text-dark">Argomento</label>
     <select
-      class="form-select form-select-lg custom-input w-auto"
+      class="form-select custom-input w-auto"
       formControlName="topicId"
       aria-label="Seleziona argomento"
     >
@@ -44,9 +42,7 @@
       class="d-flex flex-row justify-content-between align-items-center mb-3"
     >
       <div>
-        <h5 class="form-label fw-semibold text-dark">
-          Contenuto della domanda
-        </h5>
+        <h5 class="form-label text-dark">Contenuto della domanda</h5>
         <p class="text-dark mb-0">
           Scrivi la domanda, le risposte e una spiegazione riguardante la
           risposta corretta. Puoi sempre usare l’AI per aiutarti nella
@@ -65,7 +61,7 @@
 
     <section class="row">
       <div class="col-md-8 d-flex flex-column">
-        <label class="form-label fw-semibold text-dark">Testo</label>
+        <label class="form-label text-dark">Testo</label>
         <textarea
           class="form-control custom-input flex-fill"
           formControlName="text"
@@ -74,7 +70,7 @@
         ></textarea>
       </div>
       <div class="col-md-4 d-flex flex-column">
-        <label class="form-label fw-semibold text-dark">Allega immagine</label>
+        <label class="form-label text-dark">Allega immagine</label>
         <div
           id="imageDropArea"
           class="rounded-4 p-3"
@@ -132,7 +128,7 @@
   </section>
 
   @if(SelectedQuestionType() === 'scelta multipla' ) {
-  <section class="row form-section">
+  <section class="form-section">
     <div class="col-8">
       <app-multiple-choice-options
         [options]="questionOptions"
@@ -142,12 +138,12 @@
   </section>
   } @if(SelectedQuestionType() === 'vero falso' ) {
   <section class="form-section">
-    <label class="form-label fw-semibold text-dark">Risposta corretta</label>
+    <label class="form-label text-dark">Risposta corretta</label>
     <p class="text-muted mb-3">Seleziona se l'affermazione è vera o falsa</p>
     <div class="row">
       <div class="col-3">
         <div
-          class="card shadow-sm typeCard p-1 cursor-pointer"
+          class="card typeCard p-1 cursor-pointer"
           (click)="onSelectCorrectAnswer(true)"
           [class.selected]="QuestionForm.get('correctAnswer')?.value === true"
         >
@@ -182,7 +178,7 @@
   }
 
   <section class="form-section">
-    <label class="form-label fw-semibold text-dark"
+    <label class="form-label text-dark"
       >Spiegazione della risposta corretta</label
     >
     <textarea
@@ -246,7 +242,7 @@
 
   <section class="d-flex flex-row justify-content-end mt-5 gap-3">
     <button
-      class="btn btn-success text-white btn-lg fs-3"
+      class="btn btn-primary icon-btn btn-lg"
       type="submit"
       [disabled]="QuestionForm.invalid || IsLoading()"
     >

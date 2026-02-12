@@ -6,7 +6,7 @@
     </h5>
   </div>
   <button
-    class="btn btn-primary btn-lg ms-auto icon-btn py-3"
+    class="btn btn-gradient btn-lg ms-auto py-3 icon-btn"
     routerLink="/t/tests/new"
   >
     <fa-icon [icon]="PlusIcon" />
@@ -14,12 +14,12 @@
   </button>
 </div>
 
-<section class="form-section d-flex flex-row align-items-center mb-5 gap-3">
+<section class="d-flex flex-row align-items-center mb-5 gap-3">
   <div>
     <input
       type="text"
       id="search-term"
-      class="form-control me-3 custom-input"
+      class="form-control me-3 custom-input filter"
       placeholder="Cerca test..."
       style="min-width: 400px"
       [value]="SearchTerm()"
@@ -30,7 +30,7 @@
   <div>
     <select
       id="publication-status"
-      class="form-select custom-input"
+      class="form-select custom-input filter"
       style="max-width: 200px"
       [value]="Status()"
       (change)="onStatusChange($any($event.target).value)"
@@ -79,7 +79,7 @@
   [class.inTableView]="ViewType === 'table'"
   [class.inGridView]="ViewType === 'grid'"
 >
-  <ngb-pagination
+  <app-syllex-pagination
     [collectionSize]="CollectionSize()"
     [page]="Page()"
     [pageSize]="PageSize()"
@@ -87,7 +87,7 @@
   />
 
   <select
-    class="form-select form-select-sm"
+    class="form-select form-select-sm custom-input"
     style="width: auto"
     [value]="PageSize()"
     (change)="onPageSizeChange(+$any($event.target).value)"

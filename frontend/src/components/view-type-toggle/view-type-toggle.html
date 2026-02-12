@@ -1,16 +1,15 @@
-<div class="btn-group">
-  <button
-    class="btn"
-    [ngClass]="{'btn-outline-primary': viewType() !== 'table', 'btn-primary': viewType() === 'table'}"
-    (click)="onChangeViewType('table')"
-  >
-    <fa-icon [icon]="ListIcon"></fa-icon>
-  </button>
-  <button
-    class="btn"
-    [ngClass]="{'btn-outline-primary': viewType() !== 'grid', 'btn-primary': viewType() === 'grid'}"
-    (click)="onChangeViewType('grid')"
-  >
-    <fa-icon [icon]="GridIcon"></fa-icon>
-  </button>
+<div
+  class="wrapper"
+  style="z-index: 99"
+  [ngClass]="viewType() === 'table' ? 'table-view' : 'grid-view'"
+>
+  <div id="selector"></div>
+  <div style="z-index: 100">
+    <div class="icon-wrapper" (click)="onChangeViewType('table')">
+      <fa-icon [icon]="TableIcon" id="table-icon"></fa-icon>
+    </div>
+    <div class="icon-wrapper" (click)="onChangeViewType('grid')">
+      <fa-icon [icon]="GridIcon" id="grid-icon"></fa-icon>
+    </div>
+  </div>
 </div>

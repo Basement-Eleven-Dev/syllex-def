@@ -26,6 +26,7 @@ import { NgbCollapse, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { RouterModule } from '@angular/router';
 import { ConfirmActionDirective } from '../../directives/confirm-action.directive';
 import { Materia } from '../../services/materia';
+import { TitleCasePipe } from '@angular/common';
 
 @Component({
   selector: 'div[app-question-card]',
@@ -38,6 +39,7 @@ import { Materia } from '../../services/materia';
     NgbCollapse,
     RouterModule,
     ConfirmActionDirective,
+    TitleCasePipe,
   ],
   templateUrl: './question-card.html',
   styleUrl: './question-card.scss',

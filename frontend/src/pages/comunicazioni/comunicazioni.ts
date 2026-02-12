@@ -4,7 +4,7 @@ import { faPlus, faXmark } from '@fortawesome/pro-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ComunicazioneCard } from '../../components/comunicazione-card/comunicazione-card';
 import { RouterModule } from '@angular/router';
-import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
+import { SyllexPagination } from '../../components/syllex-pagination/syllex-pagination';
 import { FormsModule } from '@angular/forms';
 import {
   ComunicazioniService,
@@ -18,7 +18,7 @@ import { ClassiService } from '../../services/classi-service';
     FontAwesomeModule,
     ComunicazioneCard,
     RouterModule,
-    NgbPagination,
+    SyllexPagination,
     FormsModule,
   ],
   templateUrl: './comunicazioni.html',
