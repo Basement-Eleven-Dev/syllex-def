@@ -17,6 +17,7 @@ import { LaboratorioAi } from '../pages/laboratorio-ai/laboratorio-ai';
 import { CreateEditComunicazione } from '../pages/create-edit-comunicazione/create-edit-comunicazione';
 import { Correzione } from '../pages/correzione/correzione';
 import { Profile } from '../pages/profile/profile';
+import { AgentPage } from '../pages/agent-page/agent-page';
 
 export const routes: Routes = [
   {
@@ -106,6 +107,10 @@ export const routes: Routes = [
       {
         path: 'laboratorio-ai',
         component: LaboratorioAi,
+      },
+      {
+        path: 'agente',
+        component: AgentPage,
       },
       {
         path: 'profilo',

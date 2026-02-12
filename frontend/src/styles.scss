@@ -328,8 +328,8 @@ textarea.custom-input {
   background: linear-gradient(
     135deg,
     var(--bs-primary) 0%,
-    color-mix(in srgb, var(--bs-primary) 70%, black) 50%,
-    color-mix(in srgb, var(--bs-primary) 90%, black) 100%
+    color-mix(in srgb, var(--bs-primary) 70%, rgb(242, 242, 242)) 50%,
+    color-mix(in srgb, var(--bs-primary) 90%, rgb(242, 242, 242)) 100%
   );
   color: white;
   border: none;
@@ -347,8 +347,8 @@ textarea.custom-input {
     background: linear-gradient(
       135deg,
       var(--bs-primary) 0%,
-      color-mix(in srgb, var(--bs-primary) 70%, black) 50%,
-      color-mix(in srgb, var(--bs-primary) 50%, white) 100%
+      color-mix(in srgb, var(--bs-primary) 70%, rgb(242, 242, 242)) 50%,
+      color-mix(in srgb, var(--bs-primary) 90%, rgb(242, 242, 242)) 100%
     );
     color: white;
     font-weight: bold;
