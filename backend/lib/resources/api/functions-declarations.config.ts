@@ -198,12 +198,6 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
-    apiRoute: "tests/{subjectId}/published/count",
-    functionPath: "tests/countPublishedTests.ts",
-    method: "get",
-    role: "teacher",
-  },
-  {
     apiRoute: "tests/assignments-to-grade/{subjectId}/count",
     functionPath: "tests/countAssignmentsToGrade.ts",
     method: "get",

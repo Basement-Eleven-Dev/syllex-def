@@ -19,6 +19,7 @@ import { FUNCTIONS_PATH } from "../../../environment";
 import { LambdaConstruct } from "../lambda";
 import { DefaultLambdaRole } from "../roles";
 import { API_GATEWAY_TIMEOUT } from "../../../src/env";
+import { writeFile } from "fs/promises";
 
 export interface RouteConstructProps extends NestedStackProps {
     apiId: string,
