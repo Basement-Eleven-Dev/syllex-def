@@ -29,7 +29,9 @@ export interface RouteConstructProps extends NestedStackProps {
         teacher?: Authorizer,
         student?: Authorizer
     },
-    validator?: RequestValidator
+    validator?: RequestValidator,
+    cognitoPoolId: string,
+    cognitoClientId: string
 
 }
 
@@ -83,8 +85,12 @@ export class RouteConstruct extends NestedStack {
         let apiMethod = resource.addMethod(
             method,
             new LambdaIntegration(
-                new LambdaConstruct(this, functionName, FUNCTIONS_PATH + functionPath, this.role).lambda,
+                new LambdaConstruct(this, functionName, FUNCTIONS_PATH + functionPath, this.role, {
+                    COGNITO_POOL_ID: this.props.cognitoPoolId,
+                    COGNITO_CLIENT_ID: this.props.cognitoClientId,
+                }).lambda,
                 {
+
                     timeout: Duration.seconds(API_GATEWAY_TIMEOUT),
                 }
             ),
