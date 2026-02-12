@@ -43,7 +43,7 @@
   </div>
   <button
     type="button"
-    class="btn btn-outline-danger"
+    class="btn btn-outline-danger btn-sm"
     (click)="clearFilters()"
     title="Pulisci filtri"
   >
@@ -52,6 +52,7 @@
   <app-view-type-toggle
     class="ms-auto"
     [viewType]="ViewType"
+    [pageKey]="'test'"
     (viewTypeChange)="onChangeViewType($event)"
   />
 </section>

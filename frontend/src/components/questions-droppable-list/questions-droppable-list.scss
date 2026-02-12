@@ -4,6 +4,8 @@
 
 .drop-zone {
   min-height: 400px;
+  max-height: 900px;
+  overflow-y: auto;
   transition: all 0.3s ease;
   background: #fafafa;
   border: 1px dashed #ccc;

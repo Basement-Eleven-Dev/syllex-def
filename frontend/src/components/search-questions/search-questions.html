@@ -4,7 +4,7 @@
 
 <div class="questions-list mt-4">
   <h6 class="mb-3 text-muted">
-    Risultati ({{ isLoading() ? '...' : filteredQuestions().length }})
+    Risultati ({{ isLoading() ? '...' : totalQuestions() }})
   </h6>
 
   @if (isLoading()) {
@@ -38,5 +38,14 @@
     ></div>
     }
   </div>
-  }
+
+  @if (totalQuestions() > pageSize) {
+  <app-syllex-pagination
+    class="d-flex justify-content-center mt-3"
+    [collectionSize]="totalQuestions()"
+    [page]="currentPage()"
+    [pageSize]="pageSize"
+    (pageChange)="onPageChange($event)"
+  />
+  } }
 </div>

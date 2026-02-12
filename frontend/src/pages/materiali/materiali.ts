@@ -108,7 +108,9 @@ export class Materiali {
   protected readonly ClearIcon = faXmark;
 
   // Signals
-  protected readonly viewType = signal<ViewType>('grid');
+  protected readonly viewType = signal<ViewType>(
+    this.loadViewTypePreference('materiali') || 'grid',
+  );
   protected readonly searchTerm = signal<string>('');
   protected readonly highlightedItemId = signal<string | null>(null);
 
@@ -164,6 +166,15 @@ export class Materiali {
   // Event Handlers
   protected onChangeViewType(type: ViewType): void {
     this.viewType.set(type);
+  }
+
+  private loadViewTypePreference(pageKey: string): ViewType | null {
+    try {
+      const saved = localStorage.getItem(`viewType_${pageKey}`);
+      return saved === 'grid' || saved === 'table' ? saved : null;
+    } catch (error) {
+      return null;
+    }
   }
 
   protected onSelectItem(item: MaterialInterface, event?: MouseEvent): void {

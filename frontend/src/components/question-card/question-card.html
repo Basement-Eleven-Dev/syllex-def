@@ -1,22 +1,9 @@
 <div
   class="d-flex align-items-start gap-2 card question-card p-3 h-100"
   [class.moveable]="showTestCompositionActions"
-  [class.collapsed]="isCollapsed()"
   id="questionCard"
 >
   <div class="card-body">
-    @if(collapsable()) {
-    <button
-      type="button"
-      class="collapse-banner btn btn-link p-0"
-      (click)="toggleCollapse()"
-      [attr.aria-expanded]="!isCollapsed()"
-      aria-label="Toggle card content"
-    >
-      <fa-icon [icon]="collapseIcon()"></fa-icon>
-    </button>
-    }
-
     <div class="flex-grow-1 w-100 d-flex flex-column gap-2">
       <div class="d-flex align-items-center gap-2 mb-2">
         @if(showPolicy){
@@ -31,13 +18,7 @@
         >
       </div>
 
-      <!-- Preview sempre visibile quando collassata -->
-      @if(isCollapsed()) {
-      <p class="mb-0 text-muted question-preview">{{ questionPreview() }}</p>
-      }
-
-      <!-- Contenuto completo espanso -->
-      <div [ngbCollapse]="isCollapsed()">
+      <div>
         <div class="d-flex flex-column">
           @if(question.imageUrl) {
           <div class="text-center">

@@ -1,4 +1,4 @@
-<div class="w-100 dvh-100 d-flex flex-column">
+<div class="w-100 dvh-100 d-flex flex-row">
   @if (showLoading()) {
   <div id="loadingOverlay" animate.enter="fade-in">
     <fa-icon [icon]="SpinnerIcon" [animation]="'spin'" size="3x"></fa-icon>
@@ -7,26 +7,20 @@
       <span class="fw-bold">{{ materia.materiaSelected()?.name }}</span>
     </h2>
   </div>
-  }
-  <app-nav></app-nav>
+  } @if (!showLoading()) {
+  <app-sidebar></app-sidebar>
   <div id="content" class="flex-fill overflow-hidden">
-    <div class="h-100 d-flex flex-row">
-      <app-sidebar></app-sidebar>
-      <div class="flex-grow-1 overflow-auto">
-        @if (showLoading()) {
-        <div class="text-center pt-5">
-          <fa-icon [icon]="SpinnerIcon" [animation]="'spin'"></fa-icon>
-        </div>
-        } @else {
-
+    <div class="container h-100 d-flex flex-column">
+      <app-nav></app-nav>
+      <div class="flex-fill overflow-auto">
         <div
-          class="py-4 px-0 container"
+          class="py-4 container-fluid"
           [@routeAnimation]="getRouteAnimationState()"
         >
           <router-outlet></router-outlet>
         </div>
-        }
       </div>
     </div>
   </div>
+  }
 </div>

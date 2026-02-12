@@ -1,11 +1,11 @@
-<div class="h-100 bg-light shadow rounded-top-5 rounded-bottom-5">
-  <div class="w-100 px-3 py-4 d-flex flex-column h-100 card">
+<div class="h-100 bg-light" style="width: 250px">
+  <div class="w-100 px-3 py-4 d-flex flex-column h-100">
     <div
       class="card bg-secondary text-dark p-3 d-flex flex-column justify-content-center fw-bold overflow-hidden position-relative"
     >
       <fa-icon [icon]="BookIcon" [size]="'lg'" id="bookIcon"></fa-icon>
       <div
-        class="text-decoration-underline fw-light cursor-pointer d-flex flex-row justify-content-between align-items-center w-100 z-index-1 position-relative mb-1"
+        class="text-decoration-underline fw-light cursor-pointer d-flex flex-row justify-content-between align-items-center w-100 z-index-1 position-relative mb-1 small"
         style="z-index: 1"
         (click)="toggleSubjectsCollapse()"
         [attr.aria-expanded]="!isSubjectsCollapsed()"
