@@ -1,47 +1,39 @@
 import { DatePipe, NgComponentOutlet } from '@angular/common';
-import { Component } from '@angular/core';
 import {
-  NgbNav,
-  NgbNavContent,
-  NgbNavItem,
-  NgbNavItemRole,
-  NgbNavLinkBase,
-  NgbNavLinkButton,
-  NgbNavOutlet,
-} from '@ng-bootstrap/ng-bootstrap';
-import { StackedIcon } from '../../components/stacked-icon/stacked-icon';
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faChartLine,
-  faCheck,
   faPencilAlt,
+  faSpinnerThird,
   faTrash,
   faUsers,
 } from '@fortawesome/pro-solid-svg-icons';
-import {
-  FontAwesomeModule,
-  IconDefinition,
-} from '@fortawesome/angular-fontawesome';
+import { BackTo } from '../../components/back-to/back-to';
 import { TestAssignments } from '../../components/test-assignments/test-assignments';
 import { TestStats } from '../../components/test-stats/test-stats';
-import { BackTo } from '../../components/back-to/back-to';
+import { FeedbackService } from '../../services/feedback-service';
+import { TestInterface, TestsService } from '../../services/tests-service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-interface TestDetailProps {
-  title: string;
-  createdAt: Date;
-  status: 'bozza' | 'pubblicato' | 'archiviato';
-}
-
-interface Stats {
+interface TestStat {
   mainValue: number;
   subValue: number;
   label: string;
   percentageValue?: number;
 }
 
-export interface Section {
+interface TestSection {
   id: number;
   title: string;
-  icon: IconDefinition;
+  icon: any;
   component: any;
 }
 
@@ -50,13 +42,6 @@ export interface Section {
   imports: [
     DatePipe,
     NgComponentOutlet,
-    NgbNavContent,
-    NgbNav,
-    NgbNavItem,
-    NgbNavItemRole,
-    NgbNavLinkButton,
-    NgbNavLinkBase,
-    NgbNavOutlet,
     FontAwesomeModule,
     TestAssignments,
     TestStats,
@@ -66,43 +51,143 @@ export interface Section {
   styleUrl: './test-detail.scss',
 })
 export class TestDetail {
-  UsersIcon = faUsers;
-  CheckIcon = faCheck;
-  ChartIcon = faChartLine;
-  TrashIcon = faTrash;
-  EditIcon = faPencilAlt;
+  // Services
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly testsService = inject(TestsService);
+  private readonly feedbackService = inject(FeedbackService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  test: TestDetailProps = {
-    title: 'Esempio di Test',
-    createdAt: new Date(),
-    status: 'bozza',
-  };
+  // Icons
+  readonly UsersIcon = faUsers;
+  readonly ChartIcon = faChartLine;
+  readonly TrashIcon = faTrash;
+  readonly EditIcon = faPencilAlt;
+  readonly SpinnerIcon = faSpinnerThird;
 
-  activeSection = 2; // 1: Assegnazioni, 2: Statistiche
+  // State
+  readonly TestData = signal<TestInterface | null>(null);
+  readonly IsLoading = signal<boolean>(true);
+  readonly ActiveSection = signal<number>(1);
 
-  stats: Stats[] = [
-    {
-      mainValue: 150,
-      subValue: 75,
-      label: 'Consegne',
-      percentageValue: 50,
-    },
-    {
-      mainValue: 200,
-      subValue: 120,
-      label: 'Punteggio medio',
-      percentageValue: 60,
-    },
-    { mainValue: 300, subValue: 180, label: 'Idonei', percentageValue: 60 },
-  ];
+  // Computed
+  readonly TestId = computed(() => this.route.snapshot.paramMap.get('testId'));
+  readonly TestStats = computed<TestStat[]>(() => {
+    const test = this.TestData();
+    if (!test) return [];
 
-  sections: Section[] = [
+    return [
+      {
+        mainValue: 150,
+        subValue: 75,
+        label: 'Consegne',
+        percentageValue: 50,
+      },
+      {
+        mainValue: 200,
+        subValue: 120,
+        label: 'Punteggio medio',
+        percentageValue: 60,
+      },
+      {
+        mainValue: 300,
+        subValue: 180,
+        label: 'Idonei',
+        percentageValue: 60,
+      },
+    ];
+  });
+
+  readonly Sections: TestSection[] = [
     {
       id: 1,
       title: 'Assegnazioni',
       icon: this.UsersIcon,
       component: TestAssignments,
     },
-    { id: 2, title: 'Statistiche', icon: this.ChartIcon, component: TestStats },
+    {
+      id: 2,
+      title: 'Statistiche',
+      icon: this.ChartIcon,
+      component: TestStats,
+    },
   ];
+
+  readonly ActiveSectionComponent = computed(
+    () =>
+      this.Sections.find((s) => s.id === this.ActiveSection())?.component ||
+      null,
+  );
+
+  constructor() {
+    this.loadTestData();
+  }
+
+  private loadTestData(): void {
+    const testId = this.TestId();
+    if (!testId) {
+      this.feedbackService.showFeedback('Test ID non trovato', false);
+      this.router.navigate(['/t/tests']);
+      return;
+    }
+
+    this.IsLoading.set(true);
+    this.testsService
+      .getTestById(testId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.TestData.set(response.test);
+          console.log('Loaded test data:', response.test);
+          this.IsLoading.set(false);
+        },
+        error: (error) => {
+          console.error('Error loading test:', error);
+          this.feedbackService.showFeedback(
+            'Errore nel caricamento del test',
+            false,
+          );
+          this.IsLoading.set(false);
+          this.router.navigate(['/t/tests']);
+        },
+      });
+  }
+
+  onEditTest(): void {
+    const testId = this.TestId();
+    if (testId) {
+      this.router.navigate(['/t/tests/edit', testId]);
+    }
+  }
+
+  onDeleteTest(): void {
+    const testId = this.TestId();
+    if (!testId) return;
+
+    if (!confirm('Sei sicuro di voler eliminare questo test?')) return;
+
+    this.testsService
+      .deleteTest(testId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.feedbackService.showFeedback(
+            'Test eliminato con successo',
+            true,
+          );
+          this.router.navigate(['/t/tests']);
+        },
+        error: (error) => {
+          console.error('Error deleting test:', error);
+          this.feedbackService.showFeedback(
+            "Errore durante l'eliminazione del test",
+            false,
+          );
+        },
+      });
+  }
+
+  onChangeSection(sectionId: number): void {
+    this.ActiveSection.set(sectionId);
+  }
 }

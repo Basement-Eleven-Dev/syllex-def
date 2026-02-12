@@ -3,25 +3,42 @@
   [label]="'Torna alla lista dei test'"
 ></app-back-to>
 
+@if (IsLoading()) {
+<div class="d-flex justify-content-center align-items-center py-5">
+  <fa-icon
+    [icon]="SpinnerIcon"
+    [animation]="'spin'"
+    [size]="'3x'"
+    class="text-primary"
+  ></fa-icon>
+</div>
+} @else if (TestData()) {
 <div class="mb-3 d-flex flex-row justify-content-between align-items-center">
-  <h1 class="mb-0 display-6 text-dark fw-bold">{{ test.title }}</h1>
+  <h1
+    class="mb-0 display-6 text-dark fw-bold d-flex flex-row align-items-center gap-2"
+  >
+    <span [class]="'status-pill ' + TestData()!.status"></span>
+    {{ TestData()!.name }}
+  </h1>
 
   <div class="d-flex flex-row gap-2 align-items-center">
-    <button class="btn btn-outline-primary">
+    <button class="btn btn-outline-primary icon-btn" (click)="onEditTest()">
       <fa-icon [icon]="EditIcon"></fa-icon> Modifica
     </button>
-    <button class="btn btn-outline-danger">
+    <button class="btn btn-outline-danger icon-btn" (click)="onDeleteTest()">
       <fa-icon [icon]="TrashIcon"></fa-icon> Elimina
     </button>
   </div>
 </div>
-<p class="text-dark mb-0">
-  Creato il {{ test.createdAt | date: 'd MMM y' }} -
-  <span [class]="'status-pill ' + test.status">{{ test.status }}</span>
-</p>
 
-<div class="row mt-5">
-  @for(stat of stats; track $index) {
+@if (TestData()!.availableFrom) {
+<p class="text-dark mb-0">
+  Creato il {{ TestData()!.availableFrom | date: 'd MMM y' }}
+</p>
+}
+
+<div class="row my-5 d-flex flex-row justify-content-center">
+  @for(stat of TestStats(); track $index) {
   <div class="col-12 col-md-6 col-lg-3 mb-3">
     <div class="card">
       <div class="card-body d-flex flex-column align-items-center p-1">
@@ -33,33 +50,34 @@
           >
           <p class="mb-0 cardDescription text-dark">{{ stat.label }}</p>
         </div>
+        @if (stat.percentageValue !== undefined) {
         <p class="mb-0 text-dark">{{ stat.percentageValue }}%</p>
+        }
       </div>
     </div>
   </div>
   }
 </div>
 
-<div class="card mt-3">
-  <div class="card-header">
-    <ul
-      ngbNav
-      #nav="ngbNav"
-      [(activeId)]="activeSection"
-      [destroyOnHide]="false"
-      class="nav-tabs nav-fill card-header-tabs fs-4 text-dark"
+<div class="row">
+  <div class="col-2 d-flex flex-column gap-2">
+    @for(section of Sections; track section.id) {
+    <button
+      class="btn"
+      [class.btn-primary]="ActiveSection() === section.id"
+      [class.btn-outline-primary]="ActiveSection() !== section.id"
+      (click)="onChangeSection(section.id)"
     >
-      @for(section of sections; track $index; let first = $first) {
-      <li [ngbNavItem]="$index + 1">
-        <button ngbNavLink class="text-dark">
-          <fa-icon [icon]="section.icon"></fa-icon> {{ section.title }}
-        </button>
-        <ng-template ngbNavContent>
-          <ng-container *ngComponentOutlet="section.component" />
-        </ng-template>
-      </li>
-      }
-    </ul>
+      <fa-icon [icon]="section.icon"></fa-icon> {{ section.title }}
+    </button>
+    }
   </div>
-  <div [ngbNavOutlet]="nav" class="mt-2 p-3"></div>
+  <div class="col-10">
+    @if (ActiveSectionComponent()) {
+    <ng-container *ngComponentOutlet="ActiveSectionComponent()" />
+    }
+  </div>
 </div>
+} @else {
+<div class="alert alert-warning" role="alert">Test non trovato</div>
+}
