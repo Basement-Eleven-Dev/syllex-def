@@ -6,7 +6,6 @@ import {
   RouterModule,
 } from '@angular/router';
 import { StudentiClasseTable } from '../../components/studenti-classe-table/studenti-classe-table';
-import { Section } from '../test-detail/test-detail';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { StatisticheClasse } from '../../components/statistiche-classe/statistiche-classe';
 import { faChartLine, faUsers } from '@fortawesome/pro-solid-svg-icons';
@@ -81,7 +80,7 @@ export class ClasseDettaglio {
     },
   ];
 
-  sections: Section[] = [
+  sections: any[] = [
     {
       id: 1,
       title: 'Studenti',

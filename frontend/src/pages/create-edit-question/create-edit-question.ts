@@ -139,6 +139,12 @@ export class CreateEditQuestion {
       policy: question.policy,
     });
 
+    // Sincronizza i signal con i valori del form
+    this.SelectedQuestionType.set(question.type);
+    if (question.policy) {
+      this.SelectedPolicyType.set(question.policy);
+    }
+
     if (question.type === 'scelta multipla' && question.options) {
       this.QuestionForm.patchValue({ options: question.options });
     }

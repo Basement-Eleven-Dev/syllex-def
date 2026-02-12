@@ -1,15 +1,13 @@
-<h4 class="text-dark fw-semibold mb -4">Tabella Assegnazioni</h4>
-
 <form [formGroup]="filtersForm" class="d-flex flex-row gap-3 mb-4">
   <input
     type="text"
-    class="form-control mb-3 custom-input"
+    class="form-control mb-3 custom-input filter"
     style="max-width: 300px"
     placeholder="Cerca per nome o cognome..."
     formControlName="text"
   />
   <select
-    class="form-select mb-3 custom-input"
+    class="form-select mb-3 custom-input filter"
     formControlName="class"
     style="max-width: 200px"
   >
@@ -19,7 +17,7 @@
     <option value="3C">Classe 1A</option>
   </select>
   <select
-    class="form-select mb-3 custom-input"
+    class="form-select mb-3 custom-input filter"
     formControlName="status"
     style="max-width: 200px"
   >
