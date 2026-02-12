@@ -35,7 +35,9 @@ export class RestApiGateway extends Construct {
           teacher: this.teacherAuthorizer,
           student: this.studentAuthorizer
         },
-        integrations: integrations
+        integrations: integrations,
+        cognitoPoolId: this.cognitoPool.userPoolId,
+        cognitoClientId: this.cognitoClient.userPoolClientId
       })
       this.methods.concat(nestedStack.methods);
     });
