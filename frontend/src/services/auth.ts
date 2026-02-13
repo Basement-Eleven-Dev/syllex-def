@@ -163,6 +163,7 @@ export class Auth {
     try {
       await signOut();
       this.user$.next(null);
+      window.location.reload();
       return { success: true, message: 'Logout riuscito' };
     } catch (error: any) {
       return {

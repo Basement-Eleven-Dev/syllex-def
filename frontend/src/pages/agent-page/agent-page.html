@@ -1,0 +1,14 @@
+<h1 class="text-dark fw-medium mb-3 display-6">Agente AI</h1>
+<h5 class="text-dark mb-0 fw-normal">
+  Interagisci e imposta l'agente AI di {{ materiaService.materiaSelected()?.name
+  }} per te e i tuoi studenti.
+</h5>
+
+<div class="row g-3 flex-fill pb-3 mt-3">
+  <div class="col-12 col-lg-6">
+    <app-agent-settings-form></app-agent-settings-form>
+  </div>
+  <div class="col-12 col-lg-6">
+    <app-agent-chat></app-agent-chat>
+  </div>
+</div>

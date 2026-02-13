@@ -84,3 +84,20 @@
 ::ng-deep .circle-btn.dropdown-toggle::after {
   display: none;
 }
+
+tbody > tr > td {
+  color: var(--bs-dark);
+  border: none;
+  padding: 1rem;
+}
+
+thead > tr > th {
+  color: var(--bs-dark);
+  border: none;
+  padding: 1rem;
+}
+tr {
+  &:hover {
+    cursor: pointer;
+  }
+}

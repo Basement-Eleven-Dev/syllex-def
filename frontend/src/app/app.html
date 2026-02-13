@@ -2,20 +2,15 @@
 
 <!-- Toast container -->
 <div class="toast-container">
+  @for(toast of feedbackService.toasts(); track toast.id) {
   <ngb-toast
-    *ngFor="let toast of feedbackService.toasts()"
-    [class]="toast.classname"
+    [class]="toast.classname +' rounded-syllex'"
     [autohide]="false"
     (hidden)="feedbackService.remove(toast.id)"
   >
-    <div class="d-flex align-items-center">
-      <div class="me-auto">{{ toast.message }}</div>
-      <button
-        type="button"
-        class="btn-close btn-close-white ms-2"
-        aria-label="Close"
-        (click)="feedbackService.remove(toast.id)"
-      ></button>
+    <div class="rounded-syllex text-center">
+      <span>{{ toast.message }}</span>
     </div>
   </ngb-toast>
+  }
 </div>

@@ -3,16 +3,13 @@
   [label]="'Torna alla lista delle domande'"
 ></app-back-to>
 
+<h1 class="text-dark fw-medium mb-3 display-6">{{ PageTitle() }}</h1>
+<h5 class="text-dark mb-0 fw-normal mb-5">{{ PageDescription() }}</h5>
 <form
   [formGroup]="QuestionForm"
   (ngSubmit)="onSaveQuestion()"
-  class="d-flex flex-column gap-4"
+  class="d-flex flex-column gap-4 pb-5"
 >
-  <section>
-    <h1 class="text-dark fw-medium mb-3 display-6">{{ PageTitle() }}</h1>
-    <h5 class="text-dark mb-0 fw-normal">{{ PageDescription() }}</h5>
-  </section>
-
   <section class="form-section">
     <label class="form-label text-dark">Tipologia di risposta</label>
     <app-type-selector
@@ -39,22 +36,22 @@
 
   <section class="form-section">
     <div
-      class="d-flex flex-row justify-content-between align-items-center mb-3"
+      class="d-flex flex-row justify-content-between align-items-center mb-5"
     >
       <div>
-        <h5 class="form-label text-dark">Contenuto della domanda</h5>
-        <p class="text-dark mb-0">
+        <label class="form-label text-dark">Contenuto della domanda</label>
+        <p class="text-dark fw-light mb-0">
           Scrivi la domanda, le risposte e una spiegazione riguardante la
           risposta corretta. Puoi sempre usare l’AI per aiutarti nella
           generazione.
         </p>
       </div>
       <button
-        class="btn btn-lg ai"
+        class="btn icon-btn ai"
         type="button"
         (click)="onRequestAIGeneration()"
       >
-        <fa-icon [icon]="SparklesIcon" class="me-2"></fa-icon>
+        <fa-icon [icon]="SparklesIcon"></fa-icon>
         Genera con AI
       </button>
     </div>
@@ -73,7 +70,7 @@
         <label class="form-label text-dark">Allega immagine</label>
         <div
           id="imageDropArea"
-          class="rounded-4 p-3"
+          class="rounded-syllex p-3"
           [class.dragging]="IsDragging()"
           (dragover)="onDragOver($event)"
           (dragleave)="onDragLeave($event)"
@@ -190,10 +187,10 @@
   </section>
 
   <section class="form-section">
-    <label class="form-label fw-light text-dark"
+    <label class="form-label text-dark"
       >Visibilità della domanda e politiche di utilizzo</label
     >
-    <p class="text-dark fw-bold">
+    <p class="text-dark fw-light">
       Scegli se permettere ai tuoi studenti di Scienze Nautiche di utilizzare
       questa domanda per creare dei test di autovalutazione
     </p>
@@ -201,7 +198,7 @@
     <section class="row">
       <div class="col-3">
         <div
-          class="card shadow-sm typeCard p-1"
+          class="border rounded-syllex p-3 typeCard p-1"
           (click)="onSelectPolicyType('public')"
           [class.selected]="SelectedPolicyType() === 'public'"
         >
@@ -220,7 +217,7 @@
       </div>
       <div class="col-3">
         <div
-          class="card shadow-sm typeCard p-1"
+          class="border p-3 rounded-syllex typeCard p-1"
           (click)="onSelectPolicyType('private')"
           [class.selected]="SelectedPolicyType() === 'private'"
         >
@@ -246,11 +243,9 @@
       type="submit"
       [disabled]="QuestionForm.invalid || IsLoading()"
     >
-      <fa-icon
-        [icon]="IsLoading() ? SpinnerIcon : SaveIcon"
-        [animation]="IsLoading() ? 'spin' : undefined"
-      ></fa-icon>
-      {{ SaveButtonLabel() }}
+      @if(IsLoading()){
+      <fa-icon [icon]="SpinnerIcon" [animation]="'spin'"></fa-icon>
+      } {{ SaveButtonLabel() }}
     </button>
   </section>
 </form>

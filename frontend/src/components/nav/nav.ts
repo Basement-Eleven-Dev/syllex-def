@@ -16,6 +16,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { Auth } from '../../services/auth';
 import { Calendario } from '../calendario/calendario';
+import { UserContextualMenu } from '../user-contextual-menu/user-contextual-menu';
 
 @Component({
   selector: 'app-nav',
@@ -28,6 +29,7 @@ import { Calendario } from '../calendario/calendario';
     NgbDropdownToggle,
     NgbDropdownMenu,
     NgbDropdownItem,
+    UserContextualMenu,
   ],
   templateUrl: './nav.html',
   styleUrl: './nav.scss',
@@ -67,5 +69,6 @@ export class Nav implements OnInit, OnDestroy {
       size: 'xl',
       centered: true,
     });
+    modalRef.componentInstance.showCloseButton = true;
   }
 }

@@ -4,15 +4,17 @@ import {
   TitleCasePipe,
   UpperCasePipe,
 } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faCalendar,
   faChevronLeft,
   faChevronRight,
+  faClock,
 } from '@fortawesome/pro-solid-svg-icons';
 import { BehaviorSubject, map } from 'rxjs';
 import { Materia } from '../../services/materia';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 interface DayBox {
   day: number | null;
@@ -41,6 +43,9 @@ export class Calendario {
   CalendarIcon = faCalendar;
   ArrowRightIcon = faChevronRight;
   ArrowLeftIcon = faChevronLeft;
+  ClockIcon = faClock;
+
+  @Input() showCloseButton: boolean = false;
 
   calendarEvents: CalendarEvent[] = [
     {
@@ -50,7 +55,8 @@ export class Calendario {
     },
   ];
 
-  constructor(public materiaService: Materia) {}
+  materiaService = inject(Materia);
+  activeModal = inject(NgbActiveModal, { optional: true });
 
   currentDate$ = new BehaviorSubject<Date>(new Date());
   firstDayOfMonth$ = this.currentDate$.pipe(
@@ -106,7 +112,7 @@ export class Calendario {
     );
   }
 
-  selectedDate: Date | null = null;
+  selectedDate: Date = new Date();
 
   onSelectDate(day: DayBox) {
     if (!day.isCurrentMonth || day.day === null) return;
@@ -147,4 +153,6 @@ export class Calendario {
       );
     }).length;
   }
+
+  date: Date = new Date();
 }

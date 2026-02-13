@@ -1,0 +1,125 @@
+<div class="card h-100 p-3 flex-fill overflow-auto">
+  <div class="card-body d-flex flex-column flex-grow-1">
+    <div class="d-flex flex-row align-items-start justify-content-between mb-3">
+      <h5 class="mb-0 fw-bold">Impostazioni Agente</h5>
+      <button type="submit" class="btn btn-primary icon-btn">Salva</button>
+    </div>
+    <div class="flex-fill position-relative">
+      <div
+        #scrollContent
+        class="h-100 overflow-scroll position-absolute top-0 start-0 end-0"
+      >
+        <form
+          [formGroup]="agentSettingsForm"
+          (ngSubmit)="onSubmit()"
+          class="d-flex flex-column gap-3"
+        >
+          <div class="form-group d-flex flex-column gap-1">
+            <label class="form-label text-dark" for="agentName"
+              >Nome dell'agente</label
+            >
+            <input
+              id="agentName"
+              type="text"
+              class="form-control custom-input"
+              formControlName="name"
+              placeholder="Inserisci il nome dell'agente"
+            />
+          </div>
+
+          <div class="form-group d-flex flex-column gap-1">
+            <label class="form-label text-dark" for="agentDescription"
+              >Descrizione dell'agente</label
+            >
+            <textarea
+              id="agentDescription"
+              class="form-control custom-input"
+              formControlName="description"
+              placeholder="Inserisci una breve descrizione dell'agente"
+              rows="3"
+            ></textarea>
+          </div>
+
+          <div class="form-group d-flex flex-column gap-1">
+            <label class="form-label text-dark" for="agentTone">Tono</label>
+            <select
+              id="agentTone"
+              class="form-select custom-input"
+              formControlName="tone"
+            >
+              <option value="" disabled>Seleziona un tono</option>
+              <option value="friendly">Amichevole</option>
+              <option value="formal">Formale</option>
+              <option value="concise">Conciso</option>
+              <option value="detailed">Dettagliato</option>
+            </select>
+          </div>
+          <div class="form-group d-flex flex-column gap-1">
+            <label class="form-label text-dark" for="agentVoice">Voce</label>
+            <select
+              id="agentVoice"
+              class="form-select custom-input"
+              formControlName="voice"
+            >
+              <option value="" disabled>Seleziona una voce</option>
+              <option value="voice-1">Voce 1</option>
+              <option value="voice-2">Voce 2</option>
+              <option value="voice-3">Voce 3</option>
+              <option value="voice-4">Voce 4</option>
+            </select>
+          </div>
+
+          <div class="form-group d-flex flex-column gap-1">
+            <div
+              class="d-flex flex-row align-items-center justify-content-between"
+            >
+              <label class="form-label text-dark mb-0"
+                >File e risorse ({{ files.length }})</label
+              >
+              <button
+                type="button"
+                class="btn btn-outline-primary icon-btn"
+                (click)="fileInput.click()"
+              >
+                <fa-icon [icon]="PlusIcon"></fa-icon> Aggiungi
+              </button>
+              <input
+                #fileInput
+                type="file"
+                class="d-none"
+                (change)="onFileSelected($event)"
+                multiple
+              />
+            </div>
+            @if (files.length > 0) {
+            <div class="d-flex flex-wrap gap-2 mt-2">
+              @for (file of files; track $index) {
+              <div
+                class="d-flex flex-row align-items-center gap-2 p-2 border bg-light"
+                style="border-radius: 8px"
+                (dblclick)="onRequestViewFile(file)"
+              >
+                <fa-icon
+                  [icon]="getFileIcon(file.name)"
+                  [style.color]="getFileIconColor(file.name)"
+                ></fa-icon>
+                <span class="text-truncate" style="max-width: 150px"
+                  >{{ file.name }}</span
+                >
+                <button
+                  type="button"
+                  class="btn btn-sm btn-link p-0 ms-1"
+                  (click)="removeFile($index)"
+                >
+                  <fa-icon [icon]="XmarkIcon" class="text-danger"></fa-icon>
+                </button>
+              </div>
+              }
+            </div>
+            }
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

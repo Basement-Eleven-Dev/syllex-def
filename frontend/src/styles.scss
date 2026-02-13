@@ -1,181 +1,124 @@
-/**
-* @license
-*
-* Font Family: General Sans
-* Designed by: Frode Helland
-* URL: https://www.fontshare.com/fonts/general-sans
-* Â© 2026 Indian Type Foundry
-*
-* General Sans Extralight 
-* General Sans ExtralightItalic 
-* General Sans Light 
-* General Sans LightItalic 
-* General Sans Regular 
-* General Sans Italic 
-* General Sans Medium 
-* General Sans MediumItalic 
-* General Sans Semibold 
-* General Sans SemiboldItalic 
-* General Sans Bold 
-* General Sans BoldItalic 
-* General Sans Variable (Variable font)
-* General Sans VariableItalic (Variable font)
-
-*
-*/
+/* Font Family: Sofia Pro */
 @font-face {
-  font-family: "GeneralSans-Extralight";
-  src:
-    url("/fonts/GeneralSans-Extralight.woff2") format("woff2"),
-    url("/fonts/GeneralSans-Extralight.woff") format("woff"),
-    url("/fonts/GeneralSans-Extralight.ttf") format("truetype");
+  font-family: "Sofia Pro";
+  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20UltraLight%20Az.otf")
+    format("opentype");
+  font-weight: 100;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Sofia Pro";
+  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20UltraLight%20Italic%20Az.otf")
+    format("opentype");
+  font-weight: 100;
+  font-display: swap;
+  font-style: italic;
+}
+@font-face {
+  font-family: "Sofia Pro";
+  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20ExtraLight%20Az.otf")
+    format("opentype");
   font-weight: 200;
   font-display: swap;
   font-style: normal;
 }
 @font-face {
-  font-family: "GeneralSans-ExtralightItalic";
-  src:
-    url("/fonts/GeneralSans-ExtralightItalic.woff2") format("woff2"),
-    url("/fonts/GeneralSans-ExtralightItalic.woff") format("woff"),
-    url("/fonts/GeneralSans-ExtralightItalic.ttf") format("truetype");
+  font-family: "Sofia Pro";
+  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20ExtraLight%20Italic%20Az.otf")
+    format("opentype");
   font-weight: 200;
   font-display: swap;
   font-style: italic;
 }
 @font-face {
-  font-family: "GeneralSans-Light";
-  src:
-    url("/fonts/GeneralSans-Light.woff2") format("woff2"),
-    url("/fonts/GeneralSans-Light.woff") format("woff"),
-    url("/fonts/GeneralSans-Light.ttf") format("truetype");
+  font-family: "Sofia Pro";
+  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20Light%20Az.otf") format("opentype");
   font-weight: 300;
   font-display: swap;
   font-style: normal;
 }
 @font-face {
-  font-family: "GeneralSans-LightItalic";
-  src:
-    url("/fonts/GeneralSans-LightItalic.woff2") format("woff2"),
-    url("/fonts/GeneralSans-LightItalic.woff") format("woff"),
-    url("/fonts/GeneralSans-LightItalic.ttf") format("truetype");
+  font-family: "Sofia Pro";
+  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20Light%20Italic%20Az.otf")
+    format("opentype");
   font-weight: 300;
   font-display: swap;
   font-style: italic;
 }
 @font-face {
-  font-family: "GeneralSans-Regular";
-  src:
-    url("/fonts/GeneralSans-Regular.woff2") format("woff2"),
-    url("/fonts/GeneralSans-Regular.woff") format("woff"),
-    url("/fonts/GeneralSans-Regular.ttf") format("truetype");
+  font-family: "Sofia Pro";
+  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20Regular%20Az.otf") format("opentype");
   font-weight: 400;
   font-display: swap;
   font-style: normal;
 }
 @font-face {
-  font-family: "GeneralSans-Italic";
-  src:
-    url("/fonts/GeneralSans-Italic.woff2") format("woff2"),
-    url("/fonts/GeneralSans-Italic.woff") format("woff"),
-    url("/fonts/GeneralSans-Italic.ttf") format("truetype");
+  font-family: "Sofia Pro";
+  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20Regular%20Italic%20Az.otf")
+    format("opentype");
   font-weight: 400;
   font-display: swap;
   font-style: italic;
 }
 @font-face {
-  font-family: "GeneralSans-Medium";
-  src:
-    url("/fonts/GeneralSans-Medium.woff2") format("woff2"),
-    url("/fonts/GeneralSans-Medium.woff") format("woff"),
-    url("/fonts/GeneralSans-Medium.ttf") format("truetype");
+  font-family: "Sofia Pro";
+  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20Medium%20Az.otf") format("opentype");
   font-weight: 500;
   font-display: swap;
   font-style: normal;
 }
 @font-face {
-  font-family: "GeneralSans-MediumItalic";
-  src:
-    url("/fonts/GeneralSans-MediumItalic.woff2") format("woff2"),
-    url("/fonts/GeneralSans-MediumItalic.woff") format("woff"),
-    url("/fonts/GeneralSans-MediumItalic.ttf") format("truetype");
+  font-family: "Sofia Pro";
+  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20Medium%20Italic%20Az.otf")
+    format("opentype");
   font-weight: 500;
   font-display: swap;
   font-style: italic;
 }
 @font-face {
-  font-family: "GeneralSans-Semibold";
-  src:
-    url("/fonts/GeneralSans-Semibold.woff2") format("woff2"),
-    url("/fonts/GeneralSans-Semibold.woff") format("woff"),
-    url("/fonts/GeneralSans-Semibold.ttf") format("truetype");
+  font-family: "Sofia Pro";
+  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20Semi%20Bold%20Az.otf")
+    format("opentype");
   font-weight: 600;
   font-display: swap;
   font-style: normal;
 }
 @font-face {
-  font-family: "GeneralSans-SemiboldItalic";
-  src:
-    url("/fonts/GeneralSans-SemiboldItalic.woff2") format("woff2"),
-    url("/fonts/GeneralSans-SemiboldItalic.woff") format("woff"),
-    url("/fonts/GeneralSans-SemiboldItalic.ttf") format("truetype");
+  font-family: "Sofia Pro";
+  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20Semi%20Bold%20Italic%20Az.otf")
+    format("opentype");
   font-weight: 600;
   font-display: swap;
   font-style: italic;
 }
 @font-face {
-  font-family: "GeneralSans-Bold";
-  src:
-    url("/fonts/GeneralSans-Bold.woff2") format("woff2"),
-    url("/fonts/GeneralSans-Bold.woff") format("woff"),
-    url("/fonts/GeneralSans-Bold.ttf") format("truetype");
+  font-family: "Sofia Pro";
+  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20Bold%20Az.otf") format("opentype");
   font-weight: 700;
   font-display: swap;
   font-style: normal;
 }
 @font-face {
-  font-family: "GeneralSans-BoldItalic";
-  src:
-    url("/fonts/GeneralSans-BoldItalic.woff2") format("woff2"),
-    url("/fonts/GeneralSans-BoldItalic.woff") format("woff"),
-    url("/fonts/GeneralSans-BoldItalic.ttf") format("truetype");
+  font-family: "Sofia Pro";
+  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20Bold%20Italic%20Az.otf")
+    format("opentype");
   font-weight: 700;
   font-display: swap;
   font-style: italic;
 }
-/**
-* This is a variable font
-* You can control variable axes as shown below:
-* font-variation-settings: wght 700.0;
-*
-* available axes:
-'wght' (range from 200.0 to 700.0
-*/
 @font-face {
-  font-family: "GeneralSans-Variable";
-  src:
-    url("/fonts/GeneralSans-Variable.woff2") format("woff2"),
-    url("/fonts/GeneralSans-Variable.woff") format("woff"),
-    url("/fonts/GeneralSans-Variable.ttf") format("truetype");
-  font-weight: 200 700;
+  font-family: "Sofia Pro";
+  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20Black%20Az.otf") format("opentype");
+  font-weight: 900;
   font-display: swap;
   font-style: normal;
 }
-/**
-* This is a variable font
-* You can control variable axes as shown below:
-* font-variation-settings: wght 700.0;
-*
-* available axes:
-'wght' (range from 200.0 to 700.0
-*/
 @font-face {
-  font-family: "GeneralSans-VariableItalic";
-  src:
-    url("/fonts/GeneralSans-VariableItalic.woff2") format("woff2"),
-    url("/fonts/GeneralSans-VariableItalic.woff") format("woff"),
-    url("/fonts/GeneralSans-VariableItalic.ttf") format("truetype");
-  font-weight: 200 700;
+  font-family: "Sofia Pro";
+  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20Black%20Italic%20Az.otf")
+    format("opentype");
+  font-weight: 900;
   font-display: swap;
   font-style: italic;
 }
@@ -191,7 +134,7 @@ $dark: #262626;
 $min-contrast-ratio: 4.5;
 $font-size-base: 0.9rem;
 $enable-gradients: false;
-$font-family-sans-serif: "GeneralSans", sans-serif;
+$font-family-sans-serif: "Sofia Pro", sans-serif;
 $border-radius: 0.75rem;
 $border-radius-sm: 0.5rem;
 $border-radius-lg: 0.9rem;
@@ -203,6 +146,7 @@ $btn-font-weight: 500;
 $btn-font-size: 0.813rem;
 
 $btn-padding-y: 0.575rem !default;
+$btn-padding-x: 1rem !default;
 
 $card-border-radius: $border-radius-xl;
 
@@ -264,7 +208,7 @@ body {
 .card {
   border-radius: 8px;
   border: none;
-  box-shadow: 0px 0px 14px 5px rgba(205, 205, 205, 0.204);
+  box-shadow: 0px 0px 28px 8px rgba(224, 224, 224, 0.204);
 }
 
 .rounded-syllex {
@@ -280,8 +224,8 @@ a {
 }
 
 .status-pill {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   &.pubblicato {
     background-color: var(--bs-success);
@@ -296,6 +240,9 @@ a {
     background-color: var(--bs-success);
   }
   &.private {
+    background-color: var(--bs-warning);
+  }
+  &.warning {
     background-color: var(--bs-warning);
   }
 }
@@ -313,7 +260,7 @@ textarea.custom-input {
   padding: 1rem;
 }
 
-.btn-gradient {
+.btn-gradient-secondary {
   background: linear-gradient(135deg, var(--bs-secondary) 0%, #dcffa7 100%);
   color: var(--bs-dark);
   transition: all 0.3s ease;
@@ -321,6 +268,17 @@ textarea.custom-input {
     transform: translateY(-2px);
     background: linear-gradient(135deg, var(--bs-secondary) 0%, #b9ff4f 100%);
     color: var(--bs-dark);
+  }
+}
+
+.btn-gradient-primary {
+  background: linear-gradient(135deg, var(--bs-primary) 0%, #4e86ff 100%);
+  color: white;
+  transition: all 0.3s ease;
+  &:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, var(--bs-primary) 0%, #3054a1 100%);
+    color: white;
   }
 }
 
@@ -336,7 +294,7 @@ textarea.custom-input {
   position: relative;
   cursor: pointer;
   transition: all 0.8s ease;
-  box-shadow: 0 4px 15px 0 rgba(var(--bs-primary-rgb), 0.4);
+  box-shadow: 0px 0px 28px 8px rgba(224, 224, 224, 0.204);
 
   &.not-selected {
     background: transparent;
@@ -352,7 +310,7 @@ textarea.custom-input {
     );
     color: white;
     font-weight: bold;
-    box-shadow: 0 6px 20px 0 rgba(var(--bs-primary-rgb), 0.6);
+    box-shadow: 0px 0px 28px 8px rgba(224, 224, 224, 0.204);
   }
 
   &::before {
@@ -383,7 +341,7 @@ textarea.custom-input {
   }
 
   &:hover {
-    box-shadow: 0 6px 20px 0 rgba(102, 126, 234, 0.6);
+    box-shadow: 0px 0px 28px 8px rgba(224, 224, 224, 0.204);
     color: white;
     transform: translateY(-2px);
 
@@ -393,7 +351,7 @@ textarea.custom-input {
   }
 
   &:active {
-    box-shadow: 0 2px 10px 0 rgba(102, 126, 234, 0.5);
+    box-shadow: 0px 0px 28px 8px rgba(224, 224, 224, 0.204);
     transform: translateY(0);
   }
 
@@ -427,9 +385,9 @@ textarea.custom-input {
 section {
   &.form-section {
     background-color: #ffffff;
-    padding: 1.5rem;
+    padding: 2rem;
     border-radius: 8px;
-    box-shadow: 0 4px 15px 0 rgba(55, 94, 201, 0.1);
+    box-shadow: 0px 0px 28px 8px rgba(224, 224, 224, 0.204);
   }
 }
 
@@ -473,7 +431,6 @@ section {
 
 .cardValue {
   font-size: 4rem;
-  font-weight: bold;
 }
 
 .icon-btn {
@@ -486,11 +443,10 @@ section {
 }
 .circle-btn {
   border-radius: 50%;
-  width: 2rem;
-  height: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  aspect-ratio: 1 / 1;
 }
 
 .btn-circle {
@@ -555,13 +511,13 @@ section {
 }
 
 .toast-success {
-  background-color: var(--bs-success);
-  color: white;
+  background-color: lighten($success, 20%);
+  color: rgb(26, 94, 32);
 }
 
 .toast-error {
-  background-color: var(--bs-danger);
-  color: white;
+  background-color: lighten($danger, 20%);
+  color: rgb(135, 12, 12);
 }
 
 .ellipsis-3-lines {
@@ -569,4 +525,29 @@ section {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.ellipsis-1-lines {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.form-label {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* Hide scrollbars */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
+}
+
+toast-error {
 }

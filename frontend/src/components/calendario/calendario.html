@@ -1,5 +1,13 @@
-<div class="p-3">
+<div class="card p-4">
   <div class="card-body">
+    @if(showCloseButton) {
+    <button
+      type="button"
+      class="btn-close position-absolute top-0 end-0 m-3"
+      aria-label="Close"
+      (click)="activeModal!.dismiss()"
+    ></button>
+    }
     <div
       class="d-flex flex-row justify-content-between align-items-center mb-4"
     >
@@ -11,20 +19,26 @@
           Tieni traccia dei test che hai fissato per i tuoi studenti
         </p>
       </div>
-      <div class="d-flex flex-row gap-2">
+      <div
+        class="d-flex flex-row align-items-center gap-0 border border-primary rounded-syllex"
+      >
         <button
-          class="btn btn-outline-primary btn-sm"
+          class="btn btn-link d-flex flex-column justify-content-center align-items-center"
           (click)="onPreviousMonth()"
         >
           <fa-icon [icon]="ArrowLeftIcon"></fa-icon>
         </button>
-        <button class="btn btn-outline-primary btn-sm" (click)="onNextMonth()">
+        <span class="text-primary">|</span>
+        <button
+          class="btn btn-link d-flex flex-column justify-content-center align-items-center"
+          (click)="onNextMonth()"
+        >
           <fa-icon [icon]="ArrowRightIcon"></fa-icon>
         </button>
       </div>
     </div>
     <div class="row">
-      <div class="col-6">
+      <div class="col-12 col-lg-6 mb-3">
         <div class="d-flex flex-row mb-3">
           @for(day of ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom']; track
           $index){
@@ -56,13 +70,13 @@
           }
         </div>
       </div>
-      <div class="col-6 d-flex flex-column">
+      <div class="col-12 col-lg -6 d-flex flex-column mb-3">
         <div
           class="card flex-fill p-4"
           id="calendarDayDetailCard"
           [class.no-date-selected]="!selectedDate"
         >
-          <div class="card-body d-flex flex-column">
+          <div class="card-body d-flex flex-column" style="min-height: 400px">
             @if(selectedDate){
             <h4 class="fw-semibold text-primary">Oggi</h4>
             <h5 class="fw-normal">
@@ -70,6 +84,46 @@
             </h5>
             <hr />
             }
+
+            <div
+              class="p-3 event-card rounded-syllex mb-3 d-flex flex-column gap-2"
+            >
+              <div
+                class="mb-0 d-flex flex-row align-items-center justify-content-between"
+              >
+                <h6 class="mb-0">Nome dell'evento</h6>
+
+                <small
+                  ><fa-icon [icon]="ClockIcon"></fa-icon> {{ date | date:
+                  'HH:mm'}}</small
+                >
+              </div>
+              <small class="fw-light ellipsis-1-lines">
+                Aliquip sunt pariatur voluptate ea eiusmod ut voluptate et in
+                adipisicing ut. Proident laborum ullamco dolore magna cillum in
+                nostrud ipsum laborum id nostrud. Excepteur aliqua minim qui
+                aliqua culpa enim. Veniam cupidatat reprehenderit pariatur minim
+                irure. In aute laborum commodo nisi culpa amet velit labore
+                deserunt ullamco ut esse amet cillum. Sint pariatur magna
+                deserunt duis. Ipsum in amet voluptate velit ad esse adipisicing
+                aute adipisicing elit est dolor laborum.
+              </small>
+            </div>
+            <div
+              class="p-3 event-card test rounded-syllex mb-3 d-flex flex-column gap-2"
+            >
+              <h6 class="mb-0">Test pippo franco</h6>
+              <small class="fw-light ellipsis-1-lines">
+                Aliquip sunt pariatur voluptate ea eiusmod ut voluptate et in
+                adipisicing ut. Proident laborum ullamco dolore magna cillum in
+                nostrud ipsum laborum id nostrud. Excepteur aliqua minim qui
+                aliqua culpa enim. Veniam cupidatat reprehenderit pariatur minim
+                irure. In aute laborum commodo nisi culpa amet velit labore
+                deserunt ullamco ut esse amet cillum. Sint pariatur magna
+                deserunt duis. Ipsum in amet voluptate velit ad esse adipisicing
+                aute adipisicing elit est dolor laborum.
+              </small>
+            </div>
           </div>
         </div>
       </div>

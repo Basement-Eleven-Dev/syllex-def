@@ -209,4 +209,10 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     method: "put",
     role: "teacher",
   },
+  {
+    apiRoute: "reports",
+    functionPath: "reports/createReport.ts",
+    method: "post",
+    role: "teacher",
+  },
 ];

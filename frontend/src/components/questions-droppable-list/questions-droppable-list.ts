@@ -20,11 +20,12 @@ import { CommonModule } from '@angular/common';
 import { QuestionInterface, QuestionsService } from '../../services/questions';
 import { QuestionCard } from '../question-card/question-card';
 import { forkJoin } from 'rxjs';
+import { ConfirmActionDirective } from '../../directives/confirm-action.directive';
 
 @Component({
   selector: 'app-questions-droppable-list',
   standalone: true,
-  imports: [DragDropModule, CommonModule, QuestionCard],
+  imports: [DragDropModule, CommonModule, QuestionCard, ConfirmActionDirective],
   templateUrl: './questions-droppable-list.html',
   styleUrl: './questions-droppable-list.scss',
 })
@@ -153,10 +154,8 @@ export class QuestionsDroppableList implements OnChanges, AfterViewInit {
   }
 
   clearAll(): void {
-    if (confirm('Sei sicuro di voler rimuovere tutte le domande?')) {
-      this.selectedQuestions = [];
-      this.emitChanges();
-    }
+    this.selectedQuestions = [];
+    this.emitChanges();
   }
 
   onSave(): void {

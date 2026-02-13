@@ -26,6 +26,7 @@ import { Materia } from '../../services/materia';
 import { QuestionsService } from '../../services/questions';
 import { FeedbackService } from '../../services/feedback-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DestroyRef } from '@angular/core';
 
 export interface AnswerOption {
   label: string;
@@ -53,6 +54,7 @@ export class CreateEditQuestion {
   readonly materiaService = inject(Materia);
   private readonly questionsService = inject(QuestionsService);
   private readonly feedbackService = inject(FeedbackService);
+  private readonly destroyRef = inject(DestroyRef);
 
   // Icons
   readonly SparklesIcon = faSparkles;
@@ -109,12 +111,36 @@ export class CreateEditQuestion {
     if (this.QuestionId) {
       this.loadQuestion(this.QuestionId);
     }
+
+    // Update validators when question type changes
+    this.QuestionForm.get('type')?.valueChanges.subscribe((type) => {
+      this.updateFormValidators(type);
+    });
+  }
+
+  private updateFormValidators(type: string): void {
+    const correctAnswerControl = this.QuestionForm.get('correctAnswer');
+    const optionsControl = this.QuestionForm.get('options');
+
+    if (type === 'vero falso') {
+      correctAnswerControl?.setValidators([Validators.required]);
+      optionsControl?.clearValidators();
+    } else if (type === 'scelta multipla') {
+      correctAnswerControl?.clearValidators();
+      optionsControl?.setValidators([Validators.required]);
+    } else {
+      correctAnswerControl?.clearValidators();
+      optionsControl?.clearValidators();
+    }
+
+    correctAnswerControl?.updateValueAndValidity();
+    optionsControl?.updateValueAndValidity();
   }
 
   private loadQuestion(questionId: string): void {
     this.questionsService
       .loadQuestion(questionId)
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (question) => {
           this.CurrentQuestionId.set(question._id);
@@ -192,7 +218,7 @@ export class CreateEditQuestion {
           this.UploadedImageFile() || undefined,
         );
 
-    serviceCall.pipe(takeUntilDestroyed()).subscribe({
+    serviceCall.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         const message = this.CurrentQuestionId()
           ? 'Domanda modificata con successo!'
@@ -235,6 +261,7 @@ export class CreateEditQuestion {
   onSelectQuestionType(type: string): void {
     this.SelectedQuestionType.set(type);
     this.QuestionForm.patchValue({ type });
+    this.updateFormValidators(type);
   }
 
   onSelectPolicyType(policy: string): void {

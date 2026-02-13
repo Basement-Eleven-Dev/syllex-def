@@ -44,7 +44,7 @@ export class Test implements OnDestroy {
   Loading = signal<boolean>(false);
   CollectionSize = signal<number>(0);
   Page = signal<number>(1);
-  PageSize = signal<number>(10);
+  PageSize = signal<number>(5);
   SearchTerm = signal<string>('');
   Status = signal<TestStatus>('');
   ViewType: ViewType = this.loadViewTypePreference('test') || 'grid';

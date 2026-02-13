@@ -164,8 +164,6 @@ export class TestDetail {
     const testId = this.TestId();
     if (!testId) return;
 
-    if (!confirm('Sei sicuro di voler eliminare questo test?')) return;
-
     this.testsService
       .deleteTest(testId)
       .pipe(takeUntilDestroyed(this.destroyRef))

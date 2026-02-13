@@ -3,9 +3,9 @@
   (ngSubmit)="onSingIn()"
   class="d-flex flex-column gap-3"
 >
-  <h5 class="text-primary fw-bold">👋 Bentornato</h5>
+  <h3 class="text-dark">Bentornato</h3>
   <div>
-    <label for="email" class="form-label text-primary">Email</label>
+    <label for="email" class="form-label text-dark">Email</label>
     <input
       type="text"
       class="form-control custom-input"
@@ -14,7 +14,7 @@
     />
   </div>
   <div>
-    <label for="password" class="form-label text-primary">Password</label>
+    <label for="password" class="form-label text-dark">Password</label>
     <input
       formControlName="password"
       type="password"
@@ -23,13 +23,13 @@
     />
   </div>
   <div class="text-end mb-4">
-    <a href="#" class="text-primary fw-semibold" routerLink="/password-reset"
+    <a href="#" class="text-dark fw-semibold" routerLink="/password-reset"
       >Hai dimenticato la password?</a
     >
   </div>
   <button
     type="submit"
-    class="btn btn-secondary btn-lg w-100"
+    class="btn btn-gradient-primary btn-lg w-100"
     [disabled]="loginForm.invalid || loading"
   >
     <fa-icon

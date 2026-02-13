@@ -1,23 +1,24 @@
 <nav
-  class="bg-primary py-3 d-flex flex-row align-items-center gap-3 card mt-3 container-fluid"
-  style="border-radius: 8px"
+  class="bg-primary py-3 px-3 px-md-4 d-flex flex-row align-items-center gap-3 rounded container-fluid d-flex flex-row align-items-center"
 >
   <img
     src="/images/logotipo.svg"
     alt="Syllex Logo"
     height="40"
-    class="me-4"
     routerLink="/t/dashboard"
   />
-  <div class="flex-fill d-flex flex-row gap-3 align-items-stretch">
-    <button class="btn calendarBtn" (click)="openCalendarioModal()">
-      <fa-icon [icon]="CalendarIcon"></fa-icon>
-      {{ now | date: 'dd - MM - yy' | titlecase }}
-    </button>
-    <div class="flex-fill d-flex">
+  <div class="d-none d-md-flex flex-fill flex-row justify-content-between">
+    <div class="d-flex flex-row gap-3">
+      <button
+        class="btn calendarBtn d-none d-md-block flex-shrink-0"
+        (click)="openCalendarioModal()"
+      >
+        <fa-icon [icon]="CalendarIcon"></fa-icon>
+        {{ now | date: 'dd - MM - yy' | titlecase }}
+      </button>
       <input
         type="text"
-        class="form-control w-auto custom-input"
+        class="form-control w-auto custom-input d-none d-md-block"
         placeholder="Search..."
       />
     </div>
@@ -43,15 +44,7 @@
         aria-labelledby="dropdownBasic1"
         class="p-3 dropdown-menu"
       >
-        <h4>
-          {{ authService.user?.firstName }} {{ authService.user?.lastName }}
-        </h4>
-        <button routerLink="/t/profilo" class="btn btn-outline-primary w-100">
-          Profilo
-        </button>
-        <button class="btn btn-outline-danger w-100" (click)="onLogout()">
-          <fa-icon [icon]="LogoutIcon"></fa-icon> Logout
-        </button>
+        <app-user-contextual-menu></app-user-contextual-menu>
       </div>
     </div>
   </div>

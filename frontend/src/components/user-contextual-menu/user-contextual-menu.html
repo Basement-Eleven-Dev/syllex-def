@@ -1,0 +1,38 @@
+<div class="d-flex flex-row align-items-center gap-2">
+  <span class="dot"></span>
+  <span>Docente</span>
+</div>
+<h5 class="fw-medium my-2">
+  {{ authService.user?.firstName }} {{ authService.user?.lastName }}
+</h5>
+<hr />
+<div routerLink="/t/profilo" class="w-100 link rounded-syllex btn text-start">
+  Profilo
+</div>
+<div routerLink="/t/tests" class="w-100 link rounded-syllex btn text-start">
+  Lista dei test
+</div>
+<div routerLink="/t/banca" class="w-100 link rounded-syllex btn text-start">
+  Banca Domande
+</div>
+<div routerLink="/t/risorse" class="w-100 link rounded-syllex btn text-start">
+  File e risorse
+</div>
+<div
+  (click)="onOpenCalendar()"
+  class="w-100 link rounded-syllex btn text-start"
+>
+  Calendario
+</div>
+<div
+  (click)="onReportBug()"
+  class="w-100 mt-4 link rounded-syllex btn text-start"
+>
+  Segnala un bug
+</div>
+<div
+  class="w-100 link rounded-syllex btn text-start logout"
+  (click)="onLogout()"
+>
+  Logout
+</div>

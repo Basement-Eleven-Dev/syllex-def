@@ -6,11 +6,11 @@
 
   &:hover {
     cursor: pointer;
-    background-color: var(--bs-secondary);
-    color: var(--bs-dark);
+    background-color: var(--bs-primary);
+    color: white;
   }
   &.selected {
-    background-color: var(--bs-secondary);
-    color: var(--bs-dark);
+    background-color: var(--bs-primary);
+    color: white;
   }
 }

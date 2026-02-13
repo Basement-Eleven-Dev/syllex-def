@@ -1,0 +1,58 @@
+<div class="card p-3 h-100">
+  <div class="card-body d-flex flex-column">
+    <div class="flex-fill position-relative">
+      <div
+        #scrollContent
+        class="h-100 overflow-scroll position-absolute top-0 start-0 end-0"
+      >
+        @for (msg of messages(); track $index) {
+        <div
+          class="d-flex mb-3"
+          [class.justify-content-end]="msg.role === 'user'"
+        >
+          <div
+            class="message-bubble p-3"
+            style="border-radius: 8px"
+            [class.user-message]="msg.role === 'user'"
+            [class.agent-message]="msg.role === 'agent'"
+          >
+            @if (msg.role === 'agent') {
+            <markdown [data]="msg.content"></markdown>
+            } @else {
+            <span>{{ msg.content }}</span>
+            }
+          </div>
+        </div>
+        } @if (isLoading()) {
+        <div class="d-flex mb-3">
+          <div class="message-bubble agent-message p-3 rounded-3">
+            <div class="typing-indicator d-flex gap-1">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+
+    <div class="pt-3 border-top">
+      <div class="input-group">
+        <textarea
+          class="form-control custom-input"
+          [(ngModel)]="inputMessage"
+          (keydown)="onKeydown($event)"
+          placeholder="Scrivi un messaggio..."
+          rows="1"
+        ></textarea>
+        <button
+          class="btn btn-primary"
+          type="button"
+          (click)="sendMessage()"
+          [disabled]="!inputMessage.trim() || isLoading()"
+        >
+          <fa-icon [icon]="SendIcon"></fa-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -14,8 +14,11 @@
       @for(test of tests; track $index){
       <tr [class.row-with-pending-corrections]="false">
         <td class="fw-bold">{{ test.name }}</td>
-        <td>
-          <span [class]="'status-pill ' + test.status">{{ test.status }}</span>
+        <td vertical-align="middle">
+          <div class="d-flex flex-row align-items-center gap-2">
+            <div [class]="'status-pill ' + test.status"></div>
+            {{ test.status | titlecase}}
+          </div>
         </td>
         <td>
           @if(test.availableFrom && test.availableTo) { Disponibile dal {{
@@ -38,13 +41,14 @@
           <span>Nessuna classe assegnata</span>
           }
         </td>
-        <td class="d-flex flex-row justify-content-end gap-2">
+        <td
+          class="d-flex flex-row justify-content-end align-items-center gap-2"
+        >
           <button
-            class="btn view-test-button btn-sm"
+            class="btn view-test-button"
             [routerLink]="['/t/tests', test._id]"
             [class.has-pending-corrections]="false"
           >
-            <fa-icon [icon]="EyeIcon"></fa-icon>
             Visualizza Test
           </button>
 
@@ -54,8 +58,12 @@
             container="body"
             placement="bottom-end"
           >
-            <button class="btn btn-light btn-sm circle-btn" ngbDropdownToggle>
-              <fa-icon [icon]="ThreeDotsIcon"></fa-icon>
+            <button class="btn btn-primary circle-btn btn-sm" ngbDropdownToggle>
+              <fa-icon
+                class="d-inline-flex"
+                [icon]="ThreeDotsIcon"
+                style="font-size: 0.9rem"
+              ></fa-icon>
             </button>
             <div ngbDropdownMenu>
               <app-test-contextual-menu

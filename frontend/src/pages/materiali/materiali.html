@@ -3,7 +3,7 @@
   Gestisci e visualizza i tuoi file e le risorse per la materia selezionata.
 </h5>
 
-<section class="d-flex flex-row align-items-center gap-3 my-5">
+<section class="d-flex flex-row gap-3 my-5">
   <input
     #fileInput
     type="file"
@@ -23,7 +23,7 @@
   </div>
   <button
     type="button"
-    class="btn btn-outline-danger btn-sm"
+    class="btn btn-outline-danger"
     (click)="clearFilters()"
     title="Pulisci filtri"
   >
@@ -162,7 +162,7 @@
             />
             }
           </td>
-          <td class="fw-medium">{{ item.name }}</td>
+          <td class="">{{ item.name }}</td>
           <td class="text-muted">{{ getItemType(item) }}</td>
           <td class="text-muted">{{ getItemSize(item) }}</td>
           <td class="text-muted">

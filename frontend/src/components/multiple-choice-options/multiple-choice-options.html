@@ -3,14 +3,14 @@
     <span class="fw-semibold">Opzioni di Risposta</span>
     <button
       type="button"
-      class="btn btn-outline-primary btn-sm"
+      class="btn btn-outline-primary icon-btn"
       (click)="onAddOption()"
     >
       <fa-icon [icon]="AddIcon"></fa-icon> Aggiungi Opzione
     </button>
   </div>
   @for(option of options; track $index){
-  <div class="d-flex flex-row gap-3 align-items-center">
+  <div class="d-flex flex-row gap-3">
     <span class="optionLabel">{{ getOptionLabel($index + 1) }}</span>
     <input
       type="text"
@@ -20,17 +20,17 @@
       placeholder="Testo dell'opzione"
     />
     <button
-      class="btn btn-sm d-flex flex-row align-items-center gap-1"
+      class="btn d-flex flex-row align-items-center gap-1"
       [class.btn-success]="option.isCorrect"
       [class.btn-outline-success]="!option.isCorrect"
       (click)="onSetCorrectOption($index)"
     >
-      <fa-icon [icon]="CheckIcon"></fa-icon> Corretta
+      <fa-icon [icon]="CheckIcon"></fa-icon>
     </button>
     @if(options.length > 2) {
     <button
       type="button"
-      class="btn btn-outline-danger btn-sm"
+      class="btn btn-outline-danger"
       (click)="onRemoveOption($index)"
       [disabled]="options.length <= 2"
     >
