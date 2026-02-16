@@ -16,6 +16,7 @@ export interface MaterialInterface {
   teacherId?: string;
   subjectId?: string;
   classIds?: string[];
+  isVectorized?: boolean;
 }
 
 @Injectable({

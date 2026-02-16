@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal, OnInit, effect, computed, output } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -12,18 +12,33 @@ import {
   faPlus,
   faSave,
   faXmark,
+  faSpinner,
 } from '@fortawesome/pro-regular-svg-icons';
 import { getFileIcon, getIconColor } from '../../app/_utils/file-icons';
 import { FileViewer } from '../file-viewer/file-viewer';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { MaterialiSelector } from '../materiali-selector/materiali-selector';
+import {
+  MaterialInterface,
+  MaterialiService,
+} from '../../services/materiali-service';
+import { EmbeddingsService } from '../../services/embeddings.service';
+import { Materia } from '../../services/materia';
+import { AgentService } from '../../services/agent.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-agent-settings-form',
-  imports: [FormsModule, ReactiveFormsModule, FontAwesomeModule, FileViewer],
+  imports: [
+    FormsModule,
+    ReactiveFormsModule,
+    FontAwesomeModule,
+    MaterialiSelector,
+  ],
   templateUrl: './agent-settings-form.html',
   styleUrl: './agent-settings-form.scss',
 })
-export class AgentSettingsForm {
+export class AgentSettingsForm implements OnInit {
   onSave() {
     throw new Error('Method not implemented.');
   }
@@ -31,18 +46,26 @@ export class AgentSettingsForm {
   XmarkIcon = faXmark;
   SaveIcon = faSave;
   PlusIcon = faPlus;
+  SpinnerIcon = faSpinner;
+
+  isLoading = signal<boolean>(false);
+  isSaving = signal<boolean>(false);
+  assistantId = signal<string | null>(null);
+
+  assistantLoaded = output<string | null>();
+
+  isUpdateMode = computed(() => !!this.assistantId());
 
   agentSettingsForm: FormGroup = new FormGroup({
     name: new FormControl('', [Validators.required]),
-    description: new FormControl(''),
     tone: new FormControl('friendly', [Validators.required]),
     voice: new FormControl(''),
   });
 
   tone: 'friendly' | 'formal' | 'concise' | 'detailed' = 'friendly';
   name: string = '';
-  description: string = '';
   files: File[] = [];
+  selectedMaterials: MaterialInterface[] = [];
 
   getFileIcon(fileName: string) {
     console.log('Getting icon for file:', fileName);
@@ -55,7 +78,64 @@ export class AgentSettingsForm {
     return getIconColor(extension);
   }
 
-  constructor(private modalService: NgbModal) {}
+  constructor(
+    private modalService: NgbModal,
+    private embeddingsService: EmbeddingsService,
+    private materiaService: Materia,
+    private agentService: AgentService,
+    private materialiService: MaterialiService,
+  ) {
+    effect(() => {
+      const subject = this.materiaService.materiaSelected();
+      if (subject?._id) {
+        this.loadAssistant(subject._id);
+      } else {
+        this.resetForm();
+      }
+    });
+  }
+
+  ngOnInit() {
+    // Logic moved to effect for reactivity, but OnInit is good practice
+  }
+
+  private loadAssistant(subjectId: string) {
+    this.isLoading.set(true);
+    this.agentService.getAssistant(subjectId).subscribe({
+      next: (res) => {
+        if (res.exists && res.assistant) {
+          // Handle both string and ObjectId serialization ({$oid: ...})
+          const id = res.assistant._id?.$oid || res.assistant._id;
+          this.assistantId.set(id);
+          this.assistantLoaded.emit(id);
+
+          this.agentSettingsForm.patchValue({
+            name: res.assistant.name,
+            tone: res.assistant.tone || 'friendly',
+            voice: res.assistant.voice || '',
+          });
+        } else {
+          this.resetForm();
+        }
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading assistant:', err);
+        this.isLoading.set(false);
+      },
+    });
+  }
+
+  private resetForm() {
+    this.assistantId.set(null);
+    this.assistantLoaded.emit(null);
+    this.agentSettingsForm.reset({
+      tone: 'friendly',
+      voice: '',
+    });
+  }
+
+
 
   onFileSelected(event: any) {
     const selectedFiles = event.target.files;
@@ -79,13 +159,76 @@ export class AgentSettingsForm {
     }).componentInstance.docUrl = fileURL;
   }
 
-  onSubmit() {
+  onMaterialSelectionChange(materials: MaterialInterface[]) {
+    this.selectedMaterials = materials;
+    console.log(
+      'Selected materials in AgentSettingsForm:',
+      this.selectedMaterials,
+    );
+  }
+
+  async onSubmit() {
     if (this.agentSettingsForm.valid) {
-      const formData = this.agentSettingsForm.value;
-      console.log('Form submitted with data:', formData);
-      // Here you can handle the form submission, e.g., send the data to a server
+      const subjectId = this.materiaService.materiaSelected()?._id || '';
+
+      const formData = {
+        ...this.agentSettingsForm.value,
+        subjectId: subjectId,
+        materialIds: this.selectedMaterials.map((m) => m._id),
+      };
+
+      try {
+        this.isSaving.set(true);
+        console.log('Form submission started with data:', formData);
+
+        let assistantId = this.assistantId();
+
+        if (assistantId) {
+          // UPDATE
+          await firstValueFrom(this.agentService.updateAgent(assistantId, formData));
+          console.log('Agent updated successfully');
+        } else {
+          // CREATE
+          const response = await firstValueFrom(
+            this.agentService.createAgent(formData),
+          );
+          assistantId = response.assistantId;
+          this.assistantId.set(assistantId);
+          this.assistantLoaded.emit(assistantId);
+          console.log('Agent created successfully, ID:', assistantId);
+        }
+
+        // 2. Se ci sono materiali selezionati, vettorizzali associandoli all'assistente
+        if (this.selectedMaterials.length > 0 && assistantId) {
+          this.embeddingsService
+            .vectorizeMaterials(formData.materialIds, subjectId, assistantId)
+            .subscribe({
+              next: (res) => {
+                console.log('Vectorization successful:', res);
+                this.finishSave(subjectId);
+              },
+              error: (err) => {
+                console.error('Vectorization error:', err);
+                this.isSaving.set(false);
+              },
+            });
+        } else {
+          this.finishSave(subjectId);
+        }
+      } catch (error) {
+        console.error('Error during agent save or vectorization:', error);
+        this.isSaving.set(false);
+      }
     } else {
       console.log('Form is invalid');
     }
+  }
+
+  private finishSave(subjectId: string) {
+    // Ricarica i materiali (per aggiornare i flag isVectorized)
+    this.materialiService.loadMaterials();
+    // Ricarica l'assistente per sicurezza
+    this.loadAssistant(subjectId);
+    this.isSaving.set(false);
   }
 }
