@@ -11,6 +11,6 @@ import { FeedbackService } from '../services/feedback-service';
   styleUrl: './app.scss',
 })
 export class App {
-  protected title = 'syllex-def';
+  protected title = 'Syllex';
   protected readonly feedbackService = inject(FeedbackService);
 }

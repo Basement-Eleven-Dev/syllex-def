@@ -1,0 +1,140 @@
+<section class="materiali-selector">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <label for="search-term" class="form-label text-dark mb-0">
+      Associa file e risorse
+    </label>
+    <div class="d-flex gap-2">
+      @if (selectedMaterialIds().size > 0) {
+      <span
+        class="badge bg-secondary shadow-sm text-dark d-flex flex-column justify-content-center ms-2"
+      >
+        {{ selectedMaterialIds().size }} selezionati
+      </span>
+      <button
+        type="button"
+        class="btn btn-outline-primary me-4"
+        (click)="deselectAll()"
+      >
+        Deseleziona tutti
+      </button>
+      } @if (!embeddingCreationMode) {
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="triggerFileUpload()"
+        [disabled]="isUploading()"
+      >
+        @if (isUploading()) {
+        <span class="spinner-border spinner-border-sm me-1"></span>
+        Caricamento... } @else {
+        <fa-icon [icon]="UploadIcon" class="me-1"></fa-icon>
+        Carica nuovo }</button
+      >}
+    </div>
+  </div>
+  <!-- Hidden file input -->
+  <input
+    #fileInput
+    type="file"
+    class="d-none"
+    (change)="onFileSelected($event)"
+    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.mp4,.avi,.mov"
+  />
+  <!-- Already Processed Materials Section -->
+  @if (embeddingCreationMode && processedMaterials().length > 0) {
+  <div class="mb-3">
+    <label class="small text-muted mb-2">Risorse già elaborate</label>
+    <ul class="list-group list-group-flush border rounded-3 mb-2" style="max-height: 150px; overflow-y: auto;">
+      @for (m of processedMaterials(); track m._id) {
+      <li class="list-group-item p-2 d-flex align-items-center opacity-75 bg-light" style="font-size: 0.9rem;">
+        <fa-icon
+          [icon]="getFileIcon(m.extension!)"
+          [style.color]="getIconColor(m)"
+          class="me-2"
+        ></fa-icon>
+        <span class="flex-grow-1 text-truncate">{{ m.name }}</span>
+        <div class="d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center gap-1 text-primary small">
+                <fa-icon [icon]="CheckIcon"></fa-icon>
+                <span>Associato</span>
+            </div>
+            <button class="btn btn-link text-danger p-0 border-0" (click)="onRemoveMaterial(m._id)" title="Rimuovi associazione">
+                <fa-icon [icon]="TrashIcon"></fa-icon>
+            </button>
+        </div>
+      </li>
+      }
+    </ul>
+  </div>
+  }
+
+  <!-- Search input -->
+  <div class="mb-3">
+    <input
+      type="text"
+      class="form-control custom-input"
+      placeholder="Cerca materiali..."
+      [ngModel]="searchQuery()"
+      (ngModelChange)="updateSearch($event)"
+    />
+  </div>
+
+  @if (isSearching()) {
+  <!-- Search results (flat list) -->
+  <ul class="list-group list-group-flush rounded-3">
+    @for (material of searchResults(); track material._id) {
+    <li
+      class="list-group-item p-2 cursor-pointer"
+      [class.list-group-item-primary]="selectedMaterialIds().has(material._id)"
+      [class.border-primary]="selectedMaterialIds().has(material._id)"
+      (click)="selectMaterial(material)"
+      role="button"
+    >
+      @if (material.path) {
+      <div class="text-muted small mb-1">
+        <fa-icon [icon]="FolderIcon" size="xs" class="me-1"></fa-icon>
+        {{ material.path }}
+      </div>
+      }
+      <div class="d-flex align-items-center">
+        <fa-icon
+          [icon]="getFileIcon(material.extension!)"
+          [style.color]="getIconColor(material)"
+          class="me-2"
+        ></fa-icon>
+        <span class="flex-grow-1">{{ material.name }}</span>
+        @if (embeddingCreationMode && material.isVectorized) {
+        <div
+          class="d-flex align-items-center gap-1"
+          style="font-size: 0.8rem; color: #28a745"
+        >
+          <fa-icon [icon]="CheckIcon"></fa-icon>
+          <span>Processato</span>
+        </div>
+        }
+      </div>
+    </li>
+    } @empty {
+    <li class="list-group-item text-muted">Nessun risultato</li>
+    }
+  </ul>
+  } @else {
+  <!-- Tree list -->
+  <div style="max-height: 300px; overflow-y: auto">
+    <ul class="list-group list-group-flush">
+      @for (item of materialiService.root(); track item._id) {
+      <app-materiali-item
+        [item]="item"
+        [embeddingCreationMode]="embeddingCreationMode"
+        [expandedFolders]="expandedFolders()"
+        [selectedMaterialIds]="selectedMaterialIds()"
+        [associatedMaterialIds]="associatedMaterialIds()"
+        [searchQuery]="searchQuery()"
+        (folderToggle)="toggleFolder($event)"
+        (materialSelect)="selectMaterial($event)"
+      />
+      }
+    </ul>
+  </div>
+  }
+</section>

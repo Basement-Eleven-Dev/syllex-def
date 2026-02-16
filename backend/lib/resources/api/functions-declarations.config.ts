@@ -224,10 +224,41 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     apiRoute: "proxy/gamma/{generationId}",
     functionPath: "ai/gammaGenerationProxy.ts",
     method: "get",
-    role: "open"
-  }, {
+    role: "open",
+  },
+  {
     apiRoute: "reports",
     functionPath: "reports/createReport.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "class/{classId}/students",
+    functionPath: "students/getClassStudents.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "class/{classId}/{subjectId}/tests",
+    functionPath: "tests/getClassAssignedTests.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "attempts/class/{classId}",
+    functionPath: "tests/getClassAttempts.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "events",
+    functionPath: "events/getEvents.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "events",
+    functionPath: "events/createEvent.ts",
     method: "post",
     role: "teacher",
   },
@@ -235,6 +266,12 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     apiRoute: "assistants/create",
     functionPath: "assistants/createAssistant.ts",
     method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "events/{eventId}",
+    functionPath: "events/deleteEvent.ts",
+    method: "delete",
     role: "teacher",
   },
   {
@@ -272,5 +309,11 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     functionPath: "messages/listenToMessage.ts",
     method: "post",
     role: "logged",
+  },
+  {
+    apiRoute: "assistants/remove-material",
+    functionPath: "assistants/removeMaterial.ts",
+    method: "post",
+    role: "teacher",
   },
 ];

@@ -1,6 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, effect, inject, signal } from '@angular/core';
 import { Materia } from './materia';
+import { User } from './auth';
+import { Observable } from 'rxjs/internal/Observable';
+import { TestInterface } from './tests-service';
 
 export interface ClassInterface {
   _id: string;
@@ -66,5 +69,21 @@ export class ClassiService {
   // Legacy compatibility - can be removed after migration
   get classi() {
     return this.Classes;
+  }
+
+  getClassStudents(classId: string): Observable<{ students: User[] }> {
+    return this.http.get<{ students: User[] }>(`class/${classId}/students`);
+  }
+
+  getClassAssignedTests(
+    classId: string,
+  ): Observable<{ tests: TestInterface[] }> {
+    let subjectId = this.materiaService.materiaSelected()?._id;
+    if (!subjectId) {
+      throw new Error('No subject selected');
+    }
+    return this.http.get<{ tests: TestInterface[] }>(
+      `class/${classId}/${subjectId}/tests`,
+    );
   }
 }

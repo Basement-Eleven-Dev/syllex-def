@@ -1,0 +1,67 @@
+<app-back-to
+  [path]="'/t/tests'"
+  [label]="'Torna alla lista dei test'"
+></app-back-to>
+
+@if (IsLoading()) {
+<div class="d-flex justify-content-center align-items-center py-5">
+  <fa-icon
+    [icon]="SpinnerIcon"
+    [animation]="'spin'"
+    [size]="'3x'"
+    class="text-primary"
+  ></fa-icon>
+</div>
+} @else if (TestData()) {
+<div class="mb-3 d-flex flex-row justify-content-between align-items-center">
+  <h1 class="mb-0 d-flex flex-row align-items-center gap-2">
+    <span [class]="'status-pill ' + TestData()!.status"></span>
+    <h1 class="text-dark fw-medium mb-0 display-6">{{ TestData()!.name }}</h1>
+  </h1>
+
+  <div class="d-flex flex-row gap-2 align-items-center">
+    <button class="btn btn-outline-primary icon-btn" (click)="onEditTest()">
+      <fa-icon [icon]="EditIcon"></fa-icon> Modifica
+    </button>
+    <button class="btn btn-outline-danger icon-btn" (click)="onDeleteTest()">
+      <fa-icon [icon]="TrashIcon"></fa-icon> Elimina
+    </button>
+  </div>
+</div>
+
+@if (TestData()!.availableFrom) {
+<h5 class="text-dark mb-0 fw-normal">
+  Creato il {{ TestData()!.availableFrom | date: 'd MMM y' }}
+</h5>
+}
+
+<div class="row my-5">
+  @for (stat of TestStats(); track $index) {
+  <div class="col-12 col-md-6 col-lg-3 mb-3">
+    <app-stat-card [stat]="stat" />
+  </div>
+  }
+</div>
+
+<div class="row">
+  <div class="col-12 col-lg-2 mb-3 mb-lg-0 d-flex flex-column gap-2">
+    @for(section of Sections; track section.id) {
+    <button
+      type="button"
+      class="p-3 rounded-syllex mb-0 section-link fs-5 fw-normal"
+      [class.active]="ActiveSection() === section.id"
+      (click)="onChangeSection(section.id)"
+    >
+      <fa-icon [icon]="section.icon"></fa-icon> {{ section.title }}
+    </button>
+    }
+  </div>
+  <div class="col-12 col-lg-10">
+    @if (ActiveSectionComponent()) {
+    <ng-container *ngComponentOutlet="ActiveSectionComponent()" />
+    }
+  </div>
+</div>
+} @else {
+<div class="alert alert-warning" role="alert">Test non trovato</div>
+}

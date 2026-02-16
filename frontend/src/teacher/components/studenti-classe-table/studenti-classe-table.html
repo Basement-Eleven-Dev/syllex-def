@@ -1,0 +1,93 @@
+<div class="card p-3">
+  <div class="card-body">
+    <!-- Search Input -->
+    <input
+      type="text"
+      class="form-control me-3 custom-input filter mb-4"
+      id="search-term"
+      placeholder="Cerca studente..."
+      style="max-width: 400px"
+      [value]="searchTerm()"
+      (input)="onSearchChange($any($event.target).value)"
+    />
+
+    <!-- Students Table -->
+    <div class="table-responsive">
+      <table class="table table-striped align-middle">
+        <thead>
+          <tr>
+            <th></th>
+            <th class="text-muted fw-light" scope="col">Nome Studente</th>
+            <th class="text-muted fw-light" scope="col">Email</th>
+            <th class="text-muted fw-light" scope="col">Performance</th>
+            <th class="text-muted fw-light" scope="col">Test Completati</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (HasNoStudents()) {
+          <tr>
+            <td colspan="6" class="text-center text-muted py-4">
+              Nessuno studente trovato
+            </td>
+          </tr>
+          } @for (studentData of paginatedStudents(); track
+          studentData.Student._id) {
+          <tr>
+            <td>
+              <img
+                [src]="getStudentAvatarUrl(studentData.Student.firstName!, studentData.Student.lastName!)"
+                [alt]="studentData.Student.firstName! + ' ' + studentData.Student.lastName!"
+                height="30"
+                class="rounded-circle"
+              />
+            </td>
+            <td class="fw-bold text-dark">
+              {{ studentData.Student.firstName }} {{
+              studentData.Student.lastName }}
+            </td>
+            <td class="text-dark">{{ studentData.Student.username }}</td>
+            <td class="text-dark">{{ studentData.PerformancePercentage }}%</td>
+            <td class="text-dark">
+              {{ studentData.CompletedTests }}/{{ testsCount() }}
+            </td>
+            <td class="text-end">
+              <a
+                [routerLink]="['/t/student', studentData.Student._id, 'class', classeId()]"
+                class="btn icon-btn btn-primary"
+              >
+                <fa-icon [icon]="EyeIcon"></fa-icon>
+                Vedi Dettagli
+              </a>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div
+      class="mt-5 d-flex flex-row justify-content-between align-items-center"
+    >
+      <app-syllex-pagination
+        [collectionSize]="collectionSize()"
+        [page]="page()"
+        [pageSize]="pageSize()"
+        (pageChange)="onPageChange($event)"
+      />
+
+      <select
+        class="form-select form-select-sm custom-input"
+        style="width: auto"
+        [value]="pageSize()"
+        (change)="onPageSizeChange(+$any($event.target).value)"
+      >
+        <option [value]="5">5 per pagina</option>
+        <option [value]="10">10 per pagina</option>
+        <option [value]="25">25 per pagina</option>
+        <option [value]="50">50 per pagina</option>
+      </select>
+    </div>
+  </div>
+</div>
