@@ -3,8 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { Materia } from '../../../services/materia';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faHeadSideBrain } from '@fortawesome/pro-regular-svg-icons';
-import { AgentSettingsForm } from '../../components/agent-settings-form/agent-settings-form';
 import { AgentChat } from '../../components/agent-chat/agent-chat';
+import { AgentSettingsForm } from '../../components/agent-settings-form/agent-settings-form';
 
 @Component({
   selector: 'app-agent-page',

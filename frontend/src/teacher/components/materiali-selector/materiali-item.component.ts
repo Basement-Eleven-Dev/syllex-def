@@ -10,6 +10,7 @@ import {
   getFileIcon,
   getFolderIcon,
   getIconColor,
+  isTextFile,
 } from '../../../app/_utils/file-icons';
 import { MaterialInterface } from '../../../services/materiali-service';
 

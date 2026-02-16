@@ -1,4 +1,11 @@
-import { Component, signal, OnInit, effect, computed, output } from '@angular/core';
+import {
+  Component,
+  signal,
+  OnInit,
+  effect,
+  computed,
+  output,
+} from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -18,14 +25,15 @@ import { getFileIcon, getIconColor } from '../../../app/_utils/file-icons';
 import { FileViewer } from '../file-viewer/file-viewer';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { MaterialiSelector } from '../materiali-selector/materiali-selector';
+
+import { firstValueFrom } from 'rxjs';
 import {
   MaterialInterface,
   MaterialiService,
-} from '../../services/materiali-service';
-import { EmbeddingsService } from '../../services/embeddings.service';
-import { Materia } from '../../services/materia';
-import { AgentService } from '../../services/agent.service';
-import { firstValueFrom } from 'rxjs';
+} from '../../../services/materiali-service';
+import { EmbeddingsService } from '../../../services/embeddings.service';
+import { Materia } from '../../../services/materia';
+import { AgentService } from '../../../services/agent.service';
 
 @Component({
   selector: 'app-agent-settings-form',
@@ -117,9 +125,8 @@ export class AgentSettingsForm implements OnInit {
           });
 
           const associatedIds =
-            res.assistant.associatedFileIds?.map(
-              (id: any) => id.$oid || id,
-            ) || [];
+            res.assistant.associatedFileIds?.map((id: any) => id.$oid || id) ||
+            [];
           this.associatedMaterialIds.set(associatedIds);
         } else {
           this.resetForm();
@@ -159,8 +166,6 @@ export class AgentSettingsForm implements OnInit {
       error: (err) => console.error('Error removing material:', err),
     });
   }
-
-
 
   onFileSelected(event: any) {
     const selectedFiles = event.target.files;
@@ -210,7 +215,9 @@ export class AgentSettingsForm implements OnInit {
 
         if (assistantId) {
           // UPDATE
-          await firstValueFrom(this.agentService.updateAgent(assistantId, formData));
+          await firstValueFrom(
+            this.agentService.updateAgent(assistantId, formData),
+          );
           console.log('Agent updated successfully');
         } else {
           // CREATE
