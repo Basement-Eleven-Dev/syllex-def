@@ -20,6 +20,7 @@ import { LambdaConstruct } from "../lambda";
 import { DefaultLambdaRole } from "../roles";
 import { API_GATEWAY_TIMEOUT } from "../../../src/env";
 import { writeFile } from "fs/promises";
+import { LayerVersion } from "aws-cdk-lib/aws-lambda";
 
 export interface RouteConstructProps extends NestedStackProps {
     apiId: string,
@@ -81,15 +82,17 @@ export class RouteConstruct extends NestedStack {
 
     }
 
-    private addMethod(resource: IResource, functionPath: string, method: string, appRole: AppRole) {
+    private addMethod(resource: IResource, functionPath: string, method: string, appRole: AppRole, layer?: { name: string, arn: string }) {
         let functionName = functionPath.split('.ts')[0].replace(/\//g, "-");
         let apiMethod = resource.addMethod(
             method,
             new LambdaIntegration(
                 new LambdaConstruct(this, functionName, FUNCTIONS_PATH + functionPath, this.role, {
                     COGNITO_POOL_ID: this.props.cognitoPoolId,
-                    COGNITO_CLIENT_ID: this.props.cognitoClientId,
-                }).lambda,
+                    COGNITO_CLIENT_ID: this.props.cognitoClientId
+                },
+                    layer ? [LayerVersion.fromLayerVersionArn(this, layer.name, layer.arn)] : []
+                ).lambda,
                 {
 
                     timeout: Duration.seconds(API_GATEWAY_TIMEOUT),
@@ -115,7 +118,7 @@ export class RouteConstruct extends NestedStack {
         integrations.forEach(int => {
             let resource = this.api.root;
             int.apiRoute.split('/').forEach(piece => resource = resource.getResource(piece) || resource.addResource(piece));
-            this.addMethod(resource, int.functionPath, int.method, int.role)
+            this.addMethod(resource, int.functionPath, int.method, int.role, int.extensionLayer)
         })
     }
 
