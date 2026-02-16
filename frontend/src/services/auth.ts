@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { Amplify } from 'aws-amplify';
 import {
   signIn,
@@ -10,6 +10,8 @@ import {
   updatePassword,
   updateUserAttribute,
   confirmUserAttribute,
+  resetPassword,
+  confirmResetPassword,
 } from 'aws-amplify/auth';
 import { HttpClient } from '@angular/common/http';
 
@@ -109,54 +111,72 @@ export class Auth {
       });
   }
 
-  sendResetPasswordCode(email: string): Observable<{
+  async sendResetPasswordCode(
+    email: string,
+  ): Promise<{
     success: boolean;
     message: string;
     codeValiditySeconds: number;
   }> {
-    return new Observable((observer) => {
-      // API call simulation
-      setTimeout(() => {
-        observer.next({
+    try {
+      const output = await resetPassword({ username: email });
+
+      if (
+        output.nextStep.resetPasswordStep === 'CONFIRM_RESET_PASSWORD_WITH_CODE'
+      ) {
+        return {
           success: true,
-          message: 'Codice verificato con successo.',
+          message: 'Codice inviato alla tua email',
           codeValiditySeconds: 300,
-        });
-        observer.complete();
-      }, 1500);
-    });
+        };
+      }
+
+      return {
+        success: false,
+        message: "Errore durante l'invio del codice",
+        codeValiditySeconds: 0,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message || "Errore durante l'invio del codice",
+        codeValiditySeconds: 0,
+      };
+    }
   }
 
-  checkResetPasswordCode(
+  async confirmResetPasswordWithCode(
     email: string,
     code: string,
-  ): Observable<{ success: boolean; message: string }> {
-    return new Observable((observer) => {
-      // API call simulation
-      setTimeout(() => {
-        observer.next({
-          success: true,
-          message: 'Codice verificato con successo.',
-        });
-        observer.complete();
-      }, 1500);
-    });
-  }
-
-  resetPassword(
-    email: string,
     newPassword: string,
-  ): Observable<{ success: boolean; message: string }> {
-    return new Observable((observer) => {
-      // API call simulation
-      setTimeout(() => {
-        observer.next({
-          success: true,
-          message: 'Password resettata con successo.',
-        });
-        observer.complete();
-      }, 1500);
-    });
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      await confirmResetPassword({
+        username: email,
+        confirmationCode: code,
+        newPassword: newPassword,
+      });
+
+      return {
+        success: true,
+        message: 'Password resettata con successo',
+      };
+    } catch (error: any) {
+      let message = 'Errore durante il reset della password';
+
+      if (error.name === 'CodeMismatchException') {
+        message = 'Codice non valido';
+      } else if (error.name === 'ExpiredCodeException') {
+        message = 'Codice scaduto';
+      } else if (error.name === 'InvalidPasswordException') {
+        message = 'La password non rispetta i requisiti minimi';
+      }
+
+      return {
+        success: false,
+        message: error.message || message,
+      };
+    }
   }
 
   async logout(): Promise<{ success: boolean; message: string }> {

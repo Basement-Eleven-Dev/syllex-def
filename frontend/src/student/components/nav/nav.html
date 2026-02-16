@@ -1,0 +1,17 @@
+<div
+  class="bg-primary py-3 px-3 mt-3 px-md-4 d-flex flex-row align-items-center gap-3 rounded container-fluid"
+>
+  <img
+    src="/images/logotipo.svg"
+    alt="Syllex Logo"
+    height="40"
+    routerLink="/t/dashboard"
+  />
+
+  @for(route of routes; track $index){
+  <a [routerLink]="route.route" class="route">
+    <fa-icon [icon]="route.icon" class="me-2"></fa-icon>
+    {{ route.label }}
+  </a>
+  }
+</div>
