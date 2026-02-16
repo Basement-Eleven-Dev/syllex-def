@@ -12,6 +12,7 @@ const generateUploadUrl = async (
   const s3Client = new S3Client({});
   // Since it's a proxy, body is a string
   const body = JSON.parse(request.body || "{}");
+
   const { filename, contentType, ...metadata } = body;
 
   if (!filename) {
@@ -21,7 +22,7 @@ const generateUploadUrl = async (
   // Configuration for the upload
   const command = new PutObjectCommand({
     Bucket: BUCKET_NAME,
-    Key: filename, // Stored in root as requested
+    Key: filename,
     ContentType: contentType || "application/octet-stream",
     Metadata: metadata,
   });

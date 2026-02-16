@@ -63,7 +63,6 @@ export const getCurrentUser = async (
   request: APIGatewayProxyEvent,
 ): Promise<User | null> => {
   const client = await mongoClient();
-
   try {
     const token = (request.headers.authorization || request.headers.Authorization)?.split(" ")[1];
     if (!token) return null;

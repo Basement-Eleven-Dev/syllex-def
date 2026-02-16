@@ -78,7 +78,7 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "logged", //!!!DA RIMETTERE A ROLE:TEACHER
   },
   {
-    apiRoute: "questions/create",
+    apiRoute: "questions",
     functionPath: "questions/createQuestion.ts",
     method: "post",
     role: "teacher",
@@ -96,7 +96,7 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
-    apiRoute: "materials/create",
+    apiRoute: "materials",
     functionPath: "materials/createMaterial.ts",
     method: "post",
     role: "teacher",
@@ -210,6 +210,18 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
+    apiRoute: "ai/materials",
+    functionPath: "ai/createAiGenMaterial.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "proxy/gamma/{generationId}",
+    functionPath: "ai/gammaGenerationProxy.ts",
+    method: "get",
+    role: "open",
+  },
+  {
     apiRoute: "reports",
     functionPath: "reports/createReport.ts",
     method: "post",
@@ -246,9 +258,57 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
+    apiRoute: "assistants/create",
+    functionPath: "assistants/createAssistant.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
     apiRoute: "events/{eventId}",
     functionPath: "events/deleteEvent.ts",
     method: "delete",
+    role: "teacher",
+  },
+  {
+    apiRoute: "assistants/get",
+    functionPath: "assistants/getAssistant.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "assistants/response",
+    functionPath: "assistants/generateResponse.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "assistants/update",
+    functionPath: "assistants/updateAssistant.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "materials/vectorize",
+    functionPath: "embeddings/vectorizeMaterials.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "messages/history",
+    functionPath: "messages/getConversationHistory.ts",
+    method: "post",
+    role: "logged",
+  },
+  {
+    apiRoute: "messages/listen",
+    functionPath: "messages/listenToMessage.ts",
+    method: "post",
+    role: "logged",
+  },
+  {
+    apiRoute: "assistants/remove-material",
+    functionPath: "assistants/removeMaterial.ts",
+    method: "post",
     role: "teacher",
   },
 ];

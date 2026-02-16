@@ -11,16 +11,46 @@
           [class.justify-content-end]="msg.role === 'user'"
         >
           <div
-            class="message-bubble p-3"
-            style="border-radius: 8px"
-            [class.user-message]="msg.role === 'user'"
-            [class.agent-message]="msg.role === 'agent'"
+            class="d-flex flex-column"
+            [class.align-items-end]="msg.role === 'user'"
           >
-            @if (msg.role === 'agent') {
-            <markdown [data]="msg.content"></markdown>
-            } @else {
-            <span>{{ msg.content }}</span>
-            }
+            <div class="d-flex align-items-center gap-2">
+              <div
+                class="message-bubble p-3"
+                style="border-radius: 8px"
+                [class.user-message]="msg.role === 'user'"
+                [class.agent-message]="msg.role === 'agent'"
+              >
+                @if (msg.role === 'agent') {
+                <markdown [data]="msg.content"></markdown>
+                } @else {
+                <span>{{ msg.content }}</span>
+                }
+              </div>
+
+              @if (msg.role === 'agent') {
+              <button
+                class="btn btn-outline-primary rounded-circle p-0 d-flex align-items-center justify-content-center btn-listen"
+                style="width: 28px; height: 28px; min-width: 28px"
+                title="Ascolta audio"
+                (click)="listenMessage(msg)"
+                [disabled]="loadingAudioIds().has(msg._id!)"
+              >
+                @if (loadingAudioIds().has(msg._id!)) {
+                <fa-icon [icon]="faSpinner" [animation]="'spin'" style="font-size: 0.8rem" />
+                } @else {
+                <fa-icon
+                  [icon]="currentPlayingId() === msg._id ? audioPause : (msg.audioUrl ? audioPlay : faHeadphones)"
+                  style="font-size: 0.8rem"
+                />
+                }
+              </button>
+              }
+            </div>
+
+            <span class="text-primary mt-1" style="font-size: 0.75rem">
+              {{ msg.timestamp | date : 'HH:mm' }}
+            </span>
           </div>
         </div>
         } @if (isLoading()) {
