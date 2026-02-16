@@ -78,7 +78,7 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "logged", //!!!DA RIMETTERE A ROLE:TEACHER
   },
   {
-    apiRoute: "questions/create",
+    apiRoute: "questions",
     functionPath: "questions/createQuestion.ts",
     method: "post",
     role: "teacher",
@@ -96,7 +96,7 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
-    apiRoute: "materials/create",
+    apiRoute: "materials",
     functionPath: "materials/createMaterial.ts",
     method: "post",
     role: "teacher",
@@ -210,6 +210,17 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
+    apiRoute: "ai/materials",
+    functionPath: "ai/createAiGenMaterial.ts",
+    method: "post",
+    role: 'teacher'
+  },
+  {
+    apiRoute: "proxy/gamma/{generationId}",
+    functionPath: "ai/gammaGenerationProxy.ts",
+    method: "get",
+    role: "open"
+  }, {
     apiRoute: "reports",
     functionPath: "reports/createReport.ts",
     method: "post",
