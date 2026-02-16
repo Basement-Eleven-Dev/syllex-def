@@ -6,6 +6,7 @@ import { ObjectId } from "mongodb";
 import { MaterialInterface } from "../../models/material";
 import { startSlidedeckGeneration } from "../../_helpers/gammaApi";
 import { uploadPlainContentToS3 } from "../../_helpers/uploadFileToS3";
+import { askLLM } from "../../_helpers/AI/simpleCompletion";
 export type AIGenMaterialInput = {
     type: 'slides' | 'map' | 'glossary' | 'summary',
     materialIds: string[],
@@ -29,6 +30,7 @@ const getPrompt = (type: AIGenMaterialInput['type'], language: string = 'it', nu
     return prompts[type] + '\n' + additionalInstructions + '\n' + guardRails;
 }
 
+
 const createAIGenMaterial = async (
     request: APIGatewayProxyEvent,
     context: Context,
@@ -47,7 +49,7 @@ const createAIGenMaterial = async (
 
     const prompt = getPrompt(type, language, numberOfSlides, additionalInstructions)
     const llmInputMaterialUrls: string[] = materialObjects.map(el => el.url!)
-    const resultContent = "" //await getLlmResponse(prompt,urls)
+    const resultContent = await askLLM(prompt, llmInputMaterialUrls)
 
     const organization = await organizationCollection.findOne({ _id: context.user!.organizationId });
 
