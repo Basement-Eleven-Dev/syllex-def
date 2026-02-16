@@ -19,6 +19,12 @@ const createTest = async (request: APIGatewayProxyEvent, context: Context) => {
   const db = await getDefaultDatabase();
   const testsCollection = db.collection<Test>("tests");
 
+  const computeMaxScore = (
+    questions: { questionId: string; points: number }[],
+  ) => {
+    return questions.reduce((total, q) => total + q.points, 0);
+  };
+
   // Prepara il test da inserire
   const newTest: any = {
     name: testData.name,
@@ -30,6 +36,7 @@ const createTest = async (request: APIGatewayProxyEvent, context: Context) => {
         points: q.points,
       }),
     ),
+    maxScore: computeMaxScore(testData.questions),
     fitScore: testData.fitScore || 0,
     teacherId: context.user._id,
     subjectId: new ObjectId(testData.subjectId),

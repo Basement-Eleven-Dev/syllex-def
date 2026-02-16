@@ -1,0 +1,139 @@
+<h1 class="text-dark fw-medium mb-3 display-6">
+  Le tue classi di {{ materiaService.materiaSelected()!.name }}
+</h1>
+<h5 class="text-dark mb-0 fw-normal">
+  Gestisci e visualizza le tue classi da qui.
+</h5>
+
+<section class="d-flex flex-row my-5 gap-3">
+  <div>
+    <input
+      type="text
+      class="form-control custom-input filter"
+      id="search-term"
+      placeholder="Cerca classi..."
+      style="min-width: 400px"
+      [value]="SearchTerm()"
+      (input)="onSearchTermChange($any($event.target).value)"
+    />
+  </div>
+  <div>
+    <select
+      id="year-filter"
+      class="form-select custom-input filter"
+      style="min-width: 200px"
+      [value]="SelectedYear()"
+      (change)="onYearChange($any($event.target).value)"
+    >
+      <option value="">Tutti gli anni</option>
+      <option value="2026">2026</option>
+      <option value="2027">2027</option>
+      <option value="2028">2028</option>
+      <option value="2029">2029</option>
+      <option value="2030">2030</option>
+    </select>
+  </div>
+  <button
+    type="button"
+    class="btn btn-outline-danger"
+    (click)="clearFilters()"
+    title="Pulisci filtri"
+  >
+    <fa-icon [icon]="ClearIcon"></fa-icon>
+  </button>
+  <app-view-type-toggle
+    class="ms-auto"
+    [viewType]="viewType"
+    [pageKey]="'classi'"
+    (viewTypeChange)="onChangeViewType($event)"
+  />
+</section>
+
+@if(viewType === 'grid') {
+<div class="row">
+  @for(classe of PaginatedClassi() ; track classe._id){
+  <div class="col-12 col-md-6 col-lg-4 mb-4">
+    <div class="card p-3 h-100 overflow-hidden position-relative">
+      <fa-icon [icon]="UsersIcon" class="background-icon"></fa-icon>
+      <div
+        class="card-body d-flex flex-column gap-4 align-items-start position-relative"
+        style="z-index: 1"
+      >
+        <h3
+          class="card-title text-dark ellipsis-3-lines mb-0"
+          [title]="classe.name"
+        >
+          {{ classe.name }}
+        </h3>
+        <div>
+          <p class="mb-1 text-dark">
+            <fa-icon [icon]="UserIcon"></fa-icon> {{ classe.students.length }}
+            student{{ classe.students.length > 1 ? 'i' : 'e' }}
+          </p>
+          <p class="text-dark">
+            <fa-icon [icon]="CalendarIcon"></fa-icon> anno di riferimento {{
+            classe.year }}
+          </p>
+        </div>
+        <a
+          [routerLink]="['/t/classi', classe._id]"
+          class="btn btn-primary mt-auto w-100"
+        >
+          Visualizza Dettagli</a
+        >
+      </div>
+    </div>
+  </div>
+  }
+</div>
+} @else {
+<table class="table table-striped align-middle">
+  <thead>
+    <tr>
+      <th class="text-muted fw-light" scope="col">Nome Classe</th>
+      <th class="text-muted fw-light" scope="col">Numero di Studenti</th>
+      <th class="text-muted fw-light" scope="col">Anno di riferimento</th>
+      <th class="text-muted fw-light text-end" scope="col">Azioni</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for(classe of PaginatedClassi(); track classe._id){
+    <tr>
+      <td class="text-dark">{{ classe.name }}</td>
+      <td class="text-dark">
+        <fa-icon [icon]="UserIcon"></fa-icon> {{ classe.students.length }}
+        student{{ classe.students.length > 1 ? 'i' : 'e' }}
+      </td>
+      <td class="text-dark">{{ classe.year }}</td>
+      <td class="text-end">
+        <a
+          [routerLink]="['/t/classi', classe._id]"
+          class="btn icon-btn btn-primary"
+          >Visualizza Dettagli</a
+        >
+      </td>
+    </tr>
+    }
+  </tbody>
+</table>
+}
+
+<div class="d-flex flex-row justify-content-between align-items-center mt-4">
+  <app-syllex-pagination
+    [collectionSize]="CollectionSize()"
+    [page]="Page()"
+    [pageSize]="PageSize()"
+    (pageChange)="onNewPageRequested($event)"
+  />
+
+  <select
+    class="form-select custom-input"
+    style="width: auto"
+    [ngModel]="PageSize()"
+    (ngModelChange)="onPageSizeChange($event)"
+  >
+    <option [ngValue]="5">5 per pagina</option>
+    <option [ngValue]="10">10 per pagina</option>
+    <option [ngValue]="20">20 per pagina</option>
+  </select>
+</div>

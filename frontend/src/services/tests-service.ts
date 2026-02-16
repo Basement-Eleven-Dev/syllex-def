@@ -13,12 +13,27 @@ export interface TestInterface {
     questionId: string;
     points: number;
   }[];
+  maxScore?: number;
   fitScore?: number;
   timeLimit?: number; // in minutes
   draft?: boolean;
   status?: 'bozza' | 'pubblicato' | 'archiviato';
   subjectId?: string;
   hasPendingCorrections?: boolean;
+}
+
+export interface AttemptInterface {
+  _id: string;
+  studentId: string;
+  teacherId: string;
+  testId: string;
+  subjectId: string;
+  status: 'processing' | 'ai-reviewed' | 'reviewed';
+  deliverdAt: Date;
+  reviewedAt?: Date;
+  score: number;
+  maxScore: number;
+  fitTestScore?: boolean; // idoneo / non idoneo
 }
 
 @Injectable({
@@ -84,6 +99,18 @@ export class TestsService {
     return this.http.put<{ success: boolean; test: TestInterface }>(
       `tests/${testId}/classes`,
       { classIds },
+    );
+  }
+
+  getClassAttempts(classId: string) {
+    return this.http.get<{ attempts: AttemptInterface[] }>(
+      `attempts/class/${classId}`,
+    );
+  }
+
+  getClassAttemptsOnTest(testId: string, classId: string) {
+    return this.http.get<{ attempts: AttemptInterface[] }>(
+      `attempts/${testId}/${classId}`,
     );
   }
 }

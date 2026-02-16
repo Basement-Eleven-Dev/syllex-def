@@ -1,0 +1,115 @@
+<form [formGroup]="filtersForm" class="d-flex flex-row gap-3 mb-4">
+  <input
+    type="text"
+    class="form-control custom-input filter"
+    style="max-width: 300px"
+    placeholder="Cerca per nome o cognome..."
+    formControlName="text"
+  />
+  <select
+    class="form-select custom-input filter"
+    formControlName="class"
+    style="max-width: 200px"
+  >
+    <option value="">Classe</option>
+    <option value="1A">Classe 1A</option>
+    <option value="2B">Classe 1A</option>
+    <option value="3C">Classe 1A</option>
+  </select>
+  <select
+    class="form-select custom-input filter"
+    formControlName="status"
+    style="max-width: 200px"
+  >
+    <option value="">Stato</option>
+    <option value="delivered">Consegnato</option>
+    <option value="not_delivered">Non consegnato</option>
+  </select>
+
+  <button
+    type="button"
+    class="btn btn-outline-danger"
+    (click)="resetFilters()"
+    title="Pulisci filtri"
+  >
+    <fa-icon [icon]="ClearIcon"></fa-icon>
+  </button>
+</form>
+
+<div class="card p-3">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle table-striped">
+        <thead>
+          <tr>
+            <th></th>
+            <th class="text-muted fw-light">Nome</th>
+            <th class="text-muted fw-light">Cognome</th>
+            <th class="text-muted fw-light">Classe</th>
+            <th class="text-muted fw-light">Punteggio</th>
+            <th class="text-muted fw-light">Consegnato il</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(assignment of testAssignments; track $index) {
+          <tr>
+            <td>
+              <div class="avatar avatar-sm">
+                <img
+                  src="https://api.dicebear.com/9.x/initials/svg?backgroundColor=3931ce&textColor=ffffff&seed={{ assignment.studenteName }} {{ assignment.studentSurname }}"
+                  alt="avatar"
+                  height="30"
+                  class="rounded-circle"
+                />
+              </div>
+            </td>
+            <td>{{ assignment.studenteName }}</td>
+            <td>{{ assignment.studentSurname }}</td>
+            <td>{{ assignment.class }}</td>
+            <td>
+              {{ assignment.score !== null ? assignment.score + ' / 100' : '/'
+              }}
+            </td>
+            <td>
+              {{ (assignment.deliveredAt | date: 'dd MMMM HH:mm' | titlecase) ||
+              '/' }}
+            </td>
+            <td class="text-end">
+              <button
+                class="btn icon-btn"
+                [class.btn-warning]="assignment.score === null"
+                [routerLink]="'/t/correzione/' + assignment.id"
+                [class.btn-primary]="assignment.score !== null"
+              >
+                {{ assignment.score === null ? 'Correggi' : 'Visualizza' }}
+              </button>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div
+      class="mt-5 d-flex flex-row justify-content-between align-items-center"
+    >
+      <app-syllex-pagination
+        [collectionSize]="collectionSize"
+        [page]="page"
+        [pageSize]="pageSize"
+        (pageChange)="page = $event; onNewPageRequested()"
+      />
+
+      <select
+        class="form-select custom-input"
+        style="width: auto"
+        [(ngModel)]="pageSize"
+        (ngModelChange)="onNewPageRequested()"
+      >
+        <option [ngValue]="5">5 per pagina</option>
+        <option [ngValue]="10">10 per pagina</option>
+        <option [ngValue]="20">20 per pagina</option>
+      </select>
+    </div>
+  </div>
+</div>

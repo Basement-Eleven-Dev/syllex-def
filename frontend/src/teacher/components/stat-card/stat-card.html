@@ -1,0 +1,21 @@
+<div class="card h-100">
+  <div class="card-body d-flex flex-column align-items-center p-1">
+    <div class="flex-fill d-flex flex-column align-items-center p-4">
+      <span class="card-value text-dark">
+        {{ stat().Value }} @if (stat().RequirePercentage) {
+        <small class="percentage">%</small>
+        }
+      </span>
+      <p class="mb-0 card-description text-dark">{{ stat().Label }}</p>
+    </div>
+    @if (stat().Link) {
+    <a
+      [routerLink]="stat().Link"
+      [queryParams]="stat().QueryParams"
+      class="mb-0 text-dark stat-link"
+    >
+      {{ stat().LinkLabel }}
+    </a>
+    }
+  </div>
+</div>

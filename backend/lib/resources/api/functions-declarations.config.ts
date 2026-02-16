@@ -215,4 +215,40 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     method: "post",
     role: "teacher",
   },
+  {
+    apiRoute: "class/{classId}/students",
+    functionPath: "students/getClassStudents.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "class/{classId}/{subjectId}/tests",
+    functionPath: "tests/getClassAssignedTests.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "attempts/class/{classId}",
+    functionPath: "tests/getClassAttempts.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "events",
+    functionPath: "events/getEvents.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "events",
+    functionPath: "events/createEvent.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "events/{eventId}",
+    functionPath: "events/deleteEvent.ts",
+    method: "delete",
+    role: "teacher",
+  },
 ];

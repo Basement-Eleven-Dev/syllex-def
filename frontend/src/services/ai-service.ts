@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { QuestionType } from '../types/question.types';
-import { AnswerOption } from '../pages/create-edit-question/create-edit-question';
+import { AnswerOption } from '../teacher/pages/create-edit-question/create-edit-question';
 
 @Injectable({
   providedIn: 'root',

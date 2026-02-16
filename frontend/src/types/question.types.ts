@@ -7,7 +7,7 @@ import {
   faPresentationScreen,
   faSpellCheck,
 } from '@fortawesome/pro-solid-svg-icons';
-import { TypeOption } from '../components/type-selector/type-selector';
+import { TypeOption } from '../teacher/components/type-selector/type-selector';
 
 export type QuestionType = 'scelta multipla' | 'vero falso' | 'risposta aperta';
 export type MaterialType =
