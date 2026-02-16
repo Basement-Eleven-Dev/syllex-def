@@ -316,7 +316,7 @@ export class MaterialiService {
       .post<{
         success: boolean;
         material: MaterialInterface;
-      }>('materials/create', {
+      }>('materials', {
         material: { ...material, subjectId },
         subjectId,
         parentId: parent._id === 'root' ? null : parent._id,

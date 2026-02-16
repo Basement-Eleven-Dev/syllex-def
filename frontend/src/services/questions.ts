@@ -25,7 +25,7 @@ export class QuestionsService {
   constructor(
     private http: HttpClient,
     private filesService: FilesService,
-  ) {}
+  ) { }
 
   createQuestion(
     q: QuestionInterface,
@@ -39,7 +39,7 @@ export class QuestionsService {
           // Aggiungo l'URL pubblico S3 alla domanda
           const questionData = { ...q, imageUrl };
           return this.http.post<{ question: QuestionInterface }>(
-            'questions/create',
+            'questions',
             questionData,
           );
         }),
@@ -48,7 +48,7 @@ export class QuestionsService {
 
     // Nessuna immagine, crea la domanda direttamente
     return this.http.post<{ question: QuestionInterface }>(
-      'questions/create',
+      'questions',
       q,
     );
   }
