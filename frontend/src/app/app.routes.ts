@@ -17,6 +17,11 @@ import { LaboratorioAi } from '../pages/laboratorio-ai/laboratorio-ai';
 import { CreateEditComunicazione } from '../pages/create-edit-comunicazione/create-edit-comunicazione';
 import { Correzione } from '../pages/correzione/correzione';
 import { Profile } from '../pages/profile/profile';
+import { AgentPage } from '../pages/agent-page/agent-page';
+
+import { studentGuard } from '../guards/student.guard';
+import { teacherGuard } from '../guards/teacher.guard';
+import { StudentLayout } from '../student/pages/student-layout/student-layout';
 
 export const routes: Routes = [
   {
@@ -32,7 +37,7 @@ export const routes: Routes = [
   {
     path: 't',
     component: TeacherLayout,
-    canActivate: [authGuard],
+    canActivate: [authGuard, teacherGuard],
     children: [
       {
         path: '',
@@ -106,6 +111,103 @@ export const routes: Routes = [
       {
         path: 'laboratorio-ai',
         component: LaboratorioAi,
+      },
+      {
+        path: 'agente',
+        component: AgentPage,
+      },
+      {
+        path: 'profilo',
+        component: Profile,
+      },
+      {
+        path: '**',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+    ],
+  },
+  {
+    path: 's',
+    component: StudentLayout,
+    canActivate: [authGuard, studentGuard],
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+      {
+        path: 'dashboard',
+        component: Dashboard,
+      },
+      {
+        path: 'banca',
+        component: Banca,
+      },
+      {
+        path: 'create-question',
+        component: CreateEditQuestion,
+      },
+      {
+        path: 'edit-question/:id',
+        component: CreateEditQuestion,
+      },
+      {
+        path: 'tests',
+        component: Test,
+      },
+      {
+        path: 'classi',
+        component: Classi,
+      },
+      {
+        path: 'classi/:classeId',
+        component: ClasseDettaglio,
+      },
+      {
+        path: 'comunicazioni',
+        component: Comunicazioni,
+      },
+      {
+        path: 'tests/new',
+        component: CreateEditTest,
+      },
+      {
+        path: 'tests/edit/:testId',
+        component: CreateEditTest,
+      },
+      {
+        path: 'tests/:testId',
+        component: TestDetail,
+      },
+      {
+        path: 'risorse',
+        component: Materiali,
+      },
+      {
+        path: 'correzione/:attemptId',
+        component: Correzione,
+      },
+      {
+        path: 'comunicazioni',
+        component: Comunicazioni,
+      },
+      {
+        path: 'comunicazioni/new',
+        component: CreateEditComunicazione,
+      },
+      {
+        path: 'comunicazioni/edit/:comunicazioneId',
+        component: CreateEditComunicazione,
+      },
+      {
+        path: 'laboratorio-ai',
+        component: LaboratorioAi,
+      },
+      {
+        path: 'agente',
+        component: AgentPage,
       },
       {
         path: 'profilo',

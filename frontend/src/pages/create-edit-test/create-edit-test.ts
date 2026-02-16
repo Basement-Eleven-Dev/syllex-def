@@ -34,6 +34,7 @@ import { Materia } from '../../services/materia';
 import { TestsService, TestInterface } from '../../services/tests-service';
 import { FeedbackService } from '../../services/feedback-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { QuestionsSearchFilters } from '../../components/questions-search-filters/questions-search-filters';
 
 @Component({
   selector: 'app-create-edit-test',
@@ -46,6 +47,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     QuestionsDroppableList,
     ClassSelector,
     BackTo,
+    QuestionsSearchFilters,
   ],
   templateUrl: './create-edit-test.html',
   styleUrl: './create-edit-test.scss',
@@ -79,6 +81,7 @@ export class CreateEditTest implements OnInit {
   readonly QuestionsToLoad = signal<
     { questionId: string; points: number }[] | undefined
   >(undefined);
+  private readonly FormChanged = signal<number>(0);
 
   // Computed
   readonly IsEditMode = computed(() => !!this.TestId());
@@ -99,6 +102,13 @@ export class CreateEditTest implements OnInit {
   });
 
   ngOnInit() {
+    // Subscribe to form changes
+    this.TestForm.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.FormChanged.update((v) => v + 1);
+      });
+
     this.route.params
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((params) => {
@@ -190,6 +200,7 @@ export class CreateEditTest implements OnInit {
   }
 
   readonly CanPublish = computed(() => {
+    this.FormChanged(); // Trigger on form changes
     const form = this.TestForm.value;
     return !!(
       form.title &&
@@ -201,7 +212,10 @@ export class CreateEditTest implements OnInit {
     );
   });
 
-  readonly CanSaveDraft = computed(() => !!this.TestForm.value.title);
+  readonly CanSaveDraft = computed(() => {
+    this.FormChanged(); // Trigger on form changes
+    return !!this.TestForm.value.title;
+  });
 
   onClassesChange(classIds: string[]): void {
     this.TestForm.get('classes')?.setValue(classIds);
@@ -237,7 +251,7 @@ export class CreateEditTest implements OnInit {
       ? this.testsService.editTest(this.TestId()!, testData)
       : this.testsService.createTest(testData);
 
-    request.pipe(takeUntilDestroyed()).subscribe({
+    request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         const message = this.IsEditMode()
           ? 'Test aggiornato con successo!'

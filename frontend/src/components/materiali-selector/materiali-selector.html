@@ -17,7 +17,7 @@
       >
         Deseleziona tutti
       </button>
-      }
+      } @if (!embeddingCreationMode) {
       <button
         type="button"
         class="btn btn-primary"
@@ -28,8 +28,8 @@
         <span class="spinner-border spinner-border-sm me-1"></span>
         Caricamento... } @else {
         <fa-icon [icon]="UploadIcon" class="me-1"></fa-icon>
-        Carica nuovo }
-      </button>
+        Carica nuovo }</button
+      >}
     </div>
   </div>
   <!-- Hidden file input -->
@@ -40,6 +40,29 @@
     (change)="onFileSelected($event)"
     accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.mp4,.avi,.mov"
   />
+  <!-- Already Processed Materials Section -->
+  @if (embeddingCreationMode && processedMaterials().length > 0) {
+  <div class="mb-3">
+    <label class="small text-muted mb-2">Risorse già elaborate</label>
+    <ul class="list-group list-group-flush border rounded-3 mb-2" style="max-height: 150px; overflow-y: auto;">
+      @for (m of processedMaterials(); track m._id) {
+      <li class="list-group-item p-2 d-flex align-items-center opacity-75 bg-light" style="font-size: 0.9rem;">
+        <fa-icon
+          [icon]="getFileIcon(m.extension!)"
+          [style.color]="getIconColor(m)"
+          class="me-2"
+        ></fa-icon>
+        <span class="flex-grow-1">{{ m.name }}</span>
+        <div class="d-flex align-items-center gap-1 text-primary small">
+          <fa-icon [icon]="CheckIcon"></fa-icon>
+          <span>Processato</span>
+        </div>
+      </li>
+      }
+    </ul>
+  </div>
+  }
+
   <!-- Search input -->
   <div class="mb-3">
     <input
@@ -56,10 +79,13 @@
   <ul class="list-group list-group-flush rounded-3">
     @for (material of searchResults(); track material._id) {
     <li
-      class="list-group-item p-2 cursor-pointer"
+      class="list-group-item p-2"
       [class.list-group-item-primary]="selectedMaterialIds().has(material._id)"
       [class.border-primary]="selectedMaterialIds().has(material._id)"
-      (click)="selectMaterial(material)"
+      [class.opacity-50]="embeddingCreationMode && material.isVectorized"
+      [class.cursor-not-allowed]="embeddingCreationMode && material.isVectorized"
+      [class.cursor-pointer]="!(embeddingCreationMode && material.isVectorized)"
+      (click)="!(embeddingCreationMode && material.isVectorized) && selectMaterial(material)"
       role="button"
     >
       @if (material.path) {
@@ -74,7 +100,16 @@
           [style.color]="getIconColor(material)"
           class="me-2"
         ></fa-icon>
-        <span>{{ material.name }}</span>
+        <span class="flex-grow-1">{{ material.name }}</span>
+        @if (embeddingCreationMode && material.isVectorized) {
+        <div
+          class="d-flex align-items-center gap-1"
+          style="font-size: 0.8rem; color: #28a745"
+        >
+          <fa-icon [icon]="CheckIcon"></fa-icon>
+          <span>Processato</span>
+        </div>
+        }
       </div>
     </li>
     } @empty {
@@ -88,6 +123,7 @@
       @for (item of materialiService.root(); track item._id) {
       <app-materiali-item
         [item]="item"
+        [embeddingCreationMode]="embeddingCreationMode"
         [expandedFolders]="expandedFolders()"
         [selectedMaterialIds]="selectedMaterialIds()"
         [searchQuery]="searchQuery()"

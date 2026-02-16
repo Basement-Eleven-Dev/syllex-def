@@ -1,11 +1,4 @@
 <div class="droppable-container d-flex flex-column">
-  <div class="d-flex justify-content-between align-items-center">
-    <label class="form-label text-dark">Domande del Test</label>
-    @if (selectedQuestions.length > 0) {
-    <a class="text-danger" (click)="clearAll()"> Rimuovi tutte </a>
-    }
-  </div>
-
   <!-- Statistiche Test -->
   @if (selectedQuestions.length > 0) {
   <div class="test-stats card mb-3 p-3 bg-light">
@@ -27,17 +20,16 @@
           <div
             class="h5 mb-0 d-flex align-items-center justify-content-center gap-2"
           >
-            <span class="badge bg-primary"
-              >SM: {{ getQuestionsByType('scelta multipla') }}</span
-            >
-            <span class="badge bg-info"
-              >VF: {{ getQuestionsByType('vero falso') }}</span
-            >
-            <span class="badge bg-success"
-              >RA: {{ getQuestionsByType('risposta aperta') }}</span
-            >
+            <div class="rounded-syllex bg-primary text-white px-3 py-2">
+              <small>SM: {{ getQuestionsByType('scelta multipla') }}</small>
+            </div>
+            <div class="rounded-syllex bg-primary text-white px-3 py-2">
+              <small>VF: {{ getQuestionsByType('vero falso') }}</small>
+            </div>
+            <div class="rounded-syllex bg-primary text-white px-3 py-2">
+              <small>RA: {{ getQuestionsByType('risposta aperta') }}</small>
+            </div>
           </div>
-          <small class="text-muted d-block text-center">Distribuzione</small>
         </div>
       </div>
     </div>
@@ -47,7 +39,7 @@
   <!-- Drop Zone -->
   <div class="flex-fill">
     <section
-      class="drop-zone p-4 rounded-5 h-100 overflow-scroll"
+      class="drop-zone p-4 rounded-syllex h-100 overflow-scroll"
       [class.has-items]="selectedQuestions.length > 0"
       [class.empty]="selectedQuestions.length === 0"
       cdkDropList
@@ -69,8 +61,6 @@
         $last; let index = $index) {
         <div
           app-question-card
-          [collapsed]="false"
-          [collapsable]="false"
           cdkDrag
           [question]="question"
           [index]="index"
@@ -83,5 +73,19 @@
       </div>
       }
     </section>
+
+    @if (selectedQuestions.length > 0) {
+    <div class="w-100 text-center mt-3">
+      <a
+        class="text-danger"
+        confirmAction
+        [confirmMessage]="'Sei sicuro di voler rimuovere tutte le domande dal test?'"
+        confirmTitle="Conferma"
+        (confirmed)="clearAll()"
+      >
+        Rimuovi tutte le domande</a
+      >
+    </div>
+    }
   </div>
 </div>

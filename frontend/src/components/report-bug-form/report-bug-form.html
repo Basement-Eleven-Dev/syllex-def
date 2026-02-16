@@ -1,0 +1,73 @@
+<div class="modal-header">
+  <h5 class="modal-title">Segnala un problema</h5>
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="Chiudi"
+    (click)="cancel()"
+    [disabled]="isSubmitting()"
+  ></button>
+</div>
+
+<div class="modal-body">
+  <p class="text-muted mb-3">
+    Se hai riscontrato un problema o un comportamento anomalo, descrivilo
+    dettagliatamente nel campo sottostante. Il nostro team esaminerà la
+    segnalazione e lavorerà per risolvere il problema il prima possibile.<br /><br />Grazie
+    per il tuo aiuto nel migliorare Syllex!
+  </p>
+
+  @if (errorMessage()) {
+  <div class="alert alert-danger" role="alert">{{ errorMessage() }}</div>
+  }
+
+  <form (ngSubmit)="submit()">
+    <div class="mb-3">
+      <label for="comment" class="form-label">
+        Cosa non ha funzionato?
+        <span class="text-danger">*</span>
+      </label>
+      <textarea
+        id="comment"
+        class="form-control custom-input"
+        [formControl]="commentControl"
+        rows="6"
+        placeholder="Descrivi il problema..."
+        [class.is-invalid]="commentControl.invalid && commentControl.touched"
+        [disabled]="isSubmitting()"
+      ></textarea>
+      @if (commentControl.invalid && commentControl.touched) {
+      <div class="invalid-feedback">
+        @if (commentControl.errors?.['required']) { Il campo è obbligatorio }
+        @if (commentControl.errors?.['minlength']) { Inserisci almeno 10
+        caratteri } @if (commentControl.errors?.['maxlength']) { Massimo 1000
+        caratteri }
+      </div>
+      }
+      <small class="form-text text-muted">
+        {{ commentControl.value?.length || 0 }} / 1000 caratteri
+      </small>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button
+    type="button"
+    class="btn btn-outline-primary"
+    (click)="cancel()"
+    [disabled]="isSubmitting()"
+  >
+    Annulla
+  </button>
+  <button
+    type="button"
+    class="btn btn-primary"
+    (click)="submit()"
+    [disabled]="!isFormValid"
+  >
+    @if (isSubmitting()) {
+    <fa-icon [icon]="SpinnerIcon" [animation]="'spin'"></fa-icon>
+    Invio in corso... } @else { Invia segnalazione }
+  </button>
+</div>

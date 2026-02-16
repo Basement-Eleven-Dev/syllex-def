@@ -14,7 +14,7 @@ import { DB_NAME } from "../src/env";
 config();
 process.env.AWS_PROFILE = "pathway";
 
-const mongoConnectionString = process.env.DBCONNECTION as string;
+const mongoConnectionString = process.env.DB_CONNECTION as string;
 const cognitoPoolId = "eu-south-1_IdnpEkSac";
 const MASTER_ADMIN_EMAIL = "admin@syllex.com";
 
@@ -36,7 +36,7 @@ export const createAndLinkUser = async (
     lastName: string;
     role: "admin" | "teacher" | "student";
     organizationIds: ObjectId[]; // Ora è un array
-  }
+  },
 ) => {
   const { email, password, firstName, lastName, role, organizationIds } =
     userData;
@@ -58,17 +58,17 @@ export const createAndLinkUser = async (
   }
 
   const createUserResult = await client.send(
-    new AdminCreateUserCommand(createUserInput)
+    new AdminCreateUserCommand(createUserInput),
   );
   const addToGroupCommand = new AdminAddUserToGroupCommand({
     UserPoolId: cognitoPoolId,
     Username: email.trim(),
-    GroupName: role == 'teacher' ? 'teachers' : 'students',
+    GroupName: role == "teacher" ? "teachers" : "students",
   });
 
   await client.send(addToGroupCommand);
   const cognitoSub = createUserResult.User?.Attributes?.find(
-    (attr) => attr.Name === "sub"
+    (attr) => attr.Name === "sub",
   )?.Value;
   if (!cognitoSub)
     throw new Error("Creazione utente Cognito fallita: 'sub' non trovato.");
@@ -133,7 +133,7 @@ const start = async () => {
     const allOrgs = await orgsCollection.find({}).toArray();
     if (allOrgs.length === 0) {
       console.error(
-        "\n❌ ERRORE: Nessuna organizzazione trovata. Per favore, inizializzane una prima."
+        "\n❌ ERRORE: Nessuna organizzazione trovata. Per favore, inizializzane una prima.",
       );
       await clientMongo.close();
       return;
@@ -178,7 +178,7 @@ const start = async () => {
     if (role === "admin") {
       await orgsCollection.updateOne(
         { _id: new ObjectId(orgId) },
-        { $addToSet: { administrators: newUser._id } }
+        { $addToSet: { administrators: newUser._id } },
       );
     }
   } else {
@@ -247,7 +247,7 @@ const start = async () => {
       }
       await usersCollection.updateOne(
         { _id: existingAdmin._id },
-        { $addToSet: { organizationIds: newOrganizationId } }
+        { $addToSet: { organizationIds: newOrganizationId } },
       );
       adminUser = await usersCollection.findOne({ _id: existingAdmin._id });
     }
@@ -255,7 +255,7 @@ const start = async () => {
     if (adminUser) {
       await orgsCollection.updateOne(
         { _id: newOrganizationId },
-        { $set: { administrators: [adminUser._id] } }
+        { $set: { administrators: [adminUser._id] } },
       );
     }
   }

@@ -220,5 +220,52 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     functionPath: "ai/gammaGenerationProxy.ts",
     method: "get",
     role: "open"
-  }
+  }, {
+    apiRoute: "reports",
+    functionPath: "reports/createReport.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "assistants/create",
+    functionPath: "assistants/createAssistant.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "assistants/get",
+    functionPath: "assistants/getAssistant.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "assistants/response",
+    functionPath: "assistants/generateResponse.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "assistants/update",
+    functionPath: "assistants/updateAssistant.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "materials/vectorize",
+    functionPath: "embeddings/vectorizeMaterials.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "messages/history",
+    functionPath: "messages/getConversationHistory.ts",
+    method: "post",
+    role: "logged",
+  },
+  {
+    apiRoute: "messages/listen",
+    functionPath: "messages/listenToMessage.ts",
+    method: "post",
+    role: "logged",
+  },
 ];

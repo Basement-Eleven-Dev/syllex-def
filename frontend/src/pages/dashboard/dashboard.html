@@ -7,46 +7,23 @@
 </h5>
 
 <div class="row mt-5">
-  @for(link of quickLinks; track $index){
-  <div class="col-12 col-md-6 col-lg-3 mb-4">
-    <div class="card linkCard" [class.bg-warning]="link.alert">
-      <div
-        class="card-body d-flex flex-row align-items-center justify-content-center gap-3"
-      >
-        <div
-          class="bg-primary rounded-circle d-flex flex-row justify-content-center align-items-center aspect-ratio-1"
-          style="width: 60px; height: 60px"
-        >
-          <fa-icon
-            [icon]="UsersIcon"
-            class="text-white"
-            style="font-size: 1.5rem"
-          ></fa-icon>
-        </div>
-        <div
-          class="flex-fill d-flex flex-column justify-content-start align-items-start"
-        >
-          <span class="">{{link.description}}</span>
-          <h1 class="fw-bold" style="line-height: 0.8">{{link.value}}</h1>
-        </div>
-      </div>
-    </div>
-  </div>
-  }
-</div>
-
-<div class="row mt-4">
-  <div class="col-6 d-flex flex-column">
+  <div class="col-12 col-lg-6 d-flex flex-column mb-3">
     <div class="card p-4 flex-fill" id="startWorkingCard">
-      <div class="card-body">
-        <span class="display-5 fw-medium text-dark" style="line-height: 1"
-          >Inizia <br />ad usare Syllex</span
-        >
-        <div class="row mt-3">
+      <div class="card-body d-flex flex-column gap-4">
+        <div>
+          <span class="display-5 fw-medium text-dark" style="line-height: 1"
+            >Mettiti al lavoro</span
+          >
+          <p class="text-dark fw-light w-75">
+            Scegli una delle azioni rapide qui sotto per iniziare a creare
+            contenuti e test per i tuoi studenti.
+          </p>
+        </div>
+        <div class="row">
           @for(action of quickActions; track $index){
           <div class="col-6 p-2">
             <button
-              class="btn btn-primary btn-lg w-100 actionButton d-flex flex-column gap-1"
+              [class]="'btn btn-lg w-100 actionButton d-flex flex-row justify-content-center align-items-center  gap-2 py-4 btn-' + action.class"
               (click)="action.action()"
             >
               <fa-icon [icon]="action.icon"></fa-icon>
@@ -58,13 +35,15 @@
       </div>
     </div>
   </div>
-  <div class="col-6 d-flex flex-column">
+  <div class="col-12 col-lg-6 d-flex flex-column mb-3">
     <div class="card overflow-scroll flex-fill p-4" style="height: 300px">
-      <div class="d-flex flex-row justify-content-between text-dark">
-        <h4 class="text-dark fw-bold mb-3">Comunica con i tuoi studenti</h4>
-        <a routerLink="/t/comunicazioni">Vedi tutte</a>
-      </div>
       <div class="card-body">
+        <div class="d-flex flex-row justify-content-between text-dark">
+          <h4 class="text-primary fw-semibold mb-3">
+            Comunica con i tuoi studenti
+          </h4>
+          <a routerLink="/t/comunicazioni">Vedi tutte</a>
+        </div>
         <div class="h-100 overflow-scroll">
           @for(c of communications; track $index; let last = $last){
           <div
@@ -74,22 +53,18 @@
           >
             <div class="card-body">
               <div
-                class="fw-semibold mb-1 d-flex flex-row justify-content-between align-items-center"
+                class="mb-1 d-flex flex-row justify-content-between align-items-center"
               >
-                <span>{{ c.title }}</span>
+                <h6 class="mb-0">{{ c.title }}</h6>
                 @if(c.materialIds && c.materialIds.length > 0){
-                <span
-                  class="btn btn-sm icon-btn border-1 border-primary text-primary fw-bold"
-                  >{{ c.materialIds.length }}
+                <small>
                   <fa-icon [icon]="AttachmentIcon"></fa-icon>
-                </span>
+                  {{ c.materialIds.length }} Allegato
+                </small>
                 }
               </div>
-              <p class="ellipsis-3-lines mb-2">{{ c.content }}</p>
-              Creato il
-              <small class="fw-semibold"
-                >{{ c.createdAt | date:'short' }}</small
-              >
+              <small class="fw-light ellipsis-1-lines">{{ c.content }}</small>
+              <small> Creato il {{ c.createdAt | date:'short' }} </small>
             </div>
           </div>
           }
@@ -99,6 +74,6 @@
   </div>
 </div>
 
-<section class="mt-5 card">
+<section class="mt-3">
   <app-calendario></app-calendario>
 </section>

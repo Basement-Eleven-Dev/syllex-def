@@ -1,32 +1,32 @@
-<div class="card">
+<div class="card p-3">
   <div class="card-body">
     <div class="d-flex flex-row text-dark align-items-center mb-3">
-      <h5 class="fw-bold mb-0 flex-fill">{{ comunicazione.title }}</h5>
+      <h6 class="mb-0 flex-fill">{{ comunicazione.title }}</h6>
       <div class="d-flex flex-row gap-1 justify-content-end align-items-center">
         <button
           type="button"
-          class="btn btn-sm btn-outline-primary"
+          class="btn btn-outline-primary"
           title="Modifica"
           [routerLink]="'/t/comunicazioni/edit/' + comunicazione._id"
         >
-          <fa-icon [icon]="EditIcon"></fa-icon> Modifica
+          <fa-icon [icon]="EditIcon"></fa-icon>
         </button>
         <button
           type="button"
-          class="btn btn-sm btn-outline-danger"
+          class="btn btn-outline-danger"
           title="Rimuovi"
           confirmAction
           [confirmMessage]="'Sei sicuro di voler eliminare la comunicazione dal titolo &quot;' + comunicazione.title + '&quot;?'"
           confirmTitle="Conferma eliminazione"
           (confirmed)="onDelete()"
         >
-          <fa-icon [icon]="TrashIcon"></fa-icon> Elimina
+          <fa-icon [icon]="TrashIcon"></fa-icon>
         </button>
       </div>
     </div>
-    <p class="card-text text-dark ellipsis-3-lines">
+    <small class="fw-light ellipsis-1-lines">
       {{ comunicazione.content }}
-    </p>
+    </small>
 
     <div class="d-flex flex-row justify-content-between align-items-end mt-4">
       <section class="flex-fill">

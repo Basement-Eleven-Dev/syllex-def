@@ -5,7 +5,8 @@ export const SYSTEM_PROMPT_FOR_ANALYSIS =
 
 export const AWS_REGION = "eu-south-1";
 
-export const ANTHROPIC_MODEL_ID = "eu.anthropic.claude-sonnet-4-5-20250929-v1:0";
+export const ANTHROPIC_MODEL_ID =
+  "eu.anthropic.claude-sonnet-4-5-20250929-v1:0";
 export const NOVA_MODEL_ID = "eu.amazon.nova-pro-v1:0";
 export const AWS_EMBEDDING_MODEL_ID = "amazon.titan-embed-text-v2:0";
 

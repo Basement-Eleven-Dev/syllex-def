@@ -4,9 +4,16 @@ import {
   FontAwesomeModule,
   IconDefinition,
 } from '@fortawesome/angular-fontawesome';
-import { faPaperclip, faPlus, faUsers } from '@fortawesome/pro-solid-svg-icons';
+import {
+  faBallotCheck,
+  faCheck,
+  faPaperclip,
+  faPlus,
+  faQuestion,
+  faUsers,
+} from '@fortawesome/pro-solid-svg-icons';
 import { Calendario } from '../../components/calendario/calendario';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { Auth } from '../../services/auth';
 import { ClassiService } from '../../services/classi-service';
 import { MaterialiService } from '../../services/materiali-service';
@@ -23,11 +30,13 @@ interface DashboardQuickLink {
   route: string;
   routeString: string;
   alert?: boolean;
+  icon: IconDefinition;
 }
 
 interface DashboardAction {
   label: string;
   icon: IconDefinition;
+  class: string;
   action: () => void;
 }
 
@@ -47,6 +56,7 @@ export class Dashboard {
     public comunicazioniService: ComunicazioniService,
     private testService: TestsService,
     public materiaService: Materia,
+    private router: Router,
   ) {
     // Aggiorna reattivamente i quickLinks quando i dati dei service cambiano
     effect(() => {
@@ -75,12 +85,14 @@ export class Dashboard {
       description: 'Classi',
       route: '/classi',
       routeString: 'Vai alle Classi',
+      icon: faUsers,
     },
     {
       value: undefined,
       description: 'Test pubblicati',
       route: '/test-pubblicati',
       routeString: 'Vai ai test pubblicati',
+      icon: faBallotCheck,
     },
     {
       value: undefined,
@@ -88,40 +100,46 @@ export class Dashboard {
       route: '/assignments',
       routeString: 'Vai alle consegne da correggere',
       alert: true,
+      icon: faCheck,
     },
     {
       value: undefined,
       description: 'Materiali',
       route: '/materiali',
       routeString: 'Vai ai materiali',
+      icon: faPaperclip,
     },
   ];
 
   quickActions: DashboardAction[] = [
     {
-      label: 'Add New Student',
+      label: 'Crea nuovo test',
       icon: faPlus,
+      class: 'primary',
       action: () => {
-        console.log('Add New Student action triggered');
+        this.router.navigateByUrl('/t/tests/new');
       },
     },
     {
-      label: 'Create Course',
-      icon: faPlus,
+      label: 'Crea nuova domanda',
+      icon: faQuestion,
+      class: 'primary',
       action: () => {
-        console.log('Create Course action triggered');
+        this.router.navigateByUrl('/t/create-question');
       },
     },
     {
-      label: 'Schedule Exam',
-      icon: faPlus,
+      label: 'Carica materiali',
+      icon: faPaperclip,
+      class: 'primary',
       action: () => {
-        console.log('Schedule Exam action triggered');
+        this.router.navigateByUrl('/t/risorse');
       },
     },
     {
-      label: 'Schedule Exam',
-      icon: faPlus,
+      label: 'Da correggere (3)',
+      icon: faCheck,
+      class: 'warning',
       action: () => {
         console.log('Schedule Exam action triggered');
       },

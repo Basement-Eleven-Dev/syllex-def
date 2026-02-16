@@ -44,10 +44,10 @@ export class Test implements OnDestroy {
   Loading = signal<boolean>(false);
   CollectionSize = signal<number>(0);
   Page = signal<number>(1);
-  PageSize = signal<number>(10);
+  PageSize = signal<number>(5);
   SearchTerm = signal<string>('');
   Status = signal<TestStatus>('');
-  ViewType: ViewType = 'grid';
+  ViewType: ViewType = this.loadViewTypePreference('test') || 'grid';
 
   // Private Properties
   private SearchTermSubject = new Subject<string>();
@@ -107,6 +107,15 @@ export class Test implements OnDestroy {
 
   onChangeViewType(type: ViewType): void {
     this.ViewType = type;
+  }
+
+  private loadViewTypePreference(pageKey: string): ViewType | null {
+    try {
+      const saved = localStorage.getItem(`viewType_${pageKey}`);
+      return saved === 'grid' || saved === 'table' ? saved : null;
+    } catch (error) {
+      return null;
+    }
   }
 
   onDeleteTest(testId: string): void {

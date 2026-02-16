@@ -6,7 +6,7 @@
     </h5>
   </div>
   <button
-    class="btn btn-gradient btn-lg ms-auto py-3 icon-btn"
+    class="btn btn-gradient-secondary btn-lg ms-auto py-3 icon-btn"
     routerLink="/t/tests/new"
   >
     <fa-icon [icon]="PlusIcon" />
@@ -14,7 +14,7 @@
   </button>
 </div>
 
-<section class="d-flex flex-row align-items-center mb-5 gap-3">
+<section class="d-flex flex-row mb-5 gap-3">
   <div>
     <input
       type="text"
@@ -52,6 +52,7 @@
   <app-view-type-toggle
     class="ms-auto"
     [viewType]="ViewType"
+    [pageKey]="'test'"
     (viewTypeChange)="onChangeViewType($event)"
   />
 </section>
@@ -74,11 +75,7 @@
 </div>
 }
 
-<div
-  class="mt-5"
-  [class.inTableView]="ViewType === 'table'"
-  [class.inGridView]="ViewType === 'grid'"
->
+<div class="mt-5 d-flex flex-row justify-content-between align-items-center">
   <app-syllex-pagination
     [collectionSize]="CollectionSize()"
     [page]="Page()"
@@ -92,8 +89,8 @@
     [value]="PageSize()"
     (change)="onPageSizeChange(+$any($event.target).value)"
   >
-    <option [ngValue]="5">5 per pagina</option>
-    <option [ngValue]="10">10 per pagina</option>
-    <option [ngValue]="20">20 per pagina</option>
+    <option value="5">5 per pagina</option>
+    <option value="10">10 per pagina</option>
+    <option value="20">20 per pagina</option>
   </select>
 </div>

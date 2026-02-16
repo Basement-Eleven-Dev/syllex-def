@@ -1,0 +1,18 @@
+.dot {
+  width: 10px;
+  height: 10px;
+  background-color: var(--bs-primary);
+  border-radius: 50%;
+  display: inline-block;
+}
+.link {
+  &:hover {
+    background-color: #9bbff87d;
+  }
+  &.logout {
+    color: var(--bs-danger);
+    &:hover {
+      background-color: #f8d7da;
+    }
+  }
+}

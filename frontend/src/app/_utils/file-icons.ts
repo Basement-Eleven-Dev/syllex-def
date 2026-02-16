@@ -10,6 +10,37 @@ import {
   IconDefinition,
 } from '@fortawesome/pro-solid-svg-icons';
 
+export const TEXT_FILE_EXTENSIONS = [
+  'txt',
+  'md',
+  'csv',
+  'json',
+  'xml',
+  'doc',
+  'docx',
+  'pdf',
+  'xls',
+  'xlsx',
+  'rtf',
+  'tex',
+  'html',
+  'js',
+  'ts',
+  'py',
+  'java',
+  'c',
+  'cpp',
+  'cs',
+  'php',
+  'go',
+  'rb',
+  'sh',
+];
+
+export function isTextFile(extension: string): boolean {
+  return TEXT_FILE_EXTENSIONS.includes(extension.toLowerCase());
+}
+
 export function getFileIcon(extension: string): IconDefinition {
   console.log('Getting icon for extension:', extension);
   switch (extension.toLowerCase()) {

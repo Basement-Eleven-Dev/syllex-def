@@ -20,7 +20,27 @@ const getMaterials = async (
     query.subjectId = new ObjectId(subjectId);
   }
 
-  const materials = await materialsCollection.find(query).toArray();
+  // Aggregation per ottenere materiali con stato di vettorizzazione
+  const materials = await materialsCollection
+    .aggregate([
+      { $match: query },
+      {
+        $lookup: {
+          from: "file_embeddings",
+          localField: "_id",
+          foreignField: "referenced_file_id",
+          pipeline: [{ $limit: 1 }, { $project: { _id: 1 } }],
+          as: "embeddings",
+        },
+      },
+      {
+        $addFields: {
+          isVectorized: { $gt: [{ $size: "$embeddings" }, 0] },
+        },
+      },
+      { $project: { embeddings: 0 } },
+    ])
+    .toArray();
 
   return {
     success: true,

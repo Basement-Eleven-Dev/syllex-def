@@ -1,13 +1,3 @@
-tbody > tr > td {
-  color: var(--bs-dark);
-}
-
-tr {
-  &:hover {
-    cursor: pointer;
-  }
-}
-
 .view-test-button {
   background-color: var(--bs-primary);
   color: white;
@@ -31,4 +21,21 @@ tr {
 
 ::ng-deep .circle-btn.dropdown-toggle::after {
   display: none;
+}
+
+tbody > tr > td {
+  color: var(--bs-dark);
+  border: none;
+  padding: 1rem;
+}
+
+thead > tr > th {
+  color: var(--bs-dark);
+  border: none;
+  padding: 1rem;
+}
+tr {
+  &:hover {
+    cursor: pointer;
+  }
 }

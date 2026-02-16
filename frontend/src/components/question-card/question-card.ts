@@ -55,13 +55,6 @@ export class QuestionCard {
 
   points: number = 1;
 
-  // Signal-based collapse state
-  collapsed = input<boolean>(true); // Input signal
-  collapsable = input<boolean>(true); // Input signal
-  readonly isCollapsed = computed(() => this.collapsed());
-  readonly collapseIcon = computed(() =>
-    this.isCollapsed() ? this.CollapseIcon : this.UnCollapseIcon,
-  );
   readonly questionPreview = computed(() => {
     const maxLength = 80;
     const text = this.question?.text || '';
@@ -84,17 +77,6 @@ export class QuestionCard {
   @Input() showPolicy: boolean = false;
   @Output() removeMe = new EventEmitter<string>();
   @Output() onExpand = new EventEmitter<string>(); // Notifica espansione
-
-  toggleCollapse(): void {
-    // Notifica il parent per toggle (parent gestisce lo stato)
-    const willExpand = this.isCollapsed();
-    if (willExpand) {
-      this.onExpand.emit(this.question._id);
-    } else {
-      // Richiude la card corrente
-      this.onExpand.emit(''); // Empty string = chiudi tutte
-    }
-  }
 
   onExpandImage(img: string): void {
     const modalRef = this.modalServ.open(ImageModalContent, {

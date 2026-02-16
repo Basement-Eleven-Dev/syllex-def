@@ -4,11 +4,18 @@ import { Subject, takeUntil, debounceTime } from 'rxjs';
 import { QuestionCard } from '../question-card/question-card';
 import { QuestionsSearchFilters } from '../questions-search-filters/questions-search-filters';
 import { QuestionsService, QuestionInterface } from '../../services/questions';
+import { SyllexPagination } from '../syllex-pagination/syllex-pagination';
 
 @Component({
   selector: 'app-search-questions',
   standalone: true,
-  imports: [DragDropModule, CdkDrag, QuestionCard, QuestionsSearchFilters],
+  imports: [
+    DragDropModule,
+    CdkDrag,
+    QuestionCard,
+    QuestionsSearchFilters,
+    SyllexPagination,
+  ],
   templateUrl: './search-questions.html',
   styleUrl: './search-questions.scss',
 })
@@ -18,6 +25,8 @@ export class SearchQuestions implements OnInit, OnDestroy {
   filteredQuestions = signal<QuestionInterface[]>([]);
   totalQuestions = signal<number>(0);
   isLoading = signal<boolean>(false);
+  currentPage = signal<number>(1);
+  readonly pageSize = 3;
 
   private currentFilters: {
     searchTerm?: string;
@@ -42,6 +51,7 @@ export class SearchQuestions implements OnInit, OnDestroy {
       .pipe(debounceTime(500), takeUntil(this.destroy$))
       .subscribe((filters) => {
         this.currentFilters = filters;
+        this.currentPage.set(1);
         this.loadQuestions();
       });
 
@@ -72,8 +82,8 @@ export class SearchQuestions implements OnInit, OnDestroy {
         this.currentFilters.type,
         this.currentFilters.topicId,
         this.currentFilters.policy,
-        1,
-        5,
+        this.currentPage(),
+        this.pageSize,
         this.subjectId,
       )
       .pipe(takeUntil(this.destroy$))
@@ -88,5 +98,10 @@ export class SearchQuestions implements OnInit, OnDestroy {
           this.isLoading.set(false);
         },
       });
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage.set(page);
+    this.loadQuestions();
   }
 }

@@ -1,0 +1,80 @@
+:host {
+  height: 100%;
+  overflow: scroll;
+}
+
+.card {
+  min-height: 600px;
+}
+
+.message-bubble {
+  max-width: 75%;
+  word-break: break-word;
+}
+
+.user-message {
+  background-color: var(--bs-primary);
+  color: white;
+}
+
+.agent-message {
+  background-color: var(--bs-light);
+  color: var(--bs-dark);
+
+  ::ng-deep {
+    p:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.typing-indicator {
+  span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--bs-primary);
+    animation: typing 1.4s infinite ease-in-out;
+
+    &:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    &:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+  }
+}
+
+@keyframes typing {
+  0%,
+  60%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+textarea.form-control {
+  resize: none;
+}
+
+.btn-listen {
+  border-color: rgba(var(--bs-primary-rgb), 0.2);
+  color: var(--bs-primary);
+  background: white;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: var(--bs-primary);
+    color: white;
+    transform: scale(1.1);
+  }
+
+  fa-icon {
+    line-height: 1;
+  }
+}

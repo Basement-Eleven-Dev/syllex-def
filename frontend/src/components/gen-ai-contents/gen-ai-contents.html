@@ -1,5 +1,5 @@
 <div
-  [class]="isOffcanvasMode() ? 'offcanvas-body dvh-100 overflow-scroll p-4' : ''"
+  [class]="isOffcanvasMode() ? 'offcanvas-body dvh-100 overflow-scroll p-4' : 'pb-5'"
 >
   <form
     [formGroup]="genForm"
@@ -7,7 +7,7 @@
     class="d-flex flex-column gap-4"
   >
     <section class="form-section">
-      <label class="fw-semibold fs-5 text-dark mb-3"
+      <label class="form-label text-dark mb-3"
         >Che tipo di {{ typeSignal() == 'questions' ? 'domande' : 'materiale' }}
         vuoi creare?</label
       >
@@ -20,7 +20,7 @@
     </section>
     @if(typeSignal() == 'questions') {
     <section class="form-section">
-      <label class="fw-semibold fs-5 text-dark mb-3"
+      <label class="form-label text-dark mb-3"
         >Quante domande vuoi generare?</label
       >
       <input
@@ -29,12 +29,13 @@
         formControlName="numberOfQuestions"
         min="1"
         max="20"
+        style="max-width: 200px"
         placeholder="Inserisci il numero di domande da generare..."
       />
     </section>
     }
     <section class="form-section">
-      <label class="fw-semibold fs-5 text-dark mb-3"
+      <label class="form-label text-dark mb-3"
         >Su che argomento di {{ materiaService.materiaSelected()?.name }} vuoi
         che si concentri l'AI?</label
       >
@@ -52,14 +53,14 @@
     </section>
 
     <section class="form-section">
-      <label class="fw-semibold fs-5 text-dark mb-3"
+      <label class="form-label text-dark mb-3"
         >Se vuoi puoi specificare uno o più file dalle tue risorse a supporto
         della generazione</label
       >
       <app-materiali-selector></app-materiali-selector>
     </section>
     <section class="form-section">
-      <label class="fw-semibold fs-5 text-dark mb-3"
+      <label class="form-label text-dark mb-3"
         >Aggiungi dettagli utili per indirizzare meglio la generazione</label
       >
       <textarea
@@ -73,11 +74,11 @@
     <div class="text-end">
       <button
         type="submit"
-        class="btn btn-primary ai btn-lg fs-4 py-3"
+        class="btn btn-primary ai btn-lg icon-btn"
         [disabled]="genForm.invalid"
         (click)="onSubmit()"
       >
-        <fa-icon [icon]="SparklesIcon" class="me-2"></fa-icon>
+        <fa-icon [icon]="SparklesIcon"></fa-icon>
         Genera {{ getSelectedTypeName() }}
       </button>
     </div>

@@ -1,0 +1,92 @@
+<div class="card h-100 p-3 flex-fill overflow-auto">
+  <div class="card-body d-flex flex-column flex-grow-1">
+    <div class="d-flex flex-row align-items-start justify-content-between mb-3">
+      <h5 class="mb-0 fw-bold">Impostazioni Agente</h5>
+      <button
+        type="submit"
+        class="btn btn-primary icon-btn d-flex align-items-center gap-2"
+        (click)="onSubmit()"
+        [disabled]="isSaving() || isLoading()"
+      >
+        @if (isSaving()) {
+        <fa-icon [icon]="SpinnerIcon" [animation]="'spin'"></fa-icon>
+        }
+        <span>{{ isUpdateMode() ? 'Aggiorna' : 'Salva' }}</span>
+      </button>
+    </div>
+    <div class="flex-fill position-relative">
+      @if (isLoading()) {
+      <div
+        class="position-absolute top-0 start-0 end-0 bottom-0 d-flex justify-content-center align-items-center bg-white bg-opacity-75"
+        style="z-index: 10"
+      >
+        <div class="text-center">
+          <fa-icon
+            [icon]="SpinnerIcon"
+            [animation]="'spin'"
+            size="2x"
+            class="text-primary"
+          ></fa-icon>
+          <p class="mt-2 text-muted small">Caricamento impostazioni...</p>
+        </div>
+      </div>
+      }
+      <div
+        #scrollContent
+        class="h-100 overflow-scroll position-absolute top-0 start-0 end-0"
+      >
+        <form
+          [formGroup]="agentSettingsForm"
+          (ngSubmit)="onSubmit()"
+          class="d-flex flex-column gap-3"
+        >
+          <div class="form-group d-flex flex-column gap-1">
+            <label class="form-label text-dark" for="agentName"
+              >Nome dell'agente</label
+            >
+            <input
+              id="agentName"
+              type="text"
+              class="form-control custom-input"
+              formControlName="name"
+              placeholder="Inserisci il nome dell'agente"
+            />
+          </div>
+
+          <div class="form-group d-flex flex-column gap-1">
+            <label class="form-label text-dark" for="agentTone">Tono</label>
+            <select
+              id="agentTone"
+              class="form-select custom-input"
+              formControlName="tone"
+            >
+              <option value="" disabled>Seleziona un tono</option>
+              <option value="friendly">Amichevole</option>
+              <option value="formal">Formale</option>
+              <option value="concise">Conciso</option>
+              <option value="detailed">Dettagliato</option>
+            </select>
+          </div>
+          <div class="form-group d-flex flex-column gap-1">
+            <label class="form-label text-dark" for="agentVoice">Voce</label>
+            <select
+              id="agentVoice"
+              class="form-select custom-input"
+              formControlName="voice"
+            >
+              <option value="" disabled>Seleziona una voce</option>
+              <option value="neutral">Neutra</option>
+              <option value="energetic">Energica</option>
+              <option value="clear">Chiara</option>
+              <option value="deep">Profonda</option>
+            </select>
+          </div>
+          <app-materiali-selector
+            [embeddingCreationMode]="true"
+            (selectionChange)="onMaterialSelectionChange($event)"
+          />
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

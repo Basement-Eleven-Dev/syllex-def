@@ -1,0 +1,29 @@
+<h1 class="text-dark fw-medium mb-3 display-6">Agente AI</h1>
+<h5 class="text-dark mb-0 fw-normal">
+  Interagisci e imposta l'agente AI di {{ materiaService.materiaSelected()?.name
+  }} per te e i tuoi studenti.
+</h5>
+
+<div class="row g-3 flex-fill pb-3 mt-3">
+  <div class="col-12 col-lg-6">
+    <app-agent-settings-form
+      (assistantLoaded)="onAssistantLoaded($event)"
+    ></app-agent-settings-form>
+  </div>
+  <div class="col-12 col-lg-6">
+    @if (currentAssistantId()) {
+    <app-agent-chat
+      [assistantId]="currentAssistantId()!"
+      [subjectId]="materiaService.materiaSelected()?._id!"
+    ></app-agent-chat>
+    } @else {
+    <div
+      class="card h-100 d-flex flex-column align-items-center justify-content-center p-5 text-center text-muted border-dashed"
+    >
+      <fa-icon [icon]="HeadSideBrainIcon" size="3x" class="mb-3"></fa-icon>
+      <h5>Agente non ancora configurato</h5>
+      <p class="small">Imposta il nome e il tono dell'agente per iniziare a chattare.</p>
+    </div>
+    }
+  </div>
+</div>

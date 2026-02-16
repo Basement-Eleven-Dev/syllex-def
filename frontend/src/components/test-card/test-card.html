@@ -6,7 +6,7 @@
         {{ test.status | titlecase }}
       </div>
       <h3
-        class="card-title text-dark fw-bold ellipsis-3-lines mb-0"
+        class="card-title text-dark ellipsis-3-lines mb-0"
         [title]="test.name"
       >
         {{ test.name }}
@@ -56,8 +56,12 @@
           container="body"
           placement="bottom-end"
         >
-          <button class="btn btn-light circle-btn" ngbDropdownToggle>
-            <fa-icon [icon]="ThreeDotsIcon"></fa-icon>
+          <button class="btn btn-primary circle-btn btn-sm" ngbDropdownToggle>
+            <fa-icon
+              [icon]="ThreeDotsIcon"
+              class="d-inline-flex"
+              style="font-size: 0.9rem"
+            ></fa-icon>
           </button>
           <div ngbDropdownMenu>
             <app-test-contextual-menu

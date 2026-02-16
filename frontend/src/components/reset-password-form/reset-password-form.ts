@@ -19,7 +19,7 @@ import {
   faSave,
 } from '@fortawesome/pro-solid-svg-icons';
 import { CodeInputComponent, CodeInputModule } from 'angular-code-input';
-import { BehaviorSubject, firstValueFrom } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import {
   hasMinLenghthValidator,
   hasNumberValidator,
@@ -118,10 +118,8 @@ export class ResetPasswordForm implements OnDestroy {
   async onSendEmail() {
     try {
       this.loading = true;
-      const result = await firstValueFrom(
-        this.authService.sendResetPasswordCode(
-          this.sendEmailForm.controls['email'].value!,
-        ),
+      const result = await this.authService.sendResetPasswordCode(
+        this.sendEmailForm.controls['email'].value!,
       );
       console.log(result);
       this.hasResult = result;
@@ -156,31 +154,34 @@ export class ResetPasswordForm implements OnDestroy {
   }
 
   sendingNewCode: boolean = false;
-  onResendCode() {
+  async onResendCode() {
     this.sendingNewCode = true;
-    setTimeout(() => {
+    try {
+      const result = await this.authService.sendResetPasswordCode(
+        this.sendEmailForm.controls['email'].value!,
+      );
+      if (result.success) {
+        this.startCodeCountdown(result.codeValiditySeconds);
+        this.codeInput.reset();
+      }
+    } catch (error) {
+      console.error('Error resending code:', error);
+    } finally {
       this.sendingNewCode = false;
-      this.startCodeCountdown(5 * 60);
-      this.codeInput.reset();
-    }, 500);
+    }
   }
 
   async onCheckCode() {
     try {
       this.loading = true;
-      const result = await firstValueFrom(
-        this.authService.checkResetPasswordCode(
-          this.sendEmailForm.controls['email'].value!,
-          this.checkCodeForm.controls['code'].value!,
-        ),
-      );
-      console.log(result);
-      this.hasResult = result;
-      if (result.success) {
-        setTimeout(() => {
-          this.currentStepIndex.next(2);
-        }, 500);
-      }
+      // Il codice viene verificato direttamente nel passaggio di reset
+      this.hasResult = {
+        success: true,
+        message: 'Codice verificato, procedi con il reset della password',
+      };
+      setTimeout(() => {
+        this.currentStepIndex.next(2);
+      }, 500);
     } catch (error) {
       console.error('Error checking code:', error);
       this.hasResult = {
@@ -195,18 +196,17 @@ export class ResetPasswordForm implements OnDestroy {
   async onResetPassword() {
     try {
       this.loading = true;
-      const result = await firstValueFrom(
-        this.authService.resetPassword(
-          this.sendEmailForm.controls['email'].value!,
-          this.resetPasswordForm.controls['newPassword'].value!,
-        ),
+      const result = await this.authService.confirmResetPasswordWithCode(
+        this.sendEmailForm.controls['email'].value!,
+        this.checkCodeForm.controls['code'].value!,
+        this.resetPasswordForm.controls['newPassword'].value!,
       );
       console.log(result);
       this.hasResult = result;
       if (result.success) {
         setTimeout(() => {
           this.router.navigate(['/']);
-        }, 500);
+        }, 1500);
       }
     } catch (error) {
       console.error('Error resetting password:', error);

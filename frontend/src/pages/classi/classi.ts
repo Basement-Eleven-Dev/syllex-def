@@ -42,7 +42,7 @@ export class Classi {
   protected readonly classiService = inject(ClassiService);
 
   // View Type
-  viewType: ViewType = 'grid';
+  viewType: ViewType = this.loadViewTypePreference('classi') || 'grid';
 
   // Signals
   SearchTerm = signal<string>('');
@@ -90,6 +90,15 @@ export class Classi {
 
   onChangeViewType(type: ViewType): void {
     this.viewType = type;
+  }
+
+  private loadViewTypePreference(pageKey: string): ViewType | null {
+    try {
+      const saved = localStorage.getItem(`viewType_${pageKey}`);
+      return saved === 'grid' || saved === 'table' ? saved : null;
+    } catch (error) {
+      return null;
+    }
   }
 
   onSearchTermChange(value: string): void {
