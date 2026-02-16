@@ -10,7 +10,6 @@ import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPaperPlane } from '@fortawesome/pro-regular-svg-icons';
 import { MarkdownComponent } from 'ngx-markdown';
-import { AgentService } from '../../services/agent.service';
 import { DatePipe } from '@angular/common';
 import {
   faHeadphones,
@@ -18,6 +17,7 @@ import {
   faPause,
 } from '@fortawesome/pro-solid-svg-icons';
 import { faSpinner } from '@fortawesome/pro-regular-svg-icons';
+import { AgentService } from '../../../services/agent.service';
 
 export interface ChatMessage {
   _id?: string;

@@ -23,7 +23,11 @@ import {
 } from '@fortawesome/pro-solid-svg-icons';
 
 import { MaterialiItemComponent } from './materiali-item.component';
-import { getFileIcon, getIconColor } from '../../../app/_utils/file-icons';
+import {
+  getFileIcon,
+  getIconColor,
+  isTextFile,
+} from '../../../app/_utils/file-icons';
 
 export interface MaterialeWithPath extends MaterialInterface {
   path: string;
