@@ -34,7 +34,8 @@ export class LambdaConstruct extends Construct {
     name: string,
     fileName: string,
     role: Role,
-    additionalEnvironment: { [k: string]: string } = {}
+    additionalEnvironment: { [k: string]: string } = {},
+    layerArns?: lambda.ILayerVersion[]
   ) {
     super(scope, name);
     this.lambda = new NodejsFunction(this, name, {
@@ -44,6 +45,7 @@ export class LambdaConstruct extends Construct {
       paramsAndSecrets: lambda.ParamsAndSecretsLayerVersion.fromVersionArn(
         "arn:aws:lambda:eu-south-1:325218067255:layer:AWS-Parameters-and-Secrets-Lambda-Extension:16"
       ),
+      layers: layerArns,
       architecture: default_lambda_architecture,
       handler: "index.handler",
       bundling: {
