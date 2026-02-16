@@ -74,6 +74,7 @@ import { MaterialInterface } from '../../services/materiali-service';
                   [embeddingCreationMode]="embeddingCreationMode()"
                   [expandedFolders]="expandedFolders()"
                   [selectedMaterialIds]="selectedMaterialIds()"
+                  [associatedMaterialIds]="associatedMaterialIds()"
                   [searchQuery]="searchQuery()"
                   (folderToggle)="folderToggle.emit($event)"
                   (materialSelect)="materialSelect.emit($event)"
@@ -97,6 +98,12 @@ import { MaterialInterface } from '../../services/materiali-service';
             class="me-2"
           ></fa-icon>
           <span class="flex-grow-1">{{ item().name }}</span>
+          @if (embeddingCreationMode() && item().isVectorized) {
+            <div class="d-flex align-items-center gap-1 text-primary small opacity-50 ms-2">
+              <fa-icon [icon]="checkIcon"></fa-icon>
+              <span>Processato</span>
+            </div>
+          }
         </li>
       }
     }
@@ -107,6 +114,7 @@ export class MaterialiItemComponent {
   embeddingCreationMode = input<boolean>(false);
   expandedFolders = input.required<Set<string>>();
   selectedMaterialIds = input.required<Set<string>>();
+  associatedMaterialIds = input.required<string[]>();
   searchQuery = input.required<string>();
 
   folderToggle = output<string>();
@@ -145,19 +153,22 @@ export class MaterialiItemComponent {
     const item = this.item();
     if (!this.embeddingCreationMode()) return true;
 
+    const associatedIds = new Set(this.associatedMaterialIds());
+
     if (this.isFolder(item)) {
-      return this.hasTextFileToProcessInFolder(item);
+      return this.hasTextFileInFolder(item, associatedIds);
     }
-    return isTextFile(item.extension || '') && !item.isVectorized;
+    // Mostra se è un file di testo e NON è già associato a questo assistente
+    return isTextFile(item.extension || '') && !associatedIds.has(item._id!);
   }
 
-  private hasTextFileToProcessInFolder(folder: MaterialInterface): boolean {
+  private hasTextFileInFolder(folder: MaterialInterface, associatedIds: Set<string>): boolean {
     if (!folder.content) return false;
     return folder.content.some((child) => {
       if (this.isFolder(child)) {
-        return this.hasTextFileToProcessInFolder(child);
+        return this.hasTextFileInFolder(child, associatedIds);
       }
-      return isTextFile(child.extension || '') && !child.isVectorized;
+      return isTextFile(child.extension || '') && !associatedIds.has(child._id!);
     });
   }
 
@@ -169,11 +180,12 @@ export class MaterialiItemComponent {
 
     // Filtra per embedding mode
     if (this.embeddingCreationMode()) {
+      const associatedIds = new Set(this.associatedMaterialIds());
       content = content.filter((child) => {
         if (this.isFolder(child)) {
-          return this.hasTextFileToProcessInFolder(child);
+          return this.hasTextFileInFolder(child, associatedIds);
         }
-        return isTextFile(child.extension || '') && !child.isVectorized;
+        return isTextFile(child.extension || '') && !associatedIds.has(child._id!);
       });
     }
 

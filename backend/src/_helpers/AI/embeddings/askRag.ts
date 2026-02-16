@@ -1,7 +1,6 @@
-import { ObjectId } from "bson";
+import { ObjectId } from "mongodb";
 import { getDefaultDatabase } from "../../getDatabase";
 import { getOpenAIClient } from "../getOpenAIClient";
-
 
 interface RelevantDocument {
   text: string;
@@ -10,12 +9,30 @@ interface RelevantDocument {
 
 export async function askRAG(
   query: string,
-subjectId: string
+  subjectId: string,
+  assistantId: string
 ): Promise<RelevantDocument[]> {
   const openai = await getOpenAIClient();
   const db = await getDefaultDatabase();
 
   try {
+    // 1. Recupera l'assistente per ottenere i file associati
+    const assistant = await db.collection("assistants").findOne({
+      _id: new ObjectId(assistantId)
+    });
+
+    const associatedFileIds = assistant?.associatedFileIds || [];
+    
+    // Se non ci sono file associati, l'agente non "sa" nulla dai documenti
+    if (associatedFileIds.length === 0) {
+      return [];
+    }
+
+    // Converti in ObjectId per il match
+    const fileObjectIds = associatedFileIds.map((id: any) => 
+        id instanceof ObjectId ? id : new ObjectId(id.$oid || id)
+    );
+
     const queryEmbeddingResponse = await openai.embeddings.create({
       model: "text-embedding-3-small",
       input: query,
@@ -37,6 +54,7 @@ subjectId: string
         {
           $match: {
             subject: new ObjectId(subjectId),
+            referenced_file_id: { $in: fileObjectIds }
           },
         },
         {
@@ -46,7 +64,6 @@ subjectId: string
           $project: {
             _id: 0,
             text: 1,
-            hotel_id: 1, // Aggiungo per debug
             score: { $meta: "vectorSearchScore" },
           },
         },

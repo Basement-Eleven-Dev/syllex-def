@@ -56,4 +56,11 @@ export class AgentService {
       { messageId, text, assistantId },
     );
   }
+
+  removeMaterial(assistantId: string, materialId: string) {
+    return this.http.post<{ success: boolean; message: string }>(
+      'assistants/remove-material',
+      { assistantId, materialId },
+    );
+  }
 }

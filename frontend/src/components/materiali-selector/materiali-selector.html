@@ -52,10 +52,15 @@
           [style.color]="getIconColor(m)"
           class="me-2"
         ></fa-icon>
-        <span class="flex-grow-1">{{ m.name }}</span>
-        <div class="d-flex align-items-center gap-1 text-primary small">
-          <fa-icon [icon]="CheckIcon"></fa-icon>
-          <span>Processato</span>
+        <span class="flex-grow-1 text-truncate">{{ m.name }}</span>
+        <div class="d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center gap-1 text-primary small">
+                <fa-icon [icon]="CheckIcon"></fa-icon>
+                <span>Associato</span>
+            </div>
+            <button class="btn btn-link text-danger p-0 border-0" (click)="onRemoveMaterial(m._id)" title="Rimuovi associazione">
+                <fa-icon [icon]="TrashIcon"></fa-icon>
+            </button>
         </div>
       </li>
       }
@@ -79,13 +84,10 @@
   <ul class="list-group list-group-flush rounded-3">
     @for (material of searchResults(); track material._id) {
     <li
-      class="list-group-item p-2"
+      class="list-group-item p-2 cursor-pointer"
       [class.list-group-item-primary]="selectedMaterialIds().has(material._id)"
       [class.border-primary]="selectedMaterialIds().has(material._id)"
-      [class.opacity-50]="embeddingCreationMode && material.isVectorized"
-      [class.cursor-not-allowed]="embeddingCreationMode && material.isVectorized"
-      [class.cursor-pointer]="!(embeddingCreationMode && material.isVectorized)"
-      (click)="!(embeddingCreationMode && material.isVectorized) && selectMaterial(material)"
+      (click)="selectMaterial(material)"
       role="button"
     >
       @if (material.path) {
@@ -126,6 +128,7 @@
         [embeddingCreationMode]="embeddingCreationMode"
         [expandedFolders]="expandedFolders()"
         [selectedMaterialIds]="selectedMaterialIds()"
+        [associatedMaterialIds]="associatedMaterialIds()"
         [searchQuery]="searchQuery()"
         (folderToggle)="toggleFolder($event)"
         (materialSelect)="selectMaterial($event)"

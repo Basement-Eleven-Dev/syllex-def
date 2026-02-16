@@ -18,6 +18,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faUpload,
   faCheckCircle,
+  faTrash,
   IconDefinition,
 } from '@fortawesome/pro-solid-svg-icons';
 import {
@@ -47,7 +48,11 @@ export class MaterialiSelector {
   @Input() embeddingCreationMode: boolean = false;
 
   initialMaterialIds = input<string[]>([]);
+  associatedMaterialIds = input<string[]>([]);
   selectionChange = output<MaterialInterface[]>();
+  removeMaterial = output<string>();
+
+  TrashIcon = faTrash;
 
   getIconColor(item: MaterialInterface): string {
     return getIconColor(item.extension || '');
@@ -65,20 +70,22 @@ export class MaterialiSelector {
 
   processedMaterials = computed(() => {
     const all = this.allMaterials();
+    const associatedIds = new Set(this.associatedMaterialIds());
     if (!this.embeddingCreationMode) return [];
     return all.filter((m) => {
       if (m.type === 'folder' || (m as any).content?.length > 0) return false;
-      return m.isVectorized && isTextFile(m.extension || '');
+      return associatedIds.has(m._id) && isTextFile(m.extension || '');
     });
   });
 
   filteredMaterials = computed(() => {
     const all = this.allMaterials();
+    const associatedIds = new Set(this.associatedMaterialIds());
     if (!this.embeddingCreationMode) return all;
     return all.filter((m) => {
-      // Escludi cartelle (che hanno content) e filtra solo file testuali NON processati
+      // Escludi cartelle e filtra solo file testuali NON ancora associati a QUESTO assistente
       if (m.type === 'folder' || (m as any).content?.length > 0) return false;
-      return isTextFile(m.extension || '') && !m.isVectorized;
+      return isTextFile(m.extension || '') && !associatedIds.has(m._id);
     });
   });
 
@@ -121,6 +128,10 @@ export class MaterialiSelector {
       newSet.has(folderId) ? newSet.delete(folderId) : newSet.add(folderId);
       return newSet;
     });
+  }
+
+  onRemoveMaterial(materialId: string): void {
+    this.removeMaterial.emit(materialId);
   }
 
   selectMaterial(material: MaterialInterface): void {

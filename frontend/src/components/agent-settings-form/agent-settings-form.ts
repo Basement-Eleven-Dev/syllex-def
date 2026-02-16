@@ -51,6 +51,7 @@ export class AgentSettingsForm implements OnInit {
   isLoading = signal<boolean>(false);
   isSaving = signal<boolean>(false);
   assistantId = signal<string | null>(null);
+  associatedMaterialIds = signal<string[]>([]);
 
   assistantLoaded = output<string | null>();
 
@@ -114,6 +115,12 @@ export class AgentSettingsForm implements OnInit {
             tone: res.assistant.tone || 'friendly',
             voice: res.assistant.voice || '',
           });
+
+          const associatedIds =
+            res.assistant.associatedFileIds?.map(
+              (id: any) => id.$oid || id,
+            ) || [];
+          this.associatedMaterialIds.set(associatedIds);
         } else {
           this.resetForm();
         }
@@ -129,9 +136,27 @@ export class AgentSettingsForm implements OnInit {
   private resetForm() {
     this.assistantId.set(null);
     this.assistantLoaded.emit(null);
+    this.associatedMaterialIds.set([]);
     this.agentSettingsForm.reset({
       tone: 'friendly',
       voice: '',
+    });
+  }
+
+  onRemoveMaterial(materialId: string) {
+    const assistantId = this.assistantId();
+    if (!assistantId) return;
+
+    this.agentService.removeMaterial(assistantId, materialId).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.associatedMaterialIds.update((ids) =>
+            ids.filter((id) => id !== materialId),
+          );
+          this.materialiService.loadMaterials();
+        }
+      },
+      error: (err) => console.error('Error removing material:', err),
     });
   }
 

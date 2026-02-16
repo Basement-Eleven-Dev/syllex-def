@@ -2,7 +2,7 @@ import { ObjectId } from "bson";
 import { getDefaultDatabase } from "../getDatabase";
 import { getSubjectById } from "../DB/subjects/getSubjectById";
 
-export async function buildReceptionist(
+export async function buildAgent(
   assistantId: string,
   context: string,
   messagesHistory: { role: string; content: string }[],
@@ -27,7 +27,8 @@ export async function buildReceptionist(
     Il tuo nome è ${name}, il tuo tono è ${tone} e la tua voce è ${voice}. 
     Stai aiutando un docente con la sua materia ${subject.name}. 
     Questo è il contesto che ti viene fornito: ${context}. 
+    I messaggi che vi siete scambiati fino ad ora tu e l'utente sono: ${messagesContext}
 
-    Rispondi sempre nella lingua in cui ti viene posta la domanda e non rispondere a domande che non sono pertinenti al contesto fornito.`;
+    Rispondi sempre nella lingua in cui ti viene posta la domanda e non rispondere a domande che non sono pertinenti al contesto fornito. Basa inoltre le tue risposte SOLO sulle informazioni fornite nel contesto e nei messaggi precedenti. Se non conosci la risposta, spiega semplicemente che non lo sai nel tono che ti è stato assegnato. Non inventare risposte.`;
   return systemPrompt;
 }

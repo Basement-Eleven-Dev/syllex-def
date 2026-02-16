@@ -12,7 +12,7 @@ export async function associateFilesToAssistant(
     { _id: new ObjectId(assistantId) },
     {
       $addToSet: {
-        associatedFileIds: { $each: fileIds }
+        associatedFileIds: { $each: fileIds.map(id => new ObjectId(id)) }
       }
     }
   );

@@ -83,7 +83,9 @@
           </div>
           <app-materiali-selector
             [embeddingCreationMode]="true"
+            [associatedMaterialIds]="associatedMaterialIds()"
             (selectionChange)="onMaterialSelectionChange($event)"
+            (removeMaterial)="onRemoveMaterial($event)"
           />
         </form>
       </div>

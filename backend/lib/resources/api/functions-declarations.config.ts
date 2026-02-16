@@ -257,4 +257,10 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     method: "post",
     role: "logged",
   },
+  {
+    apiRoute: "assistants/remove-material",
+    functionPath: "assistants/removeMaterial.ts",
+    method: "post",
+    role: "teacher",
+  },
 ];

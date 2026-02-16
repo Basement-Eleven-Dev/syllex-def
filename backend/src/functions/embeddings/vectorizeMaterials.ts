@@ -46,6 +46,17 @@ const vectorizeMaterials = async (
         continue;
       }
 
+      // Se è già vettorizzato GLOBALMENTE, non serve rifare il processo
+      // Basterà associarlo alla fine (già gestito da associateFilesToAssistant)
+      const existingEmbedding = await db.collection("file_embeddings").findOne({
+        referenced_file_id: new ObjectId(id)
+      });
+
+      if (existingEmbedding) {
+        results.push({ id, status: "success", reason: "Already vectorized, just associating" });
+        continue;
+      }
+
       if (!material.url) {
         results.push({
           id,
@@ -65,11 +76,6 @@ const vectorizeMaterials = async (
         results.push({ id, status: "skipped", reason: "No text extracted" });
         continue;
       }
-
-      console.log(
-        `Material ${id} - Extracted text length: ${text.length}`,
-        text.substring(0, 200),
-      ); // Log first 200 chars
 
       // Vectorize
       await vectorizeDocument({
