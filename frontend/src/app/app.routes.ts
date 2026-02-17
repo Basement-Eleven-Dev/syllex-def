@@ -23,6 +23,7 @@ import { studentGuard } from '../guards/student.guard';
 import { teacherGuard } from '../guards/teacher.guard';
 import { StudentLayout } from '../student/pages/student-layout/student-layout';
 import { StudentTestExecution } from '../student/pages/student-test-execution/student-test-execution';
+import { StudentTestsList } from '../student/pages/student-tests-list/student-tests-list';
 
 export const routes: Routes = [
   {
@@ -156,6 +157,10 @@ export const routes: Routes = [
       },
       {
         path: 'tests',
+        component: StudentTestsList,
+      },
+      {
+        path: 'tests/:testId',
         component: StudentTestExecution,
       },
       {
