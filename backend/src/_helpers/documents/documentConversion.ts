@@ -2,11 +2,23 @@ import { spawn } from "child_process";
 import { readFile, writeFile } from "fs/promises";
 import path from "path";
 
-export const getConvertedDocument = async (textContent: string, filename: string, toExtension: string): Promise<Buffer> => {
-    let sourceFilePath = path.join('tmp', filename)
-    let destinationFilePath = path.join('tmp', filename + '.' + toExtension)
+/**
+ * REQUIRE PANDOC EXTENSION LAYER
+ * @param textContent 
+ * @param filename 
+ * @param toExtension 
+ * @returns 
+ */
+export const getConvertedDocument = async (textContent: string, sourceFileName: string, destinationFileName: string): Promise<Buffer> => {
+    let sourceFilePath = path.join('tmp', sourceFileName)
+    let destinationFilePath = path.join('tmp', destinationFileName)
+
     await writeFile(sourceFilePath, textContent);
-    const args = ['-i', sourceFilePath, '-o', destinationFilePath];
+
+    const args = [
+        '-i', sourceFilePath,
+        '-o', destinationFilePath
+    ];
 
     const pandocProcess = spawn("pandoc", args, {
         cwd: 'tmp', // Esegui in /tmp per gestire I/O
