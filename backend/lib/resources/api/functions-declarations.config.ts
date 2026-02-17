@@ -8,7 +8,7 @@ export type FunctionIntegration = {
   functionPath: string;
   method: "get" | "post" | "put" | "delete" | "patch" | "options";
   role: AppRole;
-  extensionLayer?: { name: string, arn: string }
+  extensionLayer?: { name: string; arn: string };
 };
 
 export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
@@ -210,15 +210,16 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     method: "put",
     role: "teacher",
   },
+
   {
     apiRoute: "ai/materials",
     functionPath: "ai/createAiGenMaterial.ts",
     method: "post",
-    role: 'teacher',
+    role: "teacher",
     extensionLayer: {
-      name: 'pandoc',
-      arn: "arn:aws:lambda:eu-south-1:851725509686:layer:pandoc:1"
-    }
+      name: "pandoc",
+      arn: "arn:aws:lambda:eu-south-1:851725509686:layer:pandoc:1",
+    },
   },
   {
     apiRoute: "proxy/gamma/{generationId}",
@@ -278,13 +279,13 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     apiRoute: "assistants/get",
     functionPath: "assistants/getAssistant.ts",
     method: "post",
-    role: "teacher",
+    role: "logged",
   },
   {
     apiRoute: "assistants/response",
     functionPath: "assistants/generateResponse.ts",
     method: "post",
-    role: "teacher",
+    role: "logged",
   },
   {
     apiRoute: "assistants/update",
@@ -309,6 +310,18 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     functionPath: "messages/listenToMessage.ts",
     method: "post",
     role: "logged",
+  },
+  {
+    apiRoute: "students/me/subjects",
+    functionPath: "students/getStudentSubjects.ts",
+    method: "get",
+    role: "student",
+  },
+  {
+    apiRoute: "/student",
+    functionPath: "tests/getStudentTests.ts",
+    method: "get",
+    role: "student",
   },
   {
     apiRoute: "assistants/remove-material",

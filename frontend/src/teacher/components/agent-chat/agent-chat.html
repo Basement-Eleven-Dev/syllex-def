@@ -53,7 +53,38 @@
             </span>
           </div>
         </div>
-        } @if (isLoading()) {
+        } @empty {
+        <div class="h-100 d-flex flex-column align-items-center justify-content-center text-center p-4 animate-fade-in">
+            <div class="bg-primary bg-opacity-10 p-4 rounded-circle mb-4">
+                <fa-icon [icon]="faSparkles" size="3x" class="text-primary opacity-75"></fa-icon>
+            </div>
+            <h4 class="fw-bold text-dark mb-2">Sono il tuo Assistente Didattico</h4>
+            <p class="text-muted mb-5 max-w-300">Posso aiutarti a comprendere meglio i materiali di studio. Iniziamo?</p>
+            
+            <div class="row g-3 w-100 max-w-500">
+                <div class="col-12 col-md-6">
+                    <button (click)="setAndSendMessage('Quali sono gli argomenti principali di questa materia?')" class="btn btn-light w-100 text-start p-3 border h-100 rounded-4 transition-all hover-lift">
+                        <fa-icon [icon]="faBookOpen" class="text-primary me-2"></fa-icon>
+                        <span class="small fw-semibold">Argomenti principali</span>
+                    </button>
+                </div>
+                <div class="col-12 col-md-6">
+                    <button (click)="setAndSendMessage('Puoi farmi un riassunto sintetico della dispensa?')" class="btn btn-light w-100 text-start p-3 border h-100 rounded-4 transition-all hover-lift">
+                        <fa-icon [icon]="faLightbulb" class="text-warning me-2"></fa-icon>
+                        <span class="small fw-semibold">Riassunto sintetico</span>
+                    </button>
+                </div>
+                <div class="col-12">
+                    <button (click)="setAndSendMessage('Preparami 3 domande veloci per vedere se ho capito i concetti chiave.')" class="btn btn-light w-100 text-start p-3 border h-100 rounded-4 transition-all hover-lift">
+                        <fa-icon [icon]="faQuestionCircle" class="text-success me-2"></fa-icon>
+                        <span class="small fw-semibold">Mettimi alla prova con 3 domande</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        } 
+        
+        @if (isLoading()) {
         <div class="d-flex mb-3">
           <div class="message-bubble agent-message p-3 rounded-3">
             <div class="typing-indicator d-flex gap-1">

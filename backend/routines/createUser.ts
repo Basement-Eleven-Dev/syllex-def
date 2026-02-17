@@ -14,7 +14,7 @@ import { DB_NAME } from "../src/env";
 config();
 process.env.AWS_PROFILE = "pathway";
 
-const mongoConnectionString = process.env.DB_CONNECTION as string;
+const mongoConnectionString = process.env.DBCONNECTION as string;
 const cognitoPoolId = "eu-south-1_IdnpEkSac";
 const MASTER_ADMIN_EMAIL = "admin@syllex.com";
 

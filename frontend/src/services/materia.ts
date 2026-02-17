@@ -27,7 +27,23 @@ export class Materia {
     private http: HttpClient,
     private authService: Auth,
   ) {
-    this.getMaterieTeacher();
+    if (this.authService.user?.role === 'student') {
+      this.getMaterieStudent();
+    } else {
+      this.getMaterieTeacher();
+    }
+  }
+
+  getMaterieStudent(): void {
+    this.http
+      .get<{ success: boolean; subjects: MateriaObject[] }>('students/me/subjects')
+      .subscribe((res) => {
+        if (res.success) {
+          this.allMaterie.set(res.subjects);
+          console.log('Materie dello studente:', res.subjects);
+          this.loadSavedSubject();
+        }
+      });
   }
 
   getMaterieTeacher(): MateriaObject[] {

@@ -22,6 +22,7 @@ import { AgentPage } from '../teacher/pages/agent-page/agent-page';
 import { studentGuard } from '../guards/student.guard';
 import { teacherGuard } from '../guards/teacher.guard';
 import { StudentLayout } from '../student/pages/student-layout/student-layout';
+import { StudentTestExecution } from '../student/pages/student-test-execution/student-test-execution';
 
 export const routes: Routes = [
   {
@@ -155,7 +156,7 @@ export const routes: Routes = [
       },
       {
         path: 'tests',
-        component: Test,
+        component: StudentTestExecution,
       },
       {
         path: 'classi',

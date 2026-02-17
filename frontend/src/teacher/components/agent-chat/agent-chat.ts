@@ -1,10 +1,11 @@
 import {
   Component,
   ElementRef,
-  Input,
+  input,
   signal,
   ViewChild,
   OnInit,
+  effect,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -15,6 +16,10 @@ import {
   faHeadphones,
   faPlay,
   faPause,
+  faSparkles,
+  faLightbulb,
+  faBookOpen,
+  faQuestionCircle,
 } from '@fortawesome/pro-solid-svg-icons';
 import { faSpinner } from '@fortawesome/pro-regular-svg-icons';
 import { AgentService } from '../../../services/agent.service';
@@ -37,12 +42,27 @@ export class AgentChat implements OnInit {
   SendIcon = faPaperPlane;
   constructor(private agentService: AgentService) {}
 
-  @Input() assistantId!: string;
-  @Input() subjectId!: string;
+  assistantId = input.required<string>();
+  subjectId = input.required<string>();
 
-  ngOnInit() {
-    this.initializeChatHistory();
-  }
+  ngOnInit() {}
+
+  // Effetto: scrolla sempre in fondo quando cambia la lista dei messaggi
+  private scrollEffect = effect(() => {
+    // Scroll solo se ci sono messaggi
+    if (this.messages().length > 0) {
+      this.scrollToBottom();
+    }
+  });
+
+  // Reload history when subjectId changes
+  private roleWatcher = effect(() => {
+    const sid = this.subjectId();
+    if (sid) {
+      this.messages.set([]); // Clear messages when subject changes
+      this.initializeChatHistory();
+    }
+  });
 
   messages = signal<ChatMessage[]>([]);
   inputMessage = '';
@@ -51,6 +71,10 @@ export class AgentChat implements OnInit {
   audioPlay = faPlay;
   audioPause = faPause;
   faSpinner = faSpinner;
+  faSparkles = faSparkles;
+  faLightbulb = faLightbulb;
+  faBookOpen = faBookOpen;
+  faQuestionCircle = faQuestionCircle;
 
   loadingAudioIds = signal<Set<string>>(new Set());
   currentPlayingId = signal<string | null>(null);
@@ -58,6 +82,11 @@ export class AgentChat implements OnInit {
 
   @ViewChild('scrollContent')
   private scrollContent!: ElementRef<HTMLDivElement>;
+
+  setAndSendMessage(text: string) {
+    this.inputMessage = text;
+    this.sendMessage();
+  }
 
   sendMessage() {
     const text = this.inputMessage.trim();
@@ -73,7 +102,7 @@ export class AgentChat implements OnInit {
     this.isLoading.set(true);
 
     this.agentService
-      .generateResponse(this.assistantId, text, this.subjectId)
+      .generateResponse(this.assistantId(), text, this.subjectId())
       .subscribe({
         next: (response) => {
           if (response.success) {
@@ -106,7 +135,7 @@ export class AgentChat implements OnInit {
   }
 
   async initializeChatHistory() {
-    this.agentService.getConversationHistory(this.subjectId).subscribe({
+    this.agentService.getConversationHistory(this.subjectId()).subscribe({
       next: (response) => {
         if (response.success) {
           const history = response.conversationHistory.map((msg: any) => ({
@@ -150,7 +179,7 @@ export class AgentChat implements OnInit {
     this.loadingAudioIds.update((set) => new Set(set).add(messageId));
 
     this.agentService
-      .listenToMessage(messageId, message.content, this.assistantId)
+      .listenToMessage(messageId, message.content, this.assistantId())
       .subscribe({
         next: (res) => {
           if (res.success && res.audioUrl) {

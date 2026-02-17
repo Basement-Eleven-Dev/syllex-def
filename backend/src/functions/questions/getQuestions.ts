@@ -10,6 +10,12 @@ const getQuestions = async (
 ) => {
   const db = await getDefaultDatabase();
   const questionsCollection = db.collection<Question>("questions");
+  console.log(
+    "[BACKEND] Parametri queryString:",
+    request.queryStringParameters,
+  );
+  console.log("[BACKEND] context.user:", context.user);
+  console.log("[BACKEND] context.user._id:", context);
 
   // Estraggo i parametri dalla query string
   const {
@@ -35,6 +41,7 @@ const getQuestions = async (
 
   // Filtro per subjectId (discriminante fondamentale)
   const { subjectId } = request.queryStringParameters || {};
+  console.log("[BACKEND] subjectId:", subjectId);
   if (subjectId) {
     filter.subjectId = new ObjectId(subjectId);
   }
@@ -60,6 +67,7 @@ const getQuestions = async (
     .find(filter)
     .skip(skip)
     .limit(currentPageSize)
+    .sort({ createdAt: -1 })
     .toArray();
 
   // Conto il totale per la paginazione
