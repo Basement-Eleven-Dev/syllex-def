@@ -8,6 +8,7 @@ export type MaterialInterface = {
   isMap?: boolean;
   content?: MaterialInterface[];
   createdAt: Date;
+  type?: 'file' | 'folder';
   aiGenerated?: boolean;
   teacherId: ObjectId;
   subjectId: ObjectId;

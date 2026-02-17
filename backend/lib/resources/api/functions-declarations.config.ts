@@ -8,7 +8,7 @@ export type FunctionIntegration = {
   functionPath: string;
   method: "get" | "post" | "put" | "delete" | "patch" | "options";
   role: AppRole;
-  extensionLayer?: { name: string; arn: string };
+  extensionLayers?: { name: string; arn: string }[];
 };
 
 export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
@@ -216,10 +216,13 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     functionPath: "ai/createAiGenMaterial.ts",
     method: "post",
     role: "teacher",
-    extensionLayer: {
+    extensionLayers: [{
       name: "pandoc",
       arn: "arn:aws:lambda:eu-south-1:851725509686:layer:pandoc:1",
-    },
+    }/*, {
+      name: "wkhtml",
+      arn: "arn:aws:lambda:eu-south-1:851725509686:layer:wkhtmltox:1"
+    }*/],
   },
   {
     apiRoute: "proxy/gamma/{generationId}",

@@ -10,8 +10,8 @@ import path from "path";
  * @returns 
  */
 export const getConvertedDocument = async (textContent: string, sourceFileName: string, destinationFileName: string): Promise<Buffer> => {
-    let sourceFilePath = path.join('tmp', sourceFileName)
-    let destinationFilePath = path.join('tmp', destinationFileName)
+    let sourceFilePath = path.join('/', 'tmp', sourceFileName)
+    let destinationFilePath = path.join('/', 'tmp', destinationFileName)
 
     await writeFile(sourceFilePath, textContent);
 
@@ -21,7 +21,7 @@ export const getConvertedDocument = async (textContent: string, sourceFileName: 
     ];
 
     const pandocProcess = spawn("pandoc", args, {
-        cwd: 'tmp', // Esegui in /tmp per gestire I/O
+        cwd: '/tmp', // Esegui in /tmp per gestire I/O
         stdio: ['pipe', 'pipe', 'pipe'] // Controlla gli stream
     });
 
