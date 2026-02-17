@@ -5,8 +5,10 @@ import { getDefaultDatabase } from "../../_helpers/getDatabase";
 import { ObjectId } from "mongodb";
 import { MaterialInterface } from "../../models/material";
 import { startSlidedeckGeneration } from "../../_helpers/gammaApi";
-import { uploadPlainContentToS3 } from "../../_helpers/uploadFileToS3";
+import { uploadContentToS3 } from "../../_helpers/uploadFileToS3";
 import { askLLM } from "../../_helpers/AI/simpleCompletion";
+import { getConvertedDocument } from "../../_helpers/documents/documentConversion";
+
 export type AIGenMaterialInput = {
     type: 'slides' | 'map' | 'glossary' | 'summary',
     materialIds: string[],
@@ -57,17 +59,22 @@ const createAIGenMaterial = async (
     const organizationName: string = organization!.name; //unused for now
 
     const material: MaterialInterface = {
-        name: "", //find a way to get another name
+        name: "", //find a way to get a real name
         createdAt: new Date(),
         aiGenerated: true,
         teacherId: context.user!._id,
         subjectId: context.subjectId!
     }
     if (type == 'glossary' || type == 'summary') {
-        material.name = type + new ObjectId().toString() + '.md';
+        let fileName = type + new ObjectId().toString();
+        let markDownFilename = fileName + '.md'
+        let destinationFilename = fileName + '.pdf'
         let bucketKey = 'ai_gen/' + material.name;
-        let mimetype = 'text/markdown'
-        material.url = await uploadPlainContentToS3(bucketKey, resultContent, mimetype);
+        let mimetype = 'application/pdf'
+        let pdfFile = await getConvertedDocument(resultContent, markDownFilename, destinationFilename)
+
+        material.name = destinationFilename;
+        material.url = await uploadContentToS3(bucketKey, pdfFile, mimetype);
     }
     if (type == 'slides') {
         let res = await startSlidedeckGeneration({
@@ -84,16 +91,17 @@ const createAIGenMaterial = async (
                 }
             }
         })
-        const stageUrl = `https://${request.requestContext.domainName}/${request.requestContext.stage}/`;
+
+        material.url = `https://${request.requestContext.domainName}/${request.requestContext.stage}/proxy/gamma/${res.generationId}`;
         material.name = type + new ObjectId().toString() + '.pptx';
-        material.url = stageUrl + "proxy/gamma/" + res.generationId;
     }
     if (type == 'map') {
-        material.name = type + new ObjectId().toString() + '.txt';
         let bucketKey = 'ai_gen/' + material.name;
         let mimetype = 'text/plain'
-        material.url = await uploadPlainContentToS3(bucketKey, resultContent, mimetype);
         material.isMap = true;
+
+        material.url = await uploadContentToS3(bucketKey, resultContent, mimetype);
+        material.name = type + new ObjectId().toString() + '.txt';
     }
 
 

@@ -1,5 +1,4 @@
-import { getSecret } from "./getDatabase";
-
+import { getSecret } from "./secrets/getSecret"
 
 type HeaderFooter = {
     type: 'cardNumber' | 'image' | 'text',

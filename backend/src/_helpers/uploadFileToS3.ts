@@ -1,9 +1,9 @@
 import { PutObjectCommand, PutObjectCommandInput, S3Client } from "@aws-sdk/client-s3";
 import { BUCKET_NAME } from "../../environment";
 
-export const uploadPlainContentToS3 = async (
+export const uploadContentToS3 = async (
     key: string,
-    content: string,
+    content: Buffer | string,
     mimeType: string,
 ): Promise<string | undefined> => {
 
