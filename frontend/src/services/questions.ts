@@ -25,7 +25,7 @@ export class QuestionsService {
   constructor(
     private http: HttpClient,
     private filesService: FilesService,
-  ) { }
+  ) {}
 
   createQuestion(
     q: QuestionInterface,
@@ -47,10 +47,7 @@ export class QuestionsService {
     }
 
     // Nessuna immagine, crea la domanda direttamente
-    return this.http.post<{ question: QuestionInterface }>(
-      'questions',
-      q,
-    );
+    return this.http.post<{ question: QuestionInterface }>('questions', q);
   }
 
   editQuestion(
@@ -88,7 +85,6 @@ export class QuestionsService {
     policy?: 'public' | 'private',
     page: number = 1,
     pageSize: number = 10,
-    subjectId?: string,
   ): Observable<{ questions: QuestionInterface[]; total: number }> {
     const params = new URLSearchParams();
 
@@ -96,7 +92,6 @@ export class QuestionsService {
     if (type) params.append('type', type);
     if (topicId) params.append('topicId', topicId);
     if (policy) params.append('policy', policy);
-    if (subjectId) params.append('subjectId', subjectId);
     params.append('page', page.toString());
     params.append('pageSize', pageSize.toString());
 

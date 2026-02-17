@@ -1,7 +1,7 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
-import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { Test } from "../../models/test";
+import { lambdaRequest } from "../../../_helpers/lambdaProxyResponse";
+import { getDefaultDatabase } from "../../../_helpers/getDatabase";
+import { Test } from "../../../models/test";
 import { ObjectId } from "mongodb";
 
 const getStudentTests = async (
@@ -28,10 +28,20 @@ const getStudentTests = async (
   // Costruisci il filtro per MongoDB
   const filter: any = {};
 
-  // Solo test del teacher loggato
-  if (context.user?._id) {
-    filter.teacherId = context.user._id;
+  // Recupera tutte le classi dello studente
+  const studentId = context.user?._id;
+  if (!studentId) {
+    return { tests: [], total: 0 };
   }
+  const classesCollection = db.collection("classes");
+  const studentClasses = await classesCollection
+    .find({ students: new ObjectId(studentId) })
+    .toArray();
+  const classIds = studentClasses.map((c) => c._id);
+  if (!classIds.length) {
+    return { tests: [], total: 0 };
+  }
+  filter.classIds = { $in: classIds };
 
   if (status) {
     filter.status = status;
@@ -43,7 +53,10 @@ const getStudentTests = async (
 
   if (searchTerm && searchTerm.trim() !== "") {
     // Escape caratteri speciali regex
-    const escapedSearchTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const escapedSearchTerm = searchTerm.replace(
+      /[.*+?^${}()|[\\]\\]/g,
+      "\\$&",
+    );
     filter.name = { $regex: escapedSearchTerm, $options: "i" };
   }
 
@@ -56,8 +69,6 @@ const getStudentTests = async (
     .skip(skip)
     .limit(currentPageSize)
     .toArray();
-
-  console.log(`Trovati ${tests.length} test con filtro:`, filter);
 
   // Conta totale per paginazione
   const total = await testsCollection.countDocuments(filter);

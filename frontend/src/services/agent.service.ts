@@ -5,19 +5,18 @@ interface Agent {
   name: string;
   tone: string;
   voice: string;
-  subjectId: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class AgentService {
   constructor(private http: HttpClient) {}
 
-  getAssistant(subjectId: string) {
+  getAssistant() {
     return this.http.post<{
       success: boolean;
       exists: boolean;
       assistant: any;
-    }>('assistants/get', { subjectId });
+    }>('assistants/get', {});
   }
 
   createAgent(agent: Agent) {
@@ -34,19 +33,19 @@ export class AgentService {
     );
   }
 
-  generateResponse(assistantId: string, query: string, subjectId: string) {
+  generateResponse(assistantId: string, query: string) {
     return this.http.post<{
       success: boolean;
       aiResponse: any;
       _id: string;
       audioUrl?: string | null;
-    }>('assistants/response', { assistantId, query, subjectId });
+    }>('assistants/response', { assistantId, query });
   }
 
-  getConversationHistory(subjectId: string) {
+  getConversationHistory() {
     return this.http.post<{ success: boolean; conversationHistory: any[] }>(
       'messages/history',
-      { subjectId },
+      {},
     );
   }
 

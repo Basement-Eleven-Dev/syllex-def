@@ -10,7 +10,7 @@ const countAssignmentsToGrade = async (
   const db = await getDefaultDatabase();
   const attemptsCollection = db.collection("attempts");
 
-  const { subjectId } = request.pathParameters || {};
+  const subjectId = context.subjectId;
 
   if (!subjectId) {
     return {
@@ -23,8 +23,8 @@ const countAssignmentsToGrade = async (
 
   // Costruisci il filtro
   const filter: any = {
-    status: "ai-reviewed",
-    subjectId: new ObjectId(subjectId),
+    status: { $ne: "reviewed" },
+    subjectId: subjectId,
   };
 
   // Solo attempt del teacher loggato

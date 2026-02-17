@@ -10,17 +10,19 @@
   <div class="d-none d-md-flex flex-fill flex-row justify-content-between">
     <div class="d-flex flex-row gap-3">
       <button
-        class="btn calendarBtn d-none d-md-block flex-shrink-0"
+        class="btn calendarBtn d-none d-md-block flex-shrink-0 py-3"
         (click)="openCalendarioModal()"
       >
         <fa-icon [icon]="CalendarIcon"></fa-icon>
         {{ now | date: 'dd - MM - yy' | titlecase }}
       </button>
-      <input
+
+      <!-- <input
         type="text"
         class="form-control w-auto custom-input d-none d-md-block"
         placeholder="Search..."
-      />
+        style="min-width: 300px"
+      /> -->
     </div>
 
     <div ngbDropdown class="d-inline-block">

@@ -15,7 +15,7 @@ const createEvent = async (request: APIGatewayProxyEvent, context: Context) => {
     date: new Date(eventData.date),
     time: eventData.time || null,
     teacherId: context.user?._id,
-    subjectId: new ObjectId(eventData.subjectId),
+    subjectId: context.subjectId!,
     createdAt: new Date(),
   };
 

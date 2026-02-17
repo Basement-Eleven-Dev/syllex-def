@@ -134,7 +134,6 @@ export class Banca {
     page?: number,
     pageSize?: number,
   ): void {
-    const subjectId = this.materiaService.materiaSelected()?._id;
     console.log('Caricamento domande con i seguenti parametri:', {
       searchTerm,
       type,
@@ -142,7 +141,6 @@ export class Banca {
       policy,
       page,
       pageSize,
-      subjectId,
     });
     this.questionsService
       .loadPagedQuestions(
@@ -152,7 +150,6 @@ export class Banca {
         policy,
         page || 1,
         pageSize || 10,
-        subjectId,
       )
       .subscribe({
         next: (response) => {

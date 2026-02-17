@@ -1,7 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ReportsService } from '../../../services/reports-service';
-import { Materia } from '../../../services/materia';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faSpinnerThird } from '@fortawesome/pro-solid-svg-icons';
@@ -15,7 +14,6 @@ import { FeedbackService } from '../../../services/feedback-service';
 })
 export class ReportBugForm {
   private readonly reportsService = inject(ReportsService);
-  private readonly materiaService = inject(Materia);
   private readonly feedbackService = inject(FeedbackService);
   readonly activeModal = inject(NgbActiveModal);
 
@@ -36,18 +34,11 @@ export class ReportBugForm {
   submit(): void {
     if (!this.isFormValid) return;
 
-    const selectedSubject = this.materiaService.materiaSelected();
-    if (!selectedSubject) {
-      this.errorMessage.set('Nessuna materia selezionata');
-      return;
-    }
-
     this.isSubmitting.set(true);
     this.errorMessage.set(null);
 
     this.reportsService
       .createReport({
-        subjectId: selectedSubject._id,
         comment: this.commentControl.value!,
         url: window.location.href,
         userAgent: navigator.userAgent,

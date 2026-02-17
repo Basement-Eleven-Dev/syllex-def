@@ -12,7 +12,8 @@ const vectorizeMaterials = async (
   context: Context,
 ) => {
   const body = JSON.parse(request.body || "{}");
-  const { materialIds, subjectId, assistantId } = body;
+  const { materialIds, assistantId } = body;
+  const subjectId = context.subjectId;
   const teacherId = context.user?._id;
 
   if (!materialIds || !Array.isArray(materialIds)) {
@@ -49,11 +50,15 @@ const vectorizeMaterials = async (
       // Se è già vettorizzato GLOBALMENTE, non serve rifare il processo
       // Basterà associarlo alla fine (già gestito da associateFilesToAssistant)
       const existingEmbedding = await db.collection("file_embeddings").findOne({
-        referenced_file_id: new ObjectId(id)
+        referenced_file_id: new ObjectId(id),
       });
 
       if (existingEmbedding) {
-        results.push({ id, status: "success", reason: "Already vectorized, just associating" });
+        results.push({
+          id,
+          status: "success",
+          reason: "Already vectorized, just associating",
+        });
         continue;
       }
 

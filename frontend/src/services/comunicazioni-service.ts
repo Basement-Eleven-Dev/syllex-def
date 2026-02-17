@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Materia } from './materia';
 
 export interface ComunicazioneInterface {
   _id?: string;
@@ -18,15 +17,11 @@ export interface ComunicazioneInterface {
   providedIn: 'root',
 })
 export class ComunicazioniService {
-  constructor(
-    private http: HttpClient,
-    private materiaService: Materia,
-  ) {}
+  constructor(private http: HttpClient) {}
 
   createComunicazione(
     data: ComunicazioneInterface,
   ): Observable<{ communication: ComunicazioneInterface }> {
-    data.subjectId = this.materiaService.materiaSelected()!._id;
     return this.http.post<{ communication: ComunicazioneInterface }>(
       'communications',
       data,
@@ -45,7 +40,6 @@ export class ComunicazioniService {
     id: string,
     data: ComunicazioneInterface,
   ): Observable<{ communication: ComunicazioneInterface }> {
-    data.subjectId = this.materiaService.materiaSelected()!._id;
     return this.http.put<{ communication: ComunicazioneInterface }>(
       `communications/${id}`,
       data,
@@ -67,12 +61,9 @@ export class ComunicazioniService {
     page: number,
     pageSize: number,
   ): Observable<{ communications: ComunicazioneInterface[]; total: number }> {
-    const subjectId = this.materiaService.materiaSelected()?._id;
-
     const params: any = {
       page: page.toString(),
       pageSize: pageSize.toString(),
-      subjectId: subjectId,
     };
 
     if (searchTerm) params.searchTerm = searchTerm;

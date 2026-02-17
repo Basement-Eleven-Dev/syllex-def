@@ -97,7 +97,7 @@ export class AgentSettingsForm implements OnInit {
     effect(() => {
       const subject = this.materiaService.materiaSelected();
       if (subject?._id) {
-        this.loadAssistant(subject._id);
+        this.loadAssistant();
       } else {
         this.resetForm();
       }
@@ -108,9 +108,9 @@ export class AgentSettingsForm implements OnInit {
     // Logic moved to effect for reactivity, but OnInit is good practice
   }
 
-  private loadAssistant(subjectId: string) {
+  private loadAssistant() {
     this.isLoading.set(true);
-    this.agentService.getAssistant(subjectId).subscribe({
+    this.agentService.getAssistant().subscribe({
       next: (res) => {
         if (res.exists && res.assistant) {
           // Handle both string and ObjectId serialization ({$oid: ...})
@@ -199,11 +199,8 @@ export class AgentSettingsForm implements OnInit {
 
   async onSubmit() {
     if (this.agentSettingsForm.valid) {
-      const subjectId = this.materiaService.materiaSelected()?._id || '';
-
       const formData = {
         ...this.agentSettingsForm.value,
-        subjectId: subjectId,
         materialIds: this.selectedMaterials.map((m) => m._id),
       };
 
@@ -233,11 +230,11 @@ export class AgentSettingsForm implements OnInit {
         // 2. Se ci sono materiali selezionati, vettorizzali associandoli all'assistente
         if (this.selectedMaterials.length > 0 && assistantId) {
           this.embeddingsService
-            .vectorizeMaterials(formData.materialIds, subjectId, assistantId)
+            .vectorizeMaterials(formData.materialIds, assistantId)
             .subscribe({
               next: (res) => {
                 console.log('Vectorization successful:', res);
-                this.finishSave(subjectId);
+                this.finishSave();
               },
               error: (err) => {
                 console.error('Vectorization error:', err);
@@ -245,7 +242,7 @@ export class AgentSettingsForm implements OnInit {
               },
             });
         } else {
-          this.finishSave(subjectId);
+          this.finishSave();
         }
       } catch (error) {
         console.error('Error during agent save or vectorization:', error);
@@ -256,11 +253,11 @@ export class AgentSettingsForm implements OnInit {
     }
   }
 
-  private finishSave(subjectId: string) {
+  private finishSave() {
     // Ricarica i materiali (per aggiornare i flag isVectorized)
     this.materialiService.loadMaterials();
     // Ricarica l'assistente per sicurezza
-    this.loadAssistant(subjectId);
+    this.loadAssistant();
     this.isSaving.set(false);
   }
 }

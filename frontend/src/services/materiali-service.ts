@@ -48,7 +48,7 @@ export class MaterialiService {
       .get<{
         success: boolean;
         materials: MaterialInterface[];
-      }>(`materials/subject/${subjectId}`)
+      }>('materials/subject')
       .subscribe({
         next: (response) => {
           this.root.set(this.buildTree(response.materials));
@@ -311,15 +311,13 @@ export class MaterialiService {
     parent: MaterialInterface,
   ): Observable<{ success: boolean; material: MaterialInterface }> {
     console.log('Creating material under parent:', parent);
-    const subjectId = this.materiaService.materiaSelected()?._id;
 
     return this.httpClient
       .post<{
         success: boolean;
         material: MaterialInterface;
       }>('materials', {
-        material: { ...material, subjectId },
-        subjectId,
+        material,
         parentId: parent._id === 'root' ? null : parent._id,
       })
       .pipe(

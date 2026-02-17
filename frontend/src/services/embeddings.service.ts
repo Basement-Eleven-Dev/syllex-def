@@ -13,12 +13,11 @@ export class EmbeddingsService {
    */
   vectorizeMaterials(
     materialIds: string[],
-    subjectId: string,
     assistantId: string,
   ): Observable<{ success: boolean; results: any[] }> {
     return this.http.post<{ success: boolean; results: any[] }>(
       'materials/vectorize',
-      { materialIds, subjectId, assistantId },
+      { materialIds, assistantId },
     );
   }
 }

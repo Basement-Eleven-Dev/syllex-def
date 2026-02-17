@@ -19,7 +19,7 @@ import { DatePipe } from '@angular/common';
   template: `
     <div class="modal-header">
       <h5 class="modal-title">
-        {{ EventToEdit ? 'Modifica evento' : 'Aggiungi evento' }}
+        {{ EventToEdit ? 'Modifica evento' : 'Nuovo evento' }}
       </h5>
       <button
         type="button"
@@ -86,13 +86,7 @@ import { DatePipe } from '@angular/common';
         [disabled]="Form.invalid || Saving()"
         (click)="onSave()"
       >
-        {{
-          Saving()
-            ? 'Salvataggio...'
-            : EventToEdit
-              ? 'Aggiorna evento'
-              : 'Salva evento'
-        }}
+        {{ Saving() ? 'Salvataggio...' : EventToEdit ? 'Aggiorna' : 'Salva' }}
       </button>
     </div>
   `,

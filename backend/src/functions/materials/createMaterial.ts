@@ -15,7 +15,7 @@ const createMaterial = async (
     throw createError(400, "I dati del materiale sono richiesti");
   }
 
-  if (!body.subjectId) {
+  if (!context.subjectId) {
     throw createError(400, "subjectId è richiesto");
   }
 
@@ -30,7 +30,7 @@ const createMaterial = async (
     ...body.material,
     createdAt: new Date(),
     teacherId,
-    subjectId: new ObjectId(body.subjectId),
+    subjectId: context.subjectId,
   };
   delete material._id;
 

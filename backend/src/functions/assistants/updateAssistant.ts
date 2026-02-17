@@ -30,7 +30,7 @@ const updateAssistant = async (
   if (agent.name) updateData.name = agent.name;
   if (agent.tone) updateData.tone = agent.tone;
   if (agent.voice) updateData.voice = agent.voice;
-  if (agent.subjectId) updateData.subjectId = new ObjectId(agent.subjectId);
+  if (context.subjectId) updateData.subjectId = context.subjectId;
 
   const result = await assistantsCollection.updateOne(
     {

@@ -8,7 +8,7 @@ const getMaterials = async (
   context: Context,
 ) => {
   const teacherId = context.user?._id;
-  const subjectId = request.pathParameters?.subjectId;
+  const subjectId = context.subjectId;
 
   // Get database connection
   const db = await getDefaultDatabase();
@@ -17,7 +17,7 @@ const getMaterials = async (
   // Query per ottenere tutti i materiali del teacher e della materia
   const query: any = { teacherId };
   if (subjectId) {
-    query.subjectId = new ObjectId(subjectId);
+    query.subjectId = subjectId;
   }
 
   // Aggregation per ottenere materiali con stato di vettorizzazione

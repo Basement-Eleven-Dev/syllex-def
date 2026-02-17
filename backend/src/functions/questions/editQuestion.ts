@@ -41,8 +41,8 @@ const editQuestion = async (
     updateData.topicId = new ObjectId(questionData.topicId);
   }
 
-  if (questionData.subjectId) {
-    updateData.subjectId = new ObjectId(questionData.subjectId);
+  if (context.subjectId) {
+    updateData.subjectId = context.subjectId;
   }
 
   // Gestione imageUrl: se è un URL esistente o un nuovo caricamento

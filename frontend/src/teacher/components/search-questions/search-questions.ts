@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { CdkDrag, DragDropModule } from '@angular/cdk/drag-drop';
 import { Subject, takeUntil, debounceTime } from 'rxjs';
 import { QuestionCard } from '../question-card/question-card';
@@ -23,8 +23,6 @@ import { SyllexPagination } from '../syllex-pagination/syllex-pagination';
   styleUrl: './search-questions.scss',
 })
 export class SearchQuestions implements OnInit, OnDestroy {
-  @Input() subjectId?: string;
-
   filteredQuestions = signal<QuestionInterface[]>([]);
   totalQuestions = signal<number>(0);
   isLoading = signal<boolean>(false);
@@ -87,7 +85,6 @@ export class SearchQuestions implements OnInit, OnDestroy {
         this.currentFilters.policy,
         this.currentPage(),
         this.pageSize,
-        this.subjectId,
       )
       .pipe(takeUntil(this.destroy$))
       .subscribe({

@@ -3,6 +3,7 @@ import {
   HttpRequest,
   HttpHandlerFn,
 } from '@angular/common/http';
+import { inject } from '@angular/core';
 import { from, switchMap } from 'rxjs';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import { apiUrl as BACKEND_URL } from '../environments/environment';
@@ -14,6 +15,7 @@ export const authInterceptor: HttpInterceptorFn = (
   return from(fetchAuthSession()).pipe(
     switchMap((session) => {
       let token = session.tokens?.idToken?.toString();
+      const subjectId = localStorage.getItem('selectedSubjectId') || undefined;
       const apiUrl = req.url.startsWith('http')
         ? req.url
         : `${BACKEND_URL}/${req.url}`;
@@ -23,12 +25,17 @@ export const authInterceptor: HttpInterceptorFn = (
         return next(anonymousReq);
       }
 
+      const headers: Record<string, string> = {
+        Authorization: `Bearer ${token}`,
+      };
+
+      if (subjectId) {
+        headers['Subject-Id'] = subjectId;
+      }
+
       const authReq = req.clone({
         url: apiUrl,
-        setHeaders: {
-          Authorization: `Bearer ${token}`,
-          'User-Id': session.userSub || '',
-        },
+        setHeaders: headers,
       });
 
       return next(authReq);

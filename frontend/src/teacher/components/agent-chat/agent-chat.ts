@@ -43,7 +43,6 @@ export class AgentChat implements OnInit {
   constructor(private agentService: AgentService) {}
 
   assistantId = input.required<string>();
-  subjectId = input.required<string>();
 
   ngOnInit() {}
 
@@ -55,11 +54,11 @@ export class AgentChat implements OnInit {
     }
   });
 
-  // Reload history when subjectId changes
+  // Reload history when assistantId changes
   private roleWatcher = effect(() => {
-    const sid = this.subjectId();
-    if (sid) {
-      this.messages.set([]); // Clear messages when subject changes
+    const aid = this.assistantId();
+    if (aid) {
+      this.messages.set([]);
       this.initializeChatHistory();
     }
   });
@@ -101,30 +100,28 @@ export class AgentChat implements OnInit {
 
     this.isLoading.set(true);
 
-    this.agentService
-      .generateResponse(this.assistantId(), text, this.subjectId())
-      .subscribe({
-        next: (response) => {
-          if (response.success) {
-            this.messages.update((msgs) => [
-              ...msgs,
-              {
-                _id: response._id,
-                role: 'agent',
-                content: response.aiResponse,
-                timestamp: new Date(),
-                audioUrl: null,
-              },
-            ]);
-            this.isLoading.set(false);
-            this.scrollToBottom();
-          }
-        },
-        error: (error) => {
-          console.error('Error generating response:', error);
+    this.agentService.generateResponse(this.assistantId(), text).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.messages.update((msgs) => [
+            ...msgs,
+            {
+              _id: response._id,
+              role: 'agent',
+              content: response.aiResponse,
+              timestamp: new Date(),
+              audioUrl: null,
+            },
+          ]);
           this.isLoading.set(false);
-        },
-      });
+          this.scrollToBottom();
+        }
+      },
+      error: (error) => {
+        console.error('Error generating response:', error);
+        this.isLoading.set(false);
+      },
+    });
   }
 
   onKeydown(event: KeyboardEvent) {
@@ -135,7 +132,7 @@ export class AgentChat implements OnInit {
   }
 
   async initializeChatHistory() {
-    this.agentService.getConversationHistory(this.subjectId()).subscribe({
+    this.agentService.getConversationHistory().subscribe({
       next: (response) => {
         if (response.success) {
           const history = response.conversationHistory.map((msg: any) => ({

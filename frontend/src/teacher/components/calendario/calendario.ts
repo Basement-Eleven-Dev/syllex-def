@@ -1,5 +1,5 @@
 import { DatePipe, TitleCasePipe, UpperCasePipe } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faChevronLeft,
@@ -57,6 +57,7 @@ export class Calendario {
   SelectedDate = signal<Date>(new Date());
   Events = signal<CalendarEvent[]>([]);
   Tests = signal<TestInterface[]>([]);
+  showHeadings = input(true);
 
   // Computed
   CalendarDays = computed(() => this.buildCalendarGrid(this.CurrentDate()));

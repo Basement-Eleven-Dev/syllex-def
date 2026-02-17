@@ -38,14 +38,8 @@ export class ClassiService {
   }
 
   private loadClassesForSelectedSubject(): void {
-    const SubjectId = this.materiaService.materiaSelected()?._id;
-    if (!SubjectId) {
-      console.warn('No subject selected');
-      return;
-    }
-
     this.http
-      .get<ClassInterface[]>(`teacher/${SubjectId}/classes`)
+      .get<ClassInterface[]>('teacher/subject/classes')
       .subscribe((classes) => {
         this.Classes.set(classes);
         console.log('Teacher classes loaded:', classes);
@@ -78,12 +72,6 @@ export class ClassiService {
   getClassAssignedTests(
     classId: string,
   ): Observable<{ tests: TestInterface[] }> {
-    let subjectId = this.materiaService.materiaSelected()?._id;
-    if (!subjectId) {
-      throw new Error('No subject selected');
-    }
-    return this.http.get<{ tests: TestInterface[] }>(
-      `class/${classId}/${subjectId}/tests`,
-    );
+    return this.http.get<{ tests: TestInterface[] }>(`class/${classId}/tests`);
   }
 }

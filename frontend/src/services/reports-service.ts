@@ -3,7 +3,6 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 export interface ReportInterface {
-  subjectId: string;
   comment: string;
   url?: string;
   userAgent?: string;
