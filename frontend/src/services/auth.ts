@@ -65,7 +65,9 @@ export class Auth {
 
       if (user) {
         this.user$.next(user);
-        this.getOrganizationById(user!.organizationId);
+        if (user.organizationId) {
+          this.getOrganizationById(user.organizationId);
+        }
         return { success: true, message: 'Login riuscito' };
       } else {
         return {
@@ -95,7 +97,9 @@ export class Auth {
     try {
       const user = await firstValueFrom(this.http.get<User | null>('profile'));
       this.user$.next(user || null);
-      this.getOrganizationById(user!.organizationId);
+      if (user?.organizationId) {
+        this.getOrganizationById(user.organizationId);
+      }
     } catch (error) {
       this.user$.next(null);
     } finally {

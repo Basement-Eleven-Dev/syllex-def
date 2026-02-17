@@ -102,9 +102,9 @@
         <label class="form-label text-dark mb-0">Domande</label>
         <p class="text-dark fw-light">
           Cerca nella tua banca domande di
-          <span class="fw-bold"
-            >{{ materiaService.materiaSelected()!.name }}</span
-          >
+          <span class="fw-bold">
+            {{ materiaService.materiaSelected()?.name || '...' }}
+          </span>
           e sceglile per comporre il test
         </p>
       </div>
@@ -119,7 +119,10 @@
     ></app-questions-search-filters>
     <div class="row mt-5">
       <div class="col-6">
-        <app-search-questions #questionsSearched></app-search-questions>
+        <app-search-questions
+          #questionsSearched
+          [subjectId]="materiaService.materiaSelected()?._id"
+        ></app-search-questions>
       </div>
       <div class="col-6">
         <app-questions-droppable-list

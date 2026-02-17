@@ -78,3 +78,42 @@ textarea.form-control {
     line-height: 1;
   }
 }
+.hover-lift {
+  transition: all 0.2s ease;
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    background-color: white !important;
+    border-color: var(--bs-primary) !important;
+  }
+}
+
+.max-w-500 {
+  max-width: 500px;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.custom-input {
+  border-radius: 20px !important;
+  padding: 10px 20px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  &:focus {
+    background-color: white;
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.1);
+  }
+}

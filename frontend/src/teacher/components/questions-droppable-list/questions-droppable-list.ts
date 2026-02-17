@@ -50,9 +50,9 @@ export class QuestionsDroppableList implements OnChanges, AfterViewInit {
   constructor(private questionsService: QuestionsService) {}
 
   ngAfterViewInit(): void {
-    // Quando i QuestionCard cambiano, imposta i punteggi
+    // Quando i QuestionCard cambiano, imposta i punteggi (dopo il tick)
     this.questionCards.changes.subscribe(() => {
-      this.setQuestionPoints();
+      setTimeout(() => this.setQuestionPoints());
     });
   }
 
@@ -87,8 +87,8 @@ export class QuestionsDroppableList implements OnChanges, AfterViewInit {
         this.isLoadingQuestions = false;
         this.emitChanges();
 
-        // Imposta i punteggi (il subscription ai changes li gestirà automaticamente)
-        this.setQuestionPoints();
+        // Imposta i punteggi DOPO il tick
+        setTimeout(() => this.setQuestionPoints());
       },
       error: (error) => {
         console.error('Errore durante il caricamento delle domande:', error);

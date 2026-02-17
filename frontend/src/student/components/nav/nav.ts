@@ -24,9 +24,9 @@ export interface NavRoute {
 })
 export class Nav {
   routes: NavRoute[] = [
-    { label: 'Home', icon: faHouse, route: '/s/home' },
-    { label: 'Correzioni', icon: faFileLines, route: '/s/correzioni' },
-    { label: 'Agenti', icon: faRobot, route: '/s/agenti' },
-    { label: 'Profilo', icon: faUser, route: '/s/profile' },
+    { label: 'Home', icon: faHouse, route: '/s/dashboard' },
+    { label: 'Test', icon: faFileLines, route: '/s/tests' },
+    { label: 'Agenti', icon: faRobot, route: '/s/agente' },
+    { label: 'Profilo', icon: faUser, route: '/s/profilo' },
   ];
 }

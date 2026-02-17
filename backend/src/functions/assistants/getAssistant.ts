@@ -30,11 +30,24 @@ const getAssistant = async (
   }
 
   const db = await getDefaultDatabase();
+  const subjectsCollection = db.collection("SUBJECTS");
   const assistantsCollection = db.collection("assistants");
 
+  // Trova la materia per identificare il proprietario (teacherId)
+  const subject = await subjectsCollection.findOne({ _id: new ObjectId(subjectId as string) });
+  
+  if (!subject) {
+    return {
+      success: true,
+      exists: false,
+      message: "Subject not found"
+    };
+  }
+
+  // Cerca l'assistente associato a questa materia e a quel docente
   const assistant = await assistantsCollection.findOne({
     subjectId: new ObjectId(subjectId as string),
-    teacherId: teacherId instanceof ObjectId ? teacherId : new ObjectId(teacherId as string),
+    teacherId: subject.teacherId,
   });
 
   return {

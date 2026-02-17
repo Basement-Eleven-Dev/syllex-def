@@ -10,11 +10,15 @@ const getOrganizationById = async (
 ) => {
   const organizationId = request.pathParameters?.organizationId;
 
+  if (!organizationId || !ObjectId.isValid(organizationId)) {
+    throw createError.BadRequest("Invalid or missing organizationId");
+  }
+
   const db = await getDefaultDatabase();
   const organizationsCollection = db.collection("organizations");
 
   const organization = await organizationsCollection.findOne({
-    _id: new ObjectId(organizationId!),
+    _id: new ObjectId(organizationId),
   });
 
   if (!organization) {
