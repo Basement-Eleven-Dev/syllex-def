@@ -82,7 +82,7 @@ export class RouteConstruct extends NestedStack {
 
     }
 
-    private addMethod(resource: IResource, functionPath: string, method: string, appRole: AppRole, layer?: { name: string, arn: string }) {
+    private addMethod(resource: IResource, functionPath: string, method: string, appRole: AppRole, layers?: { name: string, arn: string }[]) {
         let functionName = functionPath.split('.ts')[0].replace(/\//g, "-");
         let apiMethod = resource.addMethod(
             method,
@@ -91,7 +91,7 @@ export class RouteConstruct extends NestedStack {
                     COGNITO_POOL_ID: this.props.cognitoPoolId,
                     COGNITO_CLIENT_ID: this.props.cognitoClientId
                 },
-                    layer ? [LayerVersion.fromLayerVersionArn(this, layer.name, layer.arn)] : []
+                    layers?.map(l => LayerVersion.fromLayerVersionArn(this, l.name, l.arn))
                 ).lambda,
                 {
 
@@ -118,7 +118,7 @@ export class RouteConstruct extends NestedStack {
         integrations.forEach(int => {
             let resource = this.api.root;
             int.apiRoute.split('/').forEach(piece => resource = resource.getResource(piece) || resource.addResource(piece));
-            this.addMethod(resource, int.functionPath, int.method, int.role, int.extensionLayer)
+            this.addMethod(resource, int.functionPath, int.method, int.role, int.extensionLayers)
         })
     }
 

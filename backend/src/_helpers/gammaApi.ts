@@ -76,15 +76,19 @@ export type GammaGeneratedSlideOutput = {
 
 
 export const startSlidedeckGeneration = async (input: GammaInput): Promise<GammaGenerationJobOutput> => {
+    console.log(input)
     const gammaApiKey = await getSecret('gamma-api-key');
     const res = await fetch('https://public-api.gamma.app/v1.0/generations', {
         method: "post",
         body: JSON.stringify(input),
         headers: {
+            'Content-Type': 'application/json',
             'X-API-KEY': gammaApiKey
         }
     })
+    console.log(res);
     const output = await res.json() as GammaGenerationJobOutput
+    console.log(output)
     return output;
 }
 
