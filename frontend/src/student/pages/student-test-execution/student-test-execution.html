@@ -1,80 +1,128 @@
-<div *ngIf="loading()" class="text-center my-5">
-  <div class="spinner-border" role="status">
-    <span class="visually-hidden">Caricamento...</span>
+<app-back-to [path]="'/s/tests'" [label]="'Torna ai test'" />
+
+@if (IsLoading()) {
+<div class="d-flex justify-content-center align-items-center py-5">
+  <fa-icon
+    [icon]="SpinnerIcon"
+    [animation]="'spin'"
+    [size]="'3x'"
+    class="text-primary"
+  ></fa-icon>
+</div>
+} @else if (Error()) {
+<div class="alert alert-danger" role="alert">{{ Error() }}</div>
+} @else if (TestData() && !TestStarted()) {
+<!-- Pre-start screen -->
+<div class="d-flex flex-column align-items-center justify-content-center py-5">
+  <div class="card p-5 text-center pre-start-card">
+    <h2 class="text-dark fw-medium mb-3">
+      @if (IsResuming()) { Hai un tentativo in corso per } @else { Stai per
+      svolgere il test }
+    </h2>
+    <h1 class="display-5 fw-bold text-primary mb-4">{{ TestData()!.name }}</h1>
+
+    <p class="text-muted mb-2">
+      {{ Questions().length }} domande @if (HasTimeLimit()) { &middot; Tempo
+      limite: {{ TestData()!.timeLimit }} minuti }
+    </p>
+
+    @if (HasDeadline()) {
+    <div
+      class="alert alert-info d-inline-flex align-items-center gap-2 mt-2 mb-4"
+    >
+      <fa-icon [icon]="ClockIcon"></fa-icon>
+      <span>
+        Questo test va consegnato entro il {{ DeadlineDate() | date: 'd MMMM y,
+        HH:mm' }}
+      </span>
+    </div>
+    }
+
+    <div class="d-flex flex-row gap-3 justify-content-center mt-3">
+      <button
+        class="btn btn-outline-secondary btn-lg px-4"
+        (click)="onGoBack()"
+      >
+        <fa-icon [icon]="BackIcon" class="me-2"></fa-icon>
+        Torna alla lista
+      </button>
+      @if (IsResuming()) {
+      <button
+        class="btn btn-warning btn-lg px-5 text-white"
+        (click)="onStartTest()"
+      >
+        <fa-icon [icon]="ResumeIcon" class="me-2"></fa-icon>
+        Riprendi test
+      </button>
+      } @else {
+      <button class="btn btn-primary btn-lg px-5" (click)="onStartTest()">
+        <fa-icon [icon]="PlayIcon" class="me-2"></fa-icon>
+        Avvia test
+      </button>
+      }
+    </div>
   </div>
 </div>
-<div *ngIf="error()" class="alert alert-danger my-4">{{ error() }}</div>
-
-<div *ngIf="!loading() && test() && questions().length" class="container">
-  <h2 class="mb-4">{{ test()?.name }}</h2>
-  <form (ngSubmit)="submit()">
-    <div *ngFor="let q of questions(); let i = index" class="mb-4">
-      <div class="card p-3">
-        <div class="mb-2"><strong>Domanda {{ i + 1 }}:</strong></div>
-        <div class="mb-2">{{ q.text }}</div>
-        <ng-container [ngSwitch]="q.type">
-          <!-- Scelta multipla -->
-          <div *ngSwitchCase="'scelta multipla'">
-            <div
-              *ngFor="let opt of q.options; let oi = index"
-              class="form-check"
-            >
-              <input
-                class="form-check-input"
-                type="radio"
-                [name]="'q_' + q._id"
-                [id]="'q_' + q._id + '_opt_' + oi"
-                [checked]="isSelected(q._id, oi)"
-                (change)="selectOption(q._id, oi)"
-              />
-              <label
-                class="form-check-label"
-                [for]="'q_' + q._id + '_opt_' + oi"
-              >
-                {{ opt.label }}
-              </label>
-            </div>
-          </div>
-          <!-- Vero/Falso -->
-          <div *ngSwitchCase="'vero falso'">
-            <div
-              *ngFor="let opt of q.options; let oi = index"
-              class="form-check"
-            >
-              <input
-                class="form-check-input"
-                type="radio"
-                [name]="'q_' + q._id"
-                [id]="'q_' + q._id + '_opt_' + oi"
-                [checked]="isSelected(q._id, oi)"
-                (change)="selectOption(q._id, oi)"
-              />
-              <label
-                class="form-check-label"
-                [for]="'q_' + q._id + '_opt_' + oi"
-              >
-                {{ opt.label }}
-              </label>
-            </div>
-          </div>
-          <!-- Risposta aperta -->
-          <div *ngSwitchCase="'risposta aperta'">
-            <textarea
-              class="form-control"
-              [name]="'q_' + q._id"
-              [id]="'q_' + q._id + '_open'"
-              rows="3"
-              [(ngModel)]="answers()[q._id]"
-              (ngModelChange)="selectOption(q._id, $event)"
-              placeholder="Scrivi la tua risposta qui..."
-            ></textarea>
-          </div>
-          <div *ngSwitchDefault>
-            <em>Tipo domanda non supportato.</em>
-          </div>
-        </ng-container>
-      </div>
-    </div>
-    <button type="submit" class="btn btn-primary mt-3">Invia risposte</button>
-  </form>
+} @else if (TestData() && TestStarted()) {
+<!-- Header -->
+<div class="d-flex flex-row justify-content-between align-items-start mb-4">
+  <div>
+    <h1 class="text-dark fw-medium mb-2 display-6">{{ TestData()!.name }}</h1>
+    <p class="text-muted mb-0">
+      {{ Questions().length }} domande &middot; {{ AnsweredCount() }} risposte
+    </p>
+  </div>
+  @if (HasTimeLimit()) {
+  <div
+    class="timer-badge d-flex align-items-center gap-2 px-4 py-2 rounded-pill fs-4 fw-semibold"
+    [class.timer-danger]="RemainingSeconds() <= 60 && !TimerExpired()"
+    [class.timer-expired]="TimerExpired()"
+  >
+    <fa-icon [icon]="ClockIcon"></fa-icon>
+    {{ FormattedTime() }}
+  </div>
+  }
 </div>
+
+@if (TimerExpired()) {
+<div
+  class="alert alert-warning d-flex align-items-center gap-2 mb-4"
+  role="alert"
+>
+  <fa-icon [icon]="ClockIcon"></fa-icon>
+  <span
+    >Tempo scaduto! Non puoi più modificare le risposte. Consegna il test.</span
+  >
+</div>
+}
+
+<!-- Questions -->
+<div class="d-flex flex-column gap-3 mb-4">
+  @for (question of Questions(); track question._id; let i = $index) {
+  <div
+    app-question-card
+    [question]="question"
+    [index]="i"
+    [showIndex]="true"
+    [studentMode]="true"
+    [locked]="TimerExpired()"
+    [dimmed]="TimerExpired()"
+    [selectedAnswer]="Answers()[question._id] ?? null"
+    (answerChange)="onAnswerChange(question._id, $event)"
+  ></div>
+  }
+</div>
+
+<!-- Submit -->
+<div class="d-flex justify-content-end mb-5">
+  <button
+    class="btn btn-primary btn-lg px-5"
+    [disabled]="IsSubmitting()"
+    (click)="onSubmit()"
+  >
+    @if (IsSubmitting()) {
+    <fa-icon [icon]="SpinnerIcon" [animation]="'spin'" class="me-2"></fa-icon>
+    } Consegna test
+  </button>
+</div>
+}

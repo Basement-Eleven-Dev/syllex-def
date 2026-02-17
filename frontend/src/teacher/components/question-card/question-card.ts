@@ -73,8 +73,13 @@ export class QuestionCard {
   @Input() showBancaActions: boolean = false;
   @Input() showExplanation: boolean = false;
   @Input() showPolicy: boolean = false;
+  @Input() studentMode: boolean = false;
+  @Input() locked: boolean = false;
+  @Input() dimmed: boolean = false;
+  @Input() selectedAnswer: number | string | null = null;
   @Output() removeMe = new EventEmitter<string>();
-  @Output() onExpand = new EventEmitter<string>(); // Notifica espansione
+  @Output() onExpand = new EventEmitter<string>();
+  @Output() answerChange = new EventEmitter<number | string>();
 
   onExpandImage(img: string): void {
     const modalRef = this.modalServ.open(ImageModalContent, {
@@ -82,6 +87,16 @@ export class QuestionCard {
       centered: true,
     });
     modalRef.componentInstance.imgSrc = img;
+  }
+
+  onSelectOption(label: string): void {
+    if (this.locked) return;
+    this.answerChange.emit(label);
+  }
+
+  onOpenAnswerChange(value: string): void {
+    if (this.locked) return;
+    this.answerChange.emit(value);
   }
 }
 
