@@ -318,8 +318,8 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "student",
   },
   {
-    apiRoute: "/student",
-    functionPath: "tests/getStudentTests.ts",
+    apiRoute: "student",
+    functionPath: "students/getStudentTests.ts",
     method: "get",
     role: "student",
   },
