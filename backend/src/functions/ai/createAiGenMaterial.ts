@@ -53,7 +53,7 @@ const createAIGenMaterial = async (
 
     const organization = await organizationCollection.findOne({ _id: context.user!.organizationId });
 
-    const organizationLogo: string = organization!.logoUrl;
+    const organizationLogoUrl: string = organization!.logoUrl;
     const organizationName: string = organization!.name; //unused for now
 
     const material: MaterialInterface = {
@@ -79,7 +79,7 @@ const createAIGenMaterial = async (
                     topLeft: {
                         type: "image",
                         source: "custom",
-                        src: organizationLogo
+                        src: organizationLogoUrl
                     }
                 }
             }
