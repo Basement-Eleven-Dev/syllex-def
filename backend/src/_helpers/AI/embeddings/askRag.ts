@@ -10,27 +10,31 @@ interface RelevantDocument {
 export async function askRAG(
   query: string,
   subjectId: string,
-  assistantId: string
+  assistantId: string,
 ): Promise<RelevantDocument[]> {
   const openai = await getOpenAIClient();
   const db = await getDefaultDatabase();
 
   try {
     // 1. Recupera l'assistente per ottenere i file associati
+
     const assistant = await db.collection("assistants").findOne({
-      _id: new ObjectId(assistantId)
+      _id: new ObjectId(assistantId),
     });
 
     const associatedFileIds = assistant?.associatedFileIds || [];
-    
+
     // Se non ci sono file associati, l'agente non "sa" nulla dai documenti
     if (associatedFileIds.length === 0) {
+      console.log(
+        "Nessun file associato all'assistente, restituisco risposta vuota.",
+      );
       return [];
     }
 
     // Converti in ObjectId per il match
-    const fileObjectIds = associatedFileIds.map((id: any) => 
-        id instanceof ObjectId ? id : new ObjectId(id.$oid || id)
+    const fileObjectIds = associatedFileIds.map((id: any) =>
+      id instanceof ObjectId ? id : new ObjectId(id.$oid || id),
     );
 
     const queryEmbeddingResponse = await openai.embeddings.create({
@@ -38,7 +42,7 @@ export async function askRAG(
       input: query,
     });
     const queryEmbedding = queryEmbeddingResponse.data[0].embedding;
-    const ragCollection = db.collection("documents_vector_search");
+    const ragCollection = db.collection("file_embeddings");
 
     const relevantDocs = await ragCollection
       .aggregate([
@@ -46,19 +50,19 @@ export async function askRAG(
           $vectorSearch: {
             queryVector: queryEmbedding,
             path: "embedding",
-            numCandidates: 150,
-            limit: 50,
-            index: "vector_index",
+            numCandidates: 200, // Aumentato per miglior richiamo
+            limit: 100, // Aumentato per filtrare meglio dopo
+            index: "documents_vector_search",
           },
         },
         {
           $match: {
             subject: new ObjectId(subjectId),
-            referenced_file_id: { $in: fileObjectIds }
+            referenced_file_id: { $in: fileObjectIds },
           },
         },
         {
-          $limit: 5, // Limitiamo ai migliori 5 risultati finali
+          $limit: 5, // Limitiamo ai migliori 5 risultati finali dopo il filtro
         },
         {
           $project: {
@@ -70,6 +74,7 @@ export async function askRAG(
       ])
       .toArray();
 
+    console.log(`RAG: trovati ${relevantDocs.length} documenti rilevanti.`);
     return relevantDocs as RelevantDocument[];
   } catch (error) {
     console.error("Errore durante la ricerca RAG:", error);
