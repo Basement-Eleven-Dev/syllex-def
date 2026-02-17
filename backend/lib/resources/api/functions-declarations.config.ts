@@ -19,7 +19,7 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
-    apiRoute: "teacher/{subjectId}/classes",
+    apiRoute: "teacher/subject/classes",
     functionPath: "teachers/getSubjectClasses.ts",
     method: "get",
     role: "teacher",
@@ -91,7 +91,7 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
-    apiRoute: "materials/subject/{subjectId}",
+    apiRoute: "materials/subject",
     functionPath: "materials/getMaterials.ts",
     method: "get",
     role: "teacher",
@@ -199,7 +199,7 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
-    apiRoute: "tests/assignments-to-grade/{subjectId}/count",
+    apiRoute: "tests/assignments-to-grade/count",
     functionPath: "tests/countAssignmentsToGrade.ts",
     method: "get",
     role: "teacher",
@@ -240,7 +240,7 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
-    apiRoute: "class/{classId}/{subjectId}/tests",
+    apiRoute: "class/{classId}/tests",
     functionPath: "tests/getClassAssignedTests.ts",
     method: "get",
     role: "teacher",

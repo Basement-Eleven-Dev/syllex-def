@@ -19,7 +19,7 @@ const createCommunication = async (
     materialIds: communicationData.materialIds.map(
       (id: string) => new ObjectId(id),
     ),
-    subjectId: new ObjectId(communicationData.subjectId),
+    subjectId: context.subjectId!,
     teacherId: context.user?._id,
     createdAt: new Date(),
   };

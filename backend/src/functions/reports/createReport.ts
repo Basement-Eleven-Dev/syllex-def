@@ -16,7 +16,8 @@ const createReport = async (
   }
 
   const body = JSON.parse(request.body || "{}");
-  const { subjectId, comment, url, userAgent } = body;
+  const { comment, url, userAgent } = body;
+  const subjectId = context.subjectId;
 
   if (!subjectId || !comment) {
     throw createError.BadRequest("subjectId and comment are required");
@@ -27,7 +28,7 @@ const createReport = async (
 
   const newReport: Omit<Report, "_id"> = {
     teacherId: teacherId,
-    subjectId: new ObjectId(subjectId),
+    subjectId: subjectId,
     comment,
     url: url || undefined,
     userAgent: userAgent || undefined,

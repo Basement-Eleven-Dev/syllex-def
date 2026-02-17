@@ -38,15 +38,15 @@ export class AgentPage {
     effect(() => {
       const subject = this.materiaService.materiaSelected();
       if (subject?._id) {
-        this.loadAssistant(subject._id);
+        this.loadAssistant();
       } else {
         this.currentAssistantId.set(null);
       }
     });
   }
 
-  private loadAssistant(subjectId: string) {
-    this.agentService.getAssistant(subjectId).subscribe({
+  private loadAssistant() {
+    this.agentService.getAssistant().subscribe({
       next: (res) => {
         if (res.exists && res.assistant) {
           const id = res.assistant._id?.$oid || res.assistant._id;

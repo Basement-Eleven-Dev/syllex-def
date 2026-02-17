@@ -3,7 +3,8 @@
     <h1 class="text-dark fw-bold mb-1 display-6">Agente AI</h1>
     @if (userRole() === 'teacher') {
     <p class="text-muted mb-0">
-      Interagisci e imposta l'agente AI per la materia <strong>{{ materiaService.materiaSelected()?.name }}</strong>.
+      Interagisci e imposta l'agente AI per la materia
+      <strong>{{ materiaService.materiaSelected()?.name }}</strong>.
     </p>
     } @else {
     <p class="text-muted mb-0">
@@ -22,7 +23,9 @@
         ></app-agent-settings-form>
       </div>
       } @else {
-      <div class="card border-0 shadow-sm rounded-4 flex-fill d-flex flex-column overflow-hidden bg-white">
+      <div
+        class="card border-0 shadow-sm rounded-4 flex-fill d-flex flex-column overflow-hidden bg-white"
+      >
         <div class="card-header bg-white border-0 pt-4 px-4 pb-2">
           <h6 class="text-primary text-uppercase ls-wide small fw-bold mb-0">
             Le Tue Materie
@@ -37,11 +40,17 @@
               (click)="selectMateria(materia)"
             >
               <div class="d-flex align-items-center">
-                <div class="subject-dot me-3" [class.bg-primary]="materiaService.materiaSelected()?._id === materia._id"></div>
+                <div
+                  class="subject-dot me-3"
+                  [class.bg-primary]="materiaService.materiaSelected()?._id === materia._id"
+                ></div>
                 <span class="fw-semibold text-dark">{{ materia.name }}</span>
               </div>
               @if (materiaService.materiaSelected()?._id === materia._id) {
-              <fa-icon [icon]="HeadSideBrainIcon" class="text-primary opacity-50"></fa-icon>
+              <fa-icon
+                [icon]="HeadSideBrainIcon"
+                class="text-primary opacity-50"
+              ></fa-icon>
               }
             </button>
             } @empty {
@@ -49,7 +58,9 @@
               <div class="opacity-25 mb-3">
                 <fa-icon [icon]="HeadSideBrainIcon" size="3x"></fa-icon>
               </div>
-              <p class="text-muted px-4">Non sei ancora iscritto a nessuna materia.</p>
+              <p class="text-muted px-4">
+                Non sei ancora iscritto a nessuna materia.
+              </p>
             </div>
             }
           </div>
@@ -62,24 +73,29 @@
     <div class="col-12 col-lg-8 d-flex flex-column h-100">
       @if (currentAssistantId()) {
       <div class="flex-fill h-100 position-relative">
-        <app-agent-chat
-          [assistantId]="currentAssistantId()!"
-          [subjectId]="materiaService.materiaSelected()?._id!"
-        ></app-agent-chat>
+        <app-agent-chat [assistantId]="currentAssistantId()!"></app-agent-chat>
       </div>
       } @else {
-      <div class="card border-0 shadow-sm rounded-4 flex-fill d-flex flex-column align-items-center justify-content-center p-5 text-center bg-white">
+      <div
+        class="card border-0 shadow-sm rounded-4 flex-fill d-flex flex-column align-items-center justify-content-center p-5 text-center bg-white"
+      >
         <div class="bg-light rounded-circle p-4 mb-4">
-          <fa-icon [icon]="HeadSideBrainIcon" size="3x" class="text-primary opacity-50"></fa-icon>
+          <fa-icon
+            [icon]="HeadSideBrainIcon"
+            size="3x"
+            class="text-primary opacity-50"
+          ></fa-icon>
         </div>
         <h4 class="text-dark fw-bold mb-2">Inizia una sessione</h4>
         @if (userRole() === 'teacher') {
         <p class="text-muted small max-w-300 mx-auto">
-          L'agente non è ancora stato configurato. Imposta un nome e un tono nella scheda a sinistra.
+          L'agente non è ancora stato configurato. Imposta un nome e un tono
+          nella scheda a sinistra.
         </p>
         } @else {
         <p class="text-muted small max-w-300 mx-auto">
-          Seleziona una materia dal menu a sinistra per iniziare a studiare con l'intelligenza artificiale.
+          Seleziona una materia dal menu a sinistra per iniziare a studiare con
+          l'intelligenza artificiale.
         </p>
         }
       </div>

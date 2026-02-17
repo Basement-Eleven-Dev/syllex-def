@@ -32,9 +32,8 @@ const getCommunications = async (
   }
 
   // Filtro per subjectId (discriminante fondamentale)
-  const { subjectId } = request.queryStringParameters || {};
-  if (subjectId) {
-    filter.subjectId = new ObjectId(subjectId);
+  if (context.subjectId) {
+    filter.subjectId = context.subjectId;
   }
 
   // Ricerca testuale su titolo e contenuto

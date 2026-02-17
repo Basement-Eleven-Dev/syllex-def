@@ -1,14 +1,12 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { Subject } from "../../models/subject";
-import { ObjectId } from "mongodb";
 
 const getSubjectClasses = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
-  const subjectId: ObjectId = new ObjectId(request.pathParameters!.subjectId!);
+  const subjectId = context.subjectId!;
   let teacherId = context.user?._id;
   const db = await getDefaultDatabase();
   const assignments = await db

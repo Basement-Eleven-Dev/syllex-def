@@ -2,11 +2,9 @@ import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
 
 interface GetAssistantRequest {
   agent: {
-    subjectId: string;
     teacherId: string;
   };
 }
@@ -20,10 +18,7 @@ const getAssistant = async (
     throw createError(401, "Utente non autenticato");
   }
 
-  // Allow subjectId from query params or body
-  const subjectId =
-    request.queryStringParameters?.subjectId ||
-    JSON.parse(request.body || "{}").subjectId;
+  const subjectId = context.subjectId;
 
   if (!subjectId) {
     throw createError(400, "subjectId è richiesto");
@@ -34,19 +29,19 @@ const getAssistant = async (
   const assistantsCollection = db.collection("assistants");
 
   // Trova la materia per identificare il proprietario (teacherId)
-  const subject = await subjectsCollection.findOne({ _id: new ObjectId(subjectId as string) });
-  
+  const subject = await subjectsCollection.findOne({ _id: subjectId });
+
   if (!subject) {
     return {
       success: true,
       exists: false,
-      message: "Subject not found"
+      message: "Subject not found",
     };
   }
 
   // Cerca l'assistente associato a questa materia e a quel docente
   const assistant = await assistantsCollection.findOne({
-    subjectId: new ObjectId(subjectId as string),
+    subjectId: subjectId,
     teacherId: subject.teacherId,
   });
 

@@ -11,7 +11,7 @@ const countPublishedTests = async (
   const db = await getDefaultDatabase();
   const testsCollection = db.collection<Test>("tests");
 
-  const { subjectId } = request.pathParameters || {};
+  const subjectId = context.subjectId;
 
   if (!subjectId) {
     return {
@@ -25,7 +25,7 @@ const countPublishedTests = async (
   // Costruisci il filtro
   const filter: any = {
     status: "pubblicato",
-    subjectId: new ObjectId(subjectId),
+    subjectId: subjectId,
   };
 
   // Solo test del teacher loggato

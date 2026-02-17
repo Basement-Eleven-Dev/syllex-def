@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Materia } from './materia';
 
 export interface TestInterface {
   _id?: string;
@@ -28,7 +27,7 @@ export interface AttemptInterface {
   teacherId: string;
   testId: string;
   subjectId: string;
-  status: 'processing' | 'ai-reviewed' | 'reviewed';
+  status: 'not-reviewed' | 'reviewed';
   deliverdAt: Date;
   reviewedAt?: Date;
   score: number;
@@ -40,10 +39,7 @@ export interface AttemptInterface {
   providedIn: 'root',
 })
 export class TestsService {
-  constructor(
-    private http: HttpClient,
-    private materiaService: Materia,
-  ) {}
+  constructor(private http: HttpClient) {}
 
   getPaginatedTests(
     page: number,
@@ -83,16 +79,10 @@ export class TestsService {
   }
 
   countAssignmentsToGrade() {
-    let subjectId = this.materiaService.materiaSelected()?._id;
-    return this.http.get<{ count: number }>(
-      `tests/assignments-to-grade/${subjectId}/count`,
-    );
+    return this.http.get<{ count: number }>('tests/assignments-to-grade/count');
   }
   countPublishedTests() {
-    let subjectId = this.materiaService.materiaSelected()?._id;
-    return this.http.get<{ count: number }>(
-      `tests/${subjectId}/published/count`,
-    );
+    return this.http.get<{ count: number }>('tests/published/count');
   }
 
   updateClassIds(testId: string, classIds: string[]) {

@@ -6,9 +6,7 @@ const getConversationHistory = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
-  const body = JSON.parse(request.body || "{}");
-  console.log("Received request for conversation history with body:", body);
-  const { subjectId } = body;
+  const subjectId = context.subjectId;
 
   console.log(
     "recuperando conversazione per subjectId:",

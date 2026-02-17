@@ -8,6 +8,7 @@ import {
   faBallotCheck,
   faBook,
   faBrainCircuit,
+  faCalendarAlt,
   faChartLine,
   faChevronDown,
   faChevronUp,
@@ -102,6 +103,11 @@ export class Sidebar {
       path: 'comunicazioni',
       label: 'Comunicazioni',
       icon: faMailboxOpenLetter,
+    },
+    {
+      path: 'eventi',
+      label: 'Eventi',
+      icon: faCalendarAlt,
     },
   ];
 

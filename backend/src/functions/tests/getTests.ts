@@ -13,7 +13,6 @@ const getTests = async (request: APIGatewayProxyEvent, context: Context) => {
     page = "1",
     pageSize = "10",
     status = "",
-    subjectId = "",
     searchTerm = "",
   } = request.queryStringParameters || {};
 
@@ -33,8 +32,8 @@ const getTests = async (request: APIGatewayProxyEvent, context: Context) => {
     filter.status = status;
   }
 
-  if (subjectId) {
-    filter.subjectId = new ObjectId(subjectId);
+  if (context.subjectId) {
+    filter.subjectId = context.subjectId;
   }
 
   if (searchTerm && searchTerm.trim() !== "") {

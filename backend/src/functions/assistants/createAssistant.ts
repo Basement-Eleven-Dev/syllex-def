@@ -10,18 +10,17 @@ const createAssistant = async (
 ) => {
   // Parse and validate request body
   const body = JSON.parse(request.body || "{}");
-  console.log(body, 'il corpo della richiesta');
+  console.log(body, "il corpo della richiesta");
 
   if (!body.agent) {
     throw createError(400, "I dati dell'assistente sono richiesti");
   }
 
-  if (!body.agent.subjectId) {
+  if (!context.subjectId) {
     throw createError(400, "subjectId è richiesto");
   }
 
   const teacherId = context.user?._id;
-  
 
   // Get database connection
   const db = await getDefaultDatabase();
@@ -35,13 +34,12 @@ const createAssistant = async (
     voice,
     createdAt: new Date(),
     teacherId,
-    subjectId: new ObjectId(body.agent.subjectId as string),
+    subjectId: context.subjectId,
   };
   delete assistant._id;
 
   const insertResult = await assistantsCollection.insertOne(assistant);
   assistant._id = insertResult.insertedId;
-
 
   return {
     success: true,

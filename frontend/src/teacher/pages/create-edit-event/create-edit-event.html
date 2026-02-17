@@ -1,0 +1,91 @@
+<app-back-to
+  [path]="'/t/eventi'"
+  [label]="'Torna alla lista degli eventi'"
+></app-back-to>
+<div class="d-flex flex-row align-items-center justify-content-between mb-4">
+  <div>
+    <h1 class="text-dark fw-medium mb-3 display-6">{{ PageTitle() }} evento</h1>
+    <h5 class="text-dark mb-0 fw-normal">{{ PageDescription() }}</h5>
+  </div>
+  @if (IsEditMode()) {
+  <div>
+    <button
+      class="btn btn-outline-danger py-3"
+      confirmAction
+      (confirmed)="onDelete()"
+      [disabled]="IsLoading()"
+    >
+      <fa-icon [icon]="TrashIcon"></fa-icon>
+      Elimina
+    </button>
+  </div>
+  }
+</div>
+<form [formGroup]="EventForm" (ngSubmit)="onSave()" class="pb-5">
+  <section class="form-section">
+    <div class="mb-3">
+      <label for="titolo" class="form-label text-dark">Titolo</label>
+      <input
+        type="text"
+        id="titolo"
+        class="form-control custom-input"
+        formControlName="title"
+        placeholder="Es. Riunione genitori"
+        [class.is-invalid]="
+          EventForm.get('title')?.invalid && EventForm.get('title')?.touched
+        "
+      />
+      @if (EventForm.get('title')?.invalid && EventForm.get('title')?.touched) {
+      <div class="invalid-feedback">Il titolo è obbligatorio</div>
+      }
+    </div>
+    <div class="mb-3">
+      <label for="descrizione" class="form-label text-dark">Descrizione</label>
+      <textarea
+        id="descrizione"
+        class="form-control custom-input"
+        formControlName="description"
+        rows="4"
+        placeholder="Descrizione dell'evento (opzionale)"
+      ></textarea>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="data" class="form-label text-dark">Data</label>
+        <input
+          type="date"
+          id="data"
+          class="form-control custom-input"
+          formControlName="date"
+          [class.is-invalid]="
+            EventForm.get('date')?.invalid && EventForm.get('date')?.touched
+          "
+        />
+        @if (EventForm.get('date')?.invalid && EventForm.get('date')?.touched) {
+        <div class="invalid-feedback">La data è obbligatoria</div>
+        }
+      </div>
+      <div class="col-md-6 mb-3">
+        <label for="ora" class="form-label text-dark">Ora</label>
+        <input
+          type="time"
+          id="ora"
+          class="form-control custom-input"
+          formControlName="time"
+        />
+      </div>
+    </div>
+  </section>
+
+  <div class="d-flex flex-row justify-content-end mt-5 gap-3">
+    <button
+      type="submit"
+      class="btn btn-gradient-primary text-white btn-lg icon-btn"
+      [disabled]="IsLoading()"
+    >
+      @if (IsLoading()) {
+      <span class="spinner-border spinner-border-sm me-2"></span>
+      } {{ IsLoading() ? 'Salvataggio...' : 'Salva' }}
+    </button>
+  </div>
+</form>

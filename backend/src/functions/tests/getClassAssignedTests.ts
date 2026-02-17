@@ -10,7 +10,7 @@ const getClassAssignedTests = async (
   context: Context,
 ) => {
   const classId = request.pathParameters?.classId;
-  const subjectId = request.pathParameters?.subjectId;
+  const subjectId = context.subjectId;
 
   if (!classId) {
     throw createError.BadRequest("classId is required");
@@ -28,7 +28,7 @@ const getClassAssignedTests = async (
   const tests = await testsCollection
     .find({
       classIds: new ObjectId(classId),
-      subjectId: new ObjectId(subjectId),
+      subjectId: subjectId,
     })
     .toArray();
 

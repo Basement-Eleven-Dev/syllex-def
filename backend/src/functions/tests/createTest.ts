@@ -8,7 +8,7 @@ import { Test } from "../../models/test";
 const createTest = async (request: APIGatewayProxyEvent, context: Context) => {
   const testData = JSON.parse(request.body || "{}");
 
-  if (!testData.subjectId) {
+  if (!context.subjectId) {
     throw createError.BadRequest("subjectId is required");
   }
 
@@ -39,7 +39,7 @@ const createTest = async (request: APIGatewayProxyEvent, context: Context) => {
     maxScore: computeMaxScore(testData.questions),
     fitScore: testData.fitScore || 0,
     teacherId: context.user._id,
-    subjectId: new ObjectId(testData.subjectId),
+    subjectId: context.subjectId,
     status: testData.status || "bozza",
     createdAt: new Date(),
     updatedAt: new Date(),

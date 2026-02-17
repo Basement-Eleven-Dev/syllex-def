@@ -7,7 +7,7 @@ const getEvents = async (request: APIGatewayProxyEvent, context: Context) => {
   const db = await getDefaultDatabase();
   const eventsCollection = db.collection("events");
 
-  const { subjectId = "", month, year } = request.queryStringParameters || {};
+  const { month, year } = request.queryStringParameters || {};
 
   const filter: any = {};
 
@@ -15,8 +15,8 @@ const getEvents = async (request: APIGatewayProxyEvent, context: Context) => {
     filter.teacherId = context.user._id;
   }
 
-  if (subjectId) {
-    filter.subjectId = new ObjectId(subjectId);
+  if (context.subjectId) {
+    filter.subjectId = context.subjectId;
   }
 
   if (month && year) {

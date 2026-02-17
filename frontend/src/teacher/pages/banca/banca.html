@@ -23,22 +23,20 @@
   ></app-questions-search-filters>
 </section>
 
-<div class="row">
+<div class="row mt-4">
   @for(question of Questions(); track question._id; let last = $last; let i =
   $index) {
-  <div class="col-12 col-lg-6">
-    <div class="mt-4">
-      <div
-        class="h-100"
-        app-question-card
-        [question]="question"
-        [showTestCompositionActions]="false"
-        [showBancaActions]="true"
-        [showExplanation]="true"
-        [showPolicy]="true"
-        (onExpand)="onQuestionExpanded($event)"
-      ></div>
-    </div>
+  <div class="col-12 col-lg-6 mb-3">
+    <div
+      class="h-100"
+      app-question-card
+      [question]="question"
+      [showTestCompositionActions]="false"
+      [showBancaActions]="true"
+      [showExplanation]="true"
+      [showPolicy]="true"
+      (onExpand)="onQuestionExpanded($event)"
+    ></div>
   </div>
   }
 </div>

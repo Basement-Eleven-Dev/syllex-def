@@ -92,7 +92,6 @@
     <button
       class="btn btn-light btnSelectQuestion"
       [class.selected]="questionIndex === $index"
-      [class]="data.questions[$index].answer.result ? data.questions[$index].answer.result : ''"
       (click)="selectQuestion($index)"
     >
       {{ $index +1 }}

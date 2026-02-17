@@ -8,7 +8,8 @@ const generateResponse = async (
   context: Context,
 ) => {
   const body = JSON.parse(request.body || "{}");
-  const { assistantId, query, subjectId } = body;
+  const { assistantId, query } = body;
+  const subjectId = context.subjectId;
 
   const userId = context.user?._id.toString();
   if (!userId) {

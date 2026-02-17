@@ -13,7 +13,7 @@ const getStatus = async (request: APIGatewayProxyEvent, context: Context) => {
 
   question.topicId = new ObjectId(question.topicId);
   question.teacherId = context.user?._id;
-  question.subjectId = new ObjectId(question.subjectId);
+  question.subjectId = context.subjectId;
 
   question._id = (await questionsCollection.insertOne(question)).insertedId;
 
