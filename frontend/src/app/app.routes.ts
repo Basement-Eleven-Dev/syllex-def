@@ -25,6 +25,7 @@ import { StudentLayout } from '../student/pages/student-layout/student-layout';
 import { StudentTestExecution } from '../student/pages/student-test-execution/student-test-execution';
 import { Events } from '../teacher/pages/events/events';
 import { CreateEditEvent } from '../teacher/pages/create-edit-event/create-edit-event';
+import { StudentTestsList } from '../student/pages/student-tests-list/student-tests-list';
 
 export const routes: Routes = [
   {
@@ -170,6 +171,10 @@ export const routes: Routes = [
       },
       {
         path: 'tests',
+        component: StudentTestsList,
+      },
+      {
+        path: 'tests/:testId',
         component: StudentTestExecution,
       },
       {
