@@ -17,6 +17,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faCheckDouble,
   faEye,
+  faFile,
   faXmark,
 } from '@fortawesome/pro-solid-svg-icons';
 import { SyllexPagination } from '../syllex-pagination/syllex-pagination';
@@ -56,6 +57,7 @@ export class TestAssignments implements OnChanges {
 
   page: number = 1;
   pageSize: number = 5;
+  fileIcon = faFile;
 
   // La dimensione della collezione ora dipende dai dati reali
   get collectionSize(): number {

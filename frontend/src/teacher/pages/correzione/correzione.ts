@@ -40,6 +40,7 @@ export class Correzione implements OnInit {
   readonly isLoading = signal<boolean>(true);
   readonly isSaving = signal<boolean>(false);
   readonly questionIndex = signal<number>(0);
+  readonly attemptId = signal<string | null>(null);
 
   // Icons
   readonly UserIcon = faUser;
@@ -53,7 +54,10 @@ export class Correzione implements OnInit {
 
   ngOnInit(): void {
     const attemptId = this.route.snapshot.paramMap.get('attemptId');
-    if (attemptId) this.loadData(attemptId);
+    if (attemptId) {
+      this.attemptId.set(attemptId);
+      this.loadData(attemptId);
+    }
   }
 
   private loadData(id: string): void {
@@ -112,6 +116,18 @@ export class Correzione implements OnInit {
         this.router.navigate(['/t/tests']);
       },
       error: () => this.isSaving.set(false),
+    });
+  }
+
+  get allQuestionsAreScored(): boolean {
+    const currentData = this.data();
+    if (!currentData) return false;
+
+    return currentData.questions.every((q: any) => {
+      const scoreDefined =
+        q.answer.score !== undefined && q.answer.score !== null;
+      const statusEvaluated = q.answer.result !== 'dubious';
+      return scoreDefined && statusEvaluated;
     });
   }
 }

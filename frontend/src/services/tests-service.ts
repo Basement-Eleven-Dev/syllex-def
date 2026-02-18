@@ -140,4 +140,11 @@ export class TestsService {
       payload,
     );
   }
+
+  correctAttemptWithAI(attemptId: string, questionId: string) {
+    return this.http.post<{ score: number; explanation: string }>(
+      `attempts/${attemptId}/${questionId}/correction/ai`,
+      {},
+    );
+  }
 }

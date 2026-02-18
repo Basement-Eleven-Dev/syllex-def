@@ -4,6 +4,14 @@
     <span class="badge" [class]="data.answer.result">
       {{ getResultLabel(data.answer.result) }}
     </span>
+
+    @if (isOpenTypeQuestion) {<button
+      (click)="correctWithAI()"
+      class="btn btn-secondary btn-sm"
+    >
+      @if(aiCorrecting === true) {
+      <fa-icon [icon]="spinner" [animation]="'spin'"></fa-icon>} Correzione IA</button
+    >}
   </label>
 
   <p class="fs-5">{{ data.question.text }}</p>
@@ -52,6 +60,7 @@
       <label class="form-label text-dark fw-bold">
         Punteggio (max {{ data.answer.maxScore }})
       </label>
+
       <input
         type="number"
         class="form-control custom-input fs-4"
