@@ -1,5 +1,12 @@
 import { DatePipe, TitleCasePipe } from '@angular/common';
-import { Component } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  signal,
+  computed,
+} from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -15,17 +22,9 @@ import {
 import { SyllexPagination } from '../syllex-pagination/syllex-pagination';
 import { RouterLink } from '@angular/router';
 
-interface TestAssignment {
-  id: number;
-  studenteName: string;
-  studentSurname: string;
-  class: string;
-  score: number | null;
-  deliveredAt: Date | null;
-}
-
 @Component({
   selector: 'app-test-assignments',
+  standalone: true, // Assicurati che sia standalone se lo usi negli imports
   imports: [
     FontAwesomeModule,
     DatePipe,
@@ -38,10 +37,16 @@ interface TestAssignment {
   templateUrl: './test-assignments.html',
   styleUrl: './test-assignments.scss',
 })
-export class TestAssignments {
+export class TestAssignments implements OnChanges {
+  // --- AGGIUNGI L'INPUT QUI ---
+  @Input() attempts: any[] = [];
+
   EyeIcon = faEye;
   ChecksIcon = faCheckDouble;
   ClearIcon = faXmark;
+
+  // Signal per gestire i dati filtrati
+  filteredAssignments = signal<any[]>([]);
 
   filtersForm: FormGroup = new FormGroup({
     text: new FormControl(''),
@@ -49,35 +54,53 @@ export class TestAssignments {
     status: new FormControl(''),
   });
 
-  testAssignments: TestAssignment[] = [
-    {
-      id: 1,
-      studenteName: 'Mario',
-      studentSurname: 'Rossi',
-      class: '3A',
-      score: 85,
-      deliveredAt: new Date('2024-05-10T10:30:00'),
-    },
-    {
-      id: 2,
-      studenteName: 'Luigi',
-      studentSurname: 'Verdi',
-      class: '3B',
-      score: null,
-      deliveredAt: null,
-    },
-  ];
-
   page: number = 1;
   pageSize: number = 5;
-  collectionSize: number = this.testAssignments.length;
-  onNewPageRequested() {}
+
+  // La dimensione della collezione ora dipende dai dati reali
+  get collectionSize(): number {
+    return this.filteredAssignments().length;
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['attempts']) {
+      this.applyFilters();
+    }
+  }
+
+  applyFilters(): void {
+    const { text, status } = this.filtersForm.value;
+
+    let data = [...this.attempts];
+
+    // Filtro testuale (Nome/Cognome)
+    if (text) {
+      const search = text.toLowerCase();
+      data = data.filter(
+        (a) =>
+          a.studentName?.toLowerCase().includes(search) ||
+          a.studentLastName?.toLowerCase().includes(search),
+      );
+    }
+
+    // Filtro Stato
+    if (status) {
+      data = data.filter((a) =>
+        status === 'delivered'
+          ? a.status === 'delivered'
+          : a.status !== 'delivered',
+      );
+    }
+
+    this.filteredAssignments.set(data);
+  }
+
+  onNewPageRequested() {
+    // Logica paginazione (opzionale se gestita lato client)
+  }
 
   resetFilters(): void {
-    this.filtersForm.reset({
-      text: '',
-      class: '',
-      status: '',
-    });
+    this.filtersForm.reset({ text: '', class: '', status: '' });
+    this.applyFilters();
   }
 }

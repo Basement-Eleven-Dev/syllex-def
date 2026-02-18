@@ -2,315 +2,240 @@ import {
   Component,
   OnInit,
   AfterViewInit,
-  OnDestroy,
   ViewChild,
   ElementRef,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  inject,
+  signal,
 } from '@angular/core';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
-import { QuestionInterface } from '../../../services/questions';
 import { faEye } from '@fortawesome/pro-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SyllexPagination } from '../syllex-pagination/syllex-pagination';
+import { SlicePipe } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
+import { TestsService } from '../../../services/tests-service';
 
-// Register Chart.js components
 Chart.register(...registerables);
-
-interface QuestionStats extends QuestionInterface {
-  correctCount: number;
-  blankCount: number;
-  errorCount: number;
-  totalResponses: number;
-}
 
 @Component({
   selector: 'app-test-stats',
+  standalone: true,
   imports: [
     FontAwesomeModule,
     FormsModule,
     SyllexPagination,
     ReactiveFormsModule,
+    SlicePipe,
   ],
   templateUrl: './test-stats.html',
   styleUrl: './test-stats.scss',
 })
-export class TestStats implements OnInit, AfterViewInit {
+export class TestStats implements OnInit, AfterViewInit, OnChanges {
+  @Input() attempts: any[] = [];
+  @Input() maxScore: number = 0;
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly testsService = inject(TestsService);
+
+  readonly data = signal<any | null>(null);
+  readonly isLoading = signal<boolean>(true);
+  readonly questionIndex = signal<number>(0);
+
   @ViewChild('scoreChart', { static: false })
   scoreChartRef!: ElementRef<HTMLCanvasElement>;
-
   @ViewChild('topicChart', { static: false })
   topicChartRef!: ElementRef<HTMLCanvasElement>;
 
   EyeIcon = faEye;
-
   selectedTopic: string = '';
   availableTopics: string[] = [];
 
-  collectionSize: number = 5;
-  page: number = 1;
-  pageSize: number = 2;
-
+  // Variabili allineate con l'HTML
+  processedQuestions: any[] = [];
+  scores: number[] = [];
   classSelected: string = '';
-
-  availableQuestions: QuestionStats[] = [
-    {
-      _id: '1',
-      imageUrl:
-        'https://t4.ftcdn.net/jpg/06/57/37/01/360_F_657370150_pdNeG5pjI976ZasVbKN9VqH1rfoykdYU.jpg',
-      text: "Qual è la capitale dell'Italia?",
-      type: 'scelta multipla',
-      topicId: 'geografia-topic-id',
-      subjectId: 'geografia-subject-id',
-      teacherId: 'teacher-id',
-      options: [
-        { label: 'Milano', isCorrect: false },
-        { label: 'Roma', isCorrect: true },
-      ],
-      policy: 'public',
-      explanation: "La capitale dell'Italia è Roma.",
-      correctCount: 80,
-      blankCount: 10,
-      errorCount: 10,
-      totalResponses: 100,
-    },
-    {
-      _id: '2',
-      text: 'Il sole sorge a est',
-      type: 'vero falso',
-      topicId: 'scienze-topic-id',
-      subjectId: 'scienze-subject-id',
-      teacherId: 'teacher-id',
-      explanation:
-        'Il sole sorge effettivamente a est a causa della rotazione della Terra.',
-      policy: 'public',
-      correctAnswer: true,
-      correctCount: 70,
-      blankCount: 20,
-      errorCount: 10,
-      totalResponses: 100,
-    },
-    {
-      _id: '3',
-      text: "Descrivi il ciclo dell'acqua",
-      type: 'risposta aperta',
-      topicId: 'scienze-topic-id',
-      subjectId: 'scienze-subject-id',
-      teacherId: 'teacher-id',
-      explanation:
-        "Il ciclo dell'acqua include evaporazione, condensazione, precipitazione e raccolta.",
-      policy: 'public',
-      correctCount: 50,
-      blankCount: 30,
-      errorCount: 10,
-      totalResponses: 100,
-    },
-  ];
-
-  testMaxScore: number = 95;
-  scores: number[] = [
-    85, 90, 78, 92, 88, 76, 95, 89, 84, 91, 45, 55, 67, 73, 98, 34, 56, 78, 89,
-    92,
-  ];
 
   private chart?: Chart;
   private topicChart?: Chart;
 
-  ngOnInit(): void {
+  // Paginazione
+  page: number = 1;
+  pageSize: number = 5;
+
+  get collectionSize(): number {
+    return this.processedQuestions.length;
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['attempts'] && this.attempts.length > 0) {
+      this.processData();
+      this.updateCharts();
+    }
+  }
+
+  private processData() {
+    // 1. Estraiamo i punteggi per il grafico della distribuzione
+    this.scores = this.attempts.map((a) => a.score || 0);
+
+    const questionMap = new Map<string, any>();
+
+    this.attempts.forEach((attempt) => {
+      attempt.questions?.forEach((q: any) => {
+        // Accediamo ai dati nidificati nell'oggetto 'question'
+        const questionData = q.question;
+        // Usiamo l'ID dell'oggetto question come chiave
+        const qId =
+          questionData._id?.$oid || questionData._id || questionData.text;
+
+        if (!questionMap.has(qId)) {
+          questionMap.set(qId, {
+            text: questionData.text,
+            topic: questionData.topic || 'Generale',
+            correctCount: 0,
+            errorCount: 0,
+            blankCount: 0,
+            totalResponses: 0,
+          });
+        }
+
+        const stats = questionMap.get(qId);
+        stats.totalResponses++;
+
+        if (!q.answer || q.answer.trim() === '') {
+          // Caso: Risposta vuota
+          stats.blankCount++;
+        } else {
+          // Caso: Risposta presente. Dobbiamo verificare se è corretta nelle options
+          const selectedOption = questionData.options?.find(
+            (opt: any) => opt.label === q.answer,
+          );
+
+          if (selectedOption?.isCorrect) {
+            stats.correctCount++;
+          } else {
+            stats.errorCount++;
+          }
+        }
+      });
+    });
+
+    // Convertiamo la mappa in array per la tabella e estraiamo i topic univoci
+    this.processedQuestions = Array.from(questionMap.values());
     this.availableTopics = Array.from(
-      new Set(this.availableQuestions.map((q) => q.topicId).filter((t) => t)),
-    ) as string[];
+      new Set(this.processedQuestions.map((q) => q.topic).filter((t) => t)),
+    );
   }
 
   ngAfterViewInit(): void {
-    // Increased timeout to ensure DOM is fully rendered
-    setTimeout(() => {
-      console.log(this.scoreChartRef);
-      if (this.scoreChartRef?.nativeElement) {
-        this.createScoreDistributionChart();
-      }
-      console.log(this.topicChartRef);
-      if (this.topicChartRef?.nativeElement) {
-        this.createTopicPerformanceChart();
-      }
-    }, 500);
+    this.updateCharts();
   }
 
+  private updateCharts() {
+    setTimeout(() => {
+      if (this.scoreChartRef?.nativeElement)
+        this.createScoreDistributionChart();
+      if (this.topicChartRef?.nativeElement) this.createTopicPerformanceChart();
+    }, 300);
+  }
+
+  // Metodi richiesti dal template
+  onNewPageRequested() {
+    /* Qui potresti gestire il cambio pagina se non è puramente client-side */
+  }
+
+  onRequestQuestionDetails(stat: any) {
+    console.log('Dettagli per:', stat);
+  }
+
+  onTopicChange = () => this.createTopicPerformanceChart();
+
+  // --- LOGICA GRAFICI (Invariata ma con controllo distruzione) ---
   private createScoreDistributionChart(): void {
+    if (this.chart) this.chart.destroy();
     const { labels, data } = this.calculateDistribution();
-
-    if (!this.scoreChartRef) return;
-
     const ctx = this.scoreChartRef.nativeElement.getContext('2d');
     if (!ctx) return;
-
-    const config: ChartConfiguration = {
+    this.chart = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: labels,
         datasets: [
           {
-            label: 'Numero di consegne',
+            label: 'Studenti',
             data: data,
             backgroundColor: '#375ec985',
-
             borderRadius: 8,
           },
         ],
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              stepSize: 1,
-              precision: 0,
-            },
-            title: {
-              display: true,
-              text: 'Numero di consegne',
-              font: {
-                size: 14,
-                weight: 'bold',
-              },
-            },
-          },
-          x: {
-            title: {
-              display: true,
-              text: 'Range punteggio',
-              font: {
-                size: 14,
-                weight: 'bold',
-              },
-            },
-          },
-        },
-        plugins: {
-          legend: {
-            display: false,
-          },
-          tooltip: {
-            callbacks: {
-              label: (context) => {
-                const count = context.parsed.y;
-                return `Consegne: ${count}`;
-              },
-            },
-          },
-        },
-      },
-    };
-
-    this.chart = new Chart(ctx, config);
+      options: { responsive: true, maintainAspectRatio: false },
+    });
   }
 
-  private calculateDistribution(): { labels: string[]; data: number[] } {
+  private calculateDistribution() {
     const numBins = 5;
-    const binSize = Math.ceil(this.testMaxScore / numBins);
-    const bins: number[] = new Array(numBins).fill(0);
-    const labels: string[] = [];
-
-    // Create labels for each bin
+    const binSize = Math.max(1, Math.ceil(this.maxScore / numBins));
+    const bins = new Array(numBins).fill(0);
+    const labels = [];
     for (let i = 0; i < numBins; i++) {
-      const start = i * binSize;
-      const end = Math.min((i + 1) * binSize, this.testMaxScore);
-      labels.push(`${start}-${end}`);
+      labels.push(
+        `${i * binSize}-${Math.min((i + 1) * binSize, this.maxScore)}`,
+      );
     }
-
-    // Count scores in each bin
-    this.scores.forEach((score) => {
-      const binIndex = Math.min(Math.floor(score / binSize), numBins - 1);
-      bins[binIndex]++;
-    });
-
+    this.scores.forEach(
+      (s) => bins[Math.min(Math.floor(s / binSize), numBins - 1)]++,
+    );
     return { labels, data: bins };
   }
 
-  onRequestQuestionDetails(stat: any) {
-    // Implement the logic to handle the request for question details
-    console.log('Requesting details for question:', stat);
-  }
-
-  onTopicChange(): void {
-    this.createTopicPerformanceChart();
-  }
-
-  onNewPageRequested(): void {}
-
   private createTopicPerformanceChart(): void {
-    if (!this.topicChartRef?.nativeElement) return;
-
-    const ctx = this.topicChartRef.nativeElement.getContext('2d');
+    if (this.topicChart) this.topicChart.destroy();
+    const filtered = this.selectedTopic
+      ? this.processedQuestions.filter((q) => q.topic === this.selectedTopic)
+      : this.processedQuestions;
+    const c = filtered.reduce((s, q) => s + q.correctCount, 0);
+    const e = filtered.reduce((s, q) => s + q.errorCount, 0);
+    const b = filtered.reduce((s, q) => s + q.blankCount, 0);
+    const ctx = this.topicChartRef?.nativeElement.getContext('2d');
     if (!ctx) return;
-
-    // Filter questions by selected topic
-    const filteredQuestions = this.selectedTopic
-      ? this.availableQuestions.filter((q) => q.topicId === this.selectedTopic)
-      : this.availableQuestions;
-
-    // Calculate totals
-    const correctTotal = filteredQuestions.reduce(
-      (sum, q) => sum + q.correctCount,
-      0,
-    );
-    const errorTotal = filteredQuestions.reduce(
-      (sum, q) => sum + q.errorCount,
-      0,
-    );
-    const blankTotal = filteredQuestions.reduce(
-      (sum, q) => sum + q.blankCount,
-      0,
-    );
-
-    // Destroy existing chart if it exists
-    if (this.topicChart) {
-      this.topicChart.destroy();
-    }
-
-    const config: ChartConfiguration = {
+    this.topicChart = new Chart(ctx, {
       type: 'pie',
       data: {
         labels: ['Corrette', 'Errate', 'Vuote'],
         datasets: [
           {
-            data: [correctTotal, errorTotal, blankTotal],
+            data: [c, e, b],
             backgroundColor: ['#28a745', '#dc3545', '#6c757d'],
-            borderWidth: 2,
-            borderColor: '#fff',
           },
         ],
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: {
-              padding: 20,
-              font: {
-                size: 14,
-              },
-            },
-          },
-          tooltip: {
-            callbacks: {
-              label: (context) => {
-                const label = context.label || '';
-                const value = context.parsed;
-                const total = correctTotal + errorTotal + blankTotal;
-                const percentage =
-                  total > 0 ? ((value / total) * 100).toFixed(1) : '0';
-                return `${label}: ${value} (${percentage}%)`;
-              },
-            },
-          },
-        },
-      },
-    };
+      options: { responsive: true, maintainAspectRatio: false },
+    });
+  }
+  ngOnInit(): void {
+    const attemptId = this.route.snapshot.paramMap.get('attemptId');
+    if (attemptId) {
+      this.loadData(attemptId);
+    } else {
+      this.router.navigate(['/t/tests']);
+    }
+  }
 
-    this.topicChart = new Chart(ctx, config);
+  private loadData(id: string): void {
+    this.isLoading.set(true);
+    this.testsService.getAttemptDetail(id).subscribe({
+      next: (response) => {
+        this.data.set(response);
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Errore:', err);
+        this.isLoading.set(false);
+      },
+    });
   }
 }

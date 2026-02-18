@@ -21,6 +21,23 @@ export interface TestInterface {
   hasPendingCorrections?: boolean;
 }
 
+interface TestDetailsResponse {
+  test: {
+    _id: string;
+    name: string;
+    availableFrom: any;
+    status: string;
+    maxScore: number;
+    fitScore: number;
+  };
+  stats: {
+    title: string;
+    value: string | number;
+    icon: string;
+  }[];
+  attempts: any[]; // Qui puoi usare la tua AttemptInterface
+}
+
 export interface AttemptInterface {
   _id: string;
   studentId: string;
@@ -101,6 +118,26 @@ export class TestsService {
   getClassAttemptsOnTest(testId: string, classId: string) {
     return this.http.get<{ attempts: AttemptInterface[] }>(
       `attempts/${testId}/${classId}`,
+    );
+  }
+
+  getTestAttemptsDetails(testId: string) {
+    // Nota: l'URL deve corrispondere alla apiRoute + il parametro id
+    return this.http.get<TestDetailsResponse>(
+      `test/attempts/details/${testId}`,
+    );
+  }
+
+  getAttemptDetail(attemptId: string) {
+    const response = this.http.get<any>(`attempts/details/${attemptId}`);
+    console.log('getAttemptDetail response:', response);
+    return response;
+  }
+
+  saveCorrection(attemptId: string, payload: any) {
+    return this.http.post<{ success: boolean; message: string }>(
+      `attempts/${attemptId}/correction`,
+      payload,
     );
   }
 }
