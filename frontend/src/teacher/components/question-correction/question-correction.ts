@@ -1,52 +1,49 @@
-import { Component, Input } from '@angular/core';
-import { QuestionInterface } from '../../../services/questions';
-import { AnswerData } from '../../pages/correzione/correzione';
+import { Component, inject, Input } from '@angular/core';
+import { NgClass, NgIf } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { TestsService } from '../../../services/tests-service';
+import { faSpinner } from '@fortawesome/pro-solid-svg-icons';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-question-correction',
-  imports: [],
+  standalone: true,
+  imports: [NgClass, FormsModule, FontAwesomeModule, NgIf],
   templateUrl: './question-correction.html',
   styleUrl: './question-correction.scss',
 })
 export class QuestionCorrection {
   @Input() index: number = 1;
-  @Input() data: {
-    question: QuestionInterface;
-    answer: AnswerData;
-  } = {
-    question: {
-      _id: 'q1',
-      text: 'Domanda di esempio',
-      type: 'risposta aperta',
-      topicId: 'math-topic-id',
-      subjectId: 'math-subject-id',
-      teacherId: 'teacher-id',
-      explanation: 'Spiegazione della domanda di esempio',
-      policy: 'public',
-    },
-    answer: {
-      result: 'correct',
-      answer:
-        'Duis mollit consequat adipisicing occaecat ipsum et anim occaecat magna deserunt et. Cillum qui exercitation in nostrud commodo nisi. Aute officia labore ipsum enim mollit labore exercitation eu. Labore aute tempor consequat culpa ipsum id amet consequat enim labore velit amet. Sint ipsum officia do amet est esse minim aute. Adipisicing sint culpa veniam sit do fugiat ea non pariatur ullamco duis.',
-      feedback:
-        'Deserunt officia tempor anim labore nostrud aute laboris veniam consequat et mollit amet esse enim. Et commodo in quis minim. Pariatur dolor ipsum consequat pariatur nisi. Nisi non deserunt anim voluptate esse consectetur veniam voluptate commodo mollit magna. Amet proident mollit incididunt amet duis aliquip id do.',
-      score: 2,
-      maxScore: 2,
-    },
-  };
+  @Input() data!: any;
+  @Input() attemptId!: string;
+  aiCorrecting = false;
+  private readonly testsService = inject(TestsService);
+  readonly spinner = faSpinner;
 
   getResultLabel(value: string): string {
-    switch (value) {
-      case 'correct':
-        return 'Corretta';
-      case 'wrong':
-        return 'Sbagliata';
-      case 'dubious':
-        return 'Dubbia';
-      case 'empty':
-        return 'Non risposta';
-      default:
-        return '';
-    }
+    const labels: Record<string, string> = {
+      correct: 'Corretta',
+      wrong: 'Sbagliata',
+      dubious: 'Dubbia',
+      empty: 'Non risposta',
+    };
+    return labels[value] || '';
+  }
+
+  get isOpenTypeQuestion(): boolean {
+    return this.data.question.type === 'risposta aperta';
+  }
+
+  correctWithAI() {
+    this.aiCorrecting = true;
+    this.testsService
+      .correctAttemptWithAI(this.attemptId, this.data.question._id)
+      .subscribe((response) => {
+        this.data.answer.isCorrect = response.score >= 0.5;
+        this.data.answer.result = response.score >= 0.5 ? 'correct' : 'wrong';
+        this.data.answer.score = response.score;
+        this.data.answer.feedback = response.explanation; // spiegazione dettagliata
+        this.aiCorrecting = false;
+      });
   }
 }

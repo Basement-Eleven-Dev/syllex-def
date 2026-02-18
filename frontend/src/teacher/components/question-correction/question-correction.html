@@ -1,51 +1,74 @@
-<div class="bg-light p-4 rounded-5 d-flex flex-column gap-3">
-  <label class="form-label text-dark fw-bold fs-4"
-    >Domanda {{ index }}
+<div class="bg-light p-4 rounded-5 d-flex flex-column gap-3 shadow-sm">
+  <label class="form-label text-dark fw-bold fs-4">
+    Domanda {{ index }}
     <span class="badge" [class]="data.answer.result">
       {{ getResultLabel(data.answer.result) }}
     </span>
+
+    @if (isOpenTypeQuestion) {<button
+      (click)="correctWithAI()"
+      class="btn btn-secondary btn-sm"
+    >
+      @if(aiCorrecting === true) {
+      <fa-icon [icon]="spinner" [animation]="'spin'"></fa-icon>} Correzione IA</button
+    >}
   </label>
-  <p>{{ data.question.text }}</p>
+
+  <p class="fs-5">{{ data.question.text }}</p>
+
   @if(data.question.imageUrl){
   <img
     [src]="data.question.imageUrl"
-    alt="Immagine domanda {{ index }}"
-    class="img-fluid mb-3"
+    class="img-fluid rounded-3 mb-3"
+    style="max-height: 300px; width: auto"
   />
   } @if(data.question.options && data.question.options.length > 0){
   <div>
     <label class="form-label text-dark fw-bold">Opzioni:</label>
-    <ol type="A">
+    <ol type="A" class="ps-3">
       @for(option of data.question.options; track $index){
-      <li>{{ option.label }}</li>
+      <li [class.correct]="option.isCorrect" [class.fw-bold]="option.isCorrect">
+        {{ option.label }} @if(option.isCorrect) { (Corretta) }
+      </li>
       }
     </ol>
   </div>
   }
 
-  <section>
-    <label class="form-label text-dark fw-bold">Risposta</label>
-    <p class="mb-0">{{ data.answer.answer }}</p>
+  <section
+    class="p-3 rounded-3 border-start border-4"
+    [ngClass]="{'border-success bg-success-subtle': data.answer.isCorrect, 'border-danger bg-danger-subtle': !data.answer.isCorrect && data.answer.result !== 'dubious', 'border-warning bg-warning-subtle': data.answer.result === 'dubious'}"
+  >
+    <label class="form-label text-dark fw-bold">Risposta dello studente:</label>
+    <p class="mb-0 fs-5">{{ data.answer.answer || 'Nessuna risposta' }}</p>
   </section>
-  <div class="row">
+
+  <div class="row mt-3 g-3">
     <div class="col-12 col-md-8">
-      <label class="form-label text-dark fw-bold">Feedback</label>
+      <label class="form-label text-dark fw-bold"
+        >Feedback per lo studente</label
+      >
       <textarea
         class="form-control custom-input"
         rows="4"
-        value="{{ data.answer.feedback }}"
-        placeholder="Inserisci il feedback per questa risposta..."
+        [(ngModel)]="data.answer.feedback"
+        placeholder="Inserisci un commento..."
       ></textarea>
     </div>
+
     <div class="col-12 col-md-4">
-      <label class="form-label text-dark fw-bold">Punteggio</label>
-      <div>
-        <input
-          type="number"
-          class="form-control custom-input"
-          value="{{ data.answer.score }}"
-        />/{{ data.answer.maxScore }}
-      </div>
+      <label class="form-label text-dark fw-bold">
+        Punteggio (max {{ data.answer.maxScore }})
+      </label>
+
+      <input
+        type="number"
+        class="form-control custom-input fs-4"
+        [(ngModel)]="data.answer.score"
+        [max]="data.answer.maxScore"
+        min="0"
+        step="0.5"
+      />
     </div>
   </div>
 </div>

@@ -364,4 +364,28 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     method: "post",
     role: "teacher",
   },
+  {
+    apiRoute: "test/attempts/details/:testId",
+    functionPath: "tests/getTestAttemptsDetails.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "attempts/details/:attemptId",
+    functionPath: "attempts/getAttemptDetails.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "attempts/:attemptId/correction",
+    functionPath: "attempts/correctAttempt.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "attempts/:attemptId/:questionId/correction/ai",
+    functionPath: "attempts/correctAttemptWithAI.ts",
+    method: "post",
+    role: "teacher",
+  },
 ];
