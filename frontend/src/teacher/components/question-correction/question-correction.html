@@ -5,7 +5,7 @@
       {{ getResultLabel(data.answer.result) }}
     </span>
 
-    @if (isOpenTypeQuestion) {<button
+    @if (isOpenTypeQuestion && !isReviewed) {<button
       (click)="correctWithAI()"
       class="btn btn-secondary btn-sm"
     >
@@ -53,6 +53,7 @@
         rows="4"
         [(ngModel)]="data.answer.feedback"
         placeholder="Inserisci un commento..."
+        [disabled]="isReviewed === true"
       ></textarea>
     </div>
 
@@ -68,6 +69,7 @@
         [max]="data.answer.maxScore"
         min="0"
         step="0.5"
+        [disabled]="isReviewed === true"
       />
     </div>
   </div>

@@ -8,7 +8,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 @Component({
   selector: 'app-question-correction',
   standalone: true,
-  imports: [NgClass, FormsModule, FontAwesomeModule, NgIf],
+  imports: [NgClass, FormsModule, FontAwesomeModule],
   templateUrl: './question-correction.html',
   styleUrl: './question-correction.scss',
 })
@@ -16,6 +16,7 @@ export class QuestionCorrection {
   @Input() index: number = 1;
   @Input() data!: any;
   @Input() attemptId!: string;
+  @Input() isReviewed!: any;
   aiCorrecting = false;
   private readonly testsService = inject(TestsService);
   readonly spinner = faSpinner;

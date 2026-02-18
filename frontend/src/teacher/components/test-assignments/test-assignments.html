@@ -40,10 +40,16 @@
             <td>{{ assignment.studentName }}</td>
             <td>{{ assignment.studentLastName }}</td>
             <td>
-              {{ assignment.score !== undefined ? (assignment.score != null ?
-              assignment.score : '?') + ' / ' + (assignment.maxScore || '100') :
-              '/' }}
+              @if(assignment.score == null) {
+              <span class="text-warning fw-bold">da correggere</span>
+              } @else {
+              <span
+                >{{ assignment.score }} / {{ assignment.maxScore ?? "100"
+                }}</span
+              >
+              }
             </td>
+
             <td>
               {{ (assignment.deliveredAt | date: 'dd MMMM HH:mm' | titlecase) ||
               '/' }}
