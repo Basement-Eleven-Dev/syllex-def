@@ -1,5 +1,12 @@
 import { DatePipe, TitleCasePipe, UpperCasePipe } from '@angular/common';
-import { Component, computed, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  input,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faChevronLeft,
@@ -13,6 +20,7 @@ import {
   CalendarService,
 } from '../../../services/calendar-service';
 import { TestInterface, TestsService } from '../../../services/tests-service';
+import { StudentTestsService } from '../../../services/student-tests.service';
 import { FeedbackService } from '../../../services/feedback-service';
 import { CalendarTestCard } from '../calendar-test-card/calendar-test-card';
 import { CalendarEventCard } from '../calendar-event-card/calendar-event-card';
@@ -36,7 +44,7 @@ export interface DayBox {
   templateUrl: './calendario.html',
   styleUrl: './calendario.scss',
 })
-export class Calendario {
+export class Calendario implements OnInit {
   protected readonly ArrowLeftIcon = faChevronLeft;
   protected readonly ArrowRightIcon = faChevronRight;
   protected readonly PlusIcon = faPlus;
@@ -49,6 +57,7 @@ export class Calendario {
   protected readonly ActiveModal = inject(NgbActiveModal, { optional: true });
   private readonly calendarService = inject(CalendarService);
   private readonly testsService = inject(TestsService);
+  private readonly studentTestsService = inject(StudentTestsService);
   private readonly modalService = inject(NgbModal);
   private readonly feedbackService = inject(FeedbackService);
 
@@ -58,20 +67,40 @@ export class Calendario {
   Events = signal<CalendarEvent[]>([]);
   Tests = signal<TestInterface[]>([]);
   showHeadings = input(true);
+  /** When true, hides add/edit/delete controls */
+  readonly = input(false);
+  /** When true, loads student tests instead of teacher tests */
+  studentMode = input(false);
+  /** Filters events and tests by subjectId client-side */
+  subjectFilter = input('');
 
   // Computed
   CalendarDays = computed(() => this.buildCalendarGrid(this.CurrentDate()));
 
+  private FilteredEvents = computed(() => {
+    const filter = this.subjectFilter();
+    return filter
+      ? this.Events().filter((e) => e.subjectId === filter)
+      : this.Events();
+  });
+
+  private FilteredTests = computed(() => {
+    const filter = this.subjectFilter();
+    return filter
+      ? this.Tests().filter((t) => t.subjectId === filter)
+      : this.Tests();
+  });
+
   SelectedDateEvents = computed(() =>
     this.filterByDate(
-      this.Events(),
+      this.FilteredEvents(),
       this.SelectedDate(),
       (e) => new Date(e.date),
     ),
   );
 
   SelectedDateTests = computed(() =>
-    this.filterByDate(this.Tests(), this.SelectedDate(), (t) =>
+    this.filterByDate(this.FilteredTests(), this.SelectedDate(), (t) =>
       t.availableFrom ? new Date(t.availableFrom) : null,
     ),
   );
@@ -82,7 +111,9 @@ export class Calendario {
       this.SelectedDateTests().length > 0,
   );
 
-  constructor() {
+  constructor() {}
+
+  ngOnInit(): void {
     this.loadMonthData(this.CurrentDate());
   }
 
@@ -118,8 +149,8 @@ export class Calendario {
     const current = this.CurrentDate();
     const target = new Date(current.getFullYear(), current.getMonth(), day.day);
     return (
-      this.countByDate(this.Events(), target, (e) => new Date(e.date)) +
-      this.countByDate(this.Tests(), target, (t) =>
+      this.countByDate(this.FilteredEvents(), target, (e) => new Date(e.date)) +
+      this.countByDate(this.FilteredTests(), target, (t) =>
         t.availableFrom ? new Date(t.availableFrom) : null,
       )
     );
@@ -128,6 +159,8 @@ export class Calendario {
   openAddEventModal(): void {
     const modalRef = this.modalService.open(AddEventModal, { centered: true });
     modalRef.componentInstance.SelectedDate = this.SelectedDate();
+    modalRef.componentInstance.SubjectId =
+      this.materiaService.materiaSelected()?._id;
 
     modalRef.result.then(
       (created: CalendarEvent) =>
@@ -181,11 +214,28 @@ export class Calendario {
         this.Events.set(res.events),
       );
 
-    this.testsService
-      .getPaginatedTests(1, 100, undefined, 'pubblicato')
-      .subscribe((res: { tests: TestInterface[]; total: number }) =>
-        this.Tests.set(res.tests),
-      );
+    if (this.studentMode()) {
+      this.studentTestsService.getAvailableTests().subscribe((tests) => {
+        const mapped = tests.map(
+          (t) =>
+            ({
+              _id: t._id,
+              name: t.name,
+              subjectId: t.subjectId,
+              availableFrom: t.availableFrom
+                ? new Date(t.availableFrom)
+                : undefined,
+            }) as TestInterface,
+        );
+        this.Tests.set(mapped);
+      });
+    } else {
+      this.testsService
+        .getPaginatedTests(1, 100, undefined, 'pubblicato')
+        .subscribe((res: { tests: TestInterface[]; total: number }) =>
+          this.Tests.set(res.tests),
+        );
+    }
   }
 
   private buildCalendarGrid(date: Date): DayBox[] {

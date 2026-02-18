@@ -32,6 +32,56 @@ const createStudentAttempt = async (
   });
 
   if (existing) {
+    // Build a map of questionId → points from the incoming body so we can
+    // patch legacy attempts that were created before points were denormalized.
+    const incomingPointsMap: Record<string, number> = {};
+    if (Array.isArray(body.questions)) {
+      for (const bq of body.questions) {
+        const qId =
+          bq.question?._id?.toString?.() ??
+          bq.question?._id?.$oid ??
+          bq.question?._id;
+        if (qId) incomingPointsMap[qId] = bq.points ?? 0;
+      }
+    }
+
+    const needsPointsPatch = existing.questions.some(
+      (q) => (q as any).points == null || (q as any).points === 0,
+    );
+
+    if (needsPointsPatch && Object.keys(incomingPointsMap).length > 0) {
+      const patchedQuestions = existing.questions.map((q) => {
+        const qId = (q.question as any)._id?.toString?.();
+        return {
+          ...q,
+          points: incomingPointsMap[qId] ?? (q as any).points ?? 0,
+        };
+      });
+      const patchedMaxScore = patchedQuestions.reduce(
+        (sum, q) => sum + ((q as any).points ?? 0),
+        0,
+      );
+
+      await attemptsCollection.updateOne(
+        { _id: existing._id },
+        {
+          $set: {
+            questions: patchedQuestions,
+            maxScore: patchedMaxScore,
+            updatedAt: new Date(),
+          },
+        },
+      );
+
+      return {
+        attempt: {
+          ...existing,
+          questions: patchedQuestions,
+          maxScore: patchedMaxScore,
+        },
+      };
+    }
+
     return { attempt: existing };
   }
 
@@ -48,7 +98,9 @@ const createStudentAttempt = async (
       ? sanitizeAttemptQuestions(body.questions)
       : [],
     score: null,
-    maxScore: body.questions?.length ?? null,
+    maxScore: body.questions
+      .map((q: any) => q.points || 0)
+      .reduce((a: number, b: number) => a + b, 0),
     fitTestScore: null,
     createdAt: now,
     updatedAt: now,

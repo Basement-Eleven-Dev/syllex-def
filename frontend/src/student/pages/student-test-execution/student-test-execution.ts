@@ -251,6 +251,10 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
       .subscribe({
         next: (attempt) => {
           if (attempt && attempt.status === 'in-progress') {
+            // The attempt is the single source of truth: override Questions
+            // with what was denormalized at test-start time so that any
+            // subsequent change to the test definition does not affect this run.
+            this.Questions.set(attempt.questions.map((aq) => aq.question));
             this.CurrentAttempt.set(attempt);
             this.IsResuming.set(true);
           }
@@ -287,10 +291,20 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
       status: 'in-progress',
       startedAt: new Date().toISOString(),
       timeSpent: 0,
-      questions: questions.map((q) => ({
-        question: q,
-        answer: null,
-      })),
+      questions: questions.map((q) => {
+        const testQuestion = test.questions?.find((tq) => {
+          const id =
+            typeof tq.questionId === 'string'
+              ? tq.questionId
+              : tq.questionId.$oid;
+          return id === q._id;
+        });
+        return {
+          question: q,
+          answer: null,
+          points: testQuestion?.points ?? 0,
+        };
+      }),
     };
 
     this.testsService
@@ -336,13 +350,14 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
       : Date.now();
     const timeSpent = Math.floor((Date.now() - startedAt) / 1000);
     const answers = this.Answers();
-    const questions = this.Questions();
 
+    // Use the attempt's own questions as base to preserve denormalized data
+    // (points, question snapshot). Only the answer field is updated.
     return {
       timeSpent,
-      questions: questions.map((q) => ({
-        question: q,
-        answer: answers[q._id] ?? null,
+      questions: (attempt?.questions ?? []).map((aq) => ({
+        ...aq,
+        answer: answers[aq.question._id] ?? null,
       })),
     };
   }

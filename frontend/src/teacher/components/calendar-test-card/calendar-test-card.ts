@@ -10,7 +10,8 @@ import { RouterLink } from '@angular/router';
   template: `
     <div
       class="p-3 event-card test rounded-syllex mb-3 d-flex flex-column gap-2"
-      [routerLink]="'/t/tests/' + Test()._id"
+      [routerLink]="readonly() ? null : '/t/tests/' + Test()._id"
+      [class.cursor-default]="readonly()"
     >
       <div class="d-flex flex-row align-items-center gap-2">
         <fa-icon [icon]="TestIcon" class="text-danger"></fa-icon>
@@ -40,5 +41,6 @@ export class CalendarTestCard {
   protected readonly TestIcon = faBallotCheck;
 
   Test = input.required<TestInterface>();
+  readonly = input(false);
   ClassCount = computed(() => this.Test().classIds?.length ?? 0);
 }

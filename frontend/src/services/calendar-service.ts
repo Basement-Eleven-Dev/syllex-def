@@ -9,6 +9,7 @@ export interface CalendarEvent {
   date: string;
   time?: string;
   createdAt?: string;
+  subjectId?: string;
 }
 
 @Injectable({

@@ -101,6 +101,8 @@ export class AddEventModal implements OnInit {
   SelectedDate!: Date;
   /** Set via componentInstance when editing an existing event */
   EventToEdit?: CalendarEvent;
+  /** Set via componentInstance to attach the current subject context */
+  SubjectId?: string;
 
   Form!: FormGroup;
   Saving = signal(false);
@@ -140,6 +142,7 @@ export class AddEventModal implements OnInit {
       description: this.Form.value.description,
       date: this.Form.value.date,
       time: this.Form.value.time || undefined,
+      subjectId: this.SubjectId,
     };
 
     if (this.EventToEdit && this.EventToEdit._id) {

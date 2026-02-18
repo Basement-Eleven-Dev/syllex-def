@@ -136,7 +136,7 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     apiRoute: "communications",
     functionPath: "communications/getCommunications.ts",
     method: "get",
-    role: "teacher",
+    role: "logged",
   },
   {
     apiRoute: "communications",

@@ -28,6 +28,7 @@ import { Events } from '../teacher/pages/events/events';
 import { CreateEditEvent } from '../teacher/pages/create-edit-event/create-edit-event';
 import { StudentTestsList } from '../student/pages/student-tests-list/student-tests-list';
 import { testExecutionGuard } from '../guards/test-execution.guard';
+import { StudentComunicazioni } from '../student/pages/student-comunicazioni/student-comunicazioni';
 
 export const routes: Routes = [
   {
@@ -194,7 +195,7 @@ export const routes: Routes = [
       },
       {
         path: 'comunicazioni',
-        component: Comunicazioni,
+        component: StudentComunicazioni,
       },
       {
         path: 'tests/new',

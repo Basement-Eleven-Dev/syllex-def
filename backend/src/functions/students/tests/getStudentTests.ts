@@ -62,13 +62,29 @@ const getStudentTests = async (
 
   console.log("Filter applicato:", JSON.stringify(filter));
 
-  // Esegui query con paginazione
-  const tests = await testsCollection
-    .find(filter)
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(currentPageSize)
-    .toArray();
+  // Esegui query con aggregation per includere subjectName
+  const pipeline = [
+    { $match: filter },
+    { $sort: { createdAt: -1 as const } },
+    {
+      $lookup: {
+        from: "subjects",
+        localField: "subjectId",
+        foreignField: "_id",
+        as: "_subject",
+      },
+    },
+    {
+      $addFields: {
+        subjectName: { $arrayElemAt: ["$_subject.name", 0] },
+      },
+    },
+    { $project: { _subject: 0 } },
+    { $skip: skip },
+    { $limit: currentPageSize },
+  ];
+
+  const tests = await testsCollection.aggregate(pipeline).toArray();
 
   // Conta totale per paginazione
   const total = await testsCollection.countDocuments(filter);

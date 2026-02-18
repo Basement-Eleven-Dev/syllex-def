@@ -22,6 +22,10 @@ export interface StudentTestInterface {
 export interface AttemptQuestionData {
   question: QuestionInterface;
   answer: number | string | null;
+  points?: number;
+  score?: number;
+  teacherComment?: string;
+  status?: 'correct' | 'wrong' | 'semi-correct';
 }
 
 export interface StudentAttemptInterface {
