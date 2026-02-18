@@ -30,27 +30,12 @@
 </section>
 
 <div class="row">
-  @for(test of Tests(); track test._id) {
+  @for (test of Tests(); track test._id) {
   <div class="col-12 col-lg-6 col-xl-4 mb-3">
-    <div class="card p-3 h-100 d-flex flex-column justify-content-between">
-      <div>
-        <h5 class="fw-bold text-dark">{{ test.name }}</h5>
-        <p class="mb-1 text-muted">Materia: {{ test.subjectName }}</p>
-        <p class="mb-1 text-muted">Stato: {{ test.status | titlecase }}</p>
-        <p class="mb-1 text-muted">
-          Disponibile dal: {{ test.availableFrom | date:'shortDate' }}
-        </p>
-        <p class="mb-1 text-muted">
-          Disponibile fino al: {{ test.availableTo | date:'shortDate' }}
-        </p>
-      </div>
-      <button
-        class="btn btn-primary mt-3 w-100"
-        [routerLink]="['/s/tests', test._id]"
-      >
-        Compila test
-      </button>
-    </div>
+    <app-student-test-card
+      [Test]="test"
+      [AttemptStatus]="getAttemptStatus(test._id)"
+    />
   </div>
   } @empty {
   <div class="col-12">

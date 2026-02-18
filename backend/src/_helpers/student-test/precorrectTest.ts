@@ -4,7 +4,7 @@ export function precorrectTest({
 }: {
   questions: any[];
   fitScore: number;
-}): { score: number; fitTestScore: boolean; status: "ai-reviewed" } | null {
+}): { score: number; fitTestScore: boolean; status: "delivered" } | null {
   if (!Array.isArray(questions) || typeof fitScore !== "number") return null;
   let score = 0;
   let maxScore = questions.length;
@@ -15,6 +15,6 @@ export function precorrectTest({
   return {
     score,
     fitTestScore: score >= fitScore,
-    status: "ai-reviewed",
+    status: "delivered",
   };
 }

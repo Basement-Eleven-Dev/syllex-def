@@ -9,6 +9,10 @@ export const handler: Handler = async (
 ): Promise<APIGatewayProxyResult> => {
     let generationID: string = event.pathParameters!.generationId!;
     let gammaUrl = await getGammaExportUrl(generationID)
+    const domain = event.requestContext.domainName;
+    const path = event.requestContext.path;
+    const fullUrl = `https://${domain}${path}`;
+    console.log('full url:', fullUrl)
     if (!gammaUrl) {
         return {
             headers: { "Access-Control-Allow-Origin": "*", },
@@ -16,9 +20,6 @@ export const handler: Handler = async (
             body: "Not ready"
         }
     }
-    const domain = event.requestContext.domainName;
-    const path = event.path;
-    const fullUrl = `https://${domain}${path}`;
     const db = await getDefaultDatabase();
     const materialCollection = db.collection('materials');
     await materialCollection.updateOne({ url: fullUrl }, { $set: { url: gammaUrl } })

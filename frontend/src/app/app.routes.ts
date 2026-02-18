@@ -23,9 +23,11 @@ import { studentGuard } from '../guards/student.guard';
 import { teacherGuard } from '../guards/teacher.guard';
 import { StudentLayout } from '../student/pages/student-layout/student-layout';
 import { StudentTestExecution } from '../student/pages/student-test-execution/student-test-execution';
+import { StudentTestReview } from '../student/pages/student-test-review/student-test-review';
 import { Events } from '../teacher/pages/events/events';
 import { CreateEditEvent } from '../teacher/pages/create-edit-event/create-edit-event';
 import { StudentTestsList } from '../student/pages/student-tests-list/student-tests-list';
+import { testExecutionGuard } from '../guards/test-execution.guard';
 
 export const routes: Routes = [
   {
@@ -174,8 +176,13 @@ export const routes: Routes = [
         component: StudentTestsList,
       },
       {
-        path: 'tests/:testId',
+        path: 'tests/execute/:testId',
         component: StudentTestExecution,
+        canDeactivate: [testExecutionGuard],
+      },
+      {
+        path: 'tests/review/:testId',
+        component: StudentTestReview,
       },
       {
         path: 'classi',

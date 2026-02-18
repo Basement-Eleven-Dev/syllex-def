@@ -54,6 +54,43 @@ li {
   }
 }
 
+.student-option {
+  cursor: pointer;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+
+  &:hover:not(.disabled) {
+    background-color: rgba(13, 110, 253, 0.05);
+  }
+
+  &.selected {
+    background-color: rgba(13, 110, 253, 0.1);
+    font-weight: 500;
+  }
+
+  &.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  label {
+    cursor: inherit;
+  }
+}
+
+.question-card.locked {
+  textarea,
+  input[type="radio"] {
+    pointer-events: none;
+  }
+}
+
+.question-card.dimmed {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
 .collapse-banner {
   position: absolute;
   bottom: 0;
