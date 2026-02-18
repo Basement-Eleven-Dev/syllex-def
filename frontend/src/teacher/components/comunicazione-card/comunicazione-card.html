@@ -2,6 +2,7 @@
   <div class="card-body">
     <div class="d-flex flex-row text-dark align-items-center mb-3">
       <h6 class="mb-0 flex-fill">{{ comunicazione.title }}</h6>
+      @if (!readonly()) {
       <div class="d-flex flex-row gap-1 justify-content-end align-items-center">
         <button
           type="button"
@@ -23,6 +24,7 @@
           <fa-icon [icon]="TrashIcon"></fa-icon>
         </button>
       </div>
+      }
     </div>
     <small class="fw-light ellipsis-1-lines">
       {{ comunicazione.content }}

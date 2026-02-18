@@ -9,6 +9,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DestroyRef } from '@angular/core';
 import { StudentTestCard } from '../../components/student-test-card/student-test-card';
+import { Materia } from '../../../services/materia';
 
 type AttemptStatus = 'in-progress' | 'delivered' | 'reviewed';
 
@@ -22,12 +23,18 @@ type AttemptStatus = 'in-progress' | 'delivered' | 'reviewed';
 export class StudentTestsList implements OnInit {
   private readonly testsService = inject(StudentTestsService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly materiaService = inject(Materia);
 
   readonly ClearIcon = faBroom;
 
   readonly Tests = signal<StudentTestInterface[]>([]);
   readonly AttemptStatusMap = signal<Map<string, AttemptStatus>>(new Map());
   readonly SearchTerm = signal('');
+  readonly SelectedSubject = signal('');
+
+  readonly Subjects = this.materiaService.allMaterie;
+
+  private allTests = signal<StudentTestInterface[]>([]);
 
   ngOnInit() {
     this.loadTests();
@@ -39,7 +46,8 @@ export class StudentTestsList implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (tests) => {
-          this.Tests.set(tests);
+          this.allTests.set(tests);
+          this.applyFilters();
           this.checkAttemptStatuses(tests);
         },
         error: (err) => {
@@ -49,13 +57,30 @@ export class StudentTestsList implements OnInit {
       });
   }
 
+  private applyFilters() {
+    let filtered = this.allTests();
+
+    const selectedSubject = this.SelectedSubject();
+    if (selectedSubject) {
+      filtered = filtered.filter((test) => test.subjectId === selectedSubject);
+    }
+
+    this.Tests.set(filtered);
+  }
+
   onSearchTermChange(term: string) {
     this.SearchTerm.set(term);
     this.loadTests();
   }
 
+  onSubjectChange(subjectId: string) {
+    this.SelectedSubject.set(subjectId);
+    this.applyFilters();
+  }
+
   clearFilters() {
     this.SearchTerm.set('');
+    this.SelectedSubject.set('');
     this.loadTests();
   }
 

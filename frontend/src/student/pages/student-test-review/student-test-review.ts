@@ -53,6 +53,21 @@ export class StudentTestReview implements OnInit {
     return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   });
 
+  readonly Status = computed(() => {
+    const status = this.Attempt()?.status;
+    console.log('Attempt status:', status);
+    switch (status) {
+      case 'in-progress':
+        return 'Incompleto';
+      case 'delivered':
+        return 'Consegnato';
+      case 'reviewed':
+        return 'Corretto dal docente';
+      default:
+        return 'Sconosciuto';
+    }
+  });
+
   readonly AnsweredCount = computed(() => {
     const questions = this.Attempt()?.questions ?? [];
     return questions.filter(

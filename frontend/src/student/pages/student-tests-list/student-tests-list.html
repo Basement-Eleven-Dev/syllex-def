@@ -19,6 +19,18 @@
       (input)="onSearchTermChange($any($event.target).value)"
     />
   </div>
+  <div>
+    <select
+      class="form-select custom-input filter"
+      [value]="SelectedSubject()"
+      (change)="onSubjectChange($any($event.target).value)"
+    >
+      <option value="">Tutte le materie</option>
+      @for (subject of Subjects(); track subject._id) {
+      <option [value]="subject._id">{{ subject.name }}</option>
+      }
+    </select>
+  </div>
   <button
     type="button"
     class="btn btn-outline-danger"

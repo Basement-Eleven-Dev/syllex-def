@@ -94,23 +94,26 @@
                   {{ SelectedDate() | date: 'fullDate' | titlecase }}
                 </h5>
               </div>
+              @if (!readonly()) {
               <button
                 class="btn btn-outline-primary"
                 (click)="openAddEventModal()"
               >
                 <fa-icon [icon]="PlusIcon"></fa-icon>
               </button>
+              }
             </div>
             <hr />
 
             @for (event of SelectedDateEvents(); track event._id) {
             <app-calendar-event-card
               [Event]="event"
+              [readonly]="readonly()"
               (Deleted)="deleteEvent($event)"
               (Edited)="editEvent($event)"
             />
             } @for (test of SelectedDateTests(); track test._id) {
-            <app-calendar-test-card [Test]="test" />
+            <app-calendar-test-card [Test]="test" [readonly]="readonly()" />
             } @if (!HasSelectedDateItems()) {
             <p class="text-muted text-center mt-4">
               Nessun evento per questa giornata

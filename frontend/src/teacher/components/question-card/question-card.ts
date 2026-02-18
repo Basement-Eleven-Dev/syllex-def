@@ -77,6 +77,9 @@ export class QuestionCard {
   @Input() locked: boolean = false;
   @Input() dimmed: boolean = false;
   @Input() selectedAnswer: number | string | null = null;
+  @Input() score: number | null = null;
+  @Input() questionStatus: 'correct' | 'wrong' | 'semi-correct' | null = null;
+  @Input() teacherFeedback: string | null = null;
   @Output() removeMe = new EventEmitter<string>();
   @Output() onExpand = new EventEmitter<string>();
   @Output() answerChange = new EventEmitter<number | string>();

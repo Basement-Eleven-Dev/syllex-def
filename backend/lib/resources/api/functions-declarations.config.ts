@@ -136,7 +136,7 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     apiRoute: "communications",
     functionPath: "communications/getCommunications.ts",
     method: "get",
-    role: "teacher",
+    role: "logged",
   },
   {
     apiRoute: "communications",
@@ -216,13 +216,15 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     functionPath: "ai/createAiGenMaterial.ts",
     method: "post",
     role: "teacher",
-    extensionLayers: [{
-      name: "pandoc",
-      arn: "arn:aws:lambda:eu-south-1:851725509686:layer:pandoc:1",
-    }/*, {
+    extensionLayers: [
+      {
+        name: "pandoc",
+        arn: "arn:aws:lambda:eu-south-1:851725509686:layer:pandoc:1",
+      } /*, {
       name: "wkhtml",
       arn: "arn:aws:lambda:eu-south-1:851725509686:layer:wkhtmltox:1"
-    }*/],
+    }*/,
+    ],
   },
   {
     apiRoute: "proxy/gamma/{generationId}",

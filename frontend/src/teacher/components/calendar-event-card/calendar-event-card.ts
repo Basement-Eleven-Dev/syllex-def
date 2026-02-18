@@ -17,25 +17,27 @@ import { ConfirmActionDirective } from '../../../directives/confirm-action.direc
               <fa-icon [icon]="ClockIcon"></fa-icon> {{ Event().time }}
             </small>
           }
-          <button
-            type="button"
-            class="btn btn-sm btn-outline-primary"
-            (click)="Edited.emit(Event()._id!)"
-            title="Modifica evento"
-          >
-            <fa-icon [icon]="EditIcon"></fa-icon>
-          </button>
-          <button
-            type="button"
-            class="btn btn-sm btn-outline-danger"
-            confirmAction
-            [confirmMessage]="'Sei sicuro di voler eliminare questo evento?'"
-            confirmTitle="Conferma eliminazione"
-            (confirmed)="Deleted.emit(Event()._id!)"
-            title="Elimina evento"
-          >
-            <fa-icon [icon]="TrashIcon"></fa-icon>
-          </button>
+          @if (!readonly()) {
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-primary"
+              (click)="Edited.emit(Event()._id!)"
+              title="Modifica evento"
+            >
+              <fa-icon [icon]="EditIcon"></fa-icon>
+            </button>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-danger"
+              confirmAction
+              [confirmMessage]="'Sei sicuro di voler eliminare questo evento?'"
+              confirmTitle="Conferma eliminazione"
+              (confirmed)="Deleted.emit(Event()._id!)"
+              title="Elimina evento"
+            >
+              <fa-icon [icon]="TrashIcon"></fa-icon>
+            </button>
+          }
         </div>
       </div>
       @if (Event().description) {
@@ -60,6 +62,7 @@ export class CalendarEventCard {
   protected readonly EditIcon = faMarker;
 
   Event = input.required<CalendarEvent>();
+  readonly = input(false);
   Deleted = output<string>();
   Edited = output<string>();
 }

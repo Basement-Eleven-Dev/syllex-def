@@ -11,6 +11,15 @@ const generateResponse = async (
   const { assistantId, query } = body;
   const subjectId = context.subjectId;
 
+  if (!subjectId) {
+    return {
+      success: false,
+      message: "Subject ID is required",
+    };
+  }
+
+  let subjectIdStr: string = subjectId.toString();
+
   const userId = context.user?._id.toString();
   if (!userId) {
     return {
@@ -18,11 +27,11 @@ const generateResponse = async (
       message: "User not authenticated",
     };
   }
-  await saveMessage(subjectId, userId, "user", query);
+  await saveMessage(subjectIdStr, userId, "user", query);
   const aiResponse = await generateAIResponse(
     assistantId,
     query,
-    subjectId,
+    subjectIdStr,
     userId,
   );
   if (!aiResponse) {
@@ -31,7 +40,7 @@ const generateResponse = async (
       message: "Failed to generate AI response",
     };
   }
-  const insertId = await saveMessage(subjectId, userId, "agent", aiResponse);
+  const insertId = await saveMessage(subjectIdStr, userId, "agent", aiResponse);
   return {
     success: true,
     aiResponse,

@@ -5,6 +5,8 @@ import {
   IconDefinition,
 } from '@fortawesome/angular-fontawesome';
 import {
+  faCalendar,
+  faFile,
   faFileLines,
   faHouse,
   faRobot,
@@ -24,7 +26,13 @@ export interface NavRoute {
 })
 export class Nav {
   routes: NavRoute[] = [
-    { label: 'Home', icon: faHouse, route: '/s/dashboard' },
+    { label: 'Dashboard', icon: faHouse, route: '/s/dashboard' },
+    {
+      label: 'Comunicazioni ed eventi',
+      icon: faCalendar,
+      route: '/s/comunicazioni',
+    },
+    { label: 'File e risorse', icon: faFile, route: '/s/risorse' },
     { label: 'Test', icon: faFileLines, route: '/s/tests' },
     { label: 'Agenti', icon: faRobot, route: '/s/agente' },
     { label: 'Profilo', icon: faUser, route: '/s/profilo' },

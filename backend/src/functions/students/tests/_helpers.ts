@@ -9,6 +9,7 @@ export function sanitizeAttemptQuestions(questions: any[]): AttemptQuestion[] {
   return questions.map((q) => ({
     question: sanitizeQuestionIds(q.question),
     answer: q.answer ?? null,
+    points: q.points ?? 0,
   }));
 }
 

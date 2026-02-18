@@ -4,6 +4,7 @@ import { Question } from "./question";
 export type AttemptQuestion = {
   question: Question;
   answer: number | string | null;
+  points: number;
 };
 
 export type Attempt = {

@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, Output, effect } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  effect,
+  input,
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 import {
   faMarker,
@@ -31,6 +38,7 @@ export class ComunicazioneCard {
   TrashIcon = faTrash;
   EditIcon = faMarker;
   @Input() comunicazione!: ComunicazioneInterface;
+  readonly = input(false);
 
   attachments: MaterialInterface[] = [];
 

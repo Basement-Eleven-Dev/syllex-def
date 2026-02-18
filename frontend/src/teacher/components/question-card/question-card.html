@@ -14,11 +14,11 @@
           {{ question.policy | titlecase }}
         </div>
         } @if(showIndex){<span class="badge bg-dark"># {{ index + 1 }}</span>}
-        <span class="text-primary">{{ question.type }}</span>
-        |
         <span class="text-muted"
           >{{ materiaService.getTopicName(question.topicId) }}</span
         >
+        |
+        <span class="text-primary">{{ question.type }}</span>
       </div>
 
       <div>
@@ -90,6 +90,32 @@
           <section>
             <p class="mb-0 fw-light text-muted">Correzione</p>
             <p>{{ question.explanation }}</p>
+          </section>
+          } @if(studentMode && questionStatus) {
+          <hr class="my-2" />
+          <section class="d-flex flex-column gap-2">
+            <div class="d-flex align-items-center gap-3">
+              <span
+                class="badge"
+                [class.bg-success]="questionStatus === 'correct'"
+                [class.bg-danger]="questionStatus === 'wrong'"
+                [class.bg-warning]="questionStatus === 'semi-correct'"
+                [class.text-dark]="questionStatus === 'semi-correct'"
+              >
+                @switch(questionStatus) { @case('correct') { Corretta }
+                @case('wrong') { Errata } @case('semi-correct') { Parzialmente
+                corretta } }
+              </span>
+              @if(score !== null) {
+              <span class="fw-semibold">Punteggio: {{ score }}</span>
+              }
+            </div>
+            <div>
+              <p class="mb-0 fw-light text-muted">Commento del docente</p>
+              <p class="mb-0">
+                {{ teacherFeedback || 'Il docente non ha lasciato commenti.' }}
+              </p>
+            </div>
           </section>
           }
         </div>

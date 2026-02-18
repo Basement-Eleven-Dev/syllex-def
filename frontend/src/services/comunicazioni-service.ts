@@ -60,6 +60,7 @@ export class ComunicazioniService {
     hasAttachments: string,
     page: number,
     pageSize: number,
+    subjectId?: string,
   ): Observable<{ communications: ComunicazioneInterface[]; total: number }> {
     const params: any = {
       page: page.toString(),
@@ -69,6 +70,7 @@ export class ComunicazioniService {
     if (searchTerm) params.searchTerm = searchTerm;
     if (classId) params.classId = classId;
     if (hasAttachments) params.hasAttachments = hasAttachments;
+    if (subjectId) params.subjectId = subjectId;
 
     return this.http.get<{
       communications: ComunicazioneInterface[];
