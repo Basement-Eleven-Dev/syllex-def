@@ -8,6 +8,7 @@ import { z } from "zod";
 import { askStrucuredLLM } from "../../_helpers/AI/simpleCompletion";
 import { Question } from "../../models/question";
 import { Topic } from "../../models/topic";
+import { retrieveRelevantDocuments } from "../../_helpers/AI/embeddings/retrieveRelevantDocuments";
 
 //API TYPES
 const questionTypes = ['open', 'true-false', 'multiple'] as const;
@@ -55,9 +56,17 @@ const getGuardrail = (language: string = 'it') => `
 // 0.8-2 for high randomness
 const QUESTION_GENERATION_MODEL_TEMPERATURE = 1;
 
-export const generateOpenQuestion = async (context: Context, difficulty: string, materials: MaterialInterface[], topic: Topic, language: string = 'it'): Promise<Question> => {
-    const PROMPT = `Create a ${difficulty} difficulty quiz question about the topic "${topic.name}" based on these documents. The quiz question must be open-answer (no choices included), and you must include the correct answer.`
-    const result = await askStrucuredLLM(PROMPT + '\n' + getGuardrail(language), materials, 'gpt-4o', OpenQuestionStructure, QUESTION_GENERATION_MODEL_TEMPERATURE)
+export const generateOpenQuestion = async (context: Context, difficulty: string, materials: ObjectId[], topic: Topic, language: string = 'it'): Promise<Question> => {
+    const INSTRUCTIONS = `Create a ${difficulty} difficulty quiz question about the topic "${topic.name}" based on these documents. The quiz question must be open-answer (no choices included), and you must include the correct answer.`
+    const relevantDocuments = await retrieveRelevantDocuments(INSTRUCTIONS, context.subjectId!, materials)
+    console.log(relevantDocuments)
+    const PROMPT = `${INSTRUCTIONS}
+    ${getGuardrail(language)}
+        -----------------
+        Documents to use:
+        ${relevantDocuments.map((item) => item.text).join("\n")}
+        `
+    const result = await askStrucuredLLM(PROMPT + '\n' + getGuardrail(language), [], 'gpt-4o', OpenQuestionStructure, QUESTION_GENERATION_MODEL_TEMPERATURE)
     const question: Question = {
         type: "risposta aperta",
         text: result.text,
@@ -71,12 +80,20 @@ export const generateOpenQuestion = async (context: Context, difficulty: string,
     return question;
 
 }
-export const generateMultipleChoiceQuestion = async (context: Context, difficulty: string, materials: MaterialInterface[], topic: Topic, language: string = 'it', numberOfAlternatives: number = 5, trueOrFalse: boolean = false): Promise<Question> => {
-    const PROMPT = `Create a ${difficulty} difficulty quiz question (multiple choices, only one is correct) about the topic "${topic.name}" based on these documents. 
-    The quiz question must contain ${numberOfAlternatives} alternatives to choose from ${trueOrFalse ? '(True or False as labels - based on the language specified)' : ''} and you need to specify which one is correct.`
-    const result = await askStrucuredLLM(PROMPT + '\n' + getGuardrail(language), materials, 'gpt-4o', MultipleChoiceQuestionStructure, QUESTION_GENERATION_MODEL_TEMPERATURE)
+export const generateMultipleChoiceQuestion = async (context: Context, difficulty: string, materials: ObjectId[], topic: Topic, language: string = 'it', numberOfAlternatives: number = 5, trueOrFalse: boolean = false): Promise<Question> => {
+    const INSTRUCTIONS = `Create a ${difficulty} difficulty ${trueOrFalse ? 'true/false' : ''} quiz question (${trueOrFalse ? 'True or False as labels - based on the language specified' : 'multiple choice, only one is correct'}) about the topic "${topic.name}" based on these documents. 
+    The quiz question must contain ${numberOfAlternatives} alternatives to choose from  and you need to specify which one is correct. Avoid labels A/B/C/D/E/... in the text of the alternatives.`
+    const relevantDocuments = await retrieveRelevantDocuments(INSTRUCTIONS, context.subjectId!, materials)
+    console.log(relevantDocuments)
+    const PROMPT = `${INSTRUCTIONS}
+    ${getGuardrail(language)}
+        -----------------
+        Documents to use:
+        ${relevantDocuments.map((item) => item.text).join("\n")}
+        `
+    const result = await askStrucuredLLM(PROMPT + '\n' + getGuardrail(language), [], 'gpt-4o', MultipleChoiceQuestionStructure, QUESTION_GENERATION_MODEL_TEMPERATURE)
     const question: Question = {
-        type: "risposta aperta",
+        type: trueOrFalse ? 'vero falso' : 'scelta multipla',
         text: result.text,
         explanation: result.explanation,
         options: result.options,
@@ -99,21 +116,17 @@ const createAIGenQuestion = async (
     if (!type || !isQuestionType(type)) throw createHttpError.BadRequest(`type field is required. Accepted values: ${questionTypes.join(', ')}. You passed "${type}"`);
     if (!topicId) throw createHttpError.BadRequest(`type topicId is required`);
     if (!(materialIds && materialIds.length > 0)) throw createHttpError.BadRequest("type materialIds is required and not empty: string[]");
-
+    const materialOIds = materialIds.map(el => new ObjectId(el));
     const db = await getDefaultDatabase();
     //load topic
     const topicCollection = db.collection('topics')
     const topic: Topic | null = await topicCollection.findOne({ _id: new ObjectId(topicId) }) as Topic | null
     if (!topic) throw createHttpError.BadRequest(`topic ${topicId} doesn't exist`);
 
-    //load materials
-    const materialCollection = db.collection('materials')
-    const materialObjects: MaterialInterface[] = await materialCollection.find({ _id: { $in: materialIds.map(el => new ObjectId(el)) } }).toArray() as MaterialInterface[];
-
     //create question
     const question = type == 'open'
-        ? await generateOpenQuestion(context, DIFFICULTY_MAP[difficulty || 2], materialObjects, topic, language)
-        : await generateMultipleChoiceQuestion(context, DIFFICULTY_MAP[difficulty || 2], materialObjects, topic, language, type == 'true-false' ? 2 : numberOfAlternatives, type == 'true-false');
+        ? await generateOpenQuestion(context, DIFFICULTY_MAP[difficulty || 2], materialOIds, topic, language)
+        : await generateMultipleChoiceQuestion(context, DIFFICULTY_MAP[difficulty || 2], materialOIds, topic, language, type == 'true-false' ? 2 : numberOfAlternatives, type == 'true-false');
 
     //store question
     const questionsCollection = db.collection('questions')

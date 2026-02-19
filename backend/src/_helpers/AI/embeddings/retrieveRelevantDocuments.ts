@@ -9,35 +9,21 @@ interface RelevantDocument {
 
 export async function retrieveRelevantDocuments(
   query: string,
-  subjectId: string,
-  assistantId: string,
+  subjectId: ObjectId,
+  associatedFileIds: ObjectId[],
+  documentLimit: number = 20
 ): Promise<RelevantDocument[]> {
   const openai = await getOpenAIClient();
   const db = await getDefaultDatabase();
 
   try {
-    // 1. Recupera l'assistente per ottenere i file associati
 
-    const assistant = await db.collection("assistants").findOne({
-      _id: new ObjectId(assistantId),
-    });
-
-    const associatedFileIds = assistant?.associatedFileIds || [];
-
-    // Se non ci sono file associati, l'agente non "sa" nulla dai documenti
-    if (associatedFileIds.length === 0) {
-      return [];
-    }
-
-    const fileObjectIds = associatedFileIds.map((id: any) =>
-      id instanceof ObjectId ? id : new ObjectId(id.$oid || id),
-    );
     const ragCollection = db.collection("file_embeddings");
 
     // 2. Recupera il nome della materia per "arricchire" la ricerca
     const subjectDoc = await db
       .collection("subjects")
-      .findOne({ _id: new ObjectId(subjectId) });
+      .findOne({ _id: subjectId });
     const enrichedQuery = subjectDoc ? `${subjectDoc.name} ${query}` : query;
 
     const queryEmbeddingResponse = await openai.embeddings.create({
@@ -57,11 +43,11 @@ export async function retrieveRelevantDocuments(
               queryVector: queryEmbedding,
               path: "embedding",
               numCandidates: 500,
-              limit: 20,
+              limit: documentLimit,
               index: "documents_vector_search",
               filter: {
                 subject: new ObjectId(subjectId),
-                referenced_file_id: { $in: fileObjectIds },
+                referenced_file_id: { $in: associatedFileIds },
               },
             },
           },
@@ -95,7 +81,7 @@ export async function retrieveRelevantDocuments(
           {
             $match: {
               subject: new ObjectId(subjectId),
-              referenced_file_id: { $in: fileObjectIds },
+              referenced_file_id: { $in: associatedFileIds },
             },
           },
           { $limit: 10 },

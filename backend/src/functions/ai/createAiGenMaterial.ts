@@ -8,6 +8,7 @@ import { startSlidedeckGeneration } from "../../_helpers/gammaApi";
 import { uploadContentToS3 } from "../../_helpers/uploadFileToS3";
 import { askLLM } from "../../_helpers/AI/simpleCompletion";
 import { getConvertedDocument } from "../../_helpers/documents/documentConversion";
+import { retrieveRelevantDocuments } from "../../_helpers/AI/embeddings/retrieveRelevantDocuments";
 
 const documentTypes = ['slides', 'map', 'glossary', 'summary'] as const;
 
@@ -26,9 +27,9 @@ export type AIGenMaterialInput = {
     language?: string
 }
 
-const getPrompt = (type: DocumentType, language: string = 'it', numberOfSlides: number = 10, additionalInstructions?: string) => {
+const getPrompt = (type: DocumentType, language: string = 'italian', numberOfSlides: number = 10, additionalInstructions?: string) => {
     const guardRails: string = `
-    Use the ${language || 'it'} language.
+    Use the ${language} language.
     Answer the query using only the information provided in the attached documents.
     Do not use any outside knowledge, facts, or assumptions not explicitly stated in these files.`
 
@@ -64,10 +65,18 @@ const createAIGenMaterial = async (
     const materialCollection = db.collection('materials')
     const organizationCollection = db.collection('organizations')
     const materialOIds = materialIds.map(el => new ObjectId(el));
-    const materialObjects: MaterialInterface[] = await materialCollection.find({ _id: { $in: materialOIds } }).toArray() as MaterialInterface[];
+    const materialObjects: MaterialInterface[] = await materialCollection.find({ _id: { $in: materialOIds } }).toArray() as MaterialInterface[]; //forse non serve
 
-    const prompt = getPrompt(type, language, numberOfSlides, additionalInstructions)
-    const resultContent = await askLLM(prompt, materialObjects, MODEL_NAMES[type])
+
+    const instructions = getPrompt(type, language, numberOfSlides, additionalInstructions)
+    const relevantDocuments = await retrieveRelevantDocuments(instructions, context.subjectId!, materialOIds)
+    console.log(relevantDocuments)
+    const prompt = `${instructions}
+    -----------------
+    Documents to use:
+    ${relevantDocuments.map((item) => item.text).join("\n")}
+    `
+    const resultContent = await askLLM(prompt, [], MODEL_NAMES[type])
 
     const organization = await organizationCollection.findOne({ _id: context.user!.organizationId });
 

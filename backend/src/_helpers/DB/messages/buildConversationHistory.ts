@@ -3,14 +3,14 @@ import { getDefaultDatabase } from "../../getDatabase";
 import { _ } from "inquirer/dist/commonjs/ui/prompt";
 
 export async function buildConversationHistory(
-  subjectId: string,
-  userId: string,
+  subjectId: ObjectId,
+  userId: ObjectId,
   keepForDashboard: boolean = false,
 ) {
   const db = await getDefaultDatabase();
   const messages = await db
     .collection("messages")
-    .find({ subjectId: new ObjectId(subjectId), userId: new ObjectId(userId) })
+    .find({ subjectId: subjectId, userId: userId })
     .sort({ timestamp: 1 })
     .toArray();
 

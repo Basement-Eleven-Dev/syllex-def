@@ -2,14 +2,14 @@ import { ObjectId } from "mongodb";
 import { getDefaultDatabase } from "../../getDatabase";
 
 export async function saveMessage(
-  subjectId: string,
-  userId: string,
+  subjectId: ObjectId,
+  userId: ObjectId,
   role: "user" | "agent",
   content: string,
 ) {
   const db = await getDefaultDatabase();
   const message = {
-    subjectId: new ObjectId(subjectId),
+    subjectId: subjectId,
     userId: new ObjectId(userId),
     role,
     content,

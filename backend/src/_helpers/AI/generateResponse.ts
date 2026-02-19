@@ -2,18 +2,31 @@ import { getOpenAIClient } from "./getOpenAIClient";
 import { buildConversationHistory } from "../DB/messages/buildConversationHistory";
 import { buildAgent } from "./buildAgent";
 import { retrieveRelevantDocuments } from "./embeddings/retrieveRelevantDocuments";
+import { getDefaultDatabase } from "../getDatabase";
+import { ObjectId } from "mongodb";
 
 export async function generateAIResponse(
   assistantId: string,
   query: string,
-  subjectId: string,
-  userId: string,
+  subjectId: ObjectId,
+  userId: ObjectId,
 ) {
   const openai = await getOpenAIClient();
+  const db = await getDefaultDatabase();
+  const assistant = await db.collection("assistants").findOne({
+    _id: new ObjectId(assistantId),
+  });
+
+  const associatedFileIds: ObjectId[] = assistant?.associatedFileIds || [];
+
+  // Se non ci sono file associati, l'agente non "sa" nulla dai documenti
+  if (associatedFileIds.length === 0) {
+    return '';
+  }
   const extractSemanticContext = await retrieveRelevantDocuments(
     query,
     subjectId,
-    assistantId,
+    associatedFileIds,
   );
   console.log("Contesto estratto:", extractSemanticContext);
   const contextString = extractSemanticContext
