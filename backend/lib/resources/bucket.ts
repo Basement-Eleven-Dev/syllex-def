@@ -2,21 +2,15 @@ import { Bucket, EventType, HttpMethods } from "aws-cdk-lib/aws-s3";
 import { Construct } from "constructs";
 import { BUCKET_NAME } from "../../environment";
 import { RemovalPolicy } from "aws-cdk-lib";
-import { LambdaDestination } from "aws-cdk-lib/aws-s3-notifications";
-import { LambdaConstruct } from "./lambda";
 import {
-  Role,
-  PolicyStatement,
-  Effect,
-  AnyPrincipal,
+  Role
 } from "aws-cdk-lib/aws-iam";
 
 export class MainBucket extends Construct {
   bucket: Bucket;
   constructor(
     scope: Construct,
-    name: string,
-    private lambdaRole: Role,
+    name: string
   ) {
     super(scope, name);
     this.bucket = new Bucket(this, "bucket-main", {
@@ -60,19 +54,5 @@ export class MainBucket extends Construct {
         },
       ],
     });
-
-    this.addNotifications();
-  }
-  addNotifications() {
-    let lambda = new LambdaConstruct(
-      this,
-      "create-object-on-db",
-      "src/_triggers/createDatabaseFile.ts",
-      this.lambdaRole,
-    ).lambda;
-    this.bucket.addEventNotification(
-      EventType.OBJECT_CREATED,
-      new LambdaDestination(lambda),
-    );
   }
 }

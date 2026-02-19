@@ -2,12 +2,11 @@ import { Collection, ObjectId } from "mongodb";
 import { getOpenAIClient } from "../getOpenAIClient";
 import { getDefaultDatabase } from "../../getDatabase";
 
-interface VectorizeDocumentParams {
-  fileId: string;
-  subject:string;
+export interface VectorizeDocumentParams {
+  materialId: string;
+  subject: string;
   teacherId: string;
   documentText: string;
-  assistantId: string;
 }
 
 export interface DocumentChunk {
@@ -24,18 +23,20 @@ export async function vectorizeDocument(
     const openai = await getOpenAIClient();
 
     const db = await getDefaultDatabase();
-    const { fileId, subject, teacherId, documentText } =
+    const { materialId, subject, teacherId, documentText } =
       vectorizeDocumentParams;
     const vector_collection: Collection<DocumentChunk> =
       db.collection("file_embeddings");
 
     // Skip if already vectorized
     const existingCount = await vector_collection.countDocuments({
-      referenced_file_id: new ObjectId(fileId),
+      referenced_file_id: new ObjectId(materialId),
     });
 
     if (existingCount > 0) {
-      console.log(`File ${fileId} already vectorized. Skipping OpenAI call.`);
+      console.log(
+        `File ${materialId} already vectorized. Skipping OpenAI call.`,
+      );
       return;
     }
 
@@ -70,7 +71,7 @@ export async function vectorizeDocument(
     const documentsWithEmbeddings: DocumentChunk[] = [];
 
     console.log(
-      `Vectorizing document ${fileId}: ${validChunks.length} chunks to process in batches of ${batchSize}`,
+      `Vectorizing document ${materialId}: ${validChunks.length} chunks to process in batches of ${batchSize}`,
     );
 
     for (let i = 0; i < validChunks.length; i += batchSize) {
@@ -83,7 +84,7 @@ export async function vectorizeDocument(
 
       const batchResults = response.data.map((item, index) => ({
         text: batch[index],
-        referenced_file_id: new ObjectId(fileId),
+        referenced_file_id: new ObjectId(materialId),
         teacher_id: new ObjectId(teacherId),
         subject: new ObjectId(subject),
         embedding: item.embedding,
@@ -100,10 +101,8 @@ export async function vectorizeDocument(
     if (documentsWithEmbeddings.length > 0) {
       await vector_collection.insertMany(documentsWithEmbeddings);
       console.log(
-        `Successfully stored ${documentsWithEmbeddings.length} embeddings for file ${fileId}`,
+        `Successfully stored ${documentsWithEmbeddings.length} embeddings for material ${materialId}`,
       );
-
-
     }
   } catch (error) {
     console.error("Error in vectorizeDocument:", error);
