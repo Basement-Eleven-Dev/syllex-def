@@ -233,6 +233,12 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     ],
   },
   {
+    apiRoute: "ai/questions",
+    functionPath: "ai/createAiGenQuestion.ts",
+    method: "post",
+    role: "open",
+  },
+  {
     apiRoute: "proxy/gamma/{generationId}",
     functionPath: "ai/gammaGenerationProxy.ts",
     method: "get",

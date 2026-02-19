@@ -35,6 +35,7 @@ export class DefaultLambdaRole extends Construct {
           "bedrock:InvokeModel",
           "bedrock:InvokeModelWithResponseStream",
           "ses:SendEmail",
+          "sqs:*"
         ],
       })
     );

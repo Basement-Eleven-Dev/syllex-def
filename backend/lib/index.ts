@@ -11,22 +11,24 @@ import {
 import { DefaultLambdaRole } from "./resources/roles";
 import { DeployStack } from "./resources/api/api_stage";
 import { MainBucket } from "./resources/bucket";
+import { VectorizingResources } from "./resources/background/vectorizingStack";
 
 export class CdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
 
-
     let role = new DefaultLambdaRole(this, "role_default_v2").role;
-    let bucket = new MainBucket(this, BUCKET_NAME, role).bucket;
+    let bucket = new MainBucket(this, BUCKET_NAME).bucket;
     let cognito = new CognitoUserPool(this, POOL_NAME);
+    let indexingTriggerStack = new VectorizingResources(this, 'material_background_vectorization', role);
     let apiGatewayInstance = new RestApiGateway(
       this,
       API_NAME,
       cognito.cognitoPool,
       cognito.cognitoPoolClient,
-      role
+      role,
+      indexingTriggerStack.queue.queueUrl.toString()
     );
     new DeployStack(this, { restApiId: apiGatewayInstance.apiGateway.restApiId, methods: apiGatewayInstance.methods })
 

@@ -13,6 +13,8 @@ import { Duration } from "aws-cdk-lib";
 import { API_GATEWAY_TIMEOUT } from "../../../src/env";
 import { AppRole, FUNCTION_INTEGRATIONS } from "./functions-declarations.config";
 import { RouteConstruct } from "./api_route";
+import { SqsQueue } from "aws-cdk-lib/aws-events-targets";
+import { Queue } from "aws-cdk-lib/aws-sqs";
 
 
 export class RestApiGateway extends Construct {
@@ -37,7 +39,8 @@ export class RestApiGateway extends Construct {
         },
         integrations: integrations,
         cognitoPoolId: this.cognitoPool.userPoolId,
-        cognitoClientId: this.cognitoClient.userPoolClientId
+        cognitoClientId: this.cognitoClient.userPoolClientId,
+        indexingQueueUrl: this.indexingQueueUrl
       })
       this.methods.concat(nestedStack.methods);
     });
@@ -94,7 +97,8 @@ export class RestApiGateway extends Construct {
     name: string,
     private cognitoPool: UserPool,
     private cognitoClient: UserPoolClient,
-    private defaultRole: Role
+    private defaultRole: Role,
+    private indexingQueueUrl: string
   ) {
     super(scope, name);
     this.apiGateway = new RestApi(this, name + "API", {
