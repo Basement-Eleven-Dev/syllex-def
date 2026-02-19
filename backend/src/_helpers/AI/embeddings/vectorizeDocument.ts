@@ -2,7 +2,7 @@ import { Collection, ObjectId } from "mongodb";
 import { getOpenAIClient } from "../getOpenAIClient";
 import { getDefaultDatabase } from "../../getDatabase";
 
-interface VectorizeDocumentParams {
+export interface VectorizeDocumentParams {
   materialId: string;
   subject: string;
   teacherId: string;
