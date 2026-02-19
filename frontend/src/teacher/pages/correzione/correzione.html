@@ -81,9 +81,7 @@
         >
         <p class="mb-0 cardDescription text-dark small text-center">
           Tempo impiegato<br />
-          <small style="font-size: 0.6em"
-            >(max : {{ (d.maxTime / 60) | number:'1.0-0' }}min)</small
-          >
+          <small style="font-size: 0.6em">(max : {{ (d.maxTime) }}min)</small>
         </p>
       </div>
     </div>
@@ -133,6 +131,7 @@
   <app-question-correction
     [index]="questionIndex() + 1"
     [data]="d.questions[questionIndex()]"
+    [isReviewed]="d.status === 'reviewed'"
     [attemptId]="id"
   />
   } }
