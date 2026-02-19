@@ -109,6 +109,12 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
+    apiRoute: "materials/{materialId}",
+    functionPath: "materials/getMaterialById.ts",
+    method: "get",
+    role: "student",
+  },
+  {
     apiRoute: "materials/{materialId}/move",
     functionPath: "materials/moveMaterial.ts",
     method: "post",
@@ -260,7 +266,7 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     apiRoute: "events",
     functionPath: "events/getEvents.ts",
     method: "get",
-    role: "teacher",
+    role: "logged",
   },
   {
     apiRoute: "events",

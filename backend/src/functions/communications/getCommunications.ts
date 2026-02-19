@@ -28,13 +28,13 @@ const getCommunications = async (
   const filter: any = {};
 
   // Solo comunicazioni del teacher loggato
-  if (context.user?._id) {
+  if (context.user?._id && context.user.role === "teacher") {
     filter.teacherId = context.user._id;
   }
 
   // può essere passata
   if (subjectId) {
-    filter.subjectId = subjectId;
+    filter.subjectId = new ObjectId(subjectId);
   } else {
     // se non è passata, ma c'è nel contesto (perché siamo in un endpoint figlio di una materia), filtro per quella
     if (context.subjectId) {
@@ -64,8 +64,6 @@ const getCommunications = async (
       { materialIds: { $size: 0 } },
     ];
   }
-
-  return filters;
 
   // Query con paginazione, ordinata per data (più recenti prima)
   const communications = await communicationsCollection

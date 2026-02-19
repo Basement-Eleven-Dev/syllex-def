@@ -5,12 +5,12 @@ import {
   ComunicazioneInterface,
   ComunicazioniService,
 } from '../../../services/comunicazioni-service';
-import { ComunicazioneCard } from '../../../teacher/components/comunicazione-card/comunicazione-card';
+import { StudentComunicazioneCard } from '../../components/student-comunicazione-card/student-comunicazione-card';
 import { SyllexPagination } from '../../../teacher/components/syllex-pagination/syllex-pagination';
 
 @Component({
   selector: 'app-student-comunicazioni',
-  imports: [Calendario, ComunicazioneCard, SyllexPagination],
+  imports: [Calendario, StudentComunicazioneCard, SyllexPagination],
   templateUrl: './student-comunicazioni.html',
   styleUrl: './student-comunicazioni.scss',
 })

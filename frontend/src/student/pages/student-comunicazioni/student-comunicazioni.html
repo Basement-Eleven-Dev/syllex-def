@@ -34,9 +34,8 @@
 @for (comunicazione of Comunicazioni(); track comunicazione._id) {
 <div
   class="mb-3"
-  app-comunicazione-card
+  app-student-comunicazione-card
   [comunicazione]="comunicazione"
-  [readonly]="true"
 ></div>
 } @empty {
 <div class="alert alert-info text-center">

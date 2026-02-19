@@ -1,0 +1,13 @@
+.attachment-badge {
+  background-color: var(--bs-light);
+  color: var(--bs-dark);
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+
+  &:hover {
+    cursor: pointer;
+    background-color: var(--bs-dark);
+    color: var(--bs-light);
+  }
+}

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import {
   FontAwesomeModule,
@@ -12,6 +12,7 @@ import {
   faRobot,
   faUser,
 } from '@fortawesome/pro-solid-svg-icons';
+import { Auth } from '../../../services/auth';
 
 export interface NavRoute {
   label: string;
@@ -25,6 +26,7 @@ export interface NavRoute {
   styleUrl: './nav.scss',
 })
 export class Nav {
+  private authService = inject(Auth);
   routes: NavRoute[] = [
     { label: 'Dashboard', icon: faHouse, route: '/s/dashboard' },
     {
@@ -37,4 +39,8 @@ export class Nav {
     { label: 'Agenti', icon: faRobot, route: '/s/agente' },
     { label: 'Profilo', icon: faUser, route: '/s/profilo' },
   ];
+
+  onLogout(): void {
+    this.authService.logout();
+  }
 }
