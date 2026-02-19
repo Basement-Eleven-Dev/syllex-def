@@ -1,7 +1,7 @@
 import { getOpenAIClient } from "./getOpenAIClient";
-import { askRAG } from "./embeddings/askRag";
 import { buildConversationHistory } from "../DB/messages/buildConversationHistory";
 import { buildAgent } from "./buildAgent";
+import { retrieveRelevantDocuments } from "./embeddings/retrieveRelevantDocuments";
 
 export async function generateAIResponse(
   assistantId: string,
@@ -10,7 +10,11 @@ export async function generateAIResponse(
   userId: string,
 ) {
   const openai = await getOpenAIClient();
-  const extractSemanticContext = await askRAG(query, subjectId, assistantId);
+  const extractSemanticContext = await retrieveRelevantDocuments(
+    query,
+    subjectId,
+    assistantId,
+  );
   console.log("Contesto estratto:", extractSemanticContext);
   const contextString = extractSemanticContext
     .map((item) => item.text)
