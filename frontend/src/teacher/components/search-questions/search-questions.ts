@@ -1,4 +1,11 @@
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  computed,
+  input,
+  signal,
+} from '@angular/core';
 import { CdkDrag, DragDropModule } from '@angular/cdk/drag-drop';
 import { Subject, takeUntil, debounceTime } from 'rxjs';
 import { QuestionCard } from '../question-card/question-card';
@@ -23,11 +30,21 @@ import { SyllexPagination } from '../syllex-pagination/syllex-pagination';
   styleUrl: './search-questions.scss',
 })
 export class SearchQuestions implements OnInit, OnDestroy {
+  // Input: IDs of questions already added to the test
+  readonly selectedQuestionIds = input<string[]>([]);
+
   filteredQuestions = signal<QuestionInterface[]>([]);
   totalQuestions = signal<number>(0);
   isLoading = signal<boolean>(false);
   currentPage = signal<number>(1);
   readonly pageSize = 3;
+
+  // Questions visible in the list (excluding already-selected ones)
+  readonly visibleQuestions = computed(() =>
+    this.filteredQuestions().filter(
+      (q) => !this.selectedQuestionIds().includes(q._id),
+    ),
+  );
 
   private currentFilters: {
     searchTerm?: string;

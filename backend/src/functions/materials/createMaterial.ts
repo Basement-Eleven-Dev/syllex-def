@@ -11,6 +11,7 @@ const createMaterial = async (
 ) => {
   // Parse and validate request body
   const body = JSON.parse(request.body || "{}");
+  console.log("Received createMaterial request with body:", body);
 
   if (!body.material) {
     throw createError(400, "I dati del materiale sono richiesti");
@@ -59,7 +60,7 @@ const createMaterial = async (
       $push: { content: material._id },
     } as any);
   }
-  await startIndexingJob(material._id)
+  await startIndexingJob(material._id);
   return {
     success: true,
     material,

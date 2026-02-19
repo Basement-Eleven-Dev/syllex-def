@@ -205,6 +205,12 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
+    apiRoute: "tests/{testId}/duplicate",
+    functionPath: "tests/duplicateTest.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
     apiRoute: "tests/assignments-to-grade/count",
     functionPath: "tests/countAssignmentsToGrade.ts",
     method: "get",
@@ -265,6 +271,12 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
   {
     apiRoute: "attempts/class/{classId}",
     functionPath: "tests/getClassAttempts.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "attempts/class/{classId}/topics-performance",
+    functionPath: "tests/getClassTopicsPerformance.ts",
     method: "get",
     role: "teacher",
   },

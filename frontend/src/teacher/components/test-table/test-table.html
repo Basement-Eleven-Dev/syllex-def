@@ -13,7 +13,7 @@
     <tbody>
       @for(test of tests; track $index){
       <tr [class.row-with-pending-corrections]="false">
-        <td class="fw-bold">{{ test.name }}</td>
+        <td>{{ test.name }}</td>
         <td vertical-align="middle">
           <div class="d-flex flex-row align-items-center gap-2">
             <div [class]="'status-pill ' + test.status"></div>
@@ -69,6 +69,7 @@
               <app-test-contextual-menu
                 [test]="test"
                 (delete)="delete.emit($event)"
+                (duplicate)="duplicate.emit($event)"
               ></app-test-contextual-menu>
             </div>
           </div>

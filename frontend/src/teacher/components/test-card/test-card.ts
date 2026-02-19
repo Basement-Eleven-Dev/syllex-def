@@ -45,6 +45,7 @@ export class TestCard {
 
   @Input() test!: TestInterface;
   @Output() delete = new EventEmitter<string>();
+  @Output() duplicate = new EventEmitter<string>();
 
   constructor(public classiService: ClassiService) {}
 

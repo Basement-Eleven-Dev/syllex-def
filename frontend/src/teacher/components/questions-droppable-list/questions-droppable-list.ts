@@ -1,20 +1,19 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   EventEmitter,
   Input,
-  Output,
-  ViewChild,
-  ViewChildren,
-  QueryList,
   OnChanges,
+  Output,
   SimpleChanges,
-  AfterViewInit,
+  computed,
+  signal,
 } from '@angular/core';
 import {
   CdkDragDrop,
+  CdkDragPlaceholder,
   DragDropModule,
   moveItemInArray,
-  transferArrayItem,
 } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import {
@@ -25,165 +24,134 @@ import { QuestionCard } from '../question-card/question-card';
 import { forkJoin } from 'rxjs';
 import { ConfirmActionDirective } from '../../../directives/confirm-action.directive';
 
+/** Extends QuestionInterface with the points assigned in test composition. */
+export type QuestionWithPoints = QuestionInterface & { points: number };
+
 @Component({
   selector: 'app-questions-droppable-list',
   standalone: true,
-  imports: [DragDropModule, CommonModule, QuestionCard, ConfirmActionDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    DragDropModule,
+    CdkDragPlaceholder,
+    CommonModule,
+    QuestionCard,
+    ConfirmActionDirective,
+  ],
   templateUrl: './questions-droppable-list.html',
   styleUrl: './questions-droppable-list.scss',
 })
-export class QuestionsDroppableList implements OnChanges, AfterViewInit {
+export class QuestionsDroppableList implements OnChanges {
   @Input() testName: string = 'Nuovo Test';
   @Input() questionsToLoad?: { questionId: string; points: number }[];
-  @Output() questionsChanged = new EventEmitter<QuestionInterface[]>();
+  @Output() questionsChanged = new EventEmitter<QuestionWithPoints[]>();
   @Output() saveTest = new EventEmitter<{
     name: string;
-    questions: QuestionInterface[];
+    questions: QuestionWithPoints[];
   }>();
 
-  @ViewChildren(QuestionCard) questionCards!: QueryList<QuestionCard>;
+  // ── State ──────────────────────────────────────────────────────────────────
+  readonly selectedQuestions = signal<QuestionWithPoints[]>([]);
+  readonly isDraggingOver = signal(false);
+  readonly isLoadingQuestions = signal(false);
 
-  selectedQuestions: QuestionInterface[] = [];
-  questionPointsMap: Map<string, number> = new Map();
-  isLoadingQuestions = false;
+  // ── Derived ────────────────────────────────────────────────────────────────
+  readonly totalPoints = computed(() =>
+    this.selectedQuestions().reduce((sum, q) => sum + q.points, 0),
+  );
 
   constructor(private questionsService: QuestionsService) {}
 
-  ngAfterViewInit(): void {
-    // Quando i QuestionCard cambiano, imposta i punteggi (dopo il tick)
-    this.questionCards.changes.subscribe(() => {
-      setTimeout(() => this.setQuestionPoints());
-    });
-  }
-
+  // ── Lifecycle ──────────────────────────────────────────────────────────────
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['questionsToLoad'] && this.questionsToLoad) {
+    if (changes['questionsToLoad'] && this.questionsToLoad?.length) {
       this.loadQuestionsFromIds(this.questionsToLoad);
     }
   }
 
-  loadQuestionsFromIds(
-    questionsData: { questionId: string; points: number }[],
-  ): void {
-    if (!questionsData || questionsData.length === 0) {
-      return;
-    }
-
-    console.log('Loading questions from IDs:', questionsData);
-    this.isLoadingQuestions = true;
-    this.questionPointsMap.clear();
-
-    // Crea array di observables per caricare tutte le domande
-    const loadObservables = questionsData.map((qData) => {
-      this.questionPointsMap.set(qData.questionId, qData.points);
-      return this.questionsService.loadQuestion(qData.questionId);
-    });
-
-    forkJoin(loadObservables).subscribe({
-      next: (questions) => {
-        console.log('Questions loaded successfully:', questions);
-        // Mantieni l'ordinamento originale
-        this.selectedQuestions = questions;
-        this.isLoadingQuestions = false;
-        this.emitChanges();
-
-        // Imposta i punteggi DOPO il tick
-        setTimeout(() => this.setQuestionPoints());
-      },
-      error: (error) => {
-        console.error('Errore durante il caricamento delle domande:', error);
-        this.isLoadingQuestions = false;
-      },
-    });
+  // ── Drag & Drop ────────────────────────────────────────────────────────────
+  onDragEnter(): void {
+    this.isDraggingOver.set(true);
   }
 
-  setQuestionPoints(): void {
-    const cardsArray = this.questionCards?.toArray() || [];
-    console.log(
-      'Setting points for cards:',
-      cardsArray.length,
-      'Questions:',
-      this.selectedQuestions.length,
-    );
-    cardsArray.forEach((card, index) => {
-      const question = this.selectedQuestions[index];
-      if (question) {
-        const savedPoints = this.questionPointsMap.get(question._id);
-        if (savedPoints !== undefined) {
-          console.log(
-            `Setting ${savedPoints} points for question ${question._id}`,
-          );
-          card.points = savedPoints;
-        }
-      }
-    });
+  onDragExit(): void {
+    this.isDraggingOver.set(false);
   }
 
-  onDrop(event: CdkDragDrop<QuestionInterface[]>): void {
+  onDrop(event: CdkDragDrop<QuestionWithPoints[]>): void {
+    this.isDraggingOver.set(false);
+
     if (event.previousContainer === event.container) {
-      // Riordino all'interno della stessa lista
-      moveItemInArray(
-        this.selectedQuestions,
-        event.previousIndex,
-        event.currentIndex,
-      );
+      // Reorder within the same list
+      const items = [...this.selectedQuestions()];
+      moveItemInArray(items, event.previousIndex, event.currentIndex);
+      this.selectedQuestions.set(items);
     } else {
-      // Trasferimento da un'altra lista
-      const droppedQuestion = event.item.data as QuestionInterface;
+      // Cross-list transfer from search panel
+      const dropped = event.item.data as QuestionInterface;
+      if (this.selectedQuestions().some((q) => q._id === dropped._id)) return;
 
-      // Verifica che la domanda non sia già presente
-      const exists = this.selectedQuestions.some(
-        (q) => q._id === droppedQuestion._id,
-      );
-      if (exists) {
-        console.warn('Domanda già aggiunta al test');
-        return;
-      }
-
-      // Crea una copia della domanda e la aggiunge alla lista
-      this.selectedQuestions.splice(event.currentIndex, 0, {
-        ...droppedQuestion,
-      });
+      const items = [...this.selectedQuestions()];
+      items.splice(event.currentIndex, 0, { ...dropped, points: 1 });
+      this.selectedQuestions.set(items);
     }
 
     this.emitChanges();
   }
 
+  // ── List mutations ─────────────────────────────────────────────────────────
+  updatePoints(questionId: string, points: number): void {
+    this.selectedQuestions.update((list) =>
+      list.map((q) => (q._id === questionId ? { ...q, points } : q)),
+    );
+    this.emitChanges();
+  }
+
   removeQuestion(questionId: string): void {
-    this.selectedQuestions = this.selectedQuestions.filter(
-      (q) => q._id !== questionId,
+    this.selectedQuestions.update((list) =>
+      list.filter((q) => q._id !== questionId),
     );
     this.emitChanges();
   }
 
   clearAll(): void {
-    this.selectedQuestions = [];
+    this.selectedQuestions.set([]);
     this.emitChanges();
   }
 
-  onSave(): void {
-    if (this.selectedQuestions.length === 0) {
-      alert('Aggiungi almeno una domanda al test');
-      return;
-    }
-    this.saveTest.emit({
-      name: this.testName,
-      questions: this.selectedQuestions,
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  getQuestionsByType(type: string): number {
+    return this.selectedQuestions().filter((q) => q.type === type).length;
+  }
+
+  // ── Private ────────────────────────────────────────────────────────────────
+  private loadQuestionsFromIds(
+    questionsData: { questionId: string; points: number }[],
+  ): void {
+    this.isLoadingQuestions.set(true);
+
+    const pointsMap = new Map(
+      questionsData.map((d) => [d.questionId, d.points]),
+    );
+    const requests = questionsData.map((d) =>
+      this.questionsService.loadQuestion(d.questionId),
+    );
+
+    forkJoin(requests).subscribe({
+      next: (questions) => {
+        this.selectedQuestions.set(
+          questions.map((q) => ({ ...q, points: pointsMap.get(q._id) ?? 1 })),
+        );
+        this.isLoadingQuestions.set(false);
+        this.emitChanges();
+      },
+      error: () => {
+        this.isLoadingQuestions.set(false);
+      },
     });
   }
 
   private emitChanges(): void {
-    this.questionsChanged.emit([...this.selectedQuestions]);
-  }
-
-  getTotalPoints(): number {
-    if (!this.questionCards) return 0;
-    return this.questionCards.toArray().reduce((total, card) => {
-      return total + (card.points || 0);
-    }, 0);
-  }
-
-  getQuestionsByType(type: string): number {
-    return this.selectedQuestions.filter((q) => q.type === type).length;
+    this.questionsChanged.emit([...this.selectedQuestions()]);
   }
 }

@@ -49,6 +49,37 @@
               (input)="onOpenAnswerChange($any($event.target).value)"
               placeholder="Scrivi la tua risposta qui..."
             ></textarea>
+            } @else if(question.type === 'vero falso') {
+            <ol type="A" class="mb-0 ps-0 gap-2 d-flex flex-column">
+              <li
+                class="d-flex align-items-center gap-2 student-option"
+                [class.selected]="selectedAnswer === 'Vero'"
+                [class.disabled]="locked"
+              >
+                <input
+                  type="radio"
+                  [name]="'q_' + question._id"
+                  [checked]="selectedAnswer === 'Vero'"
+                  [disabled]="locked"
+                  (change)="onSelectOption('Vero')"
+                />
+                <label class="mb-0">Vero</label>
+              </li>
+              <li
+                class="d-flex align-items-center gap-2 student-option"
+                [class.selected]="selectedAnswer === 'Falso'"
+                [class.disabled]="locked"
+              >
+                <input
+                  type="radio"
+                  [name]="'q_' + question._id"
+                  [checked]="selectedAnswer === 'Falso'"
+                  [disabled]="locked"
+                  (change)="onSelectOption('Falso')"
+                />
+                <label class="mb-0">Falso</label>
+              </li>
+            </ol>
             } @else {
             <ol type="A" class="mb-0 ps-0 gap-2 d-flex flex-column">
               @for (option of question.options; track $index) {
@@ -68,7 +99,40 @@
               </li>
               }
             </ol>
-            } } @else {
+            } } @else { @if(question.type === 'vero falso') {
+            <ol type="A" class="mb-0 ps-0 gap-2 d-flex flex-column">
+              <li
+                [class.correct]="question.correctAnswer === true"
+                class="d-flex align-items-center gap-2"
+              >
+                <input
+                  type="radio"
+                  name="vf-{{ question._id }}"
+                  [checked]="question.correctAnswer === true"
+                  disabled
+                />
+                <span>Vero</span>
+                @if(question.correctAnswer === true) {
+                <fa-icon [icon]="CheckIcon"></fa-icon>
+                }
+              </li>
+              <li
+                [class.correct]="question.correctAnswer === false"
+                class="d-flex align-items-center gap-2"
+              >
+                <input
+                  type="radio"
+                  name="vf-{{ question._id }}"
+                  [checked]="question.correctAnswer === false"
+                  disabled
+                />
+                <span>Falso</span>
+                @if(question.correctAnswer === false) {
+                <fa-icon [icon]="CheckIcon"></fa-icon>
+                }
+              </li>
+            </ol>
+            } @else {
             <ol type="A" class="mb-0 ps-0 gap-2 d-flex flex-column">
               @for (option of question.options; track $index) {
               <li
@@ -83,7 +147,7 @@
               </li>
               }
             </ol>
-            }
+            } }
           </section>
 
           @if(showExplanation && !studentMode) {
@@ -150,6 +214,7 @@
         class="form-control form-control-sm custom-input"
         style="width: 150px"
         [(ngModel)]="points"
+        (ngModelChange)="pointsChange.emit($event)"
         value="1"
         step="1"
         min="1"

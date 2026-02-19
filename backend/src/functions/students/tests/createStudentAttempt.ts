@@ -52,10 +52,13 @@ const createStudentAttempt = async (
     if (needsPointsPatch && Object.keys(incomingPointsMap).length > 0) {
       const patchedQuestions = existing.questions.map((q) => {
         const qId = (q.question as any)._id?.toString?.();
-        return {
-          ...q,
-          points: incomingPointsMap[qId] ?? (q as any).points ?? 0,
-        };
+        return sanitizeAttemptQuestions([
+          {
+            question: q.question,
+            answer: q.answer,
+            points: incomingPointsMap[qId] ?? (q as any).points ?? 0,
+          },
+        ])[0];
       });
       const patchedMaxScore = patchedQuestions.reduce(
         (sum, q) => sum + ((q as any).points ?? 0),

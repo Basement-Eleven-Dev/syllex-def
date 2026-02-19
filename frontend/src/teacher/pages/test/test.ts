@@ -161,4 +161,16 @@ export class Test implements OnDestroy {
     this.Tests.update((tests) => tests.filter((t) => t._id !== testId));
     this.CollectionSize.update((size) => size - 1);
   }
+
+  onDuplicateTest(testId: string): void {
+    this.testsService.duplicateTest(testId).subscribe({
+      next: (response) => {
+        this.Tests.update((tests) => [response.test, ...tests]);
+        this.CollectionSize.update((size) => size + 1);
+      },
+      error: (err: Error) => {
+        console.error('Errore durante la duplicazione del test:', err);
+      },
+    });
+  }
 }

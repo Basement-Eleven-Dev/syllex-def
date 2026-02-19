@@ -3,10 +3,8 @@
 </button>
 @if(['bozza', 'archiviato'].includes(test.status!)) {
 <button ngbDropdownItem>Pubblica</button>
-} @else if(['pubblicato'].includes(test.status!)) {
-<button ngbDropdownItem>Archivia</button>
 }
-<button ngbDropdownItem>Duplica</button>
+<button ngbDropdownItem (click)="duplicate.emit(test._id)">Duplica</button>
 <button ngbDropdownItem (click)="onRequestAssignToClass()">Assegna</button>
 <div class="dropdown-divider"></div>
 <button

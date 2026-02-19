@@ -23,7 +23,10 @@ import {
   faSave,
   faSparkles,
 } from '@fortawesome/pro-solid-svg-icons';
-import { QuestionsDroppableList } from '../../components/questions-droppable-list/questions-droppable-list';
+import {
+  QuestionsDroppableList,
+  QuestionWithPoints,
+} from '../../components/questions-droppable-list/questions-droppable-list';
 import { SearchQuestions } from '../../components/search-questions/search-questions';
 import { ClassSelector } from '../../components/class-selector/class-selector';
 import { ClassiService } from '../../../services/classi-service';
@@ -78,6 +81,7 @@ export class CreateEditTest implements OnInit {
 
   // UI State
   readonly IsLoading = signal<boolean>(false);
+  readonly SelectedQuestionIds = signal<string[]>([]);
   readonly QuestionsToLoad = signal<
     { questionId: string; points: number }[] | undefined
   >(undefined);
@@ -188,14 +192,10 @@ export class CreateEditTest implements OnInit {
   }
 
   get maxScore(): number {
-    if (!this.questionsComponent?.selectedQuestions) return 0;
-    const questionCardsArray =
-      this.questionsComponent.questionCards?.toArray() || [];
-    return this.questionsComponent.selectedQuestions.reduce(
-      (total, q, index) => {
-        return total + (questionCardsArray[index]?.points || 1);
-      },
-      0,
+    return (
+      this.questionsComponent
+        ?.selectedQuestions()
+        .reduce((sum, q) => sum + q.points, 0) ?? 0
     );
   }
 
@@ -206,7 +206,7 @@ export class CreateEditTest implements OnInit {
       form.title &&
       form.availableFrom &&
       form.classes?.length > 0 &&
-      this.questionsComponent?.selectedQuestions?.length > 0 &&
+      this.questionsComponent?.selectedQuestions()?.length > 0 &&
       form.requiredScore > 0 &&
       form.requiredScore <= this.maxScore
     );
@@ -216,6 +216,10 @@ export class CreateEditTest implements OnInit {
     this.FormChanged(); // Trigger on form changes
     return !!this.TestForm.value.title;
   });
+
+  onQuestionsChanged(questions: QuestionWithPoints[]): void {
+    this.SelectedQuestionIds.set(questions.map((q) => q._id));
+  }
 
   onClassesChange(classIds: string[]): void {
     this.TestForm.get('classes')?.setValue(classIds);
@@ -272,16 +276,9 @@ export class CreateEditTest implements OnInit {
 
   private prepareTestData(asDraft: boolean, subjectId: string): TestInterface {
     const formValue = this.TestForm.value;
-    const questionsWithPoints = this.questionsComponent.selectedQuestions.map(
-      (q, index) => {
-        const questionCardsArray =
-          this.questionsComponent.questionCards?.toArray() || [];
-        return {
-          questionId: q._id,
-          points: questionCardsArray[index]?.points || 1,
-        };
-      },
-    );
+    const questionsWithPoints = this.questionsComponent
+      .selectedQuestions()
+      .map((q) => ({ questionId: q._id, points: q.points }));
 
     const testData: TestInterface = {
       name: formValue.title,

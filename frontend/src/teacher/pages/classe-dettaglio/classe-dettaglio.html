@@ -50,8 +50,8 @@
       [students]="StudentsData()"
       [testsCount]="AssignedTestsCount()"
     />
-    } @if (ActiveSectionId() === 2) {
-    <app-statistiche-classe />
+    } @else if (ActiveSectionId() === 2) {
+    <app-statistiche-classe [classId]="ClassData()!._id" />
     }
   </div>
 </div>

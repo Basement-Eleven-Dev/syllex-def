@@ -76,12 +76,22 @@ const getAttemptDetails = async (request: APIGatewayProxyEvent) => {
       else if (resultStatus === "correct") questionsStats.correct++;
       else questionsStats.wrong++;
     } else {
-      // Per le CHIUSE: deduciamo tutto dal confronto answer <-> options
-      const correctOption = q.question.options?.find(
-        (opt: any) => opt.isCorrect,
-      );
-      const isCorrect =
-        q.answer?.toString().trim() === correctOption?.label?.toString().trim();
+      // Per le CHIUSE: deduciamo tutto dal confronto answer <-> options / correctAnswer
+      let isCorrect = false;
+
+      if (q.question.type === "vero falso") {
+        // "vero falso" usa correctAnswer: boolean, lo studente risponde 'Vero'/'Falso'
+        isCorrect =
+          (q.answer === "Vero" && q.question.correctAnswer === true) ||
+          (q.answer === "Falso" && q.question.correctAnswer === false);
+      } else {
+        const correctOption = q.question.options?.find(
+          (opt: any) => opt.isCorrect,
+        );
+        isCorrect =
+          q.answer?.toString().trim() ===
+          correctOption?.label?.toString().trim();
+      }
 
       if (isCorrect) {
         resultStatus = "correct";

@@ -64,7 +64,9 @@ export const getCurrentUser = async (
 ): Promise<User | null> => {
   const client = await mongoClient();
   try {
-    const token = (request.headers.authorization || request.headers.Authorization)?.split(" ")[1];
+    const token = (
+      request.headers.authorization || request.headers.Authorization
+    )?.split(" ")[1];
     if (!token) return null;
     const decodedToken = await getAuthCognitoUser(token);
     if (!decodedToken) return null;

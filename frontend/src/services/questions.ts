@@ -18,6 +18,31 @@ export interface QuestionInterface {
   correctAnswer?: boolean;
 }
 
+/* {
+  "_id": {
+    "$oid": "69972cdededf1e0825c4f79f"
+  },
+  "name": "Diritto del Mare",
+  "teacherId": {
+    "$oid": "6977308e6f329430d296e552"
+  }
+}
+
+{
+  text: 'La capitale d\'Italia è Roma.',
+  type: 'vero falso',
+  explanation: 'La capitale d\'Italia è Roma ed è una città ricca di storia e cultura.',
+  policy: 'public',
+  topicId: '123',
+  subjectId: {
+    "$oid": "69972cdededf1e0825c4f79f"
+  },
+  teacherId: {
+    "$oid": "6977308e6f329430d296e552"
+  },
+  correctAnswer: true,
+} */
+
 @Injectable({
   providedIn: 'root',
 })

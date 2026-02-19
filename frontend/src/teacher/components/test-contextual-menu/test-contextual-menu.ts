@@ -14,6 +14,7 @@ import { AssignClass } from '../assign-class/assign-class';
 export class TestContextualMenu {
   @Input() test!: TestInterface;
   @Output() delete = new EventEmitter<string>();
+  @Output() duplicate = new EventEmitter<string>();
 
   constructor(private modalService: NgbModal) {}
 
