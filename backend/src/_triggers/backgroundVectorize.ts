@@ -30,10 +30,9 @@ export const vectorizeMaterialAndUpdateMaterialStatus = async (
   const textExtracted = await extractTextFromFile(buffer, ext);
   const vectorizeParams: VectorizeDocumentParams = {
     materialId: materialId.toString(),
-    subject: material.subject.toString(),
+    subject: material.subjectId.toString(),
     teacherId: material.teacherId.toString(),
     documentText: textExtracted,
-    assistantId: material.assistantId.toString(),
   };
   const vectorizeDocumentResult = await vectorizeDocument(vectorizeParams);
 
@@ -43,6 +42,7 @@ export const vectorizeMaterialAndUpdateMaterialStatus = async (
 };
 
 export const startIndexingJob = async (materialId: ObjectId) => {
+  console.log(process.env, "enviroment");
   if (!process.env.INDEXING_QUEUE_URL) {
     await vectorizeMaterialAndUpdateMaterialStatus(materialId);
     return;

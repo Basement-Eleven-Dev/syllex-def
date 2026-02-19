@@ -7,7 +7,6 @@ export interface VectorizeDocumentParams {
   subject: string;
   teacherId: string;
   documentText: string;
-  assistantId: string;
 }
 
 export interface DocumentChunk {

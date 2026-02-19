@@ -64,7 +64,9 @@ export const getCurrentUser = async (
 ): Promise<User | null> => {
   const client = await mongoClient();
   try {
-    const token = (request.headers.authorization || request.headers.Authorization)?.split(" ")[1];
+    const token = (
+      request.headers.authorization || request.headers.Authorization
+    )?.split(" ")[1];
     if (!token) return null;
     const decodedToken = await getAuthCognitoUser(token);
     console.log("Decoded token:", decodedToken);
@@ -73,9 +75,7 @@ export const getCurrentUser = async (
       .db(DB_NAME)
       .collection("users")
       .findOne({ cognitoId: decodedToken.sub });
-    console.log("User found in DB:", user);
-    console.log("Db name:", DB_NAME);
-    console.log("LOGGER", user);
+
     return user as User | null;
   } catch (error) {
     return null;
