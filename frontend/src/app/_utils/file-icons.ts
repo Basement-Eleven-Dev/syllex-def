@@ -66,6 +66,7 @@ export function getFileIcon(extension: string): IconDefinition {
 }
 
 export function getIconColor(extension: string): string {
+  if (!extension) return '#4A5568'; // Default color for files without extension
   switch (extension.toLowerCase()) {
     case 'pdf':
       return '#E53E3E'; // Red
