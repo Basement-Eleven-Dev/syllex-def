@@ -82,6 +82,7 @@ export class QuestionCard {
   @Input() teacherFeedback: string | null = null;
   @Output() removeMe = new EventEmitter<string>();
   @Output() onExpand = new EventEmitter<string>();
+  @Output() pointsChange = new EventEmitter<number>();
   @Output() answerChange = new EventEmitter<number | string>();
 
   onExpandImage(img: string): void {

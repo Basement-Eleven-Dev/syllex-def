@@ -1,23 +1,31 @@
 import {
   Component,
-  effect,
   ElementRef,
-  Injector,
+  OnDestroy,
+  computed,
+  effect,
+  inject,
+  input,
   viewChild,
 } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import {
-  Chart,
-  ChartConfiguration,
   BarController,
   BarElement,
   CategoryScale,
-  LinearScale,
-  Tooltip,
+  Chart,
+  ChartConfiguration,
   Legend,
+  LinearScale,
   Title,
+  Tooltip,
 } from 'chart.js';
+import { catchError, of, startWith, switchMap } from 'rxjs';
+import {
+  TestsService,
+  TopicPerformance,
+} from '../../../services/tests-service';
 
-// Register Chart.js components
 Chart.register(
   BarController,
   BarElement,
@@ -34,58 +42,71 @@ Chart.register(
   templateUrl: './topics-performance-chart.html',
   styleUrl: './topics-performance-chart.scss',
 })
-export class TopicsPerformanceChart {
-  // Mock data: topic names with average performance scores (1-100)
-  topicsPerformance = [
-    { topic: 'Algebra', score: 85 },
-    { topic: 'Geometria', score: 78 },
-    { topic: 'Trigonometria', score: 92 },
-    { topic: 'Funzioni', score: 68 },
-    { topic: 'Derivate', score: 88 },
-    { topic: 'Integrali', score: 75 },
-    { topic: 'Limiti', score: 82 },
-  ];
+export class TopicsPerformanceChart implements OnDestroy {
+  private readonly testsService = inject(TestsService);
 
-  readonly chartRef = viewChild<ElementRef<HTMLCanvasElement>>('chart');
-  chart?: Chart;
+  readonly classId = input.required<string>();
+  readonly ChartRef = viewChild<ElementRef<HTMLCanvasElement>>('chart');
 
-  constructor(private injector: Injector) {
-    effect(
-      () => {
-        const canvasRef = this.chartRef();
-        if (canvasRef) {
-          this.createTopicsPerformanceChart(canvasRef);
-        }
-      },
-      { injector: this.injector },
-    );
+  private chart?: Chart;
+
+  // null = request in-flight, object = request settled
+  readonly TopicsData = toSignal(
+    toObservable(this.classId).pipe(
+      switchMap((id) =>
+        this.testsService.getClassTopicsPerformance(id).pipe(
+          startWith(null),
+          catchError(() => of({ topicsPerformance: [] })),
+        ),
+      ),
+    ),
+  );
+
+  readonly IsLoading = computed(() => this.TopicsData() == null);
+  readonly IsEmpty = computed(() => {
+    const data = this.TopicsData();
+    return data != null && data.topicsPerformance.length === 0;
+  });
+
+  constructor() {
+    effect(() => {
+      const canvasRef = this.ChartRef();
+      const response = this.TopicsData();
+
+      console.log('TopicsData changed:', response);
+      if (
+        canvasRef &&
+        response != null &&
+        response.topicsPerformance.length > 0
+      ) {
+        this.drawChart(canvasRef, response.topicsPerformance);
+      }
+    });
   }
 
-  private createTopicsPerformanceChart(
-    canvasRef: ElementRef<HTMLCanvasElement>,
-  ): void {
-    // Destroy existing chart if present
-    if (this.chart) {
-      this.chart.destroy();
-    }
+  ngOnDestroy(): void {
+    this.chart?.destroy();
+  }
 
-    const labels = this.topicsPerformance.map((t) => t.topic);
-    const data = this.topicsPerformance.map((t) => t.score);
+  private drawChart(
+    canvasRef: ElementRef<HTMLCanvasElement>,
+    data: TopicPerformance[],
+  ): void {
+    this.chart?.destroy();
 
     const ctx = canvasRef.nativeElement.getContext('2d');
-    if (!ctx) {
-      console.error('Failed to get 2D context');
-      return;
-    }
+    if (!ctx) return;
+
+    console.log('Drawing chart with data:', data);
 
     const config: ChartConfiguration = {
       type: 'bar',
       data: {
-        labels: labels,
+        labels: data.map((t) => t.topicName),
         datasets: [
           {
             label: 'Performance media',
-            data: data,
+            data: data.map((t) => t.percentage),
             backgroundColor: '#13214985',
             borderRadius: 8,
           },
@@ -98,39 +119,26 @@ export class TopicsPerformanceChart {
           y: {
             beginAtZero: true,
             max: 100,
-            ticks: {
-              stepSize: 10,
-            },
+            ticks: { stepSize: 10 },
             title: {
               display: true,
               text: 'Performance (%)',
-              font: {
-                size: 14,
-                weight: 'bold',
-              },
+              font: { size: 14, weight: 'bold' },
             },
           },
           x: {
             title: {
               display: true,
               text: 'Argomenti',
-              font: {
-                size: 14,
-                weight: 'bold',
-              },
+              font: { size: 14, weight: 'bold' },
             },
           },
         },
         plugins: {
-          legend: {
-            display: false,
-          },
+          legend: { display: false },
           tooltip: {
             callbacks: {
-              label: (context) => {
-                const score = context.parsed.y;
-                return `Performance: ${score}%`;
-              },
+              label: (context) => `Performance: ${context.parsed.y}%`,
             },
           },
         },

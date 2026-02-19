@@ -38,6 +38,12 @@ interface TestDetailsResponse {
   attempts: any[]; // Qui puoi usare la tua AttemptInterface
 }
 
+export interface TopicPerformance {
+  topicId: string;
+  topicName: string;
+  percentage: number;
+}
+
 export interface AttemptInterface {
   _id: string;
   studentId: string;
@@ -95,6 +101,13 @@ export class TestsService {
     );
   }
 
+  duplicateTest(testId: string) {
+    return this.http.post<{ test: TestInterface }>(
+      `tests/${testId}/duplicate`,
+      {},
+    );
+  }
+
   countAssignmentsToGrade() {
     return this.http.get<{ count: number }>('tests/assignments-to-grade/count');
   }
@@ -145,6 +158,12 @@ export class TestsService {
     return this.http.post<{ score: number; explanation: string }>(
       `attempts/${attemptId}/${questionId}/correction/ai`,
       {},
+    );
+  }
+
+  getClassTopicsPerformance(classId: string) {
+    return this.http.get<{ topicsPerformance: TopicPerformance[] }>(
+      `attempts/class/${classId}/topics-performance`,
     );
   }
 }

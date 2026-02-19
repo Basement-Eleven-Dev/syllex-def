@@ -1,17 +1,17 @@
 <div class="droppable-container d-flex flex-column">
   <!-- Statistiche Test -->
-  @if (selectedQuestions.length > 0) {
+  @if (selectedQuestions().length > 0) {
   <div class="test-stats card mb-3 p-3 bg-light">
     <div class="row">
       <div class="col-md-3">
         <div class="stat-item">
-          <strong class="h5 mb-0">{{ selectedQuestions.length }}</strong>
+          <strong class="h5 mb-0">{{ selectedQuestions().length }}</strong>
           <small class="text-muted d-block">Domande</small>
         </div>
       </div>
       <div class="col-md-3">
         <div class="stat-item">
-          <strong class="h5 mb-0">{{ getTotalPoints() }}</strong>
+          <strong class="h5 mb-0">{{ totalPoints() }}</strong>
           <small class="text-muted d-block">Punti Totali</small>
         </div>
       </div>
@@ -39,16 +39,19 @@
   <!-- Drop Zone -->
   <div class="flex-fill">
     <section
-      class="drop-zone p-4 rounded-syllex h-100 overflow-scroll"
-      [class.has-items]="selectedQuestions.length > 0"
-      [class.empty]="selectedQuestions.length === 0"
+      class="drop-zone p-4 rounded-syllex"
+      [class.has-items]="selectedQuestions().length > 0"
+      [class.empty]="selectedQuestions().length === 0"
+      [class.dragging-over]="isDraggingOver()"
       cdkDropList
       id="test-drop-list"
       cdkDropListSortingEnabled
-      [cdkDropListData]="selectedQuestions"
+      [cdkDropListData]="selectedQuestions()"
+      (cdkDropListEntered)="onDragEnter()"
+      (cdkDropListExited)="onDragExit()"
       (cdkDropListDropped)="onDrop($event)"
     >
-      @if (selectedQuestions.length === 0) {
+      @if (selectedQuestions().length === 0) {
       <div class="empty-state text-center py-5">
         <i class="bi bi-file-earmark-plus display-1 text-muted mb-3"></i>
         <p class="text-muted mb-0">
@@ -56,25 +59,30 @@
         </p>
       </div>
       } @else {
-      <div class="selected-questions-list">
-        @for (question of selectedQuestions; track question._id; let last =
-        $last; let index = $index) {
+      <div class="selected-questions-list d-flex flex-column gap-3">
+        @for (question of selectedQuestions(); track question._id; let index =
+        $index) {
         <div
           app-question-card
           cdkDrag
           [question]="question"
           [index]="index"
+          [points]="question.points"
           [showTestCompositionActions]="true"
           [showIndex]="true"
-          [class.mb-3]="!last"
+          (pointsChange)="updatePoints(question._id, $event)"
           (removeMe)="removeQuestion($event)"
-        ></div>
+        >
+          <div *cdkDragPlaceholder class="drag-drop-placeholder">
+            <i class="bi bi-arrow-down-circle me-2"></i>Rilascia qui
+          </div>
+        </div>
         }
       </div>
       }
     </section>
 
-    @if (selectedQuestions.length > 0) {
+    @if (selectedQuestions().length > 0) {
     <div class="w-100 text-center mt-3">
       <a
         class="text-danger"

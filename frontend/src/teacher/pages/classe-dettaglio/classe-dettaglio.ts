@@ -17,6 +17,7 @@ import {
   StudentPerformanceData,
 } from '../../../services/class-statistics.service';
 import { TestsService } from '../../../services/tests-service';
+import { JsonPipe } from '@angular/common';
 
 interface ClassDetailSection {
   Id: number;
@@ -33,6 +34,7 @@ interface ClassDetailSection {
     FontAwesomeModule,
     StatisticheClasse,
     StatCard,
+    JsonPipe,
   ],
   templateUrl: './classe-dettaglio.html',
   styleUrl: './classe-dettaglio.scss',
@@ -77,6 +79,7 @@ export class ClasseDettaglio {
   // Computed stats
   readonly Stats = computed<StatCardData[]>(() => {
     const classData = this.ClassData();
+    console.log('Computing stats with classData:', classData);
     if (!classData) return [];
 
     return [

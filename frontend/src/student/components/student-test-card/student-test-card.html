@@ -34,7 +34,9 @@
         [class.btn-primary]="!AttemptStatus()"
         [routerLink]="Route()"
       >
-        @if (IsCompleted()) {
+        @if (AttemptStatus() === 'reviewed') {
+        <fa-icon [icon]="ReviewIcon" class="me-2"></fa-icon>
+        Vedi correzione } @else if (AttemptStatus() === 'delivered') {
         <fa-icon [icon]="ReviewIcon" class="me-2"></fa-icon>
         Rivedi test } @else if (AttemptStatus() === 'in-progress') {
         <fa-icon [icon]="ResumeIcon" class="me-2"></fa-icon>

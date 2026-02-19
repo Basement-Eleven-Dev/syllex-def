@@ -1,6 +1,13 @@
 <div class="chart-container">
   <h5 class="fw-semibold text-dark">Performance per argomento</h5>
+  @if (IsEmpty()) {
+  <p class="text-muted fst-italic">
+    Nessun dato disponibile. I dati appariranno dopo che i test della materia
+    selezionata saranno corretti.
+  </p>
+  } @else {
   <div style="position: relative; height: 400px; width: 100%">
     <canvas #chart></canvas>
   </div>
+  }
 </div>

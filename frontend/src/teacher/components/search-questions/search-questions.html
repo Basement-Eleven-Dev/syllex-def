@@ -10,14 +10,19 @@
     Nessuna domanda trovata con i filtri selezionati. Prova a modificare i
     criteri di ricerca.
   </div>
+  } @else if (visibleQuestions().length === 0) {
+  <div class="alert alert-success" role="alert">
+    <i class="bi bi-check-circle-fill me-2"></i>
+    Tutte le domande di questa pagina sono già state aggiunte al test.
+  </div>
   } @else {
   <div
     cdkDropList
-    [cdkDropListData]="filteredQuestions()"
+    [cdkDropListData]="visibleQuestions()"
     [cdkDropListConnectedTo]="['test-drop-list']"
     cdkDropListSortingDisabled
   >
-    @for (question of filteredQuestions(); track question._id; let last = $last)
+    @for (question of visibleQuestions(); track question._id; let last = $last)
     {
     <div
       app-question-card

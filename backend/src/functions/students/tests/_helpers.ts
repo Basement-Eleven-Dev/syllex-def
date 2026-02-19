@@ -13,6 +13,29 @@ export function sanitizeAttemptQuestions(questions: any[]): AttemptQuestion[] {
   }));
 }
 
+function toObjectId(value: any): ObjectId | undefined {
+  if (!value) return undefined;
+  // Plain string ("abc123...")
+  if (typeof value === "string") {
+    try {
+      return new ObjectId(value);
+    } catch {
+      return undefined;
+    }
+  }
+  // EJSON extended format: { $oid: "abc123..." }
+  if (typeof value === "object" && typeof value.$oid === "string") {
+    try {
+      return new ObjectId(value.$oid);
+    } catch {
+      return undefined;
+    }
+  }
+  // Already an ObjectId instance
+  if (value instanceof ObjectId) return value;
+  return undefined;
+}
+
 function sanitizeQuestionIds(question: any): any {
   if (!question) return question;
 
@@ -20,13 +43,8 @@ function sanitizeQuestionIds(question: any): any {
   const objectIdFields = ["_id", "subjectId", "teacherId", "topicId"];
 
   for (const field of objectIdFields) {
-    if (sanitized[field] && typeof sanitized[field] === "string") {
-      try {
-        sanitized[field] = new ObjectId(sanitized[field]);
-      } catch {
-        // Keep as-is if not a valid ObjectId
-      }
-    }
+    const converted = toObjectId(sanitized[field]);
+    if (converted) sanitized[field] = converted;
   }
 
   return sanitized;

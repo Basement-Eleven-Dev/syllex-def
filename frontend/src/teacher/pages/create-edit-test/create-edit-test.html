@@ -119,11 +119,15 @@
     ></app-questions-search-filters>
     <div class="row mt-5">
       <div class="col-6">
-        <app-search-questions #questionsSearched></app-search-questions>
+        <app-search-questions
+          #questionsSearched
+          [selectedQuestionIds]="SelectedQuestionIds()"
+        ></app-search-questions>
       </div>
       <div class="col-6">
         <app-questions-droppable-list
           [questionsToLoad]="QuestionsToLoad()"
+          (questionsChanged)="onQuestionsChanged($event)"
         ></app-questions-droppable-list>
       </div>
     </div>

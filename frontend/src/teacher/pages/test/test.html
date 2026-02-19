@@ -58,12 +58,20 @@
 </section>
 
 @if(ViewType === 'table') {
-<app-test-table [tests]="Tests()" (delete)="onDeleteTest($event)" />
+<app-test-table
+  [tests]="Tests()"
+  (delete)="onDeleteTest($event)"
+  (duplicate)="onDuplicateTest($event)"
+/>
 } @else {
 <div class="row">
   @for(test of Tests(); track test._id) {
   <div class="col-12 col-lg-6 col-xl-4 mb-3">
-    <app-test-card [test]="test" (delete)="onDeleteTest($event)" />
+    <app-test-card
+      [test]="test"
+      (delete)="onDeleteTest($event)"
+      (duplicate)="onDuplicateTest($event)"
+    />
   </div>
   } @empty {
   <div class="col-12">
