@@ -1,7 +1,7 @@
 import pdf from "pdf-parse";
 import mammoth from "mammoth";
 import * as xlsx from "xlsx";
-
+import { extractWithGeminiVision } from "../AI/exctractWithGeminiVision";
 
 export async function extractTextFromFile(
   buffer: Buffer,
@@ -12,6 +12,17 @@ export async function extractTextFromFile(
   try {
     if (ext === "pdf") {
       const data = await pdf(buffer);
+      // Se il PDF ha poco testo (scansione), usa Gemini
+      const hasActualText = /[a-z0-9]/i.test(data.text);
+
+      if (!hasActualText || data.text.trim().length < 100) {
+        if (buffer.byteLength > 20 * 1024 * 1024) {
+          throw new Error("File troppo grande per l'analisi vision (max 20MB)");
+        }
+        console.log("PDF sembra una scansione. Uso Gemini...");
+        return await extractWithGeminiVision(buffer, "application/pdf");
+      }
+
       return data.text;
     } else if (ext === "docx" || ext === "doc") {
       const result = await mammoth.extractRawText({ buffer });
