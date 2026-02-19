@@ -42,6 +42,7 @@ export function isTextFile(extension: string): boolean {
 }
 
 export function getFileIcon(extension: string): IconDefinition {
+  if (!extension) return faFile; // Default icon for files without extension
   console.log('Getting icon for extension:', extension);
   switch (extension.toLowerCase()) {
     case 'pdf':
