@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
+import { QuestionInterface } from './questions';
 
 export interface StudentTestInterface {
   _id: string;
@@ -9,6 +10,35 @@ export interface StudentTestInterface {
   status: string;
   availableFrom?: string;
   availableTo?: string;
+  timeLimit?: number;
+  teacherId?: string;
+  subjectId?: string;
+  questions?: {
+    questionId: string | { $oid: string };
+    points: number;
+  }[];
+}
+
+export interface AttemptQuestionData {
+  question: QuestionInterface;
+  answer: number | string | null;
+  points?: number;
+  score?: number;
+  teacherComment?: string;
+  status?: 'correct' | 'wrong' | 'semi-correct';
+}
+
+export interface StudentAttemptInterface {
+  _id?: string;
+  testId: string;
+  subjectId?: string;
+  teacherId?: string;
+  status: 'in-progress' | 'delivered' | 'reviewed';
+  startedAt: string;
+  deliveredAt?: string;
+  reviewedAt?: string;
+  timeSpent: number;
+  questions: AttemptQuestionData[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -18,27 +48,51 @@ export class StudentTestsService {
   getAvailableTests(
     searchTerm: string = '',
   ): Observable<StudentTestInterface[]> {
-    console.log('Fetching available tests with searchTerm:', searchTerm);
     const params: any = {};
     if (searchTerm) params.searchTerm = searchTerm;
 
-    // The backend returns { tests, total }, so map to just tests
-    const response = this.http.get<{
-      tests: StudentTestInterface[];
-      total: number;
-    }>('students/tests', {
-      params,
-    });
-    return response.pipe(
-      // Only return the array of tests
-      map(
-        (res: { tests: StudentTestInterface[]; total: number }) =>
-          res.tests || [],
-      ),
-    );
+    return this.http
+      .get<{ tests: StudentTestInterface[]; total: number }>('students/tests', {
+        params,
+      })
+      .pipe(map((res) => res.tests || []));
   }
 
-  submitTestAttempt(attempt: any) {
-    return this.http.post('students/test/execution', attempt);
+  getAttemptByTestId(
+    testId: string,
+  ): Observable<StudentAttemptInterface | null> {
+    return this.http
+      .get<{
+        attempt: StudentAttemptInterface | null;
+      }>(`students/test/${testId}/attempt`)
+      .pipe(map((res) => res.attempt ?? null));
+  }
+
+  createAttempt(
+    attempt: StudentAttemptInterface,
+  ): Observable<StudentAttemptInterface> {
+    return this.http
+      .post<{
+        attempt: StudentAttemptInterface;
+      }>('students/test/attempt', attempt)
+      .pipe(map((res) => res.attempt));
+  }
+
+  updateAttempt(
+    attemptId: string,
+    data: Partial<StudentAttemptInterface>,
+  ): Observable<StudentAttemptInterface> {
+    return this.http
+      .put<{
+        attempt: StudentAttemptInterface;
+      }>(`students/test/attempt/${attemptId}`, data)
+      .pipe(map((res) => res.attempt));
+  }
+
+  submitTestAttempt(attemptId: string): Observable<void> {
+    return this.http.post<void>(
+      `students/test/attempt/${attemptId}/submit`,
+      {},
+    );
   }
 }

@@ -1,77 +1,87 @@
+@if (isLoading()) {
+<div class="d-flex justify-content-center align-items-center py-5">
+  <fa-icon
+    [icon]="SpinnerIcon"
+    [animation]="'spin'"
+    size="3x"
+    class="text-primary"
+  ></fa-icon>
+</div>
+} @else if (data(); as d) {
+
 <div class="d-flex flex-row align-items-center mb-5">
   <div class="flex-fill">
-    <h1 class="text-dark fw-bold mb-0 display-6">{{ data.testTitle }}</h1>
+    <h1 class="text-dark fw-bold mb-0 display-6">{{ d.testTitle }}</h1>
     <div class="d-flex flex-column gap-2 mt-3">
       <span class="text-dark mb-0">
-        <fa-icon [icon]="UserIcon" class="me-2"></fa-icon>{{ data.studentName}}
+        <fa-icon [icon]="UserIcon" class="me-2"></fa-icon>{{ d.studentName }}
       </span>
       <span class="text-dark mb-0">
-        <fa-icon [icon]="ClockIcon" class="me-2"></fa-icon>{{
-        data.submissionDate| date:'short' }}
+        <fa-icon [icon]="ClockIcon" class="me-2"></fa-icon>
+        {{ d.submissionDate | date:'short' }}
       </span>
     </div>
   </div>
   <span
     class="badge fs-5 p-3 rounded-pill"
     id="statusBadge"
-    [class.da-correggere]="data.status === 'da correggere'"
-    [class.corretto]="data.status === 'corretto'"
+    [class.da-correggere]="d.status === 'delivered'"
+    [class.corretto]="d.status === 'reviewed'"
   >
-    {{ data.status| titlecase }}
+    {{ (d.status === 'delivered' ? 'da correggere' : 'corretto') | titlecase }}
   </span>
 </div>
 
 <div class="row">
-  <div class="col-7">
+  <div class="col-12 col-lg-8 mb-3">
     <div class="card h-100 shadow">
       <div class="card-body d-flex flex-row align-items-center">
-        <div class="px-5">
-          <span class="cardValue text-dark"
-            >{{ data.score }}<span class="reduced"
-              >/{{ data.maxScore}}</span
-            ></span
-          >
+        <div class="px-5 border-end">
+          <span class="cardValue text-dark">
+            {{ d.score != null ? d.score : '?' }}<span class="reduced"
+              >/{{ d.maxScore }}</span
+            >
+          </span>
           <p class="mb-0 cardDescription text-dark">Punteggio</p>
         </div>
         <div class="flex-fill d-flex flex-column justify-content-center">
           <div
             class="d-flex flex-row justify-content-around align-items-center"
           >
-            <span class="cardValue fs-1 text-success"
-              >{{ data.questionsStats.correct }}
-              <fa-icon [icon]="CheckIcon"></fa-icon
-            ></span>
-            <span class="cardValue fs-1 text-danger"
-              >{{ data.questionsStats.wrong }}
-              <fa-icon [icon]="TimesIcon"></fa-icon
-            ></span>
-            <span class="cardValue fs-1 text-warning"
-              >{{ data.questionsStats.dubious }}
-              <fa-icon [icon]="QuestionMarkIcon"></fa-icon
-            ></span>
-            <span class="cardValue fs-1" style="color: rgb(166, 166, 166)"
-              >{{ data.questionsStats.empty }}
-              <fa-icon [icon]="CircleIcon"></fa-icon
-            ></span>
+            <span class="cardValue fs-1 text-success">
+              {{ d.questionsStats.correct }}
+              <fa-icon [icon]="CheckIcon"></fa-icon>
+            </span>
+            <span class="cardValue fs-1 text-danger">
+              {{ d.questionsStats.wrong }}
+              <fa-icon [icon]="TimesIcon"></fa-icon>
+            </span>
+            <span class="cardValue fs-1 text-warning">
+              {{ d.questionsStats.dubious }}
+              <fa-icon [icon]="QuestionMarkIcon"></fa-icon>
+            </span>
+            <span class="cardValue fs-1" style="color: rgb(166, 166, 166)">
+              {{ d.questionsStats.empty }}
+              <fa-icon [icon]="CircleIcon"></fa-icon>
+            </span>
           </div>
           <p class="mb-0 cardDescription text-dark text-center">Risposte</p>
         </div>
       </div>
     </div>
   </div>
-  <div class="col-3">
+
+  <div class="col-12 col-lg-4 mb-3">
     <div class="card h-100 shadow">
       <div
         class="card-body d-flex flex-column justify-content-center align-items-center"
       >
         <span class="cardValue text-dark"
-          >{{ data.timeSpent * 1000 | date: 'mm:ss' }}</span
+          >{{ d.timeSpent * 1000 | date: 'mm:ss' }}</span
         >
         <p class="mb-0 cardDescription text-dark small text-center">
           Tempo impiegato<br />
-          <small style="font-size: 0.6em"
-            >(max : {{ (data.maxTime / 60) }}min)</small
-          >
+          <small style="font-size: 0.6em">(max : {{ (d.maxTime) }}min)</small>
         </p>
       </div>
     </div>
@@ -79,27 +89,54 @@
 </div>
 
 <section class="form-section mt-5">
-  <label for="titolo" class="form-label text-dark fw-bold"
-    >{{ data.status == 'corretto' ? 'Correzione' : 'Precorrezione AI'}}</label
-  >
-  <p class="text-dark">
-    L'AI di Syllex ha già analizzato il compito di questo studente. Revisona le
-    domande e conferma le correzioni. Puoi modificare quando necessario.
-  </p>
-
+  <div class="d-flex justify-content-between align-items-end mb-4">
+    <div>
+      <label class="form-label text-dark fw-bold fs-3">
+        {{ d.status === 'reviewed' ? 'Correzione' : 'Precorrezione AI' }}
+      </label>
+      <p class="text-dark mb-0">
+        L'AI ha già analizzato il compito. Revisiona le domande e conferma la
+        correzione finale.
+      </p>
+    </div>
+    @if(d.status != 'reviewed') {
+    <button
+      class="btn btn-primary btn-lg shadow"
+      (click)="submitCorrection()"
+      [disabled]="isSaving() || !allQuestionsAreScored"
+    >
+      @if (isSaving()) {
+      <fa-icon [icon]="SpinnerIcon" [animation]="'spin'" class="me-2"></fa-icon>
+      } @else {
+      <fa-icon [icon]="CheckIcon" class="me-2"></fa-icon>
+      } Finalizza Correzione</button
+    >}
+  </div>
   <div class="d-flex flex-row align-items-center gap-2 flex-wrap mb-5">
-    @for(i of [].constructor(data.totalQuestions); track $index;) {
+    @for(q of d.questions; track $index) {
     <button
       class="btn btn-light btnSelectQuestion"
-      [class.selected]="questionIndex === $index"
+      [class.correct]="q?.answer?.result === 'correct'"
+      [class.wrong]="q?.answer?.result === 'wrong'"
+      [class.open]="q?.answer?.result === 'dubious'"
+      [class.empty]="q?.answer?.result === 'empty'"
+      [class.selected]="questionIndex() === $index"
       (click)="selectQuestion($index)"
     >
-      {{ $index +1 }}
+      {{ $index + 1 }}
     </button>
     }
   </div>
+  @if (attemptId(); as id) { @if (d.questions[questionIndex()]) {
   <app-question-correction
-    [index]="questionIndex + 1"
-    [data]="data.questions[questionIndex]"
-  ></app-question-correction>
+    [index]="questionIndex() + 1"
+    [data]="d.questions[questionIndex()]"
+    [isReviewed]="d.status === 'reviewed'"
+    [attemptId]="id"
+  />
+  } }
 </section>
+
+} @else {
+<div class="alert alert-warning">Impossibile caricare i dati del test.</div>
+}

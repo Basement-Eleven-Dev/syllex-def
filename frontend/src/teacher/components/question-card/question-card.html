@@ -1,6 +1,8 @@
 <div
-  class="d-flex align-items-start gap-2 card question-card p-3 h-100"
+  class="card d-flex gap-2 question-card p-3 h-100"
   [class.moveable]="showTestCompositionActions"
+  [class.locked]="locked"
+  [class.dimmed]="dimmed"
   id="questionCard"
 >
   <div class="card-body">
@@ -12,10 +14,11 @@
           {{ question.policy | titlecase }}
         </div>
         } @if(showIndex){<span class="badge bg-dark"># {{ index + 1 }}</span>}
-        <span class="text-primary">{{ question.type }}</span> |
         <span class="text-muted"
           >{{ materiaService.getTopicName(question.topicId) }}</span
         >
+        |
+        <span class="text-primary">{{ question.type }}</span>
       </div>
 
       <div>
@@ -37,6 +40,35 @@
           </section>
 
           <section class="my-3">
+            @if(studentMode) { @if(question.type === 'risposta aperta') {
+            <textarea
+              class="form-control"
+              rows="4"
+              [value]="selectedAnswer ?? ''"
+              [disabled]="locked"
+              (input)="onOpenAnswerChange($any($event.target).value)"
+              placeholder="Scrivi la tua risposta qui..."
+            ></textarea>
+            } @else {
+            <ol type="A" class="mb-0 ps-0 gap-2 d-flex flex-column">
+              @for (option of question.options; track $index) {
+              <li
+                class="d-flex align-items-center gap-2 student-option"
+                [class.selected]="selectedAnswer === option.label"
+                [class.disabled]="locked"
+              >
+                <input
+                  type="radio"
+                  [name]="'q_' + question._id"
+                  [checked]="selectedAnswer === option.label"
+                  [disabled]="locked"
+                  (change)="onSelectOption(option.label)"
+                />
+                <label class="mb-0">{{ option.label }}</label>
+              </li>
+              }
+            </ol>
+            } } @else {
             <ol type="A" class="mb-0 ps-0 gap-2 d-flex flex-column">
               @for (option of question.options; track $index) {
               <li
@@ -51,18 +83,45 @@
               </li>
               }
             </ol>
+            }
           </section>
 
-          @if(showExplanation) {
+          @if(showExplanation && !studentMode) {
           <section>
             <p class="mb-0 fw-light text-muted">Correzione</p>
             <p>{{ question.explanation }}</p>
+          </section>
+          } @if(studentMode && questionStatus) {
+          <hr class="my-2" />
+          <section class="d-flex flex-column gap-2">
+            <div class="d-flex align-items-center gap-3">
+              <span
+                class="badge"
+                [class.bg-success]="questionStatus === 'correct'"
+                [class.bg-danger]="questionStatus === 'wrong'"
+                [class.bg-warning]="questionStatus === 'semi-correct'"
+                [class.text-dark]="questionStatus === 'semi-correct'"
+              >
+                @switch(questionStatus) { @case('correct') { Corretta }
+                @case('wrong') { Errata } @case('semi-correct') { Parzialmente
+                corretta } }
+              </span>
+              @if(score !== null) {
+              <span class="fw-semibold">Punteggio: {{ score }}</span>
+              }
+            </div>
+            <div>
+              <p class="mb-0 fw-light text-muted">Commento del docente</p>
+              <p class="mb-0">
+                {{ teacherFeedback || 'Il docente non ha lasciato commenti.' }}
+              </p>
+            </div>
           </section>
           }
         </div>
       </div>
     </div>
-    @if(showBancaActions) {
+    @if(!studentMode && showBancaActions) {
     <div class="d-flex flex-row gap-1 justify-content-end w-100">
       <button
         type="button"
@@ -84,7 +143,7 @@
     }
 
     <!-- Azioni -->
-    @if(showTestCompositionActions) {
+    @if(!studentMode && showTestCompositionActions) {
     <div class="d-flex flex-row gap-1 justify-content-between w-100 mt-4">
       <input
         type="number"

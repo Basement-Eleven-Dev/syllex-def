@@ -1,12 +1,5 @@
-import { DatePipe, NgComponentOutlet } from '@angular/common';
-import {
-  Component,
-  computed,
-  DestroyRef,
-  inject,
-  OnInit,
-  signal,
-} from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
@@ -15,27 +8,31 @@ import {
   faSpinnerThird,
   faTrash,
   faUsers,
+  faPaperPlane,
+  faChartBar,
+  faCheckCircle,
 } from '@fortawesome/pro-solid-svg-icons';
 import { BackTo } from '../../components/back-to/back-to';
 import { StatCard, StatCardData } from '../../components/stat-card/stat-card';
 import { TestAssignments } from '../../components/test-assignments/test-assignments';
 import { TestStats } from '../../components/test-stats/test-stats';
 import { FeedbackService } from '../../../services/feedback-service';
-import { TestInterface, TestsService } from '../../../services/tests-service';
+import { TestsService } from '../../../services/tests-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-interface TestSection {
-  id: number;
-  title: string;
-  icon: any;
-  component: any;
-}
+// Mappatura icone: associa le stringhe del backend agli oggetti FontAwesome
+const IconMap: Record<string, any> = {
+  'paper-plane': faPaperPlane,
+  'chart-bar': faChartBar,
+  'check-circle': faCheckCircle,
+  users: faUsers,
+};
 
 @Component({
   selector: 'app-test-detail',
+  standalone: true,
   imports: [
     DatePipe,
-    NgComponentOutlet,
     FontAwesomeModule,
     TestAssignments,
     TestStats,
@@ -46,67 +43,43 @@ interface TestSection {
   styleUrl: './test-detail.scss',
 })
 export class TestDetail {
-  // Services
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly testsService = inject(TestsService);
   private readonly feedbackService = inject(FeedbackService);
   private readonly destroyRef = inject(DestroyRef);
 
-  // Icons
+  // Icone UI statiche
   readonly UsersIcon = faUsers;
   readonly ChartIcon = faChartLine;
   readonly TrashIcon = faTrash;
   readonly EditIcon = faPencilAlt;
   readonly SpinnerIcon = faSpinnerThird;
 
-  // State
-  readonly TestData = signal<TestInterface | null>(null);
+  // State (Signals)
+  readonly TestData = signal<any | null>(null);
+  readonly BackendStats = signal<any[]>([]);
+  readonly Attempts = signal<any[]>([]);
   readonly IsLoading = signal<boolean>(true);
   readonly ActiveSection = signal<number>(1);
 
   // Computed
   readonly TestId = computed(() => this.route.snapshot.paramMap.get('testId'));
-  readonly TestStats = computed<StatCardData[]>(() => {
-    const test = this.TestData();
-    if (!test) return [];
 
-    return [
-      {
-        Label: 'Consegne',
-        Value: 150,
-      },
-      {
-        Label: 'Punteggio medio',
-        Value: 200,
-      },
-      {
-        Label: 'Idonei',
-        Value: 300,
-      },
-    ];
+  // Trasforma i dati del backend nel formato richiesto dalle StatCard
+  readonly TestStats = computed<StatCardData[]>(() => {
+    return this.BackendStats().map((stat) => ({
+      Label: stat.title,
+      Value: stat.value,
+      Icon: IconMap[stat.icon] || this.ChartIcon,
+    }));
   });
 
-  readonly Sections: TestSection[] = [
-    {
-      id: 1,
-      title: 'Assegnazioni',
-      icon: this.UsersIcon,
-      component: TestAssignments,
-    },
-    {
-      id: 2,
-      title: 'Statistiche',
-      icon: this.ChartIcon,
-      component: TestStats,
-    },
+  // Lista sezioni (rimossa la proprietà 'component' perché usiamo @if nell'HTML)
+  readonly Sections = [
+    { id: 1, title: 'Assegnazioni', icon: this.UsersIcon },
+    { id: 2, title: 'Statistiche', icon: this.ChartIcon },
   ];
-
-  readonly ActiveSectionComponent = computed(
-    () =>
-      this.Sections.find((s) => s.id === this.ActiveSection())?.component ||
-      null,
-  );
 
   constructor() {
     this.loadTestData();
@@ -121,19 +94,22 @@ export class TestDetail {
     }
 
     this.IsLoading.set(true);
+
     this.testsService
-      .getTestById(testId)
+      .getTestAttemptsDetails(testId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
           this.TestData.set(response.test);
-          console.log('Loaded test data:', response.test);
+          this.BackendStats.set(response.stats);
+          this.Attempts.set(response.attempts);
+          console.log(this.Attempts);
           this.IsLoading.set(false);
         },
         error: (error) => {
-          console.error('Error loading test:', error);
+          console.error('Error loading test details:', error);
           this.feedbackService.showFeedback(
-            'Errore nel caricamento del test',
+            'Errore nel caricamento dei dati',
             false,
           );
           this.IsLoading.set(false);
@@ -144,9 +120,7 @@ export class TestDetail {
 
   onEditTest(): void {
     const testId = this.TestId();
-    if (testId) {
-      this.router.navigate(['/t/tests/edit', testId]);
-    }
+    if (testId) this.router.navigate(['/t/tests/edit', testId]);
   }
 
   onDeleteTest(): void {
@@ -164,13 +138,8 @@ export class TestDetail {
           );
           this.router.navigate(['/t/tests']);
         },
-        error: (error) => {
-          console.error('Error deleting test:', error);
-          this.feedbackService.showFeedback(
-            "Errore durante l'eliminazione del test",
-            false,
-          );
-        },
+        error: () =>
+          this.feedbackService.showFeedback('Errore eliminazione', false),
       });
   }
 

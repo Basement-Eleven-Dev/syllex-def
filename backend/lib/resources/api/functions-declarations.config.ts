@@ -109,6 +109,12 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
+    apiRoute: "materials/{materialId}",
+    functionPath: "materials/getMaterialById.ts",
+    method: "get",
+    role: "student",
+  },
+  {
     apiRoute: "materials/{materialId}/move",
     functionPath: "materials/moveMaterial.ts",
     method: "post",
@@ -136,7 +142,7 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     apiRoute: "communications",
     functionPath: "communications/getCommunications.ts",
     method: "get",
-    role: "teacher",
+    role: "logged",
   },
   {
     apiRoute: "communications",
@@ -216,14 +222,15 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     functionPath: "ai/createAiGenMaterial.ts",
     method: "post",
     role: "teacher",
-    extensionLayers: [{
-      name: "pandoc",
-      arn: "arn:aws:lambda:eu-south-1:851725509686:layer:pandoc:1",
-    }/*, {
-    //for pdf conversion - which doesn't work
+    extensionLayers: [
+      {
+        name: "pandoc",
+        arn: "arn:aws:lambda:eu-south-1:851725509686:layer:pandoc:1",
+      } /*, {
       name: "wkhtml",
       arn: "arn:aws:lambda:eu-south-1:851725509686:layer:wkhtmltox:1"
-    }*/],
+    }*/,
+    ],
   },
   {
     apiRoute: "ai/questions",
@@ -265,7 +272,7 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     apiRoute: "events",
     functionPath: "events/getEvents.ts",
     method: "get",
-    role: "teacher",
+    role: "logged",
   },
   {
     apiRoute: "events",
@@ -328,7 +335,7 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "student",
   },
   {
-    apiRoute: "student",
+    apiRoute: "students/tests",
     functionPath: "students/tests/getStudentTests.ts",
     method: "get",
     role: "student",
@@ -340,8 +347,56 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "student",
   },
   {
+    apiRoute: "students/test/{testId}/attempt",
+    functionPath: "students/tests/getStudentAttempt.ts",
+    method: "get",
+    role: "student",
+  },
+  {
+    apiRoute: "students/test/attempt",
+    functionPath: "students/tests/createStudentAttempt.ts",
+    method: "post",
+    role: "student",
+  },
+  {
+    apiRoute: "students/test/attempt/{attemptId}",
+    functionPath: "students/tests/updateStudentAttempt.ts",
+    method: "put",
+    role: "student",
+  },
+  {
+    apiRoute: "students/test/attempt/{attemptId}/submit",
+    functionPath: "students/tests/submitStudentAttempt.ts",
+    method: "post",
+    role: "student",
+  },
+  {
     apiRoute: "assistants/remove-material",
     functionPath: "assistants/removeMaterial.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "test/attempts/details/:testId",
+    functionPath: "tests/getTestAttemptsDetails.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "attempts/details/:attemptId",
+    functionPath: "attempts/getAttemptDetails.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "attempts/:attemptId/correction",
+    functionPath: "attempts/correctAttempt.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "attempts/:attemptId/:questionId/correction/ai",
+    functionPath: "attempts/correctAttemptWithAI.ts",
     method: "post",
     role: "teacher",
   },

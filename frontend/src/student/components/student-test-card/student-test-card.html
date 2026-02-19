@@ -1,0 +1,47 @@
+<div class="card p-3 h-100">
+  <div class="card-body d-flex flex-column gap-4 align-items-start">
+    <span>{{ Test().subjectName }}</span>
+    <h3
+      class="card-title text-dark ellipsis-3-lines mb-0"
+      [title]="Test().name"
+    >
+      {{ Test().name }}
+    </h3>
+
+    <section class="d-flex flex-column gap-2">
+      <div class="text-dark">
+        <fa-icon [icon]="ClockIcon" class="me-1"></fa-icon>
+        @if (Test().availableFrom && Test().availableTo) { Disponibile dal {{
+        Test().availableFrom | date: 'd MMM y' }} al {{ Test().availableTo |
+        date: 'd MMM y' }} } @else if (Test().availableFrom) { Disponibile dal
+        {{ Test().availableFrom | date: 'd MMM y' }} } @else if
+        (Test().availableTo) { Disponibile fino al {{ Test().availableTo | date:
+        'd MMM y' }} }
+      </div>
+
+      <div class="text-dark">
+        <fa-icon [icon]="QuestionsIcon" class="me-1"></fa-icon>
+        {{ QuestionsCount() }} Domande - {{ MaxScore() }} pt.
+      </div>
+    </section>
+
+    <div class="mt-auto w-100">
+      <button
+        class="btn w-100"
+        [class.btn-warning]="AttemptStatus() === 'in-progress'"
+        [class.text-white]="AttemptStatus() === 'in-progress'"
+        [class.btn-success]="IsCompleted()"
+        [class.btn-primary]="!AttemptStatus()"
+        [routerLink]="Route()"
+      >
+        @if (IsCompleted()) {
+        <fa-icon [icon]="ReviewIcon" class="me-2"></fa-icon>
+        Rivedi test } @else if (AttemptStatus() === 'in-progress') {
+        <fa-icon [icon]="ResumeIcon" class="me-2"></fa-icon>
+        Riprendi test } @else {
+        <fa-icon [icon]="PlayIcon" class="me-2"></fa-icon>
+        Compila test }
+      </button>
+    </div>
+  </div>
+</div>

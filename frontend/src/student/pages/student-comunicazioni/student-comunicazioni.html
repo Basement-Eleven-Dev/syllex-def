@@ -1,0 +1,53 @@
+<div class="d-flex flex-row align-items-center mb-5">
+  <div>
+    <h1 class="text-dark fw-medium mb-3 display-6">Comunicazioni ed eventi</h1>
+    <h5 class="text-dark mb-0 fw-normal">
+      Consulta il calendario eventi e i messaggi del tuo insegnante
+    </h5>
+  </div>
+</div>
+
+<section class="d-flex flex-row mb-5 gap-3">
+  <select
+    class="form-select custom-input filter"
+    style="max-width: 280px"
+    [value]="SelectedSubject()"
+    (change)="onSubjectChange($any($event.target).value)"
+  >
+    @for (subject of Subjects(); track subject._id) {
+    <option [value]="subject._id">{{ subject.name }}</option>
+    }
+  </select>
+</section>
+
+<app-calendario
+  [showHeadings]="false"
+  [readonly]="true"
+  [studentMode]="true"
+  [subjectFilter]="SelectedSubject()"
+></app-calendario>
+
+<hr class="my-5" />
+
+<h4 class="fw-semibold mb-4">Comunicazioni della materia</h4>
+
+@for (comunicazione of Comunicazioni(); track comunicazione._id) {
+<div
+  class="mb-3"
+  app-student-comunicazione-card
+  [comunicazione]="comunicazione"
+></div>
+} @empty {
+<div class="alert alert-info text-center">
+  Nessuna comunicazione per questa materia.
+</div>
+} @if (CollectionSize() > PageSize()) {
+<div class="mt-4 d-flex justify-content-end">
+  <app-syllex-pagination
+    [collectionSize]="CollectionSize()"
+    [page]="Page()"
+    [pageSize]="PageSize()"
+    (pageChange)="Page.set($event)"
+  />
+</div>
+}

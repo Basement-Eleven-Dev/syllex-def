@@ -16,7 +16,9 @@
 <div class="mb-3 d-flex flex-row justify-content-between align-items-center">
   <h1 class="mb-0 d-flex flex-row align-items-center gap-2">
     <span [class]="'status-pill ' + TestData()!.status"></span>
-    <h1 class="text-dark fw-medium mb-0 display-6">{{ TestData()!.name }}</h1>
+    <span class="text-dark fw-medium mb-0 display-6"
+      >{{ TestData()!.name }}</span
+    >
   </h1>
 
   <div class="d-flex flex-row gap-2 align-items-center">
@@ -48,17 +50,23 @@
     @for(section of Sections; track section.id) {
     <button
       type="button"
-      class="p-3 rounded-syllex mb-0 section-link fs-5 fw-normal"
+      class="p-3 rounded-syllex mb-0 section-link fs-5 fw-normal text-start"
       [class.active]="ActiveSection() === section.id"
       (click)="onChangeSection(section.id)"
     >
-      <fa-icon [icon]="section.icon"></fa-icon> {{ section.title }}
+      <fa-icon [icon]="section.icon" class="me-2"></fa-icon> {{ section.title }}
     </button>
     }
   </div>
+
   <div class="col-12 col-lg-10">
-    @if (ActiveSectionComponent()) {
-    <ng-container *ngComponentOutlet="ActiveSectionComponent()" />
+    @if (ActiveSection() === 1) {
+    <app-test-assignments [attempts]="Attempts()" />
+    } @else if (ActiveSection() === 2) {
+    <app-test-stats
+      [attempts]="Attempts()"
+      [maxScore]="TestData()?.maxScore || 0"
+    />
     }
   </div>
 </div>

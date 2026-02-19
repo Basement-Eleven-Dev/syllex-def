@@ -17,6 +17,7 @@ const getCommunications = async (
     hasAttachments = "",
     page = "1",
     pageSize = "10",
+    subjectId = "",
   } = request.queryStringParameters || {};
 
   const currentPage = parseInt(page, 10);
@@ -27,13 +28,18 @@ const getCommunications = async (
   const filter: any = {};
 
   // Solo comunicazioni del teacher loggato
-  if (context.user?._id) {
+  if (context.user?._id && context.user.role === "teacher") {
     filter.teacherId = context.user._id;
   }
 
-  // Filtro per subjectId (discriminante fondamentale)
-  if (context.subjectId) {
-    filter.subjectId = context.subjectId;
+  // può essere passata
+  if (subjectId) {
+    filter.subjectId = new ObjectId(subjectId);
+  } else {
+    // se non è passata, ma c'è nel contesto (perché siamo in un endpoint figlio di una materia), filtro per quella
+    if (context.subjectId) {
+      filter.subjectId = context.subjectId;
+    }
   }
 
   // Ricerca testuale su titolo e contenuto

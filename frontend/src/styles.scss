@@ -1,126 +1,103 @@
-/* Font Family: Sofia Pro */
+/* Font Family: Figtree */
 @font-face {
-  font-family: "Sofia Pro";
-  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20UltraLight%20Az.otf")
-    format("opentype");
-  font-weight: 100;
-  font-display: swap;
-  font-style: normal;
-}
-@font-face {
-  font-family: "Sofia Pro";
-  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20UltraLight%20Italic%20Az.otf")
-    format("opentype");
-  font-weight: 100;
-  font-display: swap;
-  font-style: italic;
-}
-@font-face {
-  font-family: "Sofia Pro";
-  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20ExtraLight%20Az.otf")
-    format("opentype");
-  font-weight: 200;
-  font-display: swap;
-  font-style: normal;
-}
-@font-face {
-  font-family: "Sofia Pro";
-  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20ExtraLight%20Italic%20Az.otf")
-    format("opentype");
-  font-weight: 200;
-  font-display: swap;
-  font-style: italic;
-}
-@font-face {
-  font-family: "Sofia Pro";
-  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20Light%20Az.otf") format("opentype");
-  font-weight: 300;
-  font-display: swap;
-  font-style: normal;
-}
-@font-face {
-  font-family: "Sofia Pro";
-  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20Light%20Italic%20Az.otf")
-    format("opentype");
-  font-weight: 300;
-  font-display: swap;
-  font-style: italic;
-}
-@font-face {
-  font-family: "Sofia Pro";
-  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20Regular%20Az.otf") format("opentype");
+  font-family: "Figtree";
+  src: url("/fonts/Figtree/static/Figtree-Regular.ttf") format("truetype");
   font-weight: 400;
-  font-display: swap;
   font-style: normal;
+  font-display: swap;
 }
 @font-face {
-  font-family: "Sofia Pro";
-  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20Regular%20Italic%20Az.otf")
-    format("opentype");
+  font-family: "Figtree";
+  src: url("/fonts/Figtree/static/Figtree-Italic.ttf") format("truetype");
   font-weight: 400;
-  font-display: swap;
   font-style: italic;
+  font-display: swap;
 }
 @font-face {
-  font-family: "Sofia Pro";
-  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20Medium%20Az.otf") format("opentype");
+  font-family: "Figtree";
+  src: url("/fonts/Figtree/static/Figtree-Medium.ttf") format("truetype");
   font-weight: 500;
-  font-display: swap;
   font-style: normal;
+  font-display: swap;
 }
 @font-face {
-  font-family: "Sofia Pro";
-  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20Medium%20Italic%20Az.otf")
-    format("opentype");
+  font-family: "Figtree";
+  src: url("/fonts/Figtree/static/Figtree-MediumItalic.ttf") format("truetype");
   font-weight: 500;
-  font-display: swap;
   font-style: italic;
+  font-display: swap;
 }
 @font-face {
-  font-family: "Sofia Pro";
-  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20Semi%20Bold%20Az.otf")
-    format("opentype");
+  font-family: "Figtree";
+  src: url("/fonts/Figtree/static/Figtree-SemiBold.ttf") format("truetype");
   font-weight: 600;
-  font-display: swap;
   font-style: normal;
+  font-display: swap;
 }
 @font-face {
-  font-family: "Sofia Pro";
-  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20Semi%20Bold%20Italic%20Az.otf")
-    format("opentype");
+  font-family: "Figtree";
+  src: url("/fonts/Figtree/static/Figtree-SemiBoldItalic.ttf")
+    format("truetype");
   font-weight: 600;
-  font-display: swap;
   font-style: italic;
+  font-display: swap;
 }
 @font-face {
-  font-family: "Sofia Pro";
-  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20Bold%20Az.otf") format("opentype");
+  font-family: "Figtree";
+  src: url("/fonts/Figtree/static/Figtree-Bold.ttf") format("truetype");
   font-weight: 700;
-  font-display: swap;
   font-style: normal;
+  font-display: swap;
 }
 @font-face {
-  font-family: "Sofia Pro";
-  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20Bold%20Italic%20Az.otf")
-    format("opentype");
+  font-family: "Figtree";
+  src: url("/fonts/Figtree/static/Figtree-BoldItalic.ttf") format("truetype");
   font-weight: 700;
-  font-display: swap;
   font-style: italic;
+  font-display: swap;
 }
 @font-face {
-  font-family: "Sofia Pro";
-  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20Black%20Az.otf") format("opentype");
+  font-family: "Figtree";
+  src: url("/fonts/Figtree/static/Figtree-Black.ttf") format("truetype");
   font-weight: 900;
-  font-display: swap;
   font-style: normal;
+  font-display: swap;
 }
 @font-face {
-  font-family: "Sofia Pro";
-  src: url("/fonts/Sofia-Pro/Sofia%20Pro%20Black%20Italic%20Az.otf")
-    format("opentype");
+  font-family: "Figtree";
+  src: url("/fonts/Figtree/static/Figtree-BlackItalic.ttf") format("truetype");
   font-weight: 900;
-  font-display: swap;
   font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Figtree";
+  src: url("/fonts/Figtree/static/Figtree-ExtraBold.ttf") format("truetype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Figtree";
+  src: url("/fonts/Figtree/static/Figtree-ExtraBoldItalic.ttf")
+    format("truetype");
+  font-weight: 800;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Figtree";
+  src: url("/fonts/Figtree/static/Figtree-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Figtree";
+  src: url("/fonts/Figtree/static/Figtree-LightItalic.ttf") format("truetype");
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
 }
 
 $primary: #3931ce;
@@ -134,7 +111,7 @@ $dark: #262626;
 $min-contrast-ratio: 4.5;
 $font-size-base: 0.9rem;
 $enable-gradients: false;
-$font-family-sans-serif: "Sofia Pro", sans-serif;
+$font-family-sans-serif: "Figtree", sans-serif;
 $border-radius: 0.75rem;
 $border-radius-sm: 0.5rem;
 $border-radius-lg: 0.9rem;
@@ -171,6 +148,17 @@ $form-select-focus-box-shadow: none;
 
 body {
   background-color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+// Riduci la spaziatura tra lettere su tutto
+html,
+body,
+input,
+textarea,
+select,
+button {
+  letter-spacing: -0.01em;
 }
 
 #authRightColumn {

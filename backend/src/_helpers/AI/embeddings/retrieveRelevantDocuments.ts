@@ -7,7 +7,7 @@ interface RelevantDocument {
   score: number;
 }
 
-export async function askRAG(
+export async function retrieveRelevantDocuments(
   query: string,
   subjectId: string,
   assistantId: string,

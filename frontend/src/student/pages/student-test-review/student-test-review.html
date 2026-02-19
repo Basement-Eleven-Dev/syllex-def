@@ -1,0 +1,58 @@
+<app-back-to [path]="'/s/tests'" [label]="'Torna ai test'" />
+
+@if (IsLoading()) {
+<div class="d-flex justify-content-center align-items-center py-5">
+  <fa-icon
+    [icon]="SpinnerIcon"
+    [animation]="'spin'"
+    [size]="'3x'"
+    class="text-primary"
+  ></fa-icon>
+</div>
+} @else if (Error()) {
+<div class="alert alert-danger" role="alert">{{ Error() }}</div>
+} @else if (Attempt(); as attempt) {
+<!-- Header -->
+<div class="d-flex flex-row justify-content-between align-items-start mb-4">
+  <div>
+    <h1 class="text-dark fw-medium mb-2 display-6">Riepilogo test</h1>
+    <p class="text-muted mb-0">
+      {{ attempt.questions.length }} domande &middot; {{ AnsweredCount() }}
+      risposte fornite
+    </p>
+  </div>
+  <div class="d-flex flex-column align-items-end gap-1">
+    <span class="badge bg-success fs-6 px-3 py-2">{{ Status() }}</span>
+
+    @if (attempt.timeSpent > 0) {
+    <span class="text-muted small">
+      <fa-icon [icon]="ClockIcon" class="me-1"></fa-icon>
+      Tempo impiegato: {{ FormattedTimeSpent() }}
+    </span>
+    } @if (attempt.deliveredAt) {
+    <span class="text-muted small">
+      Consegnato il {{ attempt.deliveredAt | date: 'd MMM y, HH:mm' }}
+    </span>
+    }
+  </div>
+</div>
+
+<!-- Questions (read-only) -->
+<div class="d-flex flex-column gap-3 mb-4">
+  @for (q of attempt.questions; track q.question._id; let i = $index) {
+  <div
+    class="w-100"
+    app-question-card
+    [question]="q.question"
+    [index]="i"
+    [showIndex]="true"
+    [studentMode]="true"
+    [locked]="true"
+    [selectedAnswer]="q.answer"
+    [score]="q.score ?? null"
+    [questionStatus]="q.status ?? null"
+    [teacherFeedback]="q.teacherComment ?? null"
+  ></div>
+  }
+</div>
+}
