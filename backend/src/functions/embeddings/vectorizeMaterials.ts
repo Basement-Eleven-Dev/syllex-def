@@ -84,8 +84,8 @@ const vectorizeMaterials = async (
 
       // Vectorize
       await vectorizeDocument({
-        fileId: material._id.toString(),
-        subject: subjectId!,
+        materialId: material._id.toString(),
+        subject: subjectId!.toString(),
         teacherId: teacherId.toString(),
         documentText: text,
         assistantId: assistantId,
