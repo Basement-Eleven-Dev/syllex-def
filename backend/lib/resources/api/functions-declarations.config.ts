@@ -220,9 +220,16 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
       name: "pandoc",
       arn: "arn:aws:lambda:eu-south-1:851725509686:layer:pandoc:1",
     }/*, {
+    //for pdf conversion - which doesn't work
       name: "wkhtml",
       arn: "arn:aws:lambda:eu-south-1:851725509686:layer:wkhtmltox:1"
     }*/],
+  },
+  {
+    apiRoute: "ai/questions",
+    functionPath: "ai/createAiGenQuestion.ts",
+    method: "post",
+    role: "open",
   },
   {
     apiRoute: "proxy/gamma/{generationId}",
@@ -322,7 +329,7 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
   },
   {
     apiRoute: "student",
-    functionPath: "students/getStudentTests.ts",
+    functionPath: "students/tests/getStudentTests.ts",
     method: "get",
     role: "student",
   },

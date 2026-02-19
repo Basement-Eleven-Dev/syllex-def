@@ -1,9 +1,10 @@
 import { ObjectId } from "mongodb";
 
 export type Question = {
-  _id: ObjectId;
+  _id?: ObjectId;
   type: string;
   text: string;
+  aiGenerated?: boolean;
   explanation: string;
   policy: string;
   topicId: ObjectId;

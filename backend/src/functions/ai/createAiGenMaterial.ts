@@ -56,18 +56,18 @@ const createAIGenMaterial = async (
     const { type, materialIds, numberOfSlides, additionalInstructions, language } = JSON.parse(request.body || '{}') as AIGenMaterialInput
 
     //error handling
-    if (!type || !isDocumentType(type)) throw createHttpError.BadRequest(`type field is required. Accepted values: 'slides'|'map'|'glossary'|'summary'. You passed "${type}"`);
+    if (!type || !isDocumentType(type)) throw createHttpError.BadRequest(`type field is required. Accepted values: ${documentTypes.join(', ')}. You passed "${type}"`);
     if (!(materialIds && materialIds.length > 0)) throw createHttpError.BadRequest("type materialIds is required and not empty: string[]");
 
 
     const db = await getDefaultDatabase();
     const materialCollection = db.collection('materials')
     const organizationCollection = db.collection('organizations')
-    const materialObjects: MaterialInterface[] = await materialCollection.find({ _id: { $in: materialIds.map(el => new ObjectId(el)) } }).toArray() as MaterialInterface[];
+    const materialOIds = materialIds.map(el => new ObjectId(el));
+    const materialObjects: MaterialInterface[] = await materialCollection.find({ _id: { $in: materialOIds } }).toArray() as MaterialInterface[];
 
     const prompt = getPrompt(type, language, numberOfSlides, additionalInstructions)
-    const llmInputMaterialUrls: string[] = materialObjects.map(el => el.url!)
-    const resultContent = await askLLM(prompt, llmInputMaterialUrls, MODEL_NAMES[type])
+    const resultContent = await askLLM(prompt, materialObjects, MODEL_NAMES[type])
 
     const organization = await organizationCollection.findOne({ _id: context.user!.organizationId });
 
@@ -80,18 +80,23 @@ const createAIGenMaterial = async (
         aiGenerated: true,
         type: "file",
         teacherId: context.user!._id,
-        subjectId: context.subjectId!
+        subjectId: context.subjectId!,
+        generatedFrom: materialOIds
     }
+
     if (type == 'glossary' || type == 'summary') {
+        //aggiungi intestazione
         let fileName = type + new ObjectId().toString();
         let markDownFilename = fileName + '.md'
-        let destinationFilename = fileName + '.docx'
+        material.extension = 'docx';
         let mimetype = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-        let pdfFile = await getConvertedDocument(resultContent, markDownFilename, destinationFilename)
+        let destinationFilename = fileName + '.' + material.extension;
+        let pdfFile = await getConvertedDocument(resultContent, markDownFilename, destinationFilename);
         material.name = destinationFilename;
         let bucketKey = 'ai_gen/' + material.name;
         material.url = await uploadContentToS3(bucketKey, pdfFile, mimetype);
     }
+
     if (type == 'slides') {
         let res = await startSlidedeckGeneration({
             inputText: resultContent,
@@ -113,10 +118,12 @@ const createAIGenMaterial = async (
         })
 
         material.url = `https://${request.requestContext.domainName}/${request.requestContext.stage}/proxy/gamma/${res.generationId}`;
-        material.name = type + new ObjectId().toString() + '.pptx';
+        material.extension = 'pptx'
+        material.name = type + new ObjectId().toString() + '.' + material.extension;
     }
     if (type == 'map') {
-        material.name = type + new ObjectId().toString() + '.txt';
+        material.extension = 'txt';
+        material.name = type + new ObjectId().toString() + '.' + material.extension;
         let bucketKey = 'ai_gen/' + material.name;
         let mimetype = 'text/plain; charset=utf-8'
         material.isMap = true;
