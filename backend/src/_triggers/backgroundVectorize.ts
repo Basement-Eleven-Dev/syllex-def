@@ -30,11 +30,11 @@ export const vectorizeMaterialAndUpdateMaterialStatus = async (
   const textExtracted = await extractTextFromFile(buffer, ext);
   const vectorizeParams: VectorizeDocumentParams = {
     materialId: materialId.toString(),
-    subject: material.subjectId.toString(),
-    teacherId: material.teacherId.toString(),
+    subjectId: material.subjectId,
+    teacherId: material.teacherId,
     documentText: textExtracted,
   };
-  const vectorizeDocumentResult = await vectorizeDocument(vectorizeParams);
+  await vectorizeDocument(vectorizeParams);
 
   await db
     .collection("materials")

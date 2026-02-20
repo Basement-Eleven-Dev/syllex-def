@@ -11,7 +11,7 @@ import {
 import { DefaultLambdaRole } from "./resources/roles";
 import { DeployStack } from "./resources/api/api_stage";
 import { MainBucket } from "./resources/bucket";
-import { VectorizingResources } from "./resources/background/vectorizingStack";
+import { VectorizingResources } from "./resources/background/vectorizingConstruct";
 
 export class CdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {

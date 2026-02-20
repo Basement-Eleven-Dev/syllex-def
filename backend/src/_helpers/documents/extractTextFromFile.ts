@@ -1,7 +1,7 @@
 import pdf from "pdf-parse";
 import mammoth from "mammoth";
 import * as xlsx from "xlsx";
-import { extractWithGeminiVision } from "../AI/exctractWithGeminiVision";
+import { extractPDFWithGoogleDocumentAI } from "../AI/exctractWithGeminiVision";
 
 export async function extractTextFromFile(
   buffer: Buffer,
@@ -20,7 +20,7 @@ export async function extractTextFromFile(
           throw new Error("File troppo grande per l'analisi vision (max 20MB)");
         }
         console.log("PDF sembra una scansione. Uso Gemini...");
-        return await extractWithGeminiVision(buffer, "application/pdf");
+        return await extractPDFWithGoogleDocumentAI(buffer);
       }
 
       return data.text;

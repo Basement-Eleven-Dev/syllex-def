@@ -1,7 +1,7 @@
 import "dotenv/config"; // Load .env before anything else
 import express, { Request, Response } from "express";
 import cors from "cors";
-import { FUNCTION_INTEGRATIONS } from "../lib/resources/api/functions-declarations.config";
+import { FUNCTION_INTEGRATIONS, FunctionIntegration } from "../lib/resources/api/functions-declarations.config";
 import { FUNCTIONS_PATH } from "../environment";
 import { canInvoke } from "../src/_request-validators/_helpers";
 const app = express();
@@ -10,8 +10,14 @@ const app = express();
 app.use(express.text({ type: "application/json" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+const testRoute: FunctionIntegration = {
+  apiRoute: 'execute_spot',
+  functionPath: '_test/local_test.ts',
+  role: 'open',
+  method: 'post'
+};
 
-FUNCTION_INTEGRATIONS.forEach((integration) => {
+[...FUNCTION_INTEGRATIONS, testRoute].forEach((integration) => {
   const { apiRoute, functionPath, method, role } = integration;
 
   // Converts 'teachers/{teacherId}/subjects' -> 'teachers/:teacherId/subjects'
