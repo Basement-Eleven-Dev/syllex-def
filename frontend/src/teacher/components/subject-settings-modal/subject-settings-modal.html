@@ -1,0 +1,93 @@
+<div class="modal-header">
+  <h5 class="modal-title">
+    Argomenti di <strong>{{ Subject()?.name }}</strong>
+  </h5>
+  <button
+    type="button"
+    class="btn-close"
+    (click)="ActiveModal.dismiss()"
+  ></button>
+</div>
+
+<div class="modal-body">
+  @if (ErrorMessage()) {
+  <div class="alert alert-danger py-2 mb-3">{{ ErrorMessage() }}</div>
+  } @if (Topics().length === 0) {
+  <p class="text-muted small mb-3">
+    Nessun topic presente. Aggiungine uno qui sotto.
+  </p>
+  } @else {
+  <ul
+    class="list-group list-group-flush mb-3"
+    style="max-height: 300px; overflow-y: auto"
+  >
+    @for (topic of Topics(); track topic._id) {
+    <li class="list-group-item px-0">
+      @if (EditingTopicId() === topic._id) {
+      <div class="d-flex gap-2 align-items-center">
+        <input
+          class="form-control form-control-sm"
+          [ngModel]="EditValue()"
+          (ngModelChange)="EditValue.set($event)"
+          (keydown)="onEditKeydown($event, topic._id)"
+          autofocus
+        />
+        <button
+          class="btn btn-sm btn-primary"
+          [disabled]="IsSaving() || !EditValue().trim()"
+          (click)="confirmRename(topic._id)"
+          title="Conferma"
+        >
+          <fa-icon [icon]="CheckIcon" />
+        </button>
+        <button
+          class="btn btn-sm btn-outline-secondary"
+          (click)="cancelEdit()"
+          title="Annulla"
+        >
+          <fa-icon [icon]="XmarkIcon" />
+        </button>
+      </div>
+      } @else {
+      <div class="d-flex justify-content-between align-items-center">
+        <span>{{ topic.name }}</span>
+        <button
+          class="btn btn-sm btn-outline-secondary"
+          (click)="startEdit(topic)"
+          title="Rinomina"
+        >
+          <fa-icon [icon]="PencilIcon" />
+        </button>
+      </div>
+      }
+    </li>
+    }
+  </ul>
+  }
+
+  <hr class="my-3" />
+
+  <label class="form-label small fw-semibold">Aggiungi argomento</label>
+  <div class="input-group">
+    <input
+      class="form-control"
+      placeholder="Nome argomento..."
+      [ngModel]="NewTopicName()"
+      (ngModelChange)="NewTopicName.set($event)"
+      (keydown)="onAddKeydown($event)"
+    />
+    <button
+      class="btn btn-primary"
+      [disabled]="IsAdding() || !NewTopicName().trim()"
+      (click)="addTopic()"
+    >
+      <fa-icon [icon]="PlusIcon" />
+    </button>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="ActiveModal.close()">
+    Chiudi
+  </button>
+</div>

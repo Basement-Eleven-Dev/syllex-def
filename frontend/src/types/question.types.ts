@@ -19,19 +19,19 @@ export type MaterialType =
 export const QUESTION_TYPE_OPTIONS: TypeOption[] = [
   {
     label: 'Scelta multipla',
-    description: 'Domande con opzioni di risposta multiple',
+    description: 'Domande con più opzioni di risposta, di cui una corretta',
     icon: faSpellCheck,
     value: 'scelta multipla',
   },
   {
     label: 'Vero o falso',
-    description: 'Domande con risposte binarie',
+    description: "Scegli se l'affermazione è vera o falsa",
     icon: faCheck,
     value: 'vero falso',
   },
   {
     label: 'Risposta aperta',
-    description: 'Domande che richiedono risposte dettagliate',
+    description: 'Domande che richiedono una risposta testuale libera',
     icon: faMarker,
     value: 'risposta aperta',
   },

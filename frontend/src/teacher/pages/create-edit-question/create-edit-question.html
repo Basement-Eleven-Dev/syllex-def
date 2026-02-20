@@ -41,9 +41,9 @@
       <div>
         <label class="form-label text-dark">Contenuto della domanda</label>
         <p class="text-dark fw-light mb-0">
-          Scrivi la domanda, le risposte e una spiegazione riguardante la
-          risposta corretta. Puoi sempre usare l’AI per aiutarti nella
-          generazione.
+          Compila i campi sottostanti per comporre la domanda.<br />Puoi sempre
+          usare l’AI per generare automaticamente un testo di partenza da
+          modificare a tuo piacimento! <fa-icon [icon]="WinkIcon"></fa-icon>
         </p>
       </div>
       <button
@@ -58,7 +58,10 @@
 
     <section class="row">
       <div class="col-md-8 d-flex flex-column">
-        <label class="form-label text-dark">Testo</label>
+        <label class="form-label text-dark"
+          >{{ SelectedQuestionType() === 'vero falso' ? 'Affermazione' : 'Testo'
+          }}</label
+        >
         <textarea
           class="form-control custom-input flex-fill"
           formControlName="text"

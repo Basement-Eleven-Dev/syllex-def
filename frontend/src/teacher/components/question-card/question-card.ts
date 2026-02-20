@@ -51,7 +51,7 @@ export class QuestionCard {
   readonly UnCollapseIcon = faCircleChevronUp;
   readonly RobotIcon = faRobot;
 
-  points: number = 1;
+  points = input<number>(1);
 
   readonly questionPreview = computed(() => {
     const maxLength = 80;

@@ -1,6 +1,8 @@
-<div class="position-relative">
-  <div class="card p-3" [class.has-pending-corrections]="false">
-    <div class="card-body d-flex flex-column gap-4 align-items-start">
+<div class="position-relative h-100">
+  <div class="card p-3 h-100" [class.has-pending-corrections]="false">
+    <div
+      class="card-body d-flex flex-column justify-content-between gap-3 align-items-start"
+    >
       <div class="d-flex flex-row gap-2 align-items-center">
         <div [class]="'status-pill ' + test.status"></div>
         {{ test.status | titlecase }}
