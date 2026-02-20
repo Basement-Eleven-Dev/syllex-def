@@ -1,7 +1,7 @@
-<div class="d-flex flex-row gap-3 flex-wrap">
+<div class="type-selector-grid">
   @for (option of options(); track option.value) {
   <div
-    class="p-3 rounded-syllex border typeCard flex-fill h-100"
+    class="p-3 rounded-syllex border typeCard"
     [class.smallCard]="size() === 'small'"
     (click)="onSelectType(option.value)"
     [class.selected]="selectedValue() === option.value"

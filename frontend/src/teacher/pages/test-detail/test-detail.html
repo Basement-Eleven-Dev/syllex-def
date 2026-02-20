@@ -50,7 +50,7 @@
     @for(section of Sections; track section.id) {
     <button
       type="button"
-      class="p-3 rounded-syllex mb-0 section-link fs-5 fw-normal text-start"
+      class="p-3 rounded-syllex mb-0 section-link fs-6 fw-normal"
       [class.active]="ActiveSection() === section.id"
       (click)="onChangeSection(section.id)"
     >

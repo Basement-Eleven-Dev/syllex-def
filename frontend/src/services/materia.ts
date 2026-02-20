@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
-import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
+import { Observable, tap } from 'rxjs';
 import { Auth } from './auth';
 
 export interface TopicObject {
@@ -36,7 +36,10 @@ export class Materia {
 
   getMaterieStudent(): void {
     this.http
-      .get<{ success: boolean; subjects: MateriaObject[] }>('students/me/subjects')
+      .get<{
+        success: boolean;
+        subjects: MateriaObject[];
+      }>('students/me/subjects')
       .subscribe((res) => {
         if (res.success) {
           this.allMaterie.set(res.subjects);
@@ -98,5 +101,66 @@ export class Materia {
   getTopicName(topicId: string): string {
     const topic = this.topics.find((t) => t._id === topicId);
     return topic ? topic.name : 'Sconosciuto';
+  }
+
+  addTopic(
+    subjectId: string,
+    name: string,
+  ): Observable<{ success: boolean; topic: TopicObject }> {
+    return this.http
+      .post<{
+        success: boolean;
+        topic: TopicObject;
+      }>(`subjects/${subjectId}/topics`, { name })
+      .pipe(
+        tap((res) => {
+          if (res.success) {
+            this.allMaterie.update((materie) =>
+              materie.map((m) =>
+                m._id === subjectId
+                  ? { ...m, topics: [...m.topics, res.topic] }
+                  : m,
+              ),
+            );
+            if (this.materiaSelected()?._id === subjectId) {
+              this.materiaSelected.update((s) =>
+                s ? { ...s, topics: [...s.topics, res.topic] } : s,
+              );
+            }
+          }
+        }),
+      );
+  }
+
+  renameTopic(
+    subjectId: string,
+    topicId: string,
+    name: string,
+  ): Observable<{ success: boolean; renamed: boolean }> {
+    return this.http
+      .put<{
+        success: boolean;
+        renamed: boolean;
+      }>(`subjects/${subjectId}/topics/${topicId}`, { name })
+      .pipe(
+        tap((res) => {
+          if (res.success) {
+            const updateTopics = (topics: TopicObject[]) =>
+              topics.map((t) => (t._id === topicId ? { ...t, name } : t));
+            this.allMaterie.update((materie) =>
+              materie.map((m) =>
+                m._id === subjectId
+                  ? { ...m, topics: updateTopics(m.topics) }
+                  : m,
+              ),
+            );
+            if (this.materiaSelected()?._id === subjectId) {
+              this.materiaSelected.update((s) =>
+                s ? { ...s, topics: updateTopics(s.topics) } : s,
+              );
+            }
+          }
+        }),
+      );
   }
 }

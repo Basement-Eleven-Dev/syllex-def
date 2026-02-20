@@ -19,6 +19,18 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
+    apiRoute: "subjects/{subjectId}/topics",
+    functionPath: "teachers/addTopic.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "subjects/{subjectId}/topics/{topicId}",
+    functionPath: "teachers/renameTopic.ts",
+    method: "put",
+    role: "teacher",
+  },
+  {
     apiRoute: "teacher/subject/classes",
     functionPath: "teachers/getSubjectClasses.ts",
     method: "get",

@@ -24,10 +24,11 @@ import {
   faUserCircle,
   faUsers,
 } from '@fortawesome/pro-solid-svg-icons';
-import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCollapseModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Auth } from '../../../services/auth';
 import { FormsModule } from '@angular/forms';
 import { Materia, MateriaObject } from '../../../services/materia';
+import { SubjectSettingsModal } from '../subject-settings-modal/subject-settings-modal';
 
 interface SidebarRoute {
   path: string;
@@ -47,18 +48,25 @@ interface Subject {
   styleUrl: './sidebar.scss',
 })
 export class Sidebar {
+  onRequestSubjectSettings() {
+    const modalRef = this.modalService.open(SubjectSettingsModal, {
+      centered: true,
+    });
+  }
   LogoutIcon = faRightFromBracket;
   SparklesIcon = faSparkles;
   BookIcon = faBook;
   ChevronDownIcon = faChevronDown;
   ChevronUpIcon = faChevronUp;
   HeadSideBrainIcon = faHeadSideBrain;
+  GearIcon = faGear;
 
   isSubjectsCollapsed = signal(true);
 
   constructor(
     private authService: Auth,
     public materiaService: Materia,
+    private modalService: NgbModal,
   ) {}
 
   toggleSubjectsCollapse(): void {

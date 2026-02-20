@@ -9,6 +9,7 @@ import {
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
+  faFaceGrinWink,
   faGraduationCap,
   faImage,
   faSave,
@@ -63,6 +64,7 @@ export class CreateEditQuestion {
   readonly GraduationIcon = faGraduationCap;
   readonly SaveIcon = faSave;
   readonly SpinnerIcon = faSpinnerThird;
+  readonly WinkIcon = faFaceGrinWink; // Sostituisci con l'icona appropriata
 
   // Data
   readonly QuestionTypeOptions = QUESTION_TYPE_OPTIONS;

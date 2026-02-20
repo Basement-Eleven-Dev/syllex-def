@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -43,6 +43,7 @@ export class CreateEditComunicazione {
   private readonly router = inject(Router);
   readonly classiService = inject(ClassiService);
   private readonly comunicazioniService = inject(ComunicazioniService);
+  private readonly destroyRef = inject(DestroyRef);
 
   // Icons
   readonly SaveIcon = faSave;
@@ -155,7 +156,7 @@ export class CreateEditComunicazione {
         )
       : this.comunicazioniService.createComunicazione(comunicazioneData);
 
-    serviceCall.pipe(takeUntilDestroyed()).subscribe({
+    serviceCall.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.router.navigate(['/t/comunicazioni']);
       },
