@@ -4,6 +4,7 @@ import cors from "cors";
 import { FUNCTION_INTEGRATIONS, FunctionIntegration } from "../lib/resources/api/functions-declarations.config";
 import { FUNCTIONS_PATH } from "../environment";
 import { canInvoke } from "../src/_request-validators/_helpers";
+const PORT = 3000;
 const app = express();
 // Use raw text parsing because Middy's jsonBodyParser
 // expects the event.body to be a string, not an object.
@@ -43,7 +44,7 @@ const testRoute: FunctionIntegration = {
       }
       // 1. Dynamic Import (Assumes paths are relative to this file)
       const { handler } = await import(`../${FUNCTIONS_PATH + functionPath}`);
-
+      console.log(req.originalUrl)
       // 2. Construct Lambda Proxy Event
       const event = {
         body: req.body, // This will be a string due to express.text()
@@ -55,6 +56,8 @@ const testRoute: FunctionIntegration = {
         requestContext: {
           resourcePath: apiRoute,
           httpMethod: method,
+          path: req.originalUrl,
+          domainName: "localhost:" + PORT
         },
       };
 
@@ -73,7 +76,7 @@ const testRoute: FunctionIntegration = {
   });
 });
 
-const PORT = 3000;
+
 app.listen(PORT, () => {
   console.log(`\n✅ Local Environment Ready`);
   console.table(

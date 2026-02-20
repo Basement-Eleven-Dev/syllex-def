@@ -11,7 +11,8 @@ export const handler: Handler = async (
     let gammaUrl = await getGammaExportUrl(generationID)
     const domain = event.requestContext.domainName;
     const path = event.requestContext.path;
-    const fullUrl = `https://${domain}${path}`;
+    const prefix = process.env.LOCAL_TESTING ? 'http://' : 'https://'
+    const fullUrl = prefix + domain + path;
     console.log('full url:', fullUrl)
     if (!gammaUrl) {
         return {

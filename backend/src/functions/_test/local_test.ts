@@ -6,10 +6,15 @@ import { ObjectId } from "mongodb";
 import { extractPDFWithGoogleDocumentAI } from "../../_helpers/AI/exctractWithGeminiVision";
 
 const runTest = async (
-    request: APIGatewayProxyEvent,
+    event: APIGatewayProxyEvent,
     context: Context,
 ) => {
-    const { materialId } = JSON.parse(request.body || '{}')
+    const domain = event.requestContext.domainName;
+    const path = event.requestContext.path;
+    const prefix = process.env.LOCAL_TESTING ? 'http://' : 'https://'
+    const fullUrl = prefix + domain + path;
+    return fullUrl;
+    /*const { materialId } = JSON.parse(request.body || '{}')
     const db = (await getDefaultDatabase());
     const material = await db.collection('materials').findOne({ _id: new ObjectId(materialId as string) })
     const httpResultFile = await fetch(material!.url!);
@@ -19,7 +24,7 @@ const runTest = async (
     const arrayBuffer = await httpResultFile.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     const extraction = await extractPDFWithGoogleDocumentAI(buffer)
-    return extraction
+    return extraction*/
 }
 
 export const handler = lambdaRequest(runTest);
