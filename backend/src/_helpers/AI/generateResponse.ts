@@ -38,12 +38,12 @@ export async function generateAIResponse(
     contextString,
     messagesHistory,
   );
-  const response = await openai.chat.completions.create({
+  const response = await openai.responses.create({
     model: "gpt-4o",
-    messages: [
+    input: [
       { role: "system", content: systemPrompt },
       { role: "user", content: query },
     ],
   });
-  return response.choices[0].message.content;
+  return response.output_text;
 }
