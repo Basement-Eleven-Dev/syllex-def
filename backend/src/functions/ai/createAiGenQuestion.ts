@@ -163,12 +163,18 @@ const createAIGenQuestion = async (
       `type field is required. Accepted values: ${questionTypes.join(", ")}. You passed "${type}"`,
     );
   if (!topicId) throw createHttpError.BadRequest(`type topicId is required`);
-  if (!(materialIds && materialIds.length > 0))
-    throw createHttpError.BadRequest(
-      "type materialIds is required and not empty: string[]",
-    );
-  const materialOIds = materialIds.map((el) => new ObjectId(el));
+  let materialOIds = (materialIds || []).map((el) => new ObjectId(el));
   const db = await getDefaultDatabase();
+
+  const materialCollection = db.collection<MaterialInterface>("materials");
+  if (materialOIds.length == 0) {
+    materialOIds = (
+      await materialCollection
+        .find({ subjectId: context.subjectId, vectorized: true })
+        .toArray()
+    ).map((el) => el._id!);
+  }
+
   //load topic
   const topicCollection = db.collection("topics");
   const topic: Topic | null = (await topicCollection.findOne({

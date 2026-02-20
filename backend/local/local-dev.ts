@@ -1,17 +1,24 @@
 import "dotenv/config"; // Load .env before anything else
 import express, { Request, Response } from "express";
 import cors from "cors";
-import { FUNCTION_INTEGRATIONS } from "../lib/resources/api/functions-declarations.config";
+import { FUNCTION_INTEGRATIONS, FunctionIntegration } from "../lib/resources/api/functions-declarations.config";
 import { FUNCTIONS_PATH } from "../environment";
 import { canInvoke } from "../src/_request-validators/_helpers";
+const PORT = 3000;
 const app = express();
 // Use raw text parsing because Middy's jsonBodyParser
 // expects the event.body to be a string, not an object.
 app.use(express.text({ type: "application/json" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+const testRoute: FunctionIntegration = {
+  apiRoute: 'execute_spot',
+  functionPath: '_test/local_test.ts',
+  role: 'open',
+  method: 'post'
+};
 
-FUNCTION_INTEGRATIONS.forEach((integration) => {
+[...FUNCTION_INTEGRATIONS, testRoute].forEach((integration) => {
   const { apiRoute, functionPath, method, role } = integration;
 
   // Converts 'teachers/{teacherId}/subjects' -> 'teachers/:teacherId/subjects'
@@ -37,7 +44,7 @@ FUNCTION_INTEGRATIONS.forEach((integration) => {
       }
       // 1. Dynamic Import (Assumes paths are relative to this file)
       const { handler } = await import(`../${FUNCTIONS_PATH + functionPath}`);
-
+      console.log(req.originalUrl)
       // 2. Construct Lambda Proxy Event
       const event = {
         body: req.body, // This will be a string due to express.text()
@@ -49,6 +56,9 @@ FUNCTION_INTEGRATIONS.forEach((integration) => {
         requestContext: {
           resourcePath: apiRoute,
           httpMethod: method,
+          path: req.originalUrl,
+          stage: "",
+          domainName: "localhost:" + PORT
         },
       };
 
@@ -67,7 +77,7 @@ FUNCTION_INTEGRATIONS.forEach((integration) => {
   });
 });
 
-const PORT = 3000;
+
 app.listen(PORT, () => {
   console.log(`\n✅ Local Environment Ready`);
   console.table(

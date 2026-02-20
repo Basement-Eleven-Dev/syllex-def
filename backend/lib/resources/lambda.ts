@@ -35,7 +35,7 @@ export class LambdaConstruct extends Construct {
     fileName: string,
     role: Role,
     additionalEnvironment: { [k: string]: string } = {},
-    layerArns?: lambda.ILayerVersion[]
+    layerArns?: lambda.ILayerVersion[],
   ) {
     super(scope, name);
     this.lambda = new NodejsFunction(this, name, {

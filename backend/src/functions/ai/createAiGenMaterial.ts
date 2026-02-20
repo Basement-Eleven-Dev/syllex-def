@@ -125,8 +125,8 @@ const createAIGenMaterial = async (
                 }
             }
         })
-
-        material.url = `https://${request.requestContext.domainName}/${request.requestContext.stage}/proxy/gamma/${res.generationId}`;
+        const prefix = process.env.LOCAL_TESTING ? 'http://' : 'https://'
+        material.url = `${prefix}${request.requestContext.domainName}/${request.requestContext.stage}/proxy/gamma/${res.generationId}`;
         material.extension = 'pptx'
         material.name = type + new ObjectId().toString() + '.' + material.extension;
     }

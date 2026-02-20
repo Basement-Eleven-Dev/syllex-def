@@ -4,8 +4,8 @@ import { getDefaultDatabase } from "../../getDatabase";
 
 export interface VectorizeDocumentParams {
   materialId: string;
-  subject: string;
-  teacherId: string;
+  subjectId: ObjectId;
+  teacherId: ObjectId;
   documentText: string;
 }
 
@@ -18,12 +18,12 @@ export interface DocumentChunk {
 }
 export async function vectorizeDocument(
   vectorizeDocumentParams: VectorizeDocumentParams,
-) {
+): Promise<void> {
   try {
     const openai = await getOpenAIClient();
 
     const db = await getDefaultDatabase();
-    const { materialId, subject, teacherId, documentText } =
+    const { materialId, subjectId, teacherId, documentText } =
       vectorizeDocumentParams;
     const vector_collection: Collection<DocumentChunk> =
       db.collection("file_embeddings");
@@ -85,8 +85,8 @@ export async function vectorizeDocument(
       const batchResults = response.data.map((item, index) => ({
         text: batch[index],
         referenced_file_id: new ObjectId(materialId),
-        teacher_id: new ObjectId(teacherId),
-        subject: new ObjectId(subject),
+        teacher_id: teacherId,
+        subject: subjectId,
         embedding: item.embedding,
       }));
 
