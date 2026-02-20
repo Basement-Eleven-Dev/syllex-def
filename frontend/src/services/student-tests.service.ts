@@ -3,6 +3,19 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { QuestionInterface } from './questions';
 
+export interface SelfEvaluationPayload {
+  subjectId: string;
+  topicIds: string[];
+  questionCount: number;
+  excludedTypes: string[];
+  timeLimit: number | null;
+}
+
+export interface SelfEvaluationResponse {
+  testId: string;
+  attemptId: string;
+}
+
 export interface StudentTestInterface {
   _id: string;
   name: string;
@@ -94,5 +107,15 @@ export class StudentTestsService {
       `students/test/attempt/${attemptId}/submit`,
       {},
     );
+  }
+
+  createSelfEvaluation(
+    payload: SelfEvaluationPayload,
+  ): Observable<SelfEvaluationResponse> {
+    return this.http
+      .post<
+        { success: boolean } & SelfEvaluationResponse
+      >('students/self-evaluation', payload)
+      .pipe(map(({ testId, attemptId }) => ({ testId, attemptId })));
   }
 }

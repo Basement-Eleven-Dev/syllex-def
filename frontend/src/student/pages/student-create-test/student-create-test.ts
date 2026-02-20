@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faArrowLeft,
@@ -7,16 +7,9 @@ import {
   faXmark,
 } from '@fortawesome/pro-solid-svg-icons';
 import { Materia, TopicObject } from '../../../services/materia';
+import { StudentTestsService } from '../../../services/student-tests.service';
 
 type QuestionType = 'scelta multipla' | 'vero falso' | 'risposta aperta';
-
-interface SelfEvaluationConfig {
-  subjectId: string;
-  topicIds: string[];
-  questionCount: number;
-  excludedTypes: QuestionType[];
-  timeLimit: number | null;
-}
 
 @Component({
   selector: 'app-student-create-test',
@@ -27,6 +20,8 @@ interface SelfEvaluationConfig {
 })
 export class StudentCreateTest {
   private readonly materiaService = inject(Materia);
+  private readonly testsService = inject(StudentTestsService);
+  private readonly router = inject(Router);
 
   readonly BackIcon = faArrowLeft;
   readonly CheckIcon = faCheck;
@@ -114,15 +109,23 @@ export class StudentCreateTest {
   onSubmit(): void {
     if (!this.IsFormValid() || this.IsSubmitting()) return;
 
-    const config: SelfEvaluationConfig = {
-      subjectId: this.SelectedSubjectId(),
-      topicIds: Array.from(this.SelectedTopicIds()),
-      questionCount: this.QuestionCount(),
-      excludedTypes: Array.from(this.ExcludedTypes()),
-      timeLimit: this.TimeLimitEnabled() ? this.TimeLimit() : null,
-    };
+    this.IsSubmitting.set(true);
 
-    console.log('Config test di auto-valutazione:', config);
-    // TODO: chiamare il backend per generare il test e navigare all'esecuzione
+    this.testsService
+      .createSelfEvaluation({
+        subjectId: this.SelectedSubjectId(),
+        topicIds: Array.from(this.SelectedTopicIds()),
+        questionCount: this.QuestionCount(),
+        excludedTypes: Array.from(this.ExcludedTypes()),
+        timeLimit: this.TimeLimitEnabled() ? this.TimeLimit() : null,
+      })
+      .subscribe({
+        next: ({ testId }) => {
+          this.router.navigate(['/s/tests/execute', testId]);
+        },
+        error: () => {
+          this.IsSubmitting.set(false);
+        },
+      });
   }
 }

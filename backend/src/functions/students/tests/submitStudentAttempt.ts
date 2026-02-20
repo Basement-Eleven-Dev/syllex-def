@@ -5,6 +5,7 @@ import { getDefaultDatabase } from "../../../_helpers/getDatabase";
 import { ObjectId } from "mongodb";
 import { Attempt } from "../../../models/attempt";
 import { precorrectTest } from "../../../_helpers/student-test/precorrectTest";
+import { correctStudentQuestion } from "../../../_helpers/AI/correctStudentQuestion";
 
 const submitStudentAttempt = async (
   request: APIGatewayProxyEvent,
@@ -37,7 +38,76 @@ const submitStudentAttempt = async (
     throw createError.Forbidden("Attempt already submitted");
   }
 
-  // Attempt auto-correction on closed-answer questions
+  const now = new Date();
+  const startedAt = new Date(attempt.startedAt).getTime();
+  const timeSpent = Math.floor((now.getTime() - startedAt) / 1000);
+
+  // ── Self-evaluation: correzione automatica completa (chiuse + AI per le aperte) ──
+  if ((attempt as any).source === "self-evaluation") {
+    const corrections = await Promise.all(
+      attempt.questions.map(async (q, i) => {
+        const type = q.question?.type;
+        const answer = q.answer as string;
+        const maxPoints = (q as any).points ?? 1;
+        let score = 0;
+        let teacherComment = "";
+
+        if (type === "scelta multipla") {
+          const correct = q.question?.options?.find((o) => o.isCorrect)?.label;
+          score = answer === correct ? maxPoints : 0;
+        } else if (type === "vero falso") {
+          const correctBool = (q.question as any)?.correctAnswer;
+          const answerBool = answer === "Vero";
+          score = answerBool === correctBool ? maxPoints : 0;
+        } else if (type === "risposta aperta") {
+          const result = await correctStudentQuestion(
+            answer ?? "",
+            maxPoints,
+            q.question?.explanation ?? "",
+          );
+          score = result.score;
+          teacherComment = result.explanation;
+        }
+
+        return {
+          index: i,
+          score,
+          teacherComment,
+          status: score > 0 ? "correct" : "wrong",
+        };
+      }),
+    );
+
+    const $set: Record<string, any> = {
+      status: "reviewed",
+      deliveredAt: now,
+      reviewedAt: now,
+      timeSpent,
+      updatedAt: now,
+    };
+
+    let totalScore = 0;
+    for (const { index, score, teacherComment, status } of corrections) {
+      $set[`questions.${index}.score`] = score;
+      $set[`questions.${index}.teacherComment`] = teacherComment;
+      $set[`questions.${index}.status`] = status;
+      totalScore += score;
+    }
+    $set.score = totalScore;
+    $set.maxScore = attempt.questions.reduce(
+      (s, q) => s + ((q as any).points ?? 1),
+      0,
+    );
+
+    const result = await attemptsCollection.findOneAndUpdate(
+      { _id: new ObjectId(attemptId) },
+      { $set },
+      { returnDocument: "after" },
+    );
+    return { success: true, attempt: result };
+  }
+
+  // ── Flusso normale: correzione chiuse se tutte determinabili ──
   const questionsForCorrection = attempt.questions.map((q) => ({
     answer: q.answer,
     correct: q.question?.options?.find((o) => o.isCorrect)?.label ?? null,
@@ -48,10 +118,6 @@ const submitStudentAttempt = async (
     (q) => q.type !== "risposta aperta",
   );
 
-  const now = new Date();
-  const startedAt = new Date(attempt.startedAt).getTime();
-  const timeSpent = Math.floor((now.getTime() - startedAt) / 1000);
-
   const updateFields: Record<string, any> = {
     status: "delivered",
     deliveredAt: now,
@@ -59,7 +125,6 @@ const submitStudentAttempt = async (
     updatedAt: now,
   };
 
-  // If all questions are closed-type, try auto-correction
   if (correctable) {
     const precorrection = precorrectTest({
       questions: questionsForCorrection.map((q) => ({

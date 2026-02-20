@@ -38,10 +38,16 @@ const getStudentTests = async (
     .find({ students: new ObjectId(studentId) })
     .toArray();
   const classIds = studentClasses.map((c) => c._id);
-  if (!classIds.length) {
-    return { tests: [], total: 0 };
+
+  // Include sia i test assegnati alle classi dello studente
+  // sia i test di auto-valutazione generati dallo studente stesso
+  const orConditions: any[] = [
+    { source: "self-evaluation", studentId: new ObjectId(studentId) },
+  ];
+  if (classIds.length > 0) {
+    orConditions.push({ classIds: { $in: classIds } });
   }
-  filter.classIds = { $in: classIds };
+  filter.$or = orConditions;
 
   if (status) {
     filter.status = status;

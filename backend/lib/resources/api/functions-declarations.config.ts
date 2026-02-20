@@ -395,6 +395,12 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "student",
   },
   {
+    apiRoute: "students/self-evaluation",
+    functionPath: "students/selfEvaluation/createSelfEvaluationTest.ts",
+    method: "post",
+    role: "student",
+  },
+  {
     apiRoute: "assistants/remove-material",
     functionPath: "assistants/removeMaterial.ts",
     method: "post",
