@@ -1,238 +1,255 @@
 <div
   class="card d-flex gap-2 question-card p-3 h-100"
-  [class.moveable]="showTestCompositionActions"
+  [class.moveable]="mode === 'test-composition'"
   [class.locked]="locked"
   [class.dimmed]="dimmed"
-  id="questionCard"
 >
-  <div class="card-body">
-    <div class="flex-grow-1 w-100 d-flex flex-column gap-2">
-      <div class="d-flex align-items-center gap-2 mb-2">
-        @if(showPolicy){
-        <div class="d-flex flex-row gap-2 align-items-center me-4">
-          <div [class]="'status-pill ' + question.policy"></div>
-          {{ question.policy | titlecase }}
-        </div>
-        } @if(showIndex){<span class="badge bg-dark"># {{ index + 1 }}</span>}
-        <span class="text-muted"
-          >{{ materiaService.getTopicName(question.topicId) }}</span
-        >
-        |
-        <span class="text-primary">{{ question.type }}</span>
+  <div class="card-body d-flex flex-column gap-2">
+    <!-- ── Header: policy (banca) | index (test-composition) | topic | type ── -->
+    <div class="d-flex align-items-center gap-2">
+      @if (mode === 'banca') {
+      <div class="d-flex flex-row gap-2 align-items-center me-2">
+        <div [class]="'status-pill ' + question.policy"></div>
+        <span class="text-muted small">{{ question.policy | titlecase }}</span>
       </div>
-
-      <div>
-        <div class="d-flex flex-column">
-          @if(question.imageUrl) {
-          <div class="text-center">
-            <img
-              [src]="question.imageUrl"
-              alt="Immagine della domanda"
-              class="rounded-4"
-              (click)="onExpandImage(question.imageUrl)"
-              style="max-height: 200px"
-            />
-          </div>
-          }
-          <section>
-            <p class="mb-0 fw-light text-muted">Domanda</p>
-            <p class="mb-0 fw-normal">{{ question.text }}</p>
-          </section>
-
-          <section class="my-3">
-            @if(studentMode) { @if(question.type === 'risposta aperta') {
-            <textarea
-              class="form-control"
-              rows="4"
-              [value]="selectedAnswer ?? ''"
-              [disabled]="locked"
-              (input)="onOpenAnswerChange($any($event.target).value)"
-              placeholder="Scrivi la tua risposta qui..."
-            ></textarea>
-            } @else if(question.type === 'vero falso') {
-            <ol type="A" class="mb-0 ps-0 gap-2 d-flex flex-column">
-              <li
-                class="d-flex align-items-center gap-2 student-option"
-                [class.selected]="selectedAnswer === 'Vero'"
-                [class.disabled]="locked"
-              >
-                <input
-                  type="radio"
-                  [name]="'q_' + question._id"
-                  [checked]="selectedAnswer === 'Vero'"
-                  [disabled]="locked"
-                  (change)="onSelectOption('Vero')"
-                />
-                <label class="mb-0">Vero</label>
-              </li>
-              <li
-                class="d-flex align-items-center gap-2 student-option"
-                [class.selected]="selectedAnswer === 'Falso'"
-                [class.disabled]="locked"
-              >
-                <input
-                  type="radio"
-                  [name]="'q_' + question._id"
-                  [checked]="selectedAnswer === 'Falso'"
-                  [disabled]="locked"
-                  (change)="onSelectOption('Falso')"
-                />
-                <label class="mb-0">Falso</label>
-              </li>
-            </ol>
-            } @else {
-            <ol type="A" class="mb-0 ps-0 gap-2 d-flex flex-column">
-              @for (option of question.options; track $index) {
-              <li
-                class="d-flex align-items-center gap-2 student-option"
-                [class.selected]="selectedAnswer === option.label"
-                [class.disabled]="locked"
-              >
-                <input
-                  type="radio"
-                  [name]="'q_' + question._id"
-                  [checked]="selectedAnswer === option.label"
-                  [disabled]="locked"
-                  (change)="onSelectOption(option.label)"
-                />
-                <label class="mb-0">{{ option.label }}</label>
-              </li>
-              }
-            </ol>
-            } } @else { @if(question.type === 'vero falso') {
-            <ol type="A" class="mb-0 ps-0 gap-2 d-flex flex-column">
-              <li
-                [class.correct]="question.correctAnswer === true"
-                class="d-flex align-items-center gap-2"
-              >
-                <input
-                  type="radio"
-                  name="vf-{{ question._id }}"
-                  [checked]="question.correctAnswer === true"
-                  disabled
-                />
-                <span>Vero</span>
-                @if(question.correctAnswer === true) {
-                <fa-icon [icon]="CheckIcon"></fa-icon>
-                }
-              </li>
-              <li
-                [class.correct]="question.correctAnswer === false"
-                class="d-flex align-items-center gap-2"
-              >
-                <input
-                  type="radio"
-                  name="vf-{{ question._id }}"
-                  [checked]="question.correctAnswer === false"
-                  disabled
-                />
-                <span>Falso</span>
-                @if(question.correctAnswer === false) {
-                <fa-icon [icon]="CheckIcon"></fa-icon>
-                }
-              </li>
-            </ol>
-            } @else {
-            <ol type="A" class="mb-0 ps-0 gap-2 d-flex flex-column">
-              @for (option of question.options; track $index) {
-              <li
-                [class.correct]="option.isCorrect"
-                class="d-flex align-items-center gap-2"
-              >
-                <input type="radio" name="option-{{ $index }}" />
-                <span>{{ option.label }}</span>
-                @if(option.isCorrect) {
-                <fa-icon [icon]="CheckIcon"></fa-icon>
-                }
-              </li>
-              }
-            </ol>
-            } }
-          </section>
-
-          @if(showExplanation && !studentMode) {
-          <section>
-            <p class="mb-0 fw-light text-muted">Correzione</p>
-            <p>{{ question.explanation }}</p>
-          </section>
-          } @if(studentMode && questionStatus) {
-          <hr class="my-2" />
-          <section class="d-flex flex-column gap-2">
-            <div class="d-flex align-items-center gap-3">
-              <span
-                class="badge"
-                [class.bg-success]="questionStatus === 'correct'"
-                [class.bg-danger]="questionStatus === 'wrong'"
-                [class.bg-warning]="questionStatus === 'semi-correct'"
-                [class.text-dark]="questionStatus === 'semi-correct'"
-              >
-                @switch(questionStatus) { @case('correct') { Corretta }
-                @case('wrong') { Errata } @case('semi-correct') { Parzialmente
-                corretta } }
-              </span>
-              @if(score !== null) {
-              <span class="fw-semibold">Punteggio: {{ score }}</span>
-              }
-            </div>
-            <div>
-              <p class="mb-0 fw-light text-muted">Commento del docente</p>
-              <p class="mb-0">
-                {{ teacherFeedback || 'Il docente non ha lasciato commenti.' }}
-              </p>
-            </div>
-          </section>
-          }
-        </div>
-      </div>
-    </div>
-    @if(!studentMode && showBancaActions) {
-    <div class="d-flex flex-row gap-1 justify-content-end w-100">
-      <button
-        type="button"
-        class="btn btn-outline-primary"
-        title="Modifica"
-        [routerLink]="'/t/edit-question/' + question._id"
+      } @if (mode === 'test-composition') {
+      <span class="badge bg-dark"># {{ index + 1 }}</span>
+      } @if (mode === 'student' && showIndex) {
+      <span class="badge bg-dark"># {{ index + 1 }}</span>
+      }
+      <span class="text-muted"
+        >{{ materiaService.getTopicName(question.topicId) }}</span
       >
-        <fa-icon [icon]="EditIcon"></fa-icon>
-      </button>
-      <button
-        type="button"
-        class="btn btn-outline-danger"
-        (click)="removeMe.emit(question._id)"
-        title="Rimuovi"
-      >
-        <fa-icon [icon]="TrashIcon"></fa-icon>
-      </button>
+      <span class="text-muted">|</span>
+      <span class="text-primary">{{ question.type }}</span>
     </div>
-    }
 
-    <!-- Azioni -->
-    @if(!studentMode && showTestCompositionActions) {
-    <div class="d-flex flex-row gap-1 justify-content-between w-100 mt-4">
-      <input
-        type="number"
-        class="form-control form-control-sm custom-input"
-        style="width: 150px"
-        [(ngModel)]="points"
-        (ngModelChange)="pointsChange.emit($event)"
-        value="1"
-        step="1"
-        min="1"
-        max="100"
-        placeholder="Punti se corretta"
+    <!-- ── Optional image ── -->
+    @if (question.imageUrl) {
+    <div class="text-center">
+      <img
+        [src]="question.imageUrl"
+        alt="Immagine della domanda"
+        class="rounded-4"
+        (click)="onExpandImage(question.imageUrl)"
+        style="max-height: 200px; cursor: pointer"
       />
-      <button
-        type="button"
-        class="btn btn-outline-danger"
-        (click)="removeMe.emit(question._id)"
-        title="Rimuovi"
-      >
-        <fa-icon [icon]="TrashIcon"></fa-icon>
-      </button>
     </div>
     }
 
-    <!-- Placeholder durante il drag -->
-    <div class="drag-placeholder" *cdkDragPlaceholder></div>
+    <!-- ── Question text ── -->
+    <section>
+      <p class="mb-0 fw-light text-muted">Domanda</p>
+      <p class="mb-0 fw-normal">{{ question.text }}</p>
+    </section>
+
+    <!-- ── Options ── -->
+    @if (question.type !== 'risposta aperta' || mode === 'student') {
+    <section class="my-2">
+      @if (mode === 'student') {
+      <!-- Student: interactive inputs -->
+      @if (question.type === 'risposta aperta') {
+      <textarea
+        class="form-control"
+        rows="4"
+        [value]="selectedAnswer ?? ''"
+        [disabled]="locked"
+        (input)="onOpenAnswerChange($any($event.target).value)"
+        placeholder="Scrivi la tua risposta qui..."
+      ></textarea>
+      } @else if (question.type === 'vero falso') {
+      <ol type="A" class="mb-0 ps-0 gap-2 d-flex flex-column">
+        @for (label of ['Vero', 'Falso']; track label) {
+        <li
+          class="d-flex align-items-center gap-2 student-option"
+          [class.selected]="selectedAnswer === label"
+          [class.disabled]="locked"
+        >
+          <input
+            type="radio"
+            [name]="'q_' + question._id"
+            [checked]="selectedAnswer === label"
+            [disabled]="locked"
+            (change)="onSelectOption(label)"
+          />
+          <label class="mb-0">{{ label }}</label>
+        </li>
+        }
+      </ol>
+      } @else {
+      <ol type="A" class="mb-0 ps-0 gap-2 d-flex flex-column">
+        @for (option of question.options; track $index) {
+        <li
+          class="d-flex align-items-center gap-2 student-option"
+          [class.selected]="selectedAnswer === option.label"
+          [class.disabled]="locked"
+        >
+          <input
+            type="radio"
+            [name]="'q_' + question._id"
+            [checked]="selectedAnswer === option.label"
+            [disabled]="locked"
+            (change)="onSelectOption(option.label)"
+          />
+          <label class="mb-0">{{ option.label }}</label>
+        </li>
+        }
+      </ol>
+      } } @else if (mode === 'banca' || mode === 'ai-review') {
+      <!-- Banca / ai-review: read-only with correct answer highlighted -->
+      @if (question.type === 'vero falso') {
+      <ol type="A" class="mb-0 ps-0 gap-2 d-flex flex-column">
+        @for (label of ['Vero', 'Falso']; track label) {
+        <li
+          class="d-flex align-items-center gap-2"
+          [class.correct]="(label === 'Vero' && question.correctAnswer === true) || (label === 'Falso' && question.correctAnswer === false)"
+        >
+          <input
+            type="radio"
+            [name]="'vf_' + question._id"
+            [checked]="(label === 'Vero' && question.correctAnswer === true) || (label === 'Falso' && question.correctAnswer === false)"
+            disabled
+          />
+          <span>{{ label }}</span>
+          @if ((label === 'Vero' && question.correctAnswer === true) || (label
+          === 'Falso' && question.correctAnswer === false)) {
+          <fa-icon [icon]="CheckIcon"></fa-icon>
+          }
+        </li>
+        }
+      </ol>
+      } @else {
+      <ol type="A" class="mb-0 ps-0 gap-2 d-flex flex-column">
+        @for (option of question.options; track $index) {
+        <li
+          class="d-flex align-items-center gap-2"
+          [class.correct]="option.isCorrect"
+        >
+          <input
+            type="radio"
+            [name]="'opt_' + question._id + '_' + $index"
+            disabled
+          />
+          <span>{{ option.label }}</span>
+          @if (option.isCorrect) {
+          <fa-icon [icon]="CheckIcon"></fa-icon>
+          }
+        </li>
+        }
+      </ol>
+      } } @else {
+      <!-- Preview / test-composition: read-only, no highlights -->
+      @if (question.type === 'vero falso') {
+      <ol type="A" class="mb-0 ps-0 gap-2 d-flex flex-column">
+        @for (label of ['Vero', 'Falso']; track label) {
+        <li class="d-flex align-items-center gap-2">
+          <input type="radio" [name]="'vf_' + question._id" disabled />
+          <span>{{ label }}</span>
+        </li>
+        }
+      </ol>
+      } @else {
+      <ol type="A" class="mb-0 ps-0 gap-2 d-flex flex-column">
+        @for (option of question.options; track $index) {
+        <li class="d-flex align-items-center gap-2">
+          <input
+            type="radio"
+            [name]="'opt_' + question._id + '_' + $index"
+            disabled
+          />
+          <span>{{ option.label }}</span>
+        </li>
+        }
+      </ol>
+      } }
+    </section>
+    }
+
+    <!-- ── Correzione (banca / ai-review) ── -->
+    @if (mode === 'banca' || mode === 'ai-review') {
+    <section>
+      <p class="mb-0 fw-light text-muted">Correzione</p>
+      <p class="mb-0">{{ question.explanation }}</p>
+    </section>
+    }
+
+    <!-- ── Student status feedback ── -->
+    @if (mode === 'student' && questionStatus) {
+    <hr class="my-2" />
+    <section class="d-flex flex-column gap-2">
+      <div class="d-flex align-items-center gap-3">
+        <span
+          class="badge"
+          [class.bg-success]="questionStatus === 'correct'"
+          [class.bg-danger]="questionStatus === 'wrong'"
+          [class.bg-warning]="questionStatus === 'semi-correct'"
+          [class.text-dark]="questionStatus === 'semi-correct'"
+        >
+          @switch (questionStatus) { @case ('correct') { Corretta } @case
+          ('wrong') { Errata } @case ('semi-correct') { Parzialmente corretta }
+          }
+        </span>
+        @if (score !== null) {
+        <span class="fw-semibold">Punteggio: {{ score }}</span>
+        }
+      </div>
+      <div>
+        <p class="mb-0 fw-light text-muted">Commento del docente</p>
+        <p class="mb-0">
+          {{ teacherFeedback || 'Il docente non ha lasciato commenti.' }}
+        </p>
+      </div>
+    </section>
+    }
   </div>
+
+  <!-- ── Banca actions ── -->
+  @if (mode === 'banca') {
+  <div class="d-flex flex-row gap-1 justify-content-end w-100">
+    <button
+      type="button"
+      class="btn btn-outline-primary"
+      title="Modifica"
+      [routerLink]="'/t/edit-question/' + question._id"
+    >
+      <fa-icon [icon]="EditIcon"></fa-icon>
+    </button>
+    <button
+      type="button"
+      class="btn btn-outline-danger"
+      title="Elimina"
+      (click)="removeMe.emit(question._id)"
+    >
+      <fa-icon [icon]="TrashIcon"></fa-icon>
+    </button>
+  </div>
+  }
+
+  <!-- ── Test-composition actions ── -->
+  @if (mode === 'test-composition') {
+  <div class="d-flex flex-row gap-1 justify-content-between w-100 mt-2">
+    <input
+      type="number"
+      class="form-control form-control-sm custom-input"
+      style="width: 150px"
+      [(ngModel)]="LocalPoints"
+      (ngModelChange)="pointsChange.emit($event)"
+      step="1"
+      min="1"
+      max="100"
+      placeholder="Punti se corretta"
+    />
+    <button
+      type="button"
+      class="btn btn-outline-danger"
+      title="Rimuovi"
+      (click)="removeMe.emit(question._id)"
+    >
+      <fa-icon [icon]="TrashIcon"></fa-icon>
+    </button>
+  </div>
+  }
+
+  <!-- CDK drag placeholder -->
+  <div class="drag-placeholder" *cdkDragPlaceholder></div>
 </div>

@@ -1,7 +1,7 @@
 import { Component, signal, OnInit, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faBroom } from '@fortawesome/pro-solid-svg-icons';
+import { faBroom, faPlus } from '@fortawesome/pro-solid-svg-icons';
 import {
   StudentTestInterface,
   StudentTestsService,
@@ -26,6 +26,7 @@ export class StudentTestsList implements OnInit {
   private readonly materiaService = inject(Materia);
 
   readonly ClearIcon = faBroom;
+  readonly PlusIcon = faPlus;
 
   readonly Tests = signal<StudentTestInterface[]>([]);
   readonly AttemptStatusMap = signal<Map<string, AttemptStatus>>(new Map());

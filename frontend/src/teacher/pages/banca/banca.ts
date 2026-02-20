@@ -1,11 +1,4 @@
-import {
-  Component,
-  signal,
-  computed,
-  OnInit,
-  effect,
-  inject,
-} from '@angular/core';
+import { Component, signal, computed, effect, inject } from '@angular/core';
 import { QuestionsSearchFilters } from '../../components/questions-search-filters/questions-search-filters';
 import { QuestionCard } from '../../components/question-card/question-card';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -42,7 +35,6 @@ export class Banca {
 
   // Signals
   private RawQuestions = signal<QuestionInterface[]>([]);
-  private ExpandedQuestionId = signal<string | null>(null);
   Page = signal(1);
   PageSize = signal(10);
   CollectionSize = signal(0);
@@ -59,18 +51,13 @@ export class Banca {
   });
 
   constructor() {
-    console.log('Banca constructor: component initialized');
-    // Effetto: carica domande quando cambia la materia selezionata
+    // Reset page when subject changes; the loading effect below handles the actual fetch.
     effect(() => {
       const materia = this.materiaService.materiaSelected();
-      if (materia) {
-        // Reset pagina a 1 quando cambia materia
-        this.Page.set(1);
-        this.loadQuestionsWithCurrentFilters();
-      }
+      if (materia) this.Page.set(1);
     });
 
-    // Effetto: carica domande quando cambiano filtri o paginazione
+    // Single source of truth: reload whenever any dependency changes.
     effect(() => {
       const materia = this.materiaService.materiaSelected();
       const currentFilters = this.Filters();
@@ -89,20 +76,6 @@ export class Banca {
     });
   }
 
-  private loadQuestionsWithCurrentFilters() {
-    const currentFilters = this.Filters();
-    const currentPage = this.Page();
-    const currentPageSize = this.PageSize();
-    this.loadQuestions(
-      currentFilters.searchTerm,
-      currentFilters.type,
-      currentFilters.topicId,
-      currentFilters.policy,
-      currentPage,
-      currentPageSize,
-    );
-  }
-
   onFiltersChanged(filters: {
     searchTerm?: string;
     type?: 'scelta multipla' | 'vero falso' | 'risposta aperta';
@@ -113,17 +86,12 @@ export class Banca {
     this.Page.set(1);
   }
 
-  onQuestionExpanded(questionId: string): void {
-    const currentExpanded = this.ExpandedQuestionId();
-    if (questionId === '' || currentExpanded === questionId) {
-      this.ExpandedQuestionId.set(null);
-    } else {
-      this.ExpandedQuestionId.set(questionId);
-    }
-  }
-
-  isQuestionCollapsed(questionId: string): boolean {
-    return this.ExpandedQuestionId() !== questionId;
+  /** Optimistically removes a question from the visible list. */
+  onDeleteQuestion(questionId: string): void {
+    this.RawQuestions.update((list) =>
+      list.filter((q) => q._id !== questionId),
+    );
+    this.CollectionSize.update((n) => n - 1);
   }
 
   private loadQuestions(

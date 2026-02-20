@@ -1,73 +1,162 @@
 <div
-  [class]="isOffcanvasMode() ? 'offcanvas-body dvh-100 overflow-scroll p-4' : 'pb-5'"
+  [class]="IsOffcanvasMode() ? 'offcanvas-body dvh-100 overflow-scroll p-4' : 'pb-5'"
 >
+  @if (!ReviewMode()) {
+
+  <!-- ─── PHASE 1: FORM ─────────────────────────────────────────────────── -->
   <form
     [formGroup]="genForm"
     (ngSubmit)="onSubmit()"
     class="d-flex flex-column gap-4"
   >
     <section class="form-section">
-      <label class="form-label text-dark mb-3"
-        >Che tipo di {{ typeSignal() == 'questions' ? 'domande' : 'materiale' }}
-        vuoi creare?</label
-      >
+      <label class="form-label text-dark mb-3">
+        Che tipo di {{ TypeMode() === 'questions' ? 'domande' : 'materiale' }}
+        vuoi creare?
+      </label>
       <app-type-selector
-        [options]="types()"
-        [(selectedValue)]="selectedType"
+        [options]="Types()"
+        [(selectedValue)]="SelectedType"
+        (typeSelected)="onTypeSelected($event)"
         [direction]="'row'"
         [showDescription]="true"
       ></app-type-selector>
     </section>
-    @if(typeSignal() == 'questions') {
+
+    @if (TypeMode() === 'questions') {
+
     <section class="form-section">
-      <label class="form-label text-dark mb-3"
-        >Quante domande vuoi generare?</label
-      >
-      <input
-        type="number"
-        class="form-control custom-input"
-        formControlName="numberOfQuestions"
-        min="1"
-        max="20"
-        style="max-width: 200px"
-        placeholder="Inserisci il numero di domande da generare..."
-      />
-    </section>
-    }
-    <section class="form-section">
-      <label class="form-label text-dark mb-3"
-        >Su che argomento di {{ materiaService.materiaSelected()?.name }} vuoi
-        che si concentri l'AI?</label
-      >
+      <label class="form-label text-dark mb-2">
+        Su che argomento di {{ materiaService.materiaSelected()?.name }} vuoi
+        che si concentri l'AI?
+      </label>
       <select
         class="form-select custom-input w-auto"
         formControlName="topicId"
         aria-label="Seleziona argomento"
       >
         <option value="" disabled selected>Seleziona argomento</option>
-        @for(topic of materiaService.materiaSelected()?.topics; track topic._id)
-        {
+        @for (topic of materiaService.materiaSelected()?.topics; track
+        topic._id) {
         <option [value]="topic._id">{{ topic.name }}</option>
         }
       </select>
     </section>
 
     <section class="form-section">
-      <label class="form-label text-dark mb-3"
-        >Se vuoi puoi specificare uno o più file dalle tue risorse a supporto
-        della generazione</label
+      <label class="form-label text-dark mb-2 fw-light"
+        >Parametri di generazione</label
       >
+      <div class="row g-3">
+        <div class="col-6 col-md-3">
+          <label class="form-label text-dark">N° domande</label>
+          <input
+            type="number"
+            class="form-control custom-input"
+            formControlName="numberOfQuestions"
+            min="1"
+            max="20"
+            aria-label="Numero di domande"
+          />
+        </div>
+        @if (IsMultipleChoice()) {
+        <div class="col-6 col-md-3">
+          <label class="form-label text-dark">Alternative</label>
+          <input
+            type="number"
+            class="form-control custom-input"
+            formControlName="numberOfAlternatives"
+            min="2"
+            max="8"
+            aria-label="Numero di alternative"
+          />
+        </div>
+        }
+        <div class="col-6 col-md-3">
+          <label class="form-label text-dark">Lingua</label>
+          <select
+            class="form-select custom-input"
+            formControlName="language"
+            aria-label="Lingua"
+          >
+            <option value="it">Italiano</option>
+            <option value="en">English</option>
+            <option value="es">Español</option>
+            <option value="fr">Français</option>
+            <option value="de">Deutsch</option>
+          </select>
+        </div>
+        <div class="col-6 col-md-3">
+          <label class="form-label text-dark">Difficoltà</label>
+          <select
+            class="form-select custom-input"
+            formControlName="difficulty"
+            aria-label="Difficoltà"
+          >
+            <option [value]="1">Facile</option>
+            <option [value]="2">Media</option>
+            <option [value]="3">Difficile</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    } @else {
+
+    <!-- ─── MATERIALS specific parameters ─────────────────────────────── -->
+    <section class="form-section">
+      <label class="form-label text-dark mb-2 fw-light"
+        >Parametri di generazione</label
+      >
+      <div class="row g-3">
+        @if (IsSlides()) {
+        <div class="col-6 col-md-4">
+          <label class="form-label text-dark">N° slide</label>
+          <input
+            type="number"
+            class="form-control custom-input"
+            formControlName="numberOfSlides"
+            min="3"
+            max="30"
+            aria-label="Numero di slide"
+          />
+        </div>
+        }
+        <div class="col-6 col-md-4">
+          <label class="form-label text-dark">Lingua</label>
+          <select
+            class="form-select custom-input"
+            formControlName="language"
+            aria-label="Lingua"
+          >
+            <option value="it">Italiano</option>
+            <option value="en">English</option>
+            <option value="es">Español</option>
+            <option value="fr">Français</option>
+            <option value="de">Deutsch</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    }
+
+    <section class="form-section">
+      <label class="form-label text-dark mb-2 fw-light">
+        File e risorse di supporto per la generazione
+      </label>
       <app-materiali-selector></app-materiali-selector>
     </section>
+
     <section class="form-section">
-      <label class="form-label text-dark mb-3"
-        >Aggiungi dettagli utili per indirizzare meglio la generazione</label
-      >
+      <label class="form-label text-dark mb-2">Istruzioni aggiuntive</label>
       <textarea
         class="form-control custom-input"
-        formControlName="prompt"
-        rows="4"
-        [placeholder]="typeSignal() == 'questions' ? 'Ad esempio: argomento specifico, difficoltà, specifiche delle domande...' : 'Ad esempio: stile, tono di voce, punti chiave da trattare...'"
+        formControlName="instructions"
+        rows="3"
+        [placeholder]="TypeMode() === 'questions'
+          ? 'Stile, tono, aspetti specifici da coprire...'
+          : 'Stile, tono di voce, punti chiave da trattare...'"
       ></textarea>
     </section>
 
@@ -75,12 +164,128 @@
       <button
         type="submit"
         class="btn btn-primary ai btn-lg icon-btn"
-        [disabled]="genForm.invalid"
-        (click)="onSubmit()"
+        [disabled]="genForm.invalid || IsGenerating()"
       >
-        <fa-icon [icon]="SparklesIcon"></fa-icon>
-        Genera {{ getSelectedTypeName() }}
+        <fa-icon
+          [icon]="IsGenerating() ? SpinnerIcon : SparklesIcon"
+          [animation]="IsGenerating() ? 'spin' : undefined"
+        ></fa-icon>
+        {{ IsGenerating() ? 'Generazione in corso...' : 'Genera ' +
+        getSelectedTypeName() }}
       </button>
     </div>
   </form>
+
+  } @else {
+
+  <!-- ─── PHASE 2: REVIEW ───────────────────────────────────────────────── -->
+  <div class="d-flex flex-column gap-3">
+    @if (PartialGenerationWarning() > 0) {
+    <div
+      class="alert alert-warning d-flex align-items-center gap-2 py-2 px-3"
+      role="alert"
+    >
+      <fa-icon [icon]="SparklesIcon" class="flex-shrink-0"></fa-icon>
+      <span class="small"
+        >Sono state generate meno domande di quelle richieste ({{
+        PartialGenerationWarning() }} {{ PartialGenerationWarning() === 1 ? 'non
+        riuscita' : 'non riuscite' }}).</span
+      >
+    </div>
+    }
+    <div class="d-flex align-items-center justify-content-between">
+      <button
+        class="btn btn-link p-0 text-muted small"
+        type="button"
+        (click)="onBackToForm()"
+      >
+        <fa-icon [icon]="TimesIcon" class="me-1"></fa-icon>
+        Nuova generazione
+      </button>
+      <button
+        class="btn icon-btn btn-outline-primary"
+        type="button"
+        (click)="toggleAll()"
+      >
+        <fa-icon [icon]="CheckAllIcon" class="me-1"></fa-icon>
+        {{ AllSelected() ? 'Deseleziona tutte' : 'Seleziona tutte' }}
+      </button>
+    </div>
+
+    @for (q of ReviewQuestions(); track q.TempId) {
+    <div class="position-relative">
+      <div
+        app-question-card
+        [question]="q.data"
+        mode="ai-review"
+        [class.opacity-50]="!q.Selected"
+        style="transition: opacity 0.2s"
+      ></div>
+      <div class="position-absolute top-0 end-0 p-2">
+        <div class="form-check form-switch m-0">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            role="switch"
+            style="width: 2.4em; height: 1.3em; cursor: pointer"
+            [checked]="q.Selected"
+            (change)="toggleQuestion(q.TempId)"
+            [attr.aria-label]="'Includi: ' + q.data.text"
+          />
+        </div>
+      </div>
+    </div>
+    }
+
+    <div class="d-flex justify-content-end mt-2">
+      <button
+        class="btn ai btn-lg"
+        type="button"
+        [disabled]="!AnySelected() || IsSaving()"
+        (click)="onConfirmSelection()"
+      >
+        <fa-icon
+          [icon]="IsSaving() ? SpinnerIcon : SparklesIcon"
+          [animation]="IsSaving() ? 'spin' : undefined"
+          class="me-2"
+        ></fa-icon>
+        {{ IsSaving() ? 'Salvataggio...' : IsOffcanvasMode() ? 'Aggiungi ' +
+        SelectedCount() + (SelectedCount() === 1 ? ' domanda' : ' domande') + '
+        al test' : 'Salva ' + SelectedCount() + (SelectedCount() === 1 ? '
+        domanda' : ' domande') + ' nella banca domande' }}
+      </button>
+    </div>
+  </div>
+
+  }
 </div>
+
+<!-- ─── MATERIAL SUCCESS MODAL ──────────────────────────────────────────── -->
+<ng-template #materialSuccessModal let-modal>
+  <div class="modal-header border-0 pb-0">
+    <h5 class="modal-title fw-semibold">Materiale generato</h5>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Chiudi"
+      (click)="modal.dismiss()"
+    ></button>
+  </div>
+  <div class="modal-body text-center py-4">
+    <fa-icon
+      [icon]="SparklesIcon"
+      class="text-primary mb-3 d-block"
+      style="font-size: 2rem"
+    ></fa-icon>
+    <p class="mb-0">Il tuo file è stato generato</p>
+  </div>
+  <div class="modal-footer border-0 pt-0 justify-content-center">
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="navigateToResources()"
+    >
+      Vai a file e risorse
+    </button>
+  </div>
+</ng-template>

@@ -60,7 +60,10 @@ const createMaterial = async (
       $push: { content: material._id },
     } as any);
   }
-  await startIndexingJob(material._id);
+  if (material.type !== "folder") {
+    await startIndexingJob(material._id);
+  }
+
   return {
     success: true,
     material,

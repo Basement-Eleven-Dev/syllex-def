@@ -27,6 +27,7 @@ import {
   QuestionsDroppableList,
   QuestionWithPoints,
 } from '../../components/questions-droppable-list/questions-droppable-list';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SearchQuestions } from '../../components/search-questions/search-questions';
 import { ClassSelector } from '../../components/class-selector/class-selector';
 import { ClassiService } from '../../../services/classi-service';
@@ -36,7 +37,6 @@ import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { Materia } from '../../../services/materia';
 import { TestsService, TestInterface } from '../../../services/tests-service';
 import { FeedbackService } from '../../../services/feedback-service';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { QuestionsSearchFilters } from '../../components/questions-search-filters/questions-search-filters';
 
 @Component({
@@ -315,5 +315,12 @@ export class CreateEditTest implements OnInit {
       scroll: true,
     });
     offcanvasRef.componentInstance.type = 'questions';
+    offcanvasRef.closed
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((questions: QuestionWithPoints[]) => {
+        if (questions?.length) {
+          this.questionsComponent.addQuestions(questions);
+        }
+      });
   }
 }

@@ -30,8 +30,8 @@
             <td>
               <div class="avatar avatar-sm">
                 <img
-                  src="https://api.dicebear.com/9.x/initials/svg?seed={{ assignment.studentName }} {{ assignment.studentLastName }}"
-                  alt="avatar"
+                  [src]="getStudentAvatarUrl(assignment.studentName!, assignment.studentLastName!)"
+                  [alt]="assignment.studentName! + ' ' + assignment.studentLastName!"
                   height="30"
                   class="rounded-circle"
                 />

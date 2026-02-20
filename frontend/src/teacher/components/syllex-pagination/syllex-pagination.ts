@@ -1,6 +1,8 @@
 import { Component, computed, input, output, signal } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
+  faAnglesLeft,
+  faAnglesRight,
   faChevronLeft,
   faChevronRight,
 } from '@fortawesome/pro-solid-svg-icons';
@@ -14,6 +16,8 @@ import {
 export class SyllexPagination {
   readonly ChevronLeft = faChevronLeft;
   readonly ChevronRight = faChevronRight;
+  readonly AnglesLeft = faAnglesLeft;
+  readonly AnglesRight = faAnglesRight;
 
   collectionSize = input.required<number>();
   page = input.required<number>();
@@ -75,5 +79,14 @@ export class SyllexPagination {
     if (this.page() < this.totalPages()) {
       this.pageChange.emit(this.page() + 1);
     }
+  }
+
+  onFirst(): void {
+    if (this.page() > 1) this.pageChange.emit(1);
+  }
+
+  onLast(): void {
+    if (this.page() < this.totalPages())
+      this.pageChange.emit(this.totalPages());
   }
 }

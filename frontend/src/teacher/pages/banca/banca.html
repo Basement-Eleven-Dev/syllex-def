@@ -31,12 +31,8 @@
       class="h-100"
       app-question-card
       [question]="question"
-      [locked]="true"
-      [showTestCompositionActions]="false"
-      [showBancaActions]="true"
-      [showExplanation]="true"
-      [showPolicy]="true"
-      (onExpand)="onQuestionExpanded($event)"
+      mode="banca"
+      (removeMe)="onDeleteQuestion($event)"
     ></div>
   </div>
   }

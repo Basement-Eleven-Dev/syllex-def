@@ -2,8 +2,19 @@
   <button
     class="nav-button"
     [disabled]="page() === 1"
+    (click)="onFirst()"
+    type="button"
+    title="Prima pagina"
+  >
+    <fa-icon class="d-inline-flex" [icon]="AnglesLeft"></fa-icon>
+  </button>
+
+  <button
+    class="nav-button"
+    [disabled]="page() === 1"
     (click)="onPrevious()"
     type="button"
+    title="Pagina precedente"
   >
     <fa-icon class="d-inline-flex" [icon]="ChevronLeft"></fa-icon>
   </button>
@@ -33,7 +44,18 @@
     [disabled]="page() === totalPages()"
     (click)="onNext()"
     type="button"
+    title="Pagina successiva"
   >
     <fa-icon class="d-inline-flex" [icon]="ChevronRight"></fa-icon>
+  </button>
+
+  <button
+    class="nav-button"
+    [disabled]="page() === totalPages()"
+    (click)="onLast()"
+    type="button"
+    title="Ultima pagina"
+  >
+    <fa-icon class="d-inline-flex" [icon]="AnglesRight"></fa-icon>
   </button>
 </div>

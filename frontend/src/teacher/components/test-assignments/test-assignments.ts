@@ -105,4 +105,9 @@ export class TestAssignments implements OnChanges {
     this.filtersForm.reset({ text: '', class: '', status: '' });
     this.applyFilters();
   }
+
+  getStudentAvatarUrl(firstName: string, lastName: string): string {
+    const seed = `${firstName} ${lastName}`;
+    return `https://api.dicebear.com/9.x/initials/svg?backgroundColor=3931ce&textColor=ffffff&seed=${seed}`;
+  }
 }

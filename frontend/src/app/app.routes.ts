@@ -29,6 +29,7 @@ import { CreateEditEvent } from '../teacher/pages/create-edit-event/create-edit-
 import { StudentTestsList } from '../student/pages/student-tests-list/student-tests-list';
 import { testExecutionGuard } from '../guards/test-execution.guard';
 import { StudentComunicazioni } from '../student/pages/student-comunicazioni/student-comunicazioni';
+import { StudentCreateTest } from '../student/pages/student-create-test/student-create-test';
 
 export const routes: Routes = [
   {
@@ -228,6 +229,10 @@ export const routes: Routes = [
       {
         path: 'comunicazioni/edit/:comunicazioneId',
         component: CreateEditComunicazione,
+      },
+      {
+        path: 'auto-evaluation/create',
+        component: StudentCreateTest,
       },
       {
         path: 'laboratorio-ai',

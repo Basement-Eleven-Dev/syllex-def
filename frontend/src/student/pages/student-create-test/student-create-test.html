@@ -1,0 +1,283 @@
+<!-- Intestazione -->
+<div class="d-flex align-items-center gap-3 mb-5">
+  <a routerLink="/s/tests" class="btn btn-outline-secondary btn-sm">
+    <fa-icon [icon]="BackIcon" />
+  </a>
+  <div>
+    <h1 class="text-dark fw-medium display-6 mb-1">
+      Crea test di auto-valutazione
+    </h1>
+    <p class="text-muted mb-0">
+      Configura un test personalizzato per allenarti sugli argomenti che
+      preferisci
+    </p>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Colonna sinistra: configurazione -->
+  <div class="col-12 col-xl-8">
+    <!-- Step 1: Materia -->
+    <div class="config-card mb-4">
+      <div class="config-card__header">
+        <span class="config-card__step">1</span>
+        <div>
+          <h5 class="mb-0 fw-semibold">Materia</h5>
+          <p class="text-muted small mb-0">
+            Scegli su quale materia vuoi esercitarti
+          </p>
+        </div>
+      </div>
+      <div class="config-card__body">
+        <select
+          class="form-select custom-input"
+          [value]="SelectedSubjectId()"
+          (change)="onSubjectChange($any($event.target).value)"
+        >
+          <option value="" disabled>Seleziona una materia...</option>
+          @for (subject of AllSubjects(); track subject._id) {
+          <option [value]="subject._id">{{ subject.name }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <!-- Step 2: Topic (visibile solo dopo aver scelto la materia) -->
+    @if (SelectedSubject()) {
+    <div class="config-card mb-4">
+      <div class="config-card__header">
+        <span class="config-card__step">2</span>
+        <div class="flex-grow-1">
+          <h5 class="mb-0 fw-semibold">Argomenti</h5>
+          <p class="text-muted small mb-0">
+            Seleziona uno o più argomenti su cui concentrarti
+          </p>
+        </div>
+        <div class="d-flex gap-2 ms-auto align-items-center">
+          <button
+            type="button"
+            class="btn btn-outline-primary btn-sm"
+            (click)="selectAllTopics()"
+          >
+            Tutti
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline-secondary btn-sm"
+            (click)="clearTopics()"
+          >
+            Nessuno
+          </button>
+        </div>
+      </div>
+      <div class="config-card__body">
+        <div class="d-flex flex-wrap gap-2">
+          @for (topic of AvailableTopics(); track topic._id) {
+          <button
+            type="button"
+            class="btn topic-btn"
+            [class.topic-btn--selected]="isTopicSelected(topic._id)"
+            (click)="toggleTopic(topic._id)"
+          >
+            @if (isTopicSelected(topic._id)) {
+            <fa-icon [icon]="CheckIcon" class="me-1 small" />
+            } {{ topic.name }}
+          </button>
+          } @empty {
+          <p class="text-muted small fst-italic mb-0">
+            Nessun argomento disponibile per questa materia
+          </p>
+          }
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Step 3: Numero domande -->
+    @if (SelectedTopicIds().size > 0) {
+    <div class="config-card mb-4">
+      <div class="config-card__header">
+        <span class="config-card__step">3</span>
+        <div>
+          <h5 class="mb-0 fw-semibold">Numero di domande</h5>
+          <p class="text-muted small mb-0">
+            Quante domande vuoi nel test? (1 – 100)
+          </p>
+        </div>
+      </div>
+      <div class="config-card__body">
+        <div class="d-flex align-items-center gap-3">
+          <input
+            type="range"
+            class="form-range flex-grow-1"
+            min="1"
+            max="20"
+            step="1"
+            [value]="QuestionCount()"
+            (input)="setQuestionCount($any($event.target).value)"
+          />
+          <div class="question-count-badge">{{ QuestionCount() }}</div>
+        </div>
+        <div class="d-flex justify-content-between text-muted small mt-1 px-1">
+          <span>1</span>
+          <span>5</span>
+          <span>10</span>
+          <span>15</span>
+          <span>20</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Tipologie da escludere -->
+    <div class="config-card mb-4">
+      <div class="config-card__header">
+        <span class="config-card__step">4</span>
+        <div>
+          <h5 class="mb-0 fw-semibold">Tipologie di domanda</h5>
+          <p class="text-muted small mb-0">
+            Spunta le tipologie da <strong>escludere</strong> dal test
+          </p>
+        </div>
+      </div>
+      <div class="config-card__body">
+        <div class="d-flex flex-wrap gap-3">
+          @for (type of AllQuestionTypes; track type) {
+          <div
+            class="type-toggle"
+            [class.type-toggle--excluded]="isTypeExcluded(type)"
+            (click)="toggleExcludedType(type)"
+          >
+            @if (isTypeExcluded(type)) {
+            <fa-icon [icon]="RemoveIcon" class="me-2 text-danger small" />
+            <span class="text-danger text-decoration-line-through"
+              >{{ type }}</span
+            >
+            } @else {
+            <fa-icon [icon]="CheckIcon" class="me-2 text-success small" />
+            <span>{{ type }}</span>
+            }
+          </div>
+          }
+        </div>
+        @if (ExcludedTypes().size === AllQuestionTypes.length) {
+        <div class="alert alert-warning mt-3 mb-0 py-2 small">
+          Hai escluso tutte le tipologie. Almeno una deve essere attiva.
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Step 5: Tempo -->
+    <div class="config-card mb-4">
+      <div class="config-card__header">
+        <span class="config-card__step">5</span>
+        <div class="flex-grow-1">
+          <h5 class="mb-0 fw-semibold">Limite di tempo</h5>
+          <p class="text-muted small mb-0">
+            Imposta un conto alla rovescia (opzionale)
+          </p>
+        </div>
+        <div class="form-check form-switch ms-auto">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            role="switch"
+            id="timeLimitSwitch"
+            [checked]="TimeLimitEnabled()"
+            (change)="TimeLimitEnabled.set($any($event.target).checked)"
+          />
+        </div>
+      </div>
+      @if (TimeLimitEnabled()) {
+      <div class="config-card__body">
+        <div class="d-flex align-items-center gap-3">
+          <input
+            type="number"
+            class="form-control custom-input"
+            style="max-width: 120px"
+            min="1"
+            max="180"
+            [value]="TimeLimit()"
+            (input)="setTimeLimit($any($event.target).value)"
+          />
+          <span class="text-muted">minuti</span>
+        </div>
+      </div>
+      }
+    </div>
+    }
+  </div>
+
+  <!-- Colonna destra: riepilogo + conferma -->
+  <div class="col-12 col-xl-4">
+    <div class="summary-card sticky-top" style="top: 80px">
+      <h6 class="fw-semibold mb-3">Riepilogo</h6>
+
+      <div class="summary-row">
+        <span class="summary-label">Materia</span>
+        <span class="summary-value">
+          @if (SelectedSubject()) { {{ SelectedSubject()!.name }} } @else {
+          <span class="text-muted fst-italic">Non selezionata</span>
+          }
+        </span>
+      </div>
+
+      <div class="summary-row">
+        <span class="summary-label">Argomenti</span>
+        <span class="summary-value">
+          @if (SelectedTopicIds().size > 0) { {{ SelectedTopicIds().size }}
+          selezionat{{ SelectedTopicIds().size === 1 ? 'o' : 'i' }} } @else {
+          <span class="text-muted fst-italic">Nessuno</span>
+          }
+        </span>
+      </div>
+
+      <div class="summary-row">
+        <span class="summary-label">Domande</span>
+        <span class="summary-value fw-semibold">{{ QuestionCount() }}</span>
+      </div>
+
+      <div class="summary-row">
+        <span class="summary-label">Tipologie escluse</span>
+        <span class="summary-value">
+          @if (ExcludedTypes().size === 0) {
+          <span class="text-muted fst-italic">Nessuna</span>
+          } @else { {{ ExcludedTypes().size }} }
+        </span>
+      </div>
+
+      <div class="summary-row">
+        <span class="summary-label">Tempo limite</span>
+        <span class="summary-value">
+          @if (TimeLimitEnabled()) { {{ TimeLimit() }} min } @else {
+          <span class="text-muted fst-italic">Nessuno</span>
+          }
+        </span>
+      </div>
+
+      <hr />
+
+      <button
+        type="button"
+        class="btn btn-gradient-primary w-100 py-3"
+        [disabled]="!IsFormValid() || IsSubmitting() || ExcludedTypes().size === AllQuestionTypes.length"
+        (click)="onSubmit()"
+      >
+        @if (IsSubmitting()) {
+        <span
+          class="spinner-border spinner-border-sm me-2"
+          role="status"
+        ></span>
+        Generazione in corso... } @else {
+        <fa-icon [icon]="CheckIcon" class="me-2" />
+        Crea il test }
+      </button>
+
+      @if (!IsFormValid()) {
+      <p class="text-muted small text-center mt-2 mb-0">
+        Completa tutti i campi obbligatori per continuare
+      </p>
+      }
+    </div>
+  </div>
+</div>

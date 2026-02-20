@@ -1,32 +1,25 @@
-import { CdkDrag, DragDropModule } from '@angular/cdk/drag-drop';
-import {
-  Component,
-  EventEmitter,
-  Input,
-  Output,
-  computed,
-  input,
-  signal,
-} from '@angular/core';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { QuestionInterface } from '../../../services/questions';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faCheck,
-  faChevronDown,
-  faChevronUp,
-  faCircleChevronDown,
-  faCircleChevronUp,
-  faExpand,
   faPencilAlt,
-  faRobot,
   faTrash,
 } from '@fortawesome/pro-solid-svg-icons';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { NgbCollapse, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { FormsModule } from '@angular/forms';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { RouterModule } from '@angular/router';
-import { ConfirmActionDirective } from '../../../directives/confirm-action.directive';
 import { Materia } from '../../../services/materia';
 import { TitleCasePipe } from '@angular/common';
+
+/** Controls what the card renders and which actions are visible. */
+export type QuestionCardMode =
+  | 'preview' // topic + type + text + options (no correct highlights, no actions) – default
+  | 'banca' // preview + correct highlights + policy pill + edit/delete + explanation
+  | 'ai-review' // banca-like: correct highlights + explanation, but no action buttons
+  | 'test-composition' // preview + points input + remove button + drag handle
+  | 'student'; // interactive radio/textarea + status feedback after submission
 
 @Component({
   selector: 'div[app-question-card]',
@@ -35,7 +28,6 @@ import { TitleCasePipe } from '@angular/common';
     DragDropModule,
     FontAwesomeModule,
     FormsModule,
-    ReactiveFormsModule,
     RouterModule,
     TitleCasePipe,
   ],
@@ -43,46 +35,35 @@ import { TitleCasePipe } from '@angular/common';
   styleUrl: './question-card.scss',
 })
 export class QuestionCard {
-  readonly TrashIcon = faTrash;
-  readonly CheckIcon = faCheck;
-  readonly ExpandIcon = faExpand;
-  readonly EditIcon = faPencilAlt;
-  readonly CollapseIcon = faCircleChevronDown;
-  readonly UnCollapseIcon = faCircleChevronUp;
-  readonly RobotIcon = faRobot;
+  protected readonly TrashIcon = faTrash;
+  protected readonly CheckIcon = faCheck;
+  protected readonly EditIcon = faPencilAlt;
 
-  points = input<number>(1);
+  private readonly modalServ = inject(NgbModal);
+  protected readonly materiaService = inject(Materia);
 
-  readonly questionPreview = computed(() => {
-    const maxLength = 80;
-    const text = this.question?.text || '';
-    return text.length > maxLength
-      ? text.substring(0, maxLength) + '...'
-      : text;
-  });
-
-  constructor(
-    private modalServ: NgbModal,
-    public materiaService: Materia,
-  ) {}
-
-  @Input() question!: QuestionInterface;
+  // ── Core ─────────────────────────────────────────────────────────────────
+  @Input({ required: true }) question!: QuestionInterface;
+  @Input() mode: QuestionCardMode = 'preview';
   @Input() index: number = 0;
   @Input() showIndex: boolean = false;
-  @Input() showTestCompositionActions: boolean = false;
-  @Input() showBancaActions: boolean = false;
-  @Input() showExplanation: boolean = false;
-  @Input() showPolicy: boolean = false;
-  @Input() studentMode: boolean = false;
   @Input() locked: boolean = false;
   @Input() dimmed: boolean = false;
+
+  // ── Test-composition ──────────────────────────────────────────────────────
+  /** Local copy used for ngModel binding; synced via the setter. */
+  protected LocalPoints: number = 1;
+  @Input() set points(v: number) {
+    this.LocalPoints = v;
+  }
+  @Output() pointsChange = new EventEmitter<number>();
+  @Output() removeMe = new EventEmitter<string>();
+
+  // ── Student mode ──────────────────────────────────────────────────────────
   @Input() selectedAnswer: number | string | null = null;
   @Input() score: number | null = null;
   @Input() questionStatus: 'correct' | 'wrong' | 'semi-correct' | null = null;
   @Input() teacherFeedback: string | null = null;
-  @Output() removeMe = new EventEmitter<string>();
-  @Output() onExpand = new EventEmitter<string>();
-  @Output() pointsChange = new EventEmitter<number>();
   @Output() answerChange = new EventEmitter<number | string>();
 
   onExpandImage(img: string): void {

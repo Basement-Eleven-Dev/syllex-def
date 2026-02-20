@@ -68,8 +68,7 @@
           [question]="question"
           [index]="index"
           [points]="question.points"
-          [showTestCompositionActions]="true"
-          [showIndex]="true"
+          mode="test-composition"
           (pointsChange)="updatePoints(question._id, $event)"
           (removeMe)="removeQuestion($event)"
         >

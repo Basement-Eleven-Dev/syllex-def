@@ -119,6 +119,16 @@ export class QuestionsDroppableList implements OnChanges {
     this.emitChanges();
   }
 
+  /** Appends AI-generated questions, skipping duplicates by _id. */
+  addQuestions(questions: QuestionWithPoints[]): void {
+    this.selectedQuestions.update((current) => {
+      const existingIds = new Set(current.map((q) => q._id));
+      const newOnes = questions.filter((q) => !existingIds.has(q._id));
+      return [...current, ...newOnes];
+    });
+    this.emitChanges();
+  }
+
   // ── Helpers ────────────────────────────────────────────────────────────────
   getQuestionsByType(type: string): number {
     return this.selectedQuestions().filter((q) => q.type === type).length;
