@@ -57,6 +57,7 @@ const testRoute: FunctionIntegration = {
           resourcePath: apiRoute,
           httpMethod: method,
           path: req.originalUrl,
+          stage: "",
           domainName: "localhost:" + PORT
         },
       };
