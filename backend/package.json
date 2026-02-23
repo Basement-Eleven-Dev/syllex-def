@@ -56,7 +56,6 @@
     "@dqbd/tiktoken": "^1.0.22",
     "@google-cloud/documentai": "^9.5.0",
     "@google/genai": "^1.42.0",
-    "@google/generative-ai": "^0.24.1",
     "@mermaid-js/mermaid-cli": "^11.9.0",
     "@middy/core": "^7.0.2",
     "@middy/http-cors": "^7.0.2",
