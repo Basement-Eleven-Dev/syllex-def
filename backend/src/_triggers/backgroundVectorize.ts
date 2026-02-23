@@ -10,6 +10,7 @@ import { extractTextFromFile } from "../_helpers/documents/extractTextFromFile";
 import {
   vectorizeDocument,
   VectorizeDocumentParams,
+  vectorizeDocumentWithGemini,
 } from "../_helpers/AI/embeddings/vectorizeDocument";
 import { fetchBuffer } from "../_helpers/fetchBuffer";
 
@@ -34,7 +35,7 @@ export const vectorizeMaterialAndUpdateMaterialStatus = async (
     teacherId: material.teacherId,
     documentText: textExtracted,
   };
-  await vectorizeDocument(vectorizeParams);
+  await vectorizeDocumentWithGemini(vectorizeParams);
 
   await db
     .collection("materials")
