@@ -1,6 +1,9 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { generateAIResponse } from "../../_helpers/AI/generateResponse";
+import {
+  generateAIResponse,
+  generateAIResponseGemini,
+} from "../../_helpers/AI/generateResponse";
 import { saveMessage } from "../../_helpers/DB/messages/saveMessage";
 
 const generateResponse = async (
@@ -26,12 +29,13 @@ const generateResponse = async (
     };
   }
   await saveMessage(subjectId, userId, "user", query);
-  const aiResponse = await generateAIResponse(
+  const aiResponse = await generateAIResponseGemini(
     assistantId,
     query,
     subjectId,
     userId,
   );
+
   if (!aiResponse) {
     return {
       success: false,
