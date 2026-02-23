@@ -359,6 +359,8 @@ export class Materiali {
   protected onRequestGenerate(): void {
     this.offCanvasService.open(GenAiContents, {
       position: 'end',
+      panelClass: 'offcanvas-large',
+      scroll: true,
       backdrop: true,
     });
   }
