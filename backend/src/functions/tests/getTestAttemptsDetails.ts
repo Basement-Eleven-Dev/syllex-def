@@ -99,12 +99,16 @@ const getTestAttemptsDetails = async (
   const totalDeliveries = attemptsWithStudents.length;
   let totalScore = 0;
   let eligibleCount = 0;
-
+  let toGradeCount = 0;
   attemptsWithStudents.forEach((attempt) => {
     totalScore += attempt.score || 0;
 
     if ((attempt.score || 0) >= fitScore) {
       eligibleCount++;
+    }
+
+    if (attempt.status !== "reviewed") {
+      toGradeCount++;
     }
   });
 
@@ -128,6 +132,7 @@ const getTestAttemptsDetails = async (
         icon: "chart-bar",
       },
       { title: "Idonei", value: eligibleCount, icon: "check-circle" },
+      { title: "Da correggere", value: toGradeCount, icon: "pen-nib" },
       { title: "Assegnazioni", value: totalAssignments, icon: "users" },
     ],
     attempts: attemptsWithStudents,
