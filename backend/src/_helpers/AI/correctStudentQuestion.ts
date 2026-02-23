@@ -1,5 +1,5 @@
 import { zodTextFormat } from "openai/helpers/zod";
-import { getOpenAIClient } from "./getOpenAIClient";
+import { getOpenAIClient } from "./getClient";
 import { z } from "zod";
 export async function correctStudentQuestion(
   answer: string,

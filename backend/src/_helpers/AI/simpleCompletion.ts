@@ -1,5 +1,5 @@
 import { ChatCompletionContentPart } from "openai/resources/index";
-import { getOpenAIClient } from "./getOpenAIClient";
+import { getOpenAIClient } from "./getClient";
 import { ZodObject, ZodType } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
 import { ResponseInput, ResponseInputContent, ResponseInputFile } from "openai/resources/responses/responses";
@@ -56,3 +56,8 @@ export const askStrucuredLLM = async <T>(prompt: string, materials: MaterialInte
 
     return response.output_parsed!
 };
+
+
+export const askGemini = async (prompt: string, materials: MaterialInterface[] = [], model: string = "gpt-4o", temperature?: number): Promise<string> => {
+    return ""
+}

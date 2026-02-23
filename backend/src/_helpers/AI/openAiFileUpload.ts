@@ -1,6 +1,6 @@
 import { toFile } from "openai";
 import { MaterialInterface } from "../../models/material";
-import { getOpenAIClient } from "./getOpenAIClient";
+import { getOpenAIClient } from "./getClient";
 import { getDefaultDatabase } from "../getDatabase";
 
 export const getOpenAiFileId = async (material: MaterialInterface): Promise<string> => {

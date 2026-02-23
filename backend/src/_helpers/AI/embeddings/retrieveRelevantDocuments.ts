@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import { getDefaultDatabase } from "../../getDatabase";
-import { getOpenAIClient } from "../getOpenAIClient";
+import { getOpenAIClient } from "../getClient";
 
 interface RelevantDocument {
   text: string;

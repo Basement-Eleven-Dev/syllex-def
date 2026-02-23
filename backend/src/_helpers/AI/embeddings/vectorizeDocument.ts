@@ -1,5 +1,5 @@
 import { Collection, ObjectId } from "mongodb";
-import { getOpenAIClient } from "../getOpenAIClient";
+import { getOpenAIClient } from "../getClient";
 import { getDefaultDatabase } from "../../getDatabase";
 
 export interface VectorizeDocumentParams {

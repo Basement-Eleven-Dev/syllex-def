@@ -1,4 +1,4 @@
-import { getOpenAIClient } from "./getOpenAIClient";
+import { getOpenAIClient } from "./getClient";
 import { buildConversationHistory } from "../DB/messages/buildConversationHistory";
 import { buildAgent } from "./buildAgent";
 import { retrieveRelevantDocuments } from "./embeddings/retrieveRelevantDocuments";
