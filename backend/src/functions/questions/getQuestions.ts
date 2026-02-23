@@ -10,12 +10,6 @@ const getQuestions = async (
 ) => {
   const db = await getDefaultDatabase();
   const questionsCollection = db.collection<Question>("questions");
-  console.log(
-    "[BACKEND] Parametri queryString:",
-    request.queryStringParameters,
-  );
-  console.log("[BACKEND] context.user:", context.user);
-  console.log("[BACKEND] context.user._id:", context);
 
   // Estraggo i parametri dalla query string
   const {

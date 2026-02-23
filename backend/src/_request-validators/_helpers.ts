@@ -15,7 +15,6 @@ export const canInvoke = async (
   token?: string,
   cognitoGroup?: "students" | "teachers",
 ): Promise<CognitoIdTokenPayload | null> => {
-  console.log(token, cognitoGroup);
   const verifier = CognitoJwtVerifier.create({
     userPoolId: process.env.COGNITO_POOL_ID!,
     tokenUse: "id", // Use "access" if you are sending the access token
@@ -26,7 +25,6 @@ export const canInvoke = async (
     // 2. This checks the signature against the public JWKS
     // and verifies expiration/audience/issuer.
     const payload = await verifier.verify(token);
-    console.log("✅ Token Verified:", payload);
     if (cognitoGroup) {
       if (payload["cognito:groups"]?.includes(cognitoGroup)) return payload;
       else return null;
@@ -48,11 +46,11 @@ export const checkValidation = async (
   return !authorizedPayload
     ? generatePolicy("unauthorized", "Deny", event.methodArn)
     : generatePolicy(
-        authorizedPayload.sub,
-        "Allow",
-        event.methodArn,
-        authorizedPayload,
-      );
+      authorizedPayload.sub,
+      "Allow",
+      event.methodArn,
+      authorizedPayload,
+    );
 };
 
 const generatePolicy = (
@@ -76,10 +74,10 @@ const generatePolicy = (
     // The 'context' object only supports flat Key-Value pairs (strings, numbers, booleans)
     context: contextData
       ? {
-          email: contextData.email,
-          sub: contextData.sub,
-          groups: JSON.stringify(contextData["cognito:groups"] || []),
-        }
+        email: contextData.email,
+        sub: contextData.sub,
+        groups: JSON.stringify(contextData["cognito:groups"] || []),
+      }
       : undefined,
   };
 };

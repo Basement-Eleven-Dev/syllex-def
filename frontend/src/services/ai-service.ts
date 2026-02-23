@@ -38,6 +38,7 @@ export interface GeneratedQuestion {
   type: QuestionType;
   text: string;
   explanation: string;
+  correctAnswer?: boolean;
   options?: GeneratedQuestionOption[];
 }
 

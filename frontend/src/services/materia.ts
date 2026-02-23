@@ -56,7 +56,6 @@ export class Materia {
       .get<MateriaObject[]>(`teachers/${teacherId}/subjects`)
       .subscribe((materie) => {
         this.allMaterie.set(materie);
-        console.log('Materie del teacher:', materie);
         this.loadSavedSubject();
       });
 
