@@ -34,55 +34,55 @@
 </div>
 
 <div class="row">
-  <div class="col-12 col-lg-8 mb-3">
+  <!-- Punteggio -->
+  <div class="col-12 col-md-6 col-lg-3 mb-3">
     <div class="card h-100">
-      <div class="card-body d-flex flex-row align-items-center">
-        <div class="px-5 border-end">
-          <span class="cardValue text-dark">
-            {{ d.score != null ? d.score : '?' }}<span class="reduced"
-              >/{{ d.maxScore }}</span
-            >
-          </span>
-          <p class="mb-0 cardDescription text-dark">Punteggio</p>
-        </div>
-        <div class="flex-fill d-flex flex-column justify-content-center">
-          <div
-            class="d-flex flex-row justify-content-around align-items-center"
-          >
-            <span class="cardValue fs-1 text-success">
-              {{ d.questionsStats.correct }}
-              <fa-icon [icon]="CheckIcon"></fa-icon>
-            </span>
-            <span class="cardValue fs-1 text-danger">
-              {{ d.questionsStats.wrong }}
-              <fa-icon [icon]="TimesIcon"></fa-icon>
-            </span>
-            <span class="cardValue fs-1 text-warning">
-              {{ d.questionsStats.dubious }}
-              <fa-icon [icon]="QuestionMarkIcon"></fa-icon>
-            </span>
-            <span class="cardValue fs-1" style="color: rgb(166, 166, 166)">
-              {{ d.questionsStats.empty }}
-              <fa-icon [icon]="CircleIcon"></fa-icon>
-            </span>
-          </div>
-          <p class="mb-0 cardDescription text-dark text-center">Risposte</p>
-        </div>
+      <div class="card-body d-flex flex-column align-items-center p-4">
+        <span class="card-value text-dark">
+          {{ d.score != null ? d.score : '?' }}<span class="reduced">/{{ d.maxScore }}</span>
+        </span>
+        <p class="mb-0 card-description text-dark">Punteggio</p>
       </div>
     </div>
   </div>
 
-  <div class="col-12 col-lg-4 mb-3">
+  <!-- Risposte -->
+  <div class="col-12 col-md-6 col-lg-6 mb-3">
     <div class="card h-100">
-      <div
-        class="card-body d-flex flex-column justify-content-center align-items-center"
-      >
-        <span class="cardValue text-dark"
-          >{{ d.timeSpent * 1000 | date: 'mm:ss' }}</span
-        >
-        <p class="mb-0 cardDescription text-dark small text-center">
-          Tempo impiegato<br />
-          <small style="font-size: 0.6em">(max : {{ (d.maxTime) }}min)</small>
+      <div class="card-body d-flex flex-column align-items-center p-4">
+        <div class="d-flex flex-row justify-content-around align-items-center w-100 flex-fill">
+          <span class="card-value text-success">
+            {{ d.questionsStats.correct }}
+            <fa-icon [icon]="CheckIcon" size="xs"></fa-icon>
+          </span>
+          <span class="card-value text-danger">
+            {{ d.questionsStats.wrong }}
+            <fa-icon [icon]="TimesIcon" size="xs"></fa-icon>
+          </span>
+          <span class="card-value text-warning">
+            {{ d.questionsStats.dubious }}
+            <fa-icon [icon]="QuestionMarkIcon" size="xs"></fa-icon>
+          </span>
+          <span class="card-value" style="color: rgb(166, 166, 166)">
+            {{ d.questionsStats.empty }}
+            <fa-icon [icon]="CircleIcon" size="xs"></fa-icon>
+          </span>
+        </div>
+        <p class="mb-0 card-description text-dark">Riepilogo risposte</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tempo Impiegato -->
+  <div class="col-12 col-md-6 col-lg-3 mb-3">
+    <div class="card h-100">
+      <div class="card-body d-flex flex-column align-items-center p-4">
+        <span class="card-value text-dark">
+          {{ d.timeSpent * 1000 | date: 'mm:ss' }}
+        </span>
+        <p class="mb-0 card-description text-dark">
+          Tempo impiegato <br>
+          <small style="font-size: 0.7em">(max: {{ d.maxTime }}min)</small>
         </p>
       </div>
     </div>
