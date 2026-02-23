@@ -7,12 +7,7 @@ import { getOpenAiFileId } from "./openAiFileUpload";
 import { Part } from "@google/genai";
 
 const DEFAULT_PROVIDER: 'gemini' | 'openai' = 'gemini'
-export const askStructuredLLM = async <T>(prompt: string, materials: MaterialInterface[] = [], structure: ZodType<T>, temperature?: number): Promise<T> => {
-    return {
-        'gemini': askStrucuredGemini(prompt, materials, undefined, structure, temperature),
-        'openai': askStrucuredGpt(prompt, materials, undefined, structure, temperature)
-    }[DEFAULT_PROVIDER]
-}
+
 
 const askStrucuredGpt = async <T>(prompt: string, materials: MaterialInterface[] = [], model: string = "gpt-4o", structure: ZodType<T>, temperature?: number): Promise<T> => {
     const aiClient = await getOpenAIClient();
@@ -40,9 +35,6 @@ const askStrucuredGpt = async <T>(prompt: string, materials: MaterialInterface[]
 
     return response.output_parsed!
 };
-
-
-
 const askStrucuredGemini = async <T>(prompt: string, materials: MaterialInterface[] = [], model: string = "gemini-3-flash-preview", structure: ZodType<T>, temperature?: number): Promise<T> => {
     const getMaterialPart = async (m: MaterialInterface): Promise<Part> => {
         const res = await fetch(m.url!);
@@ -76,4 +68,11 @@ const askStrucuredGemini = async <T>(prompt: string, materials: MaterialInterfac
         }
     });
     return structure.parse(JSON.parse(response.text!))
+}
+
+export const askStructuredLLM = async <T>(prompt: string, materials: MaterialInterface[] = [], structure: ZodType<T>, temperature?: number): Promise<T> => {
+    return {
+        'gemini': askStrucuredGemini(prompt, materials, undefined, structure, temperature),
+        'openai': askStrucuredGpt(prompt, materials, undefined, structure, temperature)
+    }[DEFAULT_PROVIDER]
 }
