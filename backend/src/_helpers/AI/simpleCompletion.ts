@@ -7,30 +7,12 @@ import { getOpenAiFileId } from "./openAiFileUpload";
 import { Part } from "@google/genai";
 
 const DEFAULT_PROVIDER: 'gemini' | 'openai' = 'gemini'
-
-export const askLLM = async (prompt: string, materials: MaterialInterface[] = [], model: string = "gpt-4o", temperature?: number): Promise<string> => {
-    const aiClient = await getOpenAIClient();
-
-    // 1. Prepare the content array with your text prompt
-    const fileIds: string[] = await Promise.all(materials.map(el => getOpenAiFileId(el)));
-    const fileInputs: ResponseInputFile[] = fileIds.map(el => ({
-        type: "input_file",
-        file_id: el
-    }))
-    const content: ResponseInputContent[] = fileInputs;
-    content.push({ type: "input_text", text: prompt })
-    const input: ResponseInput = [
-        { role: "user", content: content }
-    ];
-    const response = await aiClient.responses.create({
-        temperature: temperature,
-        store: false,
-        model: model, // Must use gpt-4o or gpt-4o-mini
-        input: input
-    });
-
-    return response.output_text
-};
+export const askStructuredLLM = async <T>(prompt: string, materials: MaterialInterface[] = [], structure: ZodType<T>, temperature?: number): Promise<T> => {
+    return {
+        'gemini': askStrucuredGemini(prompt, materials, undefined, structure, temperature),
+        'openai': askStrucuredGpt(prompt, materials, undefined, structure, temperature)
+    }[DEFAULT_PROVIDER]
+}
 
 const askStrucuredGpt = async <T>(prompt: string, materials: MaterialInterface[] = [], model: string = "gpt-4o", structure: ZodType<T>, temperature?: number): Promise<T> => {
     const aiClient = await getOpenAIClient();
@@ -59,10 +41,6 @@ const askStrucuredGpt = async <T>(prompt: string, materials: MaterialInterface[]
     return response.output_parsed!
 };
 
-export const askStructuredLLM = async <T>(prompt: string, materials: MaterialInterface[] = [], structure: ZodType<T>, temperature?: number): Promise<T> => {
-    if (DEFAULT_PROVIDER == 'gemini') return askStrucuredGemini(prompt, materials, undefined, structure, temperature);
-    else return askStrucuredGpt(prompt, materials, undefined, structure, temperature);
-}
 
 
 const askStrucuredGemini = async <T>(prompt: string, materials: MaterialInterface[] = [], model: string = "gemini-3-flash-preview", structure: ZodType<T>, temperature?: number): Promise<T> => {
