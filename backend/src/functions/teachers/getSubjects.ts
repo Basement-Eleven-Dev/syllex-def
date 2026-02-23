@@ -8,12 +8,50 @@ const getTeacherSubjects = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
-  const teacherId: ObjectId = new ObjectId(request.pathParameters!.teacherId!);
+  const teacherId = new ObjectId(request.pathParameters!.teacherId!);
   const db = await getDefaultDatabase();
+
   const subjects = await db
-    .collection<Subject>("SUBJECTS")
-    .find({ teacherId: teacherId })
+    .collection<Subject>("subjects")
+    .aggregate([
+      {
+        $match: {
+          teacherId: teacherId,
+        },
+      },
+      {
+        $lookup: {
+          from: "tests",
+          let: { subjectId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$subjectId", "$$subjectId"] },
+                    { $ne: ["$status", "reviewed"] },
+                  ],
+                },
+              },
+            },
+          ],
+          as: "uncorrectedTests",
+        },
+      },
+      {
+        $addFields: {
+          uncorrectedTest: { $size: "$uncorrectedTests" },
+        },
+      },
+      {
+        $project: {
+          uncorrectedTests: 0,
+        },
+      },
+    ])
     .toArray();
+
   return subjects;
 };
+
 export const handler = lambdaRequest(getTeacherSubjects);

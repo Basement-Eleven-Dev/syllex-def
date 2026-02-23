@@ -11,6 +11,7 @@ export interface MateriaObject {
   _id: string;
   name: string;
   topics: TopicObject[];
+  uncorrectedTest: number;
 }
 @Injectable({
   providedIn: 'root',
