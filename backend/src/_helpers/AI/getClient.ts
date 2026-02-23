@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import { getSecret } from "../secrets/getSecret";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, GoogleGenAIOptions } from "@google/genai";
 
 export const getOpenAIClient = async () => {
   const OPENAI_API_KEY = await getSecret("syllex_open_ai_key");
@@ -11,10 +11,16 @@ export const getOpenAIClient = async () => {
 }
 
 export const getGeminiClient = async () => {
-  const GEMINI_API_KEY = await getSecret("gemini_api_key");
-  if (!GEMINI_API_KEY) throw new Error("api key not found");
-  return new GoogleGenAI({
-    apiKey: GEMINI_API_KEY
-  })
+  //VERTEX CONFIG
+  const GEMINI_CLIENT_OPTIONS: GoogleGenAIOptions = {
+    vertexai: true,
+    apiKey: await getSecret("gemini_api_key_vertex")
+  }
+  /*
+  //NO VERTEX
+  const GEMINI_CLIENT_OPTIONS:GoogleGenAIOptions = {
+    apiKey: await getSecret("gemini_api_key")
+  }*/
+  return new GoogleGenAI(GEMINI_CLIENT_OPTIONS)
 
 }
