@@ -8,14 +8,15 @@
   ></fa-icon>
 </div>
 } @else if (data(); as d) {
-
+<app-back-to [path]="backUrl" [label]="'Vai alle correzioni'" />
 <div class="d-flex flex-row align-items-center mb-5">
   <div class="flex-fill">
-    <h1 class="text-dark fw-bold mb-0 display-6">{{ d.testTitle }}</h1>
+    <h1 class="text-dark fw-bold mb-0 display-6">
+      <fa-icon [icon]="UserIcon" class="me-2 fixed-width"></fa-icon>{{
+      d.studentName }}
+    </h1>
     <div class="d-flex flex-column gap-2 mt-3">
-      <span class="text-dark mb-0">
-        <fa-icon [icon]="UserIcon" class="me-2"></fa-icon>{{ d.studentName }}
-      </span>
+      <span class="text-dark mb-0"> Test: {{ d.testTitle }} </span>
       <span class="text-dark mb-0">
         <fa-icon [icon]="ClockIcon" class="me-2"></fa-icon>
         {{ d.submissionDate | date:'short' }}
@@ -34,7 +35,7 @@
 
 <div class="row">
   <div class="col-12 col-lg-8 mb-3">
-    <div class="card h-100 shadow">
+    <div class="card h-100">
       <div class="card-body d-flex flex-row align-items-center">
         <div class="px-5 border-end">
           <span class="cardValue text-dark">
@@ -72,7 +73,7 @@
   </div>
 
   <div class="col-12 col-lg-4 mb-3">
-    <div class="card h-100 shadow">
+    <div class="card h-100">
       <div
         class="card-body d-flex flex-column justify-content-center align-items-center"
       >
@@ -101,7 +102,7 @@
     </div>
     @if(d.status != 'reviewed') {
     <button
-      class="btn btn-primary btn-lg shadow"
+      class="btn btn-primary btn-lg"
       (click)="submitCorrection()"
       [disabled]="isSaving() || !allQuestionsAreScored"
     >

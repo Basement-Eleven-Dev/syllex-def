@@ -15,6 +15,7 @@ import { faCircle } from '@fortawesome/pro-regular-svg-icons';
 import { QuestionCorrection } from '../../components/question-correction/question-correction';
 import { TestsService } from '../../../services/tests-service';
 import { FeedbackService } from '../../../services/feedback-service';
+import { BackTo } from '../../components/back-to/back-to';
 
 @Component({
   selector: 'app-correzione',
@@ -24,7 +25,8 @@ import { FeedbackService } from '../../../services/feedback-service';
     TitleCasePipe,
     DatePipe,
     QuestionCorrection,
-    DecimalPipe,
+    BackTo,
+    QuestionCorrection,
   ],
   templateUrl: './correzione.html',
   styleUrl: './correzione.scss',
@@ -129,5 +131,10 @@ export class Correzione implements OnInit {
       const statusEvaluated = q.answer.result !== 'dubious';
       return scoreDefined && statusEvaluated;
     });
+  }
+
+  get backUrl(): string {
+    const testId = this.data()?.testId;
+    return testId ? `/t/tests/${testId}` : '/t/tests';
   }
 }
