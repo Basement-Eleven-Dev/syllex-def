@@ -3,9 +3,8 @@ import {
   EventEmitter,
   Input,
   Output,
-  computed,
+  ViewChild,
   inject,
-  input,
 } from '@angular/core';
 import {
   FaIconComponent,
@@ -50,16 +49,24 @@ export class MaterialeCard {
   @Input() item!: MaterialInterface;
   @Input() highlightedItemId: string | null = null;
   @Input() isSelected: boolean = false;
+  @Input() showSharing: boolean = true;
+  @Input() showActions: boolean = true;
 
   @Output() openItem = new EventEmitter<MaterialInterface>();
   @Output() renameItem = new EventEmitter<string>();
   @Output() deleteItem = new EventEmitter<void>();
   @Output() selectItemEvent = new EventEmitter<MouseEvent>();
 
+  @ViewChild('contextualMenu') contextualMenuRef?: MaterialeContextualMenu;
+
   modalService = inject(NgbModal);
 
   readonly ThreeDotsIcon = faEllipsisVertical;
   readonly RobotIcon = faRobot;
+
+  requestAssignToClass(): void {
+    this.contextualMenuRef?.onRequestAssignToClass();
+  }
 
   get isFolder(): boolean {
     return this.item.type === 'folder';

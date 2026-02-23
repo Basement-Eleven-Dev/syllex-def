@@ -6,6 +6,7 @@ import { Dashboard } from '../teacher/pages/dashboard/dashboard';
 import { Test } from '../teacher/pages/test/test';
 import { authGuard, guestGuard } from '../guards/auth.guard';
 import { Materiali } from '../teacher/pages/materiali/materiali';
+import { Materiali as MaterialiStudent } from '../student/pages/materiali/materiali';
 import { TestDetail } from '../teacher/pages/test-detail/test-detail';
 import { CreateEditTest } from '../teacher/pages/create-edit-test/create-edit-test';
 import { Banca } from '../teacher/pages/banca/banca';
@@ -212,7 +213,7 @@ export const routes: Routes = [
       },
       {
         path: 'risorse',
-        component: Materiali,
+        component: MaterialiStudent,
       },
       {
         path: 'correzione/:attemptId',
