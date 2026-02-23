@@ -12,14 +12,6 @@
       <div
         class="d-flex flex-column h-100 justify-content-center gap-2 flex-fill overflow-hidden"
       >
-        @if (isAIGenerated) {
-        <fa-icon
-          [icon]="RobotIcon"
-          class="me-3"
-          style="color: #9664c8"
-          size="2x"
-        ></fa-icon>
-        } @else {
         <fa-icon
           [icon]="icon"
           class="me-3"
@@ -27,7 +19,6 @@
           [style.color]="iconColor"
         ></fa-icon>
 
-        }
         <div class="overflow-hidden">
           <p
             class="card-title mb-0 text-truncate"
@@ -56,27 +47,33 @@
         </div>
       </div>
       }
-
     </div>
 
-    @if (showSharing) {
-    <div class="d-flex flex-row gap-2 align-items-center mt-3">
-      @if(isFolder){
-      <small class="text-muted"
-        >{{ folderContentLength }} element{{ folderContentLength !== 1 ? 'i' :
-        'o' }}</small
-      >
-      | }
-      <a
-        class="text-muted small"
-        (click)="$event.stopPropagation(); requestAssignToClass()"
-        ><fa-icon [icon]="ShareNodesIcon"></fa-icon>@if(item.classIds?.length
-        === 0 || !item.classIds){ Non condiviso } @else { {{
-        item.classIds?.length }} class{{ item.classIds?.length !== 1 ? 'i' : 'e'
-        }} }</a
-      >
-    </div>
-    }
+    <div class="d-flex flex-row align-items-center justify-content-between mt-3">
+      @if (showSharing) {
+      <div class="d-flex flex-row gap-2 align-items-center">
+        @if(isFolder){
+        <small class="text-muted"
+          >{{ folderContentLength }} element{{ folderContentLength !== 1 ? 'i' :
+          'o' }}</small
+        >
+        | }
+        <a
+          class="text-muted small"
+          (click)="$event.stopPropagation(); requestAssignToClass()"
+          ><fa-icon [icon]="ShareNodesIcon"></fa-icon>@if(item.classIds?.length
+          === 0 || !item.classIds){ Non condiviso } @else { {{
+          item.classIds?.length }} class{{ item.classIds?.length !== 1 ? 'i' : 'e'
+          }} }</a
+        >
+      </div>
+      } @else {
+      <span></span>
+      }
 
+      @if (isAIGenerated) {
+      <span class="badge" style="background-color: #9664c8; font-size: 0.65rem;">IA</span>
+      }
+    </div>
   </div>
 </div>
