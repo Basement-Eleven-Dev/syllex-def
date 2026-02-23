@@ -6,9 +6,10 @@ import { ObjectId } from "mongodb";
 import { MaterialInterface } from "../../models/material";
 import { startSlidedeckGeneration } from "../../_helpers/gammaApi";
 import { uploadContentToS3 } from "../../_helpers/uploadFileToS3";
-import { askLLM } from "../../_helpers/AI/simpleCompletion";
 import { getConvertedDocument } from "../../_helpers/documents/documentConversion";
 import { retrieveRelevantDocuments } from "../../_helpers/AI/embeddings/retrieveRelevantDocuments";
+import { askStructuredLLM } from "../../_helpers/AI/simpleCompletion";
+import { z } from "zod";
 
 const documentTypes = ['slides', 'map', 'glossary', 'summary'] as const;
 
@@ -30,6 +31,7 @@ export type AIGenMaterialInput = {
 const getPrompt = (type: DocumentType, language: string = 'italian', numberOfSlides: number = 10, additionalInstructions?: string) => {
     const guardRails: string = `
     Use the ${language} language.
+    Give the response a brief title. 
     Answer the query using only the information provided in the attached documents.
     Do not use any outside knowledge, facts, or assumptions not explicitly stated in these files.`
 
@@ -41,14 +43,6 @@ const getPrompt = (type: DocumentType, language: string = 'italian', numberOfSli
     }
     return prompts[type] + '\n' + additionalInstructions + '\n' + guardRails;
 }
-
-const MODEL_NAMES: Record<DocumentType, string> = {
-    'slides': 'gpt-4o',
-    'map': 'gpt-4o',
-    'summary': 'gpt-4o',
-    'glossary': 'gpt-4o',
-}
-
 
 const createAIGenMaterial = async (
     request: APIGatewayProxyEvent,
@@ -68,15 +62,13 @@ const createAIGenMaterial = async (
     const materialObjects: MaterialInterface[] = await materialCollection.find({ _id: { $in: materialOIds } }).toArray() as MaterialInterface[]; //forse non serve
 
 
-    const instructions = getPrompt(type, language, numberOfSlides, additionalInstructions)
-    const relevantDocuments = await retrieveRelevantDocuments(instructions, context.subjectId!, materialOIds)
-    console.log(relevantDocuments)
-    const prompt = `${instructions}
-    -----------------
-    Documents to use:
-    ${relevantDocuments.map((item) => item.text).join("\n")}
-    `
-    const resultContent = await askLLM(prompt, [], MODEL_NAMES[type])
+    const prompt = getPrompt(type, language, numberOfSlides, additionalInstructions)
+    //LLM STRUCTURES
+    const DocumentSchema = z.object({
+        title: z.string(),
+        content: z.string(),
+    });
+    const { title, content } = await askStructuredLLM(prompt, materialObjects, DocumentSchema)
 
     const organization = await organizationCollection.findOne({ _id: context.user!.organizationId });
 
@@ -95,12 +87,12 @@ const createAIGenMaterial = async (
 
     if (type == 'glossary' || type == 'summary') {
         //aggiungi intestazione
-        let fileName = type + new ObjectId().toString();
+        let fileName = title;
         let markDownFilename = fileName + '.md'
         material.extension = 'docx';
         let mimetype = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
         let destinationFilename = fileName + '.' + material.extension;
-        let pdfFile = await getConvertedDocument(resultContent, markDownFilename, destinationFilename);
+        let pdfFile = await getConvertedDocument(content, markDownFilename, destinationFilename);
         material.name = destinationFilename;
         let bucketKey = 'ai_gen/' + material.name;
         material.url = await uploadContentToS3(bucketKey, pdfFile, mimetype);
@@ -108,7 +100,7 @@ const createAIGenMaterial = async (
 
     if (type == 'slides') {
         let res = await startSlidedeckGeneration({
-            inputText: resultContent,
+            inputText: content,
             numCards: numberOfSlides || 10,
             textMode: 'preserve',
             exportAs: 'pptx',
@@ -128,15 +120,15 @@ const createAIGenMaterial = async (
         const prefix = process.env.LOCAL_TESTING ? 'http://' : 'https://'
         material.url = `${prefix}${request.requestContext.domainName}/${request.requestContext.stage}/proxy/gamma/${res.generationId}`;
         material.extension = 'pptx'
-        material.name = type + new ObjectId().toString() + '.' + material.extension;
+        material.name = title + '.' + material.extension;
     }
     if (type == 'map') {
         material.extension = 'txt';
-        material.name = type + new ObjectId().toString() + '.' + material.extension;
+        material.name = title + '.' + material.extension;
         let bucketKey = 'ai_gen/' + material.name;
         let mimetype = 'text/plain; charset=utf-8'
         material.isMap = true;
-        material.url = await uploadContentToS3(bucketKey, resultContent, mimetype);
+        material.url = await uploadContentToS3(bucketKey, content, mimetype);
     }
 
 

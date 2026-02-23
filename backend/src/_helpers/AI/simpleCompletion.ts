@@ -1,10 +1,12 @@
-import { ChatCompletionContentPart } from "openai/resources/index";
-import { getOpenAIClient } from "./getClient";
-import { ZodObject, ZodType } from "zod";
+import { getGeminiClient, getOpenAIClient } from "./getClient";
+import { ZodType } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
 import { ResponseInput, ResponseInputContent, ResponseInputFile } from "openai/resources/responses/responses";
 import { MaterialInterface } from "../../models/material";
 import { getOpenAiFileId } from "./openAiFileUpload";
+import { Part } from "@google/genai";
+
+const DEFAULT_PROVIDER: 'gemini' | 'openai' = 'gemini'
 
 export const askLLM = async (prompt: string, materials: MaterialInterface[] = [], model: string = "gpt-4o", temperature?: number): Promise<string> => {
     const aiClient = await getOpenAIClient();
@@ -30,7 +32,7 @@ export const askLLM = async (prompt: string, materials: MaterialInterface[] = []
     return response.output_text
 };
 
-export const askStrucuredLLM = async <T>(prompt: string, materials: MaterialInterface[] = [], model: string = "gpt-4o", structure: ZodType<T>, temperature?: number): Promise<T> => {
+const askStrucuredGpt = async <T>(prompt: string, materials: MaterialInterface[] = [], model: string = "gpt-4o", structure: ZodType<T>, temperature?: number): Promise<T> => {
     const aiClient = await getOpenAIClient();
 
     // 1. Prepare the content array with your text prompt
@@ -57,7 +59,43 @@ export const askStrucuredLLM = async <T>(prompt: string, materials: MaterialInte
     return response.output_parsed!
 };
 
+export const askStructuredLLM = async <T>(prompt: string, materials: MaterialInterface[] = [], structure: ZodType<T>, temperature?: number): Promise<T> => {
+    if (DEFAULT_PROVIDER == 'gemini') return askStrucuredGemini(prompt, materials, undefined, structure, temperature);
+    else return askStrucuredGpt(prompt, materials, undefined, structure, temperature);
+}
 
-export const askGemini = async (prompt: string, materials: MaterialInterface[] = [], model: string = "gpt-4o", temperature?: number): Promise<string> => {
-    return ""
+
+const askStrucuredGemini = async <T>(prompt: string, materials: MaterialInterface[] = [], model: string = "gemini-3-flash-preview", structure: ZodType<T>, temperature?: number): Promise<T> => {
+    const getMaterialPart = async (m: MaterialInterface): Promise<Part> => {
+        const res = await fetch(m.url!);
+        const pdfArrayBuffer = await res.arrayBuffer();
+        const contentType = res.headers.get("content-type");
+        const mimeType = contentType?.split(';')[0];
+        return {
+            inlineData: {
+                mimeType: mimeType,
+                data: Buffer.from(pdfArrayBuffer).toString("base64")
+            }
+        }
+    }
+    const client = await getGeminiClient();
+    const materialParts = await Promise.all(materials.map(m => getMaterialPart(m)))
+    const response = await client.models.generateContent({
+        model: model,
+        contents: [{
+            role: 'user',
+            parts: [
+                {
+                    text: prompt,
+                },
+                ...materialParts
+            ]
+        }],
+        config: {
+            responseMimeType: "application/json",
+            responseJsonSchema: structure.toJSONSchema(),
+            temperature: temperature
+        }
+    });
+    return structure.parse(JSON.parse(response.text!))
 }
