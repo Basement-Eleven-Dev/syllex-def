@@ -111,6 +111,7 @@ export class GenAiQuestion {
         content: question.text,
         explanation: question.explanation,
         choices: question.options,
+        correctAnswer: question.correctAnswer
       });
     } finally {
       this.IsLoading.set(false);

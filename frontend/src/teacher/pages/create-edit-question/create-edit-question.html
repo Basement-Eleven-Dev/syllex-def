@@ -1,32 +1,17 @@
-<app-back-to
-  [path]="'/t/questions'"
-  [label]="'Torna alla lista delle domande'"
-></app-back-to>
+<app-back-to [path]="'/t/questions'" [label]="'Torna alla lista delle domande'"></app-back-to>
 
 <h1 class="text-dark fw-medium mb-3 display-6">{{ PageTitle() }}</h1>
 <h5 class="text-dark mb-0 fw-normal mb-5">{{ PageDescription() }}</h5>
-<form
-  [formGroup]="QuestionForm"
-  (ngSubmit)="onSaveQuestion()"
-  class="d-flex flex-column gap-4 pb-5"
->
+<form [formGroup]="QuestionForm" (ngSubmit)="onSaveQuestion()" class="d-flex flex-column gap-4 pb-5">
   <section class="form-section">
     <label class="form-label text-dark">Tipologia di risposta</label>
-    <app-type-selector
-      [options]="QuestionTypeOptions"
-      [(selectedValue)]="SelectedQuestionType"
-      (typeSelected)="onSelectQuestionType($event)"
-      [direction]="'row'"
-    ></app-type-selector>
+    <app-type-selector [options]="QuestionTypeOptions" [(selectedValue)]="SelectedQuestionType"
+      (typeSelected)="onSelectQuestionType($event)" [direction]="'row'"></app-type-selector>
   </section>
 
   <section class="form-section">
     <label class="form-label text-dark">Argomento</label>
-    <select
-      class="form-select custom-input w-auto"
-      formControlName="topicId"
-      aria-label="Seleziona argomento"
-    >
+    <select class="form-select custom-input w-auto" formControlName="topicId" aria-label="Seleziona argomento">
       <option value="" disabled selected>Seleziona argomento</option>
       @for(topic of materiaService.topics; track topic._id) {
       <option [value]="topic._id">{{ topic.name }}</option>
@@ -35,9 +20,7 @@
   </section>
 
   <section class="form-section">
-    <div
-      class="d-flex flex-row justify-content-between align-items-center mb-5"
-    >
+    <div class="d-flex flex-row justify-content-between align-items-center mb-5">
       <div>
         <label class="form-label text-dark">Contenuto della domanda</label>
         <p class="text-dark fw-light mb-0">
@@ -46,11 +29,7 @@
           modificare a tuo piacimento! <fa-icon [icon]="WinkIcon"></fa-icon>
         </p>
       </div>
-      <button
-        class="btn icon-btn ai"
-        type="button"
-        (click)="onRequestAIGeneration()"
-      >
+      <button class="btn icon-btn ai" type="button" (click)="onRequestAIGeneration()">
         <fa-icon [icon]="SparklesIcon"></fa-icon>
         Genera con AI
       </button>
@@ -58,32 +37,18 @@
 
     <section class="row">
       <div class="col-md-8 d-flex flex-column">
-        <label class="form-label text-dark"
-          >{{ SelectedQuestionType() === 'vero falso' ? 'Affermazione' : 'Testo'
-          }}</label
-        >
-        <textarea
-          class="form-control custom-input flex-fill"
-          formControlName="text"
-          rows="4"
-          placeholder="Inserisci il testo della domanda qui..."
-        ></textarea>
+        <label class="form-label text-dark">{{ SelectedQuestionType() === 'vero falso' ? 'Affermazione' : 'Testo'
+          }}</label>
+        <textarea class="form-control custom-input flex-fill" formControlName="text" rows="4"
+          placeholder="Inserisci il testo della domanda qui..."></textarea>
       </div>
       <div class="col-md-4 d-flex flex-column">
         <label class="form-label text-dark">Allega immagine</label>
-        <div
-          id="imageDropArea"
-          class="rounded-syllex p-3"
-          [class.dragging]="IsDragging()"
-          (dragover)="onDragOver($event)"
-          (dragleave)="onDragLeave($event)"
-          (drop)="onDrop($event)"
-          (click)="fileInput?.click()"
-        >
+        <div id="imageDropArea" class="rounded-syllex p-3" [class.dragging]="IsDragging()"
+          (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)"
+          (click)="fileInput?.click()">
           @if(!ImagePreview()) {
-          <div
-            class="image-drop-zone d-flex flex-column justify-content-center align-items-center rounded-3 p-3"
-          >
+          <div class="image-drop-zone d-flex flex-column justify-content-center align-items-center rounded-3 p-3">
             <fa-icon [icon]="ImageIcon" class="mb-3" size="3x"></fa-icon>
             <p class="text-muted mb-0 text-center">
               Trascina qui un'immagine o clicca per caricare
@@ -91,37 +56,21 @@
           </div>
           } @else {
           <div class="image-preview-container position-relative">
-            <img
-              [src]="ImagePreview()"
-              alt="Preview"
-              class="img-fluid rounded-3"
-            />
+            <img [src]="ImagePreview()" alt="Preview" class="img-fluid rounded-3" />
             <div class="image-actions d-flex gap-2 mt-2">
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-primary flex-fill"
-                (click)="fileInput?.click(); $event.stopPropagation()"
-              >
+              <button type="button" class="btn btn-sm btn-outline-primary flex-fill"
+                (click)="fileInput?.click(); $event.stopPropagation()">
                 Cambia immagine
               </button>
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-danger flex-fill"
-                (click)="removeImage(); $event.stopPropagation()"
-              >
+              <button type="button" class="btn btn-sm btn-outline-danger flex-fill"
+                (click)="removeImage(); $event.stopPropagation()">
                 Rimuovi
               </button>
             </div>
           </div>
           }
-          <input
-            type="file"
-            id="fileInput"
-            #fileInput
-            class="d-none"
-            accept="image/*"
-            (change)="onFileSelected($event)"
-          />
+          <input type="file" id="fileInput" #fileInput class="d-none" accept="image/*"
+            (change)="onFileSelected($event)" />
         </div>
       </div>
     </section>
@@ -130,47 +79,27 @@
   @if(SelectedQuestionType() === 'scelta multipla' ) {
   <section class="form-section">
     <div class="col-8">
-      <app-multiple-choice-options
-        [options]="questionOptions"
-        (optionsChange)="onOptionsChange($event)"
-      ></app-multiple-choice-options>
+      <app-multiple-choice-options [options]="questionOptions"
+        (optionsChange)="onOptionsChange($event)"></app-multiple-choice-options>
     </div>
   </section>
   } @if(SelectedQuestionType() === 'vero falso' ) {
   <section class="form-section">
     <label class="form-label text-dark">Risposta corretta</label>
     <p class="text-muted mb-3">Seleziona se l'affermazione è vera o falsa</p>
-    <div class="row">
-      <div class="col-3">
-        <div
-          class="card typeCard p-1 cursor-pointer"
-          (click)="onSelectCorrectAnswer(true)"
-          [class.selected]="QuestionForm.get('correctAnswer')?.value === true"
-        >
-          <div class="card-body d-flex flex-row align-items-center gap-3">
-            <input
-              type="radio"
-              class="form-check-input"
-              [checked]="QuestionForm.get('correctAnswer')?.value === true"
-            />
-            <h5 class="mb-0 flex-fill">Vero</h5>
-          </div>
+    <div class="d-flex gap-2">
+      <div class="card typeCard shadow-sm p-1 cursor-pointer" (click)="onSelectCorrectAnswer(true)"
+        [class.selected]="QuestionForm.get('correctAnswer')?.value === true">
+        <div class="card-body d-flex flex-row align-items-center gap-3">
+          <input type="radio" class="form-check-input" [checked]="QuestionForm.get('correctAnswer')?.value === true" />
+          <h5 class="mb-0 flex-fill">Vero</h5>
         </div>
       </div>
-      <div class="col-3">
-        <div
-          class="card shadow-sm typeCard p-1 cursor-pointer"
-          (click)="onSelectCorrectAnswer(false)"
-          [class.selected]="QuestionForm.get('correctAnswer')?.value === false"
-        >
-          <div class="card-body d-flex flex-row align-items-center gap-3">
-            <input
-              type="radio"
-              class="form-check-input"
-              [checked]="QuestionForm.get('correctAnswer')?.value === false"
-            />
-            <h5 class="mb-0 flex-fill">Falso</h5>
-          </div>
+      <div class="card shadow-sm typeCard p-1 cursor-pointer" (click)="onSelectCorrectAnswer(false)"
+        [class.selected]="QuestionForm.get('correctAnswer')?.value === false">
+        <div class="card-body d-flex flex-row align-items-center gap-3">
+          <input type="radio" class="form-check-input" [checked]="QuestionForm.get('correctAnswer')?.value === false" />
+          <h5 class="mb-0 flex-fill">Falso</h5>
         </div>
       </div>
     </div>
@@ -178,74 +107,44 @@
   }
 
   <section class="form-section">
-    <label class="form-label text-dark"
-      >Spiegazione della risposta corretta</label
-    >
-    <textarea
-      class="form-control custom-input flex-fill"
-      formControlName="explanation"
-      rows="4"
-      placeholder="Inserisci una commento sulla risposta corretta..."
-    ></textarea>
+    <label class="form-label text-dark">Spiegazione della risposta corretta</label>
+    <textarea class="form-control custom-input flex-fill" formControlName="explanation" rows="4"
+      placeholder="Inserisci una commento sulla risposta corretta..."></textarea>
   </section>
 
   <section class="form-section">
-    <label class="form-label text-dark"
-      >Visibilità della domanda e politiche di utilizzo</label
-    >
+    <label class="form-label text-dark">Visibilità della domanda e politiche di utilizzo</label>
     <p class="text-dark fw-light">
       Scegli se permettere ai tuoi studenti di Scienze Nautiche di utilizzare
       questa domanda per creare dei test di autovalutazione
     </p>
 
-    <section class="row">
-      <div class="col-3">
-        <div
-          class="border rounded-syllex p-3 typeCard p-1"
-          (click)="onSelectPolicyType('public')"
-          [class.selected]="SelectedPolicyType() === 'public'"
-        >
-          <div class="card-body d-flex flex-row align-items-center gap-3">
-            <input
-              type="radio"
-              class="form-check-input"
-              [checked]="SelectedPolicyType() === 'public'"
-            />
-            <h5 class="mb-0 flex-fill">Disponibile agli studenti</h5>
-            <span class="typeIconWrapper rounded-2">
-              <fa-icon [icon]="UsersIcon" [size]="'2x'"></fa-icon>
-            </span>
-          </div>
+    <section class="d-flex gap-2">
+      <div class="border rounded-syllex p-3 typeCard p-1" (click)="onSelectPolicyType('public')"
+        [class.selected]="SelectedPolicyType() === 'public'">
+        <div class="card-body d-flex flex-row align-items-center gap-3">
+          <input type="radio" class="form-check-input" [checked]="SelectedPolicyType() === 'public'" />
+          <h5 class="mb-0 flex-fill">Disponibile agli studenti</h5>
+          <span class="typeIconWrapper rounded-2">
+            <fa-icon [icon]="UsersIcon" [size]="'2x'"></fa-icon>
+          </span>
         </div>
       </div>
-      <div class="col-3">
-        <div
-          class="border p-3 rounded-syllex typeCard p-1"
-          (click)="onSelectPolicyType('private')"
-          [class.selected]="SelectedPolicyType() === 'private'"
-        >
-          <div class="card-body d-flex flex-row align-items-center gap-3">
-            <input
-              type="radio"
-              class="form-check-input"
-              [checked]="SelectedPolicyType() === 'private'"
-            />
-            <h5 class="mb-0 flex-fill">Disponibile solo al docente</h5>
-            <span class="typeIconWrapper rounded-2">
-              <fa-icon [icon]="GraduationIcon" [size]="'2x'"></fa-icon>
-            </span>
-          </div>
+      <div class="border p-3 rounded-syllex typeCard p-1" (click)="onSelectPolicyType('private')"
+        [class.selected]="SelectedPolicyType() === 'private'">
+        <div class="card-body d-flex flex-row align-items-center gap-3">
+          <input type="radio" class="form-check-input" [checked]="SelectedPolicyType() === 'private'" />
+          <h5 class="mb-0 flex-fill">Disponibile solo al docente</h5>
+          <span class="typeIconWrapper rounded-2">
+            <fa-icon [icon]="GraduationIcon" [size]="'2x'"></fa-icon>
+          </span>
         </div>
       </div>
     </section>
   </section>
 
   <section class="d-flex flex-row justify-content-end mt-5 gap-3">
-    <button
-      class="btn btn-primary icon-btn btn-lg"
-      type="submit"
-      [disabled]="QuestionForm.invalid || IsLoading()"
-    >
+    <button class="btn btn-primary icon-btn btn-lg" type="submit" [disabled]="QuestionForm.invalid || IsLoading()">
       @if(IsLoading()){
       <fa-icon [icon]="SpinnerIcon" [animation]="'spin'"></fa-icon>
       } {{ SaveButtonLabel() }}

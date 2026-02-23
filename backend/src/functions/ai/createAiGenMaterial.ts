@@ -41,7 +41,7 @@ const getPrompt = (type: DocumentType, language: string = 'italian', numberOfSli
         'glossary': `Write me a glossary based on these documents. Use Markdown.`,
         'summary': `Write me a medium length summary of these documents. Use Markdown.`
     }
-    return prompts[type] + '\n' + additionalInstructions + '\n' + guardRails;
+    return prompts[type] + '\n' + (additionalInstructions || '\n') + '\n' + guardRails;
 }
 
 const createAIGenMaterial = async (

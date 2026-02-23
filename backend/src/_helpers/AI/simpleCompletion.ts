@@ -10,6 +10,7 @@ const DEFAULT_PROVIDER: 'gemini' | 'openai' = 'gemini'
 
 
 const askStrucuredGpt = async <T>(prompt: string, materials: MaterialInterface[] = [], model: string = "gpt-4o", structure: ZodType<T>, temperature?: number): Promise<T> => {
+    console.log('ask gpt', prompt)
     const aiClient = await getOpenAIClient();
 
     // 1. Prepare the content array with your text prompt
@@ -36,6 +37,7 @@ const askStrucuredGpt = async <T>(prompt: string, materials: MaterialInterface[]
     return response.output_parsed!
 };
 const askStrucuredGemini = async <T>(prompt: string, materials: MaterialInterface[] = [], model: string = "gemini-3-flash-preview", structure: ZodType<T>, temperature?: number): Promise<T> => {
+    console.log('asking gemini', prompt)
     const getMaterialPart = async (m: MaterialInterface): Promise<Part> => {
         const res = await fetch(m.url!);
         const pdfArrayBuffer = await res.arrayBuffer();
@@ -71,8 +73,6 @@ const askStrucuredGemini = async <T>(prompt: string, materials: MaterialInterfac
 }
 
 export const askStructuredLLM = async <T>(prompt: string, materials: MaterialInterface[] = [], structure: ZodType<T>, temperature?: number): Promise<T> => {
-    return {
-        'gemini': askStrucuredGemini(prompt, materials, undefined, structure, temperature),
-        'openai': askStrucuredGpt(prompt, materials, undefined, structure, temperature)
-    }[DEFAULT_PROVIDER]
+    if (DEFAULT_PROVIDER == 'gemini') return await askStrucuredGemini(prompt, materials, undefined, structure, temperature);
+    else return await askStrucuredGpt(prompt, materials, undefined, structure, temperature)
 }

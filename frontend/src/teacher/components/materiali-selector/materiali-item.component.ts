@@ -147,7 +147,6 @@ export class MaterialiItemComponent {
   }
 
   getFileIcon(extension: string): IconDefinition {
-    console.log('Getting icon for extension:', extension);
     return getFileIcon(extension);
   }
 

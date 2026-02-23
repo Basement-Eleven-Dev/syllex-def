@@ -6,6 +6,7 @@ export type Question = {
   text: string;
   aiGenerated?: boolean;
   explanation: string;
+  correctAnswer?: boolean;
   policy: string;
   topicId: ObjectId;
   subjectId: ObjectId;
