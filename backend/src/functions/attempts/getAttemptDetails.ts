@@ -125,6 +125,7 @@ const getAttemptDetails = async (request: APIGatewayProxyEvent) => {
   );
 
   return {
+    testId: attempt.testId,
     testTitle: attempt.testInfo.name,
     studentName: `${attempt.studentInfo.firstName} ${attempt.studentInfo.lastName}`,
     status: attempt.status,

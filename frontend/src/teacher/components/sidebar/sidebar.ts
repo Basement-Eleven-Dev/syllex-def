@@ -35,11 +35,6 @@ interface SidebarRoute {
   icon: IconDefinition;
 }
 
-interface Subject {
-  id: string;
-  name: string;
-}
-
 @Component({
   selector: 'app-sidebar',
   imports: [FontAwesomeModule, RouterModule, NgbCollapseModule, FormsModule],

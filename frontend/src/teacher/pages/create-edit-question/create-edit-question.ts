@@ -275,6 +275,8 @@ export class CreateEditQuestion {
     const offCanvasRef = this.offcanvasService.open(GenAiQuestion, {
       ariaLabelledBy: 'offcanvas-basic-title',
       position: 'end',
+      panelClass: 'offcanvas-large',
+      scroll: true,
     });
     offCanvasRef.componentInstance.selectedType.set(
       this.SelectedQuestionType(),

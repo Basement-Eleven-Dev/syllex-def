@@ -28,18 +28,16 @@ const getStudentMaterials = async (
     return { success: true, materials: [] };
   }
 
-  const classIds = classes.map((c) => c._id.toString());
+  const classIds = classes.map((c) => c._id);
+  console.log(classIds);
 
   // Recupera i materiali della materia selezionata che sono accessibili alle classi dello studente
   const materials = await db
     .collection("materials")
     .find({
       subjectId: subjectId,
-      $or: [
-        { classIds: { $exists: false } },
-        { classIds: { $size: 0 } },
-        { classIds: { $in: classIds } },
-      ],
+      classIds: { $in: classIds },
+      type: "file",
     })
     .toArray();
 
