@@ -21,6 +21,17 @@ const getTeacherSubjects = async (
       },
       {
         $lookup: {
+          from: "topics",
+          let: { subjectId: "$_id" },
+          pipeline: [
+            { $match: { $expr: { $eq: ["$subjectId", "$$subjectId"] } } },
+            { $project: { _id: 1, name: 1 } },
+          ],
+          as: "topics",
+        },
+      },
+      {
+        $lookup: {
           from: "tests",
           let: { subjectId: "$_id" },
           pipeline: [
