@@ -19,6 +19,7 @@ export interface TestInterface {
   status?: 'bozza' | 'pubblicato' | 'archiviato';
   subjectId?: string;
   hasPendingCorrections?: boolean;
+  uncorrectedCount?: number;
 }
 
 interface TestDetailsResponse {

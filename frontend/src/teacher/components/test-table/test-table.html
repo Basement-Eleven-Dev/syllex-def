@@ -12,8 +12,17 @@
     </thead>
     <tbody>
       @for(test of tests; track $index){
-      <tr [class.row-with-pending-corrections]="false">
-        <td>{{ test.name }}</td>
+      <tr [class.row-with-pending-corrections]="(test.uncorrectedCount || 0) > 0">
+        <td>
+          <div class="d-flex flex-row align-items-center gap-2">
+            {{ test.name }}
+            @if((test.uncorrectedCount || 0) > 0) {
+              <span class="badge rounded-pill bg-warning text-dark shadow-sm">
+                {{ test.uncorrectedCount }} da correggere
+              </span>
+            }
+          </div>
+        </td>
         <td vertical-align="middle">
           <div class="d-flex flex-row align-items-center gap-2">
             <div [class]="'status-pill ' + test.status"></div>
@@ -47,7 +56,7 @@
           <button
             class="btn view-test-button"
             [routerLink]="['/t/tests', test._id]"
-            [class.has-pending-corrections]="false"
+            [class.has-pending-corrections]="(test.uncorrectedCount || 0) > 0"
           >
             Visualizza Test
           </button>

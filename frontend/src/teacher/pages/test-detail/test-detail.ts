@@ -11,6 +11,7 @@ import {
   faPaperPlane,
   faChartBar,
   faCheckCircle,
+  faPenNib,
 } from '@fortawesome/pro-solid-svg-icons';
 import { BackTo } from '../../components/back-to/back-to';
 import { StatCard, StatCardData } from '../../components/stat-card/stat-card';
@@ -26,6 +27,7 @@ const IconMap: Record<string, any> = {
   'chart-bar': faChartBar,
   'check-circle': faCheckCircle,
   users: faUsers,
+  'pen-nib': faPenNib,
 };
 
 @Component({

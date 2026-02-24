@@ -1,13 +1,29 @@
-@if(isImage()) {
-<img [src]="docUrl" style="width: 100%; height: 90dvh; object-fit: contain" />
-} @else if(isBlobUrl()) {
-<ngx-doc-viewer [url]="docUrl" viewer="url" style="width: 100%; height: 90dvh">
-</ngx-doc-viewer>
-} @else {
-<ngx-doc-viewer
-  [url]="docUrl"
-  viewer="google"
-  style="width: 100%; height: 90dvh"
->
-</ngx-doc-viewer>
-}
+<div class="file-viewer-container">
+  @if (isLoading()) {
+  <div class="loading-overlay">
+    <fa-icon [icon]="SpinnerIcon" [animation]="'spin'" size="3x"></fa-icon>
+  </div>
+  } @if(isImage()) {
+  <img
+    [src]="docUrl"
+    (load)="onLoad()"
+    style="width: 100%; height: 90dvh; object-fit: contain"
+  />
+  } @else if(isBlobUrl()) {
+  <ngx-doc-viewer
+    [url]="docUrl"
+    viewer="url"
+    (loaded)="onLoad()"
+    style="width: 100%; height: 90dvh"
+  >
+  </ngx-doc-viewer>
+  } @else {
+  <ngx-doc-viewer
+    [url]="docUrl"
+    viewer="google"
+    (loaded)="onLoad()"
+    style="width: 100%; height: 90dvh"
+  >
+  </ngx-doc-viewer>
+  }
+</div>
