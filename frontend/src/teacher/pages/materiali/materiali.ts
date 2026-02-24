@@ -78,6 +78,7 @@ export class Materiali {
     'jpeg',
     'gif',
     'txt',
+    'pptx',
   ];
 
   private readonly ROOT_FOLDER_CONFIG = {

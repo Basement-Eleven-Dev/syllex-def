@@ -105,8 +105,10 @@ export class MaterialeCard {
         centered: true,
         size: 'lg',
       });
+
       modalRef.componentInstance.docUrl = this.item.url;
       modalRef.componentInstance.extension = this.item.extension;
+      modalRef.componentInstance.isMap = this.item.isMap;
     }
   }
 }

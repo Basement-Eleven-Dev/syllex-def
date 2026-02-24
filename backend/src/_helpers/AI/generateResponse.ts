@@ -91,8 +91,6 @@ export async function generateAIResponseGemini(
       messagesHistory,
     );
 
-    // 3. Generazione della risposta con Gemini
-    // Nota: Nel nuovo SDK, passiamo il system instruction separatamente o nel prompt
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: [
