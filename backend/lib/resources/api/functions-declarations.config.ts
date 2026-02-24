@@ -1,4 +1,4 @@
-export type AppRole = "student" | "teacher" | "logged" | "open";
+export type AppRole = "student" | "teacher" | "logged" | "open" | "admin";
 
 /**
  * functionPath is the relative path from FUNCTIONS_PATH (in environments.ts)

@@ -13,7 +13,7 @@ import { CognitoIdTokenPayload } from "aws-jwt-verify/jwt-model";
  */
 export const canInvoke = async (
   token?: string,
-  cognitoGroup?: "students" | "teachers",
+  cognitoGroup?: "students" | "teachers" | "admins",
 ): Promise<CognitoIdTokenPayload | null> => {
   const verifier = CognitoJwtVerifier.create({
     userPoolId: process.env.COGNITO_POOL_ID!,
@@ -39,7 +39,7 @@ export const canInvoke = async (
 
 export const checkValidation = async (
   event: APIGatewayTokenAuthorizerEvent,
-  cognitoGroup?: "students" | "teachers",
+  cognitoGroup?: "students" | "teachers" | "admins",
 ): Promise<APIGatewayAuthorizerResult> => {
   const token = event.authorizationToken.split(" ")[1];
   const authorizedPayload = await canInvoke(token, cognitoGroup);
