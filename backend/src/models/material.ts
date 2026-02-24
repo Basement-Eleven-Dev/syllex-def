@@ -8,12 +8,12 @@ export type MaterialInterface = {
   isMap?: boolean;
   content?: MaterialInterface[];
   createdAt: Date;
-  type?: 'file' | 'folder';
+  type?: "file" | "folder";
   aiGenerated?: boolean;
   openAiFileId?: string;
   vectorized?: boolean;
   extractedTextFileUrl?: string;
   teacherId: ObjectId;
   subjectId: ObjectId;
-  generatedFrom?: ObjectId[]
+  generatedFrom?: ObjectId[];
 };

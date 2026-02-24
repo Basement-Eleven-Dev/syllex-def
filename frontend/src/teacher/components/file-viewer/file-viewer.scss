@@ -3,26 +3,153 @@
   width: 100%;
   height: 90dvh;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
   background-color: #f8f9fa;
+  overflow: hidden;
 
   .loading-overlay {
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    right: 0;
+    bottom: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: white;
-    z-index: 10;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 100;
     color: var(--bs-primary);
   }
 
+  .mermaid-viewer {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background-color: #e2e8f0; // Grigio freddo tecnico per contrasto massimo
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
+
+    .mermaid-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px; 
+      
+      ::ng-deep {
+        svg {
+          display: block;
+          overflow: visible !important;
+          
+          .node rect, .node circle, .node polygon, .node path {
+            stroke-width: 2px !important; // Bordo leggermente più spesso
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.12)); // Ombra più netta
+            transition: all 0.2s ease;
+          }
+
+          .node:hover rect {
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+            stroke: var(--bs-primary) !important;
+          }
+
+          .edgePath path {
+            stroke-width: 2px !important;
+            opacity: 1;
+            stroke: #495057 !important;
+          }
+
+          .label {
+            font-weight: 600;
+            color: #212529 !important;
+          }
+
+          .cluster rect {
+
+            fill: rgb(250, 248, 233) !important;
+     
+            rx: 2rem;
+            ry: 2rem;
+            stroke-width: 2px !important;
+          }
+
+          .cluster-label span {
+            font-weight: 800 !important;
+            text-transform: uppercase;
+            color: #39052e !important;
+            font-size: 0.7rem; // Un po' più grande
+          }
+
+          // FIX DEFINITIVO PER TESTO TAGLIATO E WRAPPING
+          // Obblighiamo i contenitori di Mermaid a espandersi e non tagliare il testo
+          foreignObject {
+            overflow: visible !important;
+            
+            div {
+              white-space: normal !important; 
+              word-wrap: break-word !important;
+              overflow: visible !important;
+              max-width: 320px !important; // Limite orizzontale per forzare il wrap
+              width: auto !important;
+              display: inline-block !important; 
+              text-align: center;
+            
+            }
+          }
+        }
+      }
+    }
+
+    .zoom-controls {
+      position: absolute;
+      bottom: 2rem;
+      right: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      z-index: 5;
+
+      button {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background-color: white;
+        border: 1px solid rgba(0,0,0,0.08);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        color: #444;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+        fa-icon {
+          font-size: 1.1rem;
+        }
+
+        &:hover {
+          background-color: #fff;
+          color: var(--bs-primary);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+          border-color: rgba(var(--bs-primary-rgb), 0.2);
+        }
+
+        &:active {
+          transform: translateY(0);
+        }
+      }
+    }
+  }
+
   img {
-    max-width: 100%;
-    max-height: 100%;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
   }
 }

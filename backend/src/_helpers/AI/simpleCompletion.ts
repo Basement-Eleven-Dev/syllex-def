@@ -9,6 +9,9 @@ import {
 import { MaterialInterface } from "../../models/material";
 import { getOpenAiFileId } from "./openAiFileUpload";
 import { Part } from "@google/genai";
+import { extractTextFromFile } from "../documents/extractTextFromFile";
+import { fetchBuffer } from "../fetchBuffer";
+import { text } from "stream/consumers";
 
 const DEFAULT_PROVIDER: "gemini" | "openai" = "gemini";
 
@@ -48,11 +51,10 @@ const askStrucuredGpt = async <T>(
 const askStrucuredGemini = async <T>(
   prompt: string,
   materials: MaterialInterface[] = [],
-  model: string = "gemini-2.5-flash",
+  model: string = "gemini-3-flash-preview",
   structure: ZodType<T>,
   temperature?: number,
 ): Promise<T> => {
-  console.log("asking gemini", prompt);
   const getMaterialPart = async (m: MaterialInterface): Promise<Part> => {
     const res = await fetch(m.url!);
     const pdfArrayBuffer = await res.arrayBuffer();
@@ -65,10 +67,20 @@ const askStrucuredGemini = async <T>(
       },
     };
   };
-  const client = await getGeminiClient();
-  const materialParts = await Promise.all(
-    materials.map((m) => getMaterialPart(m)),
+
+  const textFileBuffer = await Promise.all(
+    materials.map((m) => fetchBuffer(m.extractedTextFileUrl!)),
   );
+
+  const textFileParts: Part[] = textFileBuffer.map((buffer, index) => ({
+    inlineData: {
+      mimeType: "text/plain",
+      data: buffer.toString("base64"),
+    },
+  }));
+
+  const client = await getGeminiClient();
+
   const response = await client.models.generateContent({
     model: model,
     contents: [
@@ -78,7 +90,7 @@ const askStrucuredGemini = async <T>(
           {
             text: prompt,
           },
-          ...materialParts,
+          ...textFileParts,
         ],
       },
     ],

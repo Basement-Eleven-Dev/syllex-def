@@ -7,12 +7,27 @@ export async function extractTextFromFile(
   buffer: Buffer,
   extension: string,
 ): Promise<string> {
-  const ext = extension.toLowerCase().replace(".", "");
+  console.log(
+    `Starting text extraction for file with extension: .${extension}`,
+  );
+  let ext = extension.toLowerCase().replace(".", "");
+  if (
+    ext ===
+    "application/vndopenxmlformats-officedocument.wordprocessingml.document"
+  ) {
+    ext = "docx";
+  } else if (ext === "application/msword") {
+    ext = "doc";
+  } else if (ext === "application/pdf") {
+    ext = "pdf";
+  } else if (ext.includes("spreadsheetml") || ext.includes("excel")) {
+    ext = "xlsx";
+  }
 
+  console.log(`Extracting text from file with extension: .${ext}`);
   try {
     if (ext === "pdf") {
       const data = await pdf(buffer);
-      // Se il PDF ha poco testo (scansione), usa Gemini
       const hasActualText = /[a-z0-9]/i.test(data.text);
 
       if (!hasActualText || data.text.trim().length < 100) {
@@ -25,8 +40,17 @@ export async function extractTextFromFile(
 
       return data.text;
     } else if (ext === "docx" || ext === "doc") {
+      console.log("Estrazione testo da Word con mammoth...");
       const result = await mammoth.extractRawText({ buffer });
       return result.value;
+    } else if (
+      ext === "jpeg" ||
+      ext === "jpg" ||
+      ext === "png" ||
+      ext === "tiff"
+    ) {
+      console.log("Estrazione testo da immagini con OCR...");
+      return await extractPDFWithGoogleDocumentAI(buffer);
     } else if (ext === "xlsx" || ext === "xls") {
       const workbook = xlsx.read(buffer, { type: "buffer" });
       let text = "";
