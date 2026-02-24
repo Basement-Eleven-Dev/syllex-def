@@ -13,6 +13,7 @@ import {
   vectorizeDocumentWithGemini,
 } from "../_helpers/AI/embeddings/vectorizeDocument";
 import { fetchBuffer } from "../_helpers/fetchBuffer";
+import { uploadContentToS3 } from "../_helpers/uploadFileToS3";
 
 export const vectorizeMaterialAndUpdateMaterialStatus = async (
   materialId: ObjectId,
@@ -36,10 +37,10 @@ export const vectorizeMaterialAndUpdateMaterialStatus = async (
     documentText: textExtracted,
   };
   await vectorizeDocumentWithGemini(vectorizeParams);
-
+  let extractedTextFileUrl = await uploadContentToS3('extracted-text' + material._id.toString() + '.txt', textExtracted, 'text/plain')
   await db
     .collection("materials")
-    .updateOne({ _id: materialId }, { $set: { vectorized: true } });
+    .updateOne({ _id: materialId }, { $set: { vectorized: true, extractedTextFileUrl: extractedTextFileUrl } });
 };
 
 export const startIndexingJob = async (materialId: ObjectId) => {

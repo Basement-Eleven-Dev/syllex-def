@@ -12,6 +12,7 @@ export type MaterialInterface = {
   aiGenerated?: boolean;
   openAiFileId?: string;
   vectorized?: boolean;
+  extractedTextFileUrl?: string;
   teacherId: ObjectId;
   subjectId: ObjectId;
   generatedFrom?: ObjectId[]
