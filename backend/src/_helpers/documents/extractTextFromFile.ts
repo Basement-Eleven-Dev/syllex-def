@@ -2,6 +2,7 @@ import pdf from "pdf-parse";
 import mammoth from "mammoth";
 import * as xlsx from "xlsx";
 import { extractPDFWithGoogleDocumentAI } from "../AI/exctractWithGeminiVision";
+import officeParser from "officeparser";
 
 export async function extractTextFromFile(
   buffer: Buffer,
@@ -22,6 +23,8 @@ export async function extractTextFromFile(
     ext = "pdf";
   } else if (ext.includes("spreadsheetml") || ext.includes("excel")) {
     ext = "xlsx";
+  } else if (ext === "pptx") {
+    return await extractTextFromPptx(buffer);
   }
 
   console.log(`Extracting text from file with extension: .${ext}`);
@@ -67,4 +70,38 @@ export async function extractTextFromFile(
     console.error(`Error extracting text from .${ext} file:`, error);
     throw new Error(`Failed to extract text from .${ext} file.`);
   }
+}
+export async function extractTextFromPptx(buffer: Buffer): Promise<string> {
+  return new Promise((resolve, reject) => {
+    officeParser.parseOffice(buffer, (data: unknown, err: any) => {
+      if (err) return reject(err);
+
+      if (typeof data === "string") {
+        return resolve(data.trim());
+      }
+
+      if (data && typeof data === "object") {
+        const text = extractTextFromOfficeAst(data).replace(/\s+/g, " ").trim();
+        return resolve(text);
+      }
+
+      return resolve(String(data ?? ""));
+    });
+  });
+}
+
+function extractTextFromOfficeAst(node: any, acc: string[] = []): string {
+  if (!node) return acc.join(" ");
+
+  if (typeof node === "string") {
+    acc.push(node);
+  } else if (Array.isArray(node)) {
+    node.forEach((n) => extractTextFromOfficeAst(n, acc));
+  } else if (typeof node === "object") {
+    if (typeof node.text === "string") acc.push(node.text);
+    if (node.content) extractTextFromOfficeAst(node.content, acc);
+    if (node.children) extractTextFromOfficeAst(node.children, acc);
+  }
+
+  return acc.join(" ");
 }
