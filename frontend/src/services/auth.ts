@@ -31,7 +31,8 @@ export interface User {
   firstName?: string;
   lastName?: string;
   role: 'teacher' | 'student' | 'admin';
-  organizationId: string;
+  organizationId?: string;
+  organizationIds?: string[];
 }
 
 export interface OrganizationInterface {
@@ -49,6 +50,12 @@ export class Auth {
 
   get user(): User | null {
     return this.user$.value;
+  }
+
+  get isSuperAdmin(): boolean {
+    const user = this.user;
+    if (!user || user.role !== 'admin') return false;
+    return !user.organizationId && (!user.organizationIds || user.organizationIds.length === 0);
   }
 
   constructor(private http: HttpClient) {

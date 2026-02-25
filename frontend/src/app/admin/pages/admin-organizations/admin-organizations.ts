@@ -1,7 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { Auth } from '../../../../services/auth';
 import { 
   faLandmark, 
   faPlus, 
@@ -24,6 +25,8 @@ import { FeedbackService } from '../../../../services/feedback-service';
 export class AdminOrganizations implements OnInit {
   private onboardingService = inject(OnboardingService);
   private feedbackService = inject(FeedbackService);
+  private auth = inject(Auth);
+  private router = inject(Router);
 
   organizations: any[] = [];
   loading = true;
@@ -40,6 +43,13 @@ export class AdminOrganizations implements OnInit {
   };
 
   ngOnInit() {
+    if (!this.auth.isSuperAdmin) {
+      const orgId = this.auth.user?.organizationId || this.auth.user?.organizationIds?.[0];
+      if (orgId) {
+        this.router.navigate(['/a/organizzazioni', orgId]);
+        return;
+      }
+    }
     this.loadOrganizations();
   }
 

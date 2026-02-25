@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { Auth } from '../../../../services/auth';
 import {
   FontAwesomeModule,
   IconDefinition,
@@ -29,7 +30,9 @@ interface AdminNavRoute {
   styleUrl: './admin-sidebar.scss',
 })
 export class AdminSidebar {
-  routes: AdminNavRoute[] = [
+  private auth = inject(Auth);
+
+  private rawRoutes: AdminNavRoute[] = [
     { label: 'Dashboard', icon: faHouse, route: '/a/dashboard' },
     { label: 'Onboarding', icon: faCirclePlay, route: '/a/onboarding' },
     {
@@ -38,4 +41,25 @@ export class AdminSidebar {
       route: '/a/organizzazioni',
     },
   ];
+
+  get routes(): AdminNavRoute[] {
+    if (this.auth.isSuperAdmin) {
+      return this.rawRoutes;
+    }
+
+    const orgId = this.auth.user?.organizationId || this.auth.user?.organizationIds?.[0];
+
+    return this.rawRoutes
+      .filter(r => r.route !== '/a/onboarding')
+      .map(r => {
+        if (r.route === '/a/organizzazioni') {
+          return {
+            ...r,
+            label: 'Organizzazione',
+            route: `/a/organizzazioni/${orgId}`
+          };
+        }
+        return r;
+      });
+  }
 }

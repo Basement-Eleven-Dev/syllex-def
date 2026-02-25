@@ -20,6 +20,7 @@ import {
 } from '@fortawesome/pro-solid-svg-icons';
 import { OnboardingService } from '../../service/onboarding-service';
 import { FeedbackService } from '../../../../services/feedback-service';
+import { Auth } from '../../../../services/auth';
 
 import { NgbModal, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { UserModal } from '../../components/user-modal/user-modal';
@@ -41,6 +42,7 @@ export class AdminOrganizationDetail implements OnInit {
   private route = inject(ActivatedRoute);
   private onboardingService = inject(OnboardingService);
   private feedbackService = inject(FeedbackService);
+  public auth = inject(Auth);
   private modalService = inject(NgbModal);
 
   private router = inject(Router);

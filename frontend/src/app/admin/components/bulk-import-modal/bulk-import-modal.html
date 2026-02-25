@@ -5,10 +5,36 @@
 
 <div class="modal-body p-4">
     <div class="mb-4">
-        <label class="form-label small fw-bold text-muted d-flex justify-content-between">
-            Incolla i dati (JSON o CSV)
-            <span class="fw-normal text-primary fs-xs cursor-help" title="Formato: Nome, Cognome, Email">Aiuto formato</span>
+        <label class="form-label small fw-bold text-muted d-flex justify-content-between align-items-center">
+            Incolla i dati
+            <button class="btn btn-link p-0 text-primary fs-xs text-decoration-none" (click)="showHelp = !showHelp">
+                {{ showHelp ? 'Chiudi aiuto' : 'Aiuto formato' }}
+            </button>
         </label>
+
+        @if (showHelp) {
+            <div class="bg-light border rounded-3 p-3 mb-3 small shadow-sm">
+                <p class="fw-bold text-dark mb-2">Formati supportati:</p>
+                
+                <div class="mb-3">
+                    <span class="badge bg-primary mb-1">CSV / Testo Libero</span>
+                    <p class="text-muted mb-1 extra-small">Un record per riga, campi separati da virgola:</p>
+                    <code class="d-block bg-white p-2 rounded border extra-small mb-1">Nome, Cognome, Email</code>
+                    <p class="extra-small text-muted italic">Es: Mario, Rossi, mario.rossi@email.it</p>
+                </div>
+
+                <div>
+                    <span class="badge bg-primary mb-1">JSON</span>
+                    <p class="text-muted mb-1 extra-small">Array di oggetti con chiavi:</p>
+                    <code class="d-block bg-white p-2 rounded border extra-small">
+                        [<br>
+                        &nbsp;&nbsp;&#123; "firstName": "Mario", "lastName": "Rossi", "email": "..." &#125;,<br>
+                        &nbsp;&nbsp;...<br>
+                        ]
+                    </code>
+                </div>
+            </div>
+        }
         <textarea 
             class="form-control border-light py-2 shadow-none font-monospace small" 
             rows="8" 

@@ -28,6 +28,7 @@ export class BulkImportModal {
   parsedStudents: any[] = [];
   loading = false;
   error: string | null = null;
+  showHelp = false;
 
   icons = {
     faFileImport,

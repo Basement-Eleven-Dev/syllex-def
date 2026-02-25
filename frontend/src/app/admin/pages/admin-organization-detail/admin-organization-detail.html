@@ -1,11 +1,13 @@
 <div class="container-fluid p-4">
     <!-- Breadcrumb / Back -->
-    <div class="mb-4">
-        <a routerLink="/a/organizzazioni" class="text-decoration-none text-muted small d-flex align-items-center gap-2 mb-3">
-            <fa-icon [icon]="icons.faArrowLeft" class="extra-small"></fa-icon>
-            Torna all'Hub
-        </a>
-    </div>
+    @if (auth.isSuperAdmin) {
+        <div class="mb-4">
+            <a routerLink="/a/organizzazioni" class="text-decoration-none text-muted small d-flex align-items-center gap-2 mb-3">
+                <fa-icon [icon]="icons.faArrowLeft" class="extra-small"></fa-icon>
+                Torna all'Hub
+            </a>
+        </div>
+    }
 
     @if (loading) {
         <div class="text-center py-5">
