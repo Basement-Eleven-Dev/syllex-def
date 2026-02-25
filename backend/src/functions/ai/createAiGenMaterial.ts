@@ -85,9 +85,7 @@ const createAIGenMaterial = async (
   const materialCollection = db.collection("materials");
   const organizationCollection = db.collection("organizations");
   const materialOIds = materialIds.map((el) => new ObjectId(el));
-  const materialObjects: MaterialInterface[] = (await materialCollection
-    .find({ _id: { $in: materialOIds } })
-    .toArray()) as MaterialInterface[]; //forse non serve
+  const materialObjects: MaterialInterface[] = (await materialCollection.find({ _id: { $in: materialOIds }, subjectId: context.subjectId, aiGenerated: { $ne: true } }).toArray()) as MaterialInterface[]; //forse non serve
 
   const prompt = getPrompt(
     type,
