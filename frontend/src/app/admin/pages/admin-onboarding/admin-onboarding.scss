@@ -1,0 +1,145 @@
+@import "../../../../styles.scss";
+
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
+
+.wizard-steps-container {
+  height: 60px;
+  z-index: 1;
+
+  .wizard-steps-line {
+    top: 25px;
+    left: 0;
+    height: 3px;
+    background-color: #e2e8f0;
+    z-index: -1;
+  }
+
+  .wizard-progress-bar {
+    top: 25px;
+    left: 0;
+    height: 3px;
+    background-color: $primary;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: -1;
+  }
+}
+
+.wizard-step {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100px;
+
+  .step-icon-wrapper {
+    width: 50px;
+    height: 50px;
+    background-color: #ffffff;
+    border: 3px solid #e2e8f0;
+    color: #94a3b8;
+    font-size: 1.1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2;
+  }
+
+  .step-label {
+    color: #94a3b8;
+    transition: color 0.3s ease;
+  }
+
+  &.active {
+    .step-icon-wrapper {
+      border-color: $primary;
+      color: $primary;
+      transform: scale(1.1);
+      box-shadow: 0 0 15px rgba($primary, 0.2) !important;
+    }
+    .step-label {
+      color: $primary;
+      font-weight: 700 !important;
+    }
+  }
+
+  &.completed {
+    .step-icon-wrapper {
+      background-color: $primary;
+      border-color: $primary;
+      color: #ffffff;
+    }
+    .step-label {
+      color: var(--bs-dark);
+    }
+  }
+
+  &:hover:not(.active):not(.completed) {
+    .step-icon-wrapper {
+      border-color: #cbd5e1;
+      color: #64748b;
+    }
+  }
+}
+
+.logo-upload-zone {
+  border: 2px dashed #e2e8f0;
+  transition: all 0.2s ease;
+  background-color: #fdfdfd;
+
+  &:hover {
+    border-color: $primary;
+    background-color: rgba($primary, 0.02);
+  }
+
+  .icon-circle {
+    width: 65px;
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+  }
+
+  &:hover .icon-circle {
+    transform: translateY(-5px);
+  }
+}
+
+.ls-1 {
+  letter-spacing: 0.5px;
+}
+
+.onboarding-logs-floater {
+  z-index: 1050;
+
+  button {
+    border: none;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    &:hover {
+      transform: translateY(-5px) scale(1.05);
+      background-color: $primary;
+    }
+  }
+}
+
+.card {
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.card-footer {
+  border-top: 1px solid #f1f5f9;
+}
+
+@media (max-width: 768px) {
+  .wizard-step {
+    width: 70px;
+    .step-label {
+      display: none;
+    }
+  }
+}

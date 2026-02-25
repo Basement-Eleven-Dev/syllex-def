@@ -20,6 +20,10 @@ export const studentGuard: CanActivateFn = (route, state) => {
         return true;
       }
 
+      if (user.role === 'admin') {
+        return router.createUrlTree(['/a']);
+      }
+
       return router.createUrlTree(['/t']);
     }),
   );

@@ -1,0 +1,33 @@
+<div class="h-100 card sidebar-card" style="width: 280px">
+  <div class="w-100 px-3 py-4 d-flex flex-column h-100">
+    <div class="logo-container mb-4 px-2">
+      <img
+        src="/images/logo_primary.png"
+        alt="Syllex Logo"
+        height="45"
+        routerLink="/admin/dashboard"
+        class="cursor-pointer"
+      />
+    </div>
+
+    <div id="adminRoutes" class="d-flex flex-column gap-2 flex-fill">
+      @for(route of routes; track $index){
+      <div
+        class="sidebarRoute w-100 gap-3 d-flex align-items-center p-3 rounded-3 cursor-pointer"
+        [routerLink]="route.route"
+        routerLinkActive="active"
+      >
+        <fa-icon [icon]="route.icon" [fixedWidth]="true"></fa-icon>
+        <span class="routeLabel fw-medium">{{route.label}}</span>
+      </div>
+      }
+    </div>
+
+    <div class="sidebar-footer mt-auto px-2 pt-3 border-top">
+      <div class="d-flex align-items-center gap-2 text-muted small">
+        <span class="fw-bold">Syllex v1.0</span>
+        <span class="ms-auto opacity-50">Admin Panel</span>
+      </div>
+    </div>
+  </div>
+</div>

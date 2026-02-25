@@ -1,0 +1,84 @@
+:host {
+    height: 100dvh;
+}
+
+.sidebar-card {
+    border: none;
+    border-radius: 0;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.02);
+    background: #ffffff;
+    z-index: 1000;
+}
+
+.logo-container {
+    img {
+        transition: transform 0.2s ease;
+        &:hover {
+            transform: scale(1.02);
+        }
+    }
+}
+
+.letter-spacing-1 {
+    letter-spacing: 1px;
+}
+
+.sidebarRoute {
+    text-decoration: none;
+    color: #64748b;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    fa-icon {
+        font-size: 1.1rem;
+        opacity: 0.7;
+    }
+
+    &:hover {
+        background-color: #f8fafc;
+        color: var(--bs-primary);
+        
+        fa-icon {
+            opacity: 1;
+        }
+    }
+
+    &.active {
+        background-color: var(--bs-primary);
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(var(--bs-primary-rgb), 0.25);
+
+        fa-icon {
+            opacity: 1;
+            color: #ffffff;
+        }
+    }
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+@media (max-width: 991.98px) {
+    .sidebar-card {
+        width: 80px !important;
+        
+        .routeLabel, .admin-label, .sidebar-footer span:first-child {
+            display: none;
+        }
+        
+        .sidebarRoute {
+            justify-content: center;
+            padding: 1rem !important;
+        }
+        
+        .logo-container {
+            padding: 0 !important;
+            display: flex;
+            justify-content: center;
+            
+            img {
+                height: 30px;
+            }
+        }
+    }
+}

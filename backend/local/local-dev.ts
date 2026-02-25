@@ -8,7 +8,7 @@ const PORT = 3000;
 const app = express();
 // Use raw text parsing because Middy's jsonBodyParser
 // expects the event.body to be a string, not an object.
-app.use(express.text({ type: "application/json" }));
+app.use(express.text({ type: "application/json", limit: '50mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 const testRoute: FunctionIntegration = {

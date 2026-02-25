@@ -31,6 +31,10 @@ import { StudentTestsList } from '../student/pages/student-tests-list/student-te
 import { testExecutionGuard } from '../guards/test-execution.guard';
 import { StudentComunicazioni } from '../student/pages/student-comunicazioni/student-comunicazioni';
 import { StudentCreateTest } from '../student/pages/student-create-test/student-create-test';
+import { adminGuard } from '../guards/admin.guard';
+import { AdminLayout } from './admin/layout/admin-layout/admin-layout';
+import { AdminDashboard } from './admin/pages/admin-dashboard/admin-dashboard';
+import { AdminOnboarding } from './admin/pages/admin-onboarding/admin-onboarding';
 
 export const routes: Routes = [
   {
@@ -251,6 +255,26 @@ export const routes: Routes = [
         path: '**',
         redirectTo: 'dashboard',
         pathMatch: 'full',
+      },
+    ],
+  },
+  {
+    path: 'a',
+    component: AdminLayout,
+    canActivate: [authGuard, adminGuard],
+    children: [
+            {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+      {
+        path: 'dashboard',
+        component: AdminDashboard,
+      },
+      {
+        path: 'onboarding',
+        component: AdminOnboarding,
       },
     ],
   },

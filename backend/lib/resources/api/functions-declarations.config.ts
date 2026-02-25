@@ -12,6 +12,13 @@ export type FunctionIntegration = {
 };
 
 export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
+  //rotte per ADMIN
+  {
+    apiRoute: "admin/onboarding",
+    functionPath: "admin/onboarding/createOnboarding.ts",
+    method: "post",
+    role: "admin",
+  },
   {
     apiRoute: "teachers/{teacherId}/subjects",
     functionPath: "teachers/getSubjects.ts",
@@ -436,4 +443,6 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     method: "post",
     role: "teacher",
   },
+
+
 ];

@@ -49,7 +49,14 @@ export class LoginForm {
       this.loading = false;
       if (result.success) {
         setTimeout(() => {
-          this.router.navigate(['/t/dashboard']);
+          const user = this.authService.user;
+          if (user?.role === 'admin') {
+            this.router.navigate(['/a']);
+          } else if (user?.role === 'student') {
+            this.router.navigate(['/s']);
+          } else {
+            this.router.navigate(['/t/dashboard']);
+          }
         }, 1000);
       }
     });

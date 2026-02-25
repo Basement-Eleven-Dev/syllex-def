@@ -1,10 +1,11 @@
 import { inject } from '@angular/core';
-import { Router, CanActivateFn } from '@angular/router';
-import { map, filter } from 'rxjs/operators';
-import { Auth } from '../services/auth';
 import { toObservable } from '@angular/core/rxjs-interop';
+import { CanActivateFn, Router } from '@angular/router';
+import { filter } from 'rxjs/internal/operators/filter';
+import { map } from 'rxjs/internal/operators/map';
+import { Auth } from '../services/auth';
 
-export const teacherGuard: CanActivateFn = (route, state) => {
+export const adminGuard: CanActivateFn = (route, state) => {
   const authService = inject(Auth);
   const router = inject(Router);
 
@@ -16,15 +17,11 @@ export const teacherGuard: CanActivateFn = (route, state) => {
         return router.createUrlTree(['/']);
       }
 
-      if (user.role === 'teacher') {
+      if (user.role === 'admin') {
         return true;
       }
 
-      if (user.role === 'admin') {
-        return router.createUrlTree(['/a']);
-      }
-
-      return router.createUrlTree(['/s']);
+      return router.createUrlTree(['/t']);
     }),
   );
 };

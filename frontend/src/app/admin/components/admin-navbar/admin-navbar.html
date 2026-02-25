@@ -1,0 +1,10 @@
+<nav
+  class="admin-navbar-soft d-flex align-items-center justify-content-end px-3 py-2"
+>
+  <a [routerLink]="'/admin/profile'" class="icon-link">
+    <fa-icon [icon]="faUser"></fa-icon>
+  </a>
+  <a class="icon-link text-danger ms-3" (click)="onLogout()">
+    <fa-icon [icon]="faLogout"></fa-icon>
+  </a>
+</nav>
