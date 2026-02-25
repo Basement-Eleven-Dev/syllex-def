@@ -38,6 +38,7 @@ import { AdminOnboarding } from './admin/pages/admin-onboarding/admin-onboarding
 import { AdminOrganizations } from './admin/pages/admin-organizations/admin-organizations';
 import { AdminOrganizationDetail } from './admin/pages/admin-organization-detail/admin-organization-detail';
 import { AdminClassDetail } from './admin/pages/admin-class-detail/admin-class-detail';
+import { AdminProfile } from './admin/pages/admin-profile/admin-profile';
 
 export const routes: Routes = [
   {
@@ -290,6 +291,10 @@ export const routes: Routes = [
       {
         path: 'organizzazioni/:orgId/classi/:classId',
         component: AdminClassDetail,
+      },
+      {
+        path: 'profile',
+        component: AdminProfile,
       },
     ],
   },

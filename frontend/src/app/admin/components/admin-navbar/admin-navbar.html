@@ -1,10 +1,37 @@
-<nav
-  class="admin-navbar-soft d-flex align-items-center justify-content-end px-3 py-2"
->
-  <a [routerLink]="'/admin/profile'" class="icon-link">
-    <fa-icon [icon]="faUser"></fa-icon>
-  </a>
-  <a class="icon-link text-danger ms-3" (click)="onLogout()">
-    <fa-icon [icon]="faLogout"></fa-icon>
-  </a>
+<nav class="admin-navbar-soft d-flex align-items-center justify-content-end px-3 py-2">
+    <div ngbDropdown placement="bottom-end" class="d-inline-block">
+        <button class="btn btn-link icon-link p-0 border-0 text-decoration-none" id="profileDropdown" ngbDropdownToggle>
+            <div class="d-flex align-items-center gap-2">
+                @if (user$ | async; as user) {
+                    <span class="small fw-medium text-dark d-none d-md-block">
+                        {{ user.firstName }} {{ user.lastName }}
+                    </span>
+                }
+                <div class="bg-light rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                    <fa-icon [icon]="faUser" class="text-primary"></fa-icon>
+                </div>
+            </div>
+        </button>
+        <div ngbDropdownMenu aria-labelledby="profileDropdown" class="border-0 shadow-sm rounded-4 mt-2 py-2">
+            <div class="px-3 py-2 border-bottom mb-2 d-md-none">
+                @if (user$ | async; as user) {
+                    <p class="small fw-bold mb-0">{{ user.firstName }} {{ user.lastName }}</p>
+                    <p class="extra-small text-muted mb-0">Amministratore</p>
+                }
+            </div>
+            <a ngbDropdownItem [routerLink]="'/a/profile'" class="d-flex align-items-center gap-3 py-2">
+                <fa-icon [icon]="faUser" class="text-muted"></fa-icon>
+                <span>Il mio profilo</span>
+            </a>
+            <button ngbDropdownItem (click)="onChangePassword()" class="d-flex align-items-center gap-3 py-2">
+                <fa-icon [icon]="faKey" class="text-muted"></fa-icon>
+                <span>Modifica Password</span>
+            </button>
+            <div class="dropdown-divider"></div>
+            <button ngbDropdownItem (click)="onLogout()" class="d-flex align-items-center gap-3 py-2 text-danger">
+                <fa-icon [icon]="faLogout"></fa-icon>
+                <span>Esci</span>
+            </button>
+        </div>
+    </div>
 </nav>
