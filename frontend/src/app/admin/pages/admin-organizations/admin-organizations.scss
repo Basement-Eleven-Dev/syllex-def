@@ -1,0 +1,32 @@
+@import "../../../../styles.scss";
+
+.shadow-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.08) !important;
+        border-color: var(--primary-color) !important;
+    }
+}
+
+.transition-all {
+    transition: all 0.3s ease;
+}
+
+.org-logo-container img {
+    padding: 5px;
+}
+
+.badge.bg-light {
+    background-color: #f8f9fa !important;
+    color: #666 !important;
+}
+
+.input-group-text {
+    border-color: #f0f0f0;
+}
+
+input.form-control:focus {
+    box-shadow: none;
+    border-color: var(--primary-color);
+}

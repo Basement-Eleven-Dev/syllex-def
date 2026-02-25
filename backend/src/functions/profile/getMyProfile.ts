@@ -13,6 +13,7 @@ export interface User {
 }
 
 const getProfile = async (request: APIGatewayProxyEvent) => {
+  console.log("logirequest", request)
   return (
     (await getCurrentUser(request)) || {
       message: "Utente non trovato nel database",

@@ -1,0 +1,72 @@
+<div class="modal-header border-0 pb-0">
+    <h5 class="modal-title fw-bold">{{ title }}</h5>
+    <button type="button" class="btn-close shadow-none" (click)="activeModal.dismiss()"></button>
+</div>
+
+<div class="modal-body p-4">
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+        <div class="row g-3">
+            <!-- First Name -->
+            <div class="col-md-6">
+                <label class="form-label small fw-bold text-muted">Nome</label>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-light border-light pe-2">
+                        <fa-icon [icon]="icons.faUser" class="extra-small text-muted"></fa-icon>
+                    </span>
+                    <input type="text" class="form-control border-light py-2" formControlName="firstName" placeholder="es. Mario">
+                </div>
+            </div>
+
+            <!-- Last Name -->
+            <div class="col-md-6">
+                <label class="form-label small fw-bold text-muted">Cognome</label>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-light border-light pe-2">
+                        <fa-icon [icon]="icons.faUser" class="extra-small text-muted"></fa-icon>
+                    </span>
+                    <input type="text" class="form-control border-light py-2" formControlName="lastName" placeholder="es. Rossi">
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="col-12">
+                <label class="form-label small fw-bold text-muted">Email</label>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-light border-light pe-2">
+                        <fa-icon [icon]="icons.faEnvelope" class="extra-small text-muted"></fa-icon>
+                    </span>
+                    <input type="email" class="form-control border-light py-2" formControlName="email" placeholder="mario.rossi@email.it">
+                </div>
+            </div>
+
+            <!-- Role (conditional) -->
+            @if (!fixedRole) {
+                <div class="col-12">
+                    <label class="form-label small fw-bold text-muted">Ruolo</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light border-light pe-2">
+                            <fa-icon [icon]="icons.faUserTag" class="extra-small text-muted"></fa-icon>
+                        </span>
+                        <select class="form-select border-light py-2" formControlName="role">
+                            <option value="">Seleziona ruolo...</option>
+                            <option value="teacher">Docente</option>
+                            <option value="admin">Amministratore</option>
+                            <option value="student">Studente</option>
+                        </select>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="mt-4 d-grid">
+            <button type="submit" class="btn btn-primary fw-bold py-2 d-flex align-items-center justify-content-center gap-2" [disabled]="userForm.invalid || loading">
+                @if (loading) {
+                    <span class="spinner-border spinner-border-sm" role="status"></span>
+                } @else {
+                    <fa-icon [icon]="icons.faPlus"></fa-icon>
+                }
+                Crea Utente
+            </button>
+        </div>
+    </form>
+</div>

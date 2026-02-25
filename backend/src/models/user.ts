@@ -6,5 +6,6 @@ export type User = {
     firstName?: string;
     lastName?: string;
     role: "teacher" | "student" | "admin";
-    organizationId?: ObjectId;
+    organizationId?: ObjectId; // Legacy single-org support
+    organizationIds?: ObjectId[]; // New multi-org support
 }

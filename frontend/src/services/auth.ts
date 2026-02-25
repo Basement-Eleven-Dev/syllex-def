@@ -12,6 +12,7 @@ import {
   confirmUserAttribute,
   resetPassword,
   confirmResetPassword,
+  confirmSignIn,
 } from 'aws-amplify/auth';
 import { HttpClient } from '@angular/common/http';
 
@@ -56,23 +57,36 @@ export class Auth {
 
   async login(
     credentials: SignInInput,
-  ): Promise<{ success: boolean; message: string }> {
+  ): Promise<{ success: boolean; message: string; challenge?: string }> {
     try {
-      await signIn(credentials);
-      await fetchAuthSession({ forceRefresh: true });
+      const { nextStep } = await signIn(credentials);
 
-      const user = await firstValueFrom(this.http.get<User | null>('profile'));
+      if (nextStep.signInStep === 'DONE') {
+        await fetchAuthSession({ forceRefresh: true });
+        const user = await firstValueFrom(this.http.get<User | null>('profile'));
 
-      if (user) {
-        this.user$.next(user);
-        if (user.organizationId) {
-          this.getOrganizationById(user.organizationId);
+        if (user) {
+          this.user$.next(user);
+          if (user.organizationId) {
+            this.getOrganizationById(user.organizationId);
+          }
+          return { success: true, message: 'Login riuscito' };
+        } else {
+          return {
+            success: false,
+            message: 'Impossibile recuperare il profilo utente',
+          };
         }
-        return { success: true, message: 'Login riuscito' };
+      } else if (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED') {
+        return {
+          success: true,
+          message: 'Nuova password richiesta',
+          challenge: 'NEW_PASSWORD_REQUIRED',
+        };
       } else {
         return {
           success: false,
-          message: 'Impossibile recuperare il profilo utente',
+          message: `Step di login non supportato: ${nextStep.signInStep}`,
         };
       }
     } catch (error: any) {
@@ -80,6 +94,24 @@ export class Auth {
         success: false,
         message: error.message || 'Errore durante il login',
       };
+    }
+  }
+
+  async confirmPassword(newPassword: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const { nextStep } = await confirmSignIn({ challengeResponse: newPassword });
+      
+      if (nextStep.signInStep === 'DONE') {
+        await fetchAuthSession({ forceRefresh: true });
+        const user = await firstValueFrom(this.http.get<User | null>('profile'));
+        if (user) {
+          this.user$.next(user);
+          return { success: true, message: 'Password aggiornata e login effettuato' };
+        }
+      }
+      return { success: false, message: 'Errore durante la conferma della password' };
+    } catch (error: any) {
+      return { success: false, message: error.message || 'Errore durante il cambio password' };
     }
   }
 

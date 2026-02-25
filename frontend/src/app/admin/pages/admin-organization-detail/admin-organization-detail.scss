@@ -1,0 +1,55 @@
+@import '../../../../styles.scss';
+
+.org-logo-detail {
+    background-color: #fff;
+    border: 1px solid #f0f0f0;
+}
+
+.nav-tabs .nav-link {
+    color: #6c757d;
+    font-size: 0.95rem;
+    position: relative;
+    border-bottom: 3px solid transparent !important;
+
+    &:hover {
+        color: var(--primary-color);
+    }
+
+    &.active {
+        color: var(--primary-color);
+        border-bottom-color: var(--primary-color) !important;
+    }
+}
+
+.table thead th {
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+.shadow-hover {
+    transition: all 0.3s ease;
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.06) !important;
+    }
+}
+
+.extra-small {
+    font-size: 0.75rem;
+}
+
+.bg-primary-subtle {
+    background-color: rgba(var(--primary-rgb), 0.1) !important;
+}
+
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+
+.italic {
+    font-style: italic;
+}
+
+.transition-all {
+    transition: all 0.2s ease-in-out;
+}

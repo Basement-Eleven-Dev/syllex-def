@@ -1,0 +1,247 @@
+<div class="container-fluid p-4">
+    <!-- Breadcrumb / Back -->
+    <div class="mb-4">
+        <a routerLink="/a/organizzazioni" class="text-decoration-none text-muted small d-flex align-items-center gap-2 mb-3">
+            <fa-icon [icon]="icons.faArrowLeft" class="extra-small"></fa-icon>
+            Torna all'Hub
+        </a>
+    </div>
+
+    @if (loading) {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary opacity-50" role="status">
+                <span class="visually-hidden">Caricamento...</span>
+            </div>
+        </div>
+    } @else if (organization) {
+        <!-- Header -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+            <div class="card-body p-4 p-lg-5">
+                <div class="row align-items-center g-4">
+                    <div class="col-auto">
+                        <div class="org-logo-detail border rounded-4 overflow-hidden bg-white shadow-sm d-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+                            @if (organization.logoUrl) {
+                                <img [src]="organization.logoUrl" class="w-100 h-100 object-fit-contain p-2">
+                            } @else {
+                                <fa-icon [icon]="icons.faLandmark" class="text-muted opacity-25 fs-1"></fa-icon>
+                            }
+                        </div>
+                    </div>
+                    <div class="col">
+                        <h1 class="fw-bold mb-1">{{ organization.name }}</h1>
+                        <p class="text-muted mb-0 d-flex align-items-center gap-2">
+                            <fa-icon [icon]="icons.faLandmark" class="small"></fa-icon>
+                            Organizzazione ID: <code class="bg-light px-2 rounded">{{ organization._id }}</code>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tabs Nav -->
+            <div class="border-top bg-light bg-opacity-50 px-4">
+                <nav class="nav nav-tabs border-0 gap-4">
+                    <button class="nav-link border-0 py-3 px-2 bg-transparent fw-bold transition-all" 
+                        [class.active]="activeTab === 'overview'" (click)="setActiveTab('overview')">
+                        Panoramica
+                    </button>
+                    <button class="nav-link border-0 py-3 px-2 bg-transparent fw-bold transition-all" 
+                        [class.active]="activeTab === 'staff'" (click)="setActiveTab('staff')">
+                        Staff & Docenti
+                    </button>
+                    <button class="nav-link border-0 py-3 px-2 bg-transparent fw-bold transition-all" 
+                        [class.active]="activeTab === 'didactics'" (click)="setActiveTab('didactics')">
+                        Struttura Didattica
+                    </button>
+                    <button class="nav-link border-0 py-3 px-2 bg-transparent fw-bold transition-all" 
+                        [class.active]="activeTab === 'students'" (click)="setActiveTab('students')">
+                        Anagrafica Studenti
+                    </button>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content mt-4">
+            
+            <!-- Overview Tab -->
+            @if (activeTab === 'overview') {
+                <div class="row g-4">
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm rounded-4 h-100 text-center p-4">
+                            <fa-icon [icon]="icons.faUserTie" class="fs-2 text-primary opacity-50 mb-3"></fa-icon>
+                            <h2 class="fw-bold mb-0">{{ stats.staffCount }}</h2>
+                            <p class="text-muted small mb-0">Staff & Docenti</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm rounded-4 h-100 text-center p-4">
+                            <fa-icon [icon]="icons.faUsers" class="fs-2 text-success opacity-50 mb-3"></fa-icon>
+                            <h2 class="fw-bold mb-0">{{ stats.classesCount }}</h2>
+                            <p class="text-muted small mb-0">Classi Attive</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm rounded-4 h-100 text-center p-4">
+                            <fa-icon [icon]="icons.faBook" class="fs-2 text-info opacity-50 mb-3"></fa-icon>
+                            <h2 class="fw-bold mb-0">{{ stats.subjectsCount }}</h2>
+                            <p class="text-muted small mb-0">Materie Create</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm rounded-4 h-100 text-center p-4">
+                            <fa-icon [icon]="icons.faGraduationCap" class="fs-2 text-warning opacity-50 mb-3"></fa-icon>
+                            <h2 class="fw-bold mb-0">{{ stats.studentsCount }}</h2>
+                            <p class="text-muted small mb-0">Studenti Totali</p>
+                        </div>
+                    </div>
+                    
+                    <div class="col-12 mt-4">
+                        <div class="card border-0 shadow-sm rounded-4 p-4 text-center py-5 bg-light bg-opacity-50">
+                            <p class="text-muted mb-0 italic">Dashboard dell'organizzazione in arrivo...</p>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Staff Tab -->
+            @if (activeTab === 'staff') {
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-header bg-white p-4 border-0 d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0">Elenco Personale</h5>
+                        <button class="btn btn-primary btn-sm d-flex align-items-center gap-2 px-3 fw-bold" (click)="openAddStaffModal()">
+                            <fa-icon [icon]="icons.faPlus" class="extra-small"></fa-icon>
+                            Aggiungi Personale
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4 py-3 border-0 small text-uppercase text-muted fw-bold">Nome</th>
+                                    <th class="py-3 border-0 small text-uppercase text-muted fw-bold">Ruolo</th>
+                                    <th class="py-3 border-0 small text-uppercase text-muted fw-bold">Email</th>
+                                    <th class="py-3 border-0 small text-uppercase text-muted fw-bold text-end pe-4">Azioni</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (user of staffList; track user._id) {
+                                    <tr>
+                                        <td class="ps-4 fw-medium">{{ user.firstName }} {{ user.lastName }}</td>
+                                        <td>
+                                            <span class="badge rounded-pill px-3 py-2 fw-normal" 
+                                                [class.bg-primary-subtle]="user.role === 'admin'"
+                                                [class.text-primary]="user.role === 'admin'"
+                                                [class.bg-secondary-subtle]="user.role === 'teacher'"
+                                                [class.text-dark]="user.role === 'teacher'">
+                                                {{ user.role | titlecase }}
+                                            </span>
+                                        </td>
+                                        <td class="text-muted small">{{ user.email }}</td>
+                                        <td class="text-end pe-4">
+                                            <button class="btn btn-light btn-sm rounded-circle p-2">
+                                                <fa-icon [icon]="icons.faEllipsisV" class="small"></fa-icon>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+
+            <!-- Didactics Tab -->
+            @if (activeTab === 'didactics') {
+                <div class="row g-4">
+                    <!-- Classes -->
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm rounded-4 h-100">
+                            <div class="card-header bg-white p-4 border-0">
+                                <h5 class="fw-bold mb-0">Classi</h5>
+                            </div>
+                            <div class="list-group list-group-flush">
+                                @for (cls of didactics?.classes; track cls._id) {
+                                    <div class="list-group-item p-3 border-light d-flex justify-content-between align-items-center cursor-pointer shadow-hover-sm" (click)="openBulkImportModal(cls._id)">
+                                        <div>
+                                            <p class="fw-bold mb-0">{{ cls.name }}</p>
+                                            <span class="text-muted small">{{ cls.studentCount }} studenti</span>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-light btn-sm rounded-pill px-2 py-0 extra-small border text-primary" title="Importa Studenti">
+                                                <fa-icon [icon]="icons.faPlus"></fa-icon>
+                                            </button>
+                                            <fa-icon [icon]="icons.faChevronRight" class="extra-small text-muted"></fa-icon>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Combined Assignments View would go here -->
+                     <div class="col-md-6">
+                        <div class="card border-0 shadow-sm rounded-4 h-100">
+                            <div class="card-header bg-white p-4 border-0">
+                                <h5 class="fw-bold mb-0">Materie e Docenti</h5>
+                            </div>
+                            <div class="list-group list-group-flush">
+                                @for (sub of didactics?.subjects; track sub._id) {
+                                    <div class="list-group-item p-3 border-light">
+                                        <p class="fw-bold mb-0">{{ sub.name }}</p>
+                                        <div class="d-flex align-items-center gap-2 mt-1">
+                                            <fa-icon [icon]="icons.faUserTie" class="extra-small text-muted"></fa-icon>
+                                            <span class="text-muted small">{{ sub.teacher?.firstName }} {{ sub.teacher?.lastName }}</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                     </div>
+                </div>
+            }
+
+            <!-- Students Tab -->
+            @if (activeTab === 'students') {
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-header bg-white p-4 border-0 d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0">Elenco Studenti</h5>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-primary btn-sm px-3 fw-bold" (click)="openBulkImportModal()">Importa Bulk</button>
+                            <button class="btn btn-primary btn-sm px-3 fw-bold" (click)="openAddStudentModal()">Nuovo Studente</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                       <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4 py-3 border-0 small text-uppercase text-muted fw-bold">Studente</th>
+                                    <th class="py-3 border-0 small text-uppercase text-muted fw-bold">Email</th>
+                                    <th class="py-3 border-0 small text-uppercase text-muted fw-bold text-end pe-4">Azioni</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (std of studentsList; track std._id) {
+                                    <tr>
+                                        <td class="ps-4 fw-medium">{{ std.firstName }} {{ std.lastName }}</td>
+                                        <td class="text-muted small">{{ std.email }}</td>
+                                        <td class="text-end pe-4">
+                                            <button class="btn btn-light btn-sm rounded-circle p-2">
+                                                <fa-icon [icon]="icons.faEllipsisV" class="small"></fa-icon>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                       </table>
+                    </div>
+                </div>
+            }
+
+        </div>
+
+    } @else {
+        <div class="text-center py-5">
+            <h4 class="text-muted">Organizzazione non trovata</h4>
+            <button class="btn btn-primary mt-3" routerLink="/a/organizzazioni">Torna all'Hub</button>
+        </div>
+    }
+</div>

@@ -30,7 +30,8 @@ export class LoginForm {
   });
 
   hasResult: { success: boolean; message: string } | null = null;
-
+  isChallenge: boolean = false;
+  challengeType: string | null = null;
   loading: boolean = false;
 
   constructor(
@@ -45,20 +46,44 @@ export class LoginForm {
       password: this.loginForm.value.password || '',
     };
     this.authService.login(credentials).then((result) => {
-      this.hasResult = result;
       this.loading = false;
+      if (result.success && result.challenge === 'NEW_PASSWORD_REQUIRED') {
+        this.isChallenge = true;
+        this.challengeType = result.challenge;
+        this.loginForm.get('password')?.setValue('');
+        this.hasResult = { success: true, message: 'Inserisci una nuova password per completare l\'attivazione' };
+        return;
+      }
+      
+      this.hasResult = result;
       if (result.success) {
-        setTimeout(() => {
-          const user = this.authService.user;
-          if (user?.role === 'admin') {
-            this.router.navigate(['/a']);
-          } else if (user?.role === 'student') {
-            this.router.navigate(['/s']);
-          } else {
-            this.router.navigate(['/t/dashboard']);
-          }
-        }, 1000);
+        this.handleSuccessfulLogin();
       }
     });
+  }
+
+  onConfirmChallenge() {
+    this.loading = true;
+    const newPass = this.loginForm.value.password || '';
+    this.authService.confirmPassword(newPass).then((result) => {
+      this.loading = false;
+      this.hasResult = result;
+      if (result.success) {
+        this.handleSuccessfulLogin();
+      }
+    });
+  }
+
+  private handleSuccessfulLogin() {
+    setTimeout(() => {
+      const user = this.authService.user;
+      if (user?.role === 'admin') {
+        this.router.navigate(['/a']);
+      } else if (user?.role === 'student') {
+        this.router.navigate(['/s']);
+      } else {
+        this.router.navigate(['/t/dashboard']);
+      }
+    }, 1000);
   }
 }

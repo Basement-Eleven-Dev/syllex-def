@@ -1,10 +1,10 @@
 <form
   [formGroup]="loginForm"
-  (ngSubmit)="onSingIn()"
+  (ngSubmit)="isChallenge ? onConfirmChallenge() : onSingIn()"
   class="d-flex flex-column gap-3"
 >
-  <h3 class="text-dark">Bentornato</h3>
-  <div>
+  <h3 class="text-dark">{{ isChallenge ? 'Attivazione Account' : 'Bentornato' }}</h3>
+  <div [hidden]="isChallenge">
     <label for="email" class="form-label text-dark">Email</label>
     <input
       type="text"
@@ -14,19 +14,24 @@
     />
   </div>
   <div>
-    <label for="password" class="form-label text-dark">Password</label>
+    <label for="password" class="form-label text-dark">{{ isChallenge ? 'Nuova Password' : 'Password' }}</label>
     <input
       formControlName="password"
       type="password"
       class="form-control custom-input"
       placeholder="Password"
     />
+    @if (isChallenge) {
+      <div class="form-text small opacity-50">Scegli una password sicura di almeno 8 caratteri.</div>
+    }
   </div>
-  <div class="text-end mb-4">
-    <a href="#" class="text-dark fw-semibold" routerLink="/password-reset"
-      >Hai dimenticato la password?</a
-    >
-  </div>
+  @if (!isChallenge) {
+    <div class="text-end mb-4">
+      <a href="#" class="text-dark fw-semibold" routerLink="/password-reset"
+        >Hai dimenticato la password?</a
+      >
+    </div>
+  }
   <button
     type="submit"
     class="btn btn-gradient-primary btn-lg w-100"
@@ -36,7 +41,7 @@
       [icon]="loading ? SpinnerIcon : LoginIcon"
       [animation]="loading ? 'spin' : undefined"
     ></fa-icon>
-    Login
+    {{ isChallenge ? 'Conferma e Accedi' : 'Login' }}
   </button>
   @if(hasResult){
   <div

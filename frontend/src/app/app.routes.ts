@@ -35,6 +35,9 @@ import { adminGuard } from '../guards/admin.guard';
 import { AdminLayout } from './admin/layout/admin-layout/admin-layout';
 import { AdminDashboard } from './admin/pages/admin-dashboard/admin-dashboard';
 import { AdminOnboarding } from './admin/pages/admin-onboarding/admin-onboarding';
+import { AdminOrganizations } from './admin/pages/admin-organizations/admin-organizations';
+import { AdminOrganizationDetail } from './admin/pages/admin-organization-detail/admin-organization-detail';
+import { AdminClassDetail } from './admin/pages/admin-class-detail/admin-class-detail';
 
 export const routes: Routes = [
   {
@@ -275,6 +278,18 @@ export const routes: Routes = [
       {
         path: 'onboarding',
         component: AdminOnboarding,
+      },
+      {
+        path: 'organizzazioni',
+        component: AdminOrganizations,
+      },
+      {
+        path: 'organizzazioni/:id',
+        component: AdminOrganizationDetail,
+      },
+      {
+        path: 'organizzazioni/:orgId/classi/:classId',
+        component: AdminClassDetail,
       },
     ],
   },

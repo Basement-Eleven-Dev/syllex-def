@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faUser, faRightFromBracket } from '@fortawesome/pro-solid-svg-icons';
+import { Auth } from '../../../../services/auth';
 
 @Component({
   selector: 'app-admin-navbar',
@@ -13,9 +14,9 @@ import { faUser, faRightFromBracket } from '@fortawesome/pro-solid-svg-icons';
 export class AdminNavbar {
   faUser = faUser;
   faLogout = faRightFromBracket;
+  constructor(private authService: Auth){}
 
   onLogout() {
-    // TODO: implementa logout
-    console.log('Logout admin');
+    this.authService.logout();
   }
 }

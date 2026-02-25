@@ -1,0 +1,21 @@
+@import '../../../../styles.scss';
+
+.extra-small {
+    font-size: 0.75rem;
+}
+
+.rotate-180 {
+    transform: rotate(180deg);
+}
+
+.shadow-hover-sm {
+    transition: all 0.2s ease;
+    &:hover {
+        background-color: #f8f9fa !important;
+        transform: translateX(5px);
+    }
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
