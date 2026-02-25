@@ -10,7 +10,7 @@ const createUser = async (
   context: Context,
 ) => {
   const organizationId = request.pathParameters?.organizationId;
-  const { firstName, lastName, email, role } = JSON.parse(request.body || '{}');
+  const { firstName, lastName, email, role, classId, subjectId } = JSON.parse(request.body || '{}');
 
   if (!organizationId || !ObjectId.isValid(organizationId)) {
     throw createError.BadRequest("Invalid or missing organizationId");
@@ -38,11 +38,30 @@ const createUser = async (
     updatedAt: new Date(),
   });
 
+  // 3. Optional Associations
+  if (role === 'student' && classId && ObjectId.isValid(classId)) {
+    await db.collection("classes").updateOne(
+      { _id: new ObjectId(classId) },
+      { $addToSet: { students: userResult.insertedId } }
+    );
+  }
+
+  if (role === 'teacher' && subjectId && ObjectId.isValid(subjectId)) {
+    await db.collection("subjects").updateOne(
+      { _id: new ObjectId(subjectId) },
+      { $set: { teacherId: userResult.insertedId } }
+    );
+  }
+
   return {
     success: true,
     user: {
       ...userResult,
-      _id: userResult.insertedId.toString()
+      _id: userResult.insertedId.toString(),
+      firstName,
+      lastName,
+      email: email.toLowerCase().trim(),
+      role
     }
   };
 };

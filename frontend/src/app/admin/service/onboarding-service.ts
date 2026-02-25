@@ -47,4 +47,12 @@ export class OnboardingService {
   removeUser(orgId: string, userId: string): Observable<any> {
     return this.http.delete(`admin/organizations/${orgId}/users/${userId}`);
   }
+
+  addClass(orgId: string, payload: any): Observable<any> {
+    return this.http.post(`admin/organizations/${orgId}/classes`, payload);
+  }
+
+  addSubject(orgId: string, payload: any): Observable<any> {
+    return this.http.post(`admin/organizations/${orgId}/subjects`, payload);
+  }
 }

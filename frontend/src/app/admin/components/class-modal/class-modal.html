@@ -1,0 +1,41 @@
+<div class="modal-header border-0 pb-0">
+    <h5 class="modal-title fw-bold">{{ title }}</h5>
+    <button type="button" class="btn-close shadow-none" (click)="activeModal.dismiss()"></button>
+</div>
+
+<div class="modal-body p-4">
+    <form [formGroup]="classForm" (ngSubmit)="onSubmit()">
+        <div class="row g-3">
+            <div class="col-12">
+                <label class="form-label small fw-bold text-muted">Nome Classe</label>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-light border-light pe-2">
+                        <fa-icon [icon]="icons.faUsers" class="extra-small text-muted"></fa-icon>
+                    </span>
+                    <input type="text" class="form-control border-light py-2" formControlName="name" placeholder="es. 1A">
+                </div>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label small fw-bold text-muted">Anno Accademico</label>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-light border-light pe-2">
+                        <fa-icon [icon]="icons.faCalendarAlt" class="extra-small text-muted"></fa-icon>
+                    </span>
+                    <input type="number" class="form-control border-light py-2" formControlName="year">
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 d-grid">
+            <button type="submit" class="btn btn-primary fw-bold py-2 d-flex align-items-center justify-content-center gap-2" [disabled]="classForm.invalid || loading">
+                @if (loading) {
+                    <span class="spinner-border spinner-border-sm" role="status"></span>
+                } @else {
+                    <fa-icon [icon]="icons.faPlus"></fa-icon>
+                }
+                Crea Classe
+            </button>
+        </div>
+    </form>
+</div>

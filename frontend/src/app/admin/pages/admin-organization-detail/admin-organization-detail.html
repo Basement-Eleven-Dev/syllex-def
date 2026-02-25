@@ -132,8 +132,13 @@
                 <div class="card border-0 shadow-sm rounded-4">
                     <div class="card-header bg-white p-4 border-0 d-flex justify-content-between align-items-center">
                         <h5 class="fw-bold mb-0">Elenco Personale</h5>
-                        <button class="btn btn-primary btn-sm d-flex align-items-center gap-2 px-3 fw-bold" (click)="openAddStaffModal()">
-                            <fa-icon [icon]="icons.faPlus" class="extra-small"></fa-icon>
+                        <button class="btn btn-primary btn-sm d-flex align-items-center gap-2 px-3 fw-bold" 
+                                [disabled]="didacticsLoading" (click)="openAddStaffModal()">
+                            @if (didacticsLoading) {
+                                <span class="spinner-border spinner-border-sm extra-small"></span>
+                            } @else {
+                                <fa-icon [icon]="icons.faPlus" class="extra-small"></fa-icon>
+                            }
                             Aggiungi Personale
                         </button>
                     </div>
@@ -197,8 +202,9 @@
                     <!-- Classes -->
                     <div class="col-md-6">
                         <div class="card border-0 shadow-sm rounded-4 h-100">
-                            <div class="card-header bg-white p-4 border-0">
+                            <div class="card-header bg-white p-4 border-0 d-flex justify-content-between align-items-center">
                                 <h5 class="fw-bold mb-0">Classi</h5>
+                                <button class="btn btn-primary btn-sm px-3 fw-bold" (click)="openAddClassModal()">Nuova Classe</button>
                             </div>
                             <div class="list-group list-group-flush">
                                 @for (cls of didactics?.classes; track cls._id) {
@@ -221,8 +227,9 @@
                     <!-- Combined Assignments View would go here -->
                      <div class="col-md-6">
                         <div class="card border-0 shadow-sm rounded-4 h-100">
-                            <div class="card-header bg-white p-4 border-0">
+                            <div class="card-header bg-white p-4 border-0 d-flex justify-content-between align-items-center">
                                 <h5 class="fw-bold mb-0">Materie e Docenti</h5>
+                                <button class="btn btn-primary btn-sm px-3 fw-bold" (click)="openAddSubjectModal()">Nuova Materia</button>
                             </div>
                             <div class="list-group list-group-flush">
                                 @for (sub of didactics?.subjects; track sub._id) {
@@ -247,7 +254,13 @@
                         <h5 class="fw-bold mb-0">Elenco Studenti</h5>
                         <div class="d-flex gap-2">
                             <button class="btn btn-outline-primary btn-sm px-3 fw-bold" (click)="openBulkImportModal()">Importa Bulk</button>
-                            <button class="btn btn-primary btn-sm px-3 fw-bold" (click)="openAddStudentModal()">Nuovo Studente</button>
+                            <button class="btn btn-primary btn-sm px-3 fw-bold" 
+                                [disabled]="didacticsLoading" (click)="openAddStudentModal()">
+                                @if (didacticsLoading) {
+                                    <span class="spinner-border spinner-border-sm me-1"></span>
+                                }
+                                Nuovo Studente
+                            </button>
                         </div>
                     </div>
                     <div class="table-responsive">

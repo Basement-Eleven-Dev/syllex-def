@@ -23,6 +23,8 @@ export class UserModal {
   @Input() orgId!: string;
   @Input() title: string = 'Aggiungi Utente';
   @Input() fixedRole?: string;
+  @Input() classes: any[] = [];
+  @Input() subjects: any[] = [];
 
   userForm: FormGroup;
   loading = false;
@@ -40,8 +42,26 @@ export class UserModal {
       firstName: ['', [Validators.required]],
       lastName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
-      role: ['', [Validators.required]]
+      role: ['', [Validators.required]],
+      classId: [''],
+      subjectId: ['']
     });
+
+    // Handle conditional validators based on role
+    this.userForm.get('role')?.valueChanges.subscribe(role => {
+        this.updateValidators(role);
+    });
+  }
+
+  updateValidators(role: string) {
+      const classCtrl = this.userForm.get('classId');
+      const subCtrl = this.userForm.get('subjectId');
+
+      classCtrl?.setValidators(role === 'student' ? [Validators.required] : []);
+      subCtrl?.setValidators(role === 'teacher' ? [Validators.required] : []);
+
+      classCtrl?.updateValueAndValidity();
+      subCtrl?.updateValueAndValidity();
   }
 
   ngOnInit() {

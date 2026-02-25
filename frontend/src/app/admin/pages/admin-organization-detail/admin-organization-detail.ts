@@ -1,5 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Observable, tap } from 'rxjs';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { 
@@ -22,6 +23,8 @@ import { FeedbackService } from '../../../../services/feedback-service';
 
 import { NgbModal, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { UserModal } from '../../components/user-modal/user-modal';
+import { ClassModal } from '../../components/class-modal/class-modal';
+import { SubjectModal } from '../../components/subject-modal/subject-modal';
 import { BulkImportModal } from '../../components/bulk-import-modal/bulk-import-modal';
 import { AdminAnalyticsComponent } from '../../components/admin-analytics/admin-analytics';
 
@@ -46,6 +49,7 @@ export class AdminOrganizationDetail implements OnInit {
   organization: any = null;
   stats: any = null;
   loading = true;
+  didacticsLoading = false;
   activeTab: TabType = 'overview';
 
   // Data for tabs
@@ -73,13 +77,14 @@ export class AdminOrganizationDetail implements OnInit {
     this.orgId = this.route.snapshot.paramMap.get('id');
     if (this.orgId) {
       this.loadWorkspaceDetails();
+      this.loadDidactics().subscribe();
     }
   }
 
   setActiveTab(tab: TabType) {
     this.activeTab = tab;
     if (tab === 'staff' && this.staffList.length === 0) this.loadStaff();
-    if (tab === 'didactics' && !this.didactics) this.loadDidactics();
+    if (tab === 'didactics' && !this.didactics) this.loadDidactics().subscribe();
     if (tab === 'students' && this.studentsList.length === 0) this.loadStudents();
   }
 
@@ -106,10 +111,13 @@ export class AdminOrganizationDetail implements OnInit {
   }
 
   loadDidactics() {
-    this.onboardingService.getWorkspaceDidactics(this.orgId!).subscribe({
-      next: (res) => this.didactics = res,
-      error: () => this.feedbackService.showFeedback('Errore caricamento didattica', false)
-    });
+    this.didacticsLoading = true;
+    return this.onboardingService.getWorkspaceDidactics(this.orgId!).pipe(
+      tap(res => {
+        this.didactics = res;
+        this.didacticsLoading = false;
+      })
+    );
   }
 
   loadStudents() {
@@ -120,26 +128,78 @@ export class AdminOrganizationDetail implements OnInit {
   }
 
   openAddStaffModal() {
-    const modalRef = this.modalService.open(UserModal, { centered: true });
+    const openModal = () => {
+        const modalRef = this.modalService.open(UserModal, { centered: true });
+        modalRef.componentInstance.orgId = this.orgId;
+        modalRef.componentInstance.title = 'Aggiungi Personale';
+        modalRef.componentInstance.subjects = this.didactics?.subjects || [];
+        modalRef.componentInstance.classes = this.didactics?.classes || [];
+        modalRef.result.then((newUser) => {
+            if (newUser) {
+                this.staffList = [newUser, ...this.staffList];
+                this.stats.staffCount++;
+            }
+        }, () => {});
+    };
+
+    if (!this.didactics) {
+        this.loadDidactics().subscribe({
+            next: () => openModal(),
+            error: () => this.feedbackService.showFeedback('Impossibile caricare i dati della struttura', false)
+        });
+    } else {
+        openModal();
+    }
+  }
+
+  openAddStudentModal() {
+    const openModal = () => {
+        const modalRef = this.modalService.open(UserModal, { centered: true });
+        modalRef.componentInstance.orgId = this.orgId;
+        modalRef.componentInstance.title = 'Aggiungi Studente';
+        modalRef.componentInstance.fixedRole = 'student';
+        modalRef.componentInstance.classes = this.didactics?.classes || [];
+        modalRef.componentInstance.subjects = this.didactics?.subjects || [];
+        modalRef.result.then((newUser) => {
+            if (newUser) {
+                this.studentsList = [newUser, ...this.studentsList];
+                this.stats.studentsCount++;
+            }
+        }, () => {});
+    };
+
+    if (!this.didactics) {
+        this.loadDidactics().subscribe({
+            next: () => openModal(),
+            error: () => this.feedbackService.showFeedback('Impossibile caricare i dati della struttura', false)
+        });
+    } else {
+        openModal();
+    }
+  }
+
+  openAddClassModal() {
+    const modalRef = this.modalService.open(ClassModal, { centered: true });
     modalRef.componentInstance.orgId = this.orgId;
-    modalRef.componentInstance.title = 'Aggiungi Personale';
-    modalRef.result.then((newUser) => {
-        if (newUser) {
-            this.staffList = [newUser, ...this.staffList];
-            this.stats.staffCount++;
+    modalRef.result.then((res) => {
+        if (res) {
+            this.loadDidactics();
+            this.stats.classesCount++;
         }
     }, () => {});
   }
 
-  openAddStudentModal() {
-    const modalRef = this.modalService.open(UserModal, { centered: true });
+  openAddSubjectModal() {
+    if (!this.staffList || this.staffList.length === 0) {
+        this.loadStaff();
+    }
+    const modalRef = this.modalService.open(SubjectModal, { centered: true });
     modalRef.componentInstance.orgId = this.orgId;
-    modalRef.componentInstance.title = 'Aggiungi Studente';
-    modalRef.componentInstance.fixedRole = 'student';
-    modalRef.result.then((newUser) => {
-        if (newUser) {
-            this.studentsList = [newUser, ...this.studentsList];
-            this.stats.studentsCount++;
+    modalRef.componentInstance.teachers = this.staffList.filter(u => u.role === 'teacher');
+    modalRef.result.then((res) => {
+        if (res) {
+            this.loadDidactics();
+            this.stats.subjectsCount++;
         }
     }, () => {});
   }
