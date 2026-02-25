@@ -12,6 +12,7 @@ import {
   faLandmark,
   faUser,
   faSparkles,
+  faCirclePlay,
 } from '@fortawesome/pro-solid-svg-icons';
 
 interface AdminNavRoute {
@@ -30,7 +31,7 @@ interface AdminNavRoute {
 export class AdminSidebar {
   routes: AdminNavRoute[] = [
     { label: 'Dashboard', icon: faHouse, route: '/a/dashboard' },
-    { label: 'Onboarding', icon: faSparkles, route: '/a/onboarding' },
+    { label: 'Onboarding', icon: faCirclePlay, route: '/a/onboarding' },
     {
       label: 'Organizzazioni',
       icon: faLandmark,

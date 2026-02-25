@@ -43,4 +43,8 @@ export class OnboardingService {
   getClassDetail(orgId: string, classId: string): Observable<any> {
     return this.http.get(`admin/organizations/${orgId}/classes/${classId}`);
   }
+
+  removeUser(orgId: string, userId: string): Observable<any> {
+    return this.http.delete(`admin/organizations/${orgId}/users/${userId}`);
+  }
 }

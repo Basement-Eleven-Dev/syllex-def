@@ -97,9 +97,26 @@
                                         </td>
                                         <td class="text-muted small">{{ std.email }}</td>
                                         <td class="text-end pe-4">
-                                            <button class="btn btn-light btn-sm rounded-circle p-2">
-                                                <fa-icon [icon]="icons.faArrowLeft" class="extra-small rotate-180"></fa-icon>
-                                            </button>
+                                            <div ngbDropdown container="body" display="dynamic" placement="bottom-end">
+                                                <button class="btn btn-light btn-sm rounded-circle p-2" ngbDropdownToggle>
+                                                    <fa-icon [icon]="icons.faEllipsisV" class="extra-small"></fa-icon>
+                                                </button>
+                                                <ul ngbDropdownMenu class="shadow-sm border-light">
+                                                    <li>
+                                                        <button ngbDropdownItem class="d-flex align-items-center gap-2 py-2">
+                                                            <fa-icon [icon]="icons.faEdit" class="extra-small text-muted"></fa-icon>
+                                                            <span>Modifica</span>
+                                                        </button>
+                                                    </li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li>
+                                                        <button ngbDropdownItem class="d-flex align-items-center gap-2 py-2 text-danger" (click)="removeUser(std._id)">
+                                                            <fa-icon [icon]="icons.faTrash" class="extra-small"></fa-icon>
+                                                            <span>Rimuovi</span>
+                                                        </button>
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         </td>
                                     </tr>
                                 } @empty {

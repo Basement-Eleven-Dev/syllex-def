@@ -68,6 +68,12 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "admin",
   },
   {
+    apiRoute: "admin/organizations/{organizationId}/users/{userId}",
+    functionPath: "admin/workspace/removeUser.ts",
+    method: "delete",
+    role: "admin",
+  },
+  {
     apiRoute: "teachers/{teacherId}/subjects",
     functionPath: "teachers/getSubjects.ts",
     method: "get",

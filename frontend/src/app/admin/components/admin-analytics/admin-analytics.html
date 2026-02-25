@@ -1,0 +1,67 @@
+<div class="row g-4">
+    <!-- Trend Card -->
+    <div class="col-md-7">
+        <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
+            <h6 class="fw-bold mb-3 d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-primary bg-opacity-10 p-2 rounded-circle text-primary" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-chart-line small"></i>
+                    </div>
+                    Andamento Punteggi (%)
+                </div>
+                @if (stats?.totalAttempts !== undefined) {
+                    <span class="badge bg-light text-muted border fw-normal py-1 px-2" style="font-size: 0.75rem;">
+                        {{ stats.totalAttempts }} test completati
+                    </span>
+                }
+            </h6>
+            <div class="chart-container" style="position: relative; height: 200px; width: 100%;">
+                @if (lineChartData.labels && lineChartData.labels.length > 0) {
+                    <canvas baseChart
+                        [data]="lineChartData"
+                        [options]="lineChartOptions"
+                        [type]="'line'">
+                    </canvas>
+                } @else {
+                    <div class="h-100 d-flex flex-column align-items-center justify-content-center text-muted opacity-50">
+                        <i class="fas fa-chart-line fs-1 mb-2"></i>
+                        <p class="small mb-0">Nessun dato disponibile negli ultimi 15 giorni</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Distribution Card -->
+    <div class="col-md-5">
+        <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
+            <h6 class="fw-bold mb-3 d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-success bg-opacity-10 p-2 rounded-circle text-success" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-chart-pie small"></i>
+                    </div>
+                    Composizione Hub
+                </div>
+                @if (stats?.totalTests !== undefined) {
+                    <span class="badge bg-light text-muted border fw-normal py-1 px-2" style="font-size: 0.75rem;">
+                        {{ stats.totalTests }} contenuti didattici
+                    </span>
+                }
+            </h6>
+            <div class="chart-container" style="position: relative; height: 200px; width: 100%;">
+                @if (doughnutChartData.datasets[0].data.length > 0 && stats?.studentsCount > 0) {
+                    <canvas baseChart
+                        [data]="doughnutChartData"
+                        [options]="doughnutChartOptions"
+                        [type]="'doughnut'">
+                    </canvas>
+                } @else {
+                    <div class="h-100 d-flex flex-column align-items-center justify-content-center text-muted opacity-50">
+                        <i class="fas fa-chart-pie fs-1 mb-2"></i>
+                        <p class="small mb-0">Nessun utente registrato nell'hub</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

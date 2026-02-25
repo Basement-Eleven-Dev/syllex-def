@@ -10,17 +10,20 @@ import {
   faUser, 
   faCalendarAlt,
   faPlus,
-  faFileImport
+  faFileImport,
+  faEllipsisV,
+  faEdit,
+  faTrash
 } from '@fortawesome/pro-solid-svg-icons';
 import { OnboardingService } from '../../service/onboarding-service';
 import { FeedbackService } from '../../../../services/feedback-service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { BulkImportModal } from '../../components/bulk-import-modal/bulk-import-modal';
 
 @Component({
   selector: 'app-admin-class-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, FontAwesomeModule],
+  imports: [CommonModule, RouterModule, FontAwesomeModule, NgbDropdownModule],
   templateUrl: './admin-class-detail.html',
   styleUrl: './admin-class-detail.scss',
 })
@@ -45,7 +48,10 @@ export class AdminClassDetail implements OnInit {
     faUser,
     faCalendarAlt,
     faPlus,
-    faFileImport
+    faFileImport,
+    faEllipsisV,
+    faEdit,
+    faTrash
   };
 
   ngOnInit() {
@@ -82,5 +88,18 @@ export class AdminClassDetail implements OnInit {
             this.loadClassDetail();
         }
     }, () => {});
+  }
+
+  removeUser(userId: string) {
+    if (confirm('Sei sicuro di voler rimuovere questo studente dalla classe?')) {
+        // Here removeUser removes from organization, which is fine since students belong to classes inside orbits
+        this.onboardingService.removeUser(this.orgId!, userId).subscribe({
+            next: () => {
+                this.feedbackService.showFeedback('Studente rimosso con successo', true);
+                this.students = this.students.filter(s => s._id !== userId);
+            },
+            error: () => this.feedbackService.showFeedback('Errore durante la rimozione dello studente', false)
+        });
+    }
   }
 }

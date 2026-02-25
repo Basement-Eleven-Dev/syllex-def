@@ -65,40 +65,64 @@
             
             <!-- Overview Tab -->
             @if (activeTab === 'overview') {
-                <div class="row g-4">
-                    <div class="col-md-3">
-                        <div class="card border-0 shadow-sm rounded-4 h-100 text-center p-4">
-                            <fa-icon [icon]="icons.faUserTie" class="fs-2 text-primary opacity-50 mb-3"></fa-icon>
-                            <h2 class="fw-bold mb-0">{{ stats.staffCount }}</h2>
-                            <p class="text-muted small mb-0">Staff & Docenti</p>
+                <div class="row g-4 ">
+                    <!-- Staff Stat -->
+                     <div class="d-flex justify-content-around mt-4">  
+                         <div class="col-6 col-lg-2">
+                        <div class="card border-0 shadow-sm rounded-4 h-100 p-4 shadow-hover-sm transition-all border-bottom border-primary border-3">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-primary bg-opacity-10 p-3 rounded-4 text-primary d-flex">
+                                    <fa-icon [icon]="icons.faUserTie" class="fs-4"></fa-icon>
+                                </div>
+                            </div>
+                            <h2 class="fw-bold mb-1">{{ stats.staffCount }}</h2>
+                            <p class="text-muted small mb-0 fw-medium text-uppercase ls-1">Staff & Docenti</p>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="card border-0 shadow-sm rounded-4 h-100 text-center p-4">
-                            <fa-icon [icon]="icons.faUsers" class="fs-2 text-success opacity-50 mb-3"></fa-icon>
-                            <h2 class="fw-bold mb-0">{{ stats.classesCount }}</h2>
-                            <p class="text-muted small mb-0">Classi Attive</p>
+
+                    <!-- Classes Stat -->
+                    <div class="col-6 col-lg-2">
+                        <div class="card border-0 shadow-sm rounded-4 h-100 p-4 shadow-hover-sm transition-all border-bottom border-success border-3">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-success bg-opacity-10 p-3 rounded-4 text-success d-flex">
+                                    <fa-icon [icon]="icons.faUsers" class="fs-4"></fa-icon>
+                                </div>
+                            </div>
+                            <h2 class="fw-bold mb-1">{{ stats.classesCount }}</h2>
+                            <p class="text-muted small mb-0 fw-medium text-uppercase ls-1">Classi Attive</p>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="card border-0 shadow-sm rounded-4 h-100 text-center p-4">
-                            <fa-icon [icon]="icons.faBook" class="fs-2 text-info opacity-50 mb-3"></fa-icon>
-                            <h2 class="fw-bold mb-0">{{ stats.subjectsCount }}</h2>
-                            <p class="text-muted small mb-0">Materie Create</p>
+
+                    <!-- Subjects Stat -->
+                    <div class="col-6 col-lg-2">
+                        <div class="card border-0 shadow-sm rounded-4 h-100 p-4 shadow-hover-sm transition-all border-bottom border-info border-3">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-info bg-opacity-10 p-3 rounded-4 text-info d-flex">
+                                    <fa-icon [icon]="icons.faBook" class="fs-4"></fa-icon>
+                                </div>
+                            </div>
+                            <h2 class="fw-bold mb-1">{{ stats.subjectsCount }}</h2>
+                            <p class="text-muted small mb-0 fw-medium text-uppercase ls-1">Materie Create</p>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="card border-0 shadow-sm rounded-4 h-100 text-center p-4">
-                            <fa-icon [icon]="icons.faGraduationCap" class="fs-2 text-warning opacity-50 mb-3"></fa-icon>
-                            <h2 class="fw-bold mb-0">{{ stats.studentsCount }}</h2>
-                            <p class="text-muted small mb-0">Studenti Totali</p>
+
+                    <!-- Students Stat -->
+                    <div class="col-6 col-lg-2">
+                        <div class="card border-0 shadow-sm rounded-4 h-100 p-4 shadow-hover-sm transition-all border-bottom border-warning border-3">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-warning bg-opacity-10 p-3 rounded-4 text-warning d-flex">
+                                    <fa-icon [icon]="icons.faGraduationCap" class="fs-4"></fa-icon>
+                                </div>
+                            </div>
+                            <h2 class="fw-bold mb-1">{{ stats.studentsCount }}</h2>
+                            <p class="text-muted small mb-0 fw-medium text-uppercase ls-1">Studenti Totali</p>
                         </div>
-                    </div>
-                    
+                    </div></div>
+                 
+
+                    <!-- Analytics Preview -->
                     <div class="col-12 mt-4">
-                        <div class="card border-0 shadow-sm rounded-4 p-4 text-center py-5 bg-light bg-opacity-50">
-                            <p class="text-muted mb-0 italic">Dashboard dell'organizzazione in arrivo...</p>
-                        </div>
+                        <app-admin-analytics [stats]="stats"></app-admin-analytics>
                     </div>
                 </div>
             }
@@ -138,9 +162,26 @@
                                         </td>
                                         <td class="text-muted small">{{ user.email }}</td>
                                         <td class="text-end pe-4">
-                                            <button class="btn btn-light btn-sm rounded-circle p-2">
-                                                <fa-icon [icon]="icons.faEllipsisV" class="small"></fa-icon>
-                                            </button>
+                                            <div ngbDropdown container="body" display="dynamic" placement="bottom-end">
+                                                <button class="btn btn-light btn-sm rounded-circle p-2" ngbDropdownToggle>
+                                                    <fa-icon [icon]="icons.faEllipsisV" class="small"></fa-icon>
+                                                </button>
+                                                <ul ngbDropdownMenu class="shadow-sm border-light">
+                                                    <li>
+                                                        <button ngbDropdownItem class="d-flex align-items-center gap-2 py-2">
+                                                            <fa-icon [icon]="icons.faEdit" class="extra-small text-muted"></fa-icon>
+                                                            <span>Modifica</span>
+                                                        </button>
+                                                    </li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li>
+                                                        <button ngbDropdownItem class="d-flex align-items-center gap-2 py-2 text-danger" (click)="removeUser(user._id, 'staff')">
+                                                            <fa-icon [icon]="icons.faTrash" class="extra-small"></fa-icon>
+                                                            <span>Rimuovi</span>
+                                                        </button>
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         </td>
                                     </tr>
                                 }
@@ -161,13 +202,13 @@
                             </div>
                             <div class="list-group list-group-flush">
                                 @for (cls of didactics?.classes; track cls._id) {
-                                    <div class="list-group-item p-3 border-light d-flex justify-content-between align-items-center cursor-pointer shadow-hover-sm" (click)="openBulkImportModal(cls._id)">
+                                    <div class="list-group-item p-3 border-light d-flex justify-content-between align-items-center cursor-pointer shadow-hover-sm" (click)="goToClassDetail(cls._id)">
                                         <div>
                                             <p class="fw-bold mb-0">{{ cls.name }}</p>
                                             <span class="text-muted small">{{ cls.studentCount }} studenti</span>
                                         </div>
                                         <div class="d-flex gap-2">
-                                            <button class="btn btn-light btn-sm rounded-pill px-2 py-0 extra-small border text-primary" title="Importa Studenti">
+                                            <button class="btn btn-light btn-sm rounded-pill px-2 py-0 extra-small border text-primary" title="Importa Studenti" (click)="$event.stopPropagation(); openBulkImportModal(cls._id)">
                                                 <fa-icon [icon]="icons.faPlus"></fa-icon>
                                             </button>
                                             <fa-icon [icon]="icons.faChevronRight" class="extra-small text-muted"></fa-icon>
@@ -224,9 +265,26 @@
                                         <td class="ps-4 fw-medium">{{ std.firstName }} {{ std.lastName }}</td>
                                         <td class="text-muted small">{{ std.email }}</td>
                                         <td class="text-end pe-4">
-                                            <button class="btn btn-light btn-sm rounded-circle p-2">
-                                                <fa-icon [icon]="icons.faEllipsisV" class="small"></fa-icon>
-                                            </button>
+                                            <div ngbDropdown container="body" display="dynamic" placement="bottom-end">
+                                                <button class="btn btn-light btn-sm rounded-circle p-2" ngbDropdownToggle>
+                                                    <fa-icon [icon]="icons.faEllipsisV" class="small"></fa-icon>
+                                                </button>
+                                                <ul ngbDropdownMenu class="shadow-sm border-light">
+                                                    <li>
+                                                        <button ngbDropdownItem class="d-flex align-items-center gap-2 py-2">
+                                                            <fa-icon [icon]="icons.faEdit" class="extra-small text-muted"></fa-icon>
+                                                            <span>Modifica</span>
+                                                        </button>
+                                                    </li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li>
+                                                        <button ngbDropdownItem class="d-flex align-items-center gap-2 py-2 text-danger" (click)="removeUser(std._id, 'student')">
+                                                            <fa-icon [icon]="icons.faTrash" class="extra-small"></fa-icon>
+                                                            <span>Rimuovi</span>
+                                                        </button>
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         </td>
                                     </tr>
                                 }

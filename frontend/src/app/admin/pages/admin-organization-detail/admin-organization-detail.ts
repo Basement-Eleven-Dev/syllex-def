@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { 
   faLandmark, 
@@ -13,21 +13,24 @@ import {
   faEllipsisV,
   faLink,
   faGraduationCap,
-  faChevronRight
+  faChevronRight,
+  faEdit,
+  faTrash
 } from '@fortawesome/pro-solid-svg-icons';
 import { OnboardingService } from '../../service/onboarding-service';
 import { FeedbackService } from '../../../../services/feedback-service';
 
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { UserModal } from '../../components/user-modal/user-modal';
 import { BulkImportModal } from '../../components/bulk-import-modal/bulk-import-modal';
+import { AdminAnalyticsComponent } from '../../components/admin-analytics/admin-analytics';
 
 type TabType = 'overview' | 'staff' | 'didactics' | 'students';
 
 @Component({
   selector: 'app-admin-organization-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, FontAwesomeModule],
+  imports: [CommonModule, RouterModule, FontAwesomeModule, NgbDropdownModule, AdminAnalyticsComponent],
   templateUrl: './admin-organization-detail.html',
   styleUrl: './admin-organization-detail.scss',
 })
@@ -36,6 +39,8 @@ export class AdminOrganizationDetail implements OnInit {
   private onboardingService = inject(OnboardingService);
   private feedbackService = inject(FeedbackService);
   private modalService = inject(NgbModal);
+
+  private router = inject(Router);
 
   orgId: string | null = null;
   organization: any = null;
@@ -59,7 +64,9 @@ export class AdminOrganizationDetail implements OnInit {
     faEllipsisV,
     faLink,
     faGraduationCap,
-    faChevronRight
+    faChevronRight,
+    faEdit,
+    faTrash
   };
 
   ngOnInit() {
@@ -153,5 +160,27 @@ export class AdminOrganizationDetail implements OnInit {
             if (this.activeTab === 'didactics') this.loadDidactics();
         }
     }, () => {});
+  }
+
+  goToClassDetail(classId: string) {
+    this.router.navigate(['/a/organizzazioni', this.orgId, 'classi', classId]);
+  }
+
+  removeUser(userId: string, role: 'staff' | 'student') {
+    if (confirm('Sei sicuro di voler rimuovere questo utente dall\'organizzazione?')) {
+        this.onboardingService.removeUser(this.orgId!, userId).subscribe({
+            next: () => {
+                this.feedbackService.showFeedback('Utente rimosso con successo', true);
+                if (role === 'staff') {
+                    this.staffList = this.staffList.filter(u => u._id !== userId);
+                    this.stats.staffCount--;
+                } else {
+                    this.studentsList = this.studentsList.filter(u => u._id !== userId);
+                    this.stats.studentsCount--;
+                }
+            },
+            error: () => this.feedbackService.showFeedback('Errore durante la rimozione dell\'utente', false)
+        });
+    }
   }
 }

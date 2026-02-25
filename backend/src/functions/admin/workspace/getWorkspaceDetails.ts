@@ -23,7 +23,7 @@ const getWorkspaceDetails = async (
     throw createError.NotFound("Organization not found");
   }
 
-  // 2. Get Stats
+  // 2. Base Stats (Total counts)
   const staffCount = await db.collection("users").countDocuments({ 
     $or: [
       { organizationId: orgObjectId },
@@ -48,6 +48,58 @@ const getWorkspaceDetails = async (
     organizationId: orgObjectId
   });
 
+  // 3. Performance Trend (Average Score over last 15 days)
+  const subjects = await db.collection("subjects").find({ organizationId: orgObjectId }).project({ _id: 1 }).toArray();
+  const subjectIds = subjects.map(s => s._id);
+  const tests = await db.collection("tests").find({ subjectId: { $in: subjectIds } }).project({ _id: 1 }).toArray();
+  const testIds = tests.map(t => t._id);
+
+  const fifteenDaysAgo = new Date();
+  fifteenDaysAgo.setDate(fifteenDaysAgo.getDate() - 15);
+  
+  const performanceTrend = await db.collection("attempts").aggregate([
+    { 
+      $match: { 
+        testId: { $in: testIds },
+        deliveredAt: { $gte: fifteenDaysAgo }
+      } 
+    },
+    {
+      $group: {
+        _id: { $dateToString: { format: "%Y-%m-%d", date: "$deliveredAt" } },
+        avgScore: { 
+          $avg: { 
+            $cond: [
+              { $gt: ["$maxScore", 0] },
+              { $multiply: [{ $divide: ["$score", "$maxScore"] }, 100] },
+              0
+            ]
+          } 
+        }
+      }
+    },
+    { $sort: { "_id": 1 } }
+  ]).toArray();
+
+  // 4. Role Distribution
+  const roleDistribution = await db.collection("users").aggregate([
+    { 
+      $match: { 
+        $or: [{ organizationId: orgObjectId }, { organizationIds: orgObjectId }] 
+      } 
+    },
+    {
+      $group: {
+        _id: "$role",
+        count: { $sum: 1 }
+      }
+    }
+  ]).toArray();
+
+  // 5. Overall Content Totals
+  const totalTests = await db.collection("tests").countDocuments({ subjectId: { $in: subjectIds } });
+  const totalAttempts = await db.collection("attempts").countDocuments({ testId: { $in: testIds } });
+
   return {
     success: true,
     organization: {
@@ -58,7 +110,14 @@ const getWorkspaceDetails = async (
       staffCount,
       studentsCount,
       classesCount,
-      subjectsCount
+      subjectsCount,
+      totalTests,
+      totalAttempts,
+      performanceTrend,
+      roleDistribution: roleDistribution.reduce((acc: any, curr) => {
+        acc[curr._id] = curr.count;
+        return acc;
+      }, {})
     }
   };
 };

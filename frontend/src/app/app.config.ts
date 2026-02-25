@@ -13,6 +13,7 @@ import { provideMarkdown } from 'ngx-markdown';
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from '../interceptors/auth.interceptor';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 registerLocaleData(localeIt);
 
@@ -25,5 +26,6 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withViewTransitions()),
     { provide: LOCALE_ID, useValue: 'it-IT' },
     provideMarkdown(),
+    provideCharts(withDefaultRegisterables()),
   ],
 };
