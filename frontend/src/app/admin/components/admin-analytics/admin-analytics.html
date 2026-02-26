@@ -5,11 +5,11 @@
             <h6 class="fw-bold mb-3 d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center gap-2">
                     <div class="bg-primary bg-opacity-10 p-2 rounded-circle text-primary" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-chart-line small"></i>
+                        <fa-icon [icon]="icons.faChartLine" size="sm"></fa-icon>
                     </div>
                     Andamento Punteggi (%)
                 </div>
-                @if (stats?.totalAttempts !== undefined) {
+                @if (stats?.totalAttempts > 0) {
                     <span class="badge bg-light text-muted border fw-normal py-1 px-2" style="font-size: 0.75rem;">
                         {{ stats.totalAttempts }} test completati
                     </span>
@@ -24,8 +24,8 @@
                     </canvas>
                 } @else {
                     <div class="h-100 d-flex flex-column align-items-center justify-content-center text-muted opacity-50">
-                        <i class="fas fa-chart-line fs-1 mb-2"></i>
-                        <p class="small mb-0">Nessun dato disponibile negli ultimi 15 giorni</p>
+                        <fa-icon [icon]="icons.faChartLine" size="3x" class="mb-2"></fa-icon>
+                        <p class="small mb-0">Ancora nessun dato disponibile</p>
                     </div>
                 }
             </div>
@@ -38,13 +38,13 @@
             <h6 class="fw-bold mb-3 d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center gap-2">
                     <div class="bg-success bg-opacity-10 p-2 rounded-circle text-success" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-chart-pie small"></i>
+                        <fa-icon [icon]="icons.faChartPie" size="sm"></fa-icon>
                     </div>
                     Composizione Hub
                 </div>
-                @if (stats?.totalTests !== undefined) {
+                @if (stats?.totalTests > 0) {
                     <span class="badge bg-light text-muted border fw-normal py-1 px-2" style="font-size: 0.75rem;">
-                        {{ stats.totalTests }} contenuti didattici
+                        {{ stats.totalTests }} contenuti
                     </span>
                 }
             </h6>
@@ -57,8 +57,8 @@
                     </canvas>
                 } @else {
                     <div class="h-100 d-flex flex-column align-items-center justify-content-center text-muted opacity-50">
-                        <i class="fas fa-chart-pie fs-1 mb-2"></i>
-                        <p class="small mb-0">Nessun utente registrato nell'hub</p>
+                        <fa-icon [icon]="icons.faChartPie" size="3x" class="mb-2"></fa-icon>
+                        <p class="small mb-0">Sistema in attesa di dati</p>
                     </div>
                 }
             </div>

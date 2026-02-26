@@ -2,16 +2,23 @@ import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData } from 'chart.js';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faChartLine, faChartPie } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-admin-analytics',
   standalone: true,
-  imports: [CommonModule, BaseChartDirective],
+  imports: [CommonModule, BaseChartDirective, FontAwesomeModule],
   templateUrl: './admin-analytics.html',
   styleUrl: './admin-analytics.scss',
 })
 export class AdminAnalyticsComponent implements OnInit {
   @Input() stats: any;
+
+  icons = {
+    faChartLine,
+    faChartPie
+  };
 
   // Activity Chart
   public lineChartData: ChartData<'line'> = {
