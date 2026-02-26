@@ -92,6 +92,18 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "admin",
   },
   {
+    apiRoute: "admin/organizations/stats",
+    functionPath: "admin/consumptions/getOrganizationStats.ts",
+    method: "get",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/stats/global",
+    functionPath: "admin/stats/getSuperAdminStats.ts",
+    method: "get",
+    role: "admin",
+  },
+  {
     apiRoute: "teachers/{teacherId}/subjects",
     functionPath: "teachers/getSubjects.ts",
     method: "get",

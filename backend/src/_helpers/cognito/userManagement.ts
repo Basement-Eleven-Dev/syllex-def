@@ -113,7 +113,7 @@ export const getWelcomeEmailHtml = (
       <p style="font-size: 14px; color: #666;">Al primo accesso ti verrà richiesto di cambiare questa password per la tua sicurezza.</p>
       
       <div style="text-align: center; margin: 40px 0;">
-        <a href="https://app.syllex.app" style="background-color: #007bff; color: white; padding: 14px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block;">Accedi ora</a>
+        <a href="https://app.syllex.org" style="background-color: #007bff; color: white; padding: 14px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block;">Accedi ora</a>
       </div>
       
       <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;">

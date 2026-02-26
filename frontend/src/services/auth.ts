@@ -50,13 +50,39 @@ export class Auth {
   isInitialized = signal(false);
 
   get user(): User | null {
-    return this.user$.value;
+    const user = this.user$.value;
+    if (!user) return null;
+    
+    const impersonatedOrgId = localStorage.getItem('impersonatedOrgId');
+    if (impersonatedOrgId && this.isSuperAdminInternal(user)) {
+      return { ...user, organizationId: impersonatedOrgId };
+    }
+    
+    return user;
+  }
+
+  private isSuperAdminInternal(user: User): boolean {
+    return user.role === 'admin' && !user.organizationId && (!user.organizationIds || user.organizationIds.length === 0);
   }
 
   get isSuperAdmin(): boolean {
-    const user = this.user;
+    const user = this.user$.value; // Use raw value for checking role
     if (!user || user.role !== 'admin') return false;
     return !user.organizationId && (!user.organizationIds || user.organizationIds.length === 0);
+  }
+
+  get isImpersonating(): boolean {
+    return !!localStorage.getItem('impersonatedOrgId');
+  }
+
+  impersonate(orgId: string) {
+    localStorage.setItem('impersonatedOrgId', orgId);
+    window.location.reload();
+  }
+
+  stopImpersonating() {
+    localStorage.removeItem('impersonatedOrgId');
+    window.location.reload();
   }
 
   constructor(private http: HttpClient) {

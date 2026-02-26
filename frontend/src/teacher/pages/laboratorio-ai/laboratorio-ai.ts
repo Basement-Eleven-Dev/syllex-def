@@ -6,12 +6,11 @@ import {
   faInfo,
   faSparkles,
 } from '@fortawesome/pro-solid-svg-icons';
-import { GenAiQuestions } from '../../components/gen-ai-questions/gen-ai-questions';
 import { GenAiContents } from '../../components/gen-ai-contents/gen-ai-contents';
 
 @Component({
   selector: 'app-laboratorio-ai',
-  imports: [FontAwesomeModule, GenAiQuestions, GenAiContents],
+  imports: [FontAwesomeModule, GenAiContents],
   templateUrl: './laboratorio-ai.html',
   styleUrl: './laboratorio-ai.scss',
 })

@@ -33,6 +33,45 @@ export interface AdminStats {
   };
 }
 
+export interface SuperAdminStats {
+  globalKpis: {
+    totalOrganizations: number;
+    totalUsers: number;
+    totalChunks: number;
+    estimatedTotalTokens: number;
+  };
+  organizations: Array<{
+    organizationId: string;
+    name: string;
+    userCount: number;
+    documentCount: number;
+    chunkCount: number;
+    estimatedTokens: number;
+    onboardingStatus: string;
+  }>;
+  technicalAnalysis: {
+    heavySubjects: Array<{
+      subjectId: string;
+      name: string;
+      chunkCount: number;
+      estimatedTokens: number;
+    }>;
+    activeTeachers: Array<{
+      teacherId: string;
+      name: string;
+      documentCount: number;
+      chunkCount: number;
+    }>;
+    metrics: {
+      avgChunkSize: number;
+      avgChunksPerDoc: number;
+      totalTextLength: number;
+      totalChunks: number;
+      totalDocuments: number;
+    };
+  };
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -43,8 +82,7 @@ export class StatsService {
     return this.http.get<AdminStats>(`admin/organizations/${orgId}/stats`);
   }
 
-  getSuperAdminStats(): Observable<any> {
-    // Placeholder for future implementation
-    return this.http.get<any>('admin/stats/global');
+  getSuperAdminStats(): Observable<SuperAdminStats> {
+    return this.http.get<SuperAdminStats>('admin/stats/global');
   }
 }
