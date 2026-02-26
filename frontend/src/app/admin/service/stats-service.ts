@@ -40,6 +40,7 @@ export interface SuperAdminStats {
     totalChunks: number;
     estimatedTotalTokens: number;
     totalAiMaterials: number;
+    totalEstimatedCost: number;
   };
   organizations: Array<{
     organizationId: string;
@@ -49,6 +50,7 @@ export interface SuperAdminStats {
     chunkCount: number;
     estimatedTokens: number;
     aiMaterialCount: number;
+    estimatedCost: number;
     onboardingStatus: string;
   }>;
   technicalAnalysis: {

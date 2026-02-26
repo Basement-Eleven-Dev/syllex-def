@@ -73,6 +73,19 @@
                     </div>
                 </div>
             </div>
+            <div class="col-md-6 col-lg">
+                <div class="card p-3 border-0 shadow-sm rounded-4 h-100 kpi-card">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="icon-box bg-dark bg-opacity-10 text-dark">
+                            <fa-icon [icon]="icons.faEuroSign"></fa-icon>
+                        </div>
+                        <div>
+                            <div class="text-muted extra-small fw-bold text-uppercase">Costi Stimati</div>
+                            <div class="fs-2 fw-bold lh-1">{{ stats.globalKpis.totalEstimatedCost | number:'1.2-4' }}$</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Charts Row -->
@@ -162,6 +175,7 @@
                             <th class="border-0 text-center">Documenti</th>
                             <th class="border-0 text-center">Token</th>
                             <th class="border-0 text-center">AI Gen</th>
+                            <th class="border-0 text-center">Costi</th>
                             <th class="border-0 text-center">Stato</th>
                             <th class="border-0 text-end rounded-end px-4">Azioni</th>
                         </tr>
@@ -185,6 +199,9 @@
                                 </td>
                                 <td class="text-center">
                                     <span class="badge bg-purple-soft text-purple border-0">+{{ org.aiMaterialCount || 0 }}</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="small fw-bold">{{ org.estimatedCost | number:'1.2-4' }}$</div>
                                 </td>
                                 <td class="text-center">
                                     @if (org.onboardingStatus === 'completed' || org.onboardingStatus === 'Attivo') {

@@ -16,7 +16,8 @@ import {
   faFileCode,
   faFileDownload,
   faSignOutAlt,
-  faWandMagicSparkles
+  faWandMagicSparkles,
+  faEuroSign
 } from '@fortawesome/free-solid-svg-icons';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData } from 'chart.js';
@@ -50,6 +51,7 @@ export class SuperadminLevelStats implements OnInit {
     faFileDownload,
     faSignOutAlt,
     faWandMagicSparkles,
+    faEuroSign,
   };
 
   // Top Organizations Chart
@@ -218,7 +220,7 @@ export class SuperadminLevelStats implements OnInit {
   downloadReport() {
     if (!this.stats?.organizations) return;
 
-    const headers = ['ID', 'Nome', 'Utenti', 'Documenti', 'Chunks', 'Tokens', 'Stato Onboarding'];
+    const headers = ['ID', 'Nome', 'Utenti', 'Documenti', 'Chunks', 'Tokens', 'Materiali AI', 'Costo Stimato ($)', 'Stato Onboarding'];
     const rows = this.stats.organizations.map(org => [
       org.organizationId,
       org.name,
@@ -226,6 +228,8 @@ export class SuperadminLevelStats implements OnInit {
       org.documentCount,
       org.chunkCount,
       org.estimatedTokens,
+      org.aiMaterialCount,
+      org.estimatedCost,
       org.onboardingStatus
     ]);
 

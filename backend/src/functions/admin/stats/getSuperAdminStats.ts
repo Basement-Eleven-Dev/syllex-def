@@ -31,15 +31,23 @@ const getSuperAdminStats = async (
     }
   ]).toArray();
 
+  // Cost Constants
+  const COST_PER_1M_TOKENS = 0.03;
+  const COST_PER_MATERIAL = 0.005;
+
   // AI Generated Materials
   const totalAiMaterials = await db.collection("materials").countDocuments({ aiGenerated: true });
+
+  const estimatedTotalTokens = Math.round(tokenEstimation[0]?.totalTokens || 0);
+  const totalEstimatedCost = (estimatedTotalTokens / 1000000) * COST_PER_1M_TOKENS + (totalAiMaterials * COST_PER_MATERIAL);
 
   const globalKpis = {
     totalOrganizations,
     totalUsers,
     totalChunks,
-    estimatedTotalTokens: Math.round(tokenEstimation[0]?.totalTokens || 0),
-    totalAiMaterials
+    estimatedTotalTokens,
+    totalAiMaterials,
+    totalEstimatedCost: Number(totalEstimatedCost.toFixed(4))
   };
 
   // 2. Multi-Tenant Overview (Top Organizations by Usage)
@@ -130,9 +138,12 @@ const getSuperAdminStats = async (
 
   const aiMaterialsMap = new Map(aiMaterialsByOrg.map(item => [item._id.toString(), item.count]));
 
-  // Add aiMaterialCount to orgStats
+  // Add aiMaterialCount and estimatedCost to orgStats
   orgStats.forEach(org => {
     org.aiMaterialCount = aiMaterialsMap.get(org.organizationId.toString()) || 0;
+    const tokensCost = (org.estimatedTokens / 1000000) * COST_PER_1M_TOKENS;
+    const materialsCost = org.aiMaterialCount * COST_PER_MATERIAL;
+    org.estimatedCost = Number((tokensCost + materialsCost).toFixed(4));
   });
 
   // Add organizations that might not have any embeddings yet (they won't appear in the above aggregation)
@@ -149,6 +160,10 @@ const getSuperAdminStats = async (
         $or: [{ organizationId: org._id }, { organizationIds: org._id }] 
       });
 
+      const aiMaterialCount = aiMaterialsMap.get(org._id.toString()) || 0;
+      const tokensCost = 0; // No embeddings
+      const materialsCost = aiMaterialCount * COST_PER_MATERIAL;
+
       orgStats.push({
         organizationId: org._id,
         name: org.name,
@@ -156,7 +171,8 @@ const getSuperAdminStats = async (
         documentCount: 0,
         chunkCount: 0,
         estimatedTokens: 0,
-        aiMaterialCount: aiMaterialsMap.get(org._id.toString()) || 0,
+        aiMaterialCount: aiMaterialCount,
+        estimatedCost: Number(materialsCost.toFixed(4)),
         onboardingStatus: org.onboardingStatus || (subjectCount > 0 ? "Configurata" : "Pendente")
       });
     }
