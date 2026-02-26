@@ -14,6 +14,7 @@ import {
   faUser,
   faSparkles,
   faCirclePlay,
+  faChartBar,
 } from '@fortawesome/pro-solid-svg-icons';
 
 interface AdminNavRoute {
@@ -40,6 +41,7 @@ export class AdminSidebar {
       icon: faLandmark,
       route: '/a/organizzazioni',
     },
+    { label: 'Statistiche', icon: faChartBar, route: '/a/stats' },
   ];
 
   get routes(): AdminNavRoute[] {
