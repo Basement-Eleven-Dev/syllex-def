@@ -72,13 +72,7 @@
         }
         
         .logo-container {
-            padding: 0 !important;
-            display: flex;
-            justify-content: center;
-            
-            img {
-                height: 30px;
-            }
+            display: none !important;
         }
     }
 }
