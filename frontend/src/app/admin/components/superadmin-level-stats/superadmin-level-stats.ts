@@ -15,7 +15,8 @@ import {
   faWeightHanging,
   faFileCode,
   faFileDownload,
-  faSignOutAlt
+  faSignOutAlt,
+  faWandMagicSparkles
 } from '@fortawesome/free-solid-svg-icons';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData } from 'chart.js';
@@ -48,6 +49,7 @@ export class SuperadminLevelStats implements OnInit {
     faFileCode,
     faFileDownload,
     faSignOutAlt,
+    faWandMagicSparkles,
   };
 
   // Top Organizations Chart
@@ -107,6 +109,34 @@ export class SuperadminLevelStats implements OnInit {
     }]
   };
 
+  // Top AI Producers Chart 
+  public producersChartOptions: ChartConfiguration['options'] = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (context) => `Materiali: ${context.parsed.y?.toLocaleString() || 0}`
+        }
+      }
+    },
+    scales: {
+      y: { beginAtZero: true },
+      x: { grid: { display: false } }
+    }
+  };
+
+  public producersChartData: ChartData<'bar'> = {
+    labels: [],
+    datasets: [{
+      data: [],
+      backgroundColor: '#8e44ad',
+      borderRadius: 6,
+      label: 'Materiali Generati'
+    }]
+  };
+
   ngOnInit() {
     this.loadStats();
   }
@@ -148,6 +178,18 @@ export class SuperadminLevelStats implements OnInit {
           backgroundColor: '#e74c3c',
           borderRadius: 6,
           label: 'Token per Materia'
+        }]
+      };
+    }
+
+    if (this.stats?.technicalAnalysis.topAiProducers) {
+      this.producersChartData = {
+        labels: this.stats.technicalAnalysis.topAiProducers.map(p => p.name),
+        datasets: [{
+          data: this.stats.technicalAnalysis.topAiProducers.map(p => p.count),
+          backgroundColor: '#8e44ad',
+          borderRadius: 6,
+          label: 'Materiali Generati'
         }]
       };
     }

@@ -39,6 +39,7 @@ export interface SuperAdminStats {
     totalUsers: number;
     totalChunks: number;
     estimatedTotalTokens: number;
+    totalAiMaterials: number;
   };
   organizations: Array<{
     organizationId: string;
@@ -47,6 +48,7 @@ export interface SuperAdminStats {
     documentCount: number;
     chunkCount: number;
     estimatedTokens: number;
+    aiMaterialCount: number;
     onboardingStatus: string;
   }>;
   technicalAnalysis: {
@@ -61,6 +63,10 @@ export interface SuperAdminStats {
       name: string;
       documentCount: number;
       chunkCount: number;
+    }>;
+    topAiProducers: Array<{
+      name: string;
+      count: number;
     }>;
     metrics: {
       avgChunkSize: number;

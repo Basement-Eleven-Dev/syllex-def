@@ -31,11 +31,15 @@ const getSuperAdminStats = async (
     }
   ]).toArray();
 
+  // AI Generated Materials
+  const totalAiMaterials = await db.collection("materials").countDocuments({ aiGenerated: true });
+
   const globalKpis = {
     totalOrganizations,
     totalUsers,
     totalChunks,
-    estimatedTotalTokens: Math.round(tokenEstimation[0]?.totalTokens || 0)
+    estimatedTotalTokens: Math.round(tokenEstimation[0]?.totalTokens || 0),
+    totalAiMaterials
   };
 
   // 2. Multi-Tenant Overview (Top Organizations by Usage)
@@ -86,11 +90,77 @@ const getSuperAdminStats = async (
         documentCount: { $size: "$documentIds" },
         chunkCount: 1,
         estimatedTokens: { $round: ["$estimatedTokens", 0] },
-        onboardingStatus: "$org.onboardingStatus"
+        onboardingStatus: {
+          $cond: [
+            { $ifNull: ["$org.onboardingStatus", false] },
+            "$org.onboardingStatus",
+            {
+              $cond: [
+                { $gt: [{ $size: "$documentIds" }, 0] },
+                "Attivo",
+                "Configurata"
+              ]
+            }
+          ]
+        }
       }
     },
     { $sort: { estimatedTokens: -1 } }
+  ]).toArray() as any[];
+
+  // 2.1 AI Materials count per organization
+  const aiMaterialsByOrg = await db.collection("materials").aggregate([
+    { $match: { aiGenerated: true } },
+    {
+      $lookup: {
+        from: "subjects",
+        localField: "subjectId",
+        foreignField: "_id",
+        as: "subject"
+      }
+    },
+    { $unwind: "$subject" },
+    {
+      $group: {
+        _id: "$subject.organizationId",
+        count: { $sum: 1 }
+      }
+    }
   ]).toArray();
+
+  const aiMaterialsMap = new Map(aiMaterialsByOrg.map(item => [item._id.toString(), item.count]));
+
+  // Add aiMaterialCount to orgStats
+  orgStats.forEach(org => {
+    org.aiMaterialCount = aiMaterialsMap.get(org.organizationId.toString()) || 0;
+  });
+
+  // Add organizations that might not have any embeddings yet (they won't appear in the above aggregation)
+  const allOrgs = await db.collection("organizations").find({}).toArray();
+  const existingOrgIds = orgStats.map(o => o.organizationId.toString());
+  
+  for (const org of allOrgs) {
+    if (!existingOrgIds.includes(org._id.toString())) {
+      // Check if this org has subjects
+      const subjectCount = await db.collection("subjects").countDocuments({ organizationId: org._id });
+      
+      // Check user count
+      const userCount = await db.collection("users").countDocuments({ 
+        $or: [{ organizationId: org._id }, { organizationIds: org._id }] 
+      });
+
+      orgStats.push({
+        organizationId: org._id,
+        name: org.name,
+        userCount: userCount,
+        documentCount: 0,
+        chunkCount: 0,
+        estimatedTokens: 0,
+        aiMaterialCount: aiMaterialsMap.get(org._id.toString()) || 0,
+        onboardingStatus: org.onboardingStatus || (subjectCount > 0 ? "Configurata" : "Pendente")
+      });
+    }
+  }
 
   // 3. Technical Analysis: Heavy Subjects
   const heavySubjects = await db.collection("file_embeddings").aggregate([
@@ -182,6 +252,13 @@ const getSuperAdminStats = async (
     technicalAnalysis: {
       heavySubjects,
       activeTeachers,
+      topAiProducers: aiMaterialsByOrg
+        .map(item => ({
+          name: allOrgs.find(o => o._id.toString() === item._id.toString())?.name || "Sconosciuta",
+          count: item.count
+        }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5),
       metrics: technicalMetrics[0] || { avgChunkSize: 0, avgChunksPerDoc: 0, totalTextLength: 0, totalChunks: 0, totalDocuments: 0 }
     }
   };

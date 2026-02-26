@@ -8,7 +8,7 @@
     } @else if (stats) {
         <!-- Global KPI Cards -->
         <div class="row g-3 mb-4 enter-animation">
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6 col-lg">
                 <div class="card p-3 border-0 shadow-sm rounded-4 h-100 kpi-card">
                     <div class="d-flex align-items-center gap-3">
                         <div class="icon-box bg-primary bg-opacity-10 text-primary">
@@ -21,7 +21,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6 col-lg">
                 <div class="card p-3 border-0 shadow-sm rounded-4 h-100 kpi-card">
                     <div class="d-flex align-items-center gap-3">
                         <div class="icon-box bg-success bg-opacity-10 text-success">
@@ -34,7 +34,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6 col-lg">
                 <div class="card p-3 border-0 shadow-sm rounded-4 h-100 kpi-card">
                     <div class="d-flex align-items-center gap-3">
                         <div class="icon-box bg-info bg-opacity-10 text-info">
@@ -47,7 +47,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6 col-lg">
                 <div class="card p-3 border-0 shadow-sm rounded-4 h-100 kpi-card">
                     <div class="d-flex align-items-center gap-3">
                         <div class="icon-box bg-warning bg-opacity-10 text-warning">
@@ -60,17 +60,30 @@
                     </div>
                 </div>
             </div>
+            <div class="col-md-6 col-lg">
+                <div class="card p-3 border-0 shadow-sm rounded-4 h-100 kpi-card">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="icon-box bg-purple-soft text-purple">
+                            <fa-icon [icon]="icons.faWandMagicSparkles"></fa-icon>
+                        </div>
+                        <div>
+                            <div class="text-muted extra-small fw-bold text-uppercase">Materiali GenAI</div>
+                            <div class="fs-2 fw-bold lh-1">{{ stats.globalKpis.totalAiMaterials || 0 }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Charts Row -->
         <div class="row g-4 mb-4">
-            <div class="col-lg-7">
+            <div class="col-lg-4">
                 <div class="card p-4 border-0 shadow-sm rounded-4 h-100">
                     <h6 class="fw-bold mb-4 d-flex align-items-center gap-2">
                         <fa-icon [icon]="icons.faChartLine" class="text-primary"></fa-icon>
-                        Consumo AI per Organizzazione
+                        Consumo AI (Tokens)
                     </h6>
-                    <div style="height: 350px;">
+                    <div style="height: 300px;">
                         @if (orgChartData.labels?.length) {
                             <canvas baseChart
                                 [data]="orgChartData"
@@ -85,13 +98,34 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-5">
+            <div class="col-lg-4">
+                <div class="card p-4 border-0 shadow-sm rounded-4 h-100">
+                    <h6 class="fw-bold mb-4 d-flex align-items-center gap-2">
+                        <fa-icon [icon]="icons.faWandMagicSparkles" style="color: #8e44ad;"></fa-icon>
+                        Top Producer AI (Organizzazioni)
+                    </h6>
+                    <div style="height: 300px;">
+                        @if (producersChartData.labels?.length) {
+                            <canvas baseChart
+                                [data]="producersChartData"
+                                [options]="producersChartOptions"
+                                [type]="'bar'">
+                            </canvas>
+                        } @else {
+                            <div class="h-100 d-flex flex-column align-items-center justify-content-center text-muted">
+                                <p>Dati non disponibili.</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
                 <div class="card p-4 border-0 shadow-sm rounded-4 h-100">
                     <h6 class="fw-bold mb-4 d-flex align-items-center gap-2">
                         <fa-icon [icon]="icons.faWeightHanging" class="text-danger"></fa-icon>
                         Materie più Pesanti (Tokens)
                     </h6>
-                    <div style="height: 350px;">
+                    <div style="height: 300px;">
                         @if (subjectsChartData.labels?.length) {
                             <canvas baseChart
                                 [data]="subjectsChartData"
@@ -127,6 +161,7 @@
                             <th class="border-0 text-center">Utenti</th>
                             <th class="border-0 text-center">Documenti</th>
                             <th class="border-0 text-center">Token</th>
+                            <th class="border-0 text-center">AI Gen</th>
                             <th class="border-0 text-center">Stato</th>
                             <th class="border-0 text-end rounded-end px-4">Azioni</th>
                         </tr>
@@ -149,10 +184,13 @@
                                     <span class="text-primary fw-bold">{{ formatTokens(org.estimatedTokens) }}</span>
                                 </td>
                                 <td class="text-center">
-                                    @if (org.onboardingStatus === 'completed') {
+                                    <span class="badge bg-purple-soft text-purple border-0">+{{ org.aiMaterialCount || 0 }}</span>
+                                </td>
+                                <td class="text-center">
+                                    @if (org.onboardingStatus === 'completed' || org.onboardingStatus === 'Attivo') {
                                         <span class="badge bg-success bg-opacity-10 text-success border-0 px-3">Attivo</span>
                                     } @else {
-                                        <span class="badge bg-warning bg-opacity-10 text-warning border-0 px-3">{{ org.onboardingStatus }}</span>
+                                        <span class="badge bg-warning bg-opacity-10 text-warning border-0 px-3">{{ org.onboardingStatus || 'N/A' }}</span>
                                     }
                                 </td>
                                 <td class="text-end px-4">
