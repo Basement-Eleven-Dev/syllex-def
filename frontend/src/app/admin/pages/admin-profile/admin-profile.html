@@ -36,7 +36,7 @@
                             <label class="form-label text-muted small fw-bold text-uppercase">Organizzazione</label>
                             <div class="d-flex align-items-center gap-3 p-3 bg-light rounded-3">
                                 <fa-icon [icon]="faBuilding" class="text-primary opacity-50"></fa-icon>
-                                <span class="fw-medium">{{ authService.organizationName$ | async }}</span>
+                                <span class="fw-medium">{{ (authService.organizationName$ | async) || 'Syllex Hub (Super Admin)' }}</span>
                             </div>
                         </div>
 
@@ -59,7 +59,7 @@
                             </div>
                             <div class="d-flex align-items-center gap-3 p-3 bg-light rounded-3 border">
                                 <fa-icon [icon]="faEnvelope" class="text-primary opacity-50"></fa-icon>
-                                <span class="fw-medium">{{ authService.user?.username }}</span>
+                                <span class="fw-medium">{{ authService.user?.email || authService.user?.username }}</span>
                             </div>
                         </div>
 

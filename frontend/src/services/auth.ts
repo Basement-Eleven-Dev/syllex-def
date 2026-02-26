@@ -28,6 +28,7 @@ Amplify.configure({
 export interface User {
   _id: string;
   username: string;
+  email?: string;
   firstName?: string;
   lastName?: string;
   role: 'teacher' | 'student' | 'admin';
@@ -72,17 +73,18 @@ export class Auth {
         await fetchAuthSession({ forceRefresh: true });
         const user = await firstValueFrom(this.http.get<User | null>('profile'));
 
-        if (user) {
-          this.user$.next(user);
-          if (user.organizationId) {
-            this.getOrganizationById(user.organizationId);
-          }
-          return { success: true, message: 'Login riuscito' };
-        } else {
-          return {
-            success: false,
-            message: 'Impossibile recuperare il profilo utente',
-          };
+          if (user) {
+            this.user$.next(user);
+            const orgId = user.organizationId || user.organizationIds?.[0];
+            if (orgId) {
+              this.getOrganizationById(orgId);
+            }
+            return { success: true, message: 'Login riuscito' };
+          } else {
+            return {
+              success: false,
+              message: 'Impossibile recuperare il profilo utente',
+            };
         }
       } else if (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED') {
         return {
@@ -136,8 +138,9 @@ export class Auth {
     try {
       const user = await firstValueFrom(this.http.get<User | null>('profile'));
       this.user$.next(user || null);
-      if (user?.organizationId) {
-        this.getOrganizationById(user.organizationId);
+      const orgId = user?.organizationId || user?.organizationIds?.[0];
+      if (orgId) {
+        this.getOrganizationById(orgId);
       }
     } catch (error) {
       this.user$.next(null);
