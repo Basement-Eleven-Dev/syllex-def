@@ -54,7 +54,7 @@
   @for(classe of PaginatedClassi() ; track classe._id){
   <div class="col-12 col-md-6 col-lg-4 mb-4">
     <div class="card p-3 h-100 overflow-hidden position-relative">
-      <fa-icon [icon]="UsersIcon" class="background-icon"></fa-icon>
+<!--       <fa-icon [icon]="UsersIcon" class="background-icon"></fa-icon> -->
       <div
         class="card-body d-flex flex-column gap-4 align-items-start position-relative"
         style="z-index: 1"
@@ -67,11 +67,11 @@
         </h3>
         <div>
           <p class="mb-1 text-dark">
-            <fa-icon [icon]="UserIcon"></fa-icon> {{ classe.students.length }}
+            <fa-icon [icon]="UserIcon"></fa-icon> 15
             student{{ classe.students.length > 1 ? 'i' : 'e' }}
           </p>
           <p class="text-dark">
-            <fa-icon [icon]="CalendarIcon"></fa-icon> anno di riferimento {{
+            <fa-icon [icon]="CalendarIcon"></fa-icon>   Anno Accademico {{
             classe.year }}
           </p>
         </div>
