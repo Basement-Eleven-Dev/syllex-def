@@ -33,7 +33,12 @@
                         <h1 class="fw-bold mb-1">{{ organization.name }}</h1>
                         <p class="text-muted mb-0 d-flex align-items-center gap-2">
                             <fa-icon [icon]="icons.faLandmark" class="small"></fa-icon>
-                            Organizzazione ID: <code class="bg-light px-2 rounded">{{ organization._id }}</code>
+                            Organizzazione ID: 
+                            <code class="bg-light px-2 rounded">{{ organization._id }}</code>
+                            <button class="btn btn-link p-0 text-primary border-0 shadow-none opacity-50 shadow-hover-sm transition-all" 
+                                    (click)="copyToClipboard(organization._id)" title="Copia ID">
+                                <fa-icon [icon]="icons.faCopy" class="extra-small"></fa-icon>
+                            </button>
                         </p>
                     </div>
                 </div>

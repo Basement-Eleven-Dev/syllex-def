@@ -16,7 +16,8 @@ import {
   faGraduationCap,
   faChevronRight,
   faEdit,
-  faTrash
+  faTrash,
+  faCopy
 } from '@fortawesome/pro-solid-svg-icons';
 import { OnboardingService } from '../../service/onboarding-service';
 import { FeedbackService } from '../../../../services/feedback-service';
@@ -72,7 +73,8 @@ export class AdminOrganizationDetail implements OnInit {
     faGraduationCap,
     faChevronRight,
     faEdit,
-    faTrash
+    faTrash,
+    faCopy
   };
 
   ngOnInit() {
@@ -244,5 +246,11 @@ export class AdminOrganizationDetail implements OnInit {
             error: () => this.feedbackService.showFeedback('Errore durante la rimozione dell\'utente', false)
         });
     }
+  }
+
+  copyToClipboard(text: string) {
+    navigator.clipboard.writeText(text).then(() => {
+      this.feedbackService.showFeedback('ID copiato negli appunti', true);
+    });
   }
 }
