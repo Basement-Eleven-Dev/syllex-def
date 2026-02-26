@@ -53,3 +53,18 @@
 .transition-all {
     transition: all 0.2s ease-in-out;
 }
+
+.kpi-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(2, 1fr);
+    margin-bottom: 2rem;
+
+    @media (min-width: 992px) {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    @media (max-width: 576px) {
+        grid-template-columns: 1fr;
+    }
+}
