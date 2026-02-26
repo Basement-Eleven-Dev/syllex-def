@@ -28,10 +28,24 @@ const createSubjectHandler = async (
   }
 
   const result = await db.collection("subjects").insertOne(subjectData);
+  const subjectId = result.insertedId;
+
+  // Initialize Assistant for this subject
+  await db.collection("assistants").insertOne({
+    name: "Anna",
+    tone: "friendly",
+    voice: "neutral",
+    teacherId: subjectData.teacherId || null,
+    subjectId,
+    organizationId: new ObjectId(orgId),
+    associatedFileIds: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
 
   return {
     success: true,
-    subjectId: result.insertedId.toString(),
+    subjectId: subjectId.toString(),
     message: "Materia creata con successo"
   };
 };

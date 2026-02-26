@@ -133,7 +133,21 @@ const onboardingHandler = async (
       createdAt: new Date(),
       updatedAt: new Date(),
     });
-    if (sub._id) subjectIdMap.set(sub._id, subResult.insertedId);
+    const subRealId = subResult.insertedId;
+    if (sub._id) subjectIdMap.set(sub._id, subRealId);
+
+    // Initialize Assistant for this subject
+    await db.collection("assistants").insertOne({
+      name: "Gianfilippo",
+      tone: "friendly",
+      voice: "neutral",
+      teacherId,
+      subjectId: subRealId,
+      organizationId: orgId,
+      associatedFileIds: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
   }
 
   // 4. Process Classes & Students
