@@ -1,1 +1,24 @@
+.input-group-custom {
+  .custom-input {
+    &:focus {
+      border-right-color: transparent;
+      box-shadow: none;
+    }
+  }
+
+  .border-custom {
+    border: 1px solid #ced4da;
+    background-color: #fff;
+    color: #495057;
+
+    &:hover {
+      background-color: #f8f9fa;
+      color: #0d6efd;
+    }
+
+    &:focus {
+      box-shadow: none;
+    }
+  }
+}
 
