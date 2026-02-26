@@ -317,6 +317,12 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
+    apiRoute: "events/{eventId}",
+    functionPath: "events/updateEvent.ts",
+    method: "put",
+    role: "teacher",
+  },
+  {
     apiRoute: "assistants/get",
     functionPath: "assistants/getAssistant.ts",
     method: "post",
