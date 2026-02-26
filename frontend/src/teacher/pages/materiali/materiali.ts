@@ -26,6 +26,7 @@ import {
   faSparkles,
   faRobot,
   faXmark,
+  faTrash,
 } from '@fortawesome/pro-solid-svg-icons';
 import {
   NgbDropdown,
@@ -107,6 +108,7 @@ export class Materiali {
   protected readonly sparklesIcon = faSparkles;
   protected readonly robotIcon = faRobot;
   protected readonly ClearIcon = faXmark;
+  protected readonly TrashIcon = faTrash;
 
   // Signals
   protected readonly viewType = signal<ViewType>(
@@ -178,9 +180,16 @@ export class Materiali {
     }
   }
 
-  protected onSelectItem(item: MaterialInterface, event?: MouseEvent): void {
+  protected onSelectItem(
+    item: MaterialInterface,
+    event?: MouseEvent | Event,
+  ): void {
     event?.stopPropagation();
-    const isMultiSelect = event?.ctrlKey || event?.metaKey;
+    const hasSelection = this.selectionService.selectedIds().size > 0;
+    const isMultiSelect =
+      event instanceof MouseEvent 
+        ? event.ctrlKey || event.metaKey || hasSelection 
+        : true;
     this.selectionService.toggle(item._id!, isMultiSelect);
   }
 
@@ -311,12 +320,54 @@ export class Materiali {
   }
 
   protected onRequestDeleteItem(item: MaterialInterface): void {
+    if (!confirm(`Sei sicuro di voler eliminare "${item.name}"?`)) return;
     this.materialiService.deleteItem(item._id!).subscribe({
       next: () => {
         this.selectionService.clear();
       },
       error: (err) => console.error("Errore durante l'eliminazione:", err),
     });
+  }
+
+  protected onDeleteSelection(): void {
+    const selectedIds = Array.from(this.selectionService.selectedIds());
+    if (selectedIds.length === 0) return;
+
+    if (
+      !confirm(
+        `Sei sicuro di voler eliminare i ${selectedIds.length} elementi selezionati?`,
+      )
+    )
+      return;
+
+    this.materialiService.deleteItems(selectedIds).subscribe({
+      next: () => {
+        this.selectionService.clear();
+      },
+      error: (err) =>
+        console.error("Errore durante l'eliminazione batch:", err),
+    });
+  }
+
+  protected toggleSelectAll(): void {
+    const items = this.rootFolder().content || [];
+    const selected = this.selectionService.selectedIds();
+
+    if (this.isAllSelected()) {
+      this.selectionService.clear();
+    } else {
+      items.forEach((item) => {
+        if (!selected.has(item._id!)) {
+          this.selectionService.toggle(item._id!, true);
+        }
+      });
+    }
+  }
+
+  protected isAllSelected(): boolean {
+    const items = this.rootFolder().content || [];
+    if (items.length === 0) return false;
+    return items.every((item) => this.selectionService.isSelected(item._id!));
   }
 
   protected onRequestRenameItem(

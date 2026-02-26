@@ -318,6 +318,20 @@ export class MaterialiService {
       .pipe(tap(() => this.removeItemFromAllParents(itemId)));
   }
 
+  deleteItems(itemIds: string[]): Observable<{
+    success: boolean;
+    deletedCount: number;
+    removedFromParents: number;
+  }> {
+    return this.httpClient
+      .post<{
+        success: boolean;
+        deletedCount: number;
+        removedFromParents: number;
+      }>('materials/delete-batch', { materialIds: itemIds })
+      .pipe(tap(() => itemIds.forEach((id) => this.removeItemFromAllParents(id))));
+  }
+
   renameItem(
     itemId: string,
     newName: string,

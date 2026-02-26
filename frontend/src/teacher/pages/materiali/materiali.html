@@ -57,6 +57,13 @@
       } }
     </div>
     <div class="d-flex flex-row align-items-center gap-3">
+      @if(selectionService.selectedIds().size > 0) {
+      <button class="btn btn-danger icon-btn" (click)="onDeleteSelection()">
+        <fa-icon [icon]="TrashIcon"></fa-icon> Elimina selezionati ({{
+          selectionService.selectedIds().size
+        }})
+      </button>
+      }
       <button
         class="btn btn-outline-primary icon-btn"
         (click)="onCreateNewFolder()"
@@ -123,6 +130,14 @@
     <table class="table table-hover align-middle">
       <thead class="table-light">
         <tr>
+          <th style="width: 40px">
+            <input
+              type="checkbox"
+              class="form-check-input"
+              [checked]="isAllSelected()"
+              (change)="toggleSelectAll()"
+            />
+          </th>
           <th style="width: 40px"></th>
           <th>Nome</th>
           <th style="width: 120px">Tipo</th>
@@ -132,11 +147,11 @@
         </tr>
       </thead>
       <tbody>
-        @for(item of rootFolder().content; track item._id){
+        @for(item of rootFolder().content; track item._id!){
         <tr
           class="cursor-pointer"
-          [class.table-active]="isItemSelected(item._id)"
-          [class.highlight-row]="highlightedItemId() === item._id"
+          [class.table-active]="isItemSelected(item._id!)"
+          [class.highlight-row]="highlightedItemId() === item._id!"
           [draggable]="true"
           (click)="onSelectItem(item, $event)"
           (dblclick)="onRequestOpenItem(item); $event.stopPropagation()"
@@ -146,6 +161,15 @@
           (dragenter)="onDragEnter($event)"
           (dragleave)="onDragLeave($event)"
         >
+          <td>
+            <input
+              type="checkbox"
+              class="form-check-input"
+              [checked]="isItemSelected(item._id!)"
+              (click)="$event.stopPropagation()"
+              (change)="onSelectItem(item, $event)"
+            />
+          </td>
           <td>
             @if (isAIGenerated(item)) {
             <fa-icon

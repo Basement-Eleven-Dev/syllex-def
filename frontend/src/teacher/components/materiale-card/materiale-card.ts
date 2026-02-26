@@ -92,9 +92,9 @@ export class MaterialeCard {
     return !this.isFolder && this.item.aiGenerated === true;
   }
 
-  selectItem(event: MouseEvent): void {
+  selectItem(event: MouseEvent | Event): void {
     event.stopPropagation();
-    this.selectItemEvent.emit(event);
+    this.selectItemEvent.emit(event as MouseEvent);
   }
 
   requestOpenItem(): void {

@@ -139,6 +139,12 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
+    apiRoute: "materials/delete-batch",
+    functionPath: "materials/deleteMaterialsBatch.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
     apiRoute: "materials/{materialId}/rename",
     functionPath: "materials/renameMaterial.ts",
     method: "put",

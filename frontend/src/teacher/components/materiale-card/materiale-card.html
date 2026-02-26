@@ -1,10 +1,18 @@
 <div
-  class="p-4 h-100 rounded-syllex"
+  class="p-4 h-100 rounded-syllex position-relative"
   [class]="isFolder ? 'folder-card' : 'materiale-card'"
   [class.selected]="isSelected"
   (dblclick)="requestOpenItem()"
   (click)="selectItem($event)"
 >
+  <div class="selection-checkbox" (click)="$event.stopPropagation()">
+    <input
+      type="checkbox"
+      class="form-check-input"
+      [checked]="isSelected"
+      (change)="selectItem($event)"
+    />
+  </div>
   <div class="card-body">
     <div
       class="d-flex flex-row align-items-start justify-content-between gap-3"
@@ -63,7 +71,7 @@
           (click)="$event.stopPropagation(); requestAssignToClass()"
           ><fa-icon [icon]="ShareNodesIcon"></fa-icon>@if(item.classIds?.length
           === 0 || !item.classIds){ Non condiviso } @else { {{
-          item.classIds?.length }} class{{ item.classIds?.length !== 1 ? 'i' : 'e'
+          item.classIds.length }} class{{ item.classIds.length !== 1 ? 'i' : 'e'
           }} }</a
         >
       </div>
