@@ -40,6 +40,7 @@ import { AdminOrganizationDetail } from './admin/pages/admin-organization-detail
 import { AdminClassDetail } from './admin/pages/admin-class-detail/admin-class-detail';
 import { AdminProfile } from './admin/pages/admin-profile/admin-profile';
 import { AdminStats } from './admin/pages/admin-stats/admin-stats';
+import { superadminGuard } from '../guards/superadmin.guard';
 
 export const routes: Routes = [
   {
@@ -280,6 +281,7 @@ export const routes: Routes = [
       {
         path: 'onboarding',
         component: AdminOnboarding,
+        canActivate: [superadminGuard],
       },
       {
         path: 'organizzazioni',

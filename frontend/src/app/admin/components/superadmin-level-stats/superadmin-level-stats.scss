@@ -74,3 +74,34 @@
 .bg-purple-soft {
     background-color: rgba(142, 68, 173, 0.08) !important;
 }
+
+.insight-card {
+    border: 1px solid rgba(0,0,0,0.05);
+    background: linear-gradient(to bottom right, #fff, #fefefe);
+    
+    .insight-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+}
+
+.success-pulse {
+    width: 8px;
+    height: 8px;
+    background-color: #2ecc71;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 0 rgba(46, 204, 113, 0.4);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+}
+
+.ls-1 { letter-spacing: 1px; }

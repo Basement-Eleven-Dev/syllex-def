@@ -262,6 +262,47 @@ const getSuperAdminStats = async (
     }
   ]).toArray();
 
+  // 6. Usage Trends and AI Health
+  const now = new Date();
+  const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+  const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const fortyEightHoursAgo = new Date(now.getTime() - 48 * 60 * 60 * 1000);
+
+  // Helper to get count by time range using ObjectId
+  const getChunkCountInPeriod = async (start: Date, end: Date) => {
+    const startId = ObjectId.createFromTime(Math.floor(start.getTime() / 1000));
+    const endId = ObjectId.createFromTime(Math.floor(end.getTime() / 1000));
+    return await db.collection("file_embeddings").countDocuments({
+      _id: { $gte: startId, $lt: endId }
+    });
+  };
+
+  const lastHourCount = await getChunkCountInPeriod(oneHourAgo, now);
+  const last24hCount = await getChunkCountInPeriod(twentyFourHoursAgo, now);
+  const prev24hCount = await getChunkCountInPeriod(fortyEightHoursAgo, twentyFourHoursAgo);
+
+  let usageTrendValue = 0;
+  if (prev24hCount > 0) {
+    if (last24hCount === 0) {
+      usageTrendValue = -100;
+    } else {
+      usageTrendValue = Number(((last24hCount / prev24hCount) - 1) * 100).toFixed(1) as any;
+    }
+  } else if (last24hCount > 0) {
+    usageTrendValue = 100;
+  } else {
+    usageTrendValue = 0;
+  }
+
+  // AI Success Rate based on last hour activity
+  // Since we only save successful ones, if lastHourCount > 0 we can say system is healthy.
+  // We'll return the count or a status instead of a fixed 99.8.
+  const aiHealth = {
+    recentGenerations: lastHourCount,
+    status: lastHourCount > 0 ? "Attivo" : "Inattivo",
+    successRate: lastHourCount > 0 ? 100 : 0
+  };
+
   return {
     globalKpis,
     organizations: orgStats,
@@ -275,7 +316,14 @@ const getSuperAdminStats = async (
         }))
         .sort((a, b) => b.count - a.count)
         .slice(0, 5),
-      metrics: technicalMetrics[0] || { avgChunkSize: 0, avgChunksPerDoc: 0, totalTextLength: 0, totalChunks: 0, totalDocuments: 0 }
+      metrics: {
+        ...(technicalMetrics[0] || { avgChunkSize: 0, avgChunksPerDoc: 0, totalTextLength: 0, totalChunks: 0, totalDocuments: 0 }),
+        usageTrend: {
+          value: Number(usageTrendValue),
+          isUp: Number(usageTrendValue) >= 0
+        },
+        aiHealth
+      }
     }
   };
 };

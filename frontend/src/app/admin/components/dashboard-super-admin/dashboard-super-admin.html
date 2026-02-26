@@ -1,0 +1,135 @@
+<div class="row g-4">
+    <!-- AI Health -->
+    <div class="col-12 col-md-4">
+        <div class="card p-4 border-0 shadow-sm rounded-4 h-100 insight-card">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="insight-label">Stato Generazioni AI</div>
+                <div class="status-indicator" [class.online]="aiStatus === 'Attivo'" [class.bg-secondary]="aiStatus === 'Inattivo'"></div>
+            </div>
+            <h2 class="fw-bold mb-1" [class.text-success]="aiSuccessRate > 0" [class.text-muted]="aiSuccessRate === 0">
+                {{ aiSuccessRate > 0 ? aiSuccessRate + '%' : 'Inattivo' }}
+            </h2>
+            <p class="text-muted small mb-3">
+                {{ recentGenerations > 0 ? recentGenerations + ' materiali generati nell\'ultima ora.' : 'Nessuna attività nell\'ultima ora.' }}
+            </p>
+            @if (aiSuccessRate > 0) {
+                <div class="progress" style="height: 6px;">
+                    <div class="progress-bar bg-success" role="progressbar" [style.width.%]="aiSuccessRate"></div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Usage Trend -->
+    <div class="col-12 col-md-4">
+        <div class="card p-4 border-0 shadow-sm rounded-4 h-100 insight-card">
+            <div class="insight-label mb-3">Trend Utilizzo (24h)</div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-box-lg bg-primary bg-opacity-10 text-primary">
+                    <fa-icon [icon]="icons.faArrowTrendUp"></fa-icon>
+                </div>
+                <div>
+                    <h2 class="fw-bold mb-0" [class.text-success]="usageTrend.isUp && usageTrend.value > 0" [class.text-danger]="!usageTrend.isUp && usageTrend.value < 0">
+                        {{ usageTrend.value > 0 ? '+' : '' }}{{ usageTrend.value }}%
+                    </h2>
+                    <span class="text-muted extra-small fw-bold text-uppercase ls-1">
+                        <fa-icon [icon]="usageTrend.isUp ? icons.faArrowUp : icons.faArrowDown" class="me-1"></fa-icon>
+                        Rispetto a ieri
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Onboarding Attention -->
+    <div class="col-12 col-md-4">
+        <div class="card p-4 border-0 shadow-sm rounded-4 h-100 insight-card">
+            <div class="insight-label mb-3">Attenzione Onboarding</div>
+            @if (incompleteOnboardingCount > 0) {
+                <div class="d-flex align-items-center gap-3 text-warning">
+                    <div class="icon-box-lg bg-warning bg-opacity-10">
+                        <fa-icon [icon]="icons.faExclamationTriangle"></fa-icon>
+                    </div>
+                    <div>
+                        <h2 class="fw-bold mb-0">{{ incompleteOnboardingCount }}</h2>
+                        <span class="text-muted extra-small fw-bold text-uppercase ls-1">Org da ricontattare</span>
+                    </div>
+                </div>
+            } @else {
+                <div class="d-flex align-items-center gap-3 text-success">
+                    <div class="icon-box-lg bg-success bg-opacity-10">
+                        <fa-icon [icon]="icons.faCheckCircle"></fa-icon>
+                    </div>
+                    <div>
+                        <h2 class="fw-bold mb-0">Ottimo</h2>
+                        <span class="text-muted extra-small fw-bold text-uppercase ls-1">Tutto regolare</span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-2">
+    <div class="col-lg-8">
+        <div class="card p-4 border-0 shadow-sm rounded-4 h-100 glass-card">
+            <h5 class="fw-bold mb-4 d-flex align-items-center gap-2">
+                <fa-icon [icon]="icons.faWandMagicSparkles" class="text-primary"></fa-icon>
+                Attività Principali
+            </h5>
+            
+            <div class="row g-3">
+                <div class="col-6" [routerLink]="['/a/organizzazioni']">
+                    <div class="card p-3 rounded-4 quick-action-card h-100">
+                        <fa-icon [icon]="icons.faBuilding" class="fs-4 mb-2"></fa-icon>
+                        <div class="fw-bold">Organizzazioni</div>
+                        <div class="extra-small text-muted">Gestisci scuole e enti</div>
+                    </div>
+                </div>
+                <div class="col-6" [routerLink]="['/a/stats']">
+                    <div class="card p-3 rounded-4 quick-action-card h-100">
+                        <fa-icon [icon]="icons.faChartLine" class="fs-4 mb-2"></fa-icon>
+                        <div class="fw-bold">Statistiche</div>
+                        <div class="extra-small text-muted">Dati tecnici avanzati</div>
+                    </div>
+                </div>
+                <div class="col-6" [routerLink]="['/a/onboarding']">
+                    <div class="card p-3 rounded-4 quick-action-card h-100">
+                        <fa-icon [icon]="icons.faClock" class="fs-4 mb-2"></fa-icon>
+                        <div class="fw-bold">Onboarding</div>
+                        <div class="extra-small text-muted">Importazioni</div>
+                    </div>
+                </div>
+                <div class="col-6" [routerLink]="['/a/profile']">
+                    <div class="card p-3 rounded-4 quick-action-card h-100">
+                        <fa-icon [icon]="icons.faUserCheck" class="fs-4 mb-2"></fa-icon>
+                        <div class="fw-bold">Profilo</div>
+                        <div class="extra-small text-muted">Impostazioni account</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card p-4 border-0 shadow-sm rounded-4 h-100">
+            <h6 class="insight-label mb-4">Stato Globale</h6>
+            <div class="d-flex flex-column gap-3">
+                <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <fa-icon [icon]="icons.faUsers" class="text-primary"></fa-icon>
+                        <span class="small fw-medium">Utenti Totali</span>
+                    </div>
+                    <span class="fw-bold">{{ superStats?.globalKpis?.totalUsers || 0 }}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <fa-icon [icon]="icons.faBook" class="text-primary"></fa-icon>
+                        <span class="small fw-medium">Materiali AI</span>
+                    </div>
+                    <span class="fw-bold">{{ superStats?.globalKpis?.totalAiMaterials || 0 }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

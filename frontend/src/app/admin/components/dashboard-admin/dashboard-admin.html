@@ -1,0 +1,106 @@
+<div class="row g-4">
+    <!-- Engagement -->
+    <div class="col-12 col-md-4">
+        <div class="card p-4 border-0 shadow-sm rounded-4 h-100 insight-card">
+            <div class="insight-label mb-3">Engagement Studenti</div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-box-lg bg-info bg-opacity-10 text-info">
+                    <fa-icon [icon]="icons.faChartPie"></fa-icon>
+                </div>
+                <div>
+                    <h2 class="fw-bold mb-0">{{ studentEngagement }}%</h2>
+                    <span class="text-muted extra-small fw-bold text-uppercase ls-1">Studenti attivi</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pulse -->
+    <div class="col-12 col-md-4">
+        <div class="card p-4 border-0 shadow-sm rounded-4 h-100 insight-card">
+            <div class="insight-label mb-3">Ritmo Creazione</div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-box-lg bg-purple-soft text-purple">
+                    <fa-icon [icon]="icons.faPlusCircle"></fa-icon>
+                </div>
+                <div>
+                    <h2 class="fw-bold mb-0">{{ contentPulse }}</h2>
+                    <span class="text-muted extra-small fw-bold text-uppercase ls-1">Test pubblicati</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerts -->
+    <div class="col-12 col-md-4">
+        <div class="card p-4 border-0 shadow-sm rounded-4 h-100 insight-card">
+            <div class="insight-label mb-3">Azioni Consigliate</div>
+            <div class="d-flex align-items-center gap-3 {{ inactiveClassesCount > 0 ? 'text-danger' : 'text-success' }}">
+                <div class="icon-box-lg bg-opacity-10 {{ inactiveClassesCount > 0 ? 'bg-danger' : 'bg-success' }}">
+                    <fa-icon [icon]="inactiveClassesCount > 0 ? icons.faExclamationTriangle : icons.faCheckCircle"></fa-icon>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0">{{ inactiveClassesCount > 0 ? inactiveClassesCount + ' Classi Inattive' : 'Tutto a posto' }}</h5>
+                    <span class="text-muted extra-small fw-bold text-uppercase ls-1">Monitoraggio manuale</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-2">
+    <div class="col-lg-8">
+        <div class="card p-4 border-0 shadow-sm rounded-4 h-100 glass-card">
+            <h5 class="fw-bold mb-4 d-flex align-items-center gap-2">
+                <fa-icon [icon]="icons.faWandMagicSparkles" class="text-primary"></fa-icon>
+                Attività Principali
+            </h5>
+            
+            <div class="row g-3">
+                <div class="col-6" [routerLink]="['/a/organizzazioni']">
+                    <div class="card p-3 rounded-4 quick-action-card h-100">
+                        <fa-icon [icon]="icons.faBuilding" class="fs-4 mb-2"></fa-icon>
+                        <div class="fw-bold">Organizzazioni</div>
+                        <div class="extra-small text-muted">Gestisci scuole e enti</div>
+                    </div>
+                </div>
+                <div class="col-6" [routerLink]="['/a/stats']">
+                    <div class="card p-3 rounded-4 quick-action-card h-100">
+                        <fa-icon [icon]="icons.faChartLine" class="fs-4 mb-2"></fa-icon>
+                        <div class="fw-bold">Statistiche</div>
+                        <div class="extra-small text-muted">Dati tecnici avanzati</div>
+                    </div>
+                </div>
+                <div class="col-6" [routerLink]="['/a/profile']">
+                    <div class="card p-3 rounded-4 quick-action-card h-100">
+                        <fa-icon [icon]="icons.faUserCheck" class="fs-4 mb-2"></fa-icon>
+                        <div class="fw-bold">Profilo</div>
+                        <div class="extra-small text-muted">Impostazioni account</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card p-4 border-0 shadow-sm rounded-4 h-100">
+            <h6 class="insight-label mb-4">Stato Globale</h6>
+            <div class="d-flex flex-column gap-3">
+                <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <fa-icon [icon]="icons.faUsers" class="text-primary"></fa-icon>
+                        <span class="small fw-medium">Utenti Totali</span>
+                    </div>
+                    <span class="fw-bold">{{ adminStats?.kpis?.totalStudents || 0 }}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <fa-icon [icon]="icons.faBook" class="text-primary"></fa-icon>
+                        <span class="small fw-medium">Materiali AI</span>
+                    </div>
+                    <span class="fw-bold">{{ adminStats?.kpis?.publishedTests || 0 }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

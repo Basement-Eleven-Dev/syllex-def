@@ -1,1 +1,30 @@
-<p>admin-dashboard works!</p>
+<div class="dashboard-container">
+    <!-- Welcome Header -->
+    <div class="welcome-section d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="display-6 fw-bold mb-1">
+                Ciao, {{ auth.user?.firstName || 'Admin' }} 👋
+            </h1>
+            <p class="text-muted mb-0">
+                Ecco una panoramica dell'attività di oggi in 
+                <span class="fw-bold text-dark">{{ auth.isSuperAdmin ? 'Syllex' : 'la tua organizzazione' }}</span>.
+            </p>
+        </div>
+        <div class="d-none d-md-flex align-items-center gap-3">
+            <div class="text-end">
+                <div class="small fw-bold">{{ auth.user?.role }}</div>
+                <div class="extra-small text-muted">ID: {{ auth.user?._id?.toString()?.slice(-6) }}</div>
+            </div>
+            <div class="icon-box bg-light border rounded-circle" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+                <fa-icon [icon]="icons.faUserCheck" class="text-primary"></fa-icon>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboards -->
+    @if (auth.isSuperAdmin) {
+        <app-dashboard-super-admin></app-dashboard-super-admin>
+    } @else {
+        <app-dashboard-admin></app-dashboard-admin>
+    }
+</div>

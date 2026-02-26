@@ -82,13 +82,18 @@ const getOrganizationStats = async (
     }
   ]).toArray();
 
+  // Inactive Classes: Classes in the org that have 0 students in their array
+  const classes = await db.collection("classes").find({ organizationId: orgObjectId }).toArray();
+  const inactiveClassesCount = classes.filter(cls => !cls.students || cls.students.length === 0).length;
+
   const kpis = {
     totalStudents,
     totalTeachers,
     activeClasses,
     publishedTests: publishedTests[0]?.total || 0,
     totalAttempts: engagementData[0]?.totalAttempts || 0,
-    activeStudents: engagementData[0]?.activeStudents || 0
+    activeStudents: engagementData[0]?.activeStudents || 0,
+    inactiveClassesCount
   };
 
   // 2. Teaching Activity

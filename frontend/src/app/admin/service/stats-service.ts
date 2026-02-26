@@ -10,6 +10,7 @@ export interface AdminStats {
     publishedTests: number;
     totalAttempts: number;
     activeStudents: number;
+    inactiveClassesCount: number;
   };
   teachingActivity: {
     testsBySubject: Array<{ subject: string; count: number }>;
@@ -76,6 +77,12 @@ export interface SuperAdminStats {
       totalTextLength: number;
       totalChunks: number;
       totalDocuments: number;
+      usageTrend: { value: number; isUp: boolean };
+      aiHealth: {
+        recentGenerations: number;
+        status: string;
+        successRate: number;
+      };
     };
   };
 }

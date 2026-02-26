@@ -12,8 +12,11 @@ import {
   faCalendarCheck,
   faUserTie,
   faGraduationCap,
-  faClipboardCheck,
-  faUserCheck
+  faUserCheck,
+  faChartPie,
+  faPlusCircle,
+  faTriangleExclamation,
+  faArrowTrendUp
 } from '@fortawesome/free-solid-svg-icons';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData } from 'chart.js';
@@ -42,8 +45,11 @@ export class AdminLevelStats implements OnInit {
     faCalendarCheck,
     faUserTie,
     faGraduationCap,
-    faClipboardCheck,
-    faUserCheck
+    faUserCheck,
+    faChartPie,
+    faPlusCircle,
+    faTriangleExclamation,
+    faArrowTrendUp
   };
 
   // Chart Configuration

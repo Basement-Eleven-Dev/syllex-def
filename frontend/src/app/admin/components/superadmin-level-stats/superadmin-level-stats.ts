@@ -17,7 +17,11 @@ import {
   faFileDownload,
   faSignOutAlt,
   faWandMagicSparkles,
-  faEuroSign
+  faEuroSign,
+  faCheckCircle,
+  faExclamationTriangle,
+  faArrowTrendUp,
+  faClock
 } from '@fortawesome/free-solid-svg-icons';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData } from 'chart.js';
@@ -52,6 +56,8 @@ export class SuperadminLevelStats implements OnInit {
     faSignOutAlt,
     faWandMagicSparkles,
     faEuroSign,
+    faArrowTrendUp,
+    faClock
   };
 
   // Top Organizations Chart
