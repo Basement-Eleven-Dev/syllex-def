@@ -19,7 +19,7 @@ export async function sendEmail(to: string, subject: string, html: string) {
         Data: subject,
       },
     },
-    Source: "Syllex <noreply@convivo.studio>",
+    Source: "Syllex <noreply@syllex.org>",
   });
 
   try {
