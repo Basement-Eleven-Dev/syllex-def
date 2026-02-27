@@ -1,5 +1,5 @@
-<div class="card p-4">
-  <div class="card-body">
+
+  <div class="">
     @if (showCloseButton) {
     <button
       type="button"
@@ -66,11 +66,18 @@
             >
               {{ dayBox.day }}
             </div>
-            @if (getEventCount(dayBox) > 0) {
-            <span class="event-count badge bg-primary">
-              {{ getEventCount(dayBox) }}
-            </span>
-            } }
+            <div class="event-badges">
+              @if (getEventCount(dayBox) > 0) {
+              <span class="event-count badge bg-primary" title="Eventi e Test">
+                {{ getEventCount(dayBox) }}
+              </span>
+              }
+              @if (getComunicazioniCount(dayBox) > 0) {
+              <span class="event-count badge bg-info text-dark" title="Comunicazioni">
+                {{ getComunicazioniCount(dayBox) }}
+              </span>
+              }
+            </div> }
           </div>
           }
         </div>
@@ -78,50 +85,62 @@
 
       <!-- Day detail panel -->
       <div class="col-12 col-lg-6 d-flex flex-column mb-3">
-        <div
-          class="flex-fill p-4"
-          id="calendarDayDetailCard"
-          [class.no-date-selected]="!SelectedDate()"
-        >
-          <div class="d-flex flex-column" style="min-height: 400px">
-            @if (SelectedDate()) {
-            <div
-              class="d-flex flex-row align-items-center justify-content-between mb-2"
+        @if (SelectedDate()) {
+          <div class="d-flex flex-row align-items-center justify-content-between mb-3 px-1">
+            <div>
+              <h4 class="fw-semibold text-primary mb-0">Oggi / {{ SelectedDate() | date: 'fullDate' | titlecase }}</h4>
+            </div>
+            @if (!readonly()) {
+            <button
+              class="btn btn-outline-primary btn-sm"
+              (click)="openAddEventModal()"
             >
-              <div>
-                <h4 class="fw-semibold text-primary mb-0">Oggi</h4>
-                <h5 class="fw-normal">
-                  {{ SelectedDate() | date: 'fullDate' | titlecase }}
-                </h5>
-              </div>
-              @if (!readonly()) {
-              <button
-                class="btn btn-outline-primary"
-                (click)="openAddEventModal()"
-              >
-                <fa-icon [icon]="PlusIcon"></fa-icon>
-              </button>
+              <fa-icon [icon]="PlusIcon"></fa-icon> Nuovo Evento
+            </button>
+            }
+          </div>
+
+          <div
+            class="flex-fill p-3 rounded-syllex bg-white"
+            id="calendarDayDetailCard"
+          >
+            <!-- Scrollable Content Section -->
+            <div class="calendar-events-scrollable flex-fill pe-2">
+              @for (comunicazione of SelectedDateComunicazioni(); track comunicazione._id) {
+              <div
+                app-student-comunicazione-card
+                [comunicazione]="comunicazione"
+                class="mb-3 d-block"
+              ></div>
+              } 
+              @for (event of SelectedDateEvents(); track event._id) {
+              <app-calendar-event-card
+                [Event]="event"
+                [readonly]="readonly()"
+                (Deleted)="deleteEvent($event)"
+                (Edited)="editEvent($event)"
+              />
+              } 
+              @for (test of SelectedDateTests(); track test._id) {
+              <app-calendar-test-card [Test]="test" [readonly]="readonly()" />
+              } 
+              @if (!HasSelectedDateItems()) {
+              <p class="text-muted text-center mt-4 pt-3">
+                Nessun evento per questa giornata
+              </p>
               }
             </div>
-            <hr />
-
-            @for (event of SelectedDateEvents(); track event._id) {
-            <app-calendar-event-card
-              [Event]="event"
-              [readonly]="readonly()"
-              (Deleted)="deleteEvent($event)"
-              (Edited)="editEvent($event)"
-            />
-            } @for (test of SelectedDateTests(); track test._id) {
-            <app-calendar-test-card [Test]="test" [readonly]="readonly()" />
-            } @if (!HasSelectedDateItems()) {
-            <p class="text-muted text-center mt-4">
-              Nessun evento per questa giornata
-            </p>
-            } }
           </div>
-        </div>
+        } @else {
+          <!-- State when no date is selected -->
+          <div
+            class="flex-fill p-4 rounded-syllex bg-white no-date-selected"
+            id="calendarDayDetailCard"
+          >
+            <div style="min-height: 400px"></div>
+          </div>
+        }
       </div>
     </div>
   </div>
-</div>
+

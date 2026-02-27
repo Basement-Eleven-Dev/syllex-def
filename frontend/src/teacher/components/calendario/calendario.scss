@@ -21,18 +21,27 @@
     color: var(--bs-dark);
   }
 
-  .event-count {
+  .event-badges {
     position: absolute;
     bottom: 4px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.6rem;
-    padding: 2px 5px;
-    line-height: 1;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 3px;
+
+    .event-count {
+      font-size: 0.6rem;
+      padding: 3px 6px;
+      line-height: 1;
+      border-radius: 4px;
+    }
   }
 }
 
 #calendarDayDetailCard {
+  border: 1px solid var(--bs-border-color);
+  
   &.no-date-selected {
     border: none;
     background-color: #f1f1f1;
@@ -41,3 +50,24 @@
     gap: 10px;
   }
 }
+
+.calendar-events-scrollable {
+  max-height: 450px;
+  overflow-y: auto;
+
+  /* Custom minimal scrollbar */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.15);
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+}
+

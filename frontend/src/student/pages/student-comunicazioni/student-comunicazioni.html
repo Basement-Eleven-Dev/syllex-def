@@ -7,7 +7,7 @@
   </div>
 </div>
 
-<section class="d-flex flex-row mb-5 gap-3">
+<section class="d-flex flex-row mb-3 gap-3">
   <select
     class="form-select custom-input filter"
     style="max-width: 280px"
@@ -27,30 +27,3 @@
   [studentMode]="true"
   [subjectFilter]="SelectedSubject()"
 ></app-calendario>
-
-<hr class="my-5" />
-
-<h4 class="fw-semibold mb-4">
-  {{ SelectedSubject() ? 'Comunicazioni della materia' : 'Tutte le comunicazioni' }}
-</h4>
-
-@for (comunicazione of Comunicazioni(); track comunicazione._id) {
-<div
-  class="mb-3"
-  app-student-comunicazione-card
-  [comunicazione]="comunicazione"
-></div>
-} @empty {
-<div class="alert alert-info text-center">
-  Nessuna comunicazione per questa materia.
-</div>
-} @if (CollectionSize() > PageSize()) {
-<div class="mt-4 d-flex justify-content-end">
-  <app-syllex-pagination
-    [collectionSize]="CollectionSize()"
-    [page]="Page()"
-    [pageSize]="PageSize()"
-    (pageChange)="Page.set($event)"
-  />
-</div>
-}

@@ -24,6 +24,11 @@ import { StudentTestsService } from '../../../services/student-tests.service';
 import { FeedbackService } from '../../../services/feedback-service';
 import { CalendarTestCard } from '../calendar-test-card/calendar-test-card';
 import { CalendarEventCard } from '../calendar-event-card/calendar-event-card';
+import { StudentComunicazioneCard } from '../../../student/components/student-comunicazione-card/student-comunicazione-card';
+import {
+  ComunicazioneInterface,
+  ComunicazioniService,
+} from '../../../services/comunicazioni-service';
 import { AddEventModal } from '../add-event-modal/add-event-modal';
 
 export interface DayBox {
@@ -40,6 +45,7 @@ export interface DayBox {
     TitleCasePipe,
     CalendarTestCard,
     CalendarEventCard,
+    StudentComunicazioneCard,
   ],
   templateUrl: './calendario.html',
   styleUrl: './calendario.scss',
@@ -58,6 +64,7 @@ export class Calendario implements OnInit {
   private readonly calendarService = inject(CalendarService);
   private readonly testsService = inject(TestsService);
   private readonly studentTestsService = inject(StudentTestsService);
+  private readonly comunicazioniService = inject(ComunicazioniService);
   private readonly modalService = inject(NgbModal);
   private readonly feedbackService = inject(FeedbackService);
 
@@ -66,6 +73,7 @@ export class Calendario implements OnInit {
   SelectedDate = signal<Date>(new Date());
   Events = signal<CalendarEvent[]>([]);
   Tests = signal<TestInterface[]>([]);
+  Comunicazioni = signal<ComunicazioneInterface[]>([]);
   showHeadings = input(true);
   /** When true, hides add/edit/delete controls */
   readonly = input(false);
@@ -99,6 +107,19 @@ export class Calendario implements OnInit {
     ),
   );
 
+  private FilteredComunicazioni = computed(() => {
+    const filter = this.subjectFilter();
+    return filter
+      ? this.Comunicazioni().filter((c) => c.subjectId === filter)
+      : this.Comunicazioni();
+  });
+
+  SelectedDateComunicazioni = computed(() =>
+    this.filterByDate(this.FilteredComunicazioni(), this.SelectedDate(), (c) =>
+      c.createdAt ? new Date(c.createdAt) : null,
+    ),
+  );
+
   SelectedDateTests = computed(() =>
     this.filterByDate(this.FilteredTests(), this.SelectedDate(), (t) =>
       t.availableFrom ? new Date(t.availableFrom) : null,
@@ -108,7 +129,8 @@ export class Calendario implements OnInit {
   HasSelectedDateItems = computed(
     () =>
       this.SelectedDateEvents().length > 0 ||
-      this.SelectedDateTests().length > 0,
+      this.SelectedDateTests().length > 0 ||
+      this.SelectedDateComunicazioni().length > 0,
   );
 
   constructor() {}
@@ -153,6 +175,15 @@ export class Calendario implements OnInit {
       this.countByDate(this.FilteredTests(), target, (t) =>
         t.availableFrom ? new Date(t.availableFrom) : null,
       )
+    );
+  }
+
+  getComunicazioniCount(day: DayBox): number {
+    if (!day.isCurrentMonth || day.day === null) return 0;
+    const current = this.CurrentDate();
+    const target = new Date(current.getFullYear(), current.getMonth(), day.day);
+    return this.countByDate(this.FilteredComunicazioni(), target, (c) =>
+      c.createdAt ? new Date(c.createdAt) : null,
     );
   }
 
@@ -235,6 +266,14 @@ export class Calendario implements OnInit {
         .subscribe((res: { tests: TestInterface[]; total: number }) =>
           this.Tests.set(res.tests),
         );
+    }
+    
+    if (this.studentMode()) {
+      this.comunicazioniService
+        .getPagedComunicazioni('', '', '', 1, 100, undefined)
+        .subscribe((res) => {
+          this.Comunicazioni.set(res.communications);
+        });
     }
   }
 
