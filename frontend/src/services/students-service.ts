@@ -12,4 +12,16 @@ export class StudentsService {
   getStudents(studentIds: string[]): Observable<{ students: User[] }> {
     return this.http.post<{ students: User[] }>('students', { studentIds });
   }
+
+  getStudentDetails(studentId: string, classId?: string, page: number = 1, limit: number = 10): Observable<any> {
+    const params: any = {};
+    if (classId) params.classId = classId;
+    params.page = page.toString();
+    params.limit = limit.toString();
+    return this.http.get(`teacher/students/${studentId}/details`, { params });
+  }
+
+  getStudentInsight(studentId: string): Observable<{ insight: string }> {
+    return this.http.post<{ insight: string }>(`teacher/students/${studentId}/insight`, {});
+  }
 }

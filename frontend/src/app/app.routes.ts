@@ -142,6 +142,10 @@ export const routes: Routes = [
         component: Profile,
       },
       {
+        path: 'student/:studentId/class/:classeId',
+        loadComponent: () => import('../teacher/pages/student-detail/student-detail').then(m => m.StudentDetail),
+      },
+      {
         path: '**',
         redirectTo: 'dashboard',
         pathMatch: 'full',

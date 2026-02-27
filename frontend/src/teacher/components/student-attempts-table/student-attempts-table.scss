@@ -1,0 +1,42 @@
+@import "../../../styles.scss";
+
+.card {
+    border-radius: $card-border-radius;
+}
+
+.table {
+    thead th {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        color: #6c757d;
+        padding: 1.25rem 1rem;
+        background-color: rgba($light, 0.5);
+        border: none;
+    }
+    
+    tbody td {
+        padding: 1.25rem 1rem;
+        border-color: rgba(0,0,0,0.03);
+    }
+}
+
+.badge {
+    border-radius: $badge-border-radius;
+    font-weight: 600;
+    padding: 0.5rem 0.75rem;
+}
+
+// Global color overrides for high contrast
+.text-success {
+    color: #166534 !important; // Deep forest green
+}
+
+.bg-success {
+    background-color: #166534 !important;
+}
+
+:host ::ng-deep {
+    .bg-opacity-10 {
+        background-color: rgba(22, 101, 52, 0.1) !important;
+    }
+}

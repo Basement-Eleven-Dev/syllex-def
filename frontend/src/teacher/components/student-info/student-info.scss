@@ -1,0 +1,64 @@
+@import "../../../styles.scss";
+
+.stats-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1rem !important;
+    width: 100% !important;
+    min-width: 0;
+}
+
+.stat-tile {
+    background-color: #f8faff;
+    border: 1px solid rgba($primary, 0.05);
+    border-radius: 1rem;
+    padding: 1rem;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-width: 0; // Prevent overflow
+
+    &:hover {
+        transform: translateY(-2px);
+        background-color: #f0f4ff;
+        border-color: rgba($primary, 0.1);
+    }
+}
+
+.stat-icon-bg {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba($primary, 0.1);
+    border-radius: 10px;
+    font-size: 1.1rem;
+
+    &.success-bg {
+        background-color: rgba(#166534, 0.1);
+    }
+}
+
+.text-dark-green {
+    color: #166534 !important; // Deep forest green for high contrast
+}
+
+.x-small-text {
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
+}
+
+// Ensure columns are truly side-by-side even on small containers
+.row.g-3 {
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+    
+    .col-6 {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+}
