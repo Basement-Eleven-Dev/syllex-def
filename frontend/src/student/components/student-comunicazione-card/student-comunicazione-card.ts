@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, signal } from '@angular/core';
+import { Component, inject, Input, OnInit, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -8,6 +8,7 @@ import { ComunicazioneInterface } from '../../../services/comunicazioni-service'
 import { MaterialInterface } from '../../../services/materiali-service';
 import { FileViewer } from '../.././../teacher/components/file-viewer/file-viewer';
 import { getFileIcon } from '../../../app/_utils/file-icons';
+import { Materia } from '../../../services/materia';
 
 @Component({
   selector: 'div[app-student-comunicazione-card]',
@@ -18,6 +19,8 @@ import { getFileIcon } from '../../../app/_utils/file-icons';
 })
 export class StudentComunicazioneCard implements OnInit {
   @Input() comunicazione!: ComunicazioneInterface;
+
+  protected readonly materiaService = inject(Materia);
 
   readonly attachments = signal<MaterialInterface[]>([]);
   readonly loading = signal(false);

@@ -20,9 +20,9 @@ export class StudentComunicazioni {
 
   readonly Subjects = this.materiaService.allMaterie;
   // Always has a value: seeded from the active materia, then kept in sync
-  readonly SelectedSubject = signal(
-    this.materiaService.materiaSelected()?._id ?? '',
-  );
+  // Always has a value: seeded from the active materia, then kept in sync
+  // Default to empty string for "All Subjects" if needed, or stick to current logic
+  readonly SelectedSubject = signal('');
 
   readonly Comunicazioni = signal<ComunicazioneInterface[]>([]);
   readonly Page = signal(1);
@@ -30,11 +30,12 @@ export class StudentComunicazioni {
   readonly CollectionSize = signal(0);
 
   constructor() {
-    // When materiaSelected resolves (async HTTP) and SelectedSubject is still empty, pick it up
+    // When materiaSelected resolves (async HTTP), use it as initial filter if SelectedSubject is still the default ""
     effect(() => {
       const materia = this.materiaService.materiaSelected();
       if (materia && !this.SelectedSubject()) {
-        this.SelectedSubject.set(materia._id);
+        // We could keep it empty for "All Subjects" by default, but let's follow the user's need for a "general" view.
+        // If we want "All Subjects" by default, we leave it empty.
       }
     });
 
@@ -42,9 +43,7 @@ export class StudentComunicazioni {
     effect(() => {
       const subjectId = this.SelectedSubject();
       const page = this.Page();
-      if (subjectId) {
-        this.loadComunicazioni(subjectId, page);
-      }
+      this.loadComunicazioni(subjectId, page);
     });
   }
 

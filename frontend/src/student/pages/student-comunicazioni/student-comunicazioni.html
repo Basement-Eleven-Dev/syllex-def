@@ -14,6 +14,7 @@
     [value]="SelectedSubject()"
     (change)="onSubjectChange($any($event.target).value)"
   >
+    <option value="">Tutte le materie</option>
     @for (subject of Subjects(); track subject._id) {
     <option [value]="subject._id">{{ subject.name }}</option>
     }
@@ -29,7 +30,9 @@
 
 <hr class="my-5" />
 
-<h4 class="fw-semibold mb-4">Comunicazioni della materia</h4>
+<h4 class="fw-semibold mb-4">
+  {{ SelectedSubject() ? 'Comunicazioni della materia' : 'Tutte le comunicazioni' }}
+</h4>
 
 @for (comunicazione of Comunicazioni(); track comunicazione._id) {
 <div

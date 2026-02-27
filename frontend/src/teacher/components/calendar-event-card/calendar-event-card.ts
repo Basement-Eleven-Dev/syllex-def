@@ -3,6 +3,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faClock, faMarker, faTrash } from '@fortawesome/pro-solid-svg-icons';
 import { CalendarEvent } from '../../../services/calendar-service';
 import { ConfirmActionDirective } from '../../../directives/confirm-action.directive';
+import { Materia } from '../../../services/materia';
+import { inject } from '@angular/core';
 
 @Component({
   selector: 'app-calendar-event-card',
@@ -10,8 +12,13 @@ import { ConfirmActionDirective } from '../../../directives/confirm-action.direc
   template: `
     <div class="p-3 event-card rounded-syllex mb-3 d-flex flex-column gap-2">
       <div class="d-flex flex-row align-items-center justify-content-between">
-        <h6 class="mb-0">{{ Event().title }}</h6>
+        <h6 class="mb-0 flex-fill">{{ Event().title }}</h6>
         <div class="d-flex align-items-center gap-2">
+          @if (Event().subjectId) {
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-medium px-2 py-1 small me-2">
+              {{ materiaService.getSubjectName(Event().subjectId!) }}
+            </span>
+          }
           @if (Event().time) {
             <small class="text-muted">
               <fa-icon [icon]="ClockIcon"></fa-icon> {{ Event().time }}
@@ -60,6 +67,7 @@ export class CalendarEventCard {
   protected readonly ClockIcon = faClock;
   protected readonly TrashIcon = faTrash;
   protected readonly EditIcon = faMarker;
+  protected readonly materiaService = inject(Materia);
 
   Event = input.required<CalendarEvent>();
   readonly = input(false);

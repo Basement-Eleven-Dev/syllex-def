@@ -27,20 +27,31 @@ const getCommunications = async (
   // Costruisco il filtro per MongoDB
   const filter: any = {};
 
-  // Solo comunicazioni del teacher loggato
-  if (context.user?._id && context.user.role === "teacher") {
-    filter.teacherId = context.user._id;
-  }
+  // Logica di filtraggio basata sul ruolo
+  if (context.user?._id) {
+    if (context.user.role === "teacher") {
+      // Un docente vede solo le sue comunicazioni
+      filter.teacherId = context.user._id;
+    } else if (context.user.role === "student") {
+      // Uno studente vede solo le comunicazioni delle sue classi
+      const studentClasses = await db
+        .collection("classes")
+        .find({ students: { $in: [context.user._id] } })
+        .toArray();
 
-  // può essere passata
-  if (subjectId) {
-    filter.subjectId = new ObjectId(subjectId);
-  } else {
-    // se non è passata, ma c'è nel contesto (perché siamo in un endpoint figlio di una materia), filtro per quella
-    if (context.subjectId) {
-      filter.subjectId = context.subjectId;
+      const classIds = studentClasses.map((c) => c._id);
+      filter.classIds = { $in: classIds };
     }
   }
+
+  // Filtraggio per materia
+  if (subjectId) {
+    filter.subjectId = new ObjectId(subjectId);
+  } else if (context.subjectId) {
+    // se non è passata via query, ma c'è nel contesto (es. endpoint annidato), filtro per quella
+    filter.subjectId = context.subjectId;
+  }
+  // Se non c'è subjectId e non siamo in un contesto di materia, lo studente vede tutto quello che appartiene alle sue classi
 
   // Ricerca testuale su titolo e contenuto
   if (searchTerm) {
@@ -50,9 +61,16 @@ const getCommunications = async (
     ];
   }
 
-  // Filtro per classe specifica
+  // Filtro per classe specifica (se richiesto esplicitamente oltre al filtro di ruolo)
   if (classId) {
-    filter.classIds = new ObjectId(classId);
+    const targetClassId = new ObjectId(classId);
+    if (filter.classIds) {
+      // se c'è già un filtro (es. studente), facciamo intersezione manuale o usiamo $and
+      filter.$and = [{ classIds: targetClassId }, { classIds: filter.classIds }];
+      delete filter.classIds;
+    } else {
+      filter.classIds = targetClassId;
+    }
   }
 
   // Filtro per presenza allegati

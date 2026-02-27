@@ -2,6 +2,11 @@
   <div class="card-body">
     <div class="d-flex flex-row text-dark align-items-center mb-3">
       <h6 class="mb-0 flex-fill">{{ comunicazione.title }}</h6>
+      @if (comunicazione.subjectId) {
+      <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-medium px-2 py-1 small">
+        {{ materiaService.getSubjectName(comunicazione.subjectId) }}
+      </span>
+      }
     </div>
 
     <small class="fw-light ellipsis-1-lines">
