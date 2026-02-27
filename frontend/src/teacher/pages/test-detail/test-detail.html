@@ -63,6 +63,9 @@
     @if (ActiveSection() === 1) {
     <app-test-assignments [attempts]="Attempts()" />
     } @else if (ActiveSection() === 2) {
+    <div class="mb-4">
+      <app-test-ai-summary [id]="TestId()!" mode="test" />
+    </div>
     <app-test-stats
       [attempts]="Attempts()"
       [maxScore]="TestData()?.maxScore || 0"

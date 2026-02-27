@@ -24,7 +24,8 @@ Chart.register(...registerables);
 })
 export class StudentPerformanceChartComponent implements OnDestroy {
   data = input<any[]>([]);
-  type = input<'line' | 'bar' | 'radar'>('line');
+  compareData = input<any[]>([]); // Optional class averages or other baseline
+  type = input<'line' | 'bar' | 'radar' | 'doughnut'>('line');
 
   canvasRef = viewChild<ElementRef<HTMLCanvasElement>>('chartCanvas');
   private chart?: Chart;
@@ -57,12 +58,55 @@ export class StudentPerformanceChartComponent implements OnDestroy {
 
     if (chartType === 'line') {
       config = this.buildLineConfig(chartData);
+    } else if (chartType === 'bar') {
+      config = this.buildHorizontalBarConfig(chartData, this.compareData());
     } else {
-      // Bar/radar/topic → always use horizontal bar (clean and readable)
-      config = this.buildHorizontalBarConfig(chartData);
+      config = this.buildDoughnutConfig(chartData);
     }
 
     this.chart = new Chart(ctx, config);
+  }
+
+  private buildDoughnutConfig(data: any[]): ChartConfiguration {
+    const primaryColor = '#3931ce';
+    const totalPercentage = data.length > 0
+      ? data.reduce((acc, d) => acc + (d.percentage ?? d.score ?? 0), 0) / data.length
+      : 0;
+
+    return {
+      type: 'doughnut',
+      data: {
+        labels: data.map(d => d.name || 'N/D'),
+        datasets: [{
+          data: data.map(d => d.percentage ?? d.score ?? 0),
+          backgroundColor: [
+            primaryColor,
+            '#6366f1',
+            '#818cf8',
+            '#a5b4fc',
+            '#c7d2fe'
+          ],
+          borderWidth: 0,
+          cutout: '75%',
+        } as any]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { usePointStyle: true, boxWidth: 8, font: { size: 10 } }
+          },
+          tooltip: {
+            backgroundColor: '#132149',
+            callbacks: {
+              label: (ctx) => ` ${ctx.label}: ${ctx.parsed}%`
+            }
+          }
+        }
+      }
+    };
   }
 
   private buildLineConfig(data: any[]): ChartConfiguration {
@@ -132,39 +176,51 @@ export class StudentPerformanceChartComponent implements OnDestroy {
     };
   }
 
-  private buildHorizontalBarConfig(data: any[]): ChartConfiguration {
-    const colors = [
-      '#3931ce', '#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe',
-      '#4f46e5', '#7c3aed', '#8b5cf6', '#a78bfa', '#c4b5fd'
-    ];
+  private buildHorizontalBarConfig(data: any[], compareData?: any[]): ChartConfiguration {
+    const studentColor = '#3931ce';
+    const classColor = '#3931ce33'; // Primary with low opacity
+
+    const datasets: any[] = [{
+      label: 'Studente',
+      data: data.map(d => d.percentage ?? d.score ?? 0),
+      backgroundColor: studentColor,
+      borderRadius: 4,
+      barThickness: 12,
+    }];
+
+    if (compareData && compareData.length > 0) {
+      datasets.unshift({
+        label: 'Media Classe',
+        data: data.map(d => {
+          const comp = compareData.find(c => c.name === d.name);
+          return comp ? (comp.percentage ?? comp.score ?? 0) : 0;
+        }),
+        backgroundColor: classColor,
+        borderRadius: 4,
+        barThickness: 12,
+      });
+    }
 
     return {
       type: 'bar',
       data: {
         labels: data.map(d => d.name || 'N/D'),
-        datasets: [{
-          label: 'Padronanza %',
-          data: data.map(d => d.percentage ?? d.score ?? 0),
-          backgroundColor: data.map((_, i) => colors[i % colors.length]),
-          borderRadius: 6,
-          borderSkipped: false,
-          barThickness: data.length <= 3 ? 28 : undefined,
-        }]
+        datasets: datasets
       },
       options: {
         indexAxis: 'y',
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { display: false },
+          legend: { 
+            display: !!(compareData && compareData.length > 0),
+            position: 'bottom',
+            labels: { boxWidth: 12, font: { size: 11 } }
+          },
           tooltip: {
             backgroundColor: '#132149',
-            titleFont: { size: 13 },
-            bodyFont: { size: 12 },
-            padding: 10,
-            cornerRadius: 8,
             callbacks: {
-              label: (ctx) => `Padronanza: ${ctx.parsed.x}%`
+              label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.x}%`
             }
           }
         },
@@ -172,22 +228,12 @@ export class StudentPerformanceChartComponent implements OnDestroy {
           x: {
             beginAtZero: true,
             max: 100,
-            ticks: {
-              stepSize: 25,
-              callback: (value) => `${value}%`,
-              font: { size: 11 },
-              color: '#8a92a6',
-            },
-            grid: {
-              color: 'rgba(0,0,0,0.05)',
-            },
+            ticks: { stepSize: 25, callback: (v) => `${v}%`, font: { size: 10 } },
+            grid: { color: 'rgba(0,0,0,0.05)' },
             border: { display: false },
           },
           y: {
-            ticks: {
-              font: { size: 12, weight: 'bold' as const },
-              color: '#495057',
-            },
+            ticks: { font: { size: 11 }, color: '#495057' },
             grid: { display: false },
             border: { display: false },
           }

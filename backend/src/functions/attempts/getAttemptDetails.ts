@@ -118,11 +118,82 @@ const getAttemptDetails = async (request: APIGatewayProxyEvent) => {
     };
   });
 
-  // 3. Calcolo Punteggio Totale (Somma dei punteggi dedotti)
+  // 4. Calcolo medie della classe per questo test
+  const classStats = await db
+    .collection("attempts")
+    .aggregate([
+      { $match: { testId: attempt.testId, status: "reviewed" } },
+      {
+        $group: {
+          _id: "$testId",
+          avgScore: { $avg: "$score" },
+          avgTime: { $avg: "$timeSpent" },
+          count: { $sum: 1 },
+        },
+      },
+    ])
+    .toArray();
+
+  const averages = classStats[0] || { avgScore: 0, avgTime: 0, count: 0 };
+
+  // 5. Calcolo Punteggio Totale e Performance per Argomento
   const totalCalculatedScore = mappedQuestions.reduce(
     (acc: number, curr: any) => acc + (Number(curr.answer.score) || 0),
     0,
   );
+
+  // Recupero nomi argomenti dalla materia
+  const subject = await db.collection("SUBJECTS").findOne({ _id: attempt.testInfo.subjectId });
+  const topicsMap = new Map<string, string>();
+  if (subject?.topics && Array.isArray(subject.topics)) {
+    for (const t of subject.topics) {
+      if (t && typeof t === "object" && t._id) {
+        topicsMap.set(t._id.toString(), t.name || "Generale");
+      }
+    }
+  }
+
+  const studentTopicPerformance: { [key: string]: { score: number; max: number } } = {};
+  mappedQuestions.forEach((mq: any) => {
+    const topicId = mq.question.topicId?.toString();
+    const topicName = (topicId ? topicsMap.get(topicId) : null) || "Generale";
+    
+    if (!studentTopicPerformance[topicName]) studentTopicPerformance[topicName] = { score: 0, max: 0 };
+    studentTopicPerformance[topicName].score += mq.answer.score;
+    studentTopicPerformance[topicName].max += mq.answer.maxScore;
+  });
+
+  const studentTopics = Object.entries(studentTopicPerformance).map(([name, stats]) => ({
+    name,
+    percentage: stats.max > 0 ? Math.round((stats.score / stats.max) * 100) : 0
+  }));
+
+  // 6. Calcolo performance della classe per argomento in questo test
+  const allAttempts = await db.collection("attempts")
+    .find({ testId: attempt.testId, status: "reviewed" })
+    .toArray();
+
+  const classTopicPerformance: { [key: string]: { score: number; max: number } } = {};
+  allAttempts.forEach((att: any) => {
+    att.questions.forEach((q: any) => {
+      const topicId = q.question.topicId?.toString();
+      const topicName = (topicId ? topicsMap.get(topicId) : null) || "Generale";
+      
+      const testQuestionConfig = attempt.testInfo.questions?.find(
+        (tq: any) => (tq.questionId?.toString() || tq.id?.toString()) === q.question._id.toString()
+      );
+      const qMax = testQuestionConfig?.points ?? 1;
+      
+      if (!classTopicPerformance[topicName]) classTopicPerformance[topicName] = { score: 0, max: 0 };
+      classTopicPerformance[topicName].score += (q.score || 0);
+      classTopicPerformance[topicName].max += qMax;
+    });
+  });
+
+  const classTopics = Object.entries(classTopicPerformance).map(([name, stats]) => ({
+    name,
+    percentage: stats.max > 0 ? Math.round((stats.score / stats.max) * 100) : 0
+  }));
 
   return {
     testId: attempt.testId,
@@ -134,8 +205,13 @@ const getAttemptDetails = async (request: APIGatewayProxyEvent) => {
     maxScore: attempt.testInfo.maxScore || attempt.maxScore,
     timeSpent: attempt.timeSpent,
     maxTime: attempt.testInfo.timeLimit || 0,
+    classAverageScore: Number(averages.avgScore.toFixed(1)),
+    classAverageTime: Math.round(averages.avgTime),
     totalQuestions: attempt.questions.length,
     questionsStats: questionsStats,
+    studentTopicPerformance: studentTopics,
+    classTopicPerformance: classTopics,
+    aiInsight: attempt.aiInsight || null,
     questions: mappedQuestions,
   };
 };

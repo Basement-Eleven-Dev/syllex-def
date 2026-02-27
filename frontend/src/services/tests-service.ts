@@ -167,4 +167,15 @@ export class TestsService {
       `attempts/class/${classId}/topics-performance`,
     );
   }
+
+  getTestInsight(testId: string) {
+    return this.http.post<{ insight: string }>(`test/insight/${testId}`, {});
+  }
+
+  getAttemptInsight(attemptId: string) {
+    return this.http.post<{ insight: string }>(
+      `attempts/insight/${attemptId}`,
+      {},
+    );
+  }
 }

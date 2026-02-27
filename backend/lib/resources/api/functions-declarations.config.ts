@@ -461,4 +461,16 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     method: "post",
     role: "teacher",
   },
+  {
+    apiRoute: "test/insight/{testId}",
+    functionPath: "teachers/generateTestInsight.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "attempts/insight/{attemptId}",
+    functionPath: "teachers/generateAttemptInsight.ts",
+    method: "post",
+    role: "teacher",
+  },
 ];

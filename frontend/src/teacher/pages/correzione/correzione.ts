@@ -17,6 +17,9 @@ import { TestsService } from '../../../services/tests-service';
 import { FeedbackService } from '../../../services/feedback-service';
 import { BackTo } from '../../components/back-to/back-to';
 
+import { TestAiSummaryComponent } from '../../components/test-ai-summary/test-ai-summary';
+import { StudentPerformanceChartComponent } from '../../components/student-performance-chart/student-performance-chart';
+
 @Component({
   selector: 'app-correzione',
   standalone: true,
@@ -27,6 +30,8 @@ import { BackTo } from '../../components/back-to/back-to';
     QuestionCorrection,
     BackTo,
     QuestionCorrection,
+    TestAiSummaryComponent,
+    StudentPerformanceChartComponent,
   ],
   templateUrl: './correzione.html',
   styleUrl: './correzione.scss',
