@@ -59,7 +59,7 @@ const getQuestions = async (
     .find(filter)
     .skip(skip)
     .limit(currentPageSize)
-    .sort({ createdAt: -1 })
+    .sort({ createdAt: -1, _id: -1 })
     .toArray();
 
   // Conto il totale per la paginazione
