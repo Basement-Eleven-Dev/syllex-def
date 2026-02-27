@@ -17,13 +17,45 @@ const getWorkspaceStaff = async (
   const db = await getDefaultDatabase();
   const orgObjectId = new ObjectId(organizationId);
 
-  const staff = await db.collection("users").find({ 
-    $or: [
-      { organizationId: orgObjectId },
-      { organizationIds: orgObjectId }
-    ],
-    role: { $in: ["teacher", "admin"] }
-  }).sort({ lastName: 1, firstName: 1 }).toArray();
+  // Use aggregation to find users and check if they have assignments
+  const staff = await db.collection("users").aggregate([
+    {
+      $match: {
+        $or: [
+          { organizationId: orgObjectId },
+          { organizationIds: orgObjectId }
+        ],
+        role: { $in: ["teacher", "admin"] }
+      }
+    },
+    {
+      $lookup: {
+        from: "teacher_assignments",
+        let: { userId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$teacherId", "$$userId"] },
+                  { $eq: ["$organizationId", orgObjectId] }
+                ]
+              }
+            }
+          },
+          { $limit: 1 }
+        ],
+        as: "assignments"
+      }
+    },
+    {
+      $addFields: {
+        hasAssignments: { $gt: [{ $size: "$assignments" }, 0] }
+      }
+    },
+    { $project: { assignments: 0 } },
+    { $sort: { lastName: 1, firstName: 1 } }
+  ]).toArray();
 
   return {
     success: true,

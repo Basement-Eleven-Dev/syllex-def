@@ -26,9 +26,14 @@ export class BulkImportModal {
   importData: string = '';
   selectedClassId: string = '';
   parsedStudents: any[] = [];
+  allOrgStudents: any[] = [];
+  selectedExistingIds: Set<string> = new Set();
+  searchQuery: string = '';
   loading = false;
+  dataLoading = false;
   error: string | null = null;
   showHelp = false;
+  showExisting = false;
 
   icons = {
     faFileImport,
@@ -42,9 +47,43 @@ export class BulkImportModal {
     if (this.targetClassId) {
       this.selectedClassId = this.targetClassId;
     }
+    this.loadAllStudents();
+  }
+
+  loadAllStudents() {
+    this.dataLoading = true;
+    this.onboardingService.getWorkspaceStudents(this.orgId).subscribe({
+      next: (res) => {
+        this.allOrgStudents = res.students;
+        this.dataLoading = false;
+      },
+      error: () => {
+        this.dataLoading = false;
+      }
+    });
+  }
+
+  toggleExisting() {
+    this.showExisting = !this.showExisting;
+  }
+
+  toggleStudentSelection(id: string) {
+    if (this.selectedExistingIds.has(id)) {
+        this.selectedExistingIds.delete(id);
+    } else {
+        this.selectedExistingIds.add(id);
+    }
+  }
+
+  get filteredStudents() {
+    const query = this.searchQuery.toLowerCase().trim();
+    return this.allOrgStudents.filter(s => 
+        (s.firstName.toLowerCase().includes(query) || s.lastName.toLowerCase().includes(query) || s.email.toLowerCase().includes(query))
+    );
   }
 
   parseData() {
+    // ... logic remains same ...
     this.error = null;
     if (!this.importData.trim()) {
         this.parsedStudents = [];
@@ -77,13 +116,27 @@ export class BulkImportModal {
   }
 
   onSubmit() {
-    if (this.parsedStudents.length === 0 || !this.selectedClassId) return;
+    const finalStudents = [...this.parsedStudents];
+    
+    // Add existing selected students
+    this.selectedExistingIds.forEach(id => {
+      const std = this.allOrgStudents.find(s => s._id === id);
+      if (std && !finalStudents.find(f => f.email === std.email)) {
+        finalStudents.push({
+          firstName: std.firstName,
+          lastName: std.lastName,
+          email: std.email
+        });
+      }
+    });
+
+    if (finalStudents.length === 0 || !this.selectedClassId) return;
 
     this.loading = true;
-    this.onboardingService.bulkImportStudents(this.orgId, this.selectedClassId, this.parsedStudents).subscribe({
+    this.onboardingService.bulkImportStudents(this.orgId, this.selectedClassId, finalStudents).subscribe({
       next: (res) => {
         this.loading = false;
-        this.feedbackService.showFeedback(`Importazione completata: ${res.count} studenti`, true);
+        this.feedbackService.showFeedback(`Operazione completata: ${res.count} studenti gestiti`, true);
         this.activeModal.close(true);
       },
       error: () => {

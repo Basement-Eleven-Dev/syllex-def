@@ -36,10 +36,16 @@
                 </div>
             </div>
             
-            <button class="btn btn-primary d-flex align-items-center gap-2 px-4 py-2 fw-bold shadow-sm" (click)="openBulkImport()">
-                <fa-icon [icon]="icons.faFileImport"></fa-icon>
-                Importa Studenti
-            </button>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary d-flex align-items-center gap-2 px-4 py-2 fw-bold shadow-sm" (click)="openAssignmentModal()">
+                    <fa-icon [icon]="icons.faUserPlus"></fa-icon>
+                    Associa Docente
+                </button>
+                <button class="btn btn-primary d-flex align-items-center gap-2 px-4 py-2 fw-bold shadow-sm" (click)="openBulkImport()">
+                    <fa-icon [icon]="icons.faFileImport"></fa-icon>
+                    Importa Studenti
+                </button>
+            </div>
         </div>
 
         <div class="row g-4">

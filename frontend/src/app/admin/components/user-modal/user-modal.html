@@ -78,22 +78,54 @@
                 </div>
             }
 
-            <!-- Subject Selection for Teacher (Optional but shown for structure) -->
+            <!-- Subject Selection for Teacher -->
             @if (userForm.get('role')?.value === 'teacher') {
                 <div class="col-12">
-                    <label class="form-label small fw-bold text-muted">Associa a Materia</label>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label class="form-label small fw-bold text-muted mb-0">Associa a Materia</label>
+                        <button type="button" class="btn btn-link btn-xs p-0 text-decoration-none extra-small" (click)="toggleNewSubject()">
+                            {{ isNewSubject ? 'Seleziona esistente' : 'Crea nuova materia' }}
+                        </button>
+                    </div>
+
+                    @if (!isNewSubject) {
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-light border-light pe-2">
+                                <fa-icon [icon]="icons.faBook" class="extra-small text-muted"></fa-icon>
+                            </span>
+                            <select class="form-select border-light py-2" formControlName="subjectId">
+                                <option value="">Seleziona materia...</option>
+                                @for (s of subjects; track s._id) {
+                                    <option [value]="s._id">{{ s.name }}</option>
+                                }
+                            </select>
+                        </div>
+                    } @else {
+                        <div class="input-group input-group-sm animate-in">
+                            <span class="input-group-text bg-light border-light pe-2">
+                                <fa-icon [icon]="icons.faBook" class="extra-small text-muted"></fa-icon>
+                            </span>
+                            <input type="text" class="form-control border-light py-2" formControlName="newSubjectName" placeholder="es. Filosofia">
+                        </div>
+                    }
+                    <p class="extra-small text-muted mt-1 mb-0">
+                        {{ isNewSubject ? 'Verrà creata una nuova materia e associata a questo docente.' : 'Associa il docente a una materia esistente.' }}
+                    </p>
+                </div>
+
+                <div class="col-12 mt-2 animate-in">
+                    <label class="form-label small fw-bold text-muted">Classe (Opzionale)</label>
                     <div class="input-group input-group-sm">
                         <span class="input-group-text bg-light border-light pe-2">
-                            <i class="fas fa-book extra-small text-muted"></i>
+                            <fa-icon [icon]="icons.faUsers" class="extra-small text-muted"></fa-icon>
                         </span>
-                        <select class="form-select border-light py-2" formControlName="subjectId">
-                            <option value="">Seleziona materia...</option>
-                            @for (s of subjects; track s._id) {
-                                <option [value]="s._id">{{ s.name }}</option>
+                        <select class="form-select border-light py-2" formControlName="classId">
+                            <option value="">Nessuna classe (assegna dopo)...</option>
+                            @for (c of classes; track c._id) {
+                                <option [value]="c._id">{{ c.name }}</option>
                             }
                         </select>
                     </div>
-                    <p class="extra-small text-muted mt-1 mb-0">Associa il docente a una materia per abilitarlo all'hub.</p>
                 </div>
             }
         </div>

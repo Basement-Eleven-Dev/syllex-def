@@ -269,17 +269,18 @@ const getSuperAdminStats = async (
   const fortyEightHoursAgo = new Date(now.getTime() - 48 * 60 * 60 * 1000);
 
   // Helper to get count by time range using ObjectId
-  const getChunkCountInPeriod = async (start: Date, end: Date) => {
+  const getMaterialCountInPeriod = async (start: Date, end: Date) => {
     const startId = ObjectId.createFromTime(Math.floor(start.getTime() / 1000));
     const endId = ObjectId.createFromTime(Math.floor(end.getTime() / 1000));
-    return await db.collection("file_embeddings").countDocuments({
-      _id: { $gte: startId, $lt: endId }
+    return await db.collection("materials").countDocuments({
+      _id: { $gte: startId, $lt: endId },
+      aiGenerated: true
     });
   };
 
-  const lastHourCount = await getChunkCountInPeriod(oneHourAgo, now);
-  const last24hCount = await getChunkCountInPeriod(twentyFourHoursAgo, now);
-  const prev24hCount = await getChunkCountInPeriod(fortyEightHoursAgo, twentyFourHoursAgo);
+  const lastHourCount = await getMaterialCountInPeriod(oneHourAgo, now);
+  const last24hCount = await getMaterialCountInPeriod(twentyFourHoursAgo, now);
+  const prev24hCount = await getMaterialCountInPeriod(fortyEightHoursAgo, twentyFourHoursAgo);
 
   let usageTrendValue = 0;
   if (prev24hCount > 0) {

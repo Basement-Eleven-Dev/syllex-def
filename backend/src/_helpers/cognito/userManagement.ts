@@ -2,6 +2,7 @@ import {
   AdminCreateUserCommand,
   AdminAddUserToGroupCommand,
   AdminSetUserPasswordCommand,
+  AdminUpdateUserAttributesCommand,
   CognitoIdentityProviderClient,
 } from "@aws-sdk/client-cognito-identity-provider";
 import createError from "http-errors";
@@ -84,6 +85,30 @@ export const createCognitoUser = async (
     if (error.name === "UsernameExistsException") {
       throw createError.Conflict(`User ${email} already exists`);
     }
+    throw error;
+  }
+};
+
+export const updateCognitoUser = async (
+  email: string,
+  firstName: string,
+  lastName: string
+) => {
+  if (!USER_POOL_ID) throw new Error("COGNITO_POOL_ID not configured");
+
+  try {
+    const updateCommand = new AdminUpdateUserAttributesCommand({
+      UserPoolId: USER_POOL_ID,
+      Username: email.trim(),
+      UserAttributes: [
+        { Name: "given_name", Value: firstName },
+        { Name: "family_name", Value: lastName },
+      ],
+    });
+
+    await cognitoClient.send(updateCommand);
+  } catch (error: any) {
+    console.error("Error updating Cognito user:", error);
     throw error;
   }
 };

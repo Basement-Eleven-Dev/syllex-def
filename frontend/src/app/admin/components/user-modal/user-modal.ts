@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faUser, faEnvelope, faUserTag, faPlus, faTimes } from '@fortawesome/pro-solid-svg-icons';
+import { faUser, faEnvelope, faUserTag, faPlus, faTimes, faBook, faUsers } from '@fortawesome/pro-solid-svg-icons';
 import { OnboardingService } from '../../service/onboarding-service';
 import { FeedbackService } from '../../../../services/feedback-service';
 
@@ -25,6 +25,7 @@ export class UserModal {
   @Input() fixedRole?: string;
   @Input() classes: any[] = [];
   @Input() subjects: any[] = [];
+  @Input() user?: any; // Existing user for editing
 
   userForm: FormGroup;
   loading = false;
@@ -34,8 +35,12 @@ export class UserModal {
     faEnvelope,
     faUserTag,
     faPlus,
-    faTimes
+    faTimes,
+    faBook,
+    faUsers
   };
+
+  isNewSubject = false;
 
   constructor() {
     this.userForm = this.fb.group({
@@ -44,7 +49,8 @@ export class UserModal {
       email: ['', [Validators.required, Validators.email]],
       role: ['', [Validators.required]],
       classId: [''],
-      subjectId: ['']
+      subjectId: [''],
+      newSubjectName: ['']
     });
 
     // Handle conditional validators based on role
@@ -56,17 +62,60 @@ export class UserModal {
   updateValidators(role: string) {
       const classCtrl = this.userForm.get('classId');
       const subCtrl = this.userForm.get('subjectId');
+      const newSubCtrl = this.userForm.get('newSubjectName');
 
       classCtrl?.setValidators(role === 'student' ? [Validators.required] : []);
-      subCtrl?.setValidators(role === 'teacher' ? [Validators.required] : []);
+      
+      this.updateTeacherValidators(role);
 
       classCtrl?.updateValueAndValidity();
-      subCtrl?.updateValueAndValidity();
+  }
+
+  toggleNewSubject() {
+    this.isNewSubject = !this.isNewSubject;
+    this.updateTeacherValidators(this.userForm.get('role')?.value);
+  }
+
+  private updateTeacherValidators(role: string) {
+    const subCtrl = this.userForm.get('subjectId');
+    const newSubCtrl = this.userForm.get('newSubjectName');
+
+    if (role === 'teacher') {
+      if (this.isNewSubject) {
+        subCtrl?.setValidators([]);
+        newSubCtrl?.setValidators([Validators.required]);
+        subCtrl?.setValue('');
+      } else {
+        subCtrl?.setValidators([Validators.required]);
+        newSubCtrl?.setValidators([]);
+        newSubCtrl?.setValue('');
+      }
+    } else {
+      subCtrl?.setValidators([]);
+      newSubCtrl?.setValidators([]);
+    }
+
+    subCtrl?.updateValueAndValidity();
+    newSubCtrl?.updateValueAndValidity();
   }
 
   ngOnInit() {
     if (this.fixedRole) {
       this.userForm.patchValue({ role: this.fixedRole });
+    }
+    
+    if (this.user) {
+        this.title = `Modifica ${this.user.firstName}`;
+        this.userForm.patchValue({
+            firstName: this.user.firstName,
+            lastName: this.user.lastName,
+            email: this.user.email,
+            role: this.user.role,
+            classId: this.user.classId || '',
+            subjectId: this.user.subjectId || ''
+        });
+        // Disable email editing
+        this.userForm.get('email')?.disable();
     }
   }
 
@@ -74,15 +123,23 @@ export class UserModal {
     if (this.userForm.invalid) return;
 
     this.loading = true;
-    this.onboardingService.addUser(this.orgId, this.userForm.value).subscribe({
+    const orgId = this.orgId;
+    const userData = this.userForm.getRawValue(); // Get email even if disabled
+
+    const request = this.user 
+        ? this.onboardingService.updateUser(orgId, this.user._id, userData)
+        : this.onboardingService.addUser(orgId, userData);
+
+    request.subscribe({
       next: (res) => {
         this.loading = false;
-        this.feedbackService.showFeedback('Utente aggiunto con successo', true);
-        this.activeModal.close(res.user);
+        const msg = this.user ? 'Utente aggiornato' : 'Utente aggiunto';
+        this.feedbackService.showFeedback(msg, true);
+        this.activeModal.close(res.user || res);
       },
       error: (err) => {
         this.loading = false;
-        const msg = err.status === 409 ? 'Email già esistente' : 'Errore durante la creazione';
+        const msg = err.status === 409 ? 'Email già esistente' : 'Errore durante l\'operazione';
         this.feedbackService.showFeedback(msg, false);
       }
     });

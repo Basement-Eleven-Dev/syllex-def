@@ -13,12 +13,15 @@ import {
   faFileImport,
   faEllipsisV,
   faEdit,
-  faTrash
+  faTrash,
+  faUserPlus,
+  faLandmark
 } from '@fortawesome/pro-solid-svg-icons';
 import { OnboardingService } from '../../service/onboarding-service';
 import { FeedbackService } from '../../../../services/feedback-service';
 import { NgbModal, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { BulkImportModal } from '../../components/bulk-import-modal/bulk-import-modal';
+import { AssignmentModal } from '../../components/assignment-modal/assignment-modal';
 
 @Component({
   selector: 'app-admin-class-detail',
@@ -51,7 +54,8 @@ export class AdminClassDetail implements OnInit {
     faFileImport,
     faEllipsisV,
     faEdit,
-    faTrash
+    faTrash,
+    faUserPlus
   };
 
   ngOnInit() {
@@ -76,6 +80,17 @@ export class AdminClassDetail implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  openAssignmentModal() {
+    const modalRef = this.modalService.open(AssignmentModal, { centered: true });
+    modalRef.componentInstance.orgId = this.orgId;
+    modalRef.componentInstance.classId = this.classId;
+    modalRef.result.then((res) => {
+        if (res) {
+            this.loadClassDetail();
+        }
+    }, () => {});
   }
 
   openBulkImport() {

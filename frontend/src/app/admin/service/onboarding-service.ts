@@ -36,6 +36,10 @@ export class OnboardingService {
     return this.http.post(`admin/organizations/${orgId}/users`, payload);
   }
 
+  updateUser(orgId: string, userId: string, payload: any): Observable<any> {
+    return this.http.put(`admin/organizations/${orgId}/users/${userId}`, payload);
+  }
+
   bulkImportStudents(orgId: string, classId: string, students: any[]): Observable<any> {
     return this.http.post(`admin/organizations/${orgId}/students/bulk`, { classId, students });
   }
@@ -54,5 +58,9 @@ export class OnboardingService {
 
   addSubject(orgId: string, payload: any): Observable<any> {
     return this.http.post(`admin/organizations/${orgId}/subjects`, payload);
+  }
+
+  addAssignment(orgId: string, payload: any): Observable<any> {
+    return this.http.post(`admin/organizations/${orgId}/assignments`, payload);
   }
 }

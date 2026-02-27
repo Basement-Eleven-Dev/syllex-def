@@ -17,7 +17,8 @@ import {
   faChevronRight,
   faEdit,
   faTrash,
-  faCopy
+  faCopy,
+  faExclamationCircle
 } from '@fortawesome/pro-solid-svg-icons';
 import { OnboardingService } from '../../service/onboarding-service';
 import { FeedbackService } from '../../../../services/feedback-service';
@@ -29,6 +30,8 @@ import { ClassModal } from '../../components/class-modal/class-modal';
 import { SubjectModal } from '../../components/subject-modal/subject-modal';
 import { BulkImportModal } from '../../components/bulk-import-modal/bulk-import-modal';
 import { AdminAnalyticsComponent } from '../../components/admin-analytics/admin-analytics';
+
+import { AssignmentModal } from '../../components/assignment-modal/assignment-modal';
 
 type TabType = 'overview' | 'staff' | 'didactics' | 'students';
 
@@ -74,7 +77,8 @@ export class AdminOrganizationDetail implements OnInit {
     faChevronRight,
     faEdit,
     faTrash,
-    faCopy
+    faCopy,
+    faExclamationCircle
   };
 
   ngOnInit() {
@@ -202,10 +206,59 @@ export class AdminOrganizationDetail implements OnInit {
     modalRef.componentInstance.teachers = this.staffList.filter(u => u.role === 'teacher');
     modalRef.result.then((res) => {
         if (res) {
-            this.loadDidactics();
+            this.loadDidactics().subscribe();
             this.stats.subjectsCount++;
         }
     }, () => {});
+  }
+
+  openAssignmentModal(preData?: { teacherId?: string, classId?: string }) {
+    const modalRef = this.modalService.open(AssignmentModal, { centered: true });
+    modalRef.componentInstance.orgId = this.orgId;
+    if (preData?.teacherId) modalRef.componentInstance.fixedTeacherId = preData.teacherId;
+    if (preData?.classId) modalRef.componentInstance.classId = preData.classId;
+    
+    modalRef.result.then((res) => {
+        if (res) {
+            this.loadDidactics().subscribe();
+            if (preData?.teacherId) {
+                // Refresh staff to update "Without Class" status
+                this.loadStaff();
+            }
+        }
+    }, () => {});
+  }
+
+  openAssignmentFromStaff(user: any) {
+    this.openAssignmentModal({ teacherId: user._id });
+  }
+
+  openEditUserModal(user: any, listType: 'staff' | 'student') {
+    const openModal = () => {
+        const modalRef = this.modalService.open(UserModal, { centered: true });
+        modalRef.componentInstance.orgId = this.orgId;
+        modalRef.componentInstance.user = user;
+        modalRef.componentInstance.subjects = this.didactics?.subjects || [];
+        modalRef.componentInstance.classes = this.didactics?.classes || [];
+        modalRef.result.then((updatedUser) => {
+            if (updatedUser) {
+                if (listType === 'staff') {
+                    this.staffList = this.staffList.map(u => u._id === updatedUser._id ? { ...u, ...updatedUser } : u);
+                } else {
+                    this.studentsList = this.studentsList.map(u => u._id === updatedUser._id ? { ...u, ...updatedUser } : u);
+                }
+            }
+        }, () => {});
+    };
+
+    if (!this.didactics) {
+        this.loadDidactics().subscribe({
+            next: () => openModal(),
+            error: () => this.feedbackService.showFeedback('Impossibile caricare i dati della struttura', false)
+        });
+    } else {
+        openModal();
+    }
   }
 
   openBulkImportModal(classId?: string) {

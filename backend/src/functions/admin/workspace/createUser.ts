@@ -10,7 +10,7 @@ const createUser = async (
   context: Context,
 ) => {
   const organizationId = request.pathParameters?.organizationId;
-  const { firstName, lastName, email, role, classId, subjectId } = JSON.parse(request.body || '{}');
+  const { firstName, lastName, email, role, classId, subjectId, newSubjectName } = JSON.parse(request.body || '{}');
 
   if (!organizationId || !ObjectId.isValid(organizationId)) {
     throw createError.BadRequest("Invalid or missing organizationId");
@@ -46,11 +46,51 @@ const createUser = async (
     );
   }
 
-  if (role === 'teacher' && subjectId && ObjectId.isValid(subjectId)) {
-    await db.collection("subjects").updateOne(
-      { _id: new ObjectId(subjectId) },
-      { $set: { teacherId: userResult.insertedId } }
-    );
+  if (role === 'teacher') {
+    let finalSubjectId: ObjectId | null = null;
+
+    if (newSubjectName) {
+      // Create a new subject if requested
+      const subResult = await db.collection("subjects").insertOne({
+        name: newSubjectName,
+        teacherId: userResult.insertedId,
+        organizationId: orgObjectId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      finalSubjectId = subResult.insertedId;
+
+      // Initialize Assistant for this new subject
+      await db.collection("assistants").insertOne({
+        name: "Anna",
+        tone: "friendly",
+        voice: "neutral",
+        teacherId: userResult.insertedId,
+        subjectId: finalSubjectId,
+        organizationId: orgObjectId,
+        associatedFileIds: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+    } else if (subjectId && ObjectId.isValid(subjectId)) {
+      finalSubjectId = new ObjectId(subjectId);
+      await db.collection("subjects").updateOne(
+        { _id: finalSubjectId },
+        { $set: { teacherId: userResult.insertedId } }
+      );
+    }
+
+    // 4. Integrated Class Assignment for Teachers
+    if (finalSubjectId && classId && ObjectId.isValid(classId)) {
+      await db.collection("teacher_assignments").insertOne({
+        teacherId: userResult.insertedId,
+        subjectId: finalSubjectId,
+        classId: new ObjectId(classId),
+        organizationId: orgObjectId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+    }
   }
 
   return {

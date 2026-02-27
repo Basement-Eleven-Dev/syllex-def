@@ -34,40 +34,64 @@ const bulkImportStudents = async (
   const orgObjectId = new ObjectId(organizationId);
   const classObjectId = new ObjectId(classId);
 
-  const importedStudentIds: ObjectId[] = [];
+  const studentIdsToAssign: ObjectId[] = [];
 
   for (const std of students) {
+    const email = std.email.toLowerCase().trim();
     try {
-      const cognitoId = await createCognitoUser(std.email, std.firstName, std.lastName, 'student');
-      
-      const userResult = await db.collection("users").insertOne({
-        cognitoId,
-        email: std.email.toLowerCase().trim(),
-        firstName: std.firstName,
-        lastName: std.lastName,
-        role: 'student',
-        organizationIds: [orgObjectId],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      // 1. Check if user already exists
+      let user = await db.collection("users").findOne({ email });
 
-      importedStudentIds.push(userResult.insertedId);
+      if (user) {
+        // Update user to ensure they are in this organization
+        await db.collection("users").updateOne(
+          { _id: user._id },
+          { $addToSet: { organizationIds: orgObjectId }, $set: { updatedAt: new Date() } }
+        );
+        studentIdsToAssign.push(user._id);
+      } else {
+        // 2. Create new user
+        try {
+          const cognitoId = await createCognitoUser(email, std.firstName, std.lastName, 'student');
+          
+          const userResult = await db.collection("users").insertOne({
+            cognitoId,
+            email,
+            firstName: std.firstName,
+            lastName: std.lastName,
+            role: 'student',
+            organizationIds: [orgObjectId],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+
+          studentIdsToAssign.push(userResult.insertedId);
+        } catch (cognitoError: any) {
+          // If Cognito user already exists but not in our DB (unlikely but possible)
+          if (cognitoError.name === 'UsernameExistsException') {
+            console.log(`Cognito user already exists for ${email}, manual sync needed or handle specifically`);
+          }
+          throw cognitoError;
+        }
+      }
     } catch (error: any) {
-      console.error(`Failed to import student ${std.email}:`, error);
-      // We continue with others, but in a production app we might want to collect errors
+      console.error(`Failed to process student ${std.email}:`, error);
+      // We continue with others
     }
   }
 
-  // Update class students array
-  await db.collection("classes").updateOne(
-    { _id: classObjectId, organizationId: orgObjectId },
-    { $addToSet: { students: { $each: importedStudentIds } } }
-  );
+  // 3. Update class students array with ALL processed students
+  if (studentIdsToAssign.length > 0) {
+    await db.collection("classes").updateOne(
+      { _id: classObjectId, organizationId: orgObjectId },
+      { $addToSet: { students: { $each: studentIdsToAssign } } }
+    );
+  }
 
   return {
     success: true,
-    count: importedStudentIds.length,
-    message: `${importedStudentIds.length} students imported successfully.`
+    count: studentIdsToAssign.length,
+    message: `${studentIdsToAssign.length} studenti processati correttamente.`
   };
 };
 

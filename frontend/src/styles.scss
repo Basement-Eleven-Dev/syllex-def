@@ -103,7 +103,7 @@
 $primary: #3931ce;
 $secondary: #c9f321;
 $info: #0dcaf0;
-$success: #8aff8a;
+$success: #16a34a;
 $warning: #ffbe55;
 $danger: #ff3333;
 $light: #f8f9fa;
@@ -508,8 +508,8 @@ section {
 }
 
 .toast-success {
-  background-color: lighten($success, 20%);
-  color: rgb(26, 94, 32);
+  background-color: #dcfce7;
+  color: #166534;
 }
 
 .toast-error {

@@ -67,8 +67,8 @@ export class AdminAnalyticsComponent implements OnInit {
     datasets: [
       { 
         data: [],
-        backgroundColor: ['#3498db', '#2ecc71', '#f1c40f'],
-        hoverBackgroundColor: ['#2980b9', '#27ae60', '#f39c12'],
+        backgroundColor: ['#3498db', '#16a34a', '#f59e0b'],
+        hoverBackgroundColor: ['#2980b9', '#15803d', '#d97706'],
         borderWidth: 0
       }
     ]
@@ -101,8 +101,8 @@ export class AdminAnalyticsComponent implements OnInit {
                     roles.teacher || 0,
                     roles.student || 0
                 ],
-                backgroundColor: ['#3498db', '#2ecc71', '#f1c40f'],
-                hoverBackgroundColor: ['#2980b9', '#27ae60', '#f39c12'],
+                backgroundColor: ['#3498db', '#16a34a', '#f59e0b'],
+                hoverBackgroundColor: ['#2980b9', '#15803d', '#d97706'],
                 borderWidth: 0
             }]
         };

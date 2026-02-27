@@ -74,6 +74,12 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "admin",
   },
   {
+    apiRoute: "admin/organizations/{organizationId}/users/{userId}",
+    functionPath: "admin/workspace/updateUser.ts",
+    method: "put",
+    role: "admin",
+  },
+  {
     apiRoute: "admin/organizations/{organizationId}/classes",
     functionPath: "admin/workspace/createClass.ts",
     method: "post",
@@ -82,6 +88,12 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
   {
     apiRoute: "admin/organizations/{organizationId}/subjects",
     functionPath: "admin/workspace/createSubject.ts",
+    method: "post",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/organizations/{organizationId}/assignments",
+    functionPath: "admin/workspace/createAssignment.ts",
     method: "post",
     role: "admin",
   },

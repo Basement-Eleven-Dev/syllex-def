@@ -133,9 +133,9 @@ export class AdminLevelStats implements OnInit {
 
   // Curated color palette for subjects
   private subjectColors = [
-    '#3931ce', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6',
-    '#1abc9c', '#e67e22', '#3498db', '#e91e63', '#00bcd4',
-    '#8bc34a', '#ff5722', '#607d8b', '#795548', '#cddc39'
+    '#3931ce', '#ef4444', '#16a34a', '#f59e0b', '#8b5cf6',
+    '#0d9488', '#ea580c', '#2563eb', '#db2777', '#0891b2',
+    '#65a30d', '#f97316', '#475569', '#92400e', '#84cc16'
   ];
 
   private prepareChart() {
@@ -167,9 +167,9 @@ export class AdminLevelStats implements OnInit {
   }
 
   private getScoreColor(score: number): string {
-    if (score >= 80) return '#28a745';
-    if (score >= 60) return '#ffc107';
-    return '#dc3545';
+    if (score >= 80) return '#16a34a'; // Green 600
+    if (score >= 60) return '#f59e0b'; // Amber 600
+    return '#dc3545'; // Red
   }
 }
 

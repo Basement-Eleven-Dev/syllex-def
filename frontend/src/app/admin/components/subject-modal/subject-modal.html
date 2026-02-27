@@ -17,19 +17,56 @@
             </div>
 
             <div class="col-12">
-                <label class="form-label small fw-bold text-muted">Docente Responsabile</label>
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text bg-light border-light pe-2">
-                        <fa-icon [icon]="icons.faUserTie" class="extra-small text-muted"></fa-icon>
-                    </span>
-                    <select class="form-select border-light py-2" formControlName="teacherId">
-                        <option value="">Seleziona docente...</option>
-                        @for (t of teachers; track t._id) {
-                            <option [value]="t._id">{{ t.firstName }} {{ t.lastName }}</option>
-                        }
-                    </select>
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <label class="form-label small fw-bold text-muted mb-0">Docente Responsabile</label>
+                    <button type="button" class="btn btn-link btn-xs p-0 text-decoration-none extra-small" (click)="toggleNewTeacher()">
+                        {{ isNewTeacher ? 'Seleziona esistente' : 'Crea nuovo docente' }}
+                    </button>
                 </div>
-                <p class="extra-small text-muted mt-2 mb-0 italic">Associa obbligatoriamente un docente per questa materia.</p>
+
+                @if (!isNewTeacher) {
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light border-light pe-2">
+                            <fa-icon [icon]="icons.faUserTie" class="extra-small text-muted"></fa-icon>
+                        </span>
+                        <select class="form-select border-light py-2" formControlName="teacherId">
+                            <option value="">Seleziona docente...</option>
+                            @for (t of teachers; track t._id) {
+                                <option [value]="t._id">{{ t.firstName }} {{ t.lastName }}</option>
+                            }
+                        </select>
+                    </div>
+                } @else {
+                    <div formGroupName="newTeacherData" class="row g-2 animate-in">
+                        <div class="col-md-6">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-light border-light pe-2">
+                                    <fa-icon [icon]="icons.faUser" class="extra-small text-muted"></fa-icon>
+                                </span>
+                                <input type="text" class="form-control border-light py-2" formControlName="firstName" placeholder="Nome">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-light border-light pe-2">
+                                    <fa-icon [icon]="icons.faUser" class="extra-small text-muted"></fa-icon>
+                                </span>
+                                <input type="text" class="form-control border-light py-2" formControlName="lastName" placeholder="Cognome">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-light border-light pe-2">
+                                    <fa-icon [icon]="icons.faEnvelope" class="extra-small text-muted"></fa-icon>
+                                </span>
+                                <input type="email" class="form-control border-light py-2" formControlName="email" placeholder="Email">
+                            </div>
+                        </div>
+                    </div>
+                }
+                <p class="extra-small text-muted mt-2 mb-0 italic">
+                    {{ isNewTeacher ? 'Verrà creato un nuovo docente e associato a questa materia.' : 'Associa obbligatoriamente un docente per questa materia.' }}
+                </p>
             </div>
         </div>
 
