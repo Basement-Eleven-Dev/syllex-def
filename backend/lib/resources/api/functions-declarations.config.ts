@@ -55,6 +55,18 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
+    apiRoute: "student/classes/all",
+    functionPath: "students/getAllStudentClasses.ts",
+    method: "get",
+    role: "student",
+  },
+  {
+    apiRoute: "student/subject/classes",
+    functionPath: "students/getStudentSubjectClasses.ts",
+    method: "get",
+    role: "student",
+  },
+  {
     apiRoute: "profile",
     functionPath: "profile/getMyProfile.ts",
     method: "get",

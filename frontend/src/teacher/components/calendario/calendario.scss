@@ -4,7 +4,7 @@
   gap: 5px;
 }
 .day-box {
-  aspect-ratio: 1 / 1.1;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
   position: relative;
   background-color: #c2d9ff;
@@ -41,7 +41,7 @@
 
 #calendarDayDetailCard {
   border: 1px solid var(--bs-border-color);
-  
+
   &.no-date-selected {
     border: none;
     background-color: #f1f1f1;
@@ -70,4 +70,3 @@
     background-color: rgba(0, 0, 0, 0.3);
   }
 }
-

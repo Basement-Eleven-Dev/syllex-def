@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, effect, inject, signal } from '@angular/core';
 import { Materia } from './materia';
-import { User } from './auth';
+import { Auth, User } from './auth';
 import { Observable } from 'rxjs/internal/Observable';
 import { TestInterface } from './tests-service';
 
@@ -23,6 +23,7 @@ export interface AssignmentInterface {
 export class ClassiService {
   private readonly http = inject(HttpClient);
   private readonly materiaService = inject(Materia);
+  private readonly auth = inject(Auth);
 
   readonly Classes = signal<ClassInterface[]>([]);
   readonly AllAssignments = signal<AssignmentInterface[]>([]);
@@ -38,20 +39,26 @@ export class ClassiService {
   }
 
   private loadClassesForSelectedSubject(): void {
-    this.http
-      .get<ClassInterface[]>('teacher/subject/classes')
-      .subscribe((classes) => {
-        this.Classes.set(classes);
-        console.log('Teacher classes loaded:', classes);
-      });
+    const endpoint = this.getEndpoint('subject/classes');
+    this.http.get<ClassInterface[]>(endpoint).subscribe((classes) => {
+      this.Classes.set(classes);
+      console.log('Classes loaded:', classes);
+    });
   }
 
   private loadAllAssignments(): void {
-    this.http
-      .get<AssignmentInterface[]>(`teacher/classes/all`)
-      .subscribe((assignments) => {
-        this.AllAssignments.set(assignments);
-      });
+    const endpoint = this.getEndpoint('classes/all');
+    this.http.get<AssignmentInterface[]>(endpoint).subscribe((assignments) => {
+      this.AllAssignments.set(assignments);
+    });
+  }
+
+  private getEndpoint(path: string): string {
+    const user = this.auth.user$.value;
+    if (user?.role === 'student') {
+      return `student/${path}`;
+    }
+    return `teacher/${path}`;
   }
 
   getClassNameById(classId: string): string {

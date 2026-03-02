@@ -27,6 +27,7 @@ Amplify.configure({
 export interface User {
   _id: string;
   username: string;
+  email?: string;
   firstName?: string;
   lastName?: string;
   role: 'teacher' | 'student' | 'admin';
@@ -115,9 +116,7 @@ export class Auth {
       });
   }
 
-  async sendResetPasswordCode(
-    email: string,
-  ): Promise<{
+  async sendResetPasswordCode(email: string): Promise<{
     success: boolean;
     message: string;
     codeValiditySeconds: number;

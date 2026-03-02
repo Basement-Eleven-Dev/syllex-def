@@ -47,7 +47,7 @@
         </button>
       </label>
       <h4 class="fw-light text-dark" id="email">
-        {{ authService.user?.username }}
+        {{ authService.user?.email }}
       </h4>
     </section>
   </div>
@@ -73,7 +73,7 @@
         >Materie di insegnamento</label
       >
       <div class="row">
-        @for(materia of materiaService.allMaterie(); track $index) {
+        @for(materia of getMaterie(); track $index) {
         <div class="col-4 mb-3">
           <div class="card overflow-hidden position-relative">
             <fa-icon [icon]="BookIcon" [size]="'lg'" id="bookIcon" />
@@ -82,6 +82,34 @@
               {{ countClasses(materia._id) || 'Nessuna' }} class{{
               countClasses(materia._id) > 1 ? 'i' : 'e' }} assegnat{{
               countClasses(materia._id) > 1 ? 'e' : 'a' }}
+            </div>
+          </div>
+        </div>
+        } @empty {
+        <div class="col-12">
+          <p class="text-muted">Nessuna materia assegnata</p>
+        </div>
+        }
+      </div>
+    </section>
+  </div>
+</div>
+} @else if(authService.user?.role === 'student') {
+<div class="row mt-5 pb-5">
+  <div class="col-12">
+    <section class="form-section">
+      <label for="name" class="form-label text-dark mb-4"
+        >Materie seguite</label
+      >
+      <div class="row">
+        @for(materia of getMaterie(); track $index) {
+        <div class="col-4 mb-3">
+          <div class="card overflow-hidden position-relative">
+            <fa-icon [icon]="BookIcon" [size]="'lg'" id="bookIcon" />
+            <div class="card-body">
+              <h5 class="card-title">{{ materia.name }}</h5>
+              {{ countClasses(materia._id) || 'Nessuna' }} class{{
+              countClasses(materia._id) > 1 ? 'i' : 'e' }}
             </div>
           </div>
         </div>
