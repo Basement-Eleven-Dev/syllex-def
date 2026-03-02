@@ -1,55 +1,78 @@
 <div class="container-fluid py-4">
-    @if (loading()) {
-        <div class="d-flex justify-content-center align-items-center" style="min-height: 400px">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Caricamento...</span>
-            </div>
+  @if (loading()) {
+  <div
+    class="d-flex justify-content-center align-items-center"
+    style="min-height: 400px"
+  >
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Caricamento...</span>
+    </div>
+  </div>
+  } @else if (studentData(); as data) {
+  <app-back-to
+    [path]="classId() ? '/t/classi/' + classId() : '/t/dashboard'"
+    [label]="'Torna alla classe'"
+  />
+
+  <div class="row mt-4">
+    <!-- Left Column: Student Info & AI Insight -->
+    <div class="col-12 col-lg-4">
+      <app-student-info [student]="data.student" [stats]="data.stats" />
+      <div class="mt-4">
+        <app-student-ai-summary
+          [studentId]="studentId() || ''"
+          [subjectId]="subjectId() || undefined"
+        />
+      </div>
+    </div>
+
+    <!-- Right Column: Charts & History -->
+    <div class="col-12 col-lg-8 my-4">
+      <!-- Andamento Test -->
+      <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-4">
+          <h6 class="fw-bold mb-3">
+            <fa-icon
+              [icon]="icons.faChartLine"
+              class="text-primary me-2"
+            ></fa-icon>
+            Andamento Test (Ultimi 10)
+          </h6>
+          <app-student-performance-chart
+            [data]="data.performanceByTest"
+            type="line"
+          />
         </div>
-    } @else if (studentData(); as data) {
-        <app-back-to [path]="classId() ? '/t/classi/' + classId() : '/t/dashboard'" [label]="'Torna alla classe'" />
-        
-        <div class="row mt-4">
-            <!-- Left Column: Student Info & AI Insight -->
-            <div class="col-12 col-lg-4">
-                <app-student-info [student]="data.student" [stats]="data.stats" />
-                <div class="mt-4">
-                    <app-student-ai-summary [studentId]="studentId() || ''" />
-                </div>
-            </div>
+      </div>
 
-            <!-- Right Column: Charts & History -->
-            <div class="col-12 col-lg-8 my-4">
-                <!-- Andamento Test -->
-                <div class="card border-0 shadow-sm rounded-4 mb-4">
-                    <div class="card-body p-4">
-                        <h6 class="fw-bold mb-3">
-                            <fa-icon [icon]="icons.faChartLine" class="text-primary me-2"></fa-icon>
-                            Andamento Test (Ultimi 10)
-                        </h6>
-                        <app-student-performance-chart [data]="data.performanceByTest" type="line" />
-                    </div>
-                </div>
-
-                <!-- Performance per Argomento -->
-                <div class="card border-0 shadow-sm rounded-4 mb-4">
-                    <div class="card-body p-4">
-                        <h6 class="fw-bold mb-3">
-                            <fa-icon [icon]="icons.faChartLine" class="text-primary me-2"></fa-icon>
-                            Performance per Argomento
-                        </h6>
-                        <app-student-performance-chart [data]="data.performanceByTopic" type="radar" />
-                    </div>
-                </div>
-
-                <!-- Attempts History -->
-                <app-student-attempts-table 
-                    [attempts]="data.attempts" 
-                    [pagination]="data.pagination"
-                    (pageChange)="onPageChange($event)"
-                />
-            </div>
+      <!-- Performance per Argomento -->
+      <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-4">
+          <h6 class="fw-bold mb-3">
+            <fa-icon
+              [icon]="icons.faChartLine"
+              class="text-primary me-2"
+            ></fa-icon>
+            Performance per Argomento
+          </h6>
+          <app-student-performance-chart
+            [data]="data.performanceByTopic"
+            type="radar"
+          />
         </div>
-    } @else {
-        <div class="alert alert-warning">Impossibile caricare i dati dello studente.</div>
-    }
+      </div>
+
+      <!-- Attempts History -->
+      <app-student-attempts-table
+        [attempts]="data.attempts"
+        [pagination]="data.pagination"
+        (pageChange)="onPageChange($event)"
+      />
+    </div>
+  </div>
+  } @else {
+  <div class="alert alert-warning">
+    Impossibile caricare i dati dello studente.
+  </div>
+  }
 </div>
