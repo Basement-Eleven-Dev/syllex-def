@@ -31,6 +31,7 @@ import { StudentTestsList } from '../student/pages/student-tests-list/student-te
 import { testExecutionGuard } from '../guards/test-execution.guard';
 import { StudentComunicazioni } from '../student/pages/student-comunicazioni/student-comunicazioni';
 import { StudentCreateTest } from '../student/pages/student-create-test/student-create-test';
+import { StudentDashboard } from '../student/pages/dashbaord/student-dashboard';
 
 export const routes: Routes = [
   {
@@ -164,7 +165,7 @@ export const routes: Routes = [
       },
       {
         path: 'dashboard',
-        component: Dashboard,
+        component: StudentDashboard,
       },
       {
         path: 'banca',

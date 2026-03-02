@@ -1,12 +1,35 @@
-<div class="bg-primary py-3 px-3 mt-3 px-md-4 d-flex flex-row align-items-center gap-3 rounded container-fluid">
-  <img src="/images/logotipo.svg" alt="Syllex Logo" height="40" routerLink="/s/dashboard" />
+<nav class="navbar-student">
+  <div class="navbar-student__container">
+    <div class="navbar-student__logo" routerLink="/s/dashboard">
+      <img src="/images/logotipo.svg" alt="Syllex Logo" height="40" />
+    </div>
 
-  @for(route of routes; track $index){
-  <a [routerLink]="route.route" class="route">
-    <fa-icon [fixedWidth]="true" [icon]="route.icon" class="me-2"></fa-icon>
-    {{ route.label }}
-  </a>
-  }
+    <div class="navbar-student__links">
+      @for(route of routes; track $index){
+      <a
+        [routerLink]="route.route"
+        class="navbar-student__link"
+        [routerLinkActive]="'active'"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <fa-icon
+          [fixedWidth]="true"
+          [icon]="route.icon"
+          class="navbar-student__link-icon"
+        ></fa-icon>
+        <span class="navbar-student__link-label">{{ route.label }}</span>
+      </a>
+      }
+    </div>
 
-  <a class="text-decoration-none text-danger" (click)="onLogout()">Logout</a>
-</div>
+    <div class="navbar-student__actions">
+      <a class="navbar-student__logout" (click)="onLogout()">
+        <fa-icon
+          [icon]="LogoutIcon"
+          class="navbar-student__logout-icon"
+        ></fa-icon>
+        <span>Logout</span>
+      </a>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,117 @@
+<div class="d-flex flex-row align-items-center mb-5">
+  <div>
+    <h1 class="text-dark fw-medium mb-2 display-6">
+      Ciao @if(User()){ {{ User()?.firstName || User()?.username }} } @else {
+      ... },
+    </h1>
+    <h5 class="text-dark mb-0 fw-normal">
+      ecco un riepilogo delle tue attività e performance.
+    </h5>
+  </div>
+</div>
+
+<!-- Statistiche Rapide -->
+<section class="row mb-5">
+  <div class="col-12 col-sm-6 col-lg-3 mb-3 mb-lg-0">
+    <div class="stat-box stat-box--primary">
+      <div class="stat-box__icon">
+        <fa-icon [icon]="PieIcon"></fa-icon>
+      </div>
+      <div class="stat-box__content">
+        <p class="stat-box__label">Media Globale</p>
+        <h3 class="stat-box__value">
+          {{ AverageScore() }}<span class="stat-box__unit">%</span>
+        </h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-sm-6 col-lg-3 mb-3 mb-lg-0">
+    <div class="stat-box stat-box--secondary">
+      <div class="stat-box__icon">
+        <fa-icon [icon]="TestIcon"></fa-icon>
+      </div>
+      <div class="stat-box__content">
+        <p class="stat-box__label">Test Svolti</p>
+        <h3 class="stat-box__value">{{ TotalTestsCompleted() }}</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-lg-6">
+    <div class="stat-box stat-box--subjects">
+      <p class="stat-box__title">Completamenti per Materia</p>
+      <div class="stat-box__subjects-grid">
+        @for (stat of SubjectStats(); track stat.Label) {
+        <div class="stat-box__subject-item bg-light">
+          <span class="stat-box__subject-label">{{ stat.Label }}</span>
+          <span class="stat-box__subject-value"
+            >{{ stat.Value }}@if (stat.RequirePercentage) {%}</span
+          >
+        </div>
+
+        } @empty {
+        <p class="text-muted small">
+          Nessuna statistica disponibile al momento.
+        </p>
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Content Grid -->
+<div class="row">
+  <div class="col-12 col-lg-7 d-flex flex-column mb-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <h4 class="text-dark fw-semibold mb-0">Prossimi Test</h4>
+      <a
+        routerLink="/s/tests"
+        class="btn btn-link text-decoration-none p-0 d-flex align-items-center gap-2"
+      >
+        Vedi tutti i test <fa-icon [icon]="ArrowRight"></fa-icon>
+      </a>
+    </div>
+
+    @for (test of RecentTests(); track test._id) {
+    <div class="mb-2">
+      <app-student-test-card-compact
+        [Test]="test"
+        [AttemptStatus]="getAttemptStatus(test._id)"
+      />
+    </div>
+    } @empty {
+    <div class="alert alert-light border shadow-sm">
+      <p class="mb-0 text-muted d-flex align-items-center gap-2">
+        <fa-icon [icon]="TestIcon"></fa-icon> Ottimo! Non hai nessun test in
+        scadenza imminente.
+      </p>
+    </div>
+    }
+  </div>
+
+  <div class="col-12 col-lg-5 d-flex flex-column mb-4 pl-lg-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <h4 class="text-dark fw-semibold mb-0">Ultime Comunicazioni</h4>
+      <a
+        routerLink="/s/comunicazioni"
+        class="btn btn-link text-decoration-none p-0 d-flex align-items-center gap-2"
+      >
+        Apri Calendario <fa-icon [icon]="ArrowRight"></fa-icon>
+      </a>
+    </div>
+
+    @for (comunicazione of RecentComunicazioni(); track comunicazione._id) {
+    <div
+      app-student-comunicazione-card
+      [comunicazione]="comunicazione"
+      class="mb-3 d-block"
+    ></div>
+    } @empty {
+    <div class="alert alert-light border shadow-sm">
+      <p class="mb-0 text-muted d-flex align-items-center gap-2">
+        <fa-icon [icon]="MegaphoneIcon"></fa-icon> Nessuna nuova comunicazione
+        dal professore.
+      </p>
+    </div>
+    }
+  </div>
+</div>

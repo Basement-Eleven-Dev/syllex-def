@@ -11,6 +11,7 @@ import {
   faHouse,
   faRobot,
   faUser,
+  faArrowRightFromBracket,
 } from '@fortawesome/pro-solid-svg-icons';
 import { Auth } from '../../../services/auth';
 
@@ -27,6 +28,7 @@ export interface NavRoute {
 })
 export class Nav {
   private authService = inject(Auth);
+  readonly LogoutIcon = faArrowRightFromBracket;
   routes: NavRoute[] = [
     { label: 'Dashboard', icon: faHouse, route: '/s/dashboard' },
     {

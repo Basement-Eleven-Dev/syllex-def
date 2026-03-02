@@ -1,0 +1,43 @@
+<div class="compact-test-card" [routerLink]="Route()">
+  <div class="compact-test-card__header">
+    <div class="compact-test-card__title-section">
+      <h4 class="compact-test-card__title">{{ Test().name }}</h4>
+      <span class="compact-test-card__subject">{{ Test().subjectName }}</span>
+    </div>
+    <span [class]="'compact-test-card__status ' + StatusClass()">
+      {{ StatusBadge() }}
+    </span>
+  </div>
+
+  <div class="compact-test-card__details">
+    <div class="compact-test-card__detail-item">
+      <fa-icon [icon]="QuestionsIcon" class="detail-icon"></fa-icon>
+      <span>{{ QuestionsCount() }} domande</span>
+    </div>
+    <div class="compact-test-card__detail-item">
+      <fa-icon [icon]="ClockIcon" class="detail-icon"></fa-icon>
+      <span class="detail-date">
+        @if (Test().availableFrom) { fino al {{ Test().availableTo | date: 'd
+        MMM' }} }
+      </span>
+    </div>
+  </div>
+
+  <button
+    class="compact-test-card__button"
+    [class.button--in-progress]="AttemptStatus() === 'in-progress'"
+    [class.button--completed]="IsCompleted()"
+    [class.button--pending]="!AttemptStatus()"
+    (click)="$event.preventDefault()"
+  >
+    @if (AttemptStatus() === 'reviewed') {
+    <fa-icon [icon]="ReviewIcon"></fa-icon>
+    Rivedi } @else if (AttemptStatus() === 'delivered') {
+    <fa-icon [icon]="ReviewIcon"></fa-icon>
+    Rivedi } @else if (AttemptStatus() === 'in-progress') {
+    <fa-icon [icon]="ResumeIcon"></fa-icon>
+    Riprendi } @else {
+    <fa-icon [icon]="PlayIcon"></fa-icon>
+    Compila }
+  </button>
+</div>
