@@ -14,6 +14,19 @@
     </section>
   </div>
 </div>
+} @else if(authService.user?.role === 'student') {
+<div class="row mt-5">
+  <div class="col-6">
+    <section class="form-section">
+      <label for="name" class="form-label text-dark">
+        <fa-icon [icon]="BuildingIcon"></fa-icon>La tua Istituzione</label
+      >
+      <h4 class="fw-light text-dark" id="name">
+        {{ authService.organizationName$ | async }}
+      </h4>
+    </section>
+  </div>
+</div>
 }
 
 <div class="row mt-5">

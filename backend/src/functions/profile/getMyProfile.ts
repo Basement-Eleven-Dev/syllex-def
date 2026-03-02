@@ -11,7 +11,7 @@ export interface User {
   firstName?: string;
   lastName?: string;
   role: "teacher" | "student" | "admin";
-  organizationIds?: ObjectId[];
+  organizationId?: ObjectId;
 }
 
 const getProfile = async (request: APIGatewayProxyEvent, context: Context) => {
@@ -22,11 +22,19 @@ const getProfile = async (request: APIGatewayProxyEvent, context: Context) => {
     };
   }
 
+  // Trasforma organizationIds (array) in organizationId (singolare) per compatibilità col frontend
+  const organizationId =
+    (user as any).organizationIds?.[0] || (user as any).organizationId;
+
   // Aggiungi l'email dal context (che contiene il token Cognito decodificato)
-  return {
+  const userWithEmail = {
     ...user,
+    organizationId,
     email: context.user?.email || user.email,
   };
+
+  console.log("[Profile] User recuperato:", userWithEmail);
+  return userWithEmail;
 };
 
 export const handler = lambdaRequest(getProfile);

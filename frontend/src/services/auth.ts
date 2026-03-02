@@ -97,11 +97,16 @@ export class Auth {
   private async fetchAndSetUser(): Promise<void> {
     try {
       const user = await firstValueFrom(this.http.get<User | null>('profile'));
+      console.log('[Auth] User dal profile:', user);
       this.user$.next(user || null);
       if (user?.organizationId) {
+        console.log('[Auth] organizationId trovato:', user.organizationId);
         this.getOrganizationById(user.organizationId);
+      } else {
+        console.warn("[Auth] organizationId non trovato nell'utente");
       }
     } catch (error) {
+      console.error('[Auth] Errore nel fetch user:', error);
       this.user$.next(null);
     } finally {
       this.isInitialized.set(true);
@@ -109,10 +114,18 @@ export class Auth {
   }
 
   getOrganizationById(organizationId: string) {
+    console.log('[Auth] Caricamento organizzazione:', organizationId);
     this.http
       .get<OrganizationInterface>(`organizations/${organizationId}`)
-      .subscribe((org) => {
-        this.organizationName$.next(org.name);
+      .subscribe({
+        next: (org) => {
+          console.log('[Auth] Organizzazione caricata:', org);
+          this.organizationName$.next(org.name);
+        },
+        error: (err) => {
+          console.error('[Auth] Errore nel caricamento organizzazione:', err);
+          this.organizationName$.next('Organizzazione non trovata');
+        },
       });
   }
 

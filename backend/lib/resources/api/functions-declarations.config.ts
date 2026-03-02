@@ -485,4 +485,10 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     method: "post",
     role: "teacher",
   },
+  {
+    apiRoute: "organizations/{organizationId}",
+    functionPath: "organizations/getOrganizationById.ts",
+    method: "get",
+    role: "logged",
+  },
 ];
