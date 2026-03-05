@@ -17,6 +17,7 @@ export interface MaterialInterface {
   subjectId?: string;
   classIds?: string[];
   isVectorized?: boolean;
+  isMap?: boolean;
 }
 
 @Injectable({
@@ -25,6 +26,7 @@ export interface MaterialInterface {
 export class MaterialiService {
   root = signal<MaterialInterface[]>([]);
   currentFolder = signal<MaterialInterface | null>(null);
+  isLoading = signal<boolean>(false);
 
   constructor(
     private httpClient: HttpClient,
@@ -44,6 +46,7 @@ export class MaterialiService {
     const subjectId = this.materiaService.materiaSelected()?._id;
     if (!subjectId) return;
 
+    this.isLoading.set(true);
     this.httpClient
       .get<{
         success: boolean;
@@ -51,11 +54,39 @@ export class MaterialiService {
       }>('materials/subject')
       .subscribe({
         next: (response) => {
+          this.currentFolder.set(null);
           this.root.set(this.buildTree(response.materials));
-          console.log('Materiali caricati:', this.root());
+          this.isLoading.set(false);
         },
-        error: (err) =>
-          console.error('Errore durante il caricamento dei materiali:', err),
+        error: (err) => {
+          console.error('Errore durante il caricamento dei materiali:', err);
+          this.isLoading.set(false);
+        },
+      });
+  }
+
+  loadMaterialsForStudent(subjectId: string): void {
+    if (!subjectId) return;
+
+    // Aggiorna il localStorage così l'interceptor invia il Subject-Id corretto
+    localStorage.setItem('selectedSubjectId', subjectId);
+    this.isLoading.set(true);
+    this.currentFolder.set(null);
+
+    this.httpClient
+      .get<{
+        success: boolean;
+        materials: MaterialInterface[];
+      }>('students/me/materials')
+      .subscribe({
+        next: (response) => {
+          this.root.set(this.buildTree(response.materials));
+          this.isLoading.set(false);
+        },
+        error: (err) => {
+          console.error('Errore durante il caricamento dei materiali studente:', err);
+          this.isLoading.set(false);
+        },
       });
   }
 
@@ -285,6 +316,20 @@ export class MaterialiService {
         removedFromParents: number;
       }>(`materials/${itemId}`)
       .pipe(tap(() => this.removeItemFromAllParents(itemId)));
+  }
+
+  deleteItems(itemIds: string[]): Observable<{
+    success: boolean;
+    deletedCount: number;
+    removedFromParents: number;
+  }> {
+    return this.httpClient
+      .post<{
+        success: boolean;
+        deletedCount: number;
+        removedFromParents: number;
+      }>('materials/delete-batch', { materialIds: itemIds })
+      .pipe(tap(() => itemIds.forEach((id) => this.removeItemFromAllParents(id))));
   }
 
   renameItem(

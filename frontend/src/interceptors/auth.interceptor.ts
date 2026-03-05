@@ -12,17 +12,25 @@ export const authInterceptor: HttpInterceptorFn = (
   req: HttpRequest<any>,
   next: HttpHandlerFn,
 ) => {
+  const subjectId = localStorage.getItem('selectedSubjectId') || undefined;
+  
+  // Costruiamo l'URL finale
+  const apiUrl = req.url.startsWith('http')
+    ? req.url
+    : `${BACKEND_URL}/${req.url}`;
+
+  // Se la richiesta NON è diretta al nostro backend, non aggiungiamo header di auth
+  // e non proviamo nemmeno a recuperare la sessione (risparmiamo tempo).
+  if (!apiUrl.startsWith(BACKEND_URL)) {
+    return next(req.clone({ url: apiUrl }));
+  }
+
   return from(fetchAuthSession()).pipe(
     switchMap((session) => {
       let token = session.tokens?.idToken?.toString();
-      const subjectId = localStorage.getItem('selectedSubjectId') || undefined;
-      const apiUrl = req.url.startsWith('http')
-        ? req.url
-        : `${BACKEND_URL}/${req.url}`;
 
       if (!token) {
-        const anonymousReq = req.clone({ url: apiUrl });
-        return next(anonymousReq);
+        return next(req.clone({ url: apiUrl }));
       }
 
       const headers: Record<string, string> = {

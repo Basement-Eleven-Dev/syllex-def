@@ -7,6 +7,7 @@ const getConversationHistory = async (
   context: Context,
 ) => {
   const subjectId = context.subjectId;
+  const userId = context.user?._id;
 
   console.log(
     "recuperando conversazione per subjectId:",
@@ -17,8 +18,8 @@ const getConversationHistory = async (
 
   const keepForDashboard = true;
   const conversationHistory = await buildConversationHistory(
-    subjectId,
-    context.user?._id.toString() || "",
+    subjectId!,
+    userId!,
     keepForDashboard,
   );
   return {

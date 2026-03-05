@@ -11,6 +11,7 @@ export interface MateriaObject {
   _id: string;
   name: string;
   topics: TopicObject[];
+  uncorrectedTest: number;
 }
 @Injectable({
   providedIn: 'root',
@@ -55,7 +56,6 @@ export class Materia {
       .get<MateriaObject[]>(`teachers/${teacherId}/subjects`)
       .subscribe((materie) => {
         this.allMaterie.set(materie);
-        console.log('Materie del teacher:', materie);
         this.loadSavedSubject();
       });
 
@@ -101,6 +101,11 @@ export class Materia {
   getTopicName(topicId: string): string {
     const topic = this.topics.find((t) => t._id === topicId);
     return topic ? topic.name : 'Sconosciuto';
+  }
+
+  getSubjectName(subjectId: string): string {
+    const subject = this.allMaterie().find((s) => s._id === subjectId);
+    return subject ? subject.name : 'Sconosciuto';
   }
 
   addTopic(

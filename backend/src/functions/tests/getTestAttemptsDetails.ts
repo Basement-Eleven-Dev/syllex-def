@@ -99,17 +99,34 @@ const getTestAttemptsDetails = async (
   const totalDeliveries = attemptsWithStudents.length;
   let totalScore = 0;
   let eligibleCount = 0;
-
+  let toGradeCount = 0;
   attemptsWithStudents.forEach((attempt) => {
     totalScore += attempt.score || 0;
 
     if ((attempt.score || 0) >= fitScore) {
       eligibleCount++;
     }
+
+    if (attempt.status !== "reviewed") {
+      toGradeCount++;
+    }
   });
 
   const avgScore =
     totalDeliveries > 0 ? (totalScore / totalDeliveries).toFixed(1) : "0";
+
+  const totalTimeSpent = attemptsWithStudents.reduce(
+    (acc, curr) => acc + (curr.timeSpent || 0),
+    0,
+  );
+  const avgTimeSpent =
+    totalDeliveries > 0 ? Math.round(totalTimeSpent / totalDeliveries) : 0;
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}m ${secs}s`;
+  };
 
   return {
     test: {
@@ -128,6 +145,7 @@ const getTestAttemptsDetails = async (
         icon: "chart-bar",
       },
       { title: "Idonei", value: eligibleCount, icon: "check-circle" },
+      { title: "Tempo medio", value: formatTime(avgTimeSpent), icon: "clock" },
       { title: "Assegnazioni", value: totalAssignments, icon: "users" },
     ],
     attempts: attemptsWithStudents,

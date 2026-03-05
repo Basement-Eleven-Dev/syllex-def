@@ -35,7 +35,14 @@
             role="button"
           >
             <span class="text-truncate">{{ subject.name }} </span>
-            <span class="status-pill warning"></span>
+
+            @if (subject.uncorrectedTest != 0) {
+            <span
+              class="status-pill warning d-flex align-items-center justify-content-center text-white fw-bold"
+            >
+              <span>{{ subject.uncorrectedTest }}</span></span
+            >
+            }
           </div>
           }
         </div>

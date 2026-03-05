@@ -212,9 +212,18 @@ a {
 }
 
 .status-pill {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  line-height: 1;
+  padding: 0;
+  font-weight: bold;
+  color: #fff;
+
   &.pubblicato {
     background-color: var(--bs-success);
   }
@@ -511,6 +520,7 @@ section {
 .ellipsis-3-lines {
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -518,6 +528,7 @@ section {
 .ellipsis-1-lines {
   display: -webkit-box;
   -webkit-line-clamp: 1;
+  line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

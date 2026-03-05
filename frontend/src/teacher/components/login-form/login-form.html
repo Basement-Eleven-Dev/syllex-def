@@ -15,12 +15,21 @@
   </div>
   <div>
     <label for="password" class="form-label text-dark">Password</label>
-    <input
-      formControlName="password"
-      type="password"
-      class="form-control custom-input"
-      placeholder="Password"
-    />
+    <div class="input-group input-group-custom">
+      <input
+        formControlName="password"
+        [type]="showPassword ? 'text' : 'password'"
+        class="form-control custom-input border-end-0"
+        placeholder="Password"
+      />
+      <button
+        class="btn btn-outline-secondary border-start-0 border-custom"
+        type="button"
+        (click)="showPassword = !showPassword"
+      >
+        <fa-icon [icon]="showPassword ? EyeSlashIcon : EyeIcon"></fa-icon>
+      </button>
+    </div>
   </div>
   <div class="text-end mb-4">
     <a href="#" class="text-dark fw-semibold" routerLink="/password-reset"

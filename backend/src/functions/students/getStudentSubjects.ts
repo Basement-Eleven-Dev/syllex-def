@@ -44,9 +44,24 @@ const getStudentSubjects = async (
   // Nota: Dalle ricerche precedenti il nome della collezione sembra essere "SUBJECTS"
   const subjects = await db
     .collection("SUBJECTS")
-    .find({
-      _id: { $in: subjectIds },
-    })
+    .aggregate([
+      {
+        $match: {
+          _id: { $in: subjectIds },
+        },
+      },
+      {
+        $lookup: {
+          from: "topics",
+          let: { subjectId: "$_id" },
+          pipeline: [
+            { $match: { $expr: { $eq: ["$subjectId", "$$subjectId"] } } },
+            { $project: { _id: 1, name: 1 } },
+          ],
+          as: "topics",
+        },
+      },
+    ])
     .toArray();
 
   return {

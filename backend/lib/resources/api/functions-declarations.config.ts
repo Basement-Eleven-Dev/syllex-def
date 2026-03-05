@@ -1,4 +1,4 @@
-export type AppRole = "student" | "teacher" | "logged" | "open";
+export type AppRole = "student" | "teacher" | "logged" | "open" | "admin";
 
 /**
  * functionPath is the relative path from FUNCTIONS_PATH (in environments.ts)
@@ -53,6 +53,18 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     functionPath: "teachers/getAllTeacherClasses.ts",
     method: "get",
     role: "teacher",
+  },
+  {
+    apiRoute: "student/classes/all",
+    functionPath: "students/getAllStudentClasses.ts",
+    method: "get",
+    role: "student",
+  },
+  {
+    apiRoute: "student/subject/classes",
+    functionPath: "students/getStudentSubjectClasses.ts",
+    method: "get",
+    role: "student",
   },
   {
     apiRoute: "profile",
@@ -135,6 +147,12 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
   {
     apiRoute: "materials/move-batch",
     functionPath: "materials/moveMaterialsBatch.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "materials/delete-batch",
+    functionPath: "materials/deleteMaterialsBatch.ts",
     method: "post",
     role: "teacher",
   },
@@ -229,6 +247,19 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
+    apiRoute: "teacher/students/{studentId}/details",
+    functionPath: "teachers/getStudentDetails.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "teacher/students/{studentId}/insight",
+    functionPath: "teachers/generateStudentInsight.ts",
+    method: "post",
+    role: "teacher",
+  },
+
+  {
     apiRoute: "tests/{testId}/classes",
     functionPath: "tests/updateTestClasses.ts",
     method: "put",
@@ -317,6 +348,12 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
+    apiRoute: "events/{eventId}",
+    functionPath: "events/updateEvent.ts",
+    method: "put",
+    role: "teacher",
+  },
+  {
     apiRoute: "assistants/get",
     functionPath: "assistants/getAssistant.ts",
     method: "post",
@@ -355,6 +392,12 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
   {
     apiRoute: "students/me/subjects",
     functionPath: "students/getStudentSubjects.ts",
+    method: "get",
+    role: "student",
+  },
+  {
+    apiRoute: "students/me/materials",
+    functionPath: "students/getStudentMaterials.ts",
     method: "get",
     role: "student",
   },
@@ -429,5 +472,23 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     functionPath: "attempts/correctAttemptWithAI.ts",
     method: "post",
     role: "teacher",
+  },
+  {
+    apiRoute: "test/insight/{testId}",
+    functionPath: "teachers/generateTestInsight.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "attempts/insight/{attemptId}",
+    functionPath: "teachers/generateAttemptInsight.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "organizations/{organizationId}",
+    functionPath: "organizations/getOrganizationById.ts",
+    method: "get",
+    role: "logged",
   },
 ];

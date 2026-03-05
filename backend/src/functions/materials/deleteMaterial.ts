@@ -49,6 +49,9 @@ const deleteMaterial = async (
     { $pull: { content: materialId } } as any,
   );
 
+  //rimuovi gli embeddings del materiale
+  const embeddingsCollection = db.collection("file_embeddings");
+  await embeddingsCollection.deleteMany({ referenced_file_id: materialId });
   return {
     success: true,
     deleted: deleteResult.deletedCount > 0,

@@ -211,14 +211,14 @@ export class CreateEditQuestion {
     const questionData = this.prepareQuestionData();
     const serviceCall = this.CurrentQuestionId()
       ? this.questionsService.editQuestion(
-          this.CurrentQuestionId()!,
-          questionData,
-          this.UploadedImageFile() || undefined,
-        )
+        this.CurrentQuestionId()!,
+        questionData,
+        this.UploadedImageFile() || undefined,
+      )
       : this.questionsService.createQuestion(
-          questionData,
-          this.UploadedImageFile() || undefined,
-        );
+        questionData,
+        this.UploadedImageFile() || undefined,
+      );
 
     serviceCall.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
@@ -275,11 +275,15 @@ export class CreateEditQuestion {
     const offCanvasRef = this.offcanvasService.open(GenAiQuestion, {
       ariaLabelledBy: 'offcanvas-basic-title',
       position: 'end',
+      panelClass: 'offcanvas-large',
+      scroll: true,
     });
-
     offCanvasRef.componentInstance.selectedType.set(
       this.SelectedQuestionType(),
     );
+    offCanvasRef.componentInstance.genAiQuestionForm.patchValue({
+      type: this.SelectedQuestionType()
+    })
 
     offCanvasRef.dismissed.subscribe((result) => {
       if (result) {
@@ -289,6 +293,7 @@ export class CreateEditQuestion {
   }
 
   private populateFormFromAI(result: any): void {
+    console.log(result)
     this.QuestionForm.patchValue({
       topicId: result.topic?._id || result.topic,
       type: result.type,
@@ -306,6 +311,10 @@ export class CreateEditQuestion {
         }),
       );
       this.QuestionForm.patchValue({ options });
+    }
+    if (result.type === 'vero falso') {
+      console.log(result.correctAnswer)
+      this.QuestionForm.patchValue({ correctAnswer: result.correctAnswer })
     }
   }
 

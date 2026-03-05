@@ -9,12 +9,15 @@
 
 .message-bubble {
   max-width: 75%;
+  min-width: 50px;
   word-break: break-word;
 }
 
 .user-message {
   background-color: var(--bs-primary);
   color: white;
+  text-align: right;
+  margin-left: auto;
 }
 
 .agent-message {
@@ -108,7 +111,7 @@ textarea.form-control {
 }
 
 .custom-input {
-  border-radius: 20px !important;
+  border-radius: 20px 0 0 20px !important;
   padding: 10px 20px;
   background-color: #f8f9fa;
   border: 1px solid #dee2e6;

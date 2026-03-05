@@ -4,6 +4,7 @@ import {
   faFileImage,
   faFileLines,
   faFilePdf,
+  faFilePowerpoint,
   faFileWord,
   faFolder,
   faFolderOpen,
@@ -21,6 +22,7 @@ export const TEXT_FILE_EXTENSIONS = [
   'pdf',
   'xls',
   'xlsx',
+  'pptx',
   'rtf',
   'tex',
   'html',
@@ -43,7 +45,6 @@ export function isTextFile(extension: string): boolean {
 
 export function getFileIcon(extension: string): IconDefinition {
   if (!extension) return faFile; // Default icon for files without extension
-  console.log('Getting icon for extension:', extension);
   switch (extension.toLowerCase()) {
     case 'pdf':
       return faFilePdf;
@@ -60,6 +61,9 @@ export function getFileIcon(extension: string): IconDefinition {
       return faFileImage;
     case 'txt':
       return faFileLines;
+    case 'pptx':
+    case 'ppt':
+      return faFilePowerpoint;
     default:
       return faFile;
   }
@@ -83,6 +87,9 @@ export function getIconColor(extension: string): string {
       return '#D69E2E'; // Yellow
     case 'txt':
       return '#718096'; // Gray
+    case 'pptx':
+    case 'ppt':
+      return '#D04423'; // PowerPoint Red/Orange
     default:
       return '#4A5568'; // Default gray
   }

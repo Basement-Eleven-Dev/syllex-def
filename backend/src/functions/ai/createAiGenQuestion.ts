@@ -5,10 +5,10 @@ import { ObjectId } from "mongodb";
 import { getDefaultDatabase } from "../../_helpers/getDatabase";
 import { MaterialInterface } from "../../models/material";
 import { z } from "zod";
-import { askStrucuredLLM } from "../../_helpers/AI/simpleCompletion";
+import { askStructuredLLM } from "../../_helpers/AI/simpleCompletion";
+
 import { Question } from "../../models/question";
 import { Topic } from "../../models/topic";
-import { retrieveRelevantDocuments } from "../../_helpers/AI/embeddings/retrieveRelevantDocuments";
 
 //API TYPES
 const questionTypes = ["open", "true-false", "multiple"] as const;
@@ -27,14 +27,18 @@ export type AIGenQuestionInput = {
 };
 
 //LLM STRUCTURES
-const QuestionAlternativeStructure = z.object({
-  label: z.string(),
-  isCorrect: z.boolean(),
+const TrueFalseQuestionStructure = z.object({
+  text: z.string(),
+  explanation: z.string(),
+  correctAnswer: z.boolean(),
 });
 const MultipleChoiceQuestionStructure = z.object({
   text: z.string(),
   explanation: z.string(),
-  options: z.array(QuestionAlternativeStructure),
+  options: z.array(z.object({
+    label: z.string(),
+    isCorrect: z.boolean(),
+  })),
 });
 const OpenQuestionStructure = z.object({
   text: z.string(),
@@ -56,32 +60,52 @@ const getGuardrail = (language: string = "it") => `
 
 // 0.8-2 for high randomness
 const QUESTION_GENERATION_MODEL_TEMPERATURE = 1;
+export const generateTrueFalseQuestion = async (
+  context: Context,
+  difficulty: string,
+  materialObjects: MaterialInterface[],
+  topic: Topic,
+  language: string = "it",
+  instructions: string = "",
+): Promise<Question> => {
+  const INSTRUCTIONS = `Create a ${difficulty} difficulty true/false quiz question about the topic "${topic.name}" based on these documents.
+   ${instructions}`;
 
+  const PROMPT = `${INSTRUCTIONS}
+    ${getGuardrail(language)}`;
+  const result = await askStructuredLLM(
+    PROMPT,
+    materialObjects,
+    TrueFalseQuestionStructure,
+    QUESTION_GENERATION_MODEL_TEMPERATURE,
+  );
+  const question: Question = {
+    type: "vero falso",
+    text: result.text,
+    explanation: result.explanation,
+    policy: "private",
+    correctAnswer: result.correctAnswer,
+    aiGenerated: true,
+    topicId: topic._id!,
+    teacherId: context.user!._id,
+    subjectId: context.subjectId!,
+  };
+  return question;
+}
 export const generateOpenQuestion = async (
   context: Context,
   difficulty: string,
-  materials: ObjectId[],
+  materialObjects: MaterialInterface[],
   topic: Topic,
   language: string = "it",
   instructions: string = "",
 ): Promise<Question> => {
   const INSTRUCTIONS = `Create a ${difficulty} difficulty quiz question about the topic "${topic.name}" based on these documents. The quiz question must be open-answer (no choices included), and you must include the correct answer. ${instructions}`;
-  const relevantDocuments = await retrieveRelevantDocuments(
-    INSTRUCTIONS,
-    context.subjectId!,
-    materials,
-  );
-  console.log(relevantDocuments);
   const PROMPT = `${INSTRUCTIONS}
-    ${getGuardrail(language)}
-        -----------------
-        Documents to use:
-        ${relevantDocuments.map((item) => item.text).join("\n")}
-        `;
-  const result = await askStrucuredLLM(
-    PROMPT + "\n" + getGuardrail(language),
-    [],
-    "gpt-4o",
+    ${getGuardrail(language)}`;
+  const result = await askStructuredLLM(
+    PROMPT,
+    materialObjects,
     OpenQuestionStructure,
     QUESTION_GENERATION_MODEL_TEMPERATURE,
   );
@@ -100,37 +124,26 @@ export const generateOpenQuestion = async (
 export const generateMultipleChoiceQuestion = async (
   context: Context,
   difficulty: string,
-  materials: ObjectId[],
+  materialObjects: MaterialInterface[],
   topic: Topic,
   language: string = "it",
   numberOfAlternatives: number = 5,
-  trueOrFalse: boolean = false,
   instructions: string = "",
 ): Promise<Question> => {
-  const INSTRUCTIONS = `Create a ${difficulty} difficulty ${trueOrFalse ? "true/false" : ""} quiz question (${trueOrFalse ? "True or False as labels - based on the language specified" : "multiple choice, only one is correct"}) about the topic "${topic.name}" based on these documents.
+  const INSTRUCTIONS = `Create a ${difficulty} difficulty quiz question (multiple choice, only one is correct) about the topic "${topic.name}" based on these documents.
     The quiz question must contain ${numberOfAlternatives} alternatives to choose from  and you need to specify which one is correct. Avoid labels A/B/C/D/E/... in the text of the alternatives. ${instructions}`;
 
-  const relevantDocuments = await retrieveRelevantDocuments(
-    INSTRUCTIONS,
-    context.subjectId!,
-    materials,
-  );
-  console.log(relevantDocuments);
+
   const PROMPT = `${INSTRUCTIONS}
-    ${getGuardrail(language)}
-        -----------------
-        Documents to use:
-        ${relevantDocuments.map((item) => item.text).join("\n")}
-        `;
-  const result = await askStrucuredLLM(
-    PROMPT + "\n" + getGuardrail(language),
-    [],
-    "gpt-4o",
+    ${getGuardrail(language)}`;
+  const result = await askStructuredLLM(
+    PROMPT,
+    materialObjects,
     MultipleChoiceQuestionStructure,
     QUESTION_GENERATION_MODEL_TEMPERATURE,
   );
   const question: Question = {
-    type: trueOrFalse ? "vero falso" : "scelta multipla",
+    type: "scelta multipla",
     text: result.text,
     explanation: result.explanation,
     options: result.options,
@@ -167,13 +180,7 @@ const createAIGenQuestion = async (
   const db = await getDefaultDatabase();
 
   const materialCollection = db.collection<MaterialInterface>("materials");
-  if (materialOIds.length == 0) {
-    materialOIds = (
-      await materialCollection
-        .find({ subjectId: context.subjectId, vectorized: true })
-        .toArray()
-    ).map((el) => el._id!);
-  }
+  const materialObjects: MaterialInterface[] = await materialCollection.find({ _id: { $in: materialOIds }, subjectId: context.subjectId, aiGenerated: { $ne: true } }).toArray() as MaterialInterface[]; //forse non serve
 
   //load topic
   const topicCollection = db.collection("topics");
@@ -187,25 +194,33 @@ const createAIGenQuestion = async (
   const question =
     type == "open"
       ? await generateOpenQuestion(
+        context,
+        DIFFICULTY_MAP[difficulty || 2],
+        materialObjects,
+        topic,
+        language,
+        instructions,
+      )
+      : (
+        type == 'true-false' ? await generateTrueFalseQuestion(
           context,
           DIFFICULTY_MAP[difficulty || 2],
-          materialOIds,
+          materialObjects,
           topic,
           language,
+          instructions
+        ) : await generateMultipleChoiceQuestion(
+          context,
+          DIFFICULTY_MAP[difficulty || 2],
+          materialObjects,
+          topic,
+          language,
+          numberOfAlternatives || 5,
           instructions,
         )
-      : await generateMultipleChoiceQuestion(
-          context,
-          DIFFICULTY_MAP[difficulty || 2],
-          materialOIds,
-          topic,
-          language,
-          type == "true-false" ? 2 : numberOfAlternatives,
-          type == "true-false",
-          instructions,
-        );
+      );
 
-  //store question
+  //store question - don't store yet
   /* const questionsCollection = db.collection("questions");
   question._id = (await questionsCollection.insertOne(question)).insertedId; */
   return { question };

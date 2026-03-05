@@ -1,0 +1,26 @@
+@import "../../../styles.scss";
+
+.card {
+    border-radius: $card-border-radius;
+    background: linear-gradient(135deg, rgba($primary, 0.05) 0%, rgba($primary, 0.1) 100%);
+}
+
+.text-primary {
+    color: $primary !important;
+}
+
+.ai-content {
+    font-size: 0.95rem;
+    border-left: 4px solid $primary;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+.btn-outline-primary {
+    color: $primary;
+    border-color: $primary;
+    
+    &:hover {
+        background-color: $primary;
+        color: #fff;
+    }
+}

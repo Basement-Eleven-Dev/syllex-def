@@ -8,7 +8,7 @@ import {
 } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faSignIn, faSpinnerThird } from '@fortawesome/pro-solid-svg-icons';
+import { faSignIn, faSpinnerThird, faEye, faEyeSlash } from '@fortawesome/pro-solid-svg-icons';
 import { Auth } from '../../../services/auth';
 
 @Component({
@@ -20,6 +20,10 @@ import { Auth } from '../../../services/auth';
 export class LoginForm {
   LoginIcon = faSignIn;
   SpinnerIcon = faSpinnerThird;
+  EyeIcon = faEye;
+  EyeSlashIcon = faEyeSlash;
+
+  showPassword = false;
 
   loginForm = new FormGroup({
     email: new FormControl('', [Validators.required]),

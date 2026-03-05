@@ -18,10 +18,9 @@ import {
   faGear,
   faHeadSideBrain,
   faMailboxOpenLetter,
-  faMicrochipAi,
+  faPencil,
   faRightFromBracket,
   faSparkles,
-  faUserCircle,
   faUsers,
 } from '@fortawesome/pro-solid-svg-icons';
 import { NgbCollapseModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -34,11 +33,6 @@ interface SidebarRoute {
   path: string;
   label: string;
   icon: IconDefinition;
-}
-
-interface Subject {
-  id: string;
-  name: string;
 }
 
 @Component({
@@ -60,6 +54,7 @@ export class Sidebar {
   ChevronUpIcon = faChevronUp;
   HeadSideBrainIcon = faHeadSideBrain;
   GearIcon = faGear;
+  faPencil = faPencil;
 
   isSubjectsCollapsed = signal(true);
 

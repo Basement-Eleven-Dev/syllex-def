@@ -64,6 +64,8 @@
           class="d-flex align-items-center gap-2 student-option"
           [class.selected]="selectedAnswer === label"
           [class.disabled]="locked"
+          (click)="!locked && onSelectOption(label)"
+          style="cursor: pointer"
         >
           <input
             type="radio"
@@ -72,7 +74,7 @@
             [disabled]="locked"
             (change)="onSelectOption(label)"
           />
-          <label class="mb-0">{{ label }}</label>
+          <label class="mb-0" style="cursor: pointer">{{ label }}</label>
         </li>
         }
       </ol>
@@ -83,6 +85,8 @@
           class="d-flex align-items-center gap-2 student-option"
           [class.selected]="selectedAnswer === option.label"
           [class.disabled]="locked"
+          (click)="!locked && onSelectOption(option.label)"
+          style="cursor: pointer"
         >
           <input
             type="radio"
@@ -91,7 +95,7 @@
             [disabled]="locked"
             (change)="onSelectOption(option.label)"
           />
-          <label class="mb-0">{{ option.label }}</label>
+          <label class="mb-0" style="cursor: pointer">{{ option.label }}</label>
         </li>
         }
       </ol>

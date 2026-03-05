@@ -50,7 +50,6 @@ export class TestStats implements OnInit, AfterViewInit, OnChanges {
   @ViewChild('topicChart', { static: false })
   topicChartRef!: ElementRef<HTMLCanvasElement>;
 
-  EyeIcon = faEye;
   selectedTopic: string = '';
   availableTopics: string[] = [];
 
@@ -61,6 +60,9 @@ export class TestStats implements OnInit, AfterViewInit, OnChanges {
 
   private chart?: Chart;
   private topicChart?: Chart;
+
+  // Dati calcolati per il grafico a barre degli argomenti
+  topicPerformanceData: { topicName: string; percentage: number }[] = [];
 
   // Paginazione
   page: number = 1;
@@ -128,6 +130,26 @@ export class TestStats implements OnInit, AfterViewInit, OnChanges {
     this.availableTopics = Array.from(
       new Set(this.processedQuestions.map((q) => q.topic).filter((t) => t)),
     );
+
+    // Calcoliamo la performance per argomento (simile a app-topics-performance-chart)
+    const topicStatsMap = new Map<string, { correct: number; total: number }>();
+    this.processedQuestions.forEach((q) => {
+      const topic = q.topic || 'Generale';
+      if (!topicStatsMap.has(topic)) {
+        topicStatsMap.set(topic, { correct: 0, total: 0 });
+      }
+      const stats = topicStatsMap.get(topic)!;
+      stats.correct += q.correctCount;
+      stats.total += q.totalResponses;
+    });
+
+    this.topicPerformanceData = Array.from(topicStatsMap.entries()).map(
+      ([topicName, stats]) => ({
+        topicName,
+        percentage:
+          stats.total > 0 ? (stats.correct / stats.total) * 100 : 0,
+      }),
+    );
   }
 
   ngAfterViewInit(): void {
@@ -145,10 +167,6 @@ export class TestStats implements OnInit, AfterViewInit, OnChanges {
   // Metodi richiesti dal template
   onNewPageRequested() {
     /* Qui potresti gestire il cambio pagina se non è puramente client-side */
-  }
-
-  onRequestQuestionDetails(stat: any) {
-    console.log('Dettagli per:', stat);
   }
 
   onTopicChange = () => this.createTopicPerformanceChart();
@@ -194,34 +212,98 @@ export class TestStats implements OnInit, AfterViewInit, OnChanges {
 
   private createTopicPerformanceChart(): void {
     if (this.topicChart) this.topicChart.destroy();
-    const filtered = this.selectedTopic
-      ? this.processedQuestions.filter((q) => q.topic === this.selectedTopic)
-      : this.processedQuestions;
-    const c = filtered.reduce((s, q) => s + q.correctCount, 0);
-    const e = filtered.reduce((s, q) => s + q.errorCount, 0);
-    const b = filtered.reduce((s, q) => s + q.blankCount, 0);
     const ctx = this.topicChartRef?.nativeElement.getContext('2d');
     if (!ctx) return;
-    this.topicChart = new Chart(ctx, {
-      type: 'pie',
-      data: {
-        labels: ['Corrette', 'Errate', 'Vuote'],
-        datasets: [
-          {
-            data: [c, e, b],
-            backgroundColor: ['#28a745', '#dc3545', '#6c757d'],
+
+    if (this.selectedTopic) {
+      // Se un argomento è selezionato, mostriamo il grafico a torta con il dettaglio
+      const filtered = this.processedQuestions.filter(
+        (q) => q.topic === this.selectedTopic,
+      );
+      const c = filtered.reduce((s, q) => s + q.correctCount, 0);
+      const e = filtered.reduce((s, q) => s + q.errorCount, 0);
+      const b = filtered.reduce((s, q) => s + q.blankCount, 0);
+
+      this.topicChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['Corrette', 'Errate', 'Vuote'],
+          datasets: [
+            {
+              data: [c, e, b],
+              backgroundColor: ['#28a745', '#dc3545', '#6c757d'],
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+            },
           },
-        ],
-      },
-      options: { responsive: true, maintainAspectRatio: false },
-    });
+        },
+      });
+    } else {
+      // Se nessun argomento è selezionato, mostriamo il grafico a barre di tutti gli argomenti (stile classe)
+      this.topicChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: this.topicPerformanceData.map((d) => d.topicName),
+          datasets: [
+            {
+              label: 'Performance media (%)',
+              data: this.topicPerformanceData.map((d) => d.percentage),
+              backgroundColor: '#13214985',
+              borderRadius: 8,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              ticks: { stepSize: 10 },
+              title: {
+                display: true,
+                text: 'Performance (%)',
+              },
+            },
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (context) => {
+                  const val = context.parsed.y;
+                  return `Performance: ${
+                    val !== null && val !== undefined ? val.toFixed(1) : '0'
+                  }%`;
+                },
+              },
+            },
+          },
+        },
+      });
+    }
   }
   ngOnInit(): void {
     const attemptId = this.route.snapshot.paramMap.get('attemptId');
+    // Se abbiamo già gli attempts passati come input (es. nel dettaglio test), non carichiamo i dati singoli
+    if (this.attempts && this.attempts.length > 0) {
+      this.processData();
+      return;
+    }
+
     if (attemptId) {
       this.loadData(attemptId);
     } else {
-      this.router.navigate(['/t/tests']);
+      // Se non siamo in un contesto di test globale e non c'è attemptId, allora forse c'è un problema
+      // ma se siamo nel dettaglio test, attempts sarà valorizzato.
     }
   }
 

@@ -63,7 +63,7 @@ export const createAndLinkUser = async (
   const addToGroupCommand = new AdminAddUserToGroupCommand({
     UserPoolId: cognitoPoolId,
     Username: email.trim(),
-    GroupName: role == "teacher" ? "teachers" : "students",
+    GroupName: role == "teacher" ? "teachers" : (role == 'student' ? "students" : 'admins'),
   });
 
   await client.send(addToGroupCommand);

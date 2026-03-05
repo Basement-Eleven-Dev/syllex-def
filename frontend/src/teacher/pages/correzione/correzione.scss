@@ -7,6 +7,21 @@
   }
 }
 
+.card-value {
+  font-size: 3.5rem;
+  font-weight: bold;
+}
+
+.card-description {
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.reduced {
+  font-size: 1.5rem;
+  opacity: 0.5;
+}
+
 .wrong {
   border-bottom: 4px solid #ff4c4c;
 }
@@ -24,6 +39,7 @@
   background-color: var(--bs-primary);
   color: white;
 }
+
 .btnSelectQuestion {
   width: 40px;
 }

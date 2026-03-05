@@ -35,6 +35,7 @@ const editQuestion = async (
     type: questionData.type,
     explanation: questionData.explanation,
     policy: questionData.policy,
+    updatedAt: new Date(),
   };
 
   if (questionData.topicId) {

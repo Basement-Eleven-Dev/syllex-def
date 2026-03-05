@@ -1,1 +1,65 @@
-<p>materiali works!</p>
+<div class="d-flex flex-row align-items-center mb-5">
+  <div>
+    <h1 class="text-dark fw-medium mb-3 display-6">Materiali didattici</h1>
+    <h5 class="text-dark mb-0 fw-normal">
+      Consulta i materiali didattici caricati dal tuo insegnante per questa
+      materia
+    </h5>
+  </div>
+</div>
+
+<section class="d-flex flex-row mb-5 gap-3">
+  <select
+    class="form-select custom-input filter"
+    style="max-width: 280px"
+    [value]="SelectedSubject()"
+    (change)="onSubjectChange($any($event.target).value)"
+  >
+    @for (subject of Subjects(); track subject._id) {
+    <option [value]="subject._id">{{ subject.name }}</option>
+    }
+  </select>
+</section>
+
+<!-- Breadcrumb -->
+@if (currentPathArray().length > 1) {
+<div class="d-flex flex-row align-items-center gap-2 mb-4">
+  <a class="breadcrumb-link cursor-pointer" (click)="onNavigateHome()">
+    Home
+  </a>
+  @for (dir of currentPathArray().slice(1); track $index; let last = $last) {
+  <span class="text-muted">/</span>
+  <span [class.fw-bold]="last" class="text-dark">{{ dir }}</span>
+  }
+</div>
+}
+
+<!-- Loading -->
+@if (materialiService.isLoading()) {
+<div class="text-center py-5">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Caricamento...</span>
+  </div>
+</div>
+} @else {
+
+<section class="form-section">
+  <div class="row">
+    @for (item of rootFolder().content; track item._id) {
+    <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-3">
+      <app-materiale-card
+        [item]="item"
+        [showSharing]="false"
+        [showActions]="false"
+        (openItem)="onOpenFolder(item)"
+      />
+    </div>
+    } @empty {
+    <div class="col-12 text-center py-5">
+      <p class="text-muted">Nessun materiale disponibile per questa materia</p>
+    </div>
+    }
+  </div>
+</section>
+
+}

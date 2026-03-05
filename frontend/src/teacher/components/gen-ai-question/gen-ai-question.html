@@ -1,6 +1,8 @@
 <form [formGroup]="genAiQuestionForm" (ngSubmit)="onGenerate()">
-  <div class="offcanvas-body dvh-100 overflow-scroll p-4">
-    <div class="h-100 d-flex flex-column gap-3 justify-content-between">
+  <div class="offcanvas-body dvh-100 overflow-scroll py-4">
+    <div
+      class="h-100 d-flex flex-column gap-3 justify-content-between "
+    >
       <section class="form-section">
         <app-type-selector
           [options]="questionTypeOptions"

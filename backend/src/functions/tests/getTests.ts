@@ -2,7 +2,6 @@ import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import { getDefaultDatabase } from "../../_helpers/getDatabase";
 import { Test } from "../../models/test";
-import { ObjectId } from "mongodb";
 
 const getTests = async (request: APIGatewayProxyEvent, context: Context) => {
   const db = await getDefaultDatabase();
@@ -44,15 +43,43 @@ const getTests = async (request: APIGatewayProxyEvent, context: Context) => {
 
   console.log("Filter applicato:", JSON.stringify(filter));
 
-  // Esegui query con paginazione
+  // Esegui query con aggregazione per contare i compiti da correggere
   const tests = await testsCollection
-    .find(filter)
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(currentPageSize)
+    .aggregate([
+      { $match: filter },
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: currentPageSize },
+      {
+        $lookup: {
+          from: "attempts",
+          localField: "_id",
+          foreignField: "testId",
+          as: "testAttempts",
+        },
+      },
+      {
+        $addFields: {
+          uncorrectedCount: {
+            $size: {
+              $filter: {
+                input: "$testAttempts",
+                as: "attempt",
+                cond: { $ne: ["$$attempt.status", "reviewed"] },
+              },
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          testAttempts: 0,
+        },
+      },
+    ])
     .toArray();
 
-  console.log(`Trovati ${tests.length} test con filtro:`, filter);
+  console.log(`Trovati ${tests.length} test con aggregazione e filtro:`, filter);
 
   // Conta totale per paginazione
   const total = await testsCollection.countDocuments(filter);

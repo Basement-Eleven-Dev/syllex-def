@@ -19,6 +19,7 @@ export interface TestInterface {
   status?: 'bozza' | 'pubblicato' | 'archiviato';
   subjectId?: string;
   hasPendingCorrections?: boolean;
+  uncorrectedCount?: number;
 }
 
 interface TestDetailsResponse {
@@ -164,6 +165,17 @@ export class TestsService {
   getClassTopicsPerformance(classId: string) {
     return this.http.get<{ topicsPerformance: TopicPerformance[] }>(
       `attempts/class/${classId}/topics-performance`,
+    );
+  }
+
+  getTestInsight(testId: string) {
+    return this.http.post<{ insight: string }>(`test/insight/${testId}`, {});
+  }
+
+  getAttemptInsight(attemptId: string) {
+    return this.http.post<{ insight: string }>(
+      `attempts/insight/${attemptId}`,
+      {},
     );
   }
 }

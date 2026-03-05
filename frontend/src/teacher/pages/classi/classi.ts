@@ -19,6 +19,7 @@ import {
   ViewTypeToggle,
   ViewType,
 } from '../../components/view-type-toggle/view-type-toggle';
+import { BackTo } from '../../components/back-to/back-to';
 
 @Component({
   selector: 'app-classi',

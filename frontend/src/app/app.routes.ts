@@ -6,6 +6,7 @@ import { Dashboard } from '../teacher/pages/dashboard/dashboard';
 import { Test } from '../teacher/pages/test/test';
 import { authGuard, guestGuard } from '../guards/auth.guard';
 import { Materiali } from '../teacher/pages/materiali/materiali';
+import { Materiali as MaterialiStudent } from '../student/pages/materiali/materiali';
 import { TestDetail } from '../teacher/pages/test-detail/test-detail';
 import { CreateEditTest } from '../teacher/pages/create-edit-test/create-edit-test';
 import { Banca } from '../teacher/pages/banca/banca';
@@ -30,6 +31,7 @@ import { StudentTestsList } from '../student/pages/student-tests-list/student-te
 import { testExecutionGuard } from '../guards/test-execution.guard';
 import { StudentComunicazioni } from '../student/pages/student-comunicazioni/student-comunicazioni';
 import { StudentCreateTest } from '../student/pages/student-create-test/student-create-test';
+import { StudentDashboard } from '../student/pages/dashbaord/student-dashboard';
 
 export const routes: Routes = [
   {
@@ -141,6 +143,10 @@ export const routes: Routes = [
         component: Profile,
       },
       {
+        path: 'student/:studentId/class/:classeId',
+        loadComponent: () => import('../teacher/pages/student-detail/student-detail').then(m => m.StudentDetail),
+      },
+      {
         path: '**',
         redirectTo: 'dashboard',
         pathMatch: 'full',
@@ -159,7 +165,7 @@ export const routes: Routes = [
       },
       {
         path: 'dashboard',
-        component: Dashboard,
+        component: StudentDashboard,
       },
       {
         path: 'banca',
@@ -212,7 +218,7 @@ export const routes: Routes = [
       },
       {
         path: 'risorse',
-        component: Materiali,
+        component: MaterialiStudent,
       },
       {
         path: 'correzione/:attemptId',

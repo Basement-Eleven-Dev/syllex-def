@@ -1,5 +1,5 @@
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import { getOpenAIClient } from "../AI/getOpenAIClient";
+import { getOpenAIClient } from "../AI/getClient";
 import { AWS_REGION, BUCKET_NAME } from "../../../environment";
 
 // Configura il client S3 (assicurati di avere le variabili d'ambiente caricate)

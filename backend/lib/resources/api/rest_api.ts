@@ -22,6 +22,7 @@ export class RestApiGateway extends Construct {
   loggedAuthorizer?: Authorizer;
   studentAuthorizer?: Authorizer;
   teacherAuthorizer?: Authorizer;
+  adminAuthorizer?: Authorizer;
   methods: Method[] = [];
   timeout: Duration = Duration.seconds(API_GATEWAY_TIMEOUT)
   createApiMethods() {
@@ -87,9 +88,24 @@ export class RestApiGateway extends Construct {
       }
     );
   }
+  createAdminAuthorizer() {
+    if (FUNCTION_INTEGRATIONS.some(el => el.role == 'admin')) this.adminAuthorizer = new TokenAuthorizer(
+      this,
+      "CognitoAdminAuthorizer",
+      {
+        handler: new LambdaConstruct(this, 'adminAuthorizer', 'src/_request-validators/admin-validator.ts', this.defaultRole, {
+          COGNITO_POOL_ID: this.cognitoPool.userPoolId,
+          COGNITO_CLIENT_ID: this.cognitoClient.userPoolClientId,
+        }).lambda,
+        identitySource: 'method.request.header.Authorization', // Where the token lives
+        resultsCacheTtl: Duration.minutes(5),
+      }
+    );
+  }
   createAuthorizers() {
     this.createStudentAuthorizer();
     this.createTeacherAuthorizer();
+    this.createAdminAuthorizer();
     this.createLoggedAuthorizer();
   }
   constructor(

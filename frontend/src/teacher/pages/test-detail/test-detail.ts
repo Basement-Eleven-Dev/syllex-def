@@ -11,6 +11,7 @@ import {
   faPaperPlane,
   faChartBar,
   faCheckCircle,
+  faPenNib,
 } from '@fortawesome/pro-solid-svg-icons';
 import { BackTo } from '../../components/back-to/back-to';
 import { StatCard, StatCardData } from '../../components/stat-card/stat-card';
@@ -20,12 +21,15 @@ import { FeedbackService } from '../../../services/feedback-service';
 import { TestsService } from '../../../services/tests-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+import { TestAiSummaryComponent } from '../../components/test-ai-summary/test-ai-summary';
+
 // Mappatura icone: associa le stringhe del backend agli oggetti FontAwesome
 const IconMap: Record<string, any> = {
   'paper-plane': faPaperPlane,
   'chart-bar': faChartBar,
   'check-circle': faCheckCircle,
   users: faUsers,
+  'pen-nib': faPenNib,
 };
 
 @Component({
@@ -38,6 +42,7 @@ const IconMap: Record<string, any> = {
     TestStats,
     BackTo,
     StatCard,
+    TestAiSummaryComponent,
   ],
   templateUrl: './test-detail.html',
   styleUrl: './test-detail.scss',

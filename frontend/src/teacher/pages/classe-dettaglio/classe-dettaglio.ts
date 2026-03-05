@@ -18,6 +18,7 @@ import {
 } from '../../../services/class-statistics.service';
 import { TestsService } from '../../../services/tests-service';
 import { JsonPipe } from '@angular/common';
+import { BackTo } from '../../components/back-to/back-to';
 
 interface ClassDetailSection {
   Id: number;
@@ -34,7 +35,7 @@ interface ClassDetailSection {
     FontAwesomeModule,
     StatisticheClasse,
     StatCard,
-    JsonPipe,
+    BackTo,
   ],
   templateUrl: './classe-dettaglio.html',
   styleUrl: './classe-dettaglio.scss',
@@ -102,7 +103,7 @@ export class ClasseDettaglio {
       {
         Label: 'Test Consegnati',
         Value: this.SubmittedTestsCount(),
-        Link: ['/t/classe-dettaglio', classData._id, 'test-consegnati'],
+        Link: ['/t/tests'],
         LinkLabel: 'Vedi tutti',
       },
     ];
