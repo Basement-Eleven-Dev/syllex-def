@@ -178,6 +178,7 @@
     [data]="d.questions[questionIndex()]"
     [isReviewed]="d.status === 'reviewed'"
     [attemptId]="id"
+    (scoreChanged)="onScoreChanged()"
   />
   } }
 </section>

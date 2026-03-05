@@ -1,4 +1,4 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, Output, EventEmitter } from '@angular/core';
 import { NgClass, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TestsService } from '../../../services/tests-service';
@@ -17,6 +17,7 @@ export class QuestionCorrection {
   @Input() data!: any;
   @Input() attemptId!: string;
   @Input() isReviewed!: any;
+  @Output() scoreChanged = new EventEmitter<void>();
   aiCorrecting = false;
   private readonly testsService = inject(TestsService);
   readonly spinner = faSpinner;
@@ -35,6 +36,18 @@ export class QuestionCorrection {
     return this.data.question.type === 'risposta aperta';
   }
 
+  onScoreChange(value: any): void {
+    const score = Number(value);
+    if (value === null || value === undefined || value === '') {
+      this.data.answer.result = 'dubious';
+      this.data.answer.isCorrect = false;
+    } else {
+      this.data.answer.result = score > 0 ? 'correct' : 'wrong';
+      this.data.answer.isCorrect = score > 0;
+    }
+    this.scoreChanged.emit();
+  }
+
   correctWithAI() {
     this.aiCorrecting = true;
     this.testsService
@@ -45,6 +58,7 @@ export class QuestionCorrection {
         this.data.answer.score = response.score;
         this.data.answer.feedback = response.explanation; // spiegazione dettagliata
         this.aiCorrecting = false;
+        this.scoreChanged.emit();
       });
   }
 }
