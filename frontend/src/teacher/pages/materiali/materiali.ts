@@ -187,8 +187,8 @@ export class Materiali {
     event?.stopPropagation();
     const hasSelection = this.selectionService.selectedIds().size > 0;
     const isMultiSelect =
-      event instanceof MouseEvent 
-        ? event.ctrlKey || event.metaKey || hasSelection 
+      event instanceof MouseEvent
+        ? event.ctrlKey || event.metaKey || hasSelection
         : true;
     this.selectionService.toggle(item._id!, isMultiSelect);
   }
@@ -347,6 +347,10 @@ export class Materiali {
       error: (err) =>
         console.error("Errore durante l'eliminazione batch:", err),
     });
+  }
+
+  protected onDeselectAll(): void {
+    this.selectionService.clear();
   }
 
   protected toggleSelectAll(): void {
