@@ -3,7 +3,6 @@ import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import { getDefaultDatabase } from "../../_helpers/getDatabase";
 import { ObjectId } from "mongodb";
-import { startIndexingJob } from "../../_triggers/backgroundVectorize";
 
 const createMaterial = async (
   request: APIGatewayProxyEvent,
@@ -61,6 +60,8 @@ const createMaterial = async (
     } as any);
   }
   if (material.type !== "folder") {
+    const { startIndexingJob } =
+      await import("../../_triggers/backgroundVectorize");
     await startIndexingJob(material._id);
   }
 
