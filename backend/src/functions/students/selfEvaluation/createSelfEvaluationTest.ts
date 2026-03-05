@@ -13,6 +13,7 @@ const createSelfEvaluationTest = async (
   if (!studentId) throw createError.Unauthorized("User not authenticated");
 
   const {
+    name = "Auto-valutazione",
     subjectId,
     topicIds,
     questionCount = 10,
@@ -53,7 +54,7 @@ const createSelfEvaluationTest = async (
 
   // 3. Creazione del test di auto-valutazione
   const testResult = await db.collection("tests").insertOne({
-    name: `Auto-valutazione`,
+    name: String(name).trim() || "Auto-valutazione",
     source: "self-evaluation",
     studentId: new ObjectId(studentId),
     teacherId: new ObjectId(studentId), // required field — student acts as owner

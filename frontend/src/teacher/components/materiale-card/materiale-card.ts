@@ -54,6 +54,7 @@ export class MaterialeCard {
   @Input() showSharing: boolean = true;
   @Input() showActions: boolean = true;
   @Input() showAiBadge: boolean = true;
+  @Input() showDownload: boolean = true;
 
   @Output() openItem = new EventEmitter<MaterialInterface>();
   @Output() renameItem = new EventEmitter<string>();

@@ -4,6 +4,7 @@ import { Observable, map } from 'rxjs';
 import { QuestionInterface } from './questions';
 
 export interface SelfEvaluationPayload {
+  name?: string;
   subjectId: string;
   topicIds: string[];
   questionCount: number;

@@ -13,6 +13,7 @@ export type Attempt = {
   subjectId: ObjectId;
   teacherId: ObjectId;
   studentId: ObjectId;
+  source?: "self-evaluation";
   status: "in-progress" | "delivered" | "reviewed";
   startedAt: Date;
   deliveredAt?: Date;

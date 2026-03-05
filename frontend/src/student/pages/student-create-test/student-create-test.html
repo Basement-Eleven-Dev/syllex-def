@@ -17,6 +17,28 @@
 <div class="row g-4">
   <!-- Colonna sinistra: configurazione -->
   <div class="col-12 col-xl-8">
+    <!-- Nome del test -->
+    <div class="config-card mb-4">
+      <div class="config-card__header">
+        <div>
+          <h5 class="mb-0 fw-semibold">Nome del test</h5>
+          <p class="text-muted small mb-0">
+            Assegna un nome personalizzato al test (default: Auto-valutazione)
+          </p>
+        </div>
+      </div>
+      <div class="config-card__body">
+        <input
+          type="text"
+          class="form-control custom-input"
+          placeholder="Auto-valutazione"
+          maxlength="100"
+          [value]="TestName()"
+          (input)="TestName.set($any($event.target).value)"
+        />
+      </div>
+    </div>
+
     <!-- Step 1: Materia -->
     <div class="config-card mb-4">
       <div class="config-card__header">
@@ -212,6 +234,13 @@
   <div class="col-12 col-xl-4">
     <div class="summary-card sticky-top" style="top: 80px">
       <h6 class="fw-semibold mb-3">Riepilogo</h6>
+
+      <div class="summary-row">
+        <span class="summary-label">Nome</span>
+        <span class="summary-value fw-semibold"
+          >{{ TestName().trim() || 'Auto-valutazione' }}</span
+        >
+      </div>
 
       <div class="summary-row">
         <span class="summary-label">Materia</span>

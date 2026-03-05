@@ -9,6 +9,7 @@
     </h3>
 
     <section class="d-flex flex-column gap-2">
+      @if (Test().availableFrom || Test().availableTo) {
       <div class="text-dark">
         <fa-icon [icon]="ClockIcon" class="me-1"></fa-icon>
         @if (Test().availableFrom && Test().availableTo) { Disponibile dal {{
@@ -18,6 +19,7 @@
         (Test().availableTo) { Disponibile fino al {{ Test().availableTo | date:
         'd MMM y' }} }
       </div>
+      }
 
       <div class="text-dark">
         <fa-icon [icon]="QuestionsIcon" class="me-1"></fa-icon>
