@@ -4,6 +4,7 @@ import { lambdaRequest } from "../../../_helpers/lambdaProxyResponse";
 import { getDefaultDatabase } from "../../../_helpers/getDatabase";
 import { ObjectId } from "mongodb";
 import { Attempt } from "../../../models/attempt";
+import { Test } from "../../../models/test";
 import { sanitizeAttemptQuestions } from "./_helpers";
 
 const createStudentAttempt = async (
@@ -23,6 +24,20 @@ const createStudentAttempt = async (
 
   const db = await getDefaultDatabase();
   const attemptsCollection = db.collection<Attempt>("attempts");
+  const testsCollection = db.collection<Test>("tests");
+
+  // Validate password if the test is password-protected
+  const test = await testsCollection.findOne({
+    _id: new ObjectId(body.testId),
+  });
+  if (!test) {
+    throw createError.NotFound("Test non trovato");
+  }
+  if (test.password) {
+    if (!body.password || body.password !== test.password) {
+      throw createError.Forbidden("Password del test non corretta");
+    }
+  }
 
   // Prevent duplicate in-progress attempts for the same test
   const existing = await attemptsCollection.findOne({

@@ -64,6 +64,7 @@ export class QuestionCard {
   @Input() score: number | null = null;
   @Input() questionStatus: 'correct' | 'wrong' | 'semi-correct' | null = null;
   @Input() teacherFeedback: string | null = null;
+  @Input() feedbackLabel: string = 'Commento del docente';
   @Output() answerChange = new EventEmitter<number | string>();
 
   onExpandImage(img: string): void {

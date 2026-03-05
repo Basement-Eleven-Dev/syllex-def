@@ -27,6 +27,7 @@ export interface StudentTestInterface {
   timeLimit?: number;
   teacherId?: string;
   subjectId?: string;
+  isPasswordProtected?: boolean;
   questions?: {
     questionId: string | { $oid: string };
     points: number;
@@ -47,11 +48,14 @@ export interface StudentAttemptInterface {
   testId: string;
   subjectId?: string;
   teacherId?: string;
+  source?: 'self-evaluation' | 'teacher';
   status: 'in-progress' | 'delivered' | 'reviewed';
   startedAt: string;
   deliveredAt?: string;
   reviewedAt?: string;
   timeSpent: number;
+  score?: number | null;
+  maxScore?: number | null;
   questions: AttemptQuestionData[];
 }
 
@@ -84,11 +88,14 @@ export class StudentTestsService {
 
   createAttempt(
     attempt: StudentAttemptInterface,
+    password?: string,
   ): Observable<StudentAttemptInterface> {
+    const body: any = { ...attempt };
+    if (password) body.password = password;
     return this.http
       .post<{
         attempt: StudentAttemptInterface;
-      }>('students/test/attempt', attempt)
+      }>('students/test/attempt', body)
       .pipe(map((res) => res.attempt));
   }
 

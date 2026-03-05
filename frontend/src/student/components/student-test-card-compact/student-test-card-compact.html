@@ -6,6 +6,15 @@
     </div>
   </div>
 
+  @if (ShowScore()) {
+  <div class="compact-test-card__score">
+    <fa-icon [icon]="TrophyIcon" class="score-icon"></fa-icon>
+    <span class="score-value">{{ AttemptScore()!.score }}</span>
+    <span class="score-sep">/</span>
+    <span class="score-max">{{ AttemptScore()!.maxScore }} pt</span>
+  </div>
+  }
+
   <!--   <div class="compact-test-card__details">
     <div class="compact-test-card__detail-item">
       <fa-icon [icon]="QuestionsIcon" class="detail-icon"></fa-icon>
