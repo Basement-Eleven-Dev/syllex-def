@@ -23,8 +23,7 @@ e fornisci una breve spiegazione.
 Rispondi ESCLUSIVAMENTE in JSON valido.
 Niente markdown, niente backtick.
 Formato:
-{"score": number, "explanation": string}
-`;
+{"score": number, "explanation": string}`;
 
   const response = await openai.chat.completions.create({
     model: "gpt-4o",
