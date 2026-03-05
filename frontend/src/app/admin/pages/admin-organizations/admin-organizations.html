@@ -1,0 +1,102 @@
+<div class="container-fluid p-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+        <div>
+            <h2 class="fw-bold mb-1 d-flex align-items-center gap-3">
+                <div class="bg-primary bg-opacity-10 p-2 rounded-3 text-primary d-flex">
+                    <fa-icon [icon]="icons.faLandmark"></fa-icon>
+                </div>
+                Hub Organizzazioni
+            </h2>
+            <p class="text-muted small mb-0">Gestisci le scuole e le strutture didattiche della piattaforma</p>
+        </div>
+        
+        <button class="btn btn-primary d-flex align-items-center gap-2 px-4 py-2 fw-bold shadow-sm" routerLink="/a/onboarding">
+            <fa-icon [icon]="icons.faPlus"></fa-icon>
+            Nuova Organizzazione
+        </button>
+    </div>
+
+    <!-- Stats & Search -->
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-4">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text bg-white border-end-0 border-light ps-3">
+                    <fa-icon [icon]="icons.faSearch" class="text-muted"></fa-icon>
+                </span>
+                <input 
+                    type="text" 
+                    class="form-control border-start-0 border-light py-2" 
+                    placeholder="Cerca organizzazione..." 
+                    (input)="onSearch($event)">
+            </div>
+        </div>
+        <div class="col-md-8 text-md-end mt-3 mt-md-0">
+            <span class="badge bg-light text-dark px-3 py-2 rounded-pill border fw-normal">
+                Totale: <strong>{{ organizations.length }}</strong> organizzazioni
+            </span>
+        </div>
+    </div>
+
+    <!-- Grid -->
+    @if (loading) {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary opacity-50" role="status">
+                <span class="visually-hidden">Caricamento...</span>
+            </div>
+        </div>
+    } @else {
+        <div class="row g-4">
+            @for (org of filteredOrganizations; track org._id) {
+                <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                    <div class="card h-100 border-light shadow-hover cursor-pointer transition-all rounded-4" [routerLink]="['/a/organizzazioni', org._id]">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-start mb-4">
+                                <div class="org-logo-container border rounded-3 overflow-hidden bg-light d-flex align-items-center justify-content-center" style="width: 56px; height: 56px;">
+                                    @if (org.logoUrl) {
+                                        <img [src]="org.logoUrl" class="w-100 h-100 object-fit-contain" [alt]="org.name">
+                                    } @else {
+                                        <fa-icon [icon]="icons.faLandmark" class="text-muted opacity-50 fs-4"></fa-icon>
+                                    }
+                                </div>
+                                <div class="ms-auto">
+                                    <div class="bg-light p-1 rounded-circle d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                                        <fa-icon [icon]="icons.faChevronRight" class="extra-small text-muted"></fa-icon>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h5 class="fw-bold mb-3 text-truncate">{{ org.name }}</h5>
+
+                            <div class="d-flex gap-3 mt-auto pt-3 border-top border-light border-opacity-50">
+                                <div class="d-flex align-items-center gap-2 small text-muted">
+                                    <fa-icon [icon]="icons.faUserTie" class="opacity-50"></fa-icon>
+                                    <span>Docenti</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2 small text-muted">
+                                    <fa-icon [icon]="icons.faUsers" class="opacity-50"></fa-icon>
+                                    <span>Classi</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2 small text-muted">
+                                    <fa-icon [icon]="icons.faBook" class="opacity-50"></fa-icon>
+                                    <span>Materie</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            } @empty {
+                <div class="col-12">
+                    <div class="card bg-light border-0 rounded-4 text-center py-5">
+                        <div class="card-body">
+                            <fa-icon [icon]="icons.faLandmark" class="display-4 text-muted opacity-25 mb-3 d-block"></fa-icon>
+                            <h5 class="fw-bold">Nessuna organizzazione trovata</h5>
+                            <p class="text-muted small">Inizia creando la tua prima organizzazione tramite l'onboarding.</p>
+                            <button class="btn btn-primary btn-sm px-4 fw-bold mt-2" routerLink="/a/onboarding">Inizia ora</button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

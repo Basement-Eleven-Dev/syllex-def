@@ -109,6 +109,12 @@ export class TestsService {
     );
   }
 
+  publishTest(testId: string) {
+    return this.http.put<{ test: TestInterface }>(`tests/${testId}`, {
+      status: 'pubblicato',
+    });
+  }
+
   countAssignmentsToGrade() {
     return this.http.get<{ count: number }>('tests/assignments-to-grade/count');
   }

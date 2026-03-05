@@ -62,6 +62,7 @@
   [tests]="Tests()"
   (delete)="onDeleteTest($event)"
   (duplicate)="onDuplicateTest($event)"
+  (publish)="onPublishTest($event)"
 />
 } @else {
 <div class="row">
@@ -71,6 +72,7 @@
       [test]="test"
       (delete)="onDeleteTest($event)"
       (duplicate)="onDuplicateTest($event)"
+      (publish)="onPublishTest($event)"
     />
   </div>
   } @empty {

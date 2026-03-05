@@ -12,6 +12,109 @@ export type FunctionIntegration = {
 };
 
 export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
+  //rotte per ADMIN
+  {
+    apiRoute: "admin/onboarding",
+    functionPath: "admin/onboarding/createOnboarding.ts",
+    method: "post",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/organizations",
+    functionPath: "admin/getOrganizations.ts",
+    method: "get",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/organizations/{organizationId}/workspace",
+    functionPath: "admin/workspace/getWorkspaceDetails.ts",
+    method: "get",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/organizations/{organizationId}/staff",
+    functionPath: "admin/workspace/getWorkspaceStaff.ts",
+    method: "get",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/organizations/{organizationId}/students",
+    functionPath: "admin/workspace/getWorkspaceStudents.ts",
+    method: "get",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/organizations/{organizationId}/didactics",
+    functionPath: "admin/workspace/getWorkspaceDidactics.ts",
+    method: "get",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/organizations/{organizationId}/users",
+    functionPath: "admin/workspace/createUser.ts",
+    method: "post",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/organizations/{organizationId}/students/bulk",
+    functionPath: "admin/workspace/bulkImportStudents.ts",
+    method: "post",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/organizations/{organizationId}/classes/{classId}",
+    functionPath: "admin/workspace/getClassDetail.ts",
+    method: "get",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/organizations/{organizationId}/users/{userId}",
+    functionPath: "admin/workspace/removeUser.ts",
+    method: "delete",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/organizations/{organizationId}/users/{userId}",
+    functionPath: "admin/workspace/updateUser.ts",
+    method: "put",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/organizations/{organizationId}/classes",
+    functionPath: "admin/workspace/createClass.ts",
+    method: "post",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/organizations/{organizationId}/subjects",
+    functionPath: "admin/workspace/createSubject.ts",
+    method: "post",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/organizations/{organizationId}/assignments",
+    functionPath: "admin/workspace/createAssignment.ts",
+    method: "post",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/organizations/{organizationId}/stats",
+    functionPath: "organizations/getOrganizationStats.ts",
+    method: "get",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/organizations/stats",
+    functionPath: "admin/consumptions/getOrganizationStats.ts",
+    method: "get",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/stats/global",
+    functionPath: "admin/stats/getSuperAdminStats.ts",
+    method: "get",
+    role: "admin",
+  },
   {
     apiRoute: "teachers/{teacherId}/subjects",
     functionPath: "teachers/getSubjects.ts",

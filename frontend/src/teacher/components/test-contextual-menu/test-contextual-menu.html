@@ -2,7 +2,7 @@
   Modifica
 </button>
 @if(['bozza', 'archiviato'].includes(test.status!)) {
-<button ngbDropdownItem>Pubblica</button>
+<button ngbDropdownItem (click)="publish.emit(test._id)">Pubblica</button>
 }
 <button ngbDropdownItem (click)="duplicate.emit(test._id)">Duplica</button>
 <button ngbDropdownItem (click)="onRequestAssignToClass()">Assegna</button>

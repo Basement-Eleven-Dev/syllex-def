@@ -5,7 +5,7 @@ import { fa1, fa2, faKey, faPlus } from '@fortawesome/pro-solid-svg-icons';
 
 @Component({
   selector: 'app-login-page',
-  imports: [LoginForm, StackedIcon],
+  imports: [LoginForm],
   templateUrl: './login-page.html',
   styleUrl: './login-page.scss',
 })

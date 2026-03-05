@@ -40,6 +40,7 @@ export class TestTable {
   @Input() tests: TestInterface[] = [];
   @Output() delete = new EventEmitter<string>();
   @Output() duplicate = new EventEmitter<string>();
+  @Output() publish = new EventEmitter<string>();
 
   constructor(
     private testsService: TestsService,

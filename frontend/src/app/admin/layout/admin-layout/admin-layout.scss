@@ -1,0 +1,32 @@
+:host {
+  display: block;
+  height: 100dvh;
+}
+
+.admin-navbar {
+  background: var(--bs-primary);
+  border-radius: 0.75rem;
+  color: white;
+}
+
+.admin-navbar .route {
+  color: white;
+  text-decoration: none;
+  margin-right: 1rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.admin-navbar .route:hover {
+  color: var(--bs-secondary);
+  text-decoration: underline;
+}
+
+.admin-navbar .text-danger {
+  margin-left: auto;
+}
+
+.admin-content {
+  padding: 2rem 0;
+  background: #f8fafc;
+}

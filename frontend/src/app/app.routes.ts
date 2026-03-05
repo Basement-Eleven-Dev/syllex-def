@@ -31,6 +31,16 @@ import { StudentTestsList } from '../student/pages/student-tests-list/student-te
 import { testExecutionGuard } from '../guards/test-execution.guard';
 import { StudentComunicazioni } from '../student/pages/student-comunicazioni/student-comunicazioni';
 import { StudentCreateTest } from '../student/pages/student-create-test/student-create-test';
+import { adminGuard } from '../guards/admin.guard';
+import { AdminLayout } from './admin/layout/admin-layout/admin-layout';
+import { AdminDashboard } from './admin/pages/admin-dashboard/admin-dashboard';
+import { AdminOnboarding } from './admin/pages/admin-onboarding/admin-onboarding';
+import { AdminOrganizations } from './admin/pages/admin-organizations/admin-organizations';
+import { AdminOrganizationDetail } from './admin/pages/admin-organization-detail/admin-organization-detail';
+import { AdminClassDetail } from './admin/pages/admin-class-detail/admin-class-detail';
+import { AdminProfile } from './admin/pages/admin-profile/admin-profile';
+import { AdminStats } from './admin/pages/admin-stats/admin-stats';
+import { superadminGuard } from '../guards/superadmin.guard';
 import { StudentDashboard } from '../student/pages/dashbaord/student-dashboard';
 
 export const routes: Routes = [
@@ -256,6 +266,47 @@ export const routes: Routes = [
         path: '**',
         redirectTo: 'dashboard',
         pathMatch: 'full',
+      },
+    ],
+  },
+  {
+    path: 'a',
+    component: AdminLayout,
+    canActivate: [authGuard, adminGuard],
+    children: [
+            {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+      {
+        path: 'dashboard',
+        component: AdminDashboard,
+      },
+      {
+        path: 'onboarding',
+        component: AdminOnboarding,
+        canActivate: [superadminGuard],
+      },
+      {
+        path: 'organizzazioni',
+        component: AdminOrganizations,
+      },
+      {
+        path: 'organizzazioni/:id',
+        component: AdminOrganizationDetail,
+      },
+      {
+        path: 'organizzazioni/:orgId/classi/:classId',
+        component: AdminClassDetail,
+      },
+      {
+        path: 'profile',
+        component: AdminProfile,
+      },
+      {
+        path: 'stats',
+        component: AdminStats,
       },
     ],
   },

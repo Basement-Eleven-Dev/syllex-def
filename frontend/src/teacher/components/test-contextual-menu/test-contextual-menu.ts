@@ -15,6 +15,7 @@ export class TestContextualMenu {
   @Input() test!: TestInterface;
   @Output() delete = new EventEmitter<string>();
   @Output() duplicate = new EventEmitter<string>();
+  @Output() publish = new EventEmitter<string>();
 
   constructor(private modalService: NgbModal) {}
 

@@ -35,7 +35,13 @@ export const guestGuard: CanActivateFn = (route, state) => {
         // User is not logged in, allow access to auth pages
         return true;
       } else {
-        // User is logged in, redirect to dashboard
+        // User is logged in, redirect to appropriate dashboard
+        const role = user.role;
+        if (role === 'admin') {
+          return router.createUrlTree(['/a']);
+        } else if (role === 'student') {
+          return router.createUrlTree(['/s']);
+        }
         return router.createUrlTree(['/t']);
       }
     }),
