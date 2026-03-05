@@ -51,7 +51,7 @@ export class MaterialiService {
       .get<{
         success: boolean;
         materials: MaterialInterface[];
-      }>('materials/subject')
+      }>(`materials/subject?subjectId=${subjectId}`)
       .subscribe({
         next: (response) => {
           this.currentFolder.set(null);
@@ -84,7 +84,10 @@ export class MaterialiService {
           this.isLoading.set(false);
         },
         error: (err) => {
-          console.error('Errore durante il caricamento dei materiali studente:', err);
+          console.error(
+            'Errore durante il caricamento dei materiali studente:',
+            err,
+          );
           this.isLoading.set(false);
         },
       });
@@ -329,7 +332,9 @@ export class MaterialiService {
         deletedCount: number;
         removedFromParents: number;
       }>('materials/delete-batch', { materialIds: itemIds })
-      .pipe(tap(() => itemIds.forEach((id) => this.removeItemFromAllParents(id))));
+      .pipe(
+        tap(() => itemIds.forEach((id) => this.removeItemFromAllParents(id))),
+      );
   }
 
   renameItem(

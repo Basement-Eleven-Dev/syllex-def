@@ -34,8 +34,10 @@ const getClassAttempts = async (
   );
 
   // Build filter: students in this class, optionally filtered by subject
+  // Exclude self-evaluation attempts (those are student-initiated, not teacher-assigned)
   const filter: any = {
     studentId: { $in: studentIds },
+    source: { $ne: "self-evaluation" },
   };
 
   if (subjectId) {
