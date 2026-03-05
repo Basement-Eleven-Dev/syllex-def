@@ -1,11 +1,10 @@
-@import "../../../../styles.scss";
 
 .shadow-hover {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     &:hover {
         transform: translateY(-5px);
         box-shadow: 0 12px 24px rgba(0,0,0,0.08) !important;
-        border-color: var(--primary-color) !important;
+        border-color: var(--bs-primary) !important;
     }
 }
 
@@ -28,5 +27,5 @@
 
 input.form-control:focus {
     box-shadow: none;
-    border-color: var(--primary-color);
+    border-color: var(--bs-primary)
 }

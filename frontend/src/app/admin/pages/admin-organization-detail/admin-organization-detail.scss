@@ -1,4 +1,3 @@
-@import '../../../../styles.scss';
 
 .org-logo-detail {
     background-color: #fff;
@@ -12,12 +11,12 @@
     border-bottom: 3px solid transparent !important;
 
     &:hover {
-        color: var(--primary-color);
+        color: var(--bs-primary);
     }
 
     &.active {
-        color: var(--primary-color);
-        border-bottom-color: var(--primary-color) !important;
+        color: var(--bs-primary);
+        border-bottom-color: var(--bs-primary) !important;
     }
 }
 
