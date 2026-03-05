@@ -92,7 +92,7 @@ export class Correzione implements OnInit {
   onScoreChanged(): void {
     // Force the signal to emit a new reference so Angular re-evaluates
     // allQuestionsAreScored (mutations to nested objects aren't tracked otherwise)
-    this.data.update((d) => d ? { ...d, questions: [...d.questions] } : d);
+    this.data.update((d) => (d ? { ...d, questions: [...d.questions] } : d));
   }
 
   submitCorrection() {
