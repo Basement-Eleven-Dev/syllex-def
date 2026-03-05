@@ -33,7 +33,8 @@ IMPORTANTE: Rispondi SOLO con un oggetto JSON valido nel seguente formato, senza
         },
       ],
       config: {
-        systemInstruction: "Sei un docente esperto che corregge le risposte degli studenti. Rispondi sempre e solo con JSON valido.",
+        systemInstruction:
+          "Sei un docente esperto che corregge le risposte degli studenti. Rispondi sempre e solo con JSON valido.",
         temperature: 0,
         maxOutputTokens: 300,
         responseMimeType: "application/json",
