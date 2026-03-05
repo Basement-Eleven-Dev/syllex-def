@@ -180,7 +180,7 @@ const createAIGenQuestion = async (
   const db = await getDefaultDatabase();
 
   const materialCollection = db.collection<MaterialInterface>("materials");
-  const materialObjects: MaterialInterface[] = await materialCollection.find({ _id: { $in: materialOIds } }).toArray() as MaterialInterface[]; //forse non serve
+  const materialObjects: MaterialInterface[] = await materialCollection.find({ _id: { $in: materialOIds }, subjectId: context.subjectId, aiGenerated: { $ne: true } }).toArray() as MaterialInterface[]; //forse non serve
 
   //load topic
   const topicCollection = db.collection("topics");

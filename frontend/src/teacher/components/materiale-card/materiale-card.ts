@@ -20,6 +20,7 @@ import {
   faEllipsisVertical,
   faRobot,
   faShareNodes,
+  faDownload,
 } from '@fortawesome/pro-solid-svg-icons';
 import {
   NgbDropdown,
@@ -46,11 +47,13 @@ import { FileViewer } from '../file-viewer/file-viewer';
 })
 export class MaterialeCard {
   ShareNodesIcon = faShareNodes;
+  DownloadIcon = faDownload;
   @Input() item!: MaterialInterface;
   @Input() highlightedItemId: string | null = null;
   @Input() isSelected: boolean = false;
   @Input() showSharing: boolean = true;
   @Input() showActions: boolean = true;
+  @Input() showAiBadge: boolean = true;
 
   @Output() openItem = new EventEmitter<MaterialInterface>();
   @Output() renameItem = new EventEmitter<string>();
@@ -92,9 +95,9 @@ export class MaterialeCard {
     return !this.isFolder && this.item.aiGenerated === true;
   }
 
-  selectItem(event: MouseEvent): void {
+  selectItem(event: MouseEvent | Event): void {
     event.stopPropagation();
-    this.selectItemEvent.emit(event);
+    this.selectItemEvent.emit(event as MouseEvent);
   }
 
   requestOpenItem(): void {
@@ -110,5 +113,25 @@ export class MaterialeCard {
       modalRef.componentInstance.extension = this.item.extension;
       modalRef.componentInstance.isMap = this.item.isMap;
     }
+  }
+
+  downloadFile(event: Event): void {
+    event.stopPropagation();
+    if (!this.item.url) return;
+
+    fetch(this.item.url)
+      .then((res) => res.blob())
+      .then((blob) => {
+        const objectUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = objectUrl;
+        link.download = this.item.name;
+        link.click();
+        URL.revokeObjectURL(objectUrl);
+      })
+      .catch(() => {
+        // fallback: apri in nuova tab
+        window.open(this.item.url, '_blank');
+      });
   }
 }

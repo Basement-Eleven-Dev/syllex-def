@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -35,6 +35,7 @@ export class CreateEditEvent {
   private readonly router = inject(Router);
   private readonly calendarService = inject(CalendarService);
   private readonly feedbackService = inject(FeedbackService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly SaveIcon = faSave;
   readonly TrashIcon = faTrash;
@@ -74,7 +75,7 @@ export class CreateEditEvent {
     this.IsLoading.set(true);
     this.calendarService
       .getEventById(id)
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
           const datePipe = new DatePipe('en-US');
@@ -102,7 +103,7 @@ export class CreateEditEvent {
     this.IsLoading.set(true);
     this.calendarService
       .deleteEvent(this.EventId)
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.feedbackService.showFeedback(
@@ -139,7 +140,7 @@ export class CreateEditEvent {
       ? this.calendarService.updateEvent(this.EventId!, eventData)
       : this.calendarService.createEvent(eventData);
 
-    serviceCall.pipe(takeUntilDestroyed()).subscribe({
+    serviceCall.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.feedbackService.showFeedback(
           this.IsEditMode()

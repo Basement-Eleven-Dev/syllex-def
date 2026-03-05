@@ -1,127 +1,149 @@
-<div class="card p-4">
-  <div class="card-body">
-    @if (showCloseButton) {
-    <button
-      type="button"
-      class="btn-close position-absolute top-0 end-0 m-3"
-      aria-label="Close"
-      (click)="ActiveModal!.dismiss()"
-    ></button>
-    }
+<div [class]="showCloseButton ? 'modal-body' : ''">
+  @if (showCloseButton) {
+  <button
+    type="button"
+    class="btn-close position-absolute top-0 end-0 m-3"
+    aria-label="Close"
+    (click)="ActiveModal!.dismiss()"
+  ></button>
+  }
 
+  <div
+    [class]="'mb-4 d-flex flex-row' + (showHeadings() ? ' justify-content-between align-items-center' : '')"
+  >
+    @if(showHeadings()){
+    <div class="flex-fill">
+      <h4 class="text-dark mb-0">
+        Calendario di {{ materiaService.materiaSelected()?.name }}
+      </h4>
+      <p class="text-dark fw-light mb-0">
+        Tieni traccia dei test che hai fissato per i tuoi studenti
+      </p>
+    </div>
+    }
     <div
-      [class]="'mb-4 d-flex flex-row' + (showHeadings() ? ' justify-content-between align-items-center' : '')"
+      class="d-flex flex-row align-items-center gap-0 border border-primary rounded-syllex"
     >
-      @if(showHeadings()){
-      <div class="flex-fill">
-        <h4 class="text-dark mb-0">
-          Calendario di {{ materiaService.materiaSelected()?.name }}
-        </h4>
-        <p class="text-dark fw-light mb-0">
-          Tieni traccia dei test che hai fissato per i tuoi studenti
-        </p>
-      </div>
-      }
-      <div
-        class="d-flex flex-row align-items-center gap-0 border border-primary rounded-syllex"
+      <button
+        class="btn btn-link d-flex flex-column justify-content-center align-items-center"
+        (click)="navigateMonth(-1)"
       >
-        <button
-          class="btn btn-link d-flex flex-column justify-content-center align-items-center"
-          (click)="navigateMonth(-1)"
+        <fa-icon [icon]="ArrowLeftIcon"></fa-icon>
+      </button>
+      <span class="text-primary">|</span>
+      <button
+        class="btn btn-link d-flex flex-column justify-content-center align-items-center"
+        (click)="navigateMonth(1)"
+      >
+        <fa-icon [icon]="ArrowRightIcon"></fa-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Calendar grid -->
+    <div class="col-12 col-lg-6 mb-3">
+      <div class="d-flex flex-row mb-3">
+        @for (day of ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom']; track
+        $index) {
+        <div class="flex-fill text-center fw-bold text-muted">
+          {{ day | uppercase }}
+        </div>
+        }
+      </div>
+      <div id="dayBoxesContainer">
+        @for (dayBox of CalendarDays(); track $index) {
+        <div
+          class="day-box"
+          (click)="selectDate(dayBox)"
+          [class.selected]="isSelected(dayBox)"
+          [class.opacity-25]="!dayBox.isCurrentMonth"
         >
-          <fa-icon [icon]="ArrowLeftIcon"></fa-icon>
-        </button>
-        <span class="text-primary">|</span>
-        <button
-          class="btn btn-link d-flex flex-column justify-content-center align-items-center"
-          (click)="navigateMonth(1)"
-        >
-          <fa-icon [icon]="ArrowRightIcon"></fa-icon>
-        </button>
+          @if (dayBox.isCurrentMonth) {
+          <div
+            class="d-flex flex-column h-100 justify-content-center align-items-center fs-5"
+          >
+            {{ dayBox.day }}
+          </div>
+          <div class="event-badges">
+            @if (getEventCount(dayBox) > 0) {
+            <span class="event-count badge bg-primary" title="Eventi e Test">
+              {{ getEventCount(dayBox) }}
+            </span>
+            } @if (getComunicazioniCount(dayBox) > 0) {
+            <span
+              class="event-count badge bg-info text-dark"
+              title="Comunicazioni"
+            >
+              {{ getComunicazioniCount(dayBox) }}
+            </span>
+            }
+          </div>
+          }
+        </div>
+        }
       </div>
     </div>
 
-    <div class="row">
-      <!-- Calendar grid -->
-      <div class="col-12 col-lg-6 mb-3">
-        <div class="d-flex flex-row mb-3">
-          @for (day of ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom']; track
-          $index) {
-          <div class="flex-fill text-center fw-bold text-muted">
-            {{ day | uppercase }}
-          </div>
-          }
+    <!-- Day detail panel -->
+    <div class="col-12 col-lg-6 d-flex flex-column mb-3">
+      @if (SelectedDate()) {
+      <div
+        class="d-flex flex-row align-items-center justify-content-between mb-3 px-1"
+      >
+        <div>
+          <h4 class="fw-semibold text-primary mb-0">
+            Oggi / {{ SelectedDate() | date: 'fullDate' | titlecase }}
+          </h4>
         </div>
-        <div id="dayBoxesContainer">
-          @for (dayBox of CalendarDays(); track $index) {
-          <div
-            class="day-box"
-            (click)="selectDate(dayBox)"
-            [class.selected]="isSelected(dayBox)"
-            [class.opacity-25]="!dayBox.isCurrentMonth"
-          >
-            @if (dayBox.isCurrentMonth) {
-            <div
-              class="d-flex flex-column h-100 justify-content-center align-items-center fs-5"
-            >
-              {{ dayBox.day }}
-            </div>
-            @if (getEventCount(dayBox) > 0) {
-            <span class="event-count badge bg-primary">
-              {{ getEventCount(dayBox) }}
-            </span>
-            } }
-          </div>
-          }
-        </div>
-      </div>
-
-      <!-- Day detail panel -->
-      <div class="col-12 col-lg-6 d-flex flex-column mb-3">
-        <div
-          class="flex-fill p-4"
-          id="calendarDayDetailCard"
-          [class.no-date-selected]="!SelectedDate()"
+        @if (!readonly()) {
+        <button
+          class="btn btn-outline-primary btn-sm"
+          (click)="openAddEventModal()"
         >
-          <div class="d-flex flex-column" style="min-height: 400px">
-            @if (SelectedDate()) {
-            <div
-              class="d-flex flex-row align-items-center justify-content-between mb-2"
-            >
-              <div>
-                <h4 class="fw-semibold text-primary mb-0">Oggi</h4>
-                <h5 class="fw-normal">
-                  {{ SelectedDate() | date: 'fullDate' | titlecase }}
-                </h5>
-              </div>
-              @if (!readonly()) {
-              <button
-                class="btn btn-outline-primary"
-                (click)="openAddEventModal()"
-              >
-                <fa-icon [icon]="PlusIcon"></fa-icon>
-              </button>
-              }
-            </div>
-            <hr />
+          <fa-icon [icon]="PlusIcon"></fa-icon> Nuovo Evento
+        </button>
+        }
+      </div>
 
-            @for (event of SelectedDateEvents(); track event._id) {
-            <app-calendar-event-card
-              [Event]="event"
-              [readonly]="readonly()"
-              (Deleted)="deleteEvent($event)"
-              (Edited)="editEvent($event)"
-            />
-            } @for (test of SelectedDateTests(); track test._id) {
-            <app-calendar-test-card [Test]="test" [readonly]="readonly()" />
-            } @if (!HasSelectedDateItems()) {
-            <p class="text-muted text-center mt-4">
-              Nessun evento per questa giornata
-            </p>
-            } }
-          </div>
+      <div
+        class="flex-fill p-3 rounded-syllex bg-white"
+        id="calendarDayDetailCard"
+      >
+        <!-- Scrollable Content Section -->
+        <div class="calendar-events-scrollable flex-fill pe-2">
+          @for (comunicazione of SelectedDateComunicazioni(); track
+          comunicazione._id) {
+          <div
+            app-student-comunicazione-card
+            [comunicazione]="comunicazione"
+            class="mb-3 d-block"
+          ></div>
+          } @for (event of SelectedDateEvents(); track event._id) {
+          <app-calendar-event-card
+            [Event]="event"
+            [readonly]="readonly()"
+            (Deleted)="deleteEvent($event)"
+            (Edited)="editEvent($event)"
+          />
+          } @for (test of SelectedDateTests(); track test._id) {
+          <app-calendar-test-card [Test]="test" [readonly]="readonly()" />
+          } @if (!HasSelectedDateItems()) {
+          <p class="text-muted text-center mt-4 pt-3">
+            Nessun evento per questa giornata
+          </p>
+          }
         </div>
       </div>
+      } @else {
+      <!-- State when no date is selected -->
+      <div
+        class="flex-fill p-4 rounded-syllex bg-white no-date-selected"
+        id="calendarDayDetailCard"
+      >
+        <div style="min-height: 400px"></div>
+      </div>
+      }
     </div>
   </div>
 </div>

@@ -173,4 +173,19 @@ export class Test implements OnDestroy {
       },
     });
   }
+
+  onPublishTest(testId: string): void {
+    this.testsService.publishTest(testId).subscribe({
+      next: () => {
+        this.Tests.update((tests) =>
+          tests.map((t) =>
+            t._id === testId ? { ...t, status: 'pubblicato' } : t,
+          ),
+        );
+      },
+      error: (err: Error) => {
+        console.error('Errore durante la pubblicazione del test:', err);
+      },
+    });
+  }
 }

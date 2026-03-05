@@ -12,14 +12,15 @@
     </thead>
     <tbody>
       @for(test of tests; track $index){
-      <tr [class.row-with-pending-corrections]="(test.uncorrectedCount || 0) > 0">
+      <tr
+        [class.row-with-pending-corrections]="(test.uncorrectedCount || 0) > 0"
+      >
         <td>
           <div class="d-flex flex-row align-items-center gap-2">
-            {{ test.name }}
-            @if((test.uncorrectedCount || 0) > 0) {
-              <span class="badge rounded-pill bg-warning text-dark shadow-sm">
-                {{ test.uncorrectedCount }} da correggere
-              </span>
+            {{ test.name }} @if((test.uncorrectedCount || 0) > 0) {
+            <span class="badge rounded-pill bg-warning text-dark shadow-sm">
+              {{ test.uncorrectedCount }} da correggere
+            </span>
             }
           </div>
         </td>
@@ -79,6 +80,7 @@
                 [test]="test"
                 (delete)="delete.emit($event)"
                 (duplicate)="duplicate.emit($event)"
+                (publish)="publish.emit($event)"
               ></app-test-contextual-menu>
             </div>
           </div>

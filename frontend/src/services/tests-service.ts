@@ -109,6 +109,12 @@ export class TestsService {
     );
   }
 
+  publishTest(testId: string) {
+    return this.http.put<{ test: TestInterface }>(`tests/${testId}`, {
+      status: 'pubblicato',
+    });
+  }
+
   countAssignmentsToGrade() {
     return this.http.get<{ count: number }>('tests/assignments-to-grade/count');
   }
@@ -165,6 +171,17 @@ export class TestsService {
   getClassTopicsPerformance(classId: string) {
     return this.http.get<{ topicsPerformance: TopicPerformance[] }>(
       `attempts/class/${classId}/topics-performance`,
+    );
+  }
+
+  getTestInsight(testId: string) {
+    return this.http.post<{ insight: string }>(`test/insight/${testId}`, {});
+  }
+
+  getAttemptInsight(attemptId: string) {
+    return this.http.post<{ insight: string }>(
+      `attempts/insight/${attemptId}`,
+      {},
     );
   }
 }

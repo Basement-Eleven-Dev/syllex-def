@@ -103,6 +103,11 @@ export class Materia {
     return topic ? topic.name : 'Sconosciuto';
   }
 
+  getSubjectName(subjectId: string): string {
+    const subject = this.allMaterie().find((s) => s._id === subjectId);
+    return subject ? subject.name : 'Sconosciuto';
+  }
+
   addTopic(
     subjectId: string,
     name: string,

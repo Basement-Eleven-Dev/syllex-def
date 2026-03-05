@@ -103,7 +103,7 @@ export class ClasseDettaglio {
       {
         Label: 'Test Consegnati',
         Value: this.SubmittedTestsCount(),
-        Link: ['/t/classe-dettaglio', classData._id, 'test-consegnati'],
+        Link: ['/t/tests'],
         LinkLabel: 'Vedi tutti',
       },
     ];

@@ -14,16 +14,22 @@
     />
   </div>
   <div>
-    <label for="password" class="form-label text-dark">{{ isChallenge ? 'Nuova Password' : 'Password' }}</label>
-    <input
-      formControlName="password"
-      type="password"
-      class="form-control custom-input"
-      placeholder="Password"
-    />
-    @if (isChallenge) {
-      <div class="form-text small opacity-50">Scegli una password sicura di almeno 8 caratteri.</div>
-    }
+    <label for="password" class="form-label text-dark">Password</label>
+    <div class="input-group input-group-custom">
+      <input
+        formControlName="password"
+        [type]="showPassword ? 'text' : 'password'"
+        class="form-control custom-input border-end-0"
+        placeholder="Password"
+      />
+      <button
+        class="btn btn-outline-secondary border-start-0 border-custom"
+        type="button"
+        (click)="showPassword = !showPassword"
+      >
+        <fa-icon [icon]="showPassword ? EyeSlashIcon : EyeIcon"></fa-icon>
+      </button>
+    </div>
   </div>
   @if (!isChallenge) {
     <div class="text-end mb-4">

@@ -49,6 +49,16 @@ const getStudentTests = async (
   }
   filter.$or = orConditions;
 
+  // Filtro per data di disponibilità: esclude test dove availableFrom è nel futuro
+  const now = new Date();
+  filter.$or = orConditions.map((condition) => ({
+    ...condition,
+    $or: [
+      { availableFrom: { $exists: false } },
+      { availableFrom: { $lte: now } },
+    ],
+  }));
+
   if (status) {
     filter.status = status;
   }

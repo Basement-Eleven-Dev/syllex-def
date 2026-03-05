@@ -11,10 +11,30 @@ const getEvents = async (request: APIGatewayProxyEvent, context: Context) => {
 
   const filter: any = {};
 
+  // Logica di filtraggio basata sul ruolo
   if (context.user?._id) {
-    filter.teacherId = context.user._id;
+    if (context.user.role === "teacher") {
+      // Un docente vede solo i suoi eventi
+      filter.teacherId = context.user._id;
+    } else if (context.user.role === "student") {
+      // Uno studente vede solo gli eventi delle materie in cui è iscritto
+      const studentClasses = await db
+        .collection("classes")
+        .find({ students: { $in: [context.user._id] } })
+        .toArray();
+
+      const classIds = studentClasses.map((c) => c._id);
+      const assignments = await db
+        .collection("teacher_assignments")
+        .find({ classId: { $in: classIds } })
+        .toArray();
+
+      const subjectIds = assignments.map((a) => a.subjectId);
+      filter.subjectId = { $in: subjectIds };
+    }
   }
 
+  // Se siamo in un contesto di materia specifico, restringiamo ulteriormente
   if (context.subjectId) {
     filter.subjectId = context.subjectId;
   }

@@ -158,6 +158,18 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
+    apiRoute: "student/classes/all",
+    functionPath: "students/getAllStudentClasses.ts",
+    method: "get",
+    role: "student",
+  },
+  {
+    apiRoute: "student/subject/classes",
+    functionPath: "students/getStudentSubjectClasses.ts",
+    method: "get",
+    role: "student",
+  },
+  {
     apiRoute: "profile",
     functionPath: "profile/getMyProfile.ts",
     method: "get",
@@ -238,6 +250,12 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
   {
     apiRoute: "materials/move-batch",
     functionPath: "materials/moveMaterialsBatch.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "materials/delete-batch",
+    functionPath: "materials/deleteMaterialsBatch.ts",
     method: "post",
     role: "teacher",
   },
@@ -332,6 +350,19 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
+    apiRoute: "teacher/students/{studentId}/details",
+    functionPath: "teachers/getStudentDetails.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "teacher/students/{studentId}/insight",
+    functionPath: "teachers/generateStudentInsight.ts",
+    method: "post",
+    role: "teacher",
+  },
+
+  {
     apiRoute: "tests/{testId}/classes",
     functionPath: "tests/updateTestClasses.ts",
     method: "put",
@@ -417,6 +448,12 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     apiRoute: "events/{eventId}",
     functionPath: "events/deleteEvent.ts",
     method: "delete",
+    role: "teacher",
+  },
+  {
+    apiRoute: "events/{eventId}",
+    functionPath: "events/updateEvent.ts",
+    method: "put",
     role: "teacher",
   },
   {
@@ -539,6 +576,22 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     method: "post",
     role: "teacher",
   },
-
-
+  {
+    apiRoute: "test/insight/{testId}",
+    functionPath: "teachers/generateTestInsight.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "attempts/insight/{attemptId}",
+    functionPath: "teachers/generateAttemptInsight.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "organizations/{organizationId}",
+    functionPath: "organizations/getOrganizationById.ts",
+    method: "get",
+    role: "logged",
+  },
 ];

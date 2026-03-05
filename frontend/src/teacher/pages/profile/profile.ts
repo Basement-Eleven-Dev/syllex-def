@@ -53,6 +53,15 @@ export class Profile {
   ngOnInit(): void {}
 
   // Public Methods
+  getMaterie() {
+    // Se è uno studente, usa solo le materie assegnate allo studente
+    if (this.authService.user?.role === 'student') {
+      return this.materiaService.allMaterie();
+    }
+    // Se è un docente, mostra tutte le materie
+    return this.materiaService.allMaterie();
+  }
+
   countClasses(subjectId: string): number {
     return this.Assegnazioni.filter(
       (assegnazione) => assegnazione.subjectId === subjectId,

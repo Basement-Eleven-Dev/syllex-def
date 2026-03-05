@@ -21,6 +21,8 @@ import { FeedbackService } from '../../../services/feedback-service';
 import { TestsService } from '../../../services/tests-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+import { TestAiSummaryComponent } from '../../components/test-ai-summary/test-ai-summary';
+
 // Mappatura icone: associa le stringhe del backend agli oggetti FontAwesome
 const IconMap: Record<string, any> = {
   'paper-plane': faPaperPlane,
@@ -40,6 +42,7 @@ const IconMap: Record<string, any> = {
     TestStats,
     BackTo,
     StatCard,
+    TestAiSummaryComponent,
   ],
   templateUrl: './test-detail.html',
   styleUrl: './test-detail.scss',

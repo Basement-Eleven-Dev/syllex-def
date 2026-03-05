@@ -86,7 +86,11 @@ const createAIGenMaterial = async (
   const organizationCollection = db.collection("organizations");
   const materialOIds = materialIds.map((el) => new ObjectId(el));
   const materialObjects: MaterialInterface[] = (await materialCollection
-    .find({ _id: { $in: materialOIds } })
+    .find({
+      _id: { $in: materialOIds },
+      subjectId: context.subjectId,
+      aiGenerated: { $ne: true },
+    })
     .toArray()) as MaterialInterface[]; //forse non serve
 
   const prompt = getPrompt(
@@ -106,12 +110,19 @@ const createAIGenMaterial = async (
     DocumentSchema,
   );
 
+  const organizationId =
+    (context.user as any).organizationIds?.[0] ?? context.user!.organizationId;
+
   const organization = await organizationCollection.findOne({
-    _id: context.user!.organizationId,
+    _id: organizationId,
   });
 
-  const organizationLogoUrl: string = organization!.logoUrl;
-  const organizationName: string = organization!.name; //unused for now
+  if (!organization) {
+    throw createHttpError(404, "Organization not found");
+  }
+
+  const organizationLogoUrl: string = organization.logoUrl ?? "";
+  const organizationName: string = organization.name; //unused for now
 
   const material: MaterialInterface = {
     name: "", //find a way to get a real name

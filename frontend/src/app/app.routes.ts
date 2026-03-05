@@ -41,6 +41,7 @@ import { AdminClassDetail } from './admin/pages/admin-class-detail/admin-class-d
 import { AdminProfile } from './admin/pages/admin-profile/admin-profile';
 import { AdminStats } from './admin/pages/admin-stats/admin-stats';
 import { superadminGuard } from '../guards/superadmin.guard';
+import { StudentDashboard } from '../student/pages/dashbaord/student-dashboard';
 
 export const routes: Routes = [
   {
@@ -152,6 +153,10 @@ export const routes: Routes = [
         component: Profile,
       },
       {
+        path: 'student/:studentId/class/:classeId',
+        loadComponent: () => import('../teacher/pages/student-detail/student-detail').then(m => m.StudentDetail),
+      },
+      {
         path: '**',
         redirectTo: 'dashboard',
         pathMatch: 'full',
@@ -170,7 +175,7 @@ export const routes: Routes = [
       },
       {
         path: 'dashboard',
-        component: Dashboard,
+        component: StudentDashboard,
       },
       {
         path: 'banca',
