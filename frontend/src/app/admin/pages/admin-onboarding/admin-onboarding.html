@@ -1,0 +1,471 @@
+<div class="container-fluid p-4 enter-animation">
+  <!-- Header Section -->
+  <div class="row mb-5">
+    <div class="col-12 text-center">
+      <h2 class="fw-bold text-dark mb-2">Onboarding Organizzazione</h2>
+      <p class="text-muted">Segui i passaggi per configurare la tua nuova organizzazione in pochi minuti.</p>
+    </div>
+  </div>
+
+  <!-- Wizard Steps Indicator -->
+  <div class="row justify-content-center mb-5">
+    <div class="col-lg-10">
+      <div class="wizard-steps-container d-flex justify-content-between position-relative">
+        <div class="wizard-progress-bar position-absolute w-100" [style.width.%]="(currentStep - 1) / (totalSteps - 1) * 100"></div>
+        <div class="wizard-steps-line position-absolute w-100"></div>
+        
+        @for (step of steps; track step.id) {
+          <div class="wizard-step d-flex flex-column align-items-center position-relative" 
+               [class.active]="currentStep === step.id" 
+               [class.completed]="currentStep > step.id"
+               (click)="goToStep(step.id)">
+            <div class="step-icon-wrapper rounded-circle d-flex align-items-center justify-content-center shadow-sm">
+              @if (currentStep > step.id) {
+                <fa-icon [icon]="icons.faCheck"></fa-icon>
+              } @else {
+                <fa-icon [icon]="step.icon"></fa-icon>
+              }
+            </div>
+            <span class="step-label mt-2 fw-medium small">{{ step.label }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Section -->
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+        <div class="card-body p-5">
+          
+          <!-- Step 1: Organization Profile -->
+          @if (currentStep === 1) {
+            <div class="step-content enter-animation">
+              <div class="d-flex align-items-center mb-4">
+                <div class="step-badge rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px;">1</div>
+                <h4 class="mb-0 fw-bold">Profilo Organizzazione</h4>
+              </div>
+              
+              <div class="row g-4">
+                <div class="col-md-12">
+                  <label class="form-label text-muted small text-uppercase fw-bold ls-1 mb-2">Nome Organizzazione</label>
+                  <input type="text" class="form-control custom-input p-3" 
+                         placeholder="Es. Istituto Tecnico Navale" 
+                         [(ngModel)]="orgData.name">
+                </div>
+                
+                <div class="col-md-12">
+                  <label class="form-label text-muted small text-uppercase fw-bold ls-1 mb-2">Logo Organizzazione</label>
+                  <div class="logo-upload-zone border-dashed rounded-3 p-5 d-flex flex-column align-items-center justify-content-center text-center">
+                    <div class="icon-circle bg-light p-3 rounded-circle mb-3 overflow-hidden d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                      @if (orgData.logoUrl) {
+                        <img [src]="orgData.logoUrl" class="img-fluid" alt="Logo Org">
+                      } @else {
+                        <fa-icon [icon]="icons.faCloudArrowUp" class="text-primary fs-3"></fa-icon>
+                      }
+                    </div>
+                    <p class="mb-1 fw-bold">Trascina qui il logo</p>
+                    <p class="text-muted small mb-3">Supporta PNG, JPG (Max 2MB)</p>
+                    <button class="btn btn-outline-primary btn-sm px-4" (click)="logoInput.click()">Sfoglia File</button>
+                    <input type="file" #logoInput class="d-none" (change)="onLogoSelected($event)" accept="image/*">
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Step 2: Staff Provisioning -->
+          @if (currentStep === 2) {
+            <div class="step-content enter-animation">
+              <div class="d-flex align-items-center mb-4">
+                <div class="step-badge rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px;">2</div>
+                <h4 class="mb-0 fw-bold">Provisioning Personale</h4>
+              </div>
+              
+              <div class="card bg-light border-0 mb-4 rounded-3">
+                <div class="card-body p-4">
+                  <h6 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                    <fa-icon [icon]="icons.faUserPlus" class="text-primary"></fa-icon>
+                    Aggiungi Docente o Amministratore
+                  </h6>
+                  <div class="row g-3">
+                    <div class="col-md-3">
+                      <label class="form-label small fw-bold">Nome</label>
+                      <input type="text" class="form-control form-control-sm custom-input" [(ngModel)]="newStaff.firstName">
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label small fw-bold">Cognome</label>
+                      <input type="text" class="form-control form-control-sm custom-input" [(ngModel)]="newStaff.lastName">
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label small fw-bold">Email</label>
+                      <input type="email" class="form-control form-control-sm custom-input" [(ngModel)]="newStaff.email">
+                    </div>
+                    <div class="col-md-2">
+                      <label class="form-label small fw-bold">Ruolo</label>
+                      <select class="form-select form-select-sm custom-input" [(ngModel)]="newStaff.role">
+                        <option value="teacher">Docente</option>
+                        <option value="admin">Admin</option>
+                      </select>
+                    </div>
+                    <div class="col-12 text-end">
+                      <button class="btn btn-primary btn-sm px-4 fw-bold" (click)="addStaffMember()">Aggiungi</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="staff-list">
+                <label class="form-label text-muted small text-uppercase fw-bold ls-1 mb-3">Staff Configurato ({{ staffList.length }})</label>
+                @if (staffList.length === 0) {
+                  <div class="text-center py-4 bg-white border rounded-3 text-muted italic">
+                    Nessun membro dello staff aggiunto.
+                  </div>
+                } @else {
+                  <div class="table-responsive rounded-3 border">
+                    <table class="table table-hover mb-0 align-middle">
+                      <thead class="bg-light">
+                        <tr>
+                          <th class="border-0 small fw-bold px-3">Nome</th>
+                          <th class="border-0 small fw-bold">Ruolo</th>
+                          <th class="border-0 small fw-bold">Email</th>
+                          <th class="border-0 small fw-bold text-end px-3">Azioni</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (member of staffList; track member._id; let i = $index) {
+                          <tr class="enter-animation">
+                            <td class="px-3">
+                              <div class="fw-bold">{{ member.firstName }} {{ member.lastName }}</div>
+                              <div class="text-muted extra-small d-flex align-items-center gap-1">
+                                ID: {{ member._id }}
+                                <fa-icon [icon]="icons.faCopy" class="cursor-pointer text-primary opacity-50 hover-opacity-100" (click)="copyToClipboard(member._id)"></fa-icon>
+                              </div>
+                            </td>
+                            <td>
+                              <span class="badge rounded-pill fw-bold" [ngClass]="member.role === 'admin' ? 'bg-info-subtle text-info' : 'bg-primary-subtle text-primary'">
+                                {{ member.role === 'admin' ? 'Amministratore' : 'Docente' }}
+                              </span>
+                            </td>
+                            <td class="text-muted">{{ member.email }}</td>
+                            <td class="text-end px-3">
+                              <button class="btn btn-sm btn-outline-danger border-0 p-2" (click)="removeStaffMember(i)">
+                                <fa-icon [icon]="icons.faTrashCan"></fa-icon>
+                              </button>
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Step 3: Didactic Structure -->
+          @if (currentStep === 3) {
+            <div class="step-content enter-animation">
+              <div class="d-flex align-items-center mb-4">
+                <div class="step-badge rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px;">3</div>
+                <h4 class="mb-0 fw-bold">Struttura Didattica</h4>
+              </div>
+
+              <!-- Subjects Management -->
+              <div class="card border-0 bg-light mb-5 rounded-3">
+                <div class="card-body p-4">
+                  <h6 class="fw-bold mb-3 d-flex align-items-center gap-2 text-primary">
+                    <fa-icon [icon]="icons.faBook"></fa-icon>
+                    Gestione Materie
+                  </h6>
+                  <div class="row g-3">
+                    <div class="col-md-5">
+                      <label class="form-label small fw-bold">Nome Materia</label>
+                      <input type="text" class="form-control form-control-sm custom-input" placeholder="Es. Navigazione Estrema" [(ngModel)]="newSubject.name">
+                    </div>
+                    <div class="col-md-5">
+                      <label class="form-label small fw-bold">Docente Responsabile</label>
+                      <select class="form-select form-select-sm custom-input" [(ngModel)]="newSubject.teacherId">
+                        <option value="">Seleziona un docente...</option>
+                        @for (staff of staffList; track staff._id) {
+                          @if (staff.role === 'teacher') {
+                            <option [value]="staff._id">{{ staff.firstName }} {{ staff.lastName }}</option>
+                          }
+                        }
+                      </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                      <button class="btn btn-primary btn-sm w-100 fw-bold" (click)="addSubject()">Aggiungi</button>
+                    </div>
+                  </div>
+
+                  @if (subjectsList.length > 0) {
+                    <div class="mt-4 table-responsive rounded-2 bg-white">
+                      <table class="table table-sm mb-0">
+                        <thead>
+                          <tr class="bg-gray-100">
+                            <th class="px-3 py-2 small fw-bold">Materia</th>
+                            <th class="py-2 small fw-bold">Docente</th>
+                            <th class="py-2 small fw-bold text-end px-3"></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @for (sub of subjectsList; track sub._id; let i = $index) {
+                            <tr class="align-middle">
+                              <td class="px-3 border-0">
+                                <div class="fw-bold">{{ sub.name }}</div>
+                                <div class="text-muted extra-small d-flex align-items-center gap-1">
+                                  ID: {{ sub._id }}
+                                  <fa-icon [icon]="icons.faCopy" class="cursor-pointer text-primary opacity-50" (click)="copyToClipboard(sub._id)"></fa-icon>
+                                </div>
+                              </td>
+                              <td class="border-0">{{ getTeacherName(sub.teacherId) }}</td>
+                              <td class="text-end px-3 border-0">
+                                <button class="btn btn-link text-danger p-1" (click)="removeSubject(i)">
+                                  <fa-icon [icon]="icons.faTrashCan"></fa-icon>
+                                </button>
+                              </td>
+                            </tr>
+                          }
+                        </tbody>
+                      </table>
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Classes & Students -->
+              <div class="row g-4">
+                <!-- Classes -->
+                <div class="col-md-6">
+                  <div class="card border h-100 rounded-3">
+                    <div class="card-body p-4">
+                      <h6 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                        <fa-icon [icon]="icons.faUserGroup" class="text-primary"></fa-icon>
+                        Classi
+                      </h6>
+                      <div class="d-flex gap-2 mb-3">
+                        <input type="text" class="form-control form-control-sm custom-input" placeholder="Es. 3A" [(ngModel)]="newClass.name">
+                        <button class="btn btn-primary btn-sm" (click)="addClass()">
+                          <fa-icon [icon]="icons.faPlus"></fa-icon>
+                        </button>
+                      </div>
+
+                      @for (cls of classesList; track cls._id; let i = $index) {
+                        <div class="p-2 border rounded-2 mb-2 bg-light d-flex justify-content-between align-items-center">
+                          <div>
+                            <span class="fw-bold">{{ cls.name }}</span>
+                            <span class="text-muted small ms-2">{{ cls.year }}</span>
+                            <div class="extra-small text-muted">ID: {{ cls._id }} <fa-icon [icon]="icons.faCopy" class="cursor-pointer" (click)="copyToClipboard(cls._id)"></fa-icon></div>
+                          </div>
+                          <button class="btn btn-link text-danger p-0" (click)="removeClass(i)">
+                            <fa-icon [icon]="icons.faTrashCan"></fa-icon>
+                          </button>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Bulk Import Students -->
+                <div class="col-md-6">
+                  <div class="card border h-100 rounded-3 bg-dark text-white">
+                    <div class="card-body p-4">
+                      <h6 class="fw-bold mb-2 d-flex align-items-center gap-2">
+                        <fa-icon [icon]="icons.faFileImport" class="text-secondary"></fa-icon>
+                        Importazione Studenti
+                      </h6>
+                      <p class="extra-small text-secondary mb-3">
+                        Seleziona la classe e incolla l'array JSON degli studenti.
+                      </p>
+
+                      <div class="mb-3">
+                        <label class="form-label extra-small fw-bold text-secondary">Classe di Destinazione</label>
+                        <select class="form-select form-select-sm bg-dark text-white border-secondary small" [(ngModel)]="selectedClassId">
+                          <option value="">Scegli classe...</option>
+                          @for (cls of classesList; track cls._id) {
+                            <option [value]="cls._id">{{ cls.name }}</option>
+                          }
+                        </select>
+                      </div>
+                      
+                      <textarea class="form-control bg-transparent text-white border-secondary small mb-3" 
+                                rows="4" 
+                                placeholder='[{"firstName": "Mario", "lastName": "Rossi", "email": "mario@..."}]'
+                                [(ngModel)]="bulkJsonInput"></textarea>
+                      
+                      <button class="btn btn-secondary w-100 btn-sm fw-bold" (click)="handleBulkImport()">
+                        Esegui Importazione Bulk
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Step 4: Final Linkage -->
+          @if (currentStep === 4) {
+            <div class="step-content enter-animation">
+              <div class="d-flex align-items-center mb-4">
+                <div class="step-badge rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px;">4</div>
+                <h4 class="mb-0 fw-bold">Assegnazioni & Finalizzazione</h4>
+              </div>
+              
+              <div class="alert alert-info border-0 shadow-sm rounded-3 mb-4 d-flex align-items-center gap-3">
+                <fa-icon [icon]="icons.faLandmark" class="fs-4"></fa-icon>
+                <div class="small">
+                  Questo è l'ultimo passaggio per rendere operativa l'organizzazione. Associa i docenti alle materie e alle classi corrispondenti. 
+                  Gli utenti riceveranno le credenziali via email al termine.
+                </div>
+              </div>
+
+              <div class="text-end mb-3">
+                <button class="btn btn-outline-secondary btn-sm fw-bold d-flex align-items-center gap-2 ms-auto" (click)="downloadCredentialsReport()">
+                  <fa-icon [icon]="icons.faFileCsv"></fa-icon>
+                  Scarica Report Anteprima (CSV)
+                </button>
+              </div>
+
+              <div class="card bg-light border-0 mb-4 rounded-3">
+                <div class="card-body p-4">
+                  <h6 class="fw-bold mb-3">Nuova Assegnazione</h6>
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label class="form-label small fw-bold">Materia</label>
+                      <select class="form-select form-select-sm custom-input" [(ngModel)]="newAssignment.subjectId">
+                        <option value="">Scegli la materia...</option>
+                        @for (sub of subjectsList; track sub._id) {
+                          <option [value]="sub._id">{{ sub.name }} (Docente: {{ getTeacherName(sub.teacherId) }})</option>
+                        }
+                      </select>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label small fw-bold">Classe</label>
+                      <select class="form-select form-select-sm custom-input" [(ngModel)]="newAssignment.classId">
+                        <option value="">Scegli la classe...</option>
+                        @for (cls of classesList; track cls._id) {
+                          <option [value]="cls._id">{{ cls.name }}</option>
+                        }
+                      </select>
+                    </div>
+                    <div class="col-12 text-end">
+                      <button class="btn btn-primary btn-sm fw-bold px-4" (click)="addAssignment()">Collega</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="assignments-list">
+                <label class="form-label text-muted small text-uppercase fw-bold ls-1 mb-3">Mappa Insegnamento ({{ assignmentsList.length }})</label>
+                @if (assignmentsList.length === 0) {
+                  <div class="text-center py-4 bg-white border rounded-3 text-muted italic">
+                    Nessuna assegnazione creata.
+                  </div>
+                } @else {
+                  <div class="table-responsive rounded-3 border">
+                    <table class="table table-sm table-hover mb-0 align-middle">
+                      <thead class="bg-light">
+                        <tr>
+                          <th class="px-3 py-2 small fw-bold">Docente</th>
+                          <th class="py-2 small fw-bold">Materia</th>
+                          <th class="py-2 small fw-bold">Classe</th>
+                          <th class="py-2 small fw-bold text-end px-3">Azioni</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (asg of assignmentsList; track asg._id; let i = $index) {
+                          <tr class="enter-animation">
+                            <td class="px-3">
+                              <div class="fw-bold">{{ getTeacherName(asg.teacherId) }}</div>
+                              <div class="extra-small text-muted">ID Docente: {{ asg.teacherId }} <fa-icon [icon]="icons.faCopy" class="cursor-pointer text-primary" (click)="copyToClipboard(asg.teacherId)"></fa-icon></div>
+                            </td>
+                            <td>{{ getSubjectName(asg.subjectId) }}</td>
+                            <td>{{ getClassName(asg.classId) }}</td>
+                            <td class="text-end px-3">
+                              <button class="btn btn-link text-danger p-1" (click)="removeAssignment(i)">
+                                <fa-icon [icon]="icons.faTrashCan"></fa-icon>
+                              </button>
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+        </div>
+
+        <!-- Footer Navigation -->
+        <div class="card-footer bg-light p-4 d-flex justify-content-between border-0">
+          <button class="btn btn-link text-muted text-decoration-none fw-medium d-flex align-items-center" 
+                  (click)="prevStep()" 
+                  [disabled]="currentStep === 1">
+            <fa-icon [icon]="icons.faChevronLeft" class="me-2"></fa-icon>
+            Indietro
+          </button>
+          
+          <button class="btn btn-primary px-5 py-2 fw-bold d-flex align-items-center" 
+                  (click)="currentStep === totalSteps ? finishOnboarding() : nextStep()">
+            {{ currentStep === totalSteps ? 'Concludi Onboarding' : 'Continua' }}
+            <fa-icon [icon]="currentStep === totalSteps ? icons.faCheck : icons.faChevronRight" class="ms-2"></fa-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Smart Tooltip / Logs Sidebar (Placeholder) -->
+  <div class="onboarding-logs-floater position-fixed bottom-0 end-0 m-4">
+    @if (showLogs) {
+      <div class="logs-panel card shadow-lg rounded-4 mb-3 border-0 overflow-hidden" style="width: 350px; max-height: 500px;">
+        <div class="card-header bg-dark text-white p-3 d-flex justify-content-between align-items-center">
+          <h6 class="mb-0 fw-bold">Logs Sessione</h6>
+          <div class="d-flex gap-2">
+            <fa-icon [icon]="icons.faFileCsv" class="cursor-pointer opacity-50 hover-opacity-100" (click)="downloadCredentialsReport()" title="Scarica Report CSV"></fa-icon>
+            <fa-icon [icon]="icons.faTrashCan" class="cursor-pointer opacity-50 hover-opacity-100" (click)="onboardingLogs = []" title="Pulisci Logs"></fa-icon>
+          </div>
+        </div>
+        <div class="card-body p-0 overflow-auto">
+          @if (onboardingLogs.length === 0) {
+            <div class="p-4 text-center text-muted small">Nessuna attività registrata.</div>
+          } @else {
+            <div class="list-group list-group-flush">
+              @for (log of onboardingLogs; track log.timestamp) {
+                <div class="list-group-item border-0 border-bottom p-3">
+                  <div class="d-flex justify-content-between mb-1">
+                    <span class="badge bg-primary-subtle text-primary extra-small">{{ log.type }}</span>
+                    <span class="extra-small text-muted">{{ log.timestamp }}</span>
+                  </div>
+                  <div class="small fw-bold mb-1">{{ log.description }}</div>
+                  <div class="extra-small text-muted d-flex align-items-center gap-2">
+                    ID: {{ log.id }}
+                    @if (log.id !== 'N/A') {
+                      <fa-icon [icon]="icons.faCopy" class="cursor-pointer text-primary" (click)="copyToClipboard(log.id)"></fa-icon>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <button class="btn btn-dark shadow-lg rounded-pill p-3 px-4 d-flex align-items-center gap-2" (click)="toggleLogs()">
+      @if (showLogs) {
+        <fa-icon [icon]="icons.faChevronRight"></fa-icon>
+      } @else {
+        <fa-icon [icon]="icons.faClipboardList"></fa-icon>
+      }
+      <span class="fw-bold small">{{ showLogs ? 'Chiudi' : 'Logs Sessione' }}</span>
+      @if (onboardingLogs.length > 0 && !showLogs) {
+        <span class="badge bg-danger rounded-circle p-1" style="width: 8px; height: 8px; margin-left: -5px;"></span>
+      }
+    </button>
+  </div>
+</div>

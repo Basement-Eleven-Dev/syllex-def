@@ -1,0 +1,144 @@
+<div class="modal-header border-0 pb-0">
+    <h5 class="modal-title fw-bold">{{ title }}</h5>
+    <button type="button" class="btn-close shadow-none" (click)="activeModal.dismiss()"></button>
+</div>
+
+<div class="modal-body p-4">
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+        <div class="row g-3">
+            <!-- First Name -->
+            <div class="col-md-6">
+                <label class="form-label small fw-bold text-muted">Nome</label>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-light border-light pe-2">
+                        <fa-icon [icon]="icons.faUser" class="extra-small text-muted"></fa-icon>
+                    </span>
+                    <input type="text" class="form-control border-light py-2" formControlName="firstName" placeholder="es. Mario">
+                </div>
+            </div>
+
+            <!-- Last Name -->
+            <div class="col-md-6">
+                <label class="form-label small fw-bold text-muted">Cognome</label>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-light border-light pe-2">
+                        <fa-icon [icon]="icons.faUser" class="extra-small text-muted"></fa-icon>
+                    </span>
+                    <input type="text" class="form-control border-light py-2" formControlName="lastName" placeholder="es. Rossi">
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="col-12">
+                <label class="form-label small fw-bold text-muted">Email</label>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-light border-light pe-2">
+                        <fa-icon [icon]="icons.faEnvelope" class="extra-small text-muted"></fa-icon>
+                    </span>
+                    <input type="email" class="form-control border-light py-2" formControlName="email" placeholder="mario.rossi@email.it">
+                </div>
+            </div>
+
+            <!-- Role (conditional) -->
+            @if (!fixedRole) {
+                <div class="col-12">
+                    <label class="form-label small fw-bold text-muted">Ruolo</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light border-light pe-2">
+                            <fa-icon [icon]="icons.faUserTag" class="extra-small text-muted"></fa-icon>
+                        </span>
+                        <select class="form-select border-light py-2" formControlName="role">
+                            <option value="">Seleziona ruolo...</option>
+                            <option value="teacher">Docente</option>
+                            <option value="admin">Amministratore</option>
+                            <option value="student">Studente</option>
+                        </select>
+                    </div>
+                </div>
+            }
+
+            <!-- Class Selection for Student -->
+            @if (userForm.get('role')?.value === 'student') {
+                <div class="col-12">
+                    <label class="form-label small fw-bold text-muted">Classe di Appartenenza</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light border-light pe-2">
+                            <i class="fas fa-users extra-small text-muted"></i>
+                        </span>
+                        <select class="form-select border-light py-2" formControlName="classId">
+                            <option value="">Seleziona classe...</option>
+                            @for (c of classes; track c._id) {
+                                <option [value]="c._id">{{ c.name }}</option>
+                            }
+                        </select>
+                    </div>
+                    <p class="extra-small text-danger mt-1 mb-0" *ngIf="userForm.get('classId')?.touched && userForm.get('classId')?.invalid">
+                        Lo studente deve essere associato a una classe.
+                    </p>
+                </div>
+            }
+
+            <!-- Subject Selection for Teacher -->
+            @if (userForm.get('role')?.value === 'teacher') {
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label class="form-label small fw-bold text-muted mb-0">Associa a Materia</label>
+                        <button type="button" class="btn btn-link btn-xs p-0 text-decoration-none extra-small" (click)="toggleNewSubject()">
+                            {{ isNewSubject ? 'Seleziona esistente' : 'Crea nuova materia' }}
+                        </button>
+                    </div>
+
+                    @if (!isNewSubject) {
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-light border-light pe-2">
+                                <fa-icon [icon]="icons.faBook" class="extra-small text-muted"></fa-icon>
+                            </span>
+                            <select class="form-select border-light py-2" formControlName="subjectId">
+                                <option value="">Seleziona materia...</option>
+                                @for (s of subjects; track s._id) {
+                                    <option [value]="s._id">{{ s.name }}</option>
+                                }
+                            </select>
+                        </div>
+                    } @else {
+                        <div class="input-group input-group-sm animate-in">
+                            <span class="input-group-text bg-light border-light pe-2">
+                                <fa-icon [icon]="icons.faBook" class="extra-small text-muted"></fa-icon>
+                            </span>
+                            <input type="text" class="form-control border-light py-2" formControlName="newSubjectName" placeholder="es. Filosofia">
+                        </div>
+                    }
+                    <p class="extra-small text-muted mt-1 mb-0">
+                        {{ isNewSubject ? 'Verrà creata una nuova materia e associata a questo docente.' : 'Associa il docente a una materia esistente.' }}
+                    </p>
+                </div>
+
+                <div class="col-12 mt-2 animate-in">
+                    <label class="form-label small fw-bold text-muted">Classe (Opzionale)</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light border-light pe-2">
+                            <fa-icon [icon]="icons.faUsers" class="extra-small text-muted"></fa-icon>
+                        </span>
+                        <select class="form-select border-light py-2" formControlName="classId">
+                            <option value="">Nessuna classe (assegna dopo)...</option>
+                            @for (c of classes; track c._id) {
+                                <option [value]="c._id">{{ c.name }}</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="mt-4 d-grid">
+            <button type="submit" class="btn btn-primary fw-bold py-2 d-flex align-items-center justify-content-center gap-2" [disabled]="userForm.invalid || loading">
+                @if (loading) {
+                    <span class="spinner-border spinner-border-sm" role="status"></span>
+                } @else {
+                    <fa-icon [icon]="icons.faPlus"></fa-icon>
+                }
+                Crea Utente
+            </button>
+        </div>
+    </form>
+</div>
