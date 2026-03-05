@@ -51,7 +51,7 @@ export class MaterialiService {
       .get<{
         success: boolean;
         materials: MaterialInterface[];
-      }>('materials/subject')
+      }>(`materials/subject?subjectId=${subjectId}`)
       .subscribe({
         next: (response) => {
           this.currentFolder.set(null);
