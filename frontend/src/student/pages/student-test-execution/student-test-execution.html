@@ -80,11 +80,14 @@
         [disabled]="IsStarting() || (IsPasswordProtected() && !PasswordInput().trim())"
       >
         @if (IsStarting()) {
-        <fa-icon [icon]="SpinnerIcon" [animation]="'spin'" class="me-2"></fa-icon>
+        <fa-icon
+          [icon]="SpinnerIcon"
+          [animation]="'spin'"
+          class="me-2"
+        ></fa-icon>
         } @else {
         <fa-icon [icon]="PlayIcon" class="me-2"></fa-icon>
-        }
-        {{ IsStarting() ? 'Avvio in corso...' : 'Avvia test' }}
+        } {{ IsStarting() ? 'Avvio in corso...' : 'Avvia test' }}
       </button>
       }
     </div>
