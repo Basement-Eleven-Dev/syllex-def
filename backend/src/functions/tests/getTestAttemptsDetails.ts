@@ -128,6 +128,34 @@ const getTestAttemptsDetails = async (
     return `${mins}m ${secs}s`;
   };
 
+  // Risolvi i nomi degli argomenti dalla materia del test
+  const subject = test.subjectId
+    ? await db.collection("SUBJECTS").findOne({ _id: test.subjectId })
+    : null;
+  const topicsMap = new Map<string, string>();
+  if (subject?.topics && Array.isArray(subject.topics)) {
+    for (const t of subject.topics) {
+      if (t && typeof t === "object" && t._id) {
+        topicsMap.set(t._id.toString(), t.name || "Generale");
+      }
+    }
+  }
+
+  // Aggiungi il nome del topic a ogni domanda di ogni attempt
+  const attemptsWithTopics = attemptsWithStudents.map((attempt: any) => ({
+    ...attempt,
+    questions: (attempt.questions || []).map((q: any) => ({
+      ...q,
+      question: {
+        ...q.question,
+        topic:
+          (q.question?.topicId
+            ? topicsMap.get(q.question.topicId.toString())
+            : null) || "Generale",
+      },
+    })),
+  }));
+
   return {
     test: {
       _id: test._id,
@@ -148,7 +176,7 @@ const getTestAttemptsDetails = async (
       { title: "Tempo medio", value: formatTime(avgTimeSpent), icon: "clock" },
       { title: "Assegnazioni", value: totalAssignments, icon: "users" },
     ],
-    attempts: attemptsWithStudents,
+    attempts: attemptsWithTopics,
   };
 };
 
