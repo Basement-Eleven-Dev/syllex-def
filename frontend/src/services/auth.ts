@@ -52,23 +52,30 @@ export class Auth {
   get user(): User | null {
     const user = this.user$.value;
     if (!user) return null;
-    
+
     const impersonatedOrgId = localStorage.getItem('impersonatedOrgId');
     if (impersonatedOrgId && this.isSuperAdminInternal(user)) {
       return { ...user, organizationId: impersonatedOrgId };
     }
-    
+
     return user;
   }
 
   private isSuperAdminInternal(user: User): boolean {
-    return user.role === 'admin' && !user.organizationId && (!user.organizationIds || user.organizationIds.length === 0);
+    return (
+      user.role === 'admin' &&
+      !user.organizationId &&
+      (!user.organizationIds || user.organizationIds.length === 0)
+    );
   }
 
   get isSuperAdmin(): boolean {
     const user = this.user$.value; // Use raw value for checking role
     if (!user || user.role !== 'admin') return false;
-    return !user.organizationId && (!user.organizationIds || user.organizationIds.length === 0);
+    return (
+      !user.organizationId &&
+      (!user.organizationIds || user.organizationIds.length === 0)
+    );
   }
 
   get isImpersonating(): boolean {
@@ -93,26 +100,35 @@ export class Auth {
     credentials: SignInInput,
   ): Promise<{ success: boolean; message: string; challenge?: string }> {
     try {
+      // Amplify v6: se c'è già una sessione attiva, signIn lancia un errore.
+      // Effettuiamo un signOut silenzioso prima di procedere.
+      try {
+        await signOut();
+      } catch (_) {}
       const { nextStep } = await signIn(credentials);
 
       if (nextStep.signInStep === 'DONE') {
         await fetchAuthSession({ forceRefresh: true });
-        const user = await firstValueFrom(this.http.get<User | null>('profile'));
+        const user = await firstValueFrom(
+          this.http.get<User | null>('profile'),
+        );
 
-          if (user) {
-            this.user$.next(user);
-            const orgId = user.organizationId || user.organizationIds?.[0];
-            if (orgId) {
-              this.getOrganizationById(orgId);
-            }
-            return { success: true, message: 'Login riuscito' };
-          } else {
-            return {
-              success: false,
-              message: 'Impossibile recuperare il profilo utente',
-            };
+        if (user) {
+          this.user$.next(user);
+          const orgId = user.organizationId || user.organizationIds?.[0];
+          if (orgId) {
+            this.getOrganizationById(orgId);
+          }
+          return { success: true, message: 'Login riuscito' };
+        } else {
+          return {
+            success: false,
+            message: 'Impossibile recuperare il profilo utente',
+          };
         }
-      } else if (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED') {
+      } else if (
+        nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED'
+      ) {
         return {
           success: true,
           message: 'Nuova password richiesta',
@@ -132,21 +148,36 @@ export class Auth {
     }
   }
 
-  async confirmPassword(newPassword: string): Promise<{ success: boolean; message: string }> {
+  async confirmPassword(
+    newPassword: string,
+  ): Promise<{ success: boolean; message: string }> {
     try {
-      const { nextStep } = await confirmSignIn({ challengeResponse: newPassword });
-      
+      const { nextStep } = await confirmSignIn({
+        challengeResponse: newPassword,
+      });
+
       if (nextStep.signInStep === 'DONE') {
         await fetchAuthSession({ forceRefresh: true });
-        const user = await firstValueFrom(this.http.get<User | null>('profile'));
+        const user = await firstValueFrom(
+          this.http.get<User | null>('profile'),
+        );
         if (user) {
           this.user$.next(user);
-          return { success: true, message: 'Password aggiornata e login effettuato' };
+          return {
+            success: true,
+            message: 'Password aggiornata e login effettuato',
+          };
         }
       }
-      return { success: false, message: 'Errore durante la conferma della password' };
+      return {
+        success: false,
+        message: 'Errore durante la conferma della password',
+      };
     } catch (error: any) {
-      return { success: false, message: error.message || 'Errore durante il cambio password' };
+      return {
+        success: false,
+        message: error.message || 'Errore durante il cambio password',
+      };
     }
   }
 

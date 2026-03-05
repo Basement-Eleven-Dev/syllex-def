@@ -1,4 +1,3 @@
-@import "../../../../styles.scss";
 
 :host {
   display: block;
@@ -22,7 +21,7 @@
     top: 25px;
     left: 0;
     height: 3px;
-    background-color: $primary;
+    background-color: var(--bs-primary);
     transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: -1;
   }
@@ -51,21 +50,21 @@
 
   &.active {
     .step-icon-wrapper {
-      border-color: $primary;
-      color: $primary;
+      border-color: var(--bs-primary);
+      color: var(--bs-primary);
       transform: scale(1.1);
-      box-shadow: 0 0 15px rgba($primary, 0.2) !important;
+      box-shadow: 0 0 15px rgba(var(--bs-primary-rgb), 0.2) !important;
     }
     .step-label {
-      color: $primary;
+      color: var(--bs-primary);
       font-weight: 700 !important;
     }
   }
 
   &.completed {
     .step-icon-wrapper {
-      background-color: $primary;
-      border-color: $primary;
+      background-color: var(--bs-primary);
+      border-color: var(--bs-primary);
       color: #ffffff;
     }
     .step-label {
@@ -87,8 +86,8 @@
   background-color: #fdfdfd;
 
   &:hover {
-    border-color: $primary;
-    background-color: rgba($primary, 0.02);
+    border-color: var(--bs-primary);
+    background-color: rgba( var(--bs-primary-rgb), 0.02);
   }
 
   .icon-circle {
@@ -118,7 +117,7 @@
 
     &:hover {
       transform: translateY(-5px) scale(1.05);
-      background-color: $primary;
+      background-color:  var(--bs-primary);
     }
   }
 }
