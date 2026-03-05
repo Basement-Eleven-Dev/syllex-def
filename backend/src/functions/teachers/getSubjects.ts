@@ -32,7 +32,7 @@ const getTeacherSubjects = async (
       },
       {
         $lookup: {
-          from: "tests",
+          from: "attempts",
           let: { subjectId: "$_id" },
           pipeline: [
             {
@@ -41,6 +41,7 @@ const getTeacherSubjects = async (
                   $and: [
                     { $eq: ["$subjectId", "$$subjectId"] },
                     { $ne: ["$status", "reviewed"] },
+                    { $ne: ["$source", "self-evaluation"] },
                   ],
                 },
               },
