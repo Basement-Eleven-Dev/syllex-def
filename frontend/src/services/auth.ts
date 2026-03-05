@@ -93,6 +93,9 @@ export class Auth {
     credentials: SignInInput,
   ): Promise<{ success: boolean; message: string; challenge?: string }> {
     try {
+      // Amplify v6: se c'è già una sessione attiva, signIn lancia un errore.
+      // Effettuiamo un signOut silenzioso prima di procedere.
+      try { await signOut(); } catch (_) {}
       const { nextStep } = await signIn(credentials);
 
       if (nextStep.signInStep === 'DONE') {
