@@ -1,4 +1,3 @@
-@import '../../../../styles.scss';
 
 .extra-small {
     font-size: 0.75rem;
@@ -12,6 +11,7 @@
     font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace !important;
 }
 
+
 .input-group-text {
     border-color: #f0f0f0;
 }
@@ -22,5 +22,5 @@
 
 textarea.form-control:focus, select.form-select:focus {
     box-shadow: none;
-    border-color: var(--primary-color);
+    border-color: var(--bs-primary);
 }
