@@ -8,7 +8,11 @@ const getMaterials = async (
   context: Context,
 ) => {
   const teacherId = context.user?._id;
-  const subjectId = context.subjectId;
+  // Prefer explicit query param, fallback to header-based context
+  const subjectIdParam = request.queryStringParameters?.subjectId;
+  const subjectId = subjectIdParam
+    ? new ObjectId(subjectIdParam)
+    : context.subjectId;
 
   // Get database connection
   const db = await getDefaultDatabase();

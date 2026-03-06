@@ -43,9 +43,9 @@
           </p>
         </div>
       </div>
-      @if (showActions) {
+      @if (showActions || (showDownload && !isFolder)) {
       <div class="d-flex flex-row align-items-start gap-1">
-        @if (!isFolder) {
+        @if (!isFolder && showDownload) {
         <button
           class="btn btn-light circle-btn btn-sm"
           (click)="downloadFile($event)"
@@ -53,7 +53,7 @@
         >
           <fa-icon [icon]="DownloadIcon"></fa-icon>
         </button>
-        }
+        } @if (showActions) {
         <div ngbDropdown class="d-inline-block">
           <button
             class="btn btn-light circle-btn btn-sm"
@@ -71,6 +71,7 @@
             ></app-materiale-contextual-menu>
           </div>
         </div>
+        }
       </div>
       }
     </div>

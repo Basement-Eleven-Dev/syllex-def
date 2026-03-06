@@ -4,12 +4,18 @@
       <h4 class="compact-test-card__title">{{ Test().name }}</h4>
       <span class="compact-test-card__subject">{{ Test().subjectName }}</span>
     </div>
-    <span [class]="'compact-test-card__status ' + StatusClass()">
-      {{ StatusBadge() }}
-    </span>
   </div>
 
-  <div class="compact-test-card__details">
+  @if (ShowScore()) {
+  <div class="compact-test-card__score">
+    <fa-icon [icon]="TrophyIcon" class="score-icon"></fa-icon>
+    <span class="score-value">{{ AttemptScore()!.score }}</span>
+    <span class="score-sep">/</span>
+    <span class="score-max">{{ AttemptScore()!.maxScore }} pt</span>
+  </div>
+  }
+
+  <!--   <div class="compact-test-card__details">
     <div class="compact-test-card__detail-item">
       <fa-icon [icon]="QuestionsIcon" class="detail-icon"></fa-icon>
       <span>{{ QuestionsCount() }} domande</span>
@@ -21,7 +27,7 @@
         MMM' }} }
       </span>
     </div>
-  </div>
+  </div> -->
 
   <button
     class="compact-test-card__button"

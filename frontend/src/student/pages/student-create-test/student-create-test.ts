@@ -34,6 +34,7 @@ export class StudentCreateTest {
     'risposta aperta',
   ];
 
+  readonly TestName = signal<string>('Auto-valutazione');
   readonly SelectedSubjectId = signal<string>('');
   readonly SelectedTopicIds = signal<Set<string>>(new Set());
   readonly QuestionCount = signal<number>(10);
@@ -54,6 +55,7 @@ export class StudentCreateTest {
 
   readonly IsFormValid = computed(
     () =>
+      this.TestName().trim().length > 0 &&
       this.SelectedSubjectId().length > 0 &&
       this.SelectedTopicIds().size > 0 &&
       this.QuestionCount() >= 1 &&
@@ -113,6 +115,7 @@ export class StudentCreateTest {
 
     this.testsService
       .createSelfEvaluation({
+        name: this.TestName().trim() || 'Auto-valutazione',
         subjectId: this.SelectedSubjectId(),
         topicIds: Array.from(this.SelectedTopicIds()),
         questionCount: this.QuestionCount(),

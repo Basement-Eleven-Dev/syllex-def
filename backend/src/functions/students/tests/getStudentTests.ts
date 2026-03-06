@@ -93,9 +93,12 @@ const getStudentTests = async (
     {
       $addFields: {
         subjectName: { $arrayElemAt: ["$_subject.name", 0] },
+        isPasswordProtected: {
+          $cond: [{ $gt: ["$password", null] }, true, false],
+        },
       },
     },
-    { $project: { _subject: 0 } },
+    { $project: { _subject: 0, password: 0 } },
     { $skip: skip },
     { $limit: currentPageSize },
   ];
