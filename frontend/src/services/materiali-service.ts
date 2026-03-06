@@ -212,28 +212,6 @@ export class MaterialiService {
     return search(this.root());
   }
 
-  uploadMaterial(
-    file: File,
-    targetFolder: MaterialInterface,
-  ): MaterialInterface {
-    const extension = file.name.split('.').pop()?.toLowerCase() || '';
-    const newMaterial: MaterialInterface = {
-      _id: `file-${Date.now()}`,
-      name: file.name,
-      url: `/materials/${file.name}`,
-      extension: extension,
-      createdAt: new Date(),
-    };
-
-    // TODO: Chiamata HTTP al backend per caricare il file
-    if (targetFolder.name === '/') {
-      this.root.update((current) => [...current, newMaterial]);
-    } else {
-      targetFolder.content!.push(newMaterial);
-    }
-
-    return newMaterial;
-  }
 
   moveItem(
     itemId: string,
