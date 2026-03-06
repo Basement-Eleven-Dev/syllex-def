@@ -19,5 +19,3 @@ export type Test = {
   createdAt: Date;
   updatedAt: Date;
 };
-
-"mario.dachille@outlook.it" | "3464725413";

@@ -54,6 +54,8 @@ const getQuestions = async (
     filter.policy = policy;
   }
 
+  console.log("Filtro per getQuestions:", filter);
+
   // Query con paginazione
   const questions = await questionsCollection
     .find(filter)

@@ -103,12 +103,12 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     method: "get",
     role: "admin",
   },
-  {
+  /*   {
     apiRoute: "admin/organizations/stats",
     functionPath: "admin/consumptions/getOrganizationStats.ts",
     method: "get",
     role: "admin",
-  },
+  }, */
   {
     apiRoute: "admin/stats/global",
     functionPath: "admin/stats/getSuperAdminStats.ts",
@@ -587,11 +587,5 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     functionPath: "teachers/generateAttemptInsight.ts",
     method: "post",
     role: "teacher",
-  },
-  {
-    apiRoute: "organizations/{organizationId}",
-    functionPath: "organizations/getOrganizationById.ts",
-    method: "get",
-    role: "logged",
   },
 ];
