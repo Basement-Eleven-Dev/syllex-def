@@ -159,7 +159,7 @@ const createAIGenMaterial = async (
       textMode: "preserve",
       exportAs: "pptx",
       imageOptions: {
-        source: "webFreeToUse",
+        source: "aiGenerated",
       },
       cardOptions: {
         headerFooter: {

@@ -12,6 +12,7 @@ export interface MaterialInterface {
   extension?: string;
   content?: MaterialInterface[];
   createdAt?: Date;
+  byteSize?: number;
   aiGenerated?: boolean;
   teacherId?: string;
   subjectId?: string;

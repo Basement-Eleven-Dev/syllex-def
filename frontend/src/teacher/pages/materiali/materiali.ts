@@ -244,11 +244,12 @@ export class Materiali {
         url: url,
         extension: extension,
         createdAt: new Date(),
+        byteSize: file.size
       };
       this.materialiService
         .createMaterial(newMaterial, this.rootFolder())
         .subscribe({
-          next: () => {},
+          next: () => { },
           error: (err) =>
             console.error('Errore durante la creazione del materiale:', err),
         });
@@ -268,7 +269,7 @@ export class Materiali {
         this.rootFolder(),
       )
       .subscribe({
-        next: () => {},
+        next: () => { },
         error: (err) =>
           console.error('Errore durante la creazione della cartella:', err),
       });
@@ -379,7 +380,7 @@ export class Materiali {
     newName: string,
   ): void {
     this.materialiService.renameItem(item._id!, newName).subscribe({
-      next: () => {},
+      next: () => { },
       error: (err) => console.error('Errore durante la rinomina:', err),
     });
   }
