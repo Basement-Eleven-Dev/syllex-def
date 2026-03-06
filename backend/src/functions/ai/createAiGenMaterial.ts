@@ -34,13 +34,13 @@ const getPrompt = (
   additionalInstructions?: string,
 ) => {
   const guardRails: string = `
-    Use the ${language} language.
-    Give the response a brief title. 
-    Answer the query using only the information provided in the attached documents.
-    Do not use any outside knowledge, facts, or assumptions not explicitly stated in these files.`;
+    Scrivi tutto il contenuto in ${language}.
+    Dai alla risposta un titolo breve.
+    Rispondi alla query utilizzando solo le informazioni fornite nei documenti allegati.
+    Non utilizzare conoscenze esterne, fatti o supposizioni non esplicitamente indicati in questi file.`;
 
   const prompts: Record<DocumentType, string> = {
-    slides: `Write me a ${numberOfSlides || 10}-slides content based on these documents.`,
+    slides: `Scrivimi ${numberOfSlides || 10} diapositive basate sui documenti forniti. In 'content' inserisci tutto il testo che dovrebbe essere presente compreso di titoli delle slide e specifiche su come presentare le informazioni, senza alcuna spiegazione o testo aggiuntivo. Mantieni il testo conciso e adatto a una presentazione visiva in ambito educativo. Se necessario, organizza le informazioni in punti ed elenchi.`,
     map: `
 Write a valid mermaid.js diagram based on these documents.
 
@@ -54,9 +54,15 @@ STRICT RULES:
     glossary: `Write me a glossary based on these documents. Use Markdown.`,
     summary: `Write me a medium length summary of these documents. Use Markdown.`,
   };
-  return (
-    prompts[type] + "\n" + (additionalInstructions || "\n") + "\n" + guardRails
-  );
+
+  let promptResult = prompts[type];
+  if (additionalInstructions) {
+    promptResult +=
+      `\nWhat you should focus on when creating the ${type}: ` +
+      additionalInstructions;
+  }
+  promptResult += "\n" + guardRails;
+  return promptResult;
 };
 
 const createAIGenMaterial = async (
@@ -99,6 +105,8 @@ const createAIGenMaterial = async (
     numberOfSlides,
     additionalInstructions,
   );
+
+  console.log("Generated prompt for LLM:", prompt);
   //LLM STRUCTURES
   const DocumentSchema = z.object({
     title: z.string(),
@@ -109,6 +117,8 @@ const createAIGenMaterial = async (
     materialObjects,
     DocumentSchema,
   );
+
+  console.log("LLM response:", { title, content });
 
   const organizationId =
     (context.user as any).organizationIds?.[0] ?? context.user!.organizationId;
@@ -159,7 +169,7 @@ const createAIGenMaterial = async (
       textMode: "preserve",
       exportAs: "pptx",
       imageOptions: {
-        source: "webFreeToUse",
+        source: "aiGenerated",
       },
       cardOptions: {
         headerFooter: {
@@ -172,7 +182,7 @@ const createAIGenMaterial = async (
       },
     });
     const prefix = process.env.LOCAL_TESTING ? "http://" : "https://";
-    material.url = `${prefix}${request.requestContext.domainName}/${request.requestContext.stage}/proxy/gamma/${res.generationId}`;
+    material.url = `${prefix}${request.requestContext.domainName}${request.requestContext.stage ? "/" + request.requestContext.stage : ""}/proxy/gamma/${res.generationId}`;
     material.extension = "pptx";
     material.name = title + "." + material.extension;
   }

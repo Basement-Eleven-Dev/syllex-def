@@ -135,7 +135,7 @@ export class GenAiContents implements OnInit {
       Validators.min(3),
       Validators.max(30),
     ]),
-    language: new FormControl('it', [Validators.required]),
+    language: new FormControl('italiano', [Validators.required]),
     difficulty: new FormControl<1 | 2 | 3>(2, [Validators.required]),
     numberOfAlternatives: new FormControl(4),
     instructions: new FormControl(''),

@@ -36,12 +36,31 @@
         HH:mm" }}
       </span>
     </div>
+    } @if (IsPasswordProtected() && !IsResuming()) {
+    <div class="mt-3 mb-1 text-start">
+      <label class="form-label text-muted small fw-semibold">
+        <fa-icon [icon]="LockIcon" class="me-1"></fa-icon>
+        Questo test è protetto da password
+      </label>
+      <input
+        type="password"
+        class="form-control form-control-lg"
+        [class.is-invalid]="PasswordError()"
+        placeholder="Inserisci la password del test"
+        [value]="PasswordInput()"
+        (input)="PasswordInput.set($any($event.target).value); PasswordError.set(null)"
+      />
+      @if (PasswordError()) {
+      <div class="invalid-feedback d-block">{{ PasswordError() }}</div>
+      }
+    </div>
     }
 
     <div class="d-flex flex-row gap-3 justify-content-center mt-3">
       <button
         class="btn btn-outline-secondary btn-lg px-4"
         (click)="onGoBack()"
+        [disabled]="IsStarting()"
       >
         <fa-icon [icon]="BackIcon" class="me-2"></fa-icon>
         Torna alla lista
@@ -55,9 +74,20 @@
         Riprendi test
       </button>
       } @else {
-      <button class="btn btn-primary btn-lg px-5" (click)="onStartTest()">
+      <button
+        class="btn btn-primary btn-lg px-5"
+        (click)="onStartTest()"
+        [disabled]="IsStarting() || (IsPasswordProtected() && !PasswordInput().trim())"
+      >
+        @if (IsStarting()) {
+        <fa-icon
+          [icon]="SpinnerIcon"
+          [animation]="'spin'"
+          class="me-2"
+        ></fa-icon>
+        } @else {
         <fa-icon [icon]="PlayIcon" class="me-2"></fa-icon>
-        Avvia test
+        } {{ IsStarting() ? 'Avvio in corso...' : 'Avvia test' }}
       </button>
       }
     </div>

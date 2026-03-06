@@ -12,6 +12,7 @@ export interface MaterialInterface {
   extension?: string;
   content?: MaterialInterface[];
   createdAt?: Date;
+  byteSize?: number;
   aiGenerated?: boolean;
   teacherId?: string;
   subjectId?: string;
@@ -51,7 +52,7 @@ export class MaterialiService {
       .get<{
         success: boolean;
         materials: MaterialInterface[];
-      }>('materials/subject')
+      }>(`materials/subject?subjectId=${subjectId}`)
       .subscribe({
         next: (response) => {
           this.currentFolder.set(null);
@@ -84,7 +85,10 @@ export class MaterialiService {
           this.isLoading.set(false);
         },
         error: (err) => {
-          console.error('Errore durante il caricamento dei materiali studente:', err);
+          console.error(
+            'Errore durante il caricamento dei materiali studente:',
+            err,
+          );
           this.isLoading.set(false);
         },
       });
@@ -208,29 +212,6 @@ export class MaterialiService {
     return search(this.root());
   }
 
-  uploadMaterial(
-    file: File,
-    targetFolder: MaterialInterface,
-  ): MaterialInterface {
-    const extension = file.name.split('.').pop()?.toLowerCase() || '';
-    const newMaterial: MaterialInterface = {
-      _id: `file-${Date.now()}`,
-      name: file.name,
-      url: `/materials/${file.name}`,
-      extension: extension,
-      createdAt: new Date(),
-    };
-
-    // TODO: Chiamata HTTP al backend per caricare il file
-    if (targetFolder.name === '/') {
-      this.root.update((current) => [...current, newMaterial]);
-    } else {
-      targetFolder.content!.push(newMaterial);
-    }
-
-    return newMaterial;
-  }
-
   moveItem(
     itemId: string,
     targetFolderId: string,
@@ -329,7 +310,9 @@ export class MaterialiService {
         deletedCount: number;
         removedFromParents: number;
       }>('materials/delete-batch', { materialIds: itemIds })
-      .pipe(tap(() => itemIds.forEach((id) => this.removeItemFromAllParents(id))));
+      .pipe(
+        tap(() => itemIds.forEach((id) => this.removeItemFromAllParents(id))),
+      );
   }
 
   renameItem(

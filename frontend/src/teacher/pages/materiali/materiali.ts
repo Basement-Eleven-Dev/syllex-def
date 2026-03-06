@@ -154,6 +154,8 @@ export class Materiali {
         this.highlightedItemId.set(null);
       }
     });
+
+    this.materialiService.loadMaterials();
   }
 
   clearFilters(): void {
@@ -244,6 +246,7 @@ export class Materiali {
         url: url,
         extension: extension,
         createdAt: new Date(),
+        byteSize: file.size,
       };
       this.materialiService
         .createMaterial(newMaterial, this.rootFolder())

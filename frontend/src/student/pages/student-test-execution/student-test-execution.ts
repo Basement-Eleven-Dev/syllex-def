@@ -15,6 +15,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faArrowLeft,
   faClock,
+  faLock,
   faPlay,
   faRotateRight,
   faSpinnerThird,
@@ -55,6 +56,7 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
   readonly PlayIcon = faPlay;
   readonly BackIcon = faArrowLeft;
   readonly ResumeIcon = faRotateRight;
+  readonly LockIcon = faLock;
 
   // State
   private readonly TestId = this.route.snapshot.paramMap.get('testId')!;
@@ -68,6 +70,9 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
   readonly RemainingSeconds = signal(0);
   readonly TestStarted = signal(false);
   readonly IsResuming = signal(false);
+  readonly IsStarting = signal(false);
+  readonly PasswordInput = signal('');
+  readonly PasswordError = signal<string | null>(null);
 
   private CurrentAttempt = signal<StudentAttemptInterface | null>(null);
 
@@ -76,6 +81,9 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
 
   // Computed
   readonly HasTimeLimit = computed(() => (this.TestData()?.timeLimit ?? 0) > 0);
+  readonly IsPasswordProtected = computed(
+    () => !!this.TestData()?.isPasswordProtected,
+  );
   readonly TimerExpired = computed(
     () => this.HasTimeLimit() && this.RemainingSeconds() <= 0,
   );
@@ -110,10 +118,20 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
   }
 
   onStartTest(): void {
-    this.TestStarted.set(true);
+    // Se il test è protetto da password e non stiamo riprendendo, valida prima
+    if (this.IsPasswordProtected() && !this.IsResuming()) {
+      if (!this.PasswordInput().trim()) {
+        this.PasswordError.set('Inserisci la password per avviare il test');
+        return;
+      }
+    }
+    this.PasswordError.set(null);
     if (this.IsResuming()) {
+      // Ripristino locale: nessuna API da attendere, transizione immediata
+      this.TestStarted.set(true);
       this.restoreFromAttempt(this.CurrentAttempt()!);
     } else {
+      // TestStarted verrà impostato SOLO dopo conferma del server
       this.createAttemptOnDb();
     }
   }
@@ -307,21 +325,28 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
       }),
     };
 
+    this.IsStarting.set(true);
     this.testsService
-      .createAttempt(attempt)
+      .createAttempt(attempt, this.PasswordInput() || undefined)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (created) => {
+          this.IsStarting.set(false);
           this.CurrentAttempt.set(created);
+          this.TestStarted.set(true);
           const startedAt = new Date(created.startedAt).getTime();
           this.startTimer(test.timeLimit, startedAt);
         },
         error: (err) => {
-          this.feedbackService.showFeedback(
-            "Errore nell'avvio del test: " + (err?.message || err),
-            false,
-          );
-          this.TestStarted.set(false);
+          this.IsStarting.set(false);
+          if (err?.status === 403) {
+            this.PasswordError.set('Password errata. Riprova.');
+          } else {
+            this.feedbackService.showFeedback(
+              "Errore nell'avvio del test: " + (err?.message || err),
+              false,
+            );
+          }
         },
       });
   }

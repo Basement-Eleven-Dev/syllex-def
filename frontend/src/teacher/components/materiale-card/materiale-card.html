@@ -2,9 +2,18 @@
   class="p-4 h-100 rounded-syllex position-relative"
   [class]="isFolder ? 'folder-card' : 'materiale-card'"
   [class.selected]="isSelected"
+  [class.opacity-50]="isReady === false"
+  [class.pe-none]="isReady === false"
   (dblclick)="requestOpenItem()"
   (click)="selectItem($event)"
 >
+  @if (isReady === false) {
+  <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center rounded-syllex" style="z-index:1; background:rgba(255,255,255,0.4)">
+    <div class="spinner-border spinner-border-sm text-secondary" role="status">
+      <span class="visually-hidden">Elaborazione in corso…</span>
+    </div>
+  </div>
+  }
   <div class="selection-checkbox" (click)="$event.stopPropagation()">
     <input
       type="checkbox"
@@ -27,12 +36,19 @@
       <div
         class="d-flex flex-column h-100 justify-content-center gap-2 flex-fill overflow-hidden"
       >
-        <fa-icon
-          [icon]="icon"
-          class="me-3"
-          size="2x"
-          [style.color]="iconColor"
-        ></fa-icon>
+
+        @if (isReady === false || isReady === undefined) {
+          <div class="spinner-border spinner-border-sm text-secondary" role="status">
+            <span class="visually-hidden">Elaborazione in corso…</span>
+          </div>
+        } @else {
+          <fa-icon
+            [icon]="icon"
+            class="me-3"
+            size="2x"
+            [style.color]="iconColor"
+          ></fa-icon>
+        }
 
         <div class="overflow-hidden">
           <p
@@ -43,9 +59,9 @@
           </p>
         </div>
       </div>
-      @if (showActions) {
+      @if (showActions || (showDownload && !isFolder)) {
       <div class="d-flex flex-row align-items-start gap-1">
-        @if (!isFolder) {
+        @if (!isFolder && showDownload) {
         <button
           class="btn btn-light circle-btn btn-sm"
           (click)="downloadFile($event)"
@@ -53,7 +69,7 @@
         >
           <fa-icon [icon]="DownloadIcon"></fa-icon>
         </button>
-        }
+        } @if (showActions) {
         <div ngbDropdown class="d-inline-block">
           <button
             class="btn btn-light circle-btn btn-sm"
@@ -71,6 +87,7 @@
             ></app-materiale-contextual-menu>
           </div>
         </div>
+        }
       </div>
       }
     </div>

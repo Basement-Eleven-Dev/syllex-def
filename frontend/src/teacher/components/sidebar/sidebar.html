@@ -9,6 +9,7 @@
         </a>
       </div>
       <h4 class="fw-bold mb-0">{{ selectedSubject?.name }}</h4>
+      @if (availableSubjects().length > 0) {
       <div
         class="text-decoration-underline fw-light cursor-pointer d-flex flex-row justify-content-between align-items-center w-100 z-index-1 position-relative mb-1 small"
         style="z-index: 1"
@@ -47,6 +48,7 @@
           }
         </div>
       </div>
+      }
     </div>
 
     <div id="mainRoutes" class="d-flex flex-column gap-2 flex-fill mt-4">

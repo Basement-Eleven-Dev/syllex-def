@@ -9,6 +9,7 @@ const getClassAttempts = async (
   context: Context,
 ) => {
   const classId = request.pathParameters?.classId;
+  const subjectId = context.subjectId;
 
   if (!classId) {
     throw createError.BadRequest("classId is required");
@@ -32,12 +33,19 @@ const getClassAttempts = async (
     typeof id === "string" ? new ObjectId(id) : id,
   );
 
-  // Find all attempts for students in this class
-  const attempts = await attemptsCollection
-    .find({
-      studentId: { $in: studentIds },
-    })
-    .toArray();
+  // Build filter: students in this class, optionally filtered by subject
+  // Exclude self-evaluation attempts (those are student-initiated, not teacher-assigned)
+  const filter: any = {
+    studentId: { $in: studentIds },
+    source: { $ne: "self-evaluation" },
+  };
+
+  if (subjectId) {
+    filter.subjectId = subjectId;
+  }
+
+  // Find all attempts for students in this class (filtered by subject)
+  const attempts = await attemptsCollection.find(filter).toArray();
 
   return {
     attempts,

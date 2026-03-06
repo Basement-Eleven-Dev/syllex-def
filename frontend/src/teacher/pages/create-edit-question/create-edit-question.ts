@@ -211,14 +211,14 @@ export class CreateEditQuestion {
     const questionData = this.prepareQuestionData();
     const serviceCall = this.CurrentQuestionId()
       ? this.questionsService.editQuestion(
-        this.CurrentQuestionId()!,
-        questionData,
-        this.UploadedImageFile() || undefined,
-      )
+          this.CurrentQuestionId()!,
+          questionData,
+          this.UploadedImageFile() || undefined,
+        )
       : this.questionsService.createQuestion(
-        questionData,
-        this.UploadedImageFile() || undefined,
-      );
+          questionData,
+          this.UploadedImageFile() || undefined,
+        );
 
     serviceCall.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
@@ -227,6 +227,8 @@ export class CreateEditQuestion {
           : 'Domanda salvata con successo!';
         this.feedbackService.showFeedback(message, true);
         this.IsLoading.set(false);
+        // go back to the page you came from
+        window.history.back();
       },
       error: (error) => {
         console.error('Error saving question:', error);
@@ -282,8 +284,8 @@ export class CreateEditQuestion {
       this.SelectedQuestionType(),
     );
     offCanvasRef.componentInstance.genAiQuestionForm.patchValue({
-      type: this.SelectedQuestionType()
-    })
+      type: this.SelectedQuestionType(),
+    });
 
     offCanvasRef.dismissed.subscribe((result) => {
       if (result) {
@@ -293,7 +295,7 @@ export class CreateEditQuestion {
   }
 
   private populateFormFromAI(result: any): void {
-    console.log(result)
+    console.log(result);
     this.QuestionForm.patchValue({
       topicId: result.topic?._id || result.topic,
       type: result.type,
@@ -313,8 +315,8 @@ export class CreateEditQuestion {
       this.QuestionForm.patchValue({ options });
     }
     if (result.type === 'vero falso') {
-      console.log(result.correctAnswer)
-      this.QuestionForm.patchValue({ correctAnswer: result.correctAnswer })
+      console.log(result.correctAnswer);
+      this.QuestionForm.patchValue({ correctAnswer: result.correctAnswer });
     }
   }
 

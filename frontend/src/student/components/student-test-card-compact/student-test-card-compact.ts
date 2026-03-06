@@ -10,6 +10,7 @@ import {
   faRotateRight,
   faStar,
   faArrowRight,
+  faTrophy,
 } from '@fortawesome/pro-solid-svg-icons';
 import { StudentTestInterface } from '../../../services/student-tests.service';
 
@@ -25,6 +26,9 @@ type AttemptStatus = 'in-progress' | 'delivered' | 'reviewed';
 export class StudentTestCardCompact {
   readonly Test = input.required<StudentTestInterface>();
   readonly AttemptStatus = input<AttemptStatus | null>(null);
+  readonly AttemptScore = input<{ score: number; maxScore: number } | null>(
+    null,
+  );
 
   readonly ClockIcon = faClock;
   readonly QuestionsIcon = faQuestionCircle;
@@ -32,11 +36,16 @@ export class StudentTestCardCompact {
   readonly ResumeIcon = faRotateRight;
   readonly ReviewIcon = faEye;
   readonly ArrowIcon = faArrowRight;
+  readonly TrophyIcon = faTrophy;
 
   readonly QuestionsCount = computed(() => this.Test().questions?.length ?? 0);
 
   readonly MaxScore = computed(() =>
     (this.Test().questions ?? []).reduce((total, q) => total + q.points, 0),
+  );
+
+  readonly ShowScore = computed(
+    () => this.AttemptStatus() === 'reviewed' && this.AttemptScore() !== null,
   );
 
   readonly IsCompleted = computed(() => {
