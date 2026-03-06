@@ -44,6 +44,7 @@ export class RestApiGateway extends Construct {
         apiId: this.apiGateway.restApiId,
         rootResourceId: this.apiGateway.restApiRootResourceId,
         authorizers: {
+          admin: this.adminAuthorizer,
           logged: this.loggedAuthorizer,
           teacher: this.teacherAuthorizer,
           student: this.studentAuthorizer,

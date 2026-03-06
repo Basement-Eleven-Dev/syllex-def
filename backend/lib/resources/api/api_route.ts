@@ -30,6 +30,7 @@ export interface RouteConstructProps extends NestedStackProps {
         logged?: Authorizer,
         teacher?: Authorizer,
         student?: Authorizer
+        admin?: Authorizer
     },
     validator?: RequestValidator,
     cognitoPoolId: string,
@@ -47,6 +48,7 @@ export class RouteConstruct extends NestedStack {
         if (appRole == 'logged') return this.props.authorizers.logged!;
         if (appRole == 'teacher') return this.props.authorizers.teacher!;
         if (appRole == 'student') return this.props.authorizers.student!;
+        if (appRole == 'admin') return this.props.authorizers.admin!;
         return undefined
     }
 
