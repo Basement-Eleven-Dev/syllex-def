@@ -40,7 +40,7 @@ const getPrompt = (
     Non utilizzare conoscenze esterne, fatti o supposizioni non esplicitamente indicati in questi file.`;
 
   const prompts: Record<DocumentType, string> = {
-    slides: `Scrivi il contenuto per un deck di ${numberOfSlides || 10} diapositive basato sui documenti forniti. Fornisci solo il testo che dovrebbe essere presente su ogni diapositiva, senza alcuna spiegazione o testo aggiuntivo. Mantieni il testo conciso e adatto a una presentazione visiva in ambito educativo. Se necessario, organizza le informazioni in punti elenco per facilitare la lettura durante la presentazione.`,
+    slides: `Scrivimi ${numberOfSlides || 10} diapositive basate sui documenti forniti. In 'content' inserisci tutto il testo che dovrebbe essere presente compreso di titoli delle slide e specifiche su come presentare le informazioni, senza alcuna spiegazione o testo aggiuntivo. Mantieni il testo conciso e adatto a una presentazione visiva in ambito educativo. Se necessario, organizza le informazioni in punti ed elenchi.`,
     map: `
 Write a valid mermaid.js diagram based on these documents.
 
@@ -117,6 +117,8 @@ const createAIGenMaterial = async (
     materialObjects,
     DocumentSchema,
   );
+
+  console.log("LLM response:", { title, content });
 
   const organizationId =
     (context.user as any).organizationIds?.[0] ?? context.user!.organizationId;
