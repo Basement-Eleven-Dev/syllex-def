@@ -144,7 +144,7 @@ export class RestApiGateway extends Construct {
   createAuthorizers() {
     this.createStudentAuthorizer();
     this.createTeacherAuthorizer();
-    //this.createAdminAuthorizer();
+    this.createAdminAuthorizer();
     this.createLoggedAuthorizer();
   }
   constructor(
