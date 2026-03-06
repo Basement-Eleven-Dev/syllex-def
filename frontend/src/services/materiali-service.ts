@@ -212,7 +212,6 @@ export class MaterialiService {
     return search(this.root());
   }
 
-
   moveItem(
     itemId: string,
     targetFolderId: string,

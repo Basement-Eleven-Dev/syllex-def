@@ -2,6 +2,8 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnDestroy,
+  OnInit,
   Output,
   ViewChild,
   inject,
@@ -45,7 +47,7 @@ import { FileViewer } from '../file-viewer/file-viewer';
   templateUrl: './materiale-card.html',
   styleUrl: './materiale-card.scss',
 })
-export class MaterialeCard {
+export class MaterialeCard implements OnInit, OnDestroy {
   ShareNodesIcon = faShareNodes;
   DownloadIcon = faDownload;
   @Input() item!: MaterialInterface;
@@ -70,6 +72,45 @@ export class MaterialeCard {
 
   requestAssignToClass(): void {
     this.contextualMenuRef?.onRequestAssignToClass();
+  }
+
+  isReady: boolean | undefined = undefined;
+  polingInterval: any;
+
+  ngOnInit(): void {
+    if (this.item.url?.includes('proxy/gamma/')) {
+      this.isReady = false;
+      this.polingInterval = setInterval(async () => {
+        try {
+          // redirect: 'follow' (default) means fetch will follow the 301 automatically;
+          // response.redirected === true and response.url holds the final destination URL.
+          const response = await fetch(this.item.url!, { method: 'GET' });
+
+          if (response.status === 404) return; // not ready yet, keep polling
+
+          clearInterval(this.polingInterval);
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data.url) {
+              this.item = { ...this.item, url: data.url };
+            }
+          }
+
+          this.isReady = true;
+        } catch (error) {
+          console.error('Error polling for material readiness:', error);
+        }
+      }, 5000); // Poll every 5 seconds
+    } else {
+      this.isReady = true;
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.polingInterval) {
+      clearInterval(this.polingInterval);
+    }
   }
 
   get isFolder(): boolean {
