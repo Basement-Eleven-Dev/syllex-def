@@ -19,7 +19,7 @@ export const lambdaRequest = (handler: any) => {
   return middy(handler)
     .use({
       before: async (request) => {
-        const subjectIdHeader = request.event.headers["Subject-Id"]
+        const subjectIdHeader = request.event.headers["Subject-Id"] || request.event['subject-id'];
         request.context.subjectId = subjectIdHeader
           ? new ObjectId(subjectIdHeader as string)
           : undefined;
