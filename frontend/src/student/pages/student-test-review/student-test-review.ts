@@ -13,6 +13,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faCheck,
   faClock,
+  faCircle,
+  faQuestion,
   faSpinnerThird,
   faXmark,
 } from '@fortawesome/pro-solid-svg-icons';
@@ -39,12 +41,18 @@ export class StudentTestReview implements OnInit {
   readonly ClockIcon = faClock;
   readonly CorrectIcon = faCheck;
   readonly WrongIcon = faXmark;
+  readonly QuestionIcon = faQuestion;
+  readonly CircleIcon = faCircle;
 
   private readonly TestId = this.route.snapshot.paramMap.get('testId')!;
 
   readonly Attempt = signal<StudentAttemptInterface | null>(null);
   readonly IsLoading = signal(true);
   readonly Error = signal<string | null>(null);
+
+  readonly IsAutoEvaluation = computed(
+    () => this.Attempt()?.source === 'self-evaluation',
+  );
 
   readonly FormattedTimeSpent = computed(() => {
     const seconds = this.Attempt()?.timeSpent ?? 0;
@@ -62,7 +70,9 @@ export class StudentTestReview implements OnInit {
       case 'delivered':
         return 'Consegnato';
       case 'reviewed':
-        return 'Corretto dal docente';
+        return this.IsAutoEvaluation()
+          ? "Corretto dall'AI di Syllex"
+          : 'Corretto dal docente';
       default:
         return 'Sconosciuto';
     }
@@ -74,6 +84,43 @@ export class StudentTestReview implements OnInit {
       (q) => q.answer !== null && q.answer !== undefined && q.answer !== '',
     ).length;
   });
+
+  readonly CorrectCount = computed(
+    () =>
+      this.Attempt()?.questions.filter((q) => q.status === 'correct').length ??
+      0,
+  );
+
+  readonly WrongCount = computed(
+    () =>
+      this.Attempt()?.questions.filter((q) => q.status === 'wrong').length ?? 0,
+  );
+
+  readonly SemiCorrectCount = computed(
+    () =>
+      this.Attempt()?.questions.filter((q) => q.status === 'semi-correct')
+        .length ?? 0,
+  );
+
+  readonly EmptyCount = computed(
+    () => this.Attempt()?.questions.filter((q) => !q.status).length ?? 0,
+  );
+
+  readonly Score = computed(() =>
+    this.Attempt()
+      ?.questions.reduce((sum, q) => sum + (q.score ?? 0), 0)
+      .toFixed(1),
+  );
+
+  readonly MaxScore = computed(() =>
+    this.Attempt()
+      ?.questions.reduce((sum, q) => sum + (q.points ?? 0), 0)
+      .toFixed(1),
+  );
+
+  readonly FeedbackLabel = computed(() =>
+    this.IsAutoEvaluation() ? "Commento dell'AI" : 'Commento del docente',
+  );
 
   ngOnInit(): void {
     this.loadAttempt();

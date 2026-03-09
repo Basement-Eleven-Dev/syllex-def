@@ -22,6 +22,7 @@
         <h3 class="stat-box__value">
           {{ AverageScore() }}<span class="stat-box__unit">%</span>
         </h3>
+        <p class="stat-box__subtitle">calcolata sui test corretti</p>
       </div>
     </div>
   </div>
@@ -56,6 +57,7 @@
     <app-student-test-card-compact
       [Test]="test"
       [AttemptStatus]="getAttemptStatus(test._id)"
+      [AttemptScore]="getAttemptScore(test._id)"
     />
   </div>
   } @empty {

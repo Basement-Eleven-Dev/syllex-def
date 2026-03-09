@@ -11,11 +11,13 @@ import { LambdaConstruct } from "../lambda";
 import { Role } from "aws-cdk-lib/aws-iam";
 import { Duration } from "aws-cdk-lib";
 import { API_GATEWAY_TIMEOUT } from "../../../src/env";
-import { AppRole, FUNCTION_INTEGRATIONS } from "./functions-declarations.config";
+import {
+  AppRole,
+  FUNCTION_INTEGRATIONS,
+} from "./functions-declarations.config";
 import { RouteConstruct } from "./api_route";
 import { SqsQueue } from "aws-cdk-lib/aws-events-targets";
 import { Queue } from "aws-cdk-lib/aws-sqs";
-
 
 export class RestApiGateway extends Construct {
   apiGateway: RestApi;
@@ -24,83 +26,120 @@ export class RestApiGateway extends Construct {
   teacherAuthorizer?: Authorizer;
   adminAuthorizer?: Authorizer;
   methods: Method[] = [];
-  timeout: Duration = Duration.seconds(API_GATEWAY_TIMEOUT)
+  timeout: Duration = Duration.seconds(API_GATEWAY_TIMEOUT);
   createApiMethods() {
-    this.apiGateway.root.addMethod('GET');
-    const routes: string[] = [...new Set(FUNCTION_INTEGRATIONS.map(el => el.apiRoute.toLowerCase().split('/')[0]))]
+    this.apiGateway.root.addMethod("GET");
+    const routes: string[] = [
+      ...new Set(
+        FUNCTION_INTEGRATIONS.map(
+          (el) => el.apiRoute.toLowerCase().split("/")[0],
+        ),
+      ),
+    ];
     routes.forEach((route: string) => {
-      const integrations = FUNCTION_INTEGRATIONS.filter(el => el.apiRoute.split('/')[0] == route)
+      const integrations = FUNCTION_INTEGRATIONS.filter(
+        (el) => el.apiRoute.split("/")[0] == route,
+      );
       let nestedStack = new RouteConstruct(this, route, {
         apiId: this.apiGateway.restApiId,
         rootResourceId: this.apiGateway.restApiRootResourceId,
         authorizers: {
+          admin: this.adminAuthorizer,
           logged: this.loggedAuthorizer,
           teacher: this.teacherAuthorizer,
-          student: this.studentAuthorizer
+          student: this.studentAuthorizer,
         },
         integrations: integrations,
         cognitoPoolId: this.cognitoPool.userPoolId,
         cognitoClientId: this.cognitoClient.userPoolClientId,
-        indexingQueueUrl: this.indexingQueueUrl
-      })
+        indexingQueueUrl: this.indexingQueueUrl,
+      });
       this.methods.concat(nestedStack.methods);
     });
   }
   createLoggedAuthorizer() {
-    if (FUNCTION_INTEGRATIONS.some(el => el.role == 'logged')) this.loggedAuthorizer = new TokenAuthorizer(
-      this,
-      "CognitoLoggedAuthorizer",
-      {
-        handler: new LambdaConstruct(this, 'loggedAuthorizer', 'src/_request-validators/logged-validator.ts', this.defaultRole, {
-          COGNITO_POOL_ID: this.cognitoPool.userPoolId,
-          COGNITO_CLIENT_ID: this.cognitoClient.userPoolClientId,
-        }).lambda,
-        identitySource: 'method.request.header.Authorization', // Where the token lives
-        resultsCacheTtl: Duration.minutes(5),
-      }
-    );
+    if (FUNCTION_INTEGRATIONS.some((el) => el.role == "logged"))
+      this.loggedAuthorizer = new TokenAuthorizer(
+        this,
+        "CognitoLoggedAuthorizer",
+        {
+          handler: new LambdaConstruct(
+            this,
+            "loggedAuthorizer",
+            "src/_request-validators/logged-validator.ts",
+            this.defaultRole,
+            {
+              COGNITO_POOL_ID: this.cognitoPool.userPoolId,
+              COGNITO_CLIENT_ID: this.cognitoClient.userPoolClientId,
+            },
+          ).lambda,
+          identitySource: "method.request.header.Authorization", // Where the token lives
+          resultsCacheTtl: Duration.minutes(5),
+        },
+      );
   }
   createStudentAuthorizer() {
-    if (FUNCTION_INTEGRATIONS.some(el => el.role == 'student')) this.studentAuthorizer = new TokenAuthorizer(
-      this,
-      "CognitoStudentAuthorizer",
-      {
-        handler: new LambdaConstruct(this, 'studentAuthorizer', 'src/_request-validators/student-validator.ts', this.defaultRole, {
-          COGNITO_POOL_ID: this.cognitoPool.userPoolId,
-          COGNITO_CLIENT_ID: this.cognitoClient.userPoolClientId,
-        }).lambda,
-        identitySource: 'method.request.header.Authorization', // Where the token lives
-        resultsCacheTtl: Duration.minutes(5),
-      }
-    );
+    if (FUNCTION_INTEGRATIONS.some((el) => el.role == "student"))
+      this.studentAuthorizer = new TokenAuthorizer(
+        this,
+        "CognitoStudentAuthorizer",
+        {
+          handler: new LambdaConstruct(
+            this,
+            "studentAuthorizer",
+            "src/_request-validators/student-validator.ts",
+            this.defaultRole,
+            {
+              COGNITO_POOL_ID: this.cognitoPool.userPoolId,
+              COGNITO_CLIENT_ID: this.cognitoClient.userPoolClientId,
+            },
+          ).lambda,
+          identitySource: "method.request.header.Authorization", // Where the token lives
+          resultsCacheTtl: Duration.minutes(5),
+        },
+      );
   }
   createTeacherAuthorizer() {
-    if (FUNCTION_INTEGRATIONS.some(el => el.role == 'teacher')) this.teacherAuthorizer = new TokenAuthorizer(
-      this,
-      "CognitoTeacherAuthorizer",
-      {
-        handler: new LambdaConstruct(this, 'teacherAuthorizer', 'src/_request-validators/teacher-validator.ts', this.defaultRole, {
-          COGNITO_POOL_ID: this.cognitoPool.userPoolId,
-          COGNITO_CLIENT_ID: this.cognitoClient.userPoolClientId,
-        }).lambda,
-        identitySource: 'method.request.header.Authorization', // Where the token lives
-        resultsCacheTtl: Duration.minutes(5),
-      }
-    );
+    if (FUNCTION_INTEGRATIONS.some((el) => el.role == "teacher"))
+      this.teacherAuthorizer = new TokenAuthorizer(
+        this,
+        "CognitoTeacherAuthorizer",
+        {
+          handler: new LambdaConstruct(
+            this,
+            "teacherAuthorizer",
+            "src/_request-validators/teacher-validator.ts",
+            this.defaultRole,
+            {
+              COGNITO_POOL_ID: this.cognitoPool.userPoolId,
+              COGNITO_CLIENT_ID: this.cognitoClient.userPoolClientId,
+            },
+          ).lambda,
+          identitySource: "method.request.header.Authorization", // Where the token lives
+          resultsCacheTtl: Duration.minutes(5),
+        },
+      );
   }
   createAdminAuthorizer() {
-    if (FUNCTION_INTEGRATIONS.some(el => el.role == 'admin')) this.adminAuthorizer = new TokenAuthorizer(
-      this,
-      "CognitoAdminAuthorizer",
-      {
-        handler: new LambdaConstruct(this, 'adminAuthorizer', 'src/_request-validators/admin-validator.ts', this.defaultRole, {
-          COGNITO_POOL_ID: this.cognitoPool.userPoolId,
-          COGNITO_CLIENT_ID: this.cognitoClient.userPoolClientId,
-        }).lambda,
-        identitySource: 'method.request.header.Authorization', // Where the token lives
-        resultsCacheTtl: Duration.minutes(5),
-      }
-    );
+    if (FUNCTION_INTEGRATIONS.some((el) => el.role == "admin"))
+      this.adminAuthorizer = new TokenAuthorizer(
+        this,
+        "CognitoAdminAuthorizer",
+        {
+          handler: new LambdaConstruct(
+            this,
+            "adminAuthorizer",
+            "src/_request-validators/admin-validator.ts",
+            this.defaultRole,
+            {
+              COGNITO_POOL_ID: this.cognitoPool.userPoolId,
+              COGNITO_CLIENT_ID: this.cognitoClient.userPoolClientId,
+            },
+          ).lambda,
+          identitySource: "method.request.header.Authorization", // Where the token lives
+          resultsCacheTtl: Duration.minutes(5),
+        },
+      );
   }
   createAuthorizers() {
     this.createStudentAuthorizer();
@@ -114,7 +153,7 @@ export class RestApiGateway extends Construct {
     private cognitoPool: UserPool,
     private cognitoClient: UserPoolClient,
     private defaultRole: Role,
-    private indexingQueueUrl: string
+    private indexingQueueUrl: string,
   ) {
     super(scope, name);
     this.apiGateway = new RestApi(this, name + "API", {
@@ -127,4 +166,3 @@ export class RestApiGateway extends Construct {
     this.createApiMethods();
   }
 }
-

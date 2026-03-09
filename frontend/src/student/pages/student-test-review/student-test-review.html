@@ -37,6 +37,54 @@
   </div>
 </div>
 
+<!-- Summary cards (visible only when reviewed) -->
+@if (attempt.status === 'reviewed') {
+<div class="row mb-4">
+  <!-- Punteggio -->
+  <div class="col-12 col-md-4 mb-3">
+    <div class="card h-100">
+      <div class="card-body d-flex flex-column align-items-center p-4">
+        <span class="card-value text-dark">
+          {{ Score() }}<span class="reduced">/{{ MaxScore() }}</span>
+        </span>
+        <p class="mb-0 card-description text-dark">Punteggio</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Risposte -->
+  <div class="col-12 col-md-4 mb-3">
+    <div class="card h-100">
+      <div class="card-body d-flex flex-column align-items-center p-4">
+        <div
+          class="d-flex flex-row justify-content-around align-items-center w-100 flex-fill"
+        >
+          <span class="card-value text-success">
+            {{ CorrectCount() }}
+            <fa-icon [icon]="CorrectIcon" size="xs"></fa-icon>
+          </span>
+          <span class="card-value text-danger">
+            {{ WrongCount() }}
+            <fa-icon [icon]="WrongIcon" size="xs"></fa-icon>
+          </span>
+        </div>
+        <p class="mb-0 card-description text-dark">Riepilogo risposte</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tempo impiegato -->
+  <div class="col-12 col-md-4 mb-3">
+    <div class="card h-100">
+      <div class="card-body d-flex flex-column align-items-center p-4">
+        <span class="card-value text-dark">{{ FormattedTimeSpent() }}</span>
+        <p class="mb-0 card-description text-dark">Tempo impiegato</p>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
 <!-- Questions (read-only) -->
 <div class="d-flex flex-column gap-3 mb-4">
   @for (q of attempt.questions; track q.question._id; let i = $index) {
@@ -52,6 +100,7 @@
     [score]="q.score ?? null"
     [questionStatus]="q.status ?? null"
     [teacherFeedback]="q.teacherComment ?? null"
+    [feedbackLabel]="FeedbackLabel()"
   ></div>
   }
 </div>

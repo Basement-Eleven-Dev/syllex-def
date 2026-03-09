@@ -130,6 +130,42 @@
   }
 }
 
+.compact-test-card__score {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.75rem;
+  background-color: rgba(123, 31, 162, 0.08);
+  border-radius: 0.5rem;
+  flex-shrink: 0;
+
+  .score-icon {
+    font-size: 0.75rem;
+    color: #7b1fa2;
+  }
+
+  .score-value {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #7b1fa2;
+  }
+
+  .score-sep {
+    font-size: 0.8rem;
+    color: #aaa;
+  }
+
+  .score-max {
+    font-size: 0.8rem;
+    color: #888;
+    font-weight: 500;
+  }
+
+  @media (max-width: 576px) {
+    order: 3;
+  }
+}
+
 .compact-test-card__button {
   display: flex;
   align-items: center;

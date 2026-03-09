@@ -41,7 +41,7 @@ const createMaterial = async (
 
   // If parentId is provided, add material to parent folder
   if (body.parentId) {
-    const parentId = new ObjectId(body.parentId);
+    const parentId = new ObjectId(body.parentId as string);
 
     // Validate parent folder exists and belongs to the teacher
     const parentFolder = await materialsCollection.findOne({
