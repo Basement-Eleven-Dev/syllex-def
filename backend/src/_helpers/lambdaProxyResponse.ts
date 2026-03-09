@@ -6,6 +6,7 @@ import httpErrorHandler from "@middy/http-error-handler";
 import { getCurrentUser } from "./getAuthCognitoUser";
 import { User } from "../models/user";
 import { ObjectId } from "mongodb";
+import { AUTHORIZED_API_HEADERS } from "../env";
 
 declare module "aws-lambda" {
   interface Context {
@@ -18,9 +19,7 @@ export const lambdaRequest = (handler: any) => {
   return middy(handler)
     .use({
       before: async (request) => {
-        const subjectIdHeader =
-          request.event.headers["Subject-Id"] ||
-          request.event.headers["subject-id"];
+        const subjectIdHeader = request.event.headers["Subject-Id"]
         request.context.subjectId = subjectIdHeader
           ? new ObjectId(subjectIdHeader as string)
           : undefined;
@@ -42,8 +41,7 @@ export const lambdaRequest = (handler: any) => {
     .use(
       cors({
         origin: "*",
-        headers:
-          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,subject-id,Subject-Id",
+        headers: AUTHORIZED_API_HEADERS.join(','),
       }),
     );
 };
