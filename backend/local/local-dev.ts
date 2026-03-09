@@ -46,6 +46,7 @@ const testRoute: FunctionIntegration = {
       const { handler } = await import(`../${FUNCTIONS_PATH + functionPath}`);
       console.log(req.originalUrl)
       // 2. Construct Lambda Proxy Event
+      console.log(req.headers, "req.headers");
       const event = {
         body: req.body, // This will be a string due to express.text()
         headers: req.headers,

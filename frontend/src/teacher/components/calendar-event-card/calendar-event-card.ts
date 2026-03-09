@@ -27,7 +27,7 @@ import { inject } from '@angular/core';
           @if (!readonly()) {
             <button
               type="button"
-              class="btn btn-sm btn-outline-primary"
+              class="btn btn-sm btn-edit"
               (click)="Edited.emit(Event()._id!)"
               title="Modifica evento"
             >
@@ -35,7 +35,7 @@ import { inject } from '@angular/core';
             </button>
             <button
               type="button"
-              class="btn btn-sm btn-outline-danger"
+              class="btn btn-sm btn-delete"
               confirmAction
               [confirmMessage]="'Sei sicuro di voler eliminare questo evento?'"
               confirmTitle="Conferma eliminazione"

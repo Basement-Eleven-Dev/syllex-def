@@ -8,6 +8,7 @@ const getSubjectClasses = async (
 ) => {
   const subjectId = context.subjectId!;
   let teacherId = context.user?._id;
+  console.log(subjectId, teacherId, "subjectId, teacherId");
   const db = await getDefaultDatabase();
   const assignments = await db
     .collection("teacher_assignments")
