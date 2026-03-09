@@ -74,7 +74,7 @@ export class RestApiGateway extends Construct {
             },
           ).lambda,
           identitySource: "method.request.header.Authorization", // Where the token lives
-          resultsCacheTtl: Duration.minutes(5),
+          resultsCacheTtl: Duration.minutes(5)
         },
       );
   }
@@ -95,7 +95,7 @@ export class RestApiGateway extends Construct {
             },
           ).lambda,
           identitySource: "method.request.header.Authorization", // Where the token lives
-          resultsCacheTtl: Duration.minutes(5),
+          resultsCacheTtl: Duration.minutes(5)
         },
       );
   }
@@ -116,7 +116,7 @@ export class RestApiGateway extends Construct {
             },
           ).lambda,
           identitySource: "method.request.header.Authorization", // Where the token lives
-          resultsCacheTtl: Duration.minutes(5),
+          resultsCacheTtl: Duration.minutes(5)
         },
       );
   }
@@ -137,7 +137,7 @@ export class RestApiGateway extends Construct {
             },
           ).lambda,
           identitySource: "method.request.header.Authorization", // Where the token lives
-          resultsCacheTtl: Duration.minutes(5),
+          resultsCacheTtl: Duration.minutes(5)
         },
       );
   }

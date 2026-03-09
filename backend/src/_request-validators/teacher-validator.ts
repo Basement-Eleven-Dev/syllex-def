@@ -10,5 +10,7 @@ export const handler = async (
     event: APIGatewayTokenAuthorizerEvent,
     context: Context
 ): Promise<APIGatewayAuthorizerResult> => {
-    return await checkValidation(event, 'teachers')
+    const policy = await checkValidation(event, 'teachers')
+    console.log(JSON.stringify(policy))
+    return policy
 };
