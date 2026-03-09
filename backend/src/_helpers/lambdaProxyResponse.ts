@@ -39,5 +39,11 @@ export const lambdaRequest = (handler: any) => {
       }),
     )
     .use(httpErrorHandler())
-    .use(cors({ origin: "*" }));
+    .use(
+      cors({
+        origin: "*",
+        headers:
+          "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,subject-id,Subject-Id",
+      }),
+    );
 };
