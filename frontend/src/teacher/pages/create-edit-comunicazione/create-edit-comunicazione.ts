@@ -93,7 +93,7 @@ export class CreateEditComunicazione {
     this.IsLoading.set(true);
     this.comunicazioniService
       .getComunicazioneById(id)
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
           this.populateFormWithComunicazione(response.communication);
@@ -129,7 +129,7 @@ export class CreateEditComunicazione {
     this.IsLoading.set(true);
     this.comunicazioniService
       .deleteComunicazione(this.ComunicazioneId)
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.router.navigate(['/t/comunicazioni']);
