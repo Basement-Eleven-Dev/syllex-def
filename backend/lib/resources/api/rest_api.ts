@@ -54,7 +54,7 @@ export class RestApiGateway extends Construct {
         cognitoClientId: this.cognitoClient.userPoolClientId,
         indexingQueueUrl: this.indexingQueueUrl,
       });
-      this.methods.concat(nestedStack.methods);
+      this.methods.push(...nestedStack.methods);
     });
   }
   createLoggedAuthorizer() {
