@@ -8,8 +8,6 @@ const countAssignmentsToGrade = async (
 ) => {
   const db = await getDefaultDatabase();
   const attemptsCollection = db.collection("attempts");
-
-
   const subjectId = context.subjectId;
 
   if (!subjectId) {
