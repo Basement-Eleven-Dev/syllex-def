@@ -45,14 +45,22 @@ export const checkValidation = async (
   const authorizedPayload = await canInvoke(token, cognitoGroup);
 
   console.log("Authorized Payload:", authorizedPayload);
+  // We use a wildcard ARN for the resource to avoid issues with Authorizer caching.
+  // API Gateway caches the policy for a given token. If the policy only allows the specific
+  // methodArn of the first request, subsequent requests to different endpoints will be denied (403).
+  const methodArnParts = event.methodArn.split("/");
+  const wildcardArn = `${methodArnParts[0]}/${methodArnParts[1]}/*/*`;
+
+
+
   return !authorizedPayload
-    ? generatePolicy("unauthorized", "Deny", event.methodArn)
+    ? generatePolicy("unauthorized", "Deny", wildcardArn)
     : generatePolicy(
-        authorizedPayload.sub,
-        "Allow",
-        event.methodArn,
-        authorizedPayload,
-      );
+      authorizedPayload.sub,
+      "Allow",
+      wildcardArn,
+      authorizedPayload,
+    );
 };
 
 const generatePolicy = (
@@ -76,10 +84,10 @@ const generatePolicy = (
     // The 'context' object only supports flat Key-Value pairs (strings, numbers, booleans)
     context: contextData
       ? {
-          email: contextData.email,
-          sub: contextData.sub,
-          groups: JSON.stringify(contextData["cognito:groups"] || []),
-        }
+        email: contextData.email,
+        sub: contextData.sub,
+        groups: JSON.stringify(contextData["cognito:groups"] || []),
+      }
       : undefined,
   };
 };

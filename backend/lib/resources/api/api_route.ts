@@ -18,7 +18,7 @@ import { Role } from "aws-cdk-lib/aws-iam";
 import { FUNCTIONS_PATH } from "../../../environment";
 import { LambdaConstruct } from "../lambda";
 import { DefaultLambdaRole } from "../roles";
-import { API_GATEWAY_TIMEOUT } from "../../../src/env";
+import { API_GATEWAY_TIMEOUT, AUTHORIZED_API_HEADERS } from "../../../src/env";
 import { writeFile } from "fs/promises";
 import { LayerVersion } from "aws-cdk-lib/aws-lambda";
 
@@ -57,7 +57,7 @@ export class RouteConstruct extends NestedStack {
             integrationResponses: [{
                 statusCode: '200',
                 responseParameters: {
-                    'method.response.header.Access-Control-Allow-Headers': "'*'",
+                    'method.response.header.Access-Control-Allow-Headers': `'${AUTHORIZED_API_HEADERS.join(',')}'`,
                     'method.response.header.Access-Control-Allow-Origin': "'*'",
                     'method.response.header.Access-Control-Allow-Credentials': "'false'",
                     'method.response.header.Access-Control-Allow-Methods': "'OPTIONS,GET,PUT,POST,DELETE,PATCH'",

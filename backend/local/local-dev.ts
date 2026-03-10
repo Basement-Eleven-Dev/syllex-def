@@ -3,7 +3,7 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import { FUNCTION_INTEGRATIONS, FunctionIntegration } from "../lib/resources/api/functions-declarations.config";
 import { FUNCTIONS_PATH } from "../environment";
-import { canInvoke } from "../src/_request-validators/_helpers";
+import { canInvoke } from "../src/_request-validators/_validators";
 const PORT = 3000;
 const app = express();
 // Use raw text parsing because Middy's jsonBodyParser
@@ -46,6 +46,7 @@ const testRoute: FunctionIntegration = {
       const { handler } = await import(`../${FUNCTIONS_PATH + functionPath}`);
       console.log(req.originalUrl)
       // 2. Construct Lambda Proxy Event
+      console.log(req.headers, "req.headers");
       const event = {
         body: req.body, // This will be a string due to express.text()
         headers: req.headers,

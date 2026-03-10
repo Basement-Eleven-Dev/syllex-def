@@ -57,7 +57,10 @@ const getStudentDetails = async (
   }
 
   // 3. Get All Attempts for this student (with filtering)
-  const attemptMatch: any = { studentId: studentObjectId };
+  const attemptMatch: any = {
+    studentId: studentObjectId,
+    source: { $ne: "self-evaluation" },
+  };
   if (subjectId) {
     attemptMatch.subjectId = subjectId;
   }

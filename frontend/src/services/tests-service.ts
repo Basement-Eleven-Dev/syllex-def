@@ -162,7 +162,7 @@ export class TestsService {
   }
 
   correctAttemptWithAI(attemptId: string, questionId: string) {
-    return this.http.post<{ score: number; explanation: string }>(
+    return this.http.post<{ score: number; explanation: string, aiProbability: string }>(
       `attempts/${attemptId}/${questionId}/correction/ai`,
       {},
     );

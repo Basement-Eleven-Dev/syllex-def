@@ -1,7 +1,6 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
 
 const countAssignmentsToGrade = async (
   request: APIGatewayProxyEvent,
@@ -9,7 +8,6 @@ const countAssignmentsToGrade = async (
 ) => {
   const db = await getDefaultDatabase();
   const attemptsCollection = db.collection("attempts");
-
   const subjectId = context.subjectId;
 
   if (!subjectId) {

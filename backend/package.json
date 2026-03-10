@@ -13,6 +13,8 @@
     "deploy": "npm run fix:pdfparse && npm run bootstrap && npm run build && cdk deploy",
     "deploy:local": "npm run fix:pdfparse && cdk bootstrap --profile=pathway && cdk synth && cdk deploy --profile=pathway",
     "create:user": "npx ts-node routines/createUser.ts",
+    "create:mock:attempts": "npx ts-node routines/createMockAttempts.ts",
+    "create:users": "npx ts-node routines/createUsers.ts",
     "dev": "AWS_PROFILE=pathway nodemon --exec tsx ./local/local-dev.ts",
     "test": "jest"
   },
