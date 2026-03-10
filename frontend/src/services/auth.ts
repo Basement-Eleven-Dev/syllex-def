@@ -13,6 +13,9 @@ import {
   resetPassword,
   confirmResetPassword,
   confirmSignIn,
+  setUpTOTP,
+  verifyTOTPSetup,
+  updateMFAPreference,
 } from 'aws-amplify/auth';
 import { HttpClient } from '@angular/common/http';
 
@@ -96,6 +99,38 @@ export class Auth {
     this.checkCurrentUser();
   }
 
+  async initiateMfaSetup(): Promise<string> {
+    try {
+      const totpSetupDetails = await setUpTOTP();
+
+      // This URI is what you feed into a QR code generator library 
+      // Example: qrcode.react or similar
+      const appName = "Syllex";
+      const setupUri = totpSetupDetails.getSetupUri(appName);
+
+      // 1. Show setupUri as a QR Code
+      // 2. Show a text input for the user to type the 6-digit code from their app
+      return setupUri.toString();
+    } catch (error) {
+      console.error('Error starting MFA setup:', error);
+      return ""
+    }
+  }
+
+  async finalizeMfa(userEnteredCode: string) {
+    try {
+      // 1. Verify the code is correct for the secret generated in Step 1
+      await verifyTOTPSetup({ code: userEnteredCode });
+
+      // 2. IMPORTANT: Set TOTP as the "Preferred" method for this user
+      // Without this, Cognito won't challenge them during the next login
+      await updateMFAPreference({ totp: 'PREFERRED' });
+
+      alert("MFA enabled successfully!");
+    } catch (error) {
+      console.error('Verification failed. The code might be expired.', error);
+    }
+  }
   async login(
     credentials: SignInInput,
   ): Promise<{ success: boolean; message: string; challenge?: string }> {
@@ -104,7 +139,7 @@ export class Auth {
       // Effettuiamo un signOut silenzioso prima di procedere.
       try {
         await signOut();
-      } catch (_) {}
+      } catch (_) { }
       const { nextStep } = await signIn(credentials);
 
       if (nextStep.signInStep === 'DONE') {
