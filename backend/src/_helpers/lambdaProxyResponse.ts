@@ -26,7 +26,6 @@ export const lambdaRequest = (handler: any) => {
           ? new ObjectId(subjectIdHeader as string)
           : undefined;
         request.context.user = await getCurrentUser(request.event);
-        console.log(request.context);
       },
     })
     .use(
