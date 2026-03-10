@@ -28,7 +28,11 @@ const generateStudentInsight = async (
   }
 
   // 2. Build match filter with optional subjectId
-  const matchFilter: any = { studentId: studentObjectId, status: "reviewed" };
+  const matchFilter: any = { 
+    studentId: studentObjectId, 
+    status: "reviewed",
+    source: { $ne: "self-evaluation" }
+  };
   if (subjectIdParam && ObjectId.isValid(subjectIdParam)) {
     matchFilter.subjectId = new ObjectId(subjectIdParam);
   }

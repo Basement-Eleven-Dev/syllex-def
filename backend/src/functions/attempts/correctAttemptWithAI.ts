@@ -50,7 +50,7 @@ const correctAttemptWithAI = async (request: APIGatewayProxyEvent) => {
   const question = attempt.questions[questionIndex];
 
   // 5. Chiamata all'AI con il maxScore reale preso dal Test
-  const { score, explanation } = await correctStudentQuestion(
+  const { score, explanation, aiProbability } = await correctStudentQuestion(
     question.answer,
     maxScore,
     question.question.explanation,
@@ -63,7 +63,8 @@ const correctAttemptWithAI = async (request: APIGatewayProxyEvent) => {
       $set: {
         [`questions.${questionIndex}.score`]: score,
         [`questions.${questionIndex}.teacherComment`]: explanation,
-        [`questions.${questionIndex}.status`]: score > 0 ? "correct" : "wrong",
+        [`questions.${questionIndex}.status`]: score >= (maxScore / 2) ? "correct" : "wrong",
+        [`questions.${questionIndex}.aiProbability`]: aiProbability,
         updatedAt: new Date(),
       },
     },
@@ -74,6 +75,7 @@ const correctAttemptWithAI = async (request: APIGatewayProxyEvent) => {
     score,
     explanation,
     maxScore, // Lo restituiamo per debug o UI
+    aiProbability
   };
 };
 

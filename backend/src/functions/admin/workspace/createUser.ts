@@ -5,6 +5,7 @@ import { getDefaultDatabase } from "../../../_helpers/getDatabase";
 import { ObjectId } from "mongodb";
 import { createCognitoUser } from "../../../_helpers/cognito/userManagement";
 
+// Questo è l'entry point per la creazione degli utenti lato admin (Workspace)
 const createUser = async (
   request: APIGatewayProxyEvent,
   context: Context,
