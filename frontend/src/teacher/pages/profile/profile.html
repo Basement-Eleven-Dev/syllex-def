@@ -6,8 +6,7 @@
   <div class="col-6">
     <section class="form-section">
       <label for="name" class="form-label text-dark">
-        <fa-icon [icon]="BuildingIcon"></fa-icon>Organizzazione</label
-      >
+        <fa-icon [icon]="BuildingIcon"></fa-icon>Organizzazione</label>
       <h4 class="fw-light text-dark" id="name">
         {{ authService.organizationName$ | async }}
       </h4>
@@ -19,8 +18,7 @@
   <div class="col-6">
     <section class="form-section">
       <label for="name" class="form-label text-dark">
-        <fa-icon [icon]="BuildingIcon"></fa-icon>La tua Istituzione</label
-      >
+        <fa-icon [icon]="BuildingIcon"></fa-icon>La tua Istituzione</label>
       <h4 class="fw-light text-dark" id="name">
         {{ authService.organizationName$ | async }}
       </h4>
@@ -51,29 +49,22 @@
 <div class="row mt-3">
   <div class="col-6">
     <section class="form-section">
-      <label
-        for="name"
-        class="form-label text-dark w-100 d-flex align-items-center justify-content-between"
-        >Email
+      <label for="name" class="form-label text-dark w-100 d-flex align-items-center justify-content-between">Email
         <button class="btn btn-link p-0 ms-2" (click)="onChangeEmail()">
           <fa-icon [icon]="EditIcon"></fa-icon> Modifica email
         </button>
       </label>
       <h4 class="fw-light text-dark" id="email">
-        {{ authService.user?.email }}
+        {{ authService.user?.username }}
       </h4>
     </section>
   </div>
   <div class="col-6">
     <section class="form-section">
-      <label
-        for="name"
-        class="form-label text-dark w-100 d-flex align-items-center justify-content-between"
-        >Password
+      <label for="name" class="form-label text-dark w-100 d-flex align-items-center justify-content-between">Password
         <button class="btn btn-link p-0 ms-2" (click)="onChangePassword()">
           <fa-icon [icon]="EditIcon"></fa-icon> Modifica password
-        </button></label
-      >
+        </button></label>
       <h4 class="fw-light text-dark" id="name">••••••••</h4>
     </section>
   </div>
@@ -82,9 +73,7 @@
 <div class="row mt-5 pb-5">
   <div class="col-12">
     <section class="form-section">
-      <label for="name" class="form-label text-dark mb-4"
-        >Materie di insegnamento</label
-      >
+      <label for="name" class="form-label text-dark mb-4">Materie di insegnamento</label>
       <div class="row">
         @for(materia of getMaterie(); track $index) {
         <div class="col-4 mb-3">
@@ -111,9 +100,7 @@
 <div class="row mt-5 pb-5">
   <div class="col-12">
     <section class="form-section">
-      <label for="name" class="form-label text-dark mb-4"
-        >Materie seguite</label
-      >
+      <label for="name" class="form-label text-dark mb-4">Materie seguite</label>
       <div class="row">
         @for(materia of getMaterie(); track $index) {
         <div class="col-4 mb-3">
