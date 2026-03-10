@@ -16,6 +16,7 @@ import {
   setUpTOTP,
   verifyTOTPSetup,
   updateMFAPreference,
+  fetchMFAPreference,
 } from 'aws-amplify/auth';
 import { HttpClient } from '@angular/common/http';
 
@@ -117,18 +118,54 @@ export class Auth {
     }
   }
 
-  async finalizeMfa(userEnteredCode: string) {
+  async finalizeMfa(userEnteredCode: string): Promise<{ success: boolean; message: string }> {
     try {
-      // 1. Verify the code is correct for the secret generated in Step 1
       await verifyTOTPSetup({ code: userEnteredCode });
-
-      // 2. IMPORTANT: Set TOTP as the "Preferred" method for this user
-      // Without this, Cognito won't challenge them during the next login
       await updateMFAPreference({ totp: 'PREFERRED' });
-
-      alert("MFA enabled successfully!");
-    } catch (error) {
+      return { success: true, message: 'Autenticazione a due fattori attivata con successo' };
+    } catch (error: any) {
       console.error('Verification failed. The code might be expired.', error);
+      return { success: false, message: 'Codice non valido o scaduto. Riprova.' };
+    }
+  }
+
+  async disableMfa(): Promise<{ success: boolean; message: string }> {
+    try {
+      await updateMFAPreference({ totp: 'NOT_PREFERRED' });
+      return { success: true, message: '2FA disattivato con successo' };
+    } catch (error: any) {
+      return { success: false, message: error.message || 'Errore durante la disattivazione del 2FA' };
+    }
+  }
+
+  async getMfaPreference(): Promise<boolean> {
+    try {
+      const preference = await fetchMFAPreference();
+      return preference.preferred === 'TOTP';
+    } catch {
+      return false;
+    }
+  }
+
+  async confirmSignInWithMfaCode(code: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const { nextStep } = await confirmSignIn({ challengeResponse: code });
+      if (nextStep.signInStep === 'DONE') {
+        await fetchAuthSession({ forceRefresh: true });
+        const user = await firstValueFrom(this.http.get<User | null>('profile'));
+        if (user) {
+          this.user$.next(user);
+          const orgId = user.organizationId || user.organizationIds?.[0];
+          if (orgId) this.getOrganizationById(orgId);
+          return { success: true, message: 'Login effettuato con successo' };
+        }
+      }
+      return { success: false, message: 'Errore durante la verifica del codice MFA' };
+    } catch (error: any) {
+      let message = 'Codice non valido';
+      if (error.name === 'CodeMismatchException') message = 'Codice non corretto';
+      if (error.name === 'ExpiredCodeException') message = 'Codice scaduto, attendi il prossimo';
+      return { success: false, message };
     }
   }
   async login(
@@ -168,6 +205,14 @@ export class Auth {
           success: true,
           message: 'Nuova password richiesta',
           challenge: 'NEW_PASSWORD_REQUIRED',
+        };
+      } else if (
+        nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_TOTP_CODE'
+      ) {
+        return {
+          success: true,
+          message: 'Inserisci il codice dalla tua app di autenticazione',
+          challenge: 'SOFTWARE_TOKEN_MFA',
         };
       } else {
         return {
