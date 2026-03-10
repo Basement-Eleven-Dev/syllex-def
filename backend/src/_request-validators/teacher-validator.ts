@@ -3,7 +3,7 @@ import {
     APIGatewayAuthorizerResult,
     Context
 } from 'aws-lambda';
-import { checkValidation } from './_helpers';
+import { checkValidation } from './_validators';
 
 
 export const handler = async (

@@ -3,7 +3,7 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import { FUNCTION_INTEGRATIONS, FunctionIntegration } from "../lib/resources/api/functions-declarations.config";
 import { FUNCTIONS_PATH } from "../environment";
-import { canInvoke } from "../src/_request-validators/_helpers";
+import { canInvoke } from "../src/_request-validators/_validators";
 const PORT = 3000;
 const app = express();
 // Use raw text parsing because Middy's jsonBodyParser
