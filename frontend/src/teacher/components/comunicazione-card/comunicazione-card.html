@@ -6,7 +6,7 @@
       <div class="d-flex flex-row gap-1 justify-content-end align-items-center">
         <button
           type="button"
-          class="btn btn-outline-primary"
+          class="btn btn-edit"
           title="Modifica"
           [routerLink]="'/t/comunicazioni/edit/' + comunicazione._id"
         >
@@ -14,7 +14,7 @@
         </button>
         <button
           type="button"
-          class="btn btn-outline-danger"
+          class="btn btn-delete"
           title="Rimuovi"
           confirmAction
           [confirmMessage]="'Sei sicuro di voler eliminare la comunicazione dal titolo &quot;' + comunicazione.title + '&quot;?'"

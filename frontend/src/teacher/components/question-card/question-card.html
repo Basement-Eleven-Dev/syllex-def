@@ -212,7 +212,7 @@
   <div class="d-flex flex-row gap-1 justify-content-end w-100">
     <button
       type="button"
-      class="btn btn-outline-primary"
+      class="btn btn-edit"
       title="Modifica"
       [routerLink]="'/t/edit-question/' + question._id"
     >
@@ -220,7 +220,7 @@
     </button>
     <button
       type="button"
-      class="btn btn-outline-danger"
+      class="btn btn-delete"
       title="Elimina"
       (click)="removeMe.emit(question._id)"
     >
@@ -245,7 +245,7 @@
     />
     <button
       type="button"
-      class="btn btn-outline-danger"
+      class="btn btn-delete"
       title="Rimuovi"
       (click)="removeMe.emit(question._id)"
     >

@@ -51,6 +51,8 @@ export const checkValidation = async (
   const methodArnParts = event.methodArn.split("/");
   const wildcardArn = `${methodArnParts[0]}/${methodArnParts[1]}/*/*`;
 
+
+
   return !authorizedPayload
     ? generatePolicy("unauthorized", "Deny", wildcardArn)
     : generatePolicy(
