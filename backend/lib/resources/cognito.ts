@@ -1,5 +1,5 @@
 import { Duration } from "aws-cdk-lib";
-import { CfnUserPoolGroup, UserPool, UserPoolClient } from "aws-cdk-lib/aws-cognito";
+import { CfnUserPoolGroup, Mfa, UserPool, UserPoolClient } from "aws-cdk-lib/aws-cognito";
 import { Construct } from "constructs";
 
 export class CognitoUserPool extends Construct {
@@ -11,6 +11,11 @@ export class CognitoUserPool extends Construct {
         this.cognitoPool = new UserPool(this, name + 'Pool', {
             signInAliases: {
                 email: true
+            },
+            mfa: Mfa.OPTIONAL,
+            mfaSecondFactor: {
+                otp: true,
+                sms: false // TOTP (Authenticator Apps) is recommended over SMS
             },
             passwordPolicy: {
                 minLength: 8,
