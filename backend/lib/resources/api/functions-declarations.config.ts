@@ -50,7 +50,7 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "admin",
   },
   {
-    apiRoute: "admin/organizations/{organizationId}/users",
+    apiRoute: "admin/organizations/{organizationId}/users", // Creazione utenti lato admin
     functionPath: "admin/workspace/createUser.ts",
     method: "post",
     role: "admin",

@@ -63,14 +63,20 @@ const getAttemptDetails = async (request: APIGatewayProxyEvent) => {
       questionsStats.empty++;
     } else if (isOpenQuestion) {
       // Per le APERTE: deduciamo lo stato dal campo status, ma il punteggio è quello del DB
-      resultStatus =
-        q.status === "correct"
-          ? "correct"
-          : q.status === "wrong"
-            ? "wrong"
-            : "dubious";
-
-      currentScore = q.score ?? 0; // Qui ci fidiamo del DB (o dell'AI)
+      const threshold = questionMaxScore / 2;
+      currentScore = q.score ?? 0;
+      
+      resultStatus = q.status;
+      if (!resultStatus || resultStatus === "dubious") {
+         // Se non c'è stato o è "dubious", rimane dubious a meno che non ci sia un punteggio numerico esplicito
+         if (typeof q.score === 'number') {
+            // Se c'è un punteggio esplicito, deduciamo lo stato
+            if (currentScore >= threshold) resultStatus = "correct";
+            else resultStatus = "wrong";
+         } else {
+            resultStatus = "dubious";
+         }
+      }
 
       if (resultStatus === "dubious") questionsStats.dubious++;
       else if (resultStatus === "correct") questionsStats.correct++;
@@ -114,6 +120,7 @@ const getAttemptDetails = async (request: APIGatewayProxyEvent) => {
         score: currentScore,
         maxScore: questionMaxScore,
         feedback: q.teacherComment || "",
+        aiProbability: q.aiProbability ?? null,
       },
     };
   });
