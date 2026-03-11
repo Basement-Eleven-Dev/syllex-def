@@ -85,7 +85,7 @@ const generateAttemptInsight = async (
   - Tempo Impiegato: ${Math.round(studentData.timeSpent / 60)} minuti
   
   Contesto Classe (Medie):
-  - Punteggio Medio: ${classContext.avgScore.toFixed(1)}
+  - Punteggio Medio: ${(classContext.avgScore || 0).toFixed(1)}
   - Tempo Medio: ${Math.round(classContext.avgTime / 60)} minuti
 
   Dettaglio Domande/Argomenti:
