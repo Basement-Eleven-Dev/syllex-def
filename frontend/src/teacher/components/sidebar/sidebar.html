@@ -2,6 +2,7 @@
   <div class="w-100 px-3 py-4 d-flex flex-column h-100">
     <div
       class="card bg-secondary text-dark p-3 d-flex flex-column justify-content-center fw-bold overflow-hidden position-relative"
+      tourAnchor="teacher-subject-select"
     >
   
       <h4 class="fw-bold mb-0">{{ selectedSubject?.name }}</h4>
@@ -60,6 +61,7 @@
         class="sidebarRoute w-100 gap-2 d-flex align-items-center"
         [routerLink]="route.path"
         routerLinkActive="active"
+        [tourAnchor]="route.tourAnchor || ''"
       >
         <fa-icon [icon]="route.icon"></fa-icon>
         <span class="routeLabel">{{route.label}}</span>
@@ -69,6 +71,7 @@
     <div
       class="btn text-start ai d-flex flex-column justify-content-center position-relative py-4 mb-2"
       routerLink="/t/agente"
+      tourAnchor="teacher-agent"
     >
       <fa-icon [icon]="HeadSideBrainIcon" id="sparkleIcon"></fa-icon>
       <h5 class="mb-0">Agente AI di {{ selectedSubject?.name }}</h5>
@@ -76,6 +79,7 @@
     <div
       class="btn text-start ai d-flex flex-column justify-content-center position-relative py-4"
       routerLink="/t/laboratorio-ai"
+      tourAnchor="teacher-ai-lab"
     >
       <fa-icon [icon]="SparklesIcon" id="sparkleIcon"></fa-icon>
       <h5 class="mb-0">Laboratorio AI</h5>

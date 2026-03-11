@@ -3,12 +3,14 @@ import {
   LOCALE_ID,
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection,
+  importProvidersFrom,
 } from '@angular/core';
 import { provideRouter, withViewTransitions } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { registerLocaleData } from '@angular/common';
 import localeIt from '@angular/common/locales/it';
 import { provideMarkdown } from 'ngx-markdown';
+import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap';
 
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
@@ -23,9 +25,19 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor])),
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes, withViewTransitions()),
+    provideRouter(
+      routes,
+      withViewTransitions({
+        onViewTransitionCreated: ({ transition }) => {
+          if (document.body.classList.contains('tour-active')) {
+            transition.skipTransition();
+          }
+        },
+      })
+    ),
     { provide: LOCALE_ID, useValue: 'it-IT' },
     provideMarkdown(),
     provideCharts(withDefaultRegisterables()),
+    importProvidersFrom(TourNgBootstrapModule),
   ],
 };

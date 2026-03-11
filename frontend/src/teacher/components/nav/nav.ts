@@ -1,5 +1,5 @@
 import { DatePipe, TitleCasePipe } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, ViewChild } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
@@ -7,6 +7,7 @@ import {
   faSignOutAlt,
   faUserCircle,
 } from '@fortawesome/pro-solid-svg-icons';
+import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 import {
   NgbDropdown,
   NgbDropdownToggle,
@@ -30,6 +31,7 @@ import { UserContextualMenu } from '../user-contextual-menu/user-contextual-menu
     NgbDropdownMenu,
     NgbDropdownItem,
     UserContextualMenu,
+    TourAnchorNgBootstrapDirective,
   ],
   templateUrl: './nav.html',
   styleUrl: './nav.scss',
@@ -70,5 +72,13 @@ export class Nav implements OnInit, OnDestroy {
       centered: true,
     });
     modalRef.componentInstance.showCloseButton = true;
+  }
+
+  @ViewChild(NgbDropdown) profileDropdown!: NgbDropdown;
+
+  closeDropdown() {
+    if (this.profileDropdown) {
+      this.profileDropdown.close();
+    }
   }
 }

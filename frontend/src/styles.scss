@@ -679,3 +679,34 @@ section {
     transform: translateY(1px);
   }
 }
+
+/* ngx-ui-tour backdrop and z-index fixes */
+.ngx-ui-tour_backdrop {
+  z-index: 1040 !important;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+.touranchor--is-active {
+  z-index: 1045 !important;
+  position: relative !important;
+}
+
+.tour-step-template {
+  z-index: 1050 !important;
+}
+
+/* Custom fluid overlay for tour */
+body.tour-active::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+  pointer-events: none; /* Let clicks pass through if needed, the library handles blocking */
+  animation: fadeInBackdrop 0.4s ease forwards;
+}
+
+@keyframes fadeInBackdrop {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

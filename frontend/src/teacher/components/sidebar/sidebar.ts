@@ -24,6 +24,7 @@ import {
   faUsers,
 } from '@fortawesome/pro-solid-svg-icons';
 import { NgbCollapseModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 import { Auth } from '../../../services/auth';
 import { FormsModule } from '@angular/forms';
 import { Materia, MateriaObject } from '../../../services/materia';
@@ -33,11 +34,12 @@ interface SidebarRoute {
   path: string;
   label: string;
   icon: IconDefinition;
+  tourAnchor?: string;
 }
 
 @Component({
   selector: 'app-sidebar',
-  imports: [FontAwesomeModule, RouterModule, NgbCollapseModule, FormsModule],
+  imports: [FontAwesomeModule, RouterModule, NgbCollapseModule, FormsModule, TourAnchorNgBootstrapDirective],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.scss',
 })
@@ -86,11 +88,13 @@ export class Sidebar {
       path: 'tests',
       label: 'Test',
       icon: faBallotCheck,
+      tourAnchor: 'teacher-tests'
     },
     {
       path: 'banca',
       label: 'Banca Domande',
       icon: faClipboardQuestion,
+      tourAnchor: 'teacher-banca'
     },
     {
       path: 'classi',

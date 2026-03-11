@@ -25,7 +25,7 @@
       /> -->
     </div>
 
-    <div ngbDropdown class="d-inline-block">
+    <div ngbDropdown class="d-inline-block" tourAnchor="teacher-profile">
       <div
         id="dropdownBasic1"
         ngbDropdownToggle
@@ -46,7 +46,7 @@
         aria-labelledby="dropdownBasic1"
         class="p-3 dropdown-menu"
       >
-        <app-user-contextual-menu></app-user-contextual-menu>
+        <app-user-contextual-menu (tourStarted)="closeDropdown()"></app-user-contextual-menu>
       </div>
     </div>
   </div>
