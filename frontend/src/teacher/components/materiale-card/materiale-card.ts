@@ -31,7 +31,7 @@ import {
   NgbModal,
 } from '@ng-bootstrap/ng-bootstrap';
 import { MaterialeContextualMenu } from '../materiale-contextual-menu/materiale-contextual-menu';
-import { MaterialInterface } from '../../../services/materiali-service';
+import { MaterialInterface } from '../../../services/materiali/materiali-service';
 import { FileViewer } from '../file-viewer/file-viewer';
 
 @Component({

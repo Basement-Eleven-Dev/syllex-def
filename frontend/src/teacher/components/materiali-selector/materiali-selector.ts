@@ -12,7 +12,7 @@ import {
 import {
   MaterialInterface,
   MaterialiService,
-} from '../../../services/materiali-service';
+} from '../../../services/materiali/materiali-service';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {

@@ -23,7 +23,7 @@ import {
 import {
   MaterialInterface,
   MaterialiService,
-} from '../../../services/materiali-service';
+} from '../../../services/materiali/materiali-service';
 import { FeedbackService } from '../../../services/feedback-service';
 import { FileViewer } from '../file-viewer/file-viewer';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';

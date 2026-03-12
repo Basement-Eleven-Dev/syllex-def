@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, effect, signal } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
-import { Materia } from './materia';
+import { Materia } from '../materia';
 
 export interface MaterialInterface {
   _id: string;

@@ -5,7 +5,7 @@ import { TestsService, TestInterface } from '../../../services/tests-service';
 import {
   MaterialiService,
   MaterialInterface,
-} from '../../../services/materiali-service';
+} from '../../../services/materiali/materiali-service';
 import { ClassiService } from '../../../services/classi-service';
 
 type ResourceType = 'test' | 'material';
