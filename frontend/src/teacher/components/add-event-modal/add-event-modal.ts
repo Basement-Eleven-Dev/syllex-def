@@ -75,7 +75,7 @@ import { DatePipe } from '@angular/common';
     <div class="modal-footer">
       <button
         type="button"
-        class="btn btn-outline-primary"
+        class="btn btn-blue"
         (click)="ActiveModal.dismiss()"
       >
         Annulla
