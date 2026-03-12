@@ -5,6 +5,9 @@
 <button ngbDropdownItem (click)="onRequestRenameItem()">Rinomina</button>
 @if(item.type !== 'folder') {
 <button ngbDropdownItem (click)="onRequestViewItem()">Visualizza</button>
+@if (isPptx) {
+<button ngbDropdownItem (click)="onRequestPresent()">Presenta</button>
+}
 <button ngbDropdownItem (click)="onRequestAssignToClass()">Assegna</button>
 }
 <div class="dropdown-divider"></div>
