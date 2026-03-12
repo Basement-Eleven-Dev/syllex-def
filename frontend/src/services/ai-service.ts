@@ -46,6 +46,7 @@ export interface GenerateMaterialRequest {
   type: BackendMaterialType;
   materialIds: string[];
   numberOfSlides?: number;
+  format?: 'pdf' | 'pptx';
   additionalInstructions?: string;
   language?: string;
 }
@@ -115,6 +116,7 @@ export class AiService {
     type: MaterialType;
     materialIds: string[];
     numberOfSlides?: number;
+    format?: 'pdf' | 'pptx';
     additionalInstructions?: string;
     language?: string;
   }): Promise<GeneratedMaterial> {
@@ -122,6 +124,7 @@ export class AiService {
       type: MATERIAL_TYPE_MAP[data.type],
       materialIds: data.materialIds,
       numberOfSlides: data.numberOfSlides,
+      format: data.format,
       additionalInstructions: data.additionalInstructions || undefined,
       language: data.language,
     };

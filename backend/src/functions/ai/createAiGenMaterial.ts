@@ -23,6 +23,7 @@ export type AIGenMaterialInput = {
   type: DocumentType;
   materialIds: string[];
   numberOfSlides?: number;
+  format?: "pptx" | "pdf";
   additionalInstructions?: string;
   language?: string;
 };
@@ -73,6 +74,7 @@ const createAIGenMaterial = async (
     type,
     materialIds,
     numberOfSlides,
+    format,
     additionalInstructions,
     language,
   } = JSON.parse(request.body || "{}") as AIGenMaterialInput;
@@ -167,7 +169,7 @@ const createAIGenMaterial = async (
       inputText: content,
       numCards: numberOfSlides || 10,
       textMode: "preserve",
-      exportAs: "pptx",
+      exportAs: format || "pptx",
       imageOptions: {
         source: "aiGenerated",
       },
@@ -183,7 +185,7 @@ const createAIGenMaterial = async (
     });
     const prefix = process.env.LOCAL_TESTING ? "http://" : "https://";
     material.url = `${prefix}${request.requestContext.domainName}${request.requestContext.stage ? "/" + request.requestContext.stage : ""}/proxy/gamma/${res.generationId}`;
-    material.extension = "pptx";
+    material.extension = format || "pptx";
     material.name = title + "." + material.extension;
   }
   if (type == "map") {
