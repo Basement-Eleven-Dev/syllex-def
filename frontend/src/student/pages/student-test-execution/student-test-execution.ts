@@ -137,8 +137,32 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
   }
 
   onAnswerChange(questionId: string, value: number | string): void {
+    const test = this.TestData();
+    const question = this.Questions().find((q) => q._id === questionId);
+    
+    // One-shot restriction: handle only if enabled and it's a closed question
+    if (test?.oneShotAnswers && question && question.type !== 'risposta aperta') {
+      const existing = this.Answers()[questionId];
+      if (existing !== null && existing !== undefined && existing !== '') {
+        // Already answered, block changes
+        return;
+      }
+    }
+
     this.Answers.update((a) => ({ ...a, [questionId]: value }));
     this.scheduleSave();
+  }
+
+  isQuestionLocked(question: QuestionInterface): boolean {
+    if (this.TimerExpired()) return true;
+    
+    const test = this.TestData();
+    if (test?.oneShotAnswers && question.type !== 'risposta aperta') {
+      const answer = this.Answers()[question._id];
+      return answer !== null && answer !== undefined && answer !== '';
+    }
+    
+    return false;
   }
 
   onSubmit(): void {

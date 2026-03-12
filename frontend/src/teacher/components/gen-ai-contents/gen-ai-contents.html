@@ -260,6 +260,32 @@
   }
 </div>
 
+@if (IsGenerating()) {
+<div id="genOverlay" class="fade-in">
+  @if (!GenerationSuccess()) {
+    <fa-icon [icon]="SpinnerIcon" [animation]="'spin'" size="3x"></fa-icon>
+    <h2 class="mt-4">Generazione in corso...</h2>
+    <p class="text-white-50 mt-2">
+      Non tornare indietro e non chiudere la pagina,<br>
+      altrimenti la generazione andrà perduta.
+    </p>
+  } @else {
+    <div class="text-center bounce-in">
+      <fa-icon [icon]="SparklesIcon" size="4x" class="text-warning"></fa-icon>
+      <h2 class="mt-4">Generazione completata!</h2>
+      <p class="text-white-50 mt-2">Il tuo materiale è pronto per essere consultato.</p>
+      
+      <button 
+        class="btn btn-light btn-lg mt-4 px-5 rounded-pill shadow" 
+        (click)="onReturnToMaterials()"
+      >
+        Vai ai materiali
+      </button>
+    </div>
+  }
+</div>
+}
+
 <!-- ─── MATERIAL SUCCESS MODAL ──────────────────────────────────────────── -->
 <ng-template #materialSuccessModal let-modal>
   <div class="modal-header border-0 pb-0">

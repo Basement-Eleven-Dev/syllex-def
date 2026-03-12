@@ -62,6 +62,10 @@ const createTest = async (request: APIGatewayProxyEvent, context: Context) => {
     newTest.randomizeQuestions = true;
   }
 
+  if (testData.oneShotAnswers === true) {
+    newTest.oneShotAnswers = true;
+  }
+
   const result = await testsCollection.insertOne(newTest as Test);
 
   return {
