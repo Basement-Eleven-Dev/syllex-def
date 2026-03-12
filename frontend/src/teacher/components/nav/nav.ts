@@ -28,7 +28,6 @@ import { UserContextualMenu } from '../user-contextual-menu/user-contextual-menu
     NgbDropdown,
     NgbDropdownToggle,
     NgbDropdownMenu,
-    NgbDropdownItem,
     UserContextualMenu,
   ],
   templateUrl: './nav.html',

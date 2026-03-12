@@ -20,6 +20,7 @@ export interface TestInterface {
   subjectId?: string;
   hasPendingCorrections?: boolean;
   uncorrectedCount?: number;
+  randomizeQuestions?: boolean;
 }
 
 interface TestDetailsResponse {

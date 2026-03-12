@@ -6,7 +6,7 @@ import { FeedbackService } from '../services/feedback-service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, NgbToastModule, NgFor],
+  imports: [RouterOutlet, NgbToastModule],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

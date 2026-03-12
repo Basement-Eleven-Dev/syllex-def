@@ -51,6 +51,8 @@ const editTest = async (request: APIGatewayProxyEvent, context: Context) => {
   if (testData.fitScore !== undefined) updateData.fitScore = testData.fitScore;
   if (testData.timeLimit) updateData.timeLimit = testData.timeLimit;
   if (context.subjectId) updateData.subjectId = context.subjectId;
+  // Explicitly handle boolean flag (cannot use truthiness check since false is valid)
+  updateData.randomizeQuestions = testData.randomizeQuestions === true;
 
   const result = await testsCollection.findOneAndUpdate(
     { _id: new ObjectId(testId), teacherId: context.user?._id },

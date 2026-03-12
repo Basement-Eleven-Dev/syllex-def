@@ -20,7 +20,6 @@ import { ClassiService } from '../../../services/classi-service';
     TitleCasePipe,
     FontAwesomeModule,
     DatePipe,
-    NgbPagination,
     CommonModule,
     FormsModule,
     NgbDropdown,

@@ -23,7 +23,6 @@ import { SyllexPagination } from '../syllex-pagination/syllex-pagination';
     DragDropModule,
     CdkDrag,
     QuestionCard,
-    QuestionsSearchFilters,
     SyllexPagination,
   ],
   templateUrl: './search-questions.html',
