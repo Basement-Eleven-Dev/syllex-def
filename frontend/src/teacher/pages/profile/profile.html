@@ -69,6 +69,32 @@
     </section>
   </div>
 </div>
+<div class="row mt-3">
+  <div class="col-6">
+    <section class="form-section">
+      <label class="form-label text-dark w-100 d-flex align-items-center justify-content-between">
+        <span>
+          <fa-icon [icon]="ShieldIcon" class="me-1"></fa-icon>
+          Autenticazione a due fattori (2FA)
+        </span>
+        @if (mfaEnabled() === true) {
+        <button class="btn btn-link p-0 ms-2 text-danger" (click)="onDisable2FA()">Disattiva</button>
+        } @else if (mfaEnabled() === false) {
+        <button class="btn btn-link p-0 ms-2" (click)="onSetup2FA()">
+          <fa-icon [icon]="EditIcon"></fa-icon> Configura
+        </button>
+        }
+      </label>
+      @if (mfaEnabled() === null) {
+      <span class="text-muted small">Caricamento...</span>
+      } @else if (mfaEnabled()) {
+      <span class="badge bg-success">Attivo</span>
+      } @else {
+      <span class="badge bg-secondary">Non attivo</span>
+      }
+    </section>
+  </div>
+</div>
 @if(authService.user?.role === 'teacher') {
 <div class="row mt-5 pb-5">
   <div class="col-12">

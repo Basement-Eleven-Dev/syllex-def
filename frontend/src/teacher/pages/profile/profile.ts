@@ -1,7 +1,7 @@
-import { Component, effect, inject } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { Auth } from '../../../services/auth';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faBook, faBuilding, faMarker } from '@fortawesome/pro-solid-svg-icons';
+import { faBook, faBuilding, faMarker, faShieldHalved } from '@fortawesome/pro-solid-svg-icons';
 import { AsyncPipe } from '@angular/common';
 import { Materia } from '../../../services/materia';
 import {
@@ -11,6 +11,7 @@ import {
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EditEmail } from '../../../app/edit-email/edit-email';
 import { EditPassword } from '../../../app/edit-password/edit-password';
+import { SetupMfa } from '../../../app/setup-mfa/setup-mfa';
 
 @Component({
   selector: 'app-profile',
@@ -29,12 +30,19 @@ export class Profile {
   public BuildingIcon = faBuilding;
   public EditIcon = faMarker;
   public BookIcon = faBook;
+  public ShieldIcon = faShieldHalved;
+  public mfaEnabled = signal<boolean | null>(null);
   public Assegnazioni: {
     class: ClassInterface;
     subjectId: string;
   }[] = [];
 
   constructor() {
+    // Load MFA preference
+    this.authService.getMfaPreference().then((enabled) => {
+      this.mfaEnabled.set(enabled);
+    });
+
     effect(() => {
       const assegnazioni = this.classiService.AllAssignments();
       if (assegnazioni) {
@@ -80,5 +88,23 @@ export class Profile {
       centered: true,
       size: 'md',
     });
+  }
+
+  async onSetup2FA(): Promise<void> {
+    const modalRef = this.modalService.open(SetupMfa, {
+      centered: true,
+      size: 'md',
+    });
+    const result = await modalRef.result.catch(() => 'dismissed');
+    if (result === 'enabled') {
+      this.mfaEnabled.set(true);
+    }
+  }
+
+  async onDisable2FA(): Promise<void> {
+    const result = await this.authService.disableMfa();
+    if (result.success) {
+      this.mfaEnabled.set(false);
+    }
   }
 }
