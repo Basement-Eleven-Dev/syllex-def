@@ -3,6 +3,10 @@ import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import { getDefaultDatabase } from "../../_helpers/getDatabase";
 import { ObjectId } from "mongodb";
+import { fetchBuffer } from "../../_helpers/fetchBuffer";
+import { extractTextFromFile } from "../../_helpers/documents/extractTextFromFile";
+import { suggestNewTopics } from "../../_helpers/AI/suggestNewTopics";
+import { Subject } from "../../models/subject";
 
 const createMaterial = async (
   request: APIGatewayProxyEvent,
@@ -71,15 +75,40 @@ const createMaterial = async (
       $push: { content: material._id },
     } as any);
   }
-  if (material.type !== "folder") {
-    const { startIndexingJob } =
-      await import("../../_triggers/backgroundVectorize");
-    await startIndexingJob(material._id);
+  let suggestedTopics: string[] = [];
+  if (material.type !== "folder" && material.url) {
+    try {
+      // Start indexing in background (existing logic)
+      const { startIndexingJob } = await import("../../_triggers/backgroundVectorize");
+      await startIndexingJob(material._id);
+
+      // Topic Discovery
+      const subject = (await db
+        .collection("subjects")
+        .findOne({ _id: context.subjectId as any })) as Subject;
+
+      if (subject) {
+        const buffer = await fetchBuffer(material.url);
+        const textExtracted = await extractTextFromFile(buffer, material.extension);
+        
+        if (textExtracted && textExtracted.trim().length > 0) {
+          suggestedTopics = await suggestNewTopics(
+            textExtracted,
+            subject.topics || [],
+            subject.name
+          );
+        }
+      }
+    } catch (discoveryError) {
+      console.error("Error during topic discovery:", discoveryError);
+      // Don't fail the whole request if discovery fails
+    }
   }
 
   return {
     success: true,
     material,
+    suggestedTopics,
   };
 };
 

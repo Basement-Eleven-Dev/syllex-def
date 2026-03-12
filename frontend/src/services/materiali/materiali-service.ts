@@ -354,13 +354,18 @@ export class MaterialiService {
   createMaterial(
     material: MaterialInterface,
     parent: MaterialInterface,
-  ): Observable<{ success: boolean; material: MaterialInterface }> {
+  ): Observable<{
+    success: boolean;
+    material: MaterialInterface;
+    suggestedTopics?: string[];
+  }> {
     console.log('Creating material under parent:', parent);
 
     return this.httpClient
       .post<{
         success: boolean;
         material: MaterialInterface;
+        suggestedTopics?: string[];
       }>('materials', {
         material,
         parentId: parent._id === 'root' ? null : parent._id,

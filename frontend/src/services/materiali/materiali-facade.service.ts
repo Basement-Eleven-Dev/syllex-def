@@ -13,6 +13,7 @@ import { getFileExtension } from '../../app/_utils/file-validation.utils';
 import { MaterialInterface, MaterialiService } from './materiali-service';
 import { MaterialeSearchService } from './materiale-search.service';
 import { MaterialeSelectionService } from './materiale-selection.service';
+import { Materia } from '../materia';
 
 /**
  * Facade that coordinates MaterialiService, SearchService, SelectionService
@@ -44,6 +45,8 @@ export class MaterialiFacadeService {
   readonly selectedCount = computed(
     () => this.selectionService.selectedIds().size,
   );
+  readonly suggestedTopics = signal<string[]>([]);
+  private readonly materiaService = inject(Materia);
 
   readonly rootFolder = computed<MaterialInterface>(() => {
     const current = this.materialiService.currentFolder();
@@ -124,7 +127,37 @@ export class MaterialiFacadeService {
           this.rootFolder(),
         );
       }),
+      tap((response) => {
+        if (response.suggestedTopics && response.suggestedTopics.length > 0) {
+          this.suggestedTopics.update((current) => {
+            const newTopics = response.suggestedTopics!.filter(
+              (t) => !current.includes(t)
+            );
+            return [...current, ...newTopics];
+          });
+        }
+      }),
       map((response) => response.material),
+    );
+  }
+
+  addSuggestedTopic(topic: string): Observable<any> {
+    const subjectId = this.materiaService.materiaSelected()?._id;
+    if (!subjectId) throw new Error('Nessuna materia selezionata');
+
+    return this.materiaService.addTopic(subjectId, topic).pipe(
+      tap(() => {
+        // Rimuovi il topic dai suggerimenti dopo averlo aggiunto
+        this.suggestedTopics.update((current) =>
+          current.filter((t) => t !== topic)
+        );
+      })
+    );
+  }
+
+  dismissSuggestedTopic(topic: string): void {
+    this.suggestedTopics.update((current) =>
+      current.filter((t) => t !== topic)
     );
   }
 
