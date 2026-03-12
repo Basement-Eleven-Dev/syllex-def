@@ -30,7 +30,7 @@ import { firstValueFrom } from 'rxjs';
 import {
   MaterialInterface,
   MaterialiService,
-} from '../../../services/materiali-service';
+} from '../../../services/materiali/materiali-service';
 import { EmbeddingsService } from '../../../services/embeddings.service';
 import { Materia } from '../../../services/materia';
 import { AgentService } from '../../../services/agent.service';

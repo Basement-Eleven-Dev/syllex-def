@@ -36,7 +36,17 @@ export class LoginForm {
   hasResult: { success: boolean; message: string } | null = null;
   isChallenge: boolean = false;
   challengeType: string | null = null;
+  isMfaChallenge: boolean = false;
   loading: boolean = false;
+
+  mfaCodeForm = new FormGroup({
+    code: new FormControl('', [
+      Validators.required,
+      Validators.minLength(6),
+      Validators.maxLength(6),
+      Validators.pattern(/^\d{6}$/),
+    ]),
+  });
 
   constructor(
     private router: Router,
@@ -58,7 +68,11 @@ export class LoginForm {
         this.hasResult = { success: true, message: 'Inserisci una nuova password per completare l\'attivazione' };
         return;
       }
-      
+      if (result.success && result.challenge === 'SOFTWARE_TOKEN_MFA') {
+        this.isMfaChallenge = true;
+        this.hasResult = { success: true, message: result.message };
+        return;
+      }
       this.hasResult = result;
       if (result.success) {
         this.handleSuccessfulLogin();
@@ -70,6 +84,19 @@ export class LoginForm {
     this.loading = true;
     const newPass = this.loginForm.value.password || '';
     this.authService.confirmPassword(newPass).then((result) => {
+      this.loading = false;
+      this.hasResult = result;
+      if (result.success) {
+        this.handleSuccessfulLogin();
+      }
+    });
+  }
+
+  onConfirmMfa() {
+    if (this.mfaCodeForm.invalid) return;
+    this.loading = true;
+    const code = this.mfaCodeForm.value.code || '';
+    this.authService.confirmSignInWithMfaCode(code).then((result) => {
       this.loading = false;
       this.hasResult = result;
       if (result.success) {

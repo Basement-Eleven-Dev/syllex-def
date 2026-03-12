@@ -18,7 +18,7 @@ import {
   ComunicazioniService,
   ComunicazioneInterface,
 } from '../../../services/comunicazioni-service';
-import { MaterialInterface } from '../../../services/materiali-service';
+import { MaterialInterface } from '../../../services/materiali/materiali-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({

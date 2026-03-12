@@ -1,0 +1,133 @@
+<div class="modal-header border-0 pb-0">
+  <h5 class="modal-title fw-semibold">
+    Autenticazione a due fattori (2FA)
+  </h5>
+  <button type="button" class="btn-close" (click)="onCancel()"></button>
+</div>
+
+<div class="modal-body px-4 py-3">
+
+  <!-- STEP: INTRO -->
+  @if (step() === 'intro') {
+    <div class="d-flex flex-column gap-3">
+      <p class="text-muted mb-0">
+        Il 2FA aggiunge un livello di sicurezza extra al tuo account. Dopo aver
+        inserito la password, ti verrà chiesto anche un codice temporaneo
+        generato dalla tua app di autenticazione.
+      </p>
+      <div class="d-flex flex-column gap-2">
+        <div class="d-flex align-items-start gap-3">
+          <span class="step-badge">1</span>
+          <span>Scansiona il QR code con un'app come <strong>Google Authenticator</strong> o <strong>Authy</strong>.</span>
+        </div>
+        <div class="d-flex align-items-start gap-3">
+          <span class="step-badge">2</span>
+          <span>Inserisci il codice a 6 cifre generato dall'app per confermare.</span>
+        </div>
+        <div class="d-flex align-items-start gap-3">
+          <span class="step-badge">3</span>
+          <span>Al prossimo accesso ti verrà chiesto il codice dopo la password.</span>
+        </div>
+      </div>
+
+      @if (errorMessage()) {
+        <div class="alert alert-danger py-2" role="alert">{{ errorMessage() }}</div>
+      }
+
+      <div class="d-flex gap-2 justify-content-end mt-2">
+        <button class="btn btn-outline-secondary" (click)="onCancel()">Annulla</button>
+        <button class="btn btn-primary" (click)="onStartSetup()" [disabled]="isLoading()">
+          @if (isLoading()) {
+            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+          }
+          Inizia configurazione
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- STEP: QR CODE -->
+  @if (step() === 'qrcode') {
+    <div class="d-flex flex-column gap-3">
+      <p class="text-muted mb-0">
+        Apri la tua app di autenticazione e scansiona il QR code qui sotto.
+      </p>
+
+      <div class="qr-container">
+        @if (qrCodeDataUrl()) {
+          <img [src]="qrCodeDataUrl()" alt="QR Code 2FA" class="qr-image" width="220" height="220" />
+        }
+        <p class="text-muted small mb-0 text-center">
+          Non riesci a scansionare? Inserisci manualmente questa chiave:
+        </p>
+        @if (secretKey()) {
+          <div class="secret-key w-100">{{ secretKey() }}</div>
+        }
+      </div>
+
+      <div class="d-flex gap-2 justify-content-end mt-2">
+        <button class="btn btn-outline-secondary" (click)="onCancel()">Annulla</button>
+        <button class="btn btn-primary" (click)="onGoToVerify()">
+          Avanti &rarr;
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- STEP: VERIFY -->
+  @if (step() === 'verify') {
+    <form [formGroup]="verifyForm" (ngSubmit)="onVerify()" class="d-flex flex-column gap-3">
+      <p class="text-muted mb-0">
+        Inserisci il codice a 6 cifre mostrato dalla tua app di autenticazione per completare l'attivazione.
+      </p>
+
+      <div>
+        <label for="mfa-code" class="form-label">Codice di verifica</label>
+        <input
+          type="text"
+          id="mfa-code"
+          class="form-control form-control-lg text-center fw-bold"
+          formControlName="code"
+          placeholder="000000"
+          maxlength="6"
+          inputmode="numeric"
+          autocomplete="one-time-code"
+          [class.is-invalid]="verifyForm.get('code')?.invalid && verifyForm.get('code')?.touched"
+        />
+        @if (verifyForm.get('code')?.invalid && verifyForm.get('code')?.touched) {
+          <div class="invalid-feedback">Inserisci un codice valido di 6 cifre</div>
+        }
+      </div>
+
+      @if (errorMessage()) {
+        <div class="alert alert-danger py-2" role="alert">{{ errorMessage() }}</div>
+      }
+
+      <div class="d-flex gap-2 justify-content-end">
+        <button type="button" class="btn btn-outline-secondary" (click)="step.set('qrcode')" [disabled]="isLoading()">
+          &larr; Indietro
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="isLoading() || verifyForm.invalid">
+          @if (isLoading()) {
+            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+          }
+          Verifica e attiva
+        </button>
+      </div>
+    </form>
+  }
+
+  <!-- STEP: SUCCESS -->
+  @if (step() === 'success') {
+    <div class="d-flex flex-column align-items-center gap-3 py-3 text-center">
+      <div class="success-icon">✅</div>
+      <h5 class="fw-semibold mb-0">2FA attivato con successo!</h5>
+      <p class="text-muted mb-0">
+        Da ora in poi, al login ti verrà chiesto il codice dalla tua app di autenticazione,
+        oltre alla password.
+      </p>
+      <button class="btn btn-primary mt-2" (click)="onClose()">Chiudi</button>
+    </div>
+  }
+
+</div>
