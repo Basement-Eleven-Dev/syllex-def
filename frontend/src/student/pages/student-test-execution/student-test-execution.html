@@ -137,7 +137,7 @@
     mode="student"
     [locked]="TimerExpired()"
     [dimmed]="TimerExpired()"
-    [selectedAnswer]="Answers()[question._id] ?? null"
+    [selectedAnswer]="Answers()[question._id]"
     (answerChange)="onAnswerChange(question._id, $event)"
   ></div>
   }

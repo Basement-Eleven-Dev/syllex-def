@@ -28,6 +28,7 @@ export interface StudentTestInterface {
   teacherId?: string;
   subjectId?: string;
   isPasswordProtected?: boolean;
+  randomizeQuestions?: boolean;
   questions?: {
     questionId: string | { $oid: string };
     points: number;
