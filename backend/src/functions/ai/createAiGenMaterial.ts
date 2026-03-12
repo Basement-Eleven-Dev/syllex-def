@@ -23,6 +23,7 @@ export type AIGenMaterialInput = {
   type: DocumentType;
   materialIds: string[];
   numberOfSlides?: number;
+  format?: "pptx" | "pdf";
   additionalInstructions?: string;
   language?: string;
 };
@@ -73,6 +74,7 @@ const createAIGenMaterial = async (
     type,
     materialIds,
     numberOfSlides,
+    format,
     additionalInstructions,
     language,
   } = JSON.parse(request.body || "{}") as AIGenMaterialInput;
@@ -88,10 +90,29 @@ const createAIGenMaterial = async (
     );
 
   const db = await getDefaultDatabase();
-  const materialCollection = db.collection("materials");
+  const materialsCollection = db.collection("materials");
+
+  // Check storage limit (1GB)
+  const STORAGE_LIMIT_B = 1024 * 1024 * 1024;
+  const currentMaterials = await materialsCollection.find({
+    teacherId: context.user!._id,
+    subjectId: context.subjectId as any,
+  }).toArray();
+
+  const totalBytes = currentMaterials.reduce(
+    (acc, m) => acc + (m.byteSize || 0),
+    0,
+  );
+  if (totalBytes >= STORAGE_LIMIT_B) {
+    throw createHttpError(
+      400,
+      "Limite di archiviazione (1GB) raggiunto per questa materia.",
+    );
+  }
+
   const organizationCollection = db.collection("organizations");
   const materialOIds = materialIds.map((el) => new ObjectId(el));
-  const materialObjects: MaterialInterface[] = (await materialCollection
+  const materialObjects: MaterialInterface[] = (await materialsCollection
     .find({
       _id: { $in: materialOIds },
       subjectId: context.subjectId,
@@ -158,6 +179,7 @@ const createAIGenMaterial = async (
       destinationFilename,
     );
     material.name = destinationFilename;
+    material.byteSize = pdfFile.length;
     let bucketKey = "ai_gen/" + material.name;
     material.url = await uploadContentToS3(bucketKey, pdfFile, mimetype);
   }
@@ -167,7 +189,7 @@ const createAIGenMaterial = async (
       inputText: content,
       numCards: numberOfSlides || 10,
       textMode: "preserve",
-      exportAs: "pptx",
+      exportAs: format || "pptx",
       imageOptions: {
         source: "aiGenerated",
       },
@@ -183,19 +205,20 @@ const createAIGenMaterial = async (
     });
     const prefix = process.env.LOCAL_TESTING ? "http://" : "https://";
     material.url = `${prefix}${request.requestContext.domainName}${request.requestContext.stage ? "/" + request.requestContext.stage : ""}/proxy/gamma/${res.generationId}`;
-    material.extension = "pptx";
+    material.extension = format || "pptx";
     material.name = title + "." + material.extension;
   }
   if (type == "map") {
     material.extension = "txt";
     material.name = title + "." + material.extension;
+    material.byteSize = Buffer.byteLength(content, "utf8");
     let bucketKey = "ai_gen/" + material.name;
     let mimetype = "text/plain; charset=utf-8";
     material.isMap = true;
     material.url = await uploadContentToS3(bucketKey, content, mimetype);
   }
 
-  const insertResult = await materialCollection.insertOne(material);
+  const insertResult = await materialsCollection.insertOne(material);
 
   return {
     material: {

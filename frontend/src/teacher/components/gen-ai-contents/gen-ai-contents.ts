@@ -136,6 +136,7 @@ export class GenAiContents implements OnInit {
       Validators.min(3),
       Validators.max(30),
     ]),
+    format: new FormControl('pptx'),
     language: new FormControl('italiano', [Validators.required]),
     difficulty: new FormControl<1 | 2 | 3>(2, [Validators.required]),
     numberOfAlternatives: new FormControl(4),
@@ -243,7 +244,7 @@ export class GenAiContents implements OnInit {
   }
 
   private async submitMaterialGeneration(): Promise<void> {
-    const { selectedType, numberOfSlides, language, instructions } =
+    const { selectedType, numberOfSlides, format, language, instructions } =
       this.genForm.value;
 
     const materialIds = [...this.materialiSelector.selectedMaterialIds()];
@@ -252,8 +253,9 @@ export class GenAiContents implements OnInit {
       type: selectedType as MaterialType,
       materialIds,
       numberOfSlides: this.IsSlides() ? numberOfSlides : undefined,
+      format: this.IsSlides() ? format : undefined,
       additionalInstructions: instructions || undefined,
-      language,
+      language: language,
     });
 
     this.GeneratedMaterial.set(material);

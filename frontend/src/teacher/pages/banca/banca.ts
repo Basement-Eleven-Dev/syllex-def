@@ -1,6 +1,7 @@
 import { Component, signal, computed, effect, inject } from '@angular/core';
 import { QuestionsSearchFilters } from '../../components/questions-search-filters/questions-search-filters';
 import { QuestionCard } from '../../components/question-card/question-card';
+import { QuestionTable } from '../../components/question-table/question-table';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPlus } from '@fortawesome/pro-solid-svg-icons';
 import { RouterModule } from '@angular/router';
@@ -11,16 +12,22 @@ import {
   QuestionInterface,
 } from '../../../services/questions';
 import { Materia } from '../../../services/materia';
+import {
+  ViewTypeToggle,
+  ViewType,
+} from '../../components/view-type-toggle/view-type-toggle';
 
 @Component({
   selector: 'app-banca',
   imports: [
     QuestionsSearchFilters,
     QuestionCard,
+    QuestionTable,
     FontAwesomeModule,
     RouterModule,
     SyllexPagination,
     FormsModule,
+    ViewTypeToggle,
   ],
   templateUrl: './banca.html',
   styleUrl: './banca.scss',
@@ -32,6 +39,9 @@ export class Banca {
   // Dependency Injection
   private readonly questionsService = inject(QuestionsService);
   protected readonly materiaService = inject(Materia);
+
+  // View type
+  ViewType: ViewType = this.loadViewTypePreference() || 'grid';
 
   // Signals
   private RawQuestions = signal<QuestionInterface[]>([]);
@@ -92,6 +102,19 @@ export class Banca {
       list.filter((q) => q._id !== questionId),
     );
     this.CollectionSize.update((n) => n - 1);
+  }
+
+  onChangeViewType(type: ViewType): void {
+    this.ViewType = type;
+  }
+
+  private loadViewTypePreference(): ViewType | null {
+    try {
+      const saved = localStorage.getItem('viewType_banca');
+      return saved === 'grid' || saved === 'table' ? saved : null;
+    } catch {
+      return null;
+    }
   }
 
   private loadQuestions(

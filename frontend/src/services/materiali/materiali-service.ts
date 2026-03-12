@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, effect, signal } from '@angular/core';
+import { Injectable, effect, signal, computed } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { Materia } from '../materia';
@@ -21,6 +21,8 @@ export interface MaterialInterface {
   isMap?: boolean;
 }
 
+export const STORAGE_LIMIT_B =1024* 1024 * 1024; // 1 GB
+
 @Injectable({
   providedIn: 'root',
 })
@@ -28,6 +30,21 @@ export class MaterialiService {
   root = signal<MaterialInterface[]>([]);
   currentFolder = signal<MaterialInterface | null>(null);
   isLoading = signal<boolean>(false);
+
+  totalByteSize = computed(() => {
+    const calculateSize = (items: MaterialInterface[]): number => {
+      return items.reduce((total, item) => {
+        let size = item.byteSize || 0;
+        if (item.type === 'folder' && item.content) {
+          size += calculateSize(item.content);
+        }
+        return total + size;
+      }, 0);
+    };
+    return calculateSize(this.root());
+  });
+
+  isStorageFull = computed(() => this.totalByteSize() >= STORAGE_LIMIT_B);
 
   constructor(
     private httpClient: HttpClient,

@@ -16,4 +16,5 @@ export type MaterialInterface = {
   teacherId: ObjectId;
   subjectId: ObjectId;
   generatedFrom?: ObjectId[];
+  byteSize?: number;
 };

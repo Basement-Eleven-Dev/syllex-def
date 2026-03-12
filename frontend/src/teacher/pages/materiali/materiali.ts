@@ -49,6 +49,7 @@ import {
   getFileExtension,
   getAllowedExtensionsLabel,
 } from '../../../app/_utils/file-validation.utils';
+import { StorageLimitBar } from '../../components/storage-limit-bar/storage-limit-bar';
 
 @Component({
   selector: 'app-materiali',
@@ -62,6 +63,7 @@ import {
     NgbDropdownToggle,
     NgbDropdownMenu,
     MaterialeContextualMenu,
+    StorageLimitBar,
   ],
   templateUrl: './materiali.html',
   styleUrl: './materiali.scss',
@@ -94,6 +96,7 @@ export class Materiali {
   readonly currentPathArray = this.facade.currentPathArray;
   readonly highlightedItemId = this.facade.highlightedItemId;
   readonly selectedCount = this.facade.selectedCount;
+  readonly isStorageFull = this.facade.isStorageFull;
 
   // ── UI-only state ─────────────────────────────────────────────────
   protected readonly viewType = signal<ViewType>('grid');
