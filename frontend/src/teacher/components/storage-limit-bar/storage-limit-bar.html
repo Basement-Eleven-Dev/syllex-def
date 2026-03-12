@@ -1,0 +1,31 @@
+<div class="storage-container mb-4">
+  <div class="d-flex justify-content-between align-items-center mb-1">
+    <span class="small fw-semibold text-primary">Utilizzo Archiviazione</span>
+    <div class="d-flex align-items-center gap-2">
+      <span class="text-muted" style="font-size: 0.7rem;">({{ percentage().toFixed(1) }}%)</span>
+      <span class="small" [class.text-danger]="isCritical()" [class.text-primary]="!isCritical()">
+        {{ formattedTotalSize() }} / {{ formattedLimit() }}
+      </span>
+    </div>
+  </div>
+  <div class="progress" style="height: 6px; background-color: rgba(0,0,0,0.05); border-radius: 10px;">
+    <div
+      class="progress-bar progress-bar-animated"
+      role="progressbar"
+      [style.width.%]="percentage()"
+      [class.bg-danger]="isCritical()"
+      [class.bg-primary]="!isCritical()"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      style="border-radius: 10px; transition: width 0.5s ease-in-out;"
+    ></div>
+  </div>
+  @if (isCritical()) {
+    <div class="mt-1">
+      <small class="text-danger" style="font-size: 0.7rem;">
+        <i class="bi bi-exclamation-triangle-fill me-1"></i>
+        Spazio quasi esaurito. Elimina dei file per caricarne altri.
+      </small>
+    </div>
+  }
+</div>
