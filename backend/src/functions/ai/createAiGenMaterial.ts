@@ -90,10 +90,29 @@ const createAIGenMaterial = async (
     );
 
   const db = await getDefaultDatabase();
-  const materialCollection = db.collection("materials");
+  const materialsCollection = db.collection("materials");
+
+  // Check storage limit (1GB)
+  const STORAGE_LIMIT_B = 1024 * 1024 * 1024;
+  const currentMaterials = await materialsCollection.find({
+    teacherId: context.user!._id,
+    subjectId: context.subjectId as any,
+  }).toArray();
+
+  const totalBytes = currentMaterials.reduce(
+    (acc, m) => acc + (m.byteSize || 0),
+    0,
+  );
+  if (totalBytes >= STORAGE_LIMIT_B) {
+    throw createHttpError(
+      400,
+      "Limite di archiviazione (1GB) raggiunto per questa materia.",
+    );
+  }
+
   const organizationCollection = db.collection("organizations");
   const materialOIds = materialIds.map((el) => new ObjectId(el));
-  const materialObjects: MaterialInterface[] = (await materialCollection
+  const materialObjects: MaterialInterface[] = (await materialsCollection
     .find({
       _id: { $in: materialOIds },
       subjectId: context.subjectId,
@@ -160,6 +179,7 @@ const createAIGenMaterial = async (
       destinationFilename,
     );
     material.name = destinationFilename;
+    material.byteSize = pdfFile.length;
     let bucketKey = "ai_gen/" + material.name;
     material.url = await uploadContentToS3(bucketKey, pdfFile, mimetype);
   }
@@ -191,13 +211,14 @@ const createAIGenMaterial = async (
   if (type == "map") {
     material.extension = "txt";
     material.name = title + "." + material.extension;
+    material.byteSize = Buffer.byteLength(content, "utf8");
     let bucketKey = "ai_gen/" + material.name;
     let mimetype = "text/plain; charset=utf-8";
     material.isMap = true;
     material.url = await uploadContentToS3(bucketKey, content, mimetype);
   }
 
-  const insertResult = await materialCollection.insertOne(material);
+  const insertResult = await materialsCollection.insertOne(material);
 
   return {
     material: {

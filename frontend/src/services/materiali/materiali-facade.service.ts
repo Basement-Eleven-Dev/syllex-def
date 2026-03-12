@@ -40,6 +40,7 @@ export class MaterialiFacadeService {
   readonly searchTerm = signal('');
   readonly highlightedItemId = signal<string | null>(null);
   readonly isLoading = this.materialiService.isLoading;
+  readonly isStorageFull = this.materialiService.isStorageFull;
   readonly selectedCount = computed(
     () => this.selectionService.selectedIds().size,
   );

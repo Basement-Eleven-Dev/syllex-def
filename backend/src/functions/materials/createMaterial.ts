@@ -26,6 +26,18 @@ const createMaterial = async (
   const db = await getDefaultDatabase();
   const materialsCollection = db.collection("materials");
 
+  // Check storage limit (1GB)
+  const STORAGE_LIMIT_B = 1024 * 1024 * 1024;
+  const materials = await materialsCollection.find({
+    teacherId,
+    subjectId: context.subjectId as any,
+  }).toArray();
+
+  const totalBytes = materials.reduce((acc, m) => acc + (m.byteSize || 0), 0);
+  if (totalBytes >= STORAGE_LIMIT_B) {
+    throw createError(400, "Limite di archiviazione (1GB) raggiunto per questa materia.");
+  }
+
   // Prepare material data
   const material = {
     ...body.material,

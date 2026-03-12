@@ -38,6 +38,8 @@
   />
 </section>
 
+<app-storage-limit-bar />
+
 <section class="form-section">
   <div class="d-flex flex-row align-items-center justify-content-between mb-4">
     <div class="d-flex flex-row align-items-center gap-2">
@@ -75,10 +77,10 @@
       <button class="btn btn-blue icon-btn" (click)="onCreateNewFolder()">
         <fa-icon [icon]="icons.plus"></fa-icon> Nuova cartella
       </button>
-      <button class="btn btn-blue icon-btn" (click)="onRequestUpload()">
+      <button class="btn btn-blue icon-btn" (click)="onRequestUpload()" [disabled]="isStorageFull()">
         <fa-icon [icon]="icons.upload"></fa-icon> Carica file
       </button>
-      <button class="btn ai icon-btn" (click)="onRequestGenerate()">
+      <button class="btn ai icon-btn" (click)="onRequestGenerate()" [disabled]="isStorageFull()">
         <fa-icon [icon]="icons.sparkles"></fa-icon> Genera con AI
       </button>
     </div>
