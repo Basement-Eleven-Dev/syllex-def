@@ -29,6 +29,7 @@ export interface StudentTestInterface {
   subjectId?: string;
   isPasswordProtected?: boolean;
   randomizeQuestions?: boolean;
+  oneShotAnswers?: boolean;
   questions?: {
     questionId: string | { $oid: string };
     points: number;

@@ -114,6 +114,15 @@
   }
 </div>
 
+@if (TestData()?.oneShotAnswers) {
+<div class="alert alert-warning d-flex align-items-center gap-2 mb-4">
+  <fa-icon [icon]="LockIcon"></fa-icon>
+  <span>
+    <strong>Modalità One-Shot attiva:</strong> Per le domande chiuse, la prima risposta data sarà definitiva e non potrai più modificarla.
+  </span>
+</div>
+}
+
 @if (TimerExpired()) {
 <div
   class="alert alert-warning d-flex align-items-center gap-2 mb-4"
@@ -135,8 +144,8 @@
     [index]="i"
     [showIndex]="true"
     mode="student"
-    [locked]="TimerExpired()"
-    [dimmed]="TimerExpired()"
+    [locked]="isQuestionLocked(question)"
+    [dimmed]="isQuestionLocked(question)"
     [selectedAnswer]="Answers()[question._id]"
     (answerChange)="onAnswerChange(question._id, $event)"
   ></div>

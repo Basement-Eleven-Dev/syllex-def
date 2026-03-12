@@ -21,6 +21,7 @@ export interface TestInterface {
   hasPendingCorrections?: boolean;
   uncorrectedCount?: number;
   randomizeQuestions?: boolean;
+  oneShotAnswers?: boolean;
 }
 
 interface TestDetailsResponse {
