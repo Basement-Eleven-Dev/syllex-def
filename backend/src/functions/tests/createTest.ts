@@ -58,6 +58,10 @@ const createTest = async (request: APIGatewayProxyEvent, context: Context) => {
     newTest.timeLimit = testData.timeLimit;
   }
 
+  if (testData.randomizeQuestions === true) {
+    newTest.randomizeQuestions = true;
+  }
+
   const result = await testsCollection.insertOne(newTest as Test);
 
   return {

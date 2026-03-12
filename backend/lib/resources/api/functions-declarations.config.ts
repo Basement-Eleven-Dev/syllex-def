@@ -565,13 +565,13 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
-    apiRoute: "attempts/:attemptId/correction",
+    apiRoute: "attempts/{attemptId}/correction",
     functionPath: "attempts/correctAttempt.ts",
     method: "post",
     role: "teacher",
   },
   {
-    apiRoute: "attempts/:attemptId/:questionId/correction/ai",
+    apiRoute: "attempts/{attemptId}/{questionId}/correction/ai",
     functionPath: "attempts/correctAttemptWithAI.ts",
     method: "post",
     role: "teacher",

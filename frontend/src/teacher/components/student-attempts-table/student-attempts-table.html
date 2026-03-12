@@ -62,7 +62,7 @@
         <div class="btn-group">
           <button 
             type="button" 
-            class="btn btn-outline-primary btn-sm rounded-start-pill px-3"
+            class="btn btn-blue btn-sm rounded-start-pill px-3"
             [disabled]="pagination.page === 1"
             (click)="pageChange.emit(pagination.page - 1)">
             <fa-icon [icon]="icons.faChevronLeft" class="me-1"></fa-icon>
@@ -70,7 +70,7 @@
           </button>
           <button 
             type="button" 
-            class="btn btn-outline-primary btn-sm rounded-end-pill px-3"
+            class="btn btn-blue btn-sm rounded-end-pill px-3"
             [disabled]="pagination.page === pagination.totalPages"
             (click)="pageChange.emit(pagination.page + 1)">
             Successiva

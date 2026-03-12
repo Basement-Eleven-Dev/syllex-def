@@ -245,12 +245,22 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (results) => {
-          const loaded = results.filter(
+          let loaded = results.filter(
             (q): q is QuestionInterface => q !== null,
           );
-          loaded.sort(
-            (a, b) => questionIds.indexOf(a._id) - questionIds.indexOf(b._id),
-          );
+          
+          if (test.randomizeQuestions) {
+            // Fisher-Yates shuffle
+            for (let i = loaded.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              [loaded[i], loaded[j]] = [loaded[j], loaded[i]];
+            }
+          } else {
+            loaded.sort(
+              (a, b) => questionIds.indexOf(a._id) - questionIds.indexOf(b._id),
+            );
+          }
+          
           this.Questions.set(loaded);
           this.IsLoading.set(false);
           this.checkExistingAttempt();

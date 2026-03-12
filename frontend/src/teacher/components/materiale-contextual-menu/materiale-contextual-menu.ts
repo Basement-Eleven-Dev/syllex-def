@@ -3,7 +3,7 @@ import { ConfirmActionDirective } from '../../../directives/confirm-action.direc
 import { NgbDropdownItem, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { RenameModal } from '../rename-modal/rename-modal';
 import { DatePipe } from '@angular/common';
-import { MaterialInterface } from '../../../services/materiali-service';
+import { MaterialInterface } from '../../../services/materiali/materiali-service';
 import { FileViewer } from '../file-viewer/file-viewer';
 import { AssignClass } from '../assign-class/assign-class';
 

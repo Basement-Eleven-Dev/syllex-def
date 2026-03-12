@@ -2,18 +2,13 @@ import {
   Component,
   inject,
   signal,
-  computed,
   ViewChild,
   ElementRef,
-  effect,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { MaterialeCard } from '../../components/materiale-card/materiale-card';
-import {
-  MaterialiService,
-  MaterialInterface,
-} from '../../../services/materiali-service';
+import { MaterialInterface } from '../../../services/materiali/materiali-service';
 import {
   FontAwesomeModule,
   IconDefinition,
@@ -44,11 +39,16 @@ import {
   ViewTypeToggle,
   ViewType,
 } from '../../components/view-type-toggle/view-type-toggle';
-import { MaterialeDragDropService } from '../../../services/materiale-drag-drop.service';
-import { MaterialeSearchService } from '../../../services/materiale-search.service';
-import { MaterialeSelectionService } from '../../../services/materiale-selection.service';
+import { MaterialeDragDropService } from '../../../services/materiali/materiale-drag-drop.service';
+import { MaterialiFacadeService } from '../../../services/materiali/materiali-facade.service';
+import { ConfirmService } from '../../../services/confirm.service';
 import { GenAiContents } from '../../components/gen-ai-contents/gen-ai-contents';
-import { FilesService } from '../../../services/files-service';
+import {
+  FILE_INPUT_ACCEPT,
+  isFileExtensionAllowed,
+  getFileExtension,
+  getAllowedExtensionsLabel,
+} from '../../../app/_utils/file-validation.utils';
 
 @Component({
   selector: 'app-materiali',
@@ -67,218 +67,144 @@ import { FilesService } from '../../../services/files-service';
   styleUrl: './materiali.scss',
 })
 export class Materiali {
-  // Costanti statiche
-  private readonly ALLOWED_EXTENSIONS = [
-    'pdf',
-    'docx',
-    'doc',
-    'xlsx',
-    'xls',
-    'png',
-    'jpg',
-    'jpeg',
-    'gif',
-    'txt',
-    'pptx',
-  ];
+  @ViewChild('fileInput')
+  private readonly fileInput!: ElementRef<HTMLInputElement>;
 
-  private readonly ROOT_FOLDER_CONFIG = {
-    _id: 'root',
-    name: '/',
-    type: 'folder' as const,
-    createdAt: new Date(),
-  };
-
-  // ViewChild
-  @ViewChild('fileInput') FileInput!: ElementRef<HTMLInputElement>;
-
-  // Dependency Injection
-  readonly materialiService = inject(MaterialiService);
+  // ── Services ──────────────────────────────────────────────────────
+  readonly facade = inject(MaterialiFacadeService);
   private readonly dragDropService = inject(MaterialeDragDropService);
-  private readonly searchService = inject(MaterialeSearchService);
-  readonly selectionService = inject(MaterialeSelectionService);
-  private readonly offCanvasService = inject(NgbOffcanvas);
-  private readonly fileService = inject(FilesService);
+  private readonly offcanvasService = inject(NgbOffcanvas);
+  private readonly confirmService = inject(ConfirmService);
 
-  // Icons (readonly)
-  protected readonly chevronRightIcon = faChevronRight;
-  protected readonly plusIcon = faPlus;
-  protected readonly uploadIcon = faUpload;
-  protected readonly threeDotsIcon = faEllipsisVertical;
-  protected readonly sparklesIcon = faSparkles;
-  protected readonly robotIcon = faRobot;
-  protected readonly ClearIcon = faXmark;
-  protected readonly TrashIcon = faTrash;
+  // ── Icons ─────────────────────────────────────────────────────────
+  protected readonly icons = {
+    chevronRight: faChevronRight,
+    plus: faPlus,
+    upload: faUpload,
+    threeDots: faEllipsisVertical,
+    sparkles: faSparkles,
+    robot: faRobot,
+    clear: faXmark,
+    trash: faTrash,
+  } as const;
 
-  // Signals
-  protected readonly viewType = signal<ViewType>(
-    this.loadViewTypePreference('materiali') || 'grid',
-  );
-  protected readonly searchTerm = signal<string>('');
-  protected readonly highlightedItemId = signal<string | null>(null);
+  // ── State proxied from facade (avoids template changes) ───────────
+  readonly searchTerm = this.facade.searchTerm;
+  readonly rootFolder = this.facade.rootFolder;
+  readonly currentPathArray = this.facade.currentPathArray;
+  readonly highlightedItemId = this.facade.highlightedItemId;
+  readonly selectedCount = this.facade.selectedCount;
 
-  protected readonly rootFolder = computed(() => {
-    const current = this.materialiService.currentFolder();
-    return (
-      current || {
-        ...this.ROOT_FOLDER_CONFIG,
-        content: this.materialiService.root(),
-      }
-    );
-  });
+  // ── UI-only state ─────────────────────────────────────────────────
+  protected readonly viewType = signal<ViewType>('grid');
+  protected readonly acceptedExtensions = FILE_INPUT_ACCEPT;
 
-  protected readonly currentPathArray = computed(() => {
-    const folder = this.rootFolder();
-    return this.materialiService.getCurrentPath(folder.name);
-  });
+  // ── View Type ─────────────────────────────────────────────────────
 
-  // Proprietà private
-  private FolderBeforeSearch: MaterialInterface | null = null;
-  private IsSearchActive = false;
-
-  constructor() {
-    effect(() => {
-      const term = this.searchTerm().trim();
-      if (term.length >= 2) {
-        if (!this.IsSearchActive) {
-          this.FolderBeforeSearch = { ...this.rootFolder() };
-          this.IsSearchActive = true;
-        }
-        this.performSearch(term);
-      } else if (term.length === 0 && this.IsSearchActive) {
-        if (this.FolderBeforeSearch) {
-          this.materialiService.currentFolder.set(this.FolderBeforeSearch);
-          this.FolderBeforeSearch = null;
-        }
-        this.IsSearchActive = false;
-        this.highlightedItemId.set(null);
-      }
-    });
-
-    this.materialiService.loadMaterials();
-  }
-
-  clearFilters(): void {
-    this.searchTerm.set('');
-    if (this.FolderBeforeSearch) {
-      this.materialiService.currentFolder.set(this.FolderBeforeSearch);
-      this.FolderBeforeSearch = null;
-    }
-    this.IsSearchActive = false;
-    this.highlightedItemId.set(null);
-  }
-
-  // Event Handlers
   protected onChangeViewType(type: ViewType): void {
     this.viewType.set(type);
   }
 
-  private loadViewTypePreference(pageKey: string): ViewType | null {
-    try {
-      const saved = localStorage.getItem(`viewType_${pageKey}`);
-      return saved === 'grid' || saved === 'table' ? saved : null;
-    } catch (error) {
-      return null;
-    }
+  // ── Navigation ────────────────────────────────────────────────────
+
+  protected onRequestOpenItem(item: MaterialInterface | string): void {
+    this.facade.openItem(item);
   }
+
+  // ── File Upload ───────────────────────────────────────────────────
+
+  protected onRequestUpload(): void {
+    this.fileInput.nativeElement.click();
+  }
+
+  protected onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    if (!isFileExtensionAllowed(file.name)) {
+      alert(
+        `Formato file non supportato. Estensioni consentite: ${getAllowedExtensionsLabel()}`,
+      );
+      input.value = '';
+      return;
+    }
+
+    this.facade.uploadFile(file).subscribe({
+      next: () => (input.value = ''),
+      error: (err) => console.error('Errore durante il caricamento:', err),
+    });
+  }
+
+  // ── CRUD ──────────────────────────────────────────────────────────
+
+  protected onCreateNewFolder(): void {
+    this.facade.createFolder().subscribe();
+  }
+
+  protected async onRequestDeleteItem(item: MaterialInterface): Promise<void> {
+    const confirmed = await this.confirmService.confirm(
+      `Sei sicuro di voler eliminare "${item.name}"?`,
+    );
+    if (!confirmed) return;
+
+    this.facade.deleteItem(item._id!).subscribe();
+  }
+
+  protected async onDeleteSelection(): Promise<void> {
+    const count = this.selectedCount();
+    if (count === 0) return;
+
+    const confirmed = await this.confirmService.confirm(
+      `Sei sicuro di voler eliminare i ${count} elementi selezionati?`,
+    );
+    if (!confirmed) return;
+
+    this.facade.deleteSelectedItems().subscribe();
+  }
+
+  protected onRequestRenameItem(
+    item: MaterialInterface,
+    newName: string,
+  ): void {
+    this.facade.renameItem(item._id!, newName).subscribe();
+  }
+
+  // ── Selection ─────────────────────────────────────────────────────
 
   protected onSelectItem(
     item: MaterialInterface,
     event?: MouseEvent | Event,
   ): void {
     event?.stopPropagation();
-    const hasSelection = this.selectionService.selectedIds().size > 0;
+    const hasSelection = this.selectedCount() > 0;
     const isMultiSelect =
       event instanceof MouseEvent
         ? event.ctrlKey || event.metaKey || hasSelection
         : true;
-    this.selectionService.toggle(item._id!, isMultiSelect);
+    this.facade.selectItem(item._id!, isMultiSelect);
   }
 
   protected isItemSelected(itemId: string): boolean {
-    return this.selectionService.isSelected(itemId);
+    return this.facade.isItemSelected(itemId);
   }
 
-  protected onRequestOpenItem(item: MaterialInterface | string): void {
-    this.FolderBeforeSearch = null;
-    this.IsSearchActive = false;
-
-    if (item === 'Home') {
-      this.materialiService.currentFolder.set(null);
-      return;
-    }
-
-    if (typeof item === 'string') {
-      const folder = this.materialiService.getFolderFromName(item);
-      if (folder) this.materialiService.currentFolder.set(folder);
-      return;
-    }
-
-    if (item.type === 'folder') {
-      this.materialiService.currentFolder.set(item);
-    }
+  protected isAllSelected(): boolean {
+    return this.facade.isAllSelected();
   }
 
-  protected onRequestUpload(): void {
-    this.FileInput.nativeElement.click();
+  protected toggleSelectAll(): void {
+    this.facade.toggleSelectAll();
   }
 
-  protected onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (!input.files || input.files.length === 0) return;
-
-    const file = input.files[0];
-    const extension = this.getFileExtension(file.name);
-
-    if (!this.isExtensionAllowed(extension)) {
-      alert(
-        `Formato file non supportato. Estensioni consentite: ${this.ALLOWED_EXTENSIONS.join(', ')}`,
-      );
-      input.value = '';
-      return;
-    }
-
-    this.fileService.uploadFile(file.name, file).subscribe((url) => {
-      const newMaterial: MaterialInterface = {
-        _id: 'temp-id-' + Date.now(),
-        name: file.name,
-        type: 'file',
-        url: url,
-        extension: extension,
-        createdAt: new Date(),
-        byteSize: file.size,
-      };
-      this.materialiService
-        .createMaterial(newMaterial, this.rootFolder())
-        .subscribe({
-          next: () => {},
-          error: (err) =>
-            console.error('Errore durante la creazione del materiale:', err),
-        });
-      input.value = '';
-    });
+  protected onDeselectAll(): void {
+    this.facade.deselectAll();
   }
 
-  protected onCreateNewFolder(): void {
-    this.materialiService
-      .createMaterial(
-        {
-          _id: 'temp-id-' + Date.now(),
-          name: 'Nuova Cartella',
-          type: 'folder',
-          content: [],
-        } as MaterialInterface,
-        this.rootFolder(),
-      )
-      .subscribe({
-        next: () => {},
-        error: (err) =>
-          console.error('Errore durante la creazione della cartella:', err),
-      });
-  }
+  // ── Drag & Drop (thin delegation) ─────────────────────────────────
 
   protected onDragStart(item: MaterialInterface, event: DragEvent): void {
-    this.dragDropService.startDrag(item, this.selectionService.getSelection());
+    this.dragDropService.startDrag(item, this.facade.getSelection());
     event.dataTransfer!.effectAllowed = 'move';
     event.dataTransfer!.setData('text/html', item._id!);
   }
@@ -292,16 +218,12 @@ export class Materiali {
   protected onDragEnter(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
-    const target = event.currentTarget as HTMLElement;
-    const targetClass = target.tagName === 'TR' ? 'drag-over' : 'drag-over';
-    target.classList.add(targetClass);
+    (event.currentTarget as HTMLElement).classList.add('drag-over');
   }
 
   protected onDragLeave(event: DragEvent): void {
     const target = event.currentTarget as HTMLElement;
-    const relatedTarget = event.relatedTarget as HTMLElement;
-
-    if (!target.contains(relatedTarget)) {
+    if (!target.contains(event.relatedTarget as HTMLElement)) {
       target.classList.remove('drag-over', 'drag-over-wrapper');
     }
   }
@@ -312,80 +234,17 @@ export class Materiali {
   ): void {
     event.preventDefault();
     event.stopPropagation();
+    (event.currentTarget as HTMLElement).classList.remove(
+      'drag-over',
+      'drag-over-wrapper',
+    );
 
-    const target = event.currentTarget as HTMLElement;
-    target.classList.remove('drag-over', 'drag-over-wrapper');
-
-    const success = this.dragDropService.handleDrop(targetItem);
-    if (success) {
-      this.selectionService.clear();
+    if (this.dragDropService.handleDrop(targetItem)) {
+      this.facade.deselectAll();
     }
   }
 
-  protected onRequestDeleteItem(item: MaterialInterface): void {
-    if (!confirm(`Sei sicuro di voler eliminare "${item.name}"?`)) return;
-    this.materialiService.deleteItem(item._id!).subscribe({
-      next: () => {
-        this.selectionService.clear();
-      },
-      error: (err) => console.error("Errore durante l'eliminazione:", err),
-    });
-  }
-
-  protected onDeleteSelection(): void {
-    const selectedIds = Array.from(this.selectionService.selectedIds());
-    if (selectedIds.length === 0) return;
-
-    if (
-      !confirm(
-        `Sei sicuro di voler eliminare i ${selectedIds.length} elementi selezionati?`,
-      )
-    )
-      return;
-
-    this.materialiService.deleteItems(selectedIds).subscribe({
-      next: () => {
-        this.selectionService.clear();
-      },
-      error: (err) =>
-        console.error("Errore durante l'eliminazione batch:", err),
-    });
-  }
-
-  protected onDeselectAll(): void {
-    this.selectionService.clear();
-  }
-
-  protected toggleSelectAll(): void {
-    const items = this.rootFolder().content || [];
-    const selected = this.selectionService.selectedIds();
-
-    if (this.isAllSelected()) {
-      this.selectionService.clear();
-    } else {
-      items.forEach((item) => {
-        if (!selected.has(item._id!)) {
-          this.selectionService.toggle(item._id!, true);
-        }
-      });
-    }
-  }
-
-  protected isAllSelected(): boolean {
-    const items = this.rootFolder().content || [];
-    if (items.length === 0) return false;
-    return items.every((item) => this.selectionService.isSelected(item._id!));
-  }
-
-  protected onRequestRenameItem(
-    item: MaterialInterface,
-    newName: string,
-  ): void {
-    this.materialiService.renameItem(item._id!, newName).subscribe({
-      next: () => {},
-      error: (err) => console.error('Errore durante la rinomina:', err),
-    });
-  }
+  // ── Icon Helpers ──────────────────────────────────────────────────
 
   protected getItemIcon(item: MaterialInterface): IconDefinition {
     return item.type === 'folder'
@@ -396,14 +255,14 @@ export class Materiali {
   protected getItemColor(item: MaterialInterface): string {
     return item.type === 'folder'
       ? getIconColor('folder')
-      : getIconColor(this.getFileExtension(item.name));
+      : getIconColor(getFileExtension(item.name));
   }
 
   protected getItemType(item: MaterialInterface): string {
     if (item.type === 'folder') {
       return `Cartella (${item.content?.length || 0})`;
     }
-    const ext = this.getFileExtension(item.name);
+    const ext = getFileExtension(item.name);
     return ext ? ext.toUpperCase() : 'File';
   }
 
@@ -415,42 +274,20 @@ export class Materiali {
     return item.type !== 'folder' && item.aiGenerated === true;
   }
 
+  // ── Search ────────────────────────────────────────────────────────
+
+  protected clearFilters(): void {
+    this.facade.clearSearch();
+  }
+
+  // ── GenAI ─────────────────────────────────────────────────────────
+
   protected onRequestGenerate(): void {
-    this.offCanvasService.open(GenAiContents, {
+    this.offcanvasService.open(GenAiContents, {
       position: 'end',
       panelClass: 'offcanvas-large',
       scroll: true,
       backdrop: true,
     });
-  }
-
-  // Private Methods
-  private performSearch(term: string): void {
-    const searchResult = this.searchService.search(
-      term,
-      this.materialiService.root(),
-    );
-
-    if (searchResult) {
-      if (searchResult.parentPath.length > 0) {
-        const parentFolder =
-          searchResult.parentPath[searchResult.parentPath.length - 1];
-        this.materialiService.currentFolder.set(parentFolder);
-      } else {
-        this.materialiService.currentFolder.set(null);
-      }
-
-      this.highlightedItemId.set(searchResult.item._id!);
-    } else {
-      this.highlightedItemId.set(null);
-    }
-  }
-
-  private getFileExtension(filename: string): string {
-    return filename.split('.').pop()?.toLowerCase() || '';
-  }
-
-  private isExtensionAllowed(extension: string): boolean {
-    return this.ALLOWED_EXTENSIONS.includes(extension);
   }
 }

@@ -34,7 +34,6 @@ import { StatCardData } from '../../../teacher/components/stat-card/stat-card';
     RouterModule,
     FontAwesomeModule,
     StudentTestCardCompact,
-    StudentComunicazioneCard,
   ],
   templateUrl: './student-dashboard.html',
   styleUrl: './student-dashboard.scss',
