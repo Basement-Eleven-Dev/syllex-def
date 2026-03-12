@@ -98,6 +98,7 @@ export class GenAiContents implements OnInit {
   readonly SelectedType = signal<string>('');
   readonly Types = signal<TypeOption[]>([]);
   readonly IsGenerating = signal<boolean>(false);
+  readonly GenerationSuccess = signal<boolean>(false);
   readonly IsSaving = signal<boolean>(false);
   readonly IsOffcanvasMode = signal<boolean>(false);
   readonly ReviewQuestions = signal<ReviewQuestion[]>([]);
@@ -192,7 +193,6 @@ export class GenAiContents implements OnInit {
         'Errore durante la generazione. Riprova.',
         false,
       );
-    } finally {
       this.IsGenerating.set(false);
     }
   }
@@ -239,6 +239,7 @@ export class GenAiContents implements OnInit {
       ),
     );
     this.ReviewMode.set(true);
+    this.IsGenerating.set(false);
   }
 
   private async submitMaterialGeneration(): Promise<void> {
@@ -256,11 +257,14 @@ export class GenAiContents implements OnInit {
     });
 
     this.GeneratedMaterial.set(material);
-    this.feedbackService.showFeedback('Materiale generato con successo!', true);
-    this.modalService.open(this.materialSuccessModal, {
-      centered: true,
-      size: 'sm',
-    });
+    this.GenerationSuccess.set(true);
+  }
+
+  onReturnToMaterials(): void {
+    this.IsGenerating.set(false);
+    this.GenerationSuccess.set(false);
+    this.GeneratedMaterial.set(null);
+    this.navigateToResources();
   }
 
   navigateToResources(): void {
