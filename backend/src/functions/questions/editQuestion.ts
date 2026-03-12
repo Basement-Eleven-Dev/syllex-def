@@ -34,6 +34,7 @@ const editQuestion = async (
     text: questionData.text,
     type: questionData.type,
     explanation: questionData.explanation,
+    difficulty: questionData.difficulty || undefined,
     policy: questionData.policy,
     updatedAt: new Date(),
   };

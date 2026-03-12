@@ -20,7 +20,11 @@ import {
 import { MultipleChoiceOptions } from '../../components/multiple-choice-options/multiple-choice-options';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { GenAiQuestion } from '../../components/gen-ai-question/gen-ai-question';
-import { QUESTION_TYPE_OPTIONS } from '../../../types/question.types';
+import {
+  QUESTION_TYPE_OPTIONS,
+  DIFFICULTY_OPTIONS,
+  QuestionDifficulty,
+} from '../../../types/question.types';
 import { BackTo } from '../../components/back-to/back-to';
 import { TypeSelector } from '../../components/type-selector/type-selector';
 import { Materia } from '../../../services/materia';
@@ -68,6 +72,7 @@ export class CreateEditQuestion {
 
   // Data
   readonly QuestionTypeOptions = QUESTION_TYPE_OPTIONS;
+  readonly DifficultyOptions = DIFFICULTY_OPTIONS;
   private readonly QuestionId = this.activatedRoute.snapshot.paramMap.get('id');
   private CurrentQuestionId = signal<string | null>(null);
 
@@ -97,6 +102,7 @@ export class CreateEditQuestion {
     type: new FormControl('scelta multipla', Validators.required),
     text: new FormControl('', Validators.required),
     topicId: new FormControl('', Validators.required),
+    difficulty: new FormControl<QuestionDifficulty>('medium'),
     explanation: new FormControl('', Validators.required),
     options: new FormControl([
       { label: 'Opzione 1', isCorrect: false },
@@ -163,6 +169,7 @@ export class CreateEditQuestion {
       type: question.type,
       text: question.text,
       topicId: question.topicId,
+      difficulty: question.difficulty || 'medium',
       explanation: question.explanation,
       policy: question.policy,
     });
@@ -301,6 +308,8 @@ export class CreateEditQuestion {
       type: result.type,
       text: result.content,
       explanation: result.explanation,
+      difficulty:
+        result.difficulty || this.QuestionForm.get('difficulty')?.value,
     });
 
     this.SelectedQuestionType.set(result.type);

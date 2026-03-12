@@ -4,11 +4,14 @@ import { Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { FilesService } from './files-service';
 
+import { QuestionDifficulty } from '../types/question.types';
+
 export interface QuestionInterface {
   _id: string;
   text: string;
   type: 'scelta multipla' | 'vero falso' | 'risposta aperta';
   explanation: string;
+  difficulty?: QuestionDifficulty;
   policy: 'public' | 'private';
   topicId: string;
   subjectId: string;
@@ -110,6 +113,7 @@ export class QuestionsService {
     policy?: 'public' | 'private',
     page: number = 1,
     pageSize: number = 10,
+    difficulty?: string,
   ): Observable<{ questions: QuestionInterface[]; total: number }> {
     const params = new URLSearchParams();
 
@@ -117,6 +121,7 @@ export class QuestionsService {
     if (type) params.append('type', type);
     if (topicId) params.append('topicId', topicId);
     if (policy) params.append('policy', policy);
+    if (difficulty) params.append('difficulty', difficulty);
     params.append('page', page.toString());
     params.append('pageSize', pageSize.toString());
 

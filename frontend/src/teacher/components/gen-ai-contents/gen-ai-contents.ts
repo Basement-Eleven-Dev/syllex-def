@@ -25,6 +25,7 @@ import {
   MATERIAL_TYPE_OPTIONS,
   MaterialType,
   QuestionType,
+  QuestionDifficulty,
 } from '../../../types/question.types';
 import {
   FormControl,
@@ -138,7 +139,9 @@ export class GenAiContents implements OnInit {
     ]),
     format: new FormControl('pptx'),
     language: new FormControl('italiano', [Validators.required]),
-    difficulty: new FormControl<1 | 2 | 3>(2, [Validators.required]),
+    difficulty: new FormControl<QuestionDifficulty>('medium', [
+      Validators.required,
+    ]),
     numberOfAlternatives: new FormControl(4),
     instructions: new FormControl(''),
   });
@@ -347,11 +350,14 @@ export class GenAiContents implements OnInit {
     teacherId: string,
   ): ReviewQuestion {
     const tempId = crypto.randomUUID();
+    const difficulty = this.genForm.controls['difficulty']
+      .value as QuestionDifficulty;
     const data: QuestionInterface = {
       _id: tempId,
       text: q.text,
       type: q.type,
       explanation: q.explanation,
+      difficulty,
       options: q.options,
       policy: 'private',
       topicId,

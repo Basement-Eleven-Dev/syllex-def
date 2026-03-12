@@ -19,13 +19,15 @@ const MATERIAL_TYPE_MAP: Record<MaterialType, BackendMaterialType> = {
   'mappe-concettuali': 'map',
 };
 
+import { QuestionDifficulty } from '../types/question.types';
+
 export interface GenerateQuestionRequest {
   topicId: string;
   materialIds: string[];
   type: BackendQuestionType;
   instructions?: string;
   language?: string;
-  difficulty?: 1 | 2 | 3;
+  difficulty?: QuestionDifficulty;
   numberOfAlternatives?: number;
 }
 
@@ -73,7 +75,7 @@ export class AiService {
     type: QuestionType;
     instructions?: string;
     language?: string;
-    difficulty?: 1 | 2 | 3;
+    difficulty?: QuestionDifficulty;
     numberOfAlternatives?: number;
   }): Promise<GeneratedQuestion> {
     const payload: GenerateQuestionRequest = {
