@@ -17,12 +17,26 @@
   </button>
 </div>
 
-<section>
+<section class="d-flex flex-row align-items-center gap-3">
   <app-questions-search-filters
+    class="flex-grow-1"
     (filtersChanged)="onFiltersChanged($event)"
   ></app-questions-search-filters>
+  <app-view-type-toggle
+    [viewType]="ViewType"
+    [pageKey]="'banca'"
+    (viewTypeChange)="onChangeViewType($event)"
+  />
 </section>
 
+@if (ViewType === 'table') {
+<div class="mt-4">
+  <app-question-table
+    [questions]="Questions()"
+    (removeMe)="onDeleteQuestion($event)"
+  />
+</div>
+} @else {
 <div class="row mt-4">
   @for(question of Questions(); track question._id; let last = $last; let i =
   $index) {
@@ -37,6 +51,7 @@
   </div>
   }
 </div>
+}
 <div
   class="mt-5 d-flex flex-row justify-content-between align-items-center mb-5"
 >
