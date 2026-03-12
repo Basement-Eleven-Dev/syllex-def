@@ -12,7 +12,12 @@ import {
   faChartBar,
   faCheckCircle,
   faPenNib,
+  faPrint,
 } from '@fortawesome/pro-solid-svg-icons';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { TestPrintModal } from '../../components/test-print-modal/test-print-modal';
+import { QuestionsService } from '../../../services/questions';
+import { forkJoin, switchMap, of, tap } from 'rxjs';
 import { BackTo } from '../../components/back-to/back-to';
 import { StatCard, StatCardData } from '../../components/stat-card/stat-card';
 import { TestAssignments } from '../../components/test-assignments/test-assignments';
@@ -53,6 +58,8 @@ export class TestDetail {
   private readonly testsService = inject(TestsService);
   private readonly feedbackService = inject(FeedbackService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly modalService = inject(NgbModal);
+  private readonly questionsService = inject(QuestionsService);
 
   // Icone UI statiche
   readonly UsersIcon = faUsers;
@@ -60,6 +67,7 @@ export class TestDetail {
   readonly TrashIcon = faTrash;
   readonly EditIcon = faPencilAlt;
   readonly SpinnerIcon = faSpinnerThird;
+  readonly PrintIcon = faPrint;
 
   // State (Signals)
   readonly TestData = signal<any | null>(null);
@@ -150,5 +158,50 @@ export class TestDetail {
 
   onChangeSection(sectionId: number): void {
     this.ActiveSection.set(sectionId);
+  }
+
+  onPrintTest(): void {
+    const testId = this.TestId();
+    if (!testId) return;
+
+    this.IsLoading.set(true);
+
+    // 1. Get full test details (to get the questions array)
+    this.testsService.getTestById(testId).pipe(
+      switchMap(response => {
+        const fullTest = response.test;
+        if (!fullTest.questions || fullTest.questions.length === 0) {
+          return of({ test: fullTest, questions: [] });
+        }
+        
+        // 2. Fetch full details for each question
+        const questionRequests = fullTest.questions.map((q: any) => 
+          this.questionsService.loadQuestion(q.questionId)
+        );
+        
+        return forkJoin(questionRequests).pipe(
+          switchMap(fullQuestions => of({ test: fullTest, questions: fullQuestions }))
+        );
+      }),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: (data: any) => {
+        this.IsLoading.set(false);
+        const modalRef = this.modalService.open(TestPrintModal, {
+          size: 'xl',
+          centered: true,
+          scrollable: true,
+          windowClass: 'modal-print-preview'
+        });
+        
+        modalRef.componentInstance.test = data.test;
+        modalRef.componentInstance.questions = data.questions;
+      },
+      error: (err) => {
+        console.error('Error fetching data for print:', err);
+        this.IsLoading.set(false);
+        this.feedbackService.showFeedback('Errore nel caricamento dei dati per la stampa', false);
+      }
+    });
   }
 }
