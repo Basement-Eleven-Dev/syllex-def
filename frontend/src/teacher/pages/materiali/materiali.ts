@@ -28,6 +28,7 @@ import {
   NgbDropdownToggle,
   NgbDropdownMenu,
   NgbOffcanvas,
+  NgbModal,
 } from '@ng-bootstrap/ng-bootstrap';
 import { MaterialeContextualMenu } from '../../components/materiale-contextual-menu/materiale-contextual-menu';
 import {
@@ -50,6 +51,8 @@ import {
   getAllowedExtensionsLabel,
 } from '../../../app/_utils/file-validation.utils';
 import { StorageLimitBar } from '../../components/storage-limit-bar/storage-limit-bar';
+import { SuggestedTopicsModal } from '../../components/suggested-topics-modal/suggested-topics-modal';
+import { effect, untracked } from '@angular/core';
 
 @Component({
   selector: 'app-materiali',
@@ -77,6 +80,16 @@ export class Materiali {
   private readonly dragDropService = inject(MaterialeDragDropService);
   private readonly offcanvasService = inject(NgbOffcanvas);
   private readonly confirmService = inject(ConfirmService);
+  private readonly modalService = inject(NgbModal);
+
+  constructor() {
+    effect(() => {
+      const topics = this.suggestedTopics();
+      if (topics.length > 0 && !this.modalService.hasOpenModals()) {
+        untracked(() => this.openSuggestedTopicsModal(topics));
+      }
+    });
+  }
 
   // ── Icons ─────────────────────────────────────────────────────────
   protected readonly icons = {
@@ -97,6 +110,7 @@ export class Materiali {
   readonly highlightedItemId = this.facade.highlightedItemId;
   readonly selectedCount = this.facade.selectedCount;
   readonly isStorageFull = this.facade.isStorageFull;
+  readonly suggestedTopics = this.facade.suggestedTopics;
 
   // ── UI-only state ─────────────────────────────────────────────────
   protected readonly viewType = signal<ViewType>('grid');
@@ -292,5 +306,27 @@ export class Materiali {
       scroll: true,
       backdrop: true,
     });
+  }
+
+  // ── Topic Suggestions ─────────────────────────────────────────────
+
+  protected onAddSuggestedTopic(topic: string): void {
+    this.facade.addSuggestedTopic(topic).subscribe({
+      next: () => console.log(`Argomento "${topic}" aggiunto con successo.`),
+      error: (err) =>
+        console.error(`Errore nell'aggiunta dell'argomento "${topic}":`, err),
+    });
+  }
+
+  protected onDismissSuggestedTopic(topic: string): void {
+    this.facade.dismissSuggestedTopic(topic);
+  }
+
+  private openSuggestedTopicsModal(topics: string[]): void {
+    const modalRef = this.modalService.open(SuggestedTopicsModal, {
+      centered: true,
+      backdrop: 'static',
+    });
+    modalRef.componentInstance.topics = topics;
   }
 }
