@@ -87,11 +87,17 @@ export class TestAssignments implements OnChanges {
 
     // Filtro Stato
     if (status) {
-      data = data.filter((a) =>
-        status === 'delivered'
-          ? a.status === 'delivered'
-          : a.status !== 'delivered',
-      );
+      if (status === 'delivered') {
+        data = data.filter(
+          (a) => a.status === 'delivered' || a.status === 'reviewed',
+        );
+      } else if (status === 'not-started') {
+        data = data.filter((a) => a.status === 'not-started');
+      } else {
+        data = data.filter(
+          (a) => a.status !== 'delivered' && a.status !== 'reviewed',
+        );
+      }
     }
 
     this.filteredAssignments.set(data);

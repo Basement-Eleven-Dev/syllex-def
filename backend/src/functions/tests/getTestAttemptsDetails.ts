@@ -81,6 +81,7 @@ const getTestAttemptsDetails = async (
       {
         $project: {
           _id: 1,
+          studentId: 1,
           score: 1,
           maxScore: 1,
           deliveredAt: 1,
@@ -88,7 +89,6 @@ const getTestAttemptsDetails = async (
           timeSpent: 1,
           studentName: "$studentDetails.firstName",
           studentLastName: "$studentDetails.lastName",
-
           questions: 1,
         },
       },
@@ -156,6 +156,38 @@ const getTestAttemptsDetails = async (
     })),
   }));
 
+  // Studenti assegnati senza attempt: includi con status "not-started"
+  const attemptStudentIds = new Set(
+    attemptsWithStudents.map((a: any) => a.studentId?.toString()),
+  );
+  const missingStudentIds = [...uniqueStudentIds].filter(
+    (id) => !attemptStudentIds.has(id as string),
+  );
+
+  let missingStudents: any[] = [];
+  if (missingStudentIds.length > 0) {
+    const students = await db
+      .collection("users")
+      .find({
+        _id: { $in: missingStudentIds.map((id) => new ObjectId(id as string)) },
+      })
+      .project({ firstName: 1, lastName: 1 })
+      .toArray();
+
+    missingStudents = students.map((s) => ({
+      _id: null,
+      status: "not-started",
+      studentName: s.firstName,
+      studentLastName: s.lastName,
+      score: null,
+      maxScore: null,
+      deliveredAt: null,
+      questions: [],
+    }));
+  }
+
+  const allAssignees = [...attemptsWithTopics, ...missingStudents];
+
   return {
     test: {
       _id: test._id,
@@ -176,7 +208,7 @@ const getTestAttemptsDetails = async (
       { title: "Tempo medio", value: formatTime(avgTimeSpent), icon: "clock" },
       { title: "Assegnazioni", value: totalAssignments, icon: "users" },
     ],
-    attempts: attemptsWithTopics,
+    attempts: allAssignees,
   };
 };
 
