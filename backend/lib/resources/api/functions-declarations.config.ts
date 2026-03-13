@@ -55,7 +55,7 @@ const ADMIN_ROUTES: FunctionIntegration[] = [
     role: "admin",
   },
   {
-    apiRoute: "admin/organizations/{organizationId}/students/bulk",
+    apiRoute: "admin/organizations/{organizationId}/import-students",
     functionPath: "admin/workspace/bulkImportStudents.ts",
     method: "post",
     role: "admin",
@@ -109,7 +109,7 @@ const ADMIN_ROUTES: FunctionIntegration[] = [
     role: "admin",
   }, */
   {
-    apiRoute: "admin/stats/global",
+    apiRoute: "admin/global-stats",
     functionPath: "admin/stats/getSuperAdminStats.ts",
     method: "get",
     role: "admin",
@@ -394,15 +394,9 @@ const TESTS_ROUTES: FunctionIntegration[] = [{
   functionPath: "tests/createTest.ts",
   method: "post",
   role: "teacher",
-}, {
-  apiRoute: "students/self-evaluation",
-  functionPath: "students/selfEvaluation/createSelfEvaluationTest.ts",
-  method: "post",
-  role: "student",
 },
-
 {
-  apiRoute: "test/insight/{testId}",
+  apiRoute: "tests/{testId}/insight",
   functionPath: "teachers/generateTestInsight.ts",
   method: "post",
   role: "teacher",
@@ -432,12 +426,6 @@ const TESTS_ROUTES: FunctionIntegration[] = [{
   role: "teacher",
 },
 {
-  apiRoute: "tests/assignments-to-grade/count",
-  functionPath: "tests/countAssignmentsToGrade.ts",
-  method: "get",
-  role: "teacher",
-},
-{
   apiRoute: "tests/{testId}/classes",
   functionPath: "tests/updateTestClasses.ts",
   method: "put",
@@ -449,18 +437,7 @@ const TESTS_ROUTES: FunctionIntegration[] = [{
   method: "get",
   role: "teacher",
 },
-{
-  apiRoute: "students/tests",
-  functionPath: "students/tests/getStudentTests.ts",
-  method: "get",
-  role: "student",
-},
-{
-  apiRoute: "students/test/execution",
-  functionPath: "students/tests/executeTest.ts",
-  method: "post",
-  role: "student",
-},]
+]
 
 const ASSISTANTS_ROUTES: FunctionIntegration[] = [
   {
@@ -607,16 +584,32 @@ const MISC_ROUTES: FunctionIntegration[] = [
   },
 ]
 export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
-  ...ADMIN_ROUTES,
-  ...SUBJECTS_ROUTES,
-  ...MATERIALS_ROUTES,
-  ...ATTEMPTS_ROUTES,
-  ...QUESTIONS_ROUTES,
-  ...COMMUNICATIONS_ROUTES,
-  ...TESTS_ROUTES,
-  ...ASSISTANTS_ROUTES,
-  ...STUDENTS_ROUTES,
-  ...EVENTS_ROUTES,
-  ...CLASSES_ROUTES,
   ...MISC_ROUTES,
+  ...ADMIN_ROUTES,
+  ...EVENTS_ROUTES,
+  ...TESTS_ROUTES,
+  {
+    apiRoute: "tests/assignments-to-grade/count",
+    functionPath: "tests/countAssignmentsToGrade.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "students/tests",
+    functionPath: "students/tests/getStudentTests.ts",
+    method: "get",
+    role: "student",
+  },
+  {
+    apiRoute: "students/test/execution",
+    functionPath: "students/tests/executeTest.ts",
+    method: "post",
+    role: "student",
+  },
+  {
+    apiRoute: "students/self-evaluation",
+    functionPath: "students/selfEvaluation/createSelfEvaluationTest.ts",
+    method: "post",
+    role: "student",
+  },
 ];

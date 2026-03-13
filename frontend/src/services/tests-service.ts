@@ -65,7 +65,7 @@ export interface AttemptInterface {
   providedIn: 'root',
 })
 export class TestsService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getPaginatedTests(
     page: number,
@@ -177,7 +177,7 @@ export class TestsService {
   }
 
   getTestInsight(testId: string) {
-    return this.http.post<{ insight: string }>(`test/insight/${testId}`, {});
+    return this.http.post<{ insight: string }>(`tests/${testId}/insight`, {});
   }
 
   getAttemptInsight(attemptId: string) {
