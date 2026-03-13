@@ -10,7 +10,7 @@ const generateStudentInsight = async (
   context: Context,
 ) => {
   const studentId = request.pathParameters?.studentId;
-  const subjectIdParam = request.queryStringParameters?.subjectId;
+  const subjectId = context.subjectId!;
 
   if (!studentId || !ObjectId.isValid(studentId)) {
     throw createError.BadRequest("Invalid or missing studentId");
@@ -28,13 +28,13 @@ const generateStudentInsight = async (
   }
 
   // 2. Build match filter with optional subjectId
-  const matchFilter: any = { 
-    studentId: studentObjectId, 
+  const matchFilter: any = {
+    studentId: studentObjectId,
     status: "reviewed",
     source: { $ne: "self-evaluation" }
   };
-  if (subjectIdParam && ObjectId.isValid(subjectIdParam)) {
-    matchFilter.subjectId = new ObjectId(subjectIdParam);
+  if (subjectId && ObjectId.isValid(subjectId)) {
+    matchFilter.subjectId = new ObjectId(subjectId);
   }
 
   // 3. Get Student Attempts with Test Names

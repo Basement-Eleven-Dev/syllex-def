@@ -146,7 +146,13 @@ const CLASSES_ROUTES: FunctionIntegration[] = [
     role: "logged",
   },
   {
-    apiRoute: "classes/all", //NON IL MASSIMO, DA FARE REFACTORING IN CASO DI AGGIUNTA DI "classes/{classId}", CREEREBBE CONFLITTO
+    apiRoute: "classes/{classId}/students",
+    functionPath: "students/getClassStudents.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "assignments",
     functionPath: "classes/getAllClasses.ts",
     method: "get",
     role: "logged",
@@ -355,6 +361,23 @@ const AI_ROUTES: FunctionIntegration[] = [
   }
 ]
 
+const STUDENTS_ROUTES: FunctionIntegration[] = [
+  {
+    apiRoute: "students/{studentId}",
+    functionPath: "teachers/getStudentDetails.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "students/{studentId}/insight",
+    functionPath: "teachers/getStudentInsight.ts",
+    method: "get",
+    role: "teacher",
+  },
+
+
+]
+
 const MATERIALS_ROUTES: FunctionIntegration[] = [{
   apiRoute: "files/upload",
   functionPath: "files/createUpload.ts",
@@ -541,39 +564,7 @@ const ASSISTANTS_ROUTES: FunctionIntegration[] = [
   },
 ]
 
-const STUDENTS_ROUTES: FunctionIntegration[] = [
-  {
-    apiRoute: "students",
-    functionPath: "students/getStudents.ts",
-    method: "post",
-    role: "teacher",
-  },
-  {
-    apiRoute: "teacher/students/{studentId}/details",
-    functionPath: "teachers/getStudentDetails.ts",
-    method: "get",
-    role: "teacher",
-  },
-  {
-    apiRoute: "teacher/students/{studentId}/insight",
-    functionPath: "teachers/generateStudentInsight.ts",
-    method: "post",
-    role: "teacher",
-  },
-  {
-    apiRoute: "class/{classId}/students",
-    functionPath: "students/getClassStudents.ts",
-    method: "get",
-    role: "teacher",
-  },
-  {
-    apiRoute: "students/me/subjects",
-    functionPath: "students/getStudentSubjects.ts",
-    method: "get",
-    role: "student",
-  },
 
-]
 
 
 export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
@@ -586,6 +577,7 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
   ...COMMUNICATIONS_ROUTES,
   ...QUESTIONS_ROUTES,
   ...AI_ROUTES,
+  ...STUDENTS_ROUTES,
   {
     apiRoute: "tests/assignments-to-grade/count",
     functionPath: "tests/countAssignmentsToGrade.ts",
@@ -608,6 +600,19 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     apiRoute: "students/self-evaluation",
     functionPath: "students/selfEvaluation/createSelfEvaluationTest.ts",
     method: "post",
+    role: "student",
+  },
+  {
+    apiRoute: "students",
+    functionPath: "students/getStudents.ts",
+    method: "post", //AAAAAA È UNA GET
+    role: "teacher",
+  },
+
+  {
+    apiRoute: "students/me/subjects", //SOVRAPPONIBILE
+    functionPath: "students/getStudentSubjects.ts",
+    method: "get",
     role: "student",
   },
 ];

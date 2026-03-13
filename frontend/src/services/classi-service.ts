@@ -45,7 +45,7 @@ export class ClassiService {
   }
 
   private loadAllAssignments(): void {
-    this.http.get<AssignmentInterface[]>('classes/all').subscribe((assignments) => {
+    this.http.get<AssignmentInterface[]>('assignments').subscribe((assignments) => {
       this.AllAssignments.set(assignments);
     });
   }
@@ -62,7 +62,7 @@ export class ClassiService {
   }
 
   getClassStudents(classId: string): Observable<{ students: User[] }> {
-    return this.http.get<{ students: User[] }>(`class/${classId}/students`);
+    return this.http.get<{ students: User[] }>(`classes/${classId}/students`);
   }
 
   getClassAssignedTests(
