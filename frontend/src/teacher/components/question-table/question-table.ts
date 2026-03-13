@@ -8,11 +8,17 @@ import { QuestionInterface } from '../../../services/questions';
 import { Materia } from '../../../services/materia';
 import { QuestionCard } from '../question-card/question-card';
 import { QuestionPreviewModal } from './question-preview-modal';
+import { ConfirmActionDirective } from '../../../directives/confirm-action.directive';
 
 @Component({
   selector: 'app-question-table',
   standalone: true,
-  imports: [TitleCasePipe, FontAwesomeModule, RouterModule],
+  imports: [
+    TitleCasePipe,
+    FontAwesomeModule,
+    RouterModule,
+    ConfirmActionDirective,
+  ],
   templateUrl: './question-table.html',
   styleUrl: './question-table.scss',
 })

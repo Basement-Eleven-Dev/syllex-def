@@ -25,7 +25,7 @@
           </tr>
         </thead>
         <tbody>
-          @for(assignment of filteredAssignments(); track $index) {
+          @for(assignment of paginatedAssignments(); track $index) {
           <tr>
             <td>
               <div class="avatar avatar-sm">
@@ -79,9 +79,9 @@
     >
       <app-syllex-pagination
         [collectionSize]="collectionSize"
-        [page]="page"
+        [page]="page()"
         [pageSize]="pageSize"
-        (pageChange)="page = $event; onNewPageRequested()"
+        (pageChange)="page.set($event)"
       />
     </div>
     } @else {

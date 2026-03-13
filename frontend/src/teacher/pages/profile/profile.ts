@@ -1,7 +1,23 @@
-import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+} from '@angular/core';
 import { Auth } from '../../../services/auth';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faBook, faBuilding, faMarker, faShieldHalved, faUser, faCog, faBell, faLock } from '@fortawesome/pro-solid-svg-icons';
+import {
+  faBook,
+  faBuilding,
+  faMarker,
+  faShieldHalved,
+  faUser,
+  faCog,
+  faBell,
+  faLock,
+} from '@fortawesome/pro-solid-svg-icons';
 import { AsyncPipe, NgClass } from '@angular/common';
 import { Materia } from '../../../services/materia';
 import {
@@ -14,6 +30,7 @@ import { EditPassword } from '../../../app/edit-password/edit-password';
 import { SetupMfa } from '../../../app/setup-mfa/setup-mfa';
 import { FormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { FeedbackService } from '../../../services/feedback-service';
 
 @Component({
   selector: 'app-profile',
@@ -27,6 +44,7 @@ export class Profile {
   public materiaService = inject(Materia);
   private classiService = inject(ClassiService);
   private modalService = inject(NgbModal);
+  private feedbackService = inject(FeedbackService);
 
   // User Signal for reactivity
   private userSignal = toSignal(this.authService.user$);
@@ -45,7 +63,9 @@ export class Profile {
   public activeTab = signal<'profile' | 'settings'>('profile');
 
   // Reactivity
-  public settingsInitialized = computed(() => !!this.userSignal()?.notificationSettings);
+  public settingsInitialized = computed(
+    () => !!this.userSignal()?.notificationSettings,
+  );
 
   // MFA
   public mfaEnabled = signal<boolean | null>(null);
@@ -55,7 +75,7 @@ export class Profile {
     newCommunication: signal(true),
     newEvent: signal(true),
     newTest: signal(true),
-    testCorrected: signal(true)
+    testCorrected: signal(true),
   };
   public Assegnazioni: {
     class: ClassInterface;
@@ -72,10 +92,12 @@ export class Profile {
     effect(() => {
       const user = this.userSignal();
       const settings = user?.notificationSettings;
-      
+
       if (settings) {
         untracked(() => {
-          this.notificationSettings.newCommunication.set(!!settings.newCommunication);
+          this.notificationSettings.newCommunication.set(
+            !!settings.newCommunication,
+          );
           this.notificationSettings.newEvent.set(!!settings.newEvent);
           this.notificationSettings.newTest.set(!!settings.newTest);
           this.notificationSettings.testCorrected.set(!!settings.testCorrected);
@@ -157,14 +179,25 @@ export class Profile {
       newCommunication: this.notificationSettings.newCommunication(),
       newEvent: this.notificationSettings.newEvent(),
       newTest: this.notificationSettings.newTest(),
-      testCorrected: this.notificationSettings.testCorrected()
+      testCorrected: this.notificationSettings.testCorrected(),
     };
-    
+
     console.log('Salvataggio impostazioni notifiche (Teacher):', settings);
     const result = await this.authService.updateNotificationSettings(settings);
-    if (!result.success) {
-      console.error('Errore durante il salvataggio delle impostazioni:', result.message);
-      // Opzionale: mostrare un toast o ripristinare il valore precedente
+    if (result.success) {
+      this.feedbackService.showFeedback(
+        'Impostazioni salvate con successo',
+        true,
+      );
+    } else {
+      console.error(
+        'Errore durante il salvataggio delle impostazioni:',
+        result.message,
+      );
+      this.feedbackService.showFeedback(
+        'Errore durante il salvataggio delle impostazioni',
+        false,
+      );
     }
   }
 }

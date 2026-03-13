@@ -2,6 +2,7 @@ import {
   Component,
   computed,
   effect,
+  inject,
   input,
   output,
   signal,
@@ -28,6 +29,7 @@ import {
   getIconColor,
   isTextFile,
 } from '../../../app/_utils/file-icons';
+import { FeedbackService } from '../../../services/feedback-service';
 
 export interface MaterialeWithPath extends MaterialInterface {
   path: string;
@@ -47,6 +49,8 @@ export class MaterialiSelector {
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   @Input() embeddingCreationMode: boolean = false;
+
+  private readonly feedbackService = inject(FeedbackService);
 
   initialMaterialIds = input<string[]>([]);
   associatedMaterialIds = input<string[]>([]);
@@ -187,6 +191,10 @@ export class MaterialiSelector {
       input.value = '';
     } catch (error) {
       console.error("Errore durante l'upload:", error);
+      this.feedbackService.showFeedback(
+        'Errore durante il caricamento del file',
+        false,
+      );
     } finally {
       this.isUploading.set(false);
     }

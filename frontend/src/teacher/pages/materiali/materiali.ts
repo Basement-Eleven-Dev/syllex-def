@@ -53,6 +53,7 @@ import {
 import { StorageLimitBar } from '../../components/storage-limit-bar/storage-limit-bar';
 import { SuggestedTopicsModal } from '../../components/suggested-topics-modal/suggested-topics-modal';
 import { effect, untracked } from '@angular/core';
+import { FeedbackService } from '../../../services/feedback-service';
 
 @Component({
   selector: 'app-materiali',
@@ -81,6 +82,7 @@ export class Materiali {
   private readonly offcanvasService = inject(NgbOffcanvas);
   private readonly confirmService = inject(ConfirmService);
   private readonly modalService = inject(NgbModal);
+  private readonly feedbackService = inject(FeedbackService);
 
   constructor() {
     effect(() => {
@@ -149,7 +151,13 @@ export class Materiali {
 
     this.facade.uploadFile(file).subscribe({
       next: () => (input.value = ''),
-      error: (err) => console.error('Errore durante il caricamento:', err),
+      error: (err) => {
+        console.error('Errore durante il caricamento:', err);
+        this.feedbackService.showFeedback(
+          'Errore durante il caricamento del file',
+          false,
+        );
+      },
     });
   }
 
@@ -312,9 +320,18 @@ export class Materiali {
 
   protected onAddSuggestedTopic(topic: string): void {
     this.facade.addSuggestedTopic(topic).subscribe({
-      next: () => console.log(`Argomento "${topic}" aggiunto con successo.`),
-      error: (err) =>
-        console.error(`Errore nell'aggiunta dell'argomento "${topic}":`, err),
+      next: () =>
+        this.feedbackService.showFeedback(
+          `Argomento "${topic}" aggiunto con successo`,
+          true,
+        ),
+      error: (err) => {
+        console.error(`Errore nell'aggiunta dell'argomento "${topic}":`, err);
+        this.feedbackService.showFeedback(
+          `Errore nell'aggiunta dell'argomento`,
+          false,
+        );
+      },
     });
   }
 

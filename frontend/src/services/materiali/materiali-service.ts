@@ -3,6 +3,7 @@ import { Injectable, effect, signal, computed } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { Materia } from '../materia';
+import { FeedbackService } from '../feedback-service';
 
 export interface MaterialInterface {
   _id: string;
@@ -21,7 +22,7 @@ export interface MaterialInterface {
   isMap?: boolean;
 }
 
-export const STORAGE_LIMIT_B =1024* 1024 * 1024; // 1 GB
+export const STORAGE_LIMIT_B = 1024 * 1024 * 1024; // 1 GB
 
 @Injectable({
   providedIn: 'root',
@@ -49,6 +50,7 @@ export class MaterialiService {
   constructor(
     private httpClient: HttpClient,
     private materiaService: Materia,
+    private feedbackService: FeedbackService,
   ) {
     // Reagisci ai cambiamenti della materia selezionata
     effect(() => {
@@ -78,6 +80,10 @@ export class MaterialiService {
         },
         error: (err) => {
           console.error('Errore durante il caricamento dei materiali:', err);
+          this.feedbackService.showFeedback(
+            'Errore nel caricamento dei materiali',
+            false,
+          );
           this.isLoading.set(false);
         },
       });
@@ -105,6 +111,10 @@ export class MaterialiService {
           console.error(
             'Errore durante il caricamento dei materiali studente:',
             err,
+          );
+          this.feedbackService.showFeedback(
+            'Errore nel caricamento dei materiali',
+            false,
           );
           this.isLoading.set(false);
         },
