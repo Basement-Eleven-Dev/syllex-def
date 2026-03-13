@@ -121,7 +121,7 @@ const SUBJECTS_ROUTES: FunctionIntegration[] = [
     apiRoute: "subjects",
     functionPath: "teachers/getSubjects.ts",
     method: "get",
-    role: "teacher",
+    role: "logged",
   },
   {
     apiRoute: "topics",
@@ -148,6 +148,12 @@ const CLASSES_ROUTES: FunctionIntegration[] = [
   {
     apiRoute: "classes/{classId}/students",
     functionPath: "students/getClassStudents.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "classes/{classId}/tests",
+    functionPath: "tests/getClassAssignedTests.ts",
     method: "get",
     role: "teacher",
   },
@@ -210,12 +216,7 @@ const TESTS_ROUTES: FunctionIntegration[] = [
     method: "put",
     role: "teacher",
   },
-  {
-    apiRoute: "class/{classId}/tests",
-    functionPath: "tests/getClassAssignedTests.ts",
-    method: "get",
-    role: "teacher",
-  },
+
 ]
 
 const EVENTS_ROUTES: FunctionIntegration[] = [
@@ -607,12 +608,5 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     functionPath: "students/getStudents.ts",
     method: "post", //AAAAAA È UNA GET
     role: "teacher",
-  },
-
-  {
-    apiRoute: "students/me/subjects", //SOVRAPPONIBILE
-    functionPath: "students/getStudentSubjects.ts",
-    method: "get",
-    role: "student",
   },
 ];

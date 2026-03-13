@@ -68,6 +68,6 @@ export class ClassiService {
   getClassAssignedTests(
     classId: string,
   ): Observable<{ tests: TestInterface[] }> {
-    return this.http.get<{ tests: TestInterface[] }>(`class/${classId}/tests`);
+    return this.http.get<{ tests: TestInterface[] }>(`classes/${classId}/tests`);
   }
 }

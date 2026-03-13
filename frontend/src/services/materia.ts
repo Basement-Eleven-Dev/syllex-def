@@ -25,40 +25,18 @@ export class Materia {
   shouldReload = signal<boolean>(false);
 
   constructor(
-    private http: HttpClient,
-    private authService: Auth,
+    private http: HttpClient
   ) {
-    if (this.authService.user?.role === 'student') {
-      this.getMaterieStudent();
-    } else {
-      this.getMaterieTeacher();
-    }
+    this.getMaterie();
   }
 
-  getMaterieStudent(): void {
+  getMaterie(): void {
     this.http
-      .get<{
-        success: boolean;
-        subjects: MateriaObject[];
-      }>('students/me/subjects')
-      .subscribe((res) => {
-        if (res.success) {
-          this.allMaterie.set(res.subjects);
-          console.log('Materie dello studente:', res.subjects);
-          this.loadSavedSubject();
-        }
-      });
-  }
-
-  getMaterieTeacher(): MateriaObject[] {
-    this.http
-      .get<MateriaObject[]>(`subjects`)
+      .get<MateriaObject[]>('subjects')
       .subscribe((materie) => {
         this.allMaterie.set(materie);
         this.loadSavedSubject();
       });
-
-    return this.allMaterie();
   }
 
   /**
