@@ -9,38 +9,54 @@
     </div>
   }
 
-  @if (mermaidContent()) {
-    <div class="mermaid-viewer">
-      <div #mermaidContainer class="mermaid-container"></div>
-      
-      <div class="zoom-controls">
-        <button (click)="resetZoom()" title="Reset vista">
-          <fa-icon [icon]="ResetIcon"></fa-icon>
-        </button>
+  <div class="file-content-body">
+    @if (mermaidContent()) {
+      <div class="mermaid-viewer">
+        <div #mermaidContainer class="mermaid-container"></div>
+        
+        <div class="zoom-controls">
+          <button (click)="resetZoom()" title="Reset vista">
+            <fa-icon [icon]="ResetIcon"></fa-icon>
+          </button>
+        </div>
       </div>
-    </div>
-  }
-  @else if (isImage()) {
-    <img
-      [src]="docUrl"
-      (load)="onLoad()"
-      style="width: 100%; height: 90dvh; object-fit: contain"
-    />
-  }
-  @else if (isBlobUrl()) {
-    <ngx-doc-viewer
-      [url]="docUrl"
-      viewer="url"
-      (loaded)="onLoad()"
-      style="width: 100%; height: 90dvh">
-    </ngx-doc-viewer>
-  }
-  @else {
-    <ngx-doc-viewer
-      [url]="docUrl"
-      viewer="google"
-      (loaded)="onLoad()"
-      style="width: 100%; height: 90dvh">
-    </ngx-doc-viewer>
-  }
+    }
+    @else if (isPdf() && !isBlobUrl()) {
+      <div class="document-wrapper">
+        <iframe
+          [src]="docUrl | safe: 'resourceUrl'"
+          (load)="onLoad()"
+          class="previewer-frame">
+        </iframe>
+      </div>
+    }
+    @else if (isImage()) {
+      <div class="image-wrapper">
+        <img
+          [src]="docUrl"
+          (load)="onLoad()"
+        />
+      </div>
+    }
+    @else if (isBlobUrl()) {
+      <div class="document-wrapper">
+        <ngx-doc-viewer
+          [url]="docUrl"
+          viewer="url"
+          (loaded)="onLoad()"
+          class="previewer-frame">
+        </ngx-doc-viewer>
+      </div>
+    }
+    @else {
+      <div class="document-wrapper">
+        <ngx-doc-viewer
+          [url]="docUrl"
+          viewer="office"
+          (loaded)="onLoad()"
+          class="previewer-frame">
+        </ngx-doc-viewer>
+      </div>
+    }
+  </div>
 </div>
