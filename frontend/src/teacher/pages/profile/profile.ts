@@ -1,8 +1,8 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { Auth } from '../../../services/auth';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faBook, faBuilding, faMarker, faShieldHalved } from '@fortawesome/pro-solid-svg-icons';
-import { AsyncPipe } from '@angular/common';
+import { faBook, faBuilding, faMarker, faShieldHalved, faUser, faCog, faBell, faLock } from '@fortawesome/pro-solid-svg-icons';
+import { AsyncPipe, NgClass } from '@angular/common';
 import { Materia } from '../../../services/materia';
 import {
   ClassInterface,
@@ -12,10 +12,12 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EditEmail } from '../../../app/edit-email/edit-email';
 import { EditPassword } from '../../../app/edit-password/edit-password';
 import { SetupMfa } from '../../../app/setup-mfa/setup-mfa';
+import { FormsModule } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-profile',
-  imports: [FontAwesomeModule, AsyncPipe],
+  imports: [FontAwesomeModule, AsyncPipe, FormsModule],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
 })
@@ -26,12 +28,35 @@ export class Profile {
   private classiService = inject(ClassiService);
   private modalService = inject(NgbModal);
 
-  // Public Properties
+  // User Signal for reactivity
+  private userSignal = toSignal(this.authService.user$);
+
+  // Icons
   public BuildingIcon = faBuilding;
   public EditIcon = faMarker;
   public BookIcon = faBook;
   public ShieldIcon = faShieldHalved;
+  public ProfileIcon = faUser;
+  public SettingsIcon = faCog;
+  public BellIcon = faBell;
+  public SecurityIcon = faLock;
+
+  // Tabs
+  public activeTab = signal<'profile' | 'settings'>('profile');
+
+  // Reactivity
+  public settingsInitialized = computed(() => !!this.userSignal()?.notificationSettings);
+
+  // MFA
   public mfaEnabled = signal<boolean | null>(null);
+
+  // Notification Settings
+  public notificationSettings = {
+    newCommunication: signal(true),
+    newEvent: signal(true),
+    newTest: signal(true),
+    testCorrected: signal(true)
+  };
   public Assegnazioni: {
     class: ClassInterface;
     subjectId: string;
@@ -41,6 +66,21 @@ export class Profile {
     // Load MFA preference
     this.authService.getMfaPreference().then((enabled) => {
       this.mfaEnabled.set(enabled);
+    });
+
+    // Initialize notification settings when user profile is loaded
+    effect(() => {
+      const user = this.userSignal();
+      const settings = user?.notificationSettings;
+      
+      if (settings) {
+        untracked(() => {
+          this.notificationSettings.newCommunication.set(!!settings.newCommunication);
+          this.notificationSettings.newEvent.set(!!settings.newEvent);
+          this.notificationSettings.newTest.set(!!settings.newTest);
+          this.notificationSettings.testCorrected.set(!!settings.testCorrected);
+        });
+      }
     });
 
     effect(() => {
@@ -105,6 +145,26 @@ export class Profile {
     const result = await this.authService.disableMfa();
     if (result.success) {
       this.mfaEnabled.set(false);
+    }
+  }
+
+  setTab(tab: 'profile' | 'settings'): void {
+    this.activeTab.set(tab);
+  }
+
+  async saveNotificationSettings(): Promise<void> {
+    const settings = {
+      newCommunication: this.notificationSettings.newCommunication(),
+      newEvent: this.notificationSettings.newEvent(),
+      newTest: this.notificationSettings.newTest(),
+      testCorrected: this.notificationSettings.testCorrected()
+    };
+    
+    console.log('Salvataggio impostazioni notifiche (Teacher):', settings);
+    const result = await this.authService.updateNotificationSettings(settings);
+    if (!result.success) {
+      console.error('Errore durante il salvataggio delle impostazioni:', result.message);
+      // Opzionale: mostrare un toast o ripristinare il valore precedente
     }
   }
 }

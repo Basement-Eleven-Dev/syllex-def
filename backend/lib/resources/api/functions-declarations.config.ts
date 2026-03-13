@@ -588,6 +588,12 @@ const MISC_ROUTES: FunctionIntegration[] = [
     role: "logged",
   },
   {
+    apiRoute: "profile/settings",
+    functionPath: "profile/updateSettings.ts",
+    method: "patch",
+    role: "logged",
+  },
+  {
     apiRoute: "status",
     functionPath: "status.ts",
     method: "get",

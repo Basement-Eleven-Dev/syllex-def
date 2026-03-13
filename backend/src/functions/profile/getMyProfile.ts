@@ -12,6 +12,12 @@ export interface User {
   lastName?: string;
   role: "teacher" | "student" | "admin";
   organizationId?: ObjectId;
+  notificationSettings?: {
+    newCommunication: boolean;
+    newEvent: boolean;
+    newTest: boolean;
+    testCorrected: boolean;
+  };
 }
 
 const getProfile = async (request: APIGatewayProxyEvent, context: Context) => {

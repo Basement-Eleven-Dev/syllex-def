@@ -47,7 +47,7 @@
         <div class="h-100 overflow-scroll">
           @for(c of communications; track $index; let last = $last){
           <div
-            class="border border-1 communicationCard rounded-syllex"
+            class="bg-syllex-light communicationCard rounded-syllex"
             [class.mb-3]="!last"
             [routerLink]="'/t/comunicazioni/edit/' + c._id"
           >
