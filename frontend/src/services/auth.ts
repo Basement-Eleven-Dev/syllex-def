@@ -38,6 +38,12 @@ export interface User {
   role: 'teacher' | 'student' | 'admin';
   organizationId?: string;
   organizationIds?: string[];
+  notificationSettings?: {
+    newCommunication: boolean;
+    newEvent: boolean;
+    newTest: boolean;
+    testCorrected: boolean;
+  };
 }
 
 export interface OrganizationInterface {
@@ -461,6 +467,31 @@ export class Auth {
       return {
         success: false,
         message: error.message || message,
+      };
+    }
+  }
+
+  async updateNotificationSettings(settings: {
+    newCommunication: boolean;
+    newEvent: boolean;
+    newTest: boolean;
+    testCorrected: boolean;
+  }): Promise<{ success: boolean; message: string }> {
+    try {
+      await firstValueFrom(
+        this.http.patch('profile/settings', { notificationSettings: settings }),
+      );
+      
+      const currentUser = this.user$.value;
+      if (currentUser) {
+        this.user$.next({ ...currentUser, notificationSettings: settings });
+      }
+      
+      return { success: true, message: 'Impostazioni aggiornate con successo' };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message || 'Errore durante l\'aggiornamento delle impostazioni',
       };
     }
   }

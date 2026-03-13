@@ -8,4 +8,10 @@ export type User = {
   lastName?: string;
   role: "teacher" | "student" | "admin";
   organizationId?: ObjectId;
+  notificationSettings?: {
+    newCommunication: boolean;
+    newEvent: boolean;
+    newTest: boolean;
+    testCorrected: boolean;
+  };
 };
