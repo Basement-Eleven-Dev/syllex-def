@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { MaterialiService, MaterialInterface } from './materiali-service';
+import { FeedbackService } from '../feedback-service';
 
 interface RootFolderInterface extends MaterialInterface {
   _id: 'root';
@@ -13,6 +14,7 @@ interface RootFolderInterface extends MaterialInterface {
 @Injectable({ providedIn: 'root' })
 export class MaterialeDragDropService {
   private materialiService = inject(MaterialiService);
+  private feedbackService = inject(FeedbackService);
   private draggedItem: MaterialInterface | null = null;
   private draggedItems: MaterialInterface[] = [];
 
@@ -50,7 +52,13 @@ export class MaterialeDragDropService {
     // Sposta tutti gli elementi tramite una singola chiamata batch
     const itemIds = itemsToMove.map((item) => item._id!);
     this.materialiService.moveItems(itemIds, targetFolder._id!).subscribe({
-      error: (err) => console.error('Errore durante lo spostamento:', err),
+      error: (err) => {
+        console.error('Errore durante lo spostamento:', err);
+        this.feedbackService.showFeedback(
+          'Errore durante lo spostamento degli elementi',
+          false,
+        );
+      },
     });
 
     this.endDrag();

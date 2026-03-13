@@ -35,7 +35,11 @@
             <button
               class="btn btn-sm btn-delete"
               title="Elimina"
-              (click)="removeMe.emit(question._id)"
+              confirmAction
+              [confirmMessage]="'Vuoi eliminare questa domanda? L\'azione non può essere annullata.'"
+              [confirmTitle]="'Elimina domanda'"
+              [confirmButtonText]="'Elimina'"
+              (confirmed)="removeMe.emit(question._id)"
             >
               <fa-icon [icon]="TrashIcon"></fa-icon>
             </button>

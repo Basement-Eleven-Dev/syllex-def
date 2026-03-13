@@ -34,6 +34,11 @@ export const teacherRoutes: Routes = [
     loadComponent: () => import('./pages/test/test').then((m) => m.Test),
   },
   {
+    path: 'lessons',
+    loadComponent: () =>
+      import('./pages/lessons/lessons').then((m) => m.Lessons),
+  },
+  {
     path: 'classi',
     loadComponent: () => import('./pages/classi/classi').then((m) => m.Classi),
   },

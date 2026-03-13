@@ -16,6 +16,7 @@ import {
   ViewTypeToggle,
   ViewType,
 } from '../../components/view-type-toggle/view-type-toggle';
+import { FeedbackService } from '../../../services/feedback-service';
 
 @Component({
   selector: 'app-banca',
@@ -39,6 +40,7 @@ export class Banca {
   // Dependency Injection
   private readonly questionsService = inject(QuestionsService);
   protected readonly materiaService = inject(Materia);
+  private readonly feedbackService = inject(FeedbackService);
 
   // View type
   ViewType: ViewType = this.loadViewTypePreference() || 'grid';
@@ -99,12 +101,27 @@ export class Banca {
     this.Page.set(1);
   }
 
-  /** Optimistically removes a question from the visible list. */
+  /** Deletes a question from the backend, then removes it from the visible list. */
   onDeleteQuestion(questionId: string): void {
-    this.RawQuestions.update((list) =>
-      list.filter((q) => q._id !== questionId),
-    );
-    this.CollectionSize.update((n) => n - 1);
+    this.questionsService.deleteQuestion(questionId).subscribe({
+      next: () => {
+        this.RawQuestions.update((list) =>
+          list.filter((q) => q._id !== questionId),
+        );
+        this.CollectionSize.update((n) => n - 1);
+        this.feedbackService.showFeedback(
+          'Domanda eliminata con successo',
+          true,
+        );
+      },
+      error: (err) => {
+        console.error('Errore nella cancellazione della domanda:', err);
+        this.feedbackService.showFeedback(
+          'Errore nella cancellazione della domanda',
+          false,
+        );
+      },
+    });
   }
 
   onChangeViewType(type: ViewType): void {
@@ -155,6 +172,10 @@ export class Banca {
         },
         error: (err) => {
           console.error('Errore nel caricamento delle domande:', err);
+          this.feedbackService.showFeedback(
+            'Errore nel caricamento delle domande',
+            false,
+          );
         },
       });
   }
