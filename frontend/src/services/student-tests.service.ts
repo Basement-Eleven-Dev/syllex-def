@@ -72,7 +72,7 @@ export class StudentTestsService {
     if (searchTerm) params.searchTerm = searchTerm;
 
     return this.http
-      .get<{ tests: StudentTestInterface[]; total: number }>('students/tests', {
+      .get<{ tests: StudentTestInterface[]; total: number }>('tests', {
         params,
       })
       .pipe(map((res) => res.tests || []));
