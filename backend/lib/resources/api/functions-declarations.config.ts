@@ -155,60 +155,61 @@ const CLASSES_ROUTES: FunctionIntegration[] = [
 
 ]
 
-const TESTS_ROUTES: FunctionIntegration[] = [{
-  apiRoute: "tests",
-  functionPath: "tests/getTests.ts",
-  method: "get",
-  role: "teacher",
-},
-{
-  apiRoute: "tests",
-  functionPath: "tests/createTest.ts",
-  method: "post",
-  role: "teacher",
-},
-{
-  apiRoute: "tests/{testId}/insight",
-  functionPath: "teachers/generateTestInsight.ts",
-  method: "post",
-  role: "teacher",
-},
-{
-  apiRoute: "tests/{testId}",
-  functionPath: "tests/getTestById.ts",
-  method: "get",
-  role: "teacher",
-},
-{
-  apiRoute: "tests/{testId}",
-  functionPath: "tests/editTest.ts",
-  method: "put",
-  role: "teacher",
-},
-{
-  apiRoute: "tests/{testId}",
-  functionPath: "tests/deleteTest.ts",
-  method: "delete",
-  role: "teacher",
-},
-{
-  apiRoute: "tests/{testId}/duplicate",
-  functionPath: "tests/duplicateTest.ts",
-  method: "post",
-  role: "teacher",
-},
-{
-  apiRoute: "tests/{testId}/classes",
-  functionPath: "tests/updateTestClasses.ts",
-  method: "put",
-  role: "teacher",
-},
-{
-  apiRoute: "class/{classId}/tests",
-  functionPath: "tests/getClassAssignedTests.ts",
-  method: "get",
-  role: "teacher",
-},
+const TESTS_ROUTES: FunctionIntegration[] = [
+  {
+    apiRoute: "tests",
+    functionPath: "tests/getTests.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "tests",
+    functionPath: "tests/createTest.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "tests/{testId}/insight",
+    functionPath: "teachers/generateTestInsight.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "tests/{testId}",
+    functionPath: "tests/getTestById.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "tests/{testId}",
+    functionPath: "tests/editTest.ts",
+    method: "put",
+    role: "teacher",
+  },
+  {
+    apiRoute: "tests/{testId}",
+    functionPath: "tests/deleteTest.ts",
+    method: "delete",
+    role: "teacher",
+  },
+  {
+    apiRoute: "tests/{testId}/duplicate",
+    functionPath: "tests/duplicateTest.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "tests/{testId}/classes",
+    functionPath: "tests/updateTestClasses.ts",
+    method: "put",
+    role: "teacher",
+  },
+  {
+    apiRoute: "class/{classId}/tests",
+    functionPath: "tests/getClassAssignedTests.ts",
+    method: "get",
+    role: "teacher",
+  },
 ]
 
 const EVENTS_ROUTES: FunctionIntegration[] = [
@@ -271,36 +272,74 @@ const MISC_ROUTES: FunctionIntegration[] = [
   },
 ]
 
-const COMMUNICATIONS_ROUTES: FunctionIntegration[] = [{
-  apiRoute: "communications",
-  functionPath: "communications/getCommunications.ts",
-  method: "get",
-  role: "logged",
-},
-{
-  apiRoute: "communications",
-  functionPath: "communications/createCommunication.ts",
-  method: "post",
-  role: "teacher",
-},
-{
-  apiRoute: "communications/{communicationId}",
-  functionPath: "communications/getCommunicationById.ts",
-  method: "get",
-  role: "logged",
-},
-{
-  apiRoute: "communications/{communicationId}",
-  functionPath: "communications/editCommunication.ts",
-  method: "put",
-  role: "teacher",
-},
-{
-  apiRoute: "communications/{communicationId}",
-  functionPath: "communications/deleteCommunication.ts",
-  method: "delete",
-  role: "teacher",
-},]
+const COMMUNICATIONS_ROUTES: FunctionIntegration[] = [
+  {
+    apiRoute: "communications",
+    functionPath: "communications/getCommunications.ts",
+    method: "get",
+    role: "logged",
+  },
+  {
+    apiRoute: "communications",
+    functionPath: "communications/createCommunication.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "communications/{communicationId}",
+    functionPath: "communications/getCommunicationById.ts",
+    method: "get",
+    role: "logged",
+  },
+  {
+    apiRoute: "communications/{communicationId}",
+    functionPath: "communications/editCommunication.ts",
+    method: "put",
+    role: "teacher",
+  },
+  {
+    apiRoute: "communications/{communicationId}",
+    functionPath: "communications/deleteCommunication.ts",
+    method: "delete",
+    role: "teacher",
+  },
+]
+
+const QUESTIONS_ROUTES: FunctionIntegration[] = [
+  {
+    apiRoute: "questions",
+    functionPath: "questions/getQuestions.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "questions/{questionId}",
+    functionPath: "questions/getQuestionById.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "questions",
+    functionPath: "questions/createQuestion.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "questions/{questionId}",
+    functionPath: "questions/editQuestion.ts",
+    method: "put",
+    role: "teacher",
+  },
+]
+
+const AI_ROUTES: FunctionIntegration[] = [
+  {
+    apiRoute: "ai/questions",
+    functionPath: "ai/createAiGenQuestion.ts",
+    method: "post",
+    role: "open",
+  }
+]
 
 const MATERIALS_ROUTES: FunctionIntegration[] = [{
   apiRoute: "files/upload",
@@ -455,38 +494,7 @@ const ATTEMPTS_ROUTES: FunctionIntegration[] = [{
   functionPath: "tests/getClassTopicsPerformance.ts",
   method: "get",
   role: "teacher",
-},]
-
-const QUESTIONS_ROUTES: FunctionIntegration[] = [{
-  apiRoute: "ai/questions",
-  functionPath: "ai/createAiGenQuestion.ts",
-  method: "post",
-  role: "open",
-},
-{
-  apiRoute: "questions",
-  functionPath: "questions/getQuestions.ts",
-  method: "get",
-  role: "teacher",
-},
-{
-  apiRoute: "questions/{questionId}",
-  functionPath: "questions/getQuestionById.ts",
-  method: "get",
-  role: "logged", //!!!DA RIMETTERE A ROLE:TEACHER
-},
-{
-  apiRoute: "questions",
-  functionPath: "questions/createQuestion.ts",
-  method: "post",
-  role: "teacher",
-},
-{
-  apiRoute: "questions/{questionId}/edit",
-  functionPath: "questions/editQuestion.ts",
-  method: "put",
-  role: "teacher",
-},]
+}]
 
 const ASSISTANTS_ROUTES: FunctionIntegration[] = [
   {
@@ -576,6 +584,8 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
   ...SUBJECTS_ROUTES,
   ...CLASSES_ROUTES,
   ...COMMUNICATIONS_ROUTES,
+  ...QUESTIONS_ROUTES,
+  ...AI_ROUTES,
   {
     apiRoute: "tests/assignments-to-grade/count",
     functionPath: "tests/countAssignmentsToGrade.ts",
