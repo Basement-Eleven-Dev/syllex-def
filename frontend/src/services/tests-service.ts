@@ -146,12 +146,12 @@ export class TestsService {
   getTestAttemptsDetails(testId: string) {
     // Nota: l'URL deve corrispondere alla apiRoute + il parametro id
     return this.http.get<TestDetailsResponse>(
-      `test/attempts/details/${testId}`,
+      `test/${testId}/attempts-details`,
     );
   }
 
   getAttemptDetail(attemptId: string) {
-    const response = this.http.get<any>(`attempts/details/${attemptId}`);
+    const response = this.http.get<any>(`attempts/${attemptId}/details`);
     console.log('getAttemptDetail response:', response);
     return response;
   }
@@ -165,7 +165,7 @@ export class TestsService {
 
   correctAttemptWithAI(attemptId: string, questionId: string) {
     return this.http.post<{ score: number; explanation: string, aiProbability: string }>(
-      `attempts/${attemptId}/${questionId}/correction/ai`,
+      `attempts/${attemptId}/questions/${questionId}/ai-correction`,
       {},
     );
   }
@@ -181,9 +181,8 @@ export class TestsService {
   }
 
   getAttemptInsight(attemptId: string) {
-    return this.http.post<{ insight: string }>(
-      `attempts/insight/${attemptId}`,
-      {},
+    return this.http.get<{ insight: string }>(
+      `attempts/${attemptId}/insight`
     );
   }
 }

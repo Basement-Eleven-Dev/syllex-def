@@ -63,7 +63,7 @@ export interface StudentAttemptInterface {
 
 @Injectable({ providedIn: 'root' })
 export class StudentTestsService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getAvailableTests(
     searchTerm: string = '',
@@ -84,7 +84,7 @@ export class StudentTestsService {
     return this.http
       .get<{
         attempt: StudentAttemptInterface | null;
-      }>(`students/test/${testId}/attempt`)
+      }>(`test/${testId}/attempt`)
       .pipe(map((res) => res.attempt ?? null));
   }
 
@@ -97,7 +97,7 @@ export class StudentTestsService {
     return this.http
       .post<{
         attempt: StudentAttemptInterface;
-      }>('students/test/attempt', body)
+      }>('test/' + attempt.testId + '/attempt', body)
       .pipe(map((res) => res.attempt));
   }
 
@@ -108,13 +108,13 @@ export class StudentTestsService {
     return this.http
       .put<{
         attempt: StudentAttemptInterface;
-      }>(`students/test/attempt/${attemptId}`, data)
+      }>(`test/${data.testId}/attempt/${attemptId}`, data)
       .pipe(map((res) => res.attempt));
   }
 
-  submitTestAttempt(attemptId: string): Observable<void> {
+  submitTestAttempt(attemptId: string, testId: string): Observable<void> {
     return this.http.post<void>(
-      `students/test/attempt/${attemptId}/submit`,
+      `test/${testId}/attempt/${attemptId}/submit`,
       {},
     );
   }

@@ -167,58 +167,6 @@ const CLASSES_ROUTES: FunctionIntegration[] = [
 
 ]
 
-const TESTS_ROUTES: FunctionIntegration[] = [
-  {
-    apiRoute: "tests",
-    functionPath: "tests/getTests.ts",
-    method: "get",
-    role: "teacher",
-  },
-  {
-    apiRoute: "tests",
-    functionPath: "tests/createTest.ts",
-    method: "post",
-    role: "teacher",
-  },
-  {
-    apiRoute: "tests/{testId}/insight",
-    functionPath: "teachers/generateTestInsight.ts",
-    method: "post",
-    role: "teacher",
-  },
-  {
-    apiRoute: "tests/{testId}",
-    functionPath: "tests/getTestById.ts",
-    method: "get",
-    role: "teacher",
-  },
-  {
-    apiRoute: "tests/{testId}",
-    functionPath: "tests/editTest.ts",
-    method: "put",
-    role: "teacher",
-  },
-  {
-    apiRoute: "tests/{testId}",
-    functionPath: "tests/deleteTest.ts",
-    method: "delete",
-    role: "teacher",
-  },
-  {
-    apiRoute: "tests/{testId}/duplicate",
-    functionPath: "tests/duplicateTest.ts",
-    method: "post",
-    role: "teacher",
-  },
-  {
-    apiRoute: "tests/{testId}/classes",
-    functionPath: "tests/updateTestClasses.ts",
-    method: "put",
-    role: "teacher",
-  },
-
-]
-
 const EVENTS_ROUTES: FunctionIntegration[] = [
   {
     apiRoute: "events",
@@ -498,70 +446,114 @@ const MATERIALS_ROUTES: FunctionIntegration[] = [
   },
 ]
 
-const ATTEMPTS_ROUTES: FunctionIntegration[] = [{
-  apiRoute: "test/attempts/details/{testId}",
-  functionPath: "tests/getTestAttemptsDetails.ts",
-  method: "get",
-  role: "teacher",
-},
-{
-  apiRoute: "attempts/details/{attemptId}",
-  functionPath: "attempts/getAttemptDetails.ts",
-  method: "get",
-  role: "teacher",
-},
-{
-  apiRoute: "attempts/{attemptId}/correction",
-  functionPath: "attempts/correctAttempt.ts",
-  method: "post",
-  role: "teacher",
-},
-{
-  apiRoute: "attempts/{attemptId}/{questionId}/correction/ai",
-  functionPath: "attempts/correctAttemptWithAI.ts",
-  method: "post",
-  role: "teacher",
-},
-{
-  apiRoute: "attempts/insight/{attemptId}",
-  functionPath: "teachers/generateAttemptInsight.ts",
-  method: "post",
-  role: "teacher",
-}, {
-  apiRoute: "students/test/{testId}/attempt",
-  functionPath: "students/tests/getStudentAttempt.ts",
-  method: "get",
-  role: "student",
-},
-{
-  apiRoute: "students/test/attempt",
-  functionPath: "students/tests/createStudentAttempt.ts",
-  method: "post",
-  role: "student",
-},
-{
-  apiRoute: "students/test/attempt/{attemptId}",
-  functionPath: "students/tests/updateStudentAttempt.ts",
-  method: "put",
-  role: "student",
-},
-{
-  apiRoute: "students/test/attempt/{attemptId}/submit",
-  functionPath: "students/tests/submitStudentAttempt.ts",
-  method: "post",
-  role: "student",
-}, {
-  apiRoute: "attempts/class/{classId}",
-  functionPath: "tests/getClassAttempts.ts",
-  method: "get",
-  role: "teacher",
-},
-{
-  apiRoute: "attempts/class/{classId}/topics-performance",
-  functionPath: "tests/getClassTopicsPerformance.ts",
-  method: "get",
-  role: "teacher",
-}]
+const TESTS_ROUTES: FunctionIntegration[] = [
+  {
+    apiRoute: "tests",
+    functionPath: "tests/getTests.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "tests",
+    functionPath: "tests/createTest.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "tests/{testId}/insight",
+    functionPath: "teachers/generateTestInsight.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "tests/{testId}",
+    functionPath: "tests/getTestById.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "tests/{testId}",
+    functionPath: "tests/editTest.ts",
+    method: "put",
+    role: "teacher",
+  },
+  {
+    apiRoute: "tests/{testId}",
+    functionPath: "tests/deleteTest.ts",
+    method: "delete",
+    role: "teacher",
+  },
+  {
+    apiRoute: "tests/{testId}/duplicate",
+    functionPath: "tests/duplicateTest.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "tests/{testId}/classes",
+    functionPath: "tests/updateTestClasses.ts",
+    method: "put",
+    role: "teacher",
+  },
+  {
+    apiRoute: "test/{testId}/attempts-details",
+    functionPath: "tests/getTestAttemptsDetails.ts",
+    method: "get",
+    role: "teacher",
+  },
+
+]
+
+const ATTEMPTS_ROUTES: FunctionIntegration[] = [
+  {
+    apiRoute: "attempts/{attemptId}/details",
+    functionPath: "attempts/getAttemptDetails.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "attempts/{attemptId}/correction",
+    functionPath: "attempts/correctAttempt.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "attempts/{attemptId}/questions/{questionId}/ai-correction",
+    functionPath: "attempts/correctAttemptWithAI.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "attempts/{attemptId}/insight",
+    functionPath: "teachers/generateAttemptInsight.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "test/{testId}/attempt", //missing /{attemptId}?
+    functionPath: "students/tests/getStudentAttempt.ts",
+    method: "get",
+    role: "student",
+  },
+  {
+    apiRoute: "test/{testId}/attempt",
+    functionPath: "students/tests/createStudentAttempt.ts",
+    method: "post",
+    role: "student",
+  },
+  {
+    apiRoute: "test/{testId}/attempt/{attemptId}",
+    functionPath: "students/tests/updateStudentAttempt.ts",
+    method: "put",
+    role: "student",
+  },
+  {
+    apiRoute: "test/{testId}/attempt/{attemptId}/submit",
+    functionPath: "students/tests/submitStudentAttempt.ts",
+    method: "post",
+    role: "student",
+  },
+]
 
 
 
@@ -580,6 +572,7 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
   ...STUDENTS_ROUTES,
   ...ASSISTANTS_ROUTES,
   ...MATERIALS_ROUTES,
+  ...ATTEMPTS_ROUTES,
   {
     apiRoute: "tests/assignments-to-grade/count",
     functionPath: "tests/countAssignmentsToGrade.ts",
@@ -604,4 +597,16 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     method: "post",
     role: "student",
   },
+  {
+    apiRoute: "attempts/class/{classId}",
+    functionPath: "tests/getClassAttempts.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "attempts/class/{classId}/topics-performance",
+    functionPath: "tests/getClassTopicsPerformance.ts",
+    method: "get",
+    role: "teacher",
+  }
 ];
