@@ -40,11 +40,11 @@ export interface ChatMessage {
 })
 export class AgentChat implements OnInit {
   SendIcon = faPaperPlane;
-  constructor(private agentService: AgentService) {}
+  constructor(private agentService: AgentService) { }
 
   assistantId = input.required<string>();
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   // Effetto: scrolla sempre in fondo quando cambia la lista dei messaggi
   private scrollEffect = effect(() => {
@@ -100,7 +100,7 @@ export class AgentChat implements OnInit {
 
     this.isLoading.set(true);
 
-    this.agentService.generateResponse(this.assistantId(), text).subscribe({
+    this.agentService.generateResponse(text).subscribe({
       next: (response) => {
         if (response.success) {
           this.messages.update((msgs) => [
@@ -134,17 +134,15 @@ export class AgentChat implements OnInit {
   async initializeChatHistory() {
     this.agentService.getConversationHistory().subscribe({
       next: (response) => {
-        if (response.success) {
-          const history = response.conversationHistory.map((msg: any) => ({
-            _id: msg._id,
-            role: msg.role,
-            content: msg.content,
-            timestamp: msg.timestamp,
-            audioUrl: msg.audioUrl || null,
-          }));
-          this.messages.set(history);
-          this.scrollToBottom();
-        }
+        const history = response.map((msg: any) => ({
+          _id: msg._id,
+          role: msg.role,
+          content: msg.content,
+          timestamp: msg.timestamp,
+          audioUrl: msg.audioUrl || null,
+        }));
+        this.messages.set(history);
+        this.scrollToBottom();
       },
       error: (error) => {
         console.error('Error fetching conversation history:', error);
@@ -176,7 +174,7 @@ export class AgentChat implements OnInit {
     this.loadingAudioIds.update((set) => new Set(set).add(messageId));
 
     this.agentService
-      .listenToMessage(messageId, message.content, this.assistantId())
+      .listenToMessage(messageId, message.content)
       .subscribe({
         next: (res) => {
           if (res.success && res.audioUrl) {

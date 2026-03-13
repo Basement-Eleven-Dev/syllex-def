@@ -8,16 +8,14 @@ const updateAssistant = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
-  const body = JSON.parse(request.body || "{}");
-  const { assistantId, agent } = body;
+  const agent = JSON.parse(request.body || "{}");
   const teacherId = context.user?._id;
-
-  if (!assistantId) {
-    throw createError(400, "assistantId è richiesto");
-  }
-
+  const subjectId = context.subjectId
   if (!agent) {
     throw createError(400, "Dati dell'agente richiesti");
+  }
+  if (!subjectId) {
+    throw createError.BadRequest('Header subject-id richiesto')
   }
 
   const db = await getDefaultDatabase();
@@ -30,11 +28,10 @@ const updateAssistant = async (
   if (agent.name) updateData.name = agent.name;
   if (agent.tone) updateData.tone = agent.tone;
   if (agent.voice) updateData.voice = agent.voice;
-  if (context.subjectId) updateData.subjectId = context.subjectId;
 
   const result = await assistantsCollection.updateOne(
     {
-      _id: new ObjectId(assistantId),
+      subjectId: subjectId,
       teacherId:
         teacherId instanceof ObjectId
           ? teacherId

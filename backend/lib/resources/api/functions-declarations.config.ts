@@ -379,6 +379,51 @@ const STUDENTS_ROUTES: FunctionIntegration[] = [
 
 ]
 
+const ASSISTANTS_ROUTES: FunctionIntegration[] = [
+  {
+    apiRoute: "assistant",
+    functionPath: "assistants/createAssistant.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "assistant",
+    functionPath: "assistants/getAssistant.ts",
+    method: "get",
+    role: "logged",
+  },
+  {
+    apiRoute: "assistant",
+    functionPath: "assistants/updateAssistant.ts",
+    method: "put",
+    role: "teacher",
+  },
+  {
+    apiRoute: "assistant/response",
+    functionPath: "assistants/generateResponse.ts",
+    method: "post",
+    role: "logged",
+  },
+  {
+    apiRoute: "assistant/materials/{materialId}",
+    functionPath: "assistants/removeMaterial.ts",
+    method: "delete",
+    role: "teacher",
+  },
+  {
+    apiRoute: "messages",
+    functionPath: "messages/getConversationHistory.ts",
+    method: "get",
+    role: "logged",
+  },
+  {
+    apiRoute: "messages/{messageId}/generate-audio",
+    functionPath: "messages/listenToMessage.ts",
+    method: "post",
+    role: "logged",
+  },
+]
+
 const MATERIALS_ROUTES: FunctionIntegration[] = [{
   apiRoute: "files/upload",
   functionPath: "files/createUpload.ts",
@@ -520,50 +565,6 @@ const ATTEMPTS_ROUTES: FunctionIntegration[] = [{
   role: "teacher",
 }]
 
-const ASSISTANTS_ROUTES: FunctionIntegration[] = [
-  {
-    apiRoute: "assistant",
-    functionPath: "assistants/createAssistant.ts",
-    method: "post",
-    role: "teacher",
-  },
-  {
-    apiRoute: "assistant",
-    functionPath: "assistants/getAssistant.ts",
-    method: "post",
-    role: "logged",
-  },
-  {
-    apiRoute: "assistant",
-    functionPath: "assistants/updateAssistant.ts",
-    method: "put",
-    role: "teacher",
-  },
-  {
-    apiRoute: "assistant/response",
-    functionPath: "assistants/generateResponse.ts",
-    method: "post",
-    role: "logged",
-  },
-  {
-    apiRoute: "assistant/remove-material",
-    functionPath: "assistants/removeMaterial.ts",
-    method: "post",
-    role: "teacher",
-  },
-  {
-    apiRoute: "messages/history",
-    functionPath: "messages/getConversationHistory.ts",
-    method: "post",
-    role: "logged",
-  },
-  {
-    apiRoute: "messages/listen",
-    functionPath: "messages/listenToMessage.ts",
-    method: "post",
-    role: "logged",
-  },
-]
 
 
 
@@ -579,6 +580,7 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
   ...QUESTIONS_ROUTES,
   ...AI_ROUTES,
   ...STUDENTS_ROUTES,
+  ...ASSISTANTS_ROUTES,
   {
     apiRoute: "tests/assignments-to-grade/count",
     functionPath: "tests/countAssignmentsToGrade.ts",

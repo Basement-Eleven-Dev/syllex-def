@@ -12,11 +12,11 @@ export class AgentService {
   constructor(private http: HttpClient) { }
 
   getAssistant() {
-    return this.http.post<{
+    return this.http.get<{
       success: boolean;
       exists: boolean;
       assistant: any;
-    }>('assistant', {});
+    }>('assistant');
   }
 
   createAgent(agent: Agent) {
@@ -26,40 +26,38 @@ export class AgentService {
     );
   }
 
-  updateAgent(assistantId: string, agent: any) {
+  updateAgent(agent: any) {
     return this.http.put<{ success: boolean }>(
       'assistant', // Note: Need to verify if this route exists or create it
-      { assistantId, agent },
+      agent,
     );
   }
 
-  generateResponse(assistantId: string, query: string) {
+  generateResponse(query: string) {
     return this.http.post<{
       success: boolean;
       aiResponse: any;
       _id: string;
       audioUrl?: string | null;
-    }>('assistant/response', { assistantId, query });
+    }>('assistant/response', { query });
   }
 
   getConversationHistory() {
-    return this.http.post<{ success: boolean; conversationHistory: any[] }>(
-      'messages/history',
-      {},
+    return this.http.get<any[]>(
+      'messages'
     );
   }
 
-  listenToMessage(messageId: string, text: string, assistantId: string) {
+  listenToMessage(messageId: string, text: string) {
     return this.http.post<{ success: boolean; audioUrl: string }>(
-      'messages/listen',
-      { messageId, text, assistantId },
+      'messages/' + messageId + '/generate-audio',
+      { text },
     );
   }
 
-  removeMaterial(assistantId: string, materialId: string) {
-    return this.http.post<{ success: boolean; message: string }>(
-      'assistant/remove-material',
-      { assistantId, materialId },
+  removeMaterial(materialId: string) {
+    return this.http.delete<{ success: boolean; message: string }>(
+      'assistant/materials/' + materialId
     );
   }
 }

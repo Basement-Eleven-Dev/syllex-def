@@ -154,7 +154,7 @@ export class AgentSettingsForm implements OnInit {
     const assistantId = this.assistantId();
     if (!assistantId) return;
 
-    this.agentService.removeMaterial(assistantId, materialId).subscribe({
+    this.agentService.removeMaterial(materialId).subscribe({
       next: (res) => {
         if (res.success) {
           this.associatedMaterialIds.update((ids) =>
@@ -213,7 +213,7 @@ export class AgentSettingsForm implements OnInit {
         if (assistantId) {
           // UPDATE
           await firstValueFrom(
-            this.agentService.updateAgent(assistantId, formData),
+            this.agentService.updateAgent(formData),
           );
           console.log('Agent updated successfully');
         } else {

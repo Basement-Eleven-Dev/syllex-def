@@ -2,12 +2,12 @@ import { ObjectId } from "mongodb";
 import { getDefaultDatabase } from "../getDatabase";
 
 export async function getAssistantVoice(
-  assistanId: string,
+  subjectId: ObjectId,
 ): Promise<string | undefined> {
   const db = await getDefaultDatabase();
   const assistant = await db
     .collection("assistants")
-    .findOne({ _id: new ObjectId(assistanId) });
+    .findOne({ subjectId: subjectId });
   if (!assistant) {
     return undefined;
   }
