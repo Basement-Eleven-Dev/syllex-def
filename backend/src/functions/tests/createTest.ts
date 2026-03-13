@@ -4,6 +4,8 @@ import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import { getDefaultDatabase } from "../../_helpers/getDatabase";
 import { ObjectId } from "mongodb";
 import { Test } from "../../models/test";
+import { notifyStudentsIfEnabled } from "../../_helpers/email/notifyStudents";
+import { newTestEmail } from "../../_helpers/email/emailTemplates";
 
 const createTest = async (request: APIGatewayProxyEvent, context: Context) => {
   const testData = JSON.parse(request.body || "{}");
@@ -67,6 +69,30 @@ const createTest = async (request: APIGatewayProxyEvent, context: Context) => {
   }
 
   const result = await testsCollection.insertOne(newTest as Test);
+
+  // Notifica email agli studenti (asincrono, non blocca la risposta)
+  const teacherName = `${context.user?.firstName || ""} ${context.user?.lastName || ""}`.trim();
+
+  // Recupera il nome della materia
+  const subject_doc = await db
+    .collection("subjects")
+    .findOne({ _id: new ObjectId(context.subjectId) });
+  const subjectName = subject_doc?.name || "Materia";
+
+  const { subject, html } = newTestEmail({
+    teacherName,
+    testTitle: testData.name,
+    subjectName,
+    questionCount: testData.questions?.length,
+  });
+console.log("prima del processo di notifica");
+  notifyStudentsIfEnabled({
+    teacher: context.user,
+    preference: "newTest",
+    classIds: newTest.classIds,
+    subject,
+    html,
+  });
 
   return {
     test: {

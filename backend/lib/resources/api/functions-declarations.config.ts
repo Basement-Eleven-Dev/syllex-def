@@ -509,7 +509,6 @@ const ASSISTANTS_ROUTES: FunctionIntegration[] = [
     method: "post",
     role: "teacher",
   },
-
   {
     apiRoute: "assistants/remove-material",
     functionPath: "assistants/removeMaterial.ts",

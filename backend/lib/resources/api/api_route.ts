@@ -35,7 +35,8 @@ export interface RouteConstructProps extends NestedStackProps {
     validator?: RequestValidator,
     cognitoPoolId: string,
     cognitoClientId: string,
-    indexingQueueUrl: string
+    indexingQueueUrl: string,
+    emailQueueUrl: string
 
 }
 
@@ -93,7 +94,8 @@ export class RouteConstruct extends NestedStack {
                 new LambdaConstruct(this, functionName, FUNCTIONS_PATH + functionPath, this.role, {
                     COGNITO_POOL_ID: this.props.cognitoPoolId,
                     COGNITO_CLIENT_ID: this.props.cognitoClientId,
-                    INDEXING_QUEUE_URL: this.props.indexingQueueUrl
+                    INDEXING_QUEUE_URL: this.props.indexingQueueUrl,
+                    EMAIL_QUEUE_URL: this.props.emailQueueUrl
                 },
                     layers?.map(l => LayerVersion.fromLayerVersionArn(this, l.name, l.arn))
                 ).lambda,
