@@ -3,53 +3,69 @@
  *
  * Ogni funzione ritorna un oggetto { subject, html } pronto per essere
  * passato a sendBulkEmail() o sendEmail().
- *
- * I 4 casi d'uso corrispondono alle preferenze nel profilo docente:
- * - newCommunication: nuova comunicazione pubblicata
- * - newEvent: nuovo evento creato nel calendario
- * - newTest: nuovo test assegnato agli studenti
- * - testCorrected: un test è stato corretto dal docente
  */
 
 const BRAND_COLOR = "#4F46E5";
+const SECONDARY_COLOR = "#7C3AED";
 const BRAND_NAME = "Syllex";
 const APP_URL = "https://app.syllex.org";
 
 /**
- * Layout base condiviso da tutti i template
+ * Layout base con estetica premium:
+ * - Font Outfit (Google Fonts)
+ * - Design a card con ombre morbide
+ * - Gradienti e look moderno
  */
-function baseLayout(content: string): string {
+function baseLayout(content: string, preheader: string = ""): string {
   return `
 <!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${BRAND_NAME}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap');
+    body { font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important; }
+  </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f4f4f7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f4f4f7;">
+<body style="margin: 0; padding: 0; background-color: #f8fafc; -webkit-font-smoothing: antialiased;">
+  <span style="display: none; max-height: 0px; overflow: hidden;">${preheader}</span>
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f8fafc;">
     <tr>
-      <td align="center" style="padding: 40px 20px;">
-        <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.07);">
-          <!-- Header -->
+      <td align="center" style="padding: 40px 16px;">
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);">
+          <!-- Header Accent -->
           <tr>
-            <td style="background: linear-gradient(135deg, ${BRAND_COLOR}, #7C3AED); padding: 32px 40px; text-align: center;">
-              <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 700; letter-spacing: -0.5px;">${BRAND_NAME}</h1>
+            <td style="height: 6px; background-color: ${BRAND_COLOR}; background: linear-gradient(90deg, ${BRAND_COLOR}, ${SECONDARY_COLOR});"></td>
+          </tr>
+          <!-- Logo/Brand Area -->
+          <tr>
+            <td style="padding: 40px 40px 20px; text-align: center;">
+              <h1 style="margin: 0; color: ${BRAND_COLOR}; font-size: 28px; font-weight: 700; letter-spacing: -1px;">${BRAND_NAME}</h1>
             </td>
           </tr>
-          <!-- Body -->
+          <!-- Main Content -->
           <tr>
-            <td style="padding: 40px;">
+            <td style="padding: 20px 40px 40px;">
               ${content}
             </td>
           </tr>
-          <!-- Footer -->
+          <!-- Footer Area -->
           <tr>
-            <td style="padding: 24px 40px; background-color: #f9fafb; border-top: 1px solid #e5e7eb; text-align: center;">
-              <p style="margin: 0; color: #9ca3af; font-size: 12px; line-height: 1.5;">
-                Questa email è stata inviata automaticamente da ${BRAND_NAME}.<br>
-                Puoi modificare le tue preferenze di notifica nelle impostazioni del tuo profilo.
+            <td style="padding: 32px 40px; background-color: #f1f5f9; text-align: center;">
+              <p style="margin: 0 0 12px; color: #475569; font-size: 13px; line-height: 1.5;">
+                Ricevi questa email perché sei uno studente registrato su <strong>${BRAND_NAME}</strong>.
+              </p>
+              <div style="margin-bottom: 12px;">
+                <a href="${APP_URL}" style="color: ${BRAND_COLOR}; text-decoration: none; font-size: 13px; font-weight: 600;">Dashboard</a>
+                <span style="color: #cbd5e1; margin: 0 8px;">•</span>
+                <a href="${APP_URL}/profilo" style="color: ${BRAND_COLOR}; text-decoration: none; font-size: 13px; font-weight: 600;">Impostazioni</a>
+              </div>
+              <p style="margin: 0; color: #94a3b8; font-size: 11px;">
+                &copy; ${new Date().getFullYear()} ${BRAND_NAME}. Tutti i diritti riservati.
               </p>
             </td>
           </tr>
@@ -62,19 +78,24 @@ function baseLayout(content: string): string {
 }
 
 /**
- * Bottone CTA (Call To Action) condiviso
+ * Bottone CTA Premium
  */
 function ctaButton(text: string, url: string): string {
   return `
-  <table role="presentation" cellspacing="0" cellpadding="0" style="margin: 28px auto 0;">
-    <tr>
-      <td style="border-radius: 8px; background: linear-gradient(135deg, ${BRAND_COLOR}, #7C3AED);">
-        <a href="${url}" target="_blank" style="display: inline-block; padding: 14px 32px; color: #2a2a2aff; text-decoration: none; font-size: 15px; font-weight: 600; letter-spacing: 0.3px;">
-          ${text}
-        </a>
-      </td>
-    </tr>
-  </table>`;
+  <div style="margin: 32px 0 0; text-align: center;">
+    <!--[if mso]>
+    <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${url}" style="height:50px;v-text-anchor:middle;width:240px;" arcsize="20%" stroke="f" fillcolor="${BRAND_COLOR}">
+      <w:anchorlock/>
+      <center>
+    <![endif]-->
+    <a href="${url}" target="_blank" style="background-color: ${BRAND_COLOR}; background: linear-gradient(135deg, ${BRAND_COLOR}, ${SECONDARY_COLOR}); border-radius: 12px; color: #ffffff; display: inline-block; font-size: 16px; font-weight: 700; line-height: 50px; text-align: center; text-decoration: none; width: 240px; -webkit-text-size-adjust: none; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);">
+      ${text}
+    </a>
+    <!--[if mso]>
+      </center>
+    </v:roundrect>
+    <![endif]-->
+  </div>`;
 }
 
 // ─────────────────────────────────────────────────────────
@@ -89,21 +110,25 @@ export interface NewCommunicationData {
 
 export function newCommunicationEmail(data: NewCommunicationData) {
   const preview = data.preview
-    ? `<p style="margin: 16px 0 0; color: #6b7280; font-size: 14px; line-height: 1.6; padding: 16px; background-color: #f9fafb; border-radius: 8px; border-left: 3px solid ${BRAND_COLOR};">${data.preview}</p>`
+    ? `<div style="margin: 24px 0; padding: 24px; background-color: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0;">
+         <p style="margin: 0; color: #475569; font-size: 15px; line-height: 1.6; font-style: italic;">"${data.preview}"</p>
+       </div>`
     : "";
 
   const html = baseLayout(`
-    <p style="margin: 0 0 8px; color: #6b7280; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">📢 Nuova Comunicazione</p>
-    <h2 style="margin: 0 0 16px; color: #111827; font-size: 22px; font-weight: 700;">${data.communicationTitle}</h2>
-    <p style="margin: 0; color: #374151; font-size: 15px; line-height: 1.6;">
-      Il docente <strong>${data.teacherName}</strong> ha pubblicato una nuova comunicazione.
+    <div style="text-align: center; margin-bottom: 24px;">
+      <span style="background-color: #e0e7ff; color: ${BRAND_COLOR}; padding: 6px 14px; border-radius: 99px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">📢 Comunicazione</span>
+    </div>
+    <h2 style="margin: 0 0 16px; color: #0f172a; font-size: 24px; font-weight: 700; text-align: center; line-height: 1.3;">${data.communicationTitle}</h2>
+    <p style="margin: 0; color: #475569; font-size: 16px; line-height: 1.6; text-align: center;">
+      Il docente <strong>${data.teacherName}</strong> ha condiviso un nuovo aggiornamento con la classe.
     </p>
     ${preview}
-    ${ctaButton("Leggi la comunicazione", APP_URL + "/comunicazioni")}
-  `);
+    ${ctaButton("Leggi tutto", APP_URL + "/comunicazioni")}
+  `, `Nuova comunicazione da ${data.teacherName}`);
 
   return {
-    subject: `📢 Nuova comunicazione: ${data.communicationTitle}`,
+    subject: `📢 ${data.communicationTitle}`,
     html,
   };
 }
@@ -115,42 +140,42 @@ export function newCommunicationEmail(data: NewCommunicationData) {
 export interface NewEventData {
   teacherName: string;
   eventTitle: string;
-  eventDate: string;  // es. "15 Marzo 2026"
-  eventTime?: string; // es. "09:00"
+  eventDate: string;
+  eventTime?: string;
 }
 
 export function newEventEmail(data: NewEventData) {
-  const timeInfo = data.eventTime
-    ? `<tr>
-        <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">🕐 Orario</td>
-        <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${data.eventTime}</td>
-       </tr>`
-    : "";
-
   const html = baseLayout(`
-    <p style="margin: 0 0 8px; color: #6b7280; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">📅 Nuovo Evento</p>
-    <h2 style="margin: 0 0 16px; color: #111827; font-size: 22px; font-weight: 700;">${data.eventTitle}</h2>
-    <p style="margin: 0 0 20px; color: #374151; font-size: 15px; line-height: 1.6;">
-      Il docente <strong>${data.teacherName}</strong> ha aggiunto un nuovo evento al calendario.
+    <div style="text-align: center; margin-bottom: 24px;">
+      <span style="background-color: #fdf2f8; color: #db2777; padding: 6px 14px; border-radius: 99px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">📅 Calendario</span>
+    </div>
+    <h2 style="margin: 0 0 16px; color: #0f172a; font-size: 24px; font-weight: 700; text-align: center;">${data.eventTitle}</h2>
+    <p style="margin: 0 0 24px; color: #475569; font-size: 16px; line-height: 1.6; text-align: center;">
+      Un nuovo evento è stato aggiunto dal docente <strong>${data.teacherName}</strong>.
     </p>
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f9fafb; border-radius: 8px; padding: 16px;">
-      <tr>
-        <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">📅 Data</td>
-        <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${data.eventDate}</td>
-      </tr>
-      ${timeInfo}
-    </table>
-    ${ctaButton("Vedi il calendario", APP_URL + "/calendario")}
-  `);
+    
+    <div style="background-color: #f8fafc; border-radius: 16px; padding: 24px; border: 1px solid #e2e8f0;">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+        <tr>
+          <td style="padding-bottom: 12px;">
+            <div style="color: #64748b; font-size: 13px; font-weight: 600; text-transform: uppercase;">Quando</div>
+            <div style="color: #0f172a; font-size: 16px; font-weight: 700; margin-top: 4px;">${data.eventDate}${data.eventTime ? ' ore ' + data.eventTime : ''}</div>
+          </td>
+        </tr>
+      </table>
+    </div>
+    
+    ${ctaButton("Apri Calendario", APP_URL + "/calendario")}
+  `, `Nuovo evento: ${data.eventTitle}`);
 
   return {
-    subject: `📅 Nuovo evento: ${data.eventTitle}`,
+    subject: `📅 ${data.eventTitle}`,
     html,
   };
 }
 
 // ─────────────────────────────────────────────────────────
-// 3. NUOVO TEST CREATO
+// 3. NUOVO TEST
 // ─────────────────────────────────────────────────────────
 
 export interface NewTestData {
@@ -161,31 +186,26 @@ export interface NewTestData {
 }
 
 export function newTestEmail(data: NewTestData) {
-  const questionsInfo = data.questionCount
-    ? `<tr>
-        <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">📝 Domande</td>
-        <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${data.questionCount}</td>
-       </tr>`
-    : "";
-
   const html = baseLayout(`
-    <p style="margin: 0 0 8px; color: #6b7280; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">📝 Nuovo Test</p>
-    <h2 style="margin: 0 0 16px; color: #111827; font-size: 22px; font-weight: 700;">${data.testTitle}</h2>
-    <p style="margin: 0 0 20px; color: #374151; font-size: 15px; line-height: 1.6;">
-      Il docente <strong>${data.teacherName}</strong> ha creato un nuovo test per la materia <strong>${data.subjectName}</strong>.
+    <div style="text-align: center; margin-bottom: 24px;">
+      <span style="background-color: #fefce8; color: #ca8a04; padding: 6px 14px; border-radius: 99px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">📝 Nuovo Test</span>
+    </div>
+    <h2 style="margin: 0 0 16px; color: #0f172a; font-size: 24px; font-weight: 700; text-align: center;">${data.testTitle}</h2>
+    <p style="margin: 0 0 24px; color: #475569; font-size: 16px; line-height: 1.6; text-align: center;">
+      Preparati! <strong>${data.teacherName}</strong> ha assegnato un nuovo test di <strong>${data.subjectName}</strong>.
     </p>
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f9fafb; border-radius: 8px; padding: 16px;">
-      <tr>
-        <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">📚 Materia</td>
-        <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${data.subjectName}</td>
-      </tr>
-      ${questionsInfo}
-    </table>
-    ${ctaButton("Vai al test", APP_URL + "/test")}
-  `);
+    
+    <div style="background-color: #fffbeb; border-radius: 16px; padding: 24px; border: 1px solid #fef3c7; text-align: center;">
+      <div style="color: #92400e; font-size: 13px; font-weight: 600; text-transform: uppercase;">Materia</div>
+      <div style="color: #451a03; font-size: 18px; font-weight: 700; margin-top: 4px;">${data.subjectName}</div>
+      ${data.questionCount ? `<div style="color: #b45309; font-size: 14px; margin-top: 8px;">${data.questionCount} domande previste</div>` : ''}
+    </div>
+    
+    ${ctaButton("Inizia il Test", APP_URL + "/test")}
+  `, `Nuovo test di ${data.subjectName}`);
 
   return {
-    subject: `📝 Nuovo test: ${data.testTitle} — ${data.subjectName}`,
+    subject: `📝 Nuovo test: ${data.testTitle}`,
     html,
   };
 }
@@ -198,31 +218,41 @@ export interface TestCorrectedData {
   teacherName: string;
   testTitle: string;
   subjectName: string;
-  score?: string; // es. "8/10" o "85%"
+  score?: string;
 }
 
 export function testCorrectedEmail(data: TestCorrectedData) {
-  const scoreInfo = data.score
-    ? `<div style="margin: 20px 0; text-align: center;">
-        <span style="display: inline-block; padding: 12px 28px; background: linear-gradient(135deg, ${BRAND_COLOR}, #7C3AED); color: #2e2b2bff; font-size: 24px; font-weight: 700; border-radius: 12px; letter-spacing: 0.5px;">
-          ${data.score}
-        </span>
-        <p style="margin: 8px 0 0; color: #6b7280; font-size: 13px;">Il tuo punteggio</p>
+  const scoreBadge = data.score
+    ? `<div style="margin: 24px 0; text-align: center;">
+         <div style="display: inline-block;">
+           <div style="color: #64748b; font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Risultato</div>
+           <table role="presentation" cellspacing="0" cellpadding="0" style="margin: 0 auto;">
+             <tr>
+               <td style="background-color: ${BRAND_COLOR}; background: linear-gradient(135deg, ${BRAND_COLOR}, ${SECONDARY_COLOR}); color: #ffffff; font-size: 36px; font-weight: 800; padding: 12px 32px; border-radius: 20px; box-shadow: 0 8px 16px rgba(79, 70, 229, 0.25); text-align: center;">
+                 ${data.score}
+               </td>
+             </tr>
+           </table>
+         </div>
        </div>`
     : "";
 
   const html = baseLayout(`
-    <p style="margin: 0 0 8px; color: #6b7280; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">✅ Test Corretto</p>
-    <h2 style="margin: 0 0 16px; color: #111827; font-size: 22px; font-weight: 700;">${data.testTitle}</h2>
-    <p style="margin: 0; color: #374151; font-size: 15px; line-height: 1.6;">
-      Il docente <strong>${data.teacherName}</strong> ha corretto il tuo test di <strong>${data.subjectName}</strong>.
+    <div style="text-align: center; margin-bottom: 24px;">
+      <span style="background-color: #f0fdf4; color: #16a34a; padding: 6px 14px; border-radius: 99px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">✅ Valutazione</span>
+    </div>
+    <h2 style="margin: 0 0 16px; color: #0f172a; font-size: 24px; font-weight: 700; text-align: center;">Risultati disponibili</h2>
+    <p style="margin: 0 0 24px; color: #475569; font-size: 16px; line-height: 1.6; text-align: center;">
+      La tua prova di <strong>${data.subjectName}</strong> (${data.testTitle}) è stata corretta da <strong>${data.teacherName}</strong>.
     </p>
-    ${scoreInfo}
-    ${ctaButton("Vedi i risultati", APP_URL + "/test")}
-  `);
+    
+    ${scoreBadge}
+    
+    ${ctaButton("Dettagli correzione", APP_URL + "/test")}
+  `, `Risultati per: ${data.testTitle}`);
 
   return {
-    subject: `✅ Test corretto: ${data.testTitle} — ${data.subjectName}`,
+    subject: `✅ Risultati Test: ${data.testTitle}`,
     html,
   };
 }
