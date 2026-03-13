@@ -16,6 +16,7 @@ import {
 } from '@fortawesome/pro-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TestPrintModal } from '../../components/test-print-modal/test-print-modal';
+import { TestResultsPrintModal } from '../../components/test-results-print-modal/test-results-print-modal';
 import { QuestionsService } from '../../../services/questions';
 import { forkJoin, switchMap, of, tap } from 'rxjs';
 import { BackTo } from '../../components/back-to/back-to';
@@ -53,6 +54,18 @@ const IconMap: Record<string, any> = {
   styleUrl: './test-detail.scss',
 })
 export class TestDetail {
+  onPrintResults(): void {
+    const modalRef = this.modalService.open(TestResultsPrintModal, {
+      size: 'xl',
+      centered: true,
+      scrollable: true,
+      windowClass: 'modal-print-preview',
+    });
+
+    modalRef.componentInstance.testName = this.TestData()?.name ?? '';
+    modalRef.componentInstance.attempts = this.Attempts();
+    modalRef.componentInstance.maxScore = this.TestData()?.maxScore ?? 0;
+  }
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly testsService = inject(TestsService);
@@ -167,41 +180,49 @@ export class TestDetail {
     this.IsLoading.set(true);
 
     // 1. Get full test details (to get the questions array)
-    this.testsService.getTestById(testId).pipe(
-      switchMap(response => {
-        const fullTest = response.test;
-        if (!fullTest.questions || fullTest.questions.length === 0) {
-          return of({ test: fullTest, questions: [] });
-        }
-        
-        // 2. Fetch full details for each question
-        const questionRequests = fullTest.questions.map((q: any) => 
-          this.questionsService.loadQuestion(q.questionId)
-        );
-        
-        return forkJoin(questionRequests).pipe(
-          switchMap(fullQuestions => of({ test: fullTest, questions: fullQuestions }))
-        );
-      }),
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe({
-      next: (data: any) => {
-        this.IsLoading.set(false);
-        const modalRef = this.modalService.open(TestPrintModal, {
-          size: 'xl',
-          centered: true,
-          scrollable: true,
-          windowClass: 'modal-print-preview'
-        });
-        
-        modalRef.componentInstance.test = data.test;
-        modalRef.componentInstance.questions = data.questions;
-      },
-      error: (err) => {
-        console.error('Error fetching data for print:', err);
-        this.IsLoading.set(false);
-        this.feedbackService.showFeedback('Errore nel caricamento dei dati per la stampa', false);
-      }
-    });
+    this.testsService
+      .getTestById(testId)
+      .pipe(
+        switchMap((response) => {
+          const fullTest = response.test;
+          if (!fullTest.questions || fullTest.questions.length === 0) {
+            return of({ test: fullTest, questions: [] });
+          }
+
+          // 2. Fetch full details for each question
+          const questionRequests = fullTest.questions.map((q: any) =>
+            this.questionsService.loadQuestion(q.questionId),
+          );
+
+          return forkJoin(questionRequests).pipe(
+            switchMap((fullQuestions) =>
+              of({ test: fullTest, questions: fullQuestions }),
+            ),
+          );
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (data: any) => {
+          this.IsLoading.set(false);
+          const modalRef = this.modalService.open(TestPrintModal, {
+            size: 'xl',
+            centered: true,
+            scrollable: true,
+            windowClass: 'modal-print-preview',
+          });
+
+          modalRef.componentInstance.test = data.test;
+          modalRef.componentInstance.questions = data.questions;
+        },
+        error: (err) => {
+          console.error('Error fetching data for print:', err);
+          this.IsLoading.set(false);
+          this.feedbackService.showFeedback(
+            'Errore nel caricamento dei dati per la stampa',
+            false,
+          );
+        },
+      });
   }
 }
