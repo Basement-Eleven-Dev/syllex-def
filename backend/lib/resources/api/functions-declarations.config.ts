@@ -338,6 +338,20 @@ const AI_ROUTES: FunctionIntegration[] = [
     functionPath: "ai/createAiGenQuestion.ts",
     method: "post",
     role: "open",
+  }, {
+    apiRoute: "ai/materials",
+    functionPath: "ai/createAiGenMaterial.ts",
+    method: "post",
+    role: "teacher",
+    extensionLayers: [
+      {
+        name: "pandoc",
+        arn: "arn:aws:lambda:eu-south-1:851725509686:layer:pandoc:1",
+      } /*, {
+      name: "wkhtml",
+      arn: "arn:aws:lambda:eu-south-1:851725509686:layer:wkhtmltox:1"
+    }*/,
+    ],
   }
 ]
 
@@ -415,20 +429,6 @@ const MATERIALS_ROUTES: FunctionIntegration[] = [{
   functionPath: "students/getStudentMaterials.ts",
   method: "get",
   role: "student",
-}, {
-  apiRoute: "ai/materials",
-  functionPath: "ai/createAiGenMaterial.ts",
-  method: "post",
-  role: "teacher",
-  extensionLayers: [
-    {
-      name: "pandoc",
-      arn: "arn:aws:lambda:eu-south-1:851725509686:layer:pandoc:1",
-    } /*, {
-      name: "wkhtml",
-      arn: "arn:aws:lambda:eu-south-1:851725509686:layer:wkhtmltox:1"
-    }*/,
-  ],
 },]
 
 const ATTEMPTS_ROUTES: FunctionIntegration[] = [{
