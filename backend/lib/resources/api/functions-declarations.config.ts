@@ -424,81 +424,79 @@ const ASSISTANTS_ROUTES: FunctionIntegration[] = [
   },
 ]
 
-const MATERIALS_ROUTES: FunctionIntegration[] = [{
-  apiRoute: "files/upload",
-  functionPath: "files/createUpload.ts",
-  method: "post",
-  role: "teacher",
-}, {
-  apiRoute: "proxy/gamma/{generationId}",
-  functionPath: "ai/gammaGenerationProxy.ts",
-  method: "get",
-  role: "open",
-}, {
-  apiRoute: "materials/subject",
-  functionPath: "materials/getMaterials.ts",
-  method: "get",
-  role: "teacher",
-},
-{
-  apiRoute: "materials",
-  functionPath: "materials/createMaterial.ts",
-  method: "post",
-  role: "teacher",
-},
-{
-  apiRoute: "materials/{materialId}",
-  functionPath: "materials/deleteMaterial.ts",
-  method: "delete",
-  role: "teacher",
-},
-{
-  apiRoute: "materials/{materialId}",
-  functionPath: "materials/getMaterialById.ts",
-  method: "get",
-  role: "student",
-},
-{
-  apiRoute: "materials/{materialId}/move",
-  functionPath: "materials/moveMaterial.ts",
-  method: "post",
-  role: "teacher",
-},
-{
-  apiRoute: "materials/move-batch",
-  functionPath: "materials/moveMaterialsBatch.ts",
-  method: "post",
-  role: "teacher",
-},
-{
-  apiRoute: "materials/delete-batch",
-  functionPath: "materials/deleteMaterialsBatch.ts",
-  method: "post",
-  role: "teacher",
-},
-{
-  apiRoute: "materials/{materialId}/rename",
-  functionPath: "materials/renameMaterial.ts",
-  method: "put",
-  role: "teacher",
-},
-{
-  apiRoute: "materials/{materialId}/classes",
-  functionPath: "materials/updateMaterialClasses.ts",
-  method: "put",
-  role: "teacher",
-}, {
-  apiRoute: "materials/vectorize",
-  functionPath: "embeddings/vectorizeMaterials.ts",
-  method: "post",
-  role: "teacher",
-},
-{
-  apiRoute: "students/me/materials",
-  functionPath: "students/getStudentMaterials.ts",
-  method: "get",
-  role: "student",
-},]
+const MATERIALS_ROUTES: FunctionIntegration[] = [
+  {
+    apiRoute: "files/upload",
+    functionPath: "files/createUpload.ts",
+    method: "post",
+    role: "teacher",
+  }, {
+    apiRoute: "proxy/gamma/{generationId}",
+    functionPath: "ai/gammaGenerationProxy.ts",
+    method: "get",
+    role: "open",
+  },
+  {
+    apiRoute: "materials",
+    functionPath: "materials/getMaterials.ts",
+    method: "get",
+    role: "logged",
+  },
+  {
+    apiRoute: "materials",
+    functionPath: "materials/createMaterial.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "materials/{materialId}",
+    functionPath: "materials/deleteMaterial.ts",
+    method: "delete",
+    role: "teacher",
+  },
+  {
+    apiRoute: "materials/{materialId}",
+    functionPath: "materials/getMaterialById.ts",
+    method: "get",
+    role: "student",
+  },
+  {
+    apiRoute: "materials/{materialId}/move",
+    functionPath: "materials/moveMaterial.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "materials/{materialId}/rename",
+    functionPath: "materials/renameMaterial.ts",
+    method: "put",
+    role: "teacher",
+  },
+  {
+    apiRoute: "batch/materials/move",
+    functionPath: "materials/moveMaterialsBatch.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "batch/materials/delete",
+    functionPath: "materials/deleteMaterialsBatch.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "batch/materials/vectorize",
+    functionPath: "embeddings/vectorizeMaterials.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "materials/{materialId}/classes",
+    functionPath: "materials/updateMaterialClasses.ts",
+    method: "put",
+    role: "teacher",
+  },
+]
 
 const ATTEMPTS_ROUTES: FunctionIntegration[] = [{
   apiRoute: "test/attempts/details/{testId}",
@@ -581,6 +579,7 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
   ...AI_ROUTES,
   ...STUDENTS_ROUTES,
   ...ASSISTANTS_ROUTES,
+  ...MATERIALS_ROUTES,
   {
     apiRoute: "tests/assignments-to-grade/count",
     functionPath: "tests/countAssignmentsToGrade.ts",

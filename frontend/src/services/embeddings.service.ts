@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class EmbeddingsService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /**
    * Vectorize a list of materials for a specific subject.
@@ -16,7 +16,7 @@ export class EmbeddingsService {
     assistantId: string,
   ): Observable<{ success: boolean; results: any[] }> {
     return this.http.post<{ success: boolean; results: any[] }>(
-      'materials/vectorize',
+      'batch/materials/vectorize',
       { materialIds, assistantId },
     );
   }

@@ -1,25 +1,44 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
 
 const getMaterials = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
-  const teacherId = context.user?._id;
-  // Prefer explicit query param, fallback to header-based context
-  const subjectIdParam = request.queryStringParameters?.subjectId;
-  const subjectId = subjectIdParam
-    ? new ObjectId(subjectIdParam)
-    : context.subjectId;
+  const user = context.user!;
+  const userId = user._id;
+  const subjectId = context.subjectId!
 
   // Get database connection
   const db = await getDefaultDatabase();
   const materialsCollection = db.collection("materials");
+  if (user.role == 'student') {
+    const classes = await db
+      .collection("classes")
+      .find({ students: { $in: [userId] } })
+      .toArray();
 
+    if (classes.length === 0) {
+      return { success: true, materials: [] };
+    }
+
+    const classIds = classes.map((c) => c._id);
+    console.log(classIds);
+
+    // Recupera i materiali della materia selezionata che sono accessibili alle classi dello studente
+    const materials = await db
+      .collection("materials")
+      .find({
+        subjectId: subjectId,
+        classIds: { $in: classIds },
+        type: "file",
+      })
+      .toArray();
+    return { materials }
+  }
   // Query per ottenere tutti i materiali del teacher e della materia
-  const query: any = { teacherId };
+  const query: any = { teacherId: userId };
   if (subjectId) {
     query.subjectId = subjectId;
   }
