@@ -19,12 +19,7 @@ import { SyllexPagination } from '../syllex-pagination/syllex-pagination';
 @Component({
   selector: 'app-search-questions',
   standalone: true,
-  imports: [
-    DragDropModule,
-    CdkDrag,
-    QuestionCard,
-    SyllexPagination,
-  ],
+  imports: [DragDropModule, CdkDrag, QuestionCard, SyllexPagination],
   templateUrl: './search-questions.html',
   styleUrl: './search-questions.scss',
 })
@@ -50,6 +45,7 @@ export class SearchQuestions implements OnInit, OnDestroy {
     type?: 'scelta multipla' | 'vero falso' | 'risposta aperta';
     policy?: 'public' | 'private';
     topicId?: string;
+    difficulty?: string;
   } = {};
 
   private destroy$ = new Subject<void>();
@@ -58,6 +54,7 @@ export class SearchQuestions implements OnInit, OnDestroy {
     type?: 'scelta multipla' | 'vero falso' | 'risposta aperta';
     policy?: 'public' | 'private';
     topicId?: string;
+    difficulty?: string;
   }>();
 
   constructor(private questionsService: QuestionsService) {}
@@ -86,6 +83,7 @@ export class SearchQuestions implements OnInit, OnDestroy {
     type?: 'scelta multipla' | 'vero falso' | 'risposta aperta';
     policy?: 'public' | 'private';
     topicId?: string;
+    difficulty?: string;
   }): void {
     this.filtersChanged$.next(filters);
   }
@@ -101,6 +99,7 @@ export class SearchQuestions implements OnInit, OnDestroy {
         this.currentFilters.policy,
         this.currentPage(),
         this.pageSize,
+        this.currentFilters.difficulty,
       )
       .pipe(takeUntil(this.destroy$))
       .subscribe({

@@ -17,6 +17,7 @@ const getQuestions = async (
     type = "",
     topicId = "",
     policy = "",
+    difficulty = "",
     page = "1",
     pageSize = "10",
   } = request.queryStringParameters || {};
@@ -52,6 +53,10 @@ const getQuestions = async (
 
   if (policy && (policy === "public" || policy === "private")) {
     filter.policy = policy;
+  }
+
+  if (difficulty) {
+    filter.difficulty = difficulty;
   }
 
   console.log("Filtro per getQuestions:", filter);

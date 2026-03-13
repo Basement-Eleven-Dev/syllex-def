@@ -10,6 +10,8 @@ import { askStructuredLLM } from "../../_helpers/AI/simpleCompletion";
 import { Question } from "../../models/question";
 import { Topic } from "../../models/topic";
 
+import { QuestionDifficulty } from "../../models/question";
+
 //API TYPES
 const questionTypes = ["open", "true-false", "multiple"] as const;
 type QuestionType = (typeof questionTypes)[number];
@@ -23,7 +25,7 @@ export type AIGenQuestionInput = {
   instructions?: string;
   type: QuestionType;
   language?: string;
-  difficulty?: 1 | 2 | 3;
+  difficulty?: QuestionDifficulty;
 };
 
 //LLM STRUCTURES
@@ -35,10 +37,12 @@ const TrueFalseQuestionStructure = z.object({
 const MultipleChoiceQuestionStructure = z.object({
   text: z.string(),
   explanation: z.string(),
-  options: z.array(z.object({
-    label: z.string(),
-    isCorrect: z.boolean(),
-  })),
+  options: z.array(
+    z.object({
+      label: z.string(),
+      isCorrect: z.boolean(),
+    }),
+  ),
 });
 const OpenQuestionStructure = z.object({
   text: z.string(),
@@ -46,10 +50,12 @@ const OpenQuestionStructure = z.object({
 });
 
 //MAPS
-const DIFFICULTY_MAP: Record<1 | 2 | 3, string> = {
-  1: "low",
-  2: "medium",
-  3: "high",
+const DIFFICULTY_PROMPT_MAP: Record<QuestionDifficulty, string> = {
+  elementary: "very easy (elementary level)",
+  easy: "easy",
+  medium: "medium",
+  hard: "hard",
+  very_hard: "very hard (expert level)",
 };
 
 //GUARDRAILS
@@ -91,7 +97,7 @@ export const generateTrueFalseQuestion = async (
     subjectId: context.subjectId!,
   };
   return question;
-}
+};
 export const generateOpenQuestion = async (
   context: Context,
   difficulty: string,
@@ -132,7 +138,6 @@ export const generateMultipleChoiceQuestion = async (
 ): Promise<Question> => {
   const INSTRUCTIONS = `Create a ${difficulty} difficulty quiz question (multiple choice, only one is correct) about the topic "${topic.name}" based on these documents.
     The quiz question must contain ${numberOfAlternatives} alternatives to choose from  and you need to specify which one is correct. Avoid labels A/B/C/D/E/... in the text of the alternatives. ${instructions}`;
-
 
   const PROMPT = `${INSTRUCTIONS}
     ${getGuardrail(language)}`;
@@ -180,7 +185,13 @@ const createAIGenQuestion = async (
   const db = await getDefaultDatabase();
 
   const materialCollection = db.collection<MaterialInterface>("materials");
-  const materialObjects: MaterialInterface[] = await materialCollection.find({ _id: { $in: materialOIds }, subjectId: context.subjectId, aiGenerated: { $ne: true } }).toArray() as MaterialInterface[]; //forse non serve
+  const materialObjects: MaterialInterface[] = (await materialCollection
+    .find({
+      _id: { $in: materialOIds },
+      subjectId: context.subjectId,
+      aiGenerated: { $ne: true },
+    })
+    .toArray()) as MaterialInterface[]; //forse non serve
 
   //load topic
   const topicCollection = db.collection("topics");
@@ -191,34 +202,35 @@ const createAIGenQuestion = async (
     throw createHttpError.BadRequest(`topic ${topicId} doesn't exist`);
 
   //create question
+  const difficultyPrompt = DIFFICULTY_PROMPT_MAP[difficulty || "medium"];
   const question =
     type == "open"
       ? await generateOpenQuestion(
-        context,
-        DIFFICULTY_MAP[difficulty || 2],
-        materialObjects,
-        topic,
-        language,
-        instructions,
-      )
-      : (
-        type == 'true-false' ? await generateTrueFalseQuestion(
           context,
-          DIFFICULTY_MAP[difficulty || 2],
+          difficultyPrompt,
           materialObjects,
           topic,
           language,
-          instructions
-        ) : await generateMultipleChoiceQuestion(
-          context,
-          DIFFICULTY_MAP[difficulty || 2],
-          materialObjects,
-          topic,
-          language,
-          numberOfAlternatives || 5,
           instructions,
         )
-      );
+      : type == "true-false"
+        ? await generateTrueFalseQuestion(
+            context,
+            difficultyPrompt,
+            materialObjects,
+            topic,
+            language,
+            instructions,
+          )
+        : await generateMultipleChoiceQuestion(
+            context,
+            difficultyPrompt,
+            materialObjects,
+            topic,
+            language,
+            numberOfAlternatives || 5,
+            instructions,
+          );
 
   //store question - don't store yet
   /* const questionsCollection = db.collection("questions");

@@ -54,6 +54,7 @@ export class Banca {
     type?: 'scelta multipla' | 'vero falso' | 'risposta aperta';
     policy?: 'public' | 'private';
     topicId?: string;
+    difficulty?: string;
   }>({});
 
   Questions = computed<QuestionInterface[]>(() => {
@@ -81,6 +82,7 @@ export class Banca {
           currentFilters.policy,
           currentPage,
           currentPageSize,
+          currentFilters.difficulty,
         );
       }
     });
@@ -91,6 +93,7 @@ export class Banca {
     type?: 'scelta multipla' | 'vero falso' | 'risposta aperta';
     policy?: 'public' | 'private';
     topicId?: string;
+    difficulty?: string;
   }): void {
     this.Filters.set(filters);
     this.Page.set(1);
@@ -124,6 +127,7 @@ export class Banca {
     policy?: 'public' | 'private',
     page?: number,
     pageSize?: number,
+    difficulty?: string,
   ): void {
     console.log('Caricamento domande con i seguenti parametri:', {
       searchTerm,
@@ -141,6 +145,7 @@ export class Banca {
         policy,
         page || 1,
         pageSize || 10,
+        difficulty,
       )
       .subscribe({
         next: (response) => {

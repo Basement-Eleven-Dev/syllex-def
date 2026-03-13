@@ -34,6 +34,17 @@
       }
     </select>
   </div>
+  <div>
+    <select
+      class="form-select custom-input filter"
+      formControlName="difficulty"
+    >
+      <option value="">Difficoltà</option>
+      @for(opt of DifficultyOptions; track opt.value) {
+      <option [value]="opt.value">{{ opt.label }}</option>
+      }
+    </select>
+  </div>
   <button
     type="button"
     class="btn btn-outline-danger"
