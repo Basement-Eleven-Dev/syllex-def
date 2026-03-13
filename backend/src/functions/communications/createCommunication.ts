@@ -2,6 +2,8 @@ import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import { getDefaultDatabase } from "../../_helpers/getDatabase";
 import { ObjectId } from "mongodb";
+import { notifyStudentsIfEnabled } from "../../_helpers/email/notifyStudents";
+import { newCommunicationEmail } from "../../_helpers/email/emailTemplates";
 
 const createCommunication = async (
   request: APIGatewayProxyEvent,
@@ -25,6 +27,22 @@ const createCommunication = async (
   };
 
   const result = await communicationsCollection.insertOne(newCommunication);
+
+  // Notifica email agli studenti (asincrono, non blocca la risposta)
+  const teacherName = `${context.user?.firstName || ""} ${context.user?.lastName || ""}`.trim();
+  const { subject, html } = newCommunicationEmail({
+    teacherName,
+    communicationTitle: communicationData.title,
+    preview: communicationData.content?.substring(0, 200),
+  });
+
+  notifyStudentsIfEnabled({
+    teacher: context.user,
+    preference: "newCommunication",
+    classIds: newCommunication.classIds,
+    subject,
+    html,
+  });
 
   return {
     communication: {
