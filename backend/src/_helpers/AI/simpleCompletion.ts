@@ -81,6 +81,14 @@ const askStrucuredGemini = async <T>(
 
   const client = await getGeminiClient();
 
+  console.log("ask gemini", prompt);
+  console.log("length of text parts", prompt.length);
+  console.log("number of text file parts", textFileParts.length);
+  console.log(
+    "parts",
+    textFileParts.map((part) => part.inlineData),
+  );
+
   const response = await client.models.generateContent({
     model: model,
     contents: [

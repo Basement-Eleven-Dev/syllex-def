@@ -109,6 +109,7 @@ export const generateOpenQuestion = async (
   const INSTRUCTIONS = `Create a ${difficulty} difficulty quiz question about the topic "${topic.name}" based on these documents. The quiz question must be open-answer (no choices included), and you must include the correct answer. ${instructions}`;
   const PROMPT = `${INSTRUCTIONS}
     ${getGuardrail(language)}`;
+
   const result = await askStructuredLLM(
     PROMPT,
     materialObjects,
