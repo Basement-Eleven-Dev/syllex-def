@@ -605,10 +605,4 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     method: "post",
     role: "student",
   },
-  {
-    apiRoute: "students",
-    functionPath: "students/getStudents.ts",
-    method: "post", //AAAAAA È UNA GET
-    role: "teacher",
-  },
 ];

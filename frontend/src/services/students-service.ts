@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { User } from './auth';
 import { Observable } from 'rxjs/internal/Observable';
 
 @Injectable({
@@ -9,9 +8,6 @@ import { Observable } from 'rxjs/internal/Observable';
 export class StudentsService {
   constructor(private http: HttpClient) { }
 
-  getStudents(studentIds: string[]): Observable<{ students: User[] }> {
-    return this.http.post<{ students: User[] }>('students', { studentIds });
-  }
 
   getStudentDetails(
     studentId: string,
