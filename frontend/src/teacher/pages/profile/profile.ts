@@ -46,7 +46,6 @@ export class Profile {
     effect(() => {
       const assegnazioni = this.classiService.AllAssignments();
       if (assegnazioni) {
-        console.log(assegnazioni);
         this.Assegnazioni = assegnazioni.map(
           (a: { class: ClassInterface; subjectId: string }) => ({
             class: a.class,
@@ -58,7 +57,7 @@ export class Profile {
   }
 
   // Lifecycle Hooks
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   // Public Methods
   getMaterie() {

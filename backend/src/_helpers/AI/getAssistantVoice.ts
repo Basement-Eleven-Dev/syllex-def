@@ -3,13 +3,13 @@ import { getDefaultDatabase } from "../getDatabase";
 
 export async function getAssistantVoice(
   assistanId: string,
-): Promise<string | null> {
+): Promise<string | undefined> {
   const db = await getDefaultDatabase();
   const assistant = await db
     .collection("assistants")
     .findOne({ _id: new ObjectId(assistanId) });
   if (!assistant) {
-    return null;
+    return undefined;
   }
 
   return getVoiceName(assistant.voice);

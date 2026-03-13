@@ -9,26 +9,26 @@ interface Agent {
 
 @Injectable({ providedIn: 'root' })
 export class AgentService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getAssistant() {
     return this.http.post<{
       success: boolean;
       exists: boolean;
       assistant: any;
-    }>('assistants/get', {});
+    }>('assistant', {});
   }
 
   createAgent(agent: Agent) {
     return this.http.post<{ success: boolean; assistantId: string }>(
-      'assistants/create',
+      'assistant',
       { agent },
     );
   }
 
   updateAgent(assistantId: string, agent: any) {
-    return this.http.post<{ success: boolean }>(
-      'assistants/update', // Note: Need to verify if this route exists or create it
+    return this.http.put<{ success: boolean }>(
+      'assistant', // Note: Need to verify if this route exists or create it
       { assistantId, agent },
     );
   }
@@ -39,7 +39,7 @@ export class AgentService {
       aiResponse: any;
       _id: string;
       audioUrl?: string | null;
-    }>('assistants/response', { assistantId, query });
+    }>('assistant/response', { assistantId, query });
   }
 
   getConversationHistory() {
@@ -58,7 +58,7 @@ export class AgentService {
 
   removeMaterial(assistantId: string, materialId: string) {
     return this.http.post<{ success: boolean; message: string }>(
-      'assistants/remove-material',
+      'assistant/remove-material',
       { assistantId, materialId },
     );
   }

@@ -51,9 +51,8 @@ export class Materia {
   }
 
   getMaterieTeacher(): MateriaObject[] {
-    let teacherId = this.authService.user?._id;
     this.http
-      .get<MateriaObject[]>(`teachers/${teacherId}/subjects`)
+      .get<MateriaObject[]>(`subjects`)
       .subscribe((materie) => {
         this.allMaterie.set(materie);
         this.loadSavedSubject();
@@ -116,7 +115,7 @@ export class Materia {
       .post<{
         success: boolean;
         topic: TopicObject;
-      }>(`subjects/${subjectId}/topics`, { name })
+      }>(`topics`, { name })
       .pipe(
         tap((res) => {
           if (res.success) {
@@ -146,7 +145,7 @@ export class Materia {
       .put<{
         success: boolean;
         renamed: boolean;
-      }>(`subjects/${subjectId}/topics/${topicId}`, { name })
+      }>(`topics/${topicId}`, { name })
       .pipe(
         tap((res) => {
           if (res.success) {

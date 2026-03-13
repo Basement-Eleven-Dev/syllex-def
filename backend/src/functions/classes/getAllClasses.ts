@@ -4,15 +4,27 @@ import { getDefaultDatabase } from "../../_helpers/getDatabase";
 import { Subject } from "../../models/subject";
 import { ObjectId } from "mongodb";
 
-const getAllTeacherClasses = async (
+
+const getAllClasses = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
-  let teacherId = context.user?._id;
+  const userId = context.user?._id;
   const db = await getDefaultDatabase();
+  let assignmentMatch: any = { teacherId: userId };
+  if (context.user?.role == 'student') {
+    const studentClasses = await db
+      .collection("classes")
+      .find({ students: { $in: [userId] } })
+      .toArray();
+
+    const classIds = studentClasses.map((c) => c._id);
+    assignmentMatch = { classId: { $in: classIds } }
+  }
+
   const assignments = await db
     .collection("teacher_assignments")
-    .find({ teacherId: teacherId })
+    .find(assignmentMatch)
     .toArray();
 
   const classIds = assignments.map((assignment) => assignment.classId);
@@ -35,4 +47,4 @@ const getAllTeacherClasses = async (
 
   return result;
 };
-export const handler = lambdaRequest(getAllTeacherClasses);
+export const handler = lambdaRequest(getAllClasses);

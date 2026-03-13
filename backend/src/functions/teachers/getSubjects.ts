@@ -8,7 +8,7 @@ const getTeacherSubjects = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
-  const teacherId = new ObjectId(request.pathParameters!.teacherId!);
+  const teacherId = context.user!._id;
   const db = await getDefaultDatabase();
 
   const subjects = await db
