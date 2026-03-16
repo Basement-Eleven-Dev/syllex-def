@@ -23,7 +23,6 @@ export interface AssignmentInterface {
 export class ClassiService {
   private readonly http = inject(HttpClient);
   private readonly materiaService = inject(Materia);
-  private readonly auth = inject(Auth);
 
   readonly Classes = signal<ClassInterface[]>([]);
   readonly AllAssignments = signal<AssignmentInterface[]>([]);
@@ -39,26 +38,16 @@ export class ClassiService {
   }
 
   private loadClassesForSelectedSubject(): void {
-    const endpoint = this.getEndpoint('subject/classes');
-    this.http.get<ClassInterface[]>(endpoint).subscribe((classes) => {
+    this.http.get<ClassInterface[]>('classes').subscribe((classes) => {
       this.Classes.set(classes);
       console.log('Classes loaded:', classes);
     });
   }
 
   private loadAllAssignments(): void {
-    const endpoint = this.getEndpoint('classes/all');
-    this.http.get<AssignmentInterface[]>(endpoint).subscribe((assignments) => {
+    this.http.get<AssignmentInterface[]>('assignments').subscribe((assignments) => {
       this.AllAssignments.set(assignments);
     });
-  }
-
-  private getEndpoint(path: string): string {
-    const user = this.auth.user$.value;
-    if (user?.role === 'student') {
-      return `student/${path}`;
-    }
-    return `teacher/${path}`;
   }
 
   getClassNameById(classId: string): string {
@@ -73,12 +62,12 @@ export class ClassiService {
   }
 
   getClassStudents(classId: string): Observable<{ students: User[] }> {
-    return this.http.get<{ students: User[] }>(`class/${classId}/students`);
+    return this.http.get<{ students: User[] }>(`classes/${classId}/students`);
   }
 
   getClassAssignedTests(
     classId: string,
   ): Observable<{ tests: TestInterface[] }> {
-    return this.http.get<{ tests: TestInterface[] }>(`class/${classId}/tests`);
+    return this.http.get<{ tests: TestInterface[] }>(`classes/${classId}/tests`);
   }
 }

@@ -7,21 +7,13 @@ const countAssignmentsToGrade = async (
   context: Context,
 ) => {
   const db = await getDefaultDatabase();
+  const { onlyCount = 'true', excludeStatus = 'reviewed' } = request.queryStringParameters || {};
   const attemptsCollection = db.collection("attempts");
   const subjectId = context.subjectId;
 
-  if (!subjectId) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({
-        error: "subjectId is required",
-      }),
-    };
-  }
-
   // Costruisci il filtro
   const filter: any = {
-    status: { $ne: "reviewed" },
+    status: { $ne: excludeStatus },
     subjectId: subjectId,
   };
 
@@ -29,13 +21,16 @@ const countAssignmentsToGrade = async (
   if (context.user?._id) {
     filter.teacherId = context.user._id;
   }
+  if (JSON.parse(onlyCount)) {
 
-  // Conta i documenti
-  const count = await attemptsCollection.countDocuments(filter);
+    // Conta i documenti
+    const count = await attemptsCollection.countDocuments(filter);
 
-  return {
-    count: count,
-  };
+    return {
+      count: count,
+    };
+  }
+  else return await attemptsCollection.find(filter).toArray();
 };
 
 export const handler = lambdaRequest(countAssignmentsToGrade);

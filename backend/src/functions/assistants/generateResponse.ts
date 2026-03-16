@@ -11,7 +11,7 @@ const generateResponse = async (
   context: Context,
 ) => {
   const body = JSON.parse(request.body || "{}");
-  const { assistantId, query } = body;
+  const { query } = body;
   const subjectId = context.subjectId;
 
   if (!subjectId) {
@@ -30,7 +30,6 @@ const generateResponse = async (
   }
   await saveMessage(subjectId, userId, "user", query);
   const aiResponse = await generateAIResponseGemini(
-    assistantId,
     query,
     subjectId,
     userId,
