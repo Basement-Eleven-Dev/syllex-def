@@ -152,6 +152,18 @@ const CLASSES_ROUTES: FunctionIntegration[] = [
     role: "teacher",
   },
   {
+    apiRoute: "classes/{classId}/attempts",
+    functionPath: "tests/getClassAttempts.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "classes/{classId}/topics-performance",
+    functionPath: "tests/getClassTopicsPerformance.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
     apiRoute: "classes/{classId}/tests",
     functionPath: "tests/getClassAssignedTests.ts",
     method: "get",
@@ -591,16 +603,5 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     method: "post",
     role: "student",
   },
-  {
-    apiRoute: "attempts/class/{classId}",
-    functionPath: "tests/getClassAttempts.ts",
-    method: "get",
-    role: "teacher",
-  },
-  {
-    apiRoute: "attempts/class/{classId}/topics-performance",
-    functionPath: "tests/getClassTopicsPerformance.ts",
-    method: "get",
-    role: "teacher",
-  }
+
 ];

@@ -133,7 +133,7 @@ export class TestsService {
 
   getClassAttempts(classId: string) {
     return this.http.get<{ attempts: AttemptInterface[] }>(
-      `attempts/class/${classId}`,
+      `classes/${classId}/attempts`,
     );
   }
 
@@ -172,7 +172,7 @@ export class TestsService {
 
   getClassTopicsPerformance(classId: string) {
     return this.http.get<{ topicsPerformance: TopicPerformance[] }>(
-      `attempts/class/${classId}/topics-performance`,
+      `classes/${classId}/topics-performance`,
     );
   }
 
