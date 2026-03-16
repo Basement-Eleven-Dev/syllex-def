@@ -53,7 +53,7 @@ export class QuestionsService {
   constructor(
     private http: HttpClient,
     private filesService: FilesService,
-  ) {}
+  ) { }
 
   createQuestion(
     q: QuestionInterface,
@@ -89,7 +89,7 @@ export class QuestionsService {
         switchMap((imageUrl) => {
           const questionData = { ...q, imageUrl };
           return this.http.put<{ question: QuestionInterface }>(
-            `questions/${id}/edit`,
+            `questions/${id}`,
             questionData,
           );
         }),
@@ -97,7 +97,7 @@ export class QuestionsService {
     }
 
     return this.http.put<{ question: QuestionInterface }>(
-      `questions/${id}/edit`,
+      `questions/${id}`,
       q,
     );
   }

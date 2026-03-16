@@ -139,7 +139,7 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
   onAnswerChange(questionId: string, value: number | string): void {
     const test = this.TestData();
     const question = this.Questions().find((q) => q._id === questionId);
-    
+
     // One-shot restriction: handle only if enabled and it's a closed question
     if (test?.oneShotAnswers && question && question.type !== 'risposta aperta') {
       const existing = this.Answers()[questionId];
@@ -155,13 +155,13 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
 
   isQuestionLocked(question: QuestionInterface): boolean {
     if (this.TimerExpired()) return true;
-    
+
     const test = this.TestData();
     if (test?.oneShotAnswers && question.type !== 'risposta aperta') {
       const answer = this.Answers()[question._id];
       return answer !== null && answer !== undefined && answer !== '';
     }
-    
+
     return false;
   }
 
@@ -180,7 +180,7 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
       .subscribe({
         next: () => {
           this.testsService
-            .submitTestAttempt(attempt._id!)
+            .submitTestAttempt(attempt._id!, this.TestId)
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe({
               next: () => {
@@ -272,7 +272,7 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
           let loaded = results.filter(
             (q): q is QuestionInterface => q !== null,
           );
-          
+
           if (test.randomizeQuestions) {
             // Fisher-Yates shuffle
             for (let i = loaded.length - 1; i > 0; i--) {
@@ -284,7 +284,7 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
               (a, b) => questionIds.indexOf(a._id) - questionIds.indexOf(b._id),
             );
           }
-          
+
           this.Questions.set(loaded);
           this.IsLoading.set(false);
           this.checkExistingAttempt();

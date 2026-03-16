@@ -1,33 +1,23 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { mongoClient } from "../../_helpers/getDatabase";
+import { getDefaultDatabase, mongoClient } from "../../_helpers/getDatabase";
 import { DB_NAME } from "../../env";
+import createHttpError from "http-errors";
 
 const updateEmail = async (request: APIGatewayProxyEvent, context: Context) => {
-  const user = context.user;
-
-  if (!user) {
-    return {
-      statusCode: 401,
-      body: { message: "Utente non autenticato" },
-    };
-  }
+  const user = context.user!;
 
   const body = JSON.parse(request.body || "{}");
   const { email } = body;
 
   if (!email || typeof email !== "string") {
-    return {
-      statusCode: 400,
-      body: { message: "Email non valida" },
-    };
+    throw createHttpError.BadRequest('Email required')
   }
 
-  const client = await mongoClient();
+  const db = await getDefaultDatabase();
 
   try {
-    const result = await client
-      .db(DB_NAME)
+    const result = await db
       .collection("users")
       .updateOne(
         { _id: user._id },
@@ -40,28 +30,16 @@ const updateEmail = async (request: APIGatewayProxyEvent, context: Context) => {
       );
 
     if (result.matchedCount === 0) {
-      return {
-        statusCode: 404,
-        body: { message: "Utente non trovato" },
-      };
+      throw createHttpError.NotFound('User not found')
     }
 
     return {
-      statusCode: 200,
-      body: {
-        success: true,
-        message: "Email aggiornata con successo",
-      },
+      success: true,
+      message: "Email aggiornata con successo",
     };
   } catch (error: any) {
     console.error("Errore durante l'aggiornamento dell'email:", error);
-    return {
-      statusCode: 500,
-      body: {
-        success: false,
-        message: "Errore durante l'aggiornamento dell'email",
-      },
-    };
+    throw createHttpError.InternalServerError("Errore durante l'aggiornamento dell'email")
   }
 };
 

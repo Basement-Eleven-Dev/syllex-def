@@ -13,15 +13,6 @@ const countPublishedTests = async (
 
   const subjectId = context.subjectId;
 
-  if (!subjectId) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({
-        error: "subjectId is required",
-      }),
-    };
-  }
-
   // Costruisci il filtro
   const filter: any = {
     status: "pubblicato",

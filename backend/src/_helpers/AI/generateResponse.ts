@@ -38,7 +38,7 @@ export async function generateAIResponse(
     .join("\n");
   const messagesHistory = await buildConversationHistory(subjectId, userId);
   const systemPrompt = await buildAgent(
-    assistantId,
+    subjectId,
     contextString,
     messagesHistory,
   );
@@ -53,7 +53,6 @@ export async function generateAIResponse(
 }
 
 export async function generateAIResponseGemini(
-  assistantId: string,
   query: string,
   subjectId: ObjectId,
   userId: ObjectId,
@@ -63,7 +62,7 @@ export async function generateAIResponseGemini(
     const db = await getDefaultDatabase();
 
     const assistant = await db.collection("assistants").findOne({
-      _id: new ObjectId(assistantId),
+      subjectId: subjectId,
     });
 
     const associatedFileIds: ObjectId[] = assistant?.associatedFileIds || [];
@@ -86,7 +85,7 @@ export async function generateAIResponseGemini(
     // 2. Costruzione della memoria e del System Prompt
     const messagesHistory = await buildConversationHistory(subjectId, userId);
     const systemPrompt = await buildAgent(
-      assistantId,
+      subjectId,
       contextString,
       messagesHistory,
     );

@@ -71,7 +71,7 @@ export class MaterialiService {
       .get<{
         success: boolean;
         materials: MaterialInterface[];
-      }>(`materials/subject?subjectId=${subjectId}`)
+      }>(`materials`)
       .subscribe({
         next: (response) => {
           this.currentFolder.set(null);
@@ -101,7 +101,7 @@ export class MaterialiService {
       .get<{
         success: boolean;
         materials: MaterialInterface[];
-      }>('students/me/materials')
+      }>('materials')
       .subscribe({
         next: (response) => {
           this.root.set(this.buildTree(response.materials));
@@ -274,7 +274,7 @@ export class MaterialiService {
         moved: boolean;
         movedCount: number;
         removedFromParents: number;
-      }>('materials/move-batch', {
+      }>('batch/materials/move', {
         materialIds: itemIds,
         newParentId: backendParentId,
       })
@@ -336,7 +336,7 @@ export class MaterialiService {
         success: boolean;
         deletedCount: number;
         removedFromParents: number;
-      }>('materials/delete-batch', { materialIds: itemIds })
+      }>('batch/materials/delete', { materialIds: itemIds })
       .pipe(
         tap(() => itemIds.forEach((id) => this.removeItemFromAllParents(id))),
       );

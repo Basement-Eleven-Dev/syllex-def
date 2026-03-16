@@ -9,9 +9,9 @@ const listenToMessage = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
-  const body = JSON.parse(request.body || "{}");
-  const { messageId, text, assistantId } = body;
-  const voice = await getAssistantVoice(assistantId);
+  const { text } = JSON.parse(request.body || "{}");
+  const messageId = request.pathParameters!.messageId! as string;
+  const voice = await getAssistantVoice(context.subjectId!);
 
   let audioUrl;
   if (voice) {

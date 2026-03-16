@@ -65,7 +65,7 @@ export interface AttemptInterface {
   providedIn: 'root',
 })
 export class TestsService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getPaginatedTests(
     page: number,
@@ -118,11 +118,9 @@ export class TestsService {
   }
 
   countAssignmentsToGrade() {
-    return this.http.get<{ count: number }>('tests/assignments-to-grade/count');
+    return this.http.get<{ count: number }>('attempts');
   }
-  countPublishedTests() {
-    return this.http.get<{ count: number }>('tests/published/count');
-  }
+
 
   updateClassIds(testId: string, classIds: string[]) {
     return this.http.put<{ success: boolean; test: TestInterface }>(
@@ -133,7 +131,7 @@ export class TestsService {
 
   getClassAttempts(classId: string) {
     return this.http.get<{ attempts: AttemptInterface[] }>(
-      `attempts/class/${classId}`,
+      `classes/${classId}/attempts`,
     );
   }
 
@@ -146,12 +144,12 @@ export class TestsService {
   getTestAttemptsDetails(testId: string) {
     // Nota: l'URL deve corrispondere alla apiRoute + il parametro id
     return this.http.get<TestDetailsResponse>(
-      `test/attempts/details/${testId}`,
+      `test/${testId}/attempts-details`,
     );
   }
 
   getAttemptDetail(attemptId: string) {
-    const response = this.http.get<any>(`attempts/details/${attemptId}`);
+    const response = this.http.get<any>(`attempts/${attemptId}/details`);
     console.log('getAttemptDetail response:', response);
     return response;
   }
@@ -165,25 +163,24 @@ export class TestsService {
 
   correctAttemptWithAI(attemptId: string, questionId: string) {
     return this.http.post<{ score: number; explanation: string, aiProbability: string }>(
-      `attempts/${attemptId}/${questionId}/correction/ai`,
+      `attempts/${attemptId}/questions/${questionId}/ai-correction`,
       {},
     );
   }
 
   getClassTopicsPerformance(classId: string) {
     return this.http.get<{ topicsPerformance: TopicPerformance[] }>(
-      `attempts/class/${classId}/topics-performance`,
+      `classes/${classId}/topics-performance`,
     );
   }
 
   getTestInsight(testId: string) {
-    return this.http.post<{ insight: string }>(`test/insight/${testId}`, {});
+    return this.http.post<{ insight: string }>(`tests/${testId}/insight`, {});
   }
 
   getAttemptInsight(attemptId: string) {
-    return this.http.post<{ insight: string }>(
-      `attempts/insight/${attemptId}`,
-      {},
+    return this.http.get<{ insight: string }>(
+      `attempts/${attemptId}/insight`
     );
   }
 }

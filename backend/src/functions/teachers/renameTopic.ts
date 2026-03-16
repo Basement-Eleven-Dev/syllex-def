@@ -5,7 +5,10 @@ import { getDefaultDatabase } from "../../_helpers/getDatabase";
 import { ObjectId } from "mongodb";
 
 const renameTopic = async (request: APIGatewayProxyEvent, context: Context) => {
-  const subjectId = new ObjectId(request.pathParameters!.subjectId!);
+  const subjectId = context.subjectId;
+  if (!subjectId) {
+    throw createError.BadRequest('Subject-Id header is required')
+  }
   const topicId = new ObjectId(request.pathParameters!.topicId!);
   const body = JSON.parse(request.body || "{}");
   const name = body.name?.trim();
