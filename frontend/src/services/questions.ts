@@ -129,4 +129,8 @@ export class QuestionsService {
       `questions?${params.toString()}`,
     );
   }
+
+  deleteQuestion(id: string): Observable<{ deleted: boolean }> {
+    return this.http.delete<{ deleted: boolean }>(`questions/${id}`);
+  }
 }

@@ -13,7 +13,12 @@ const listenToMessage = async (
   const messageId = request.pathParameters!.messageId! as string;
   const voice = await getAssistantVoice(context.subjectId!);
 
-  const audioUrl = await generateAndUploadAudio(text, messageId, voice);
+  let audioUrl;
+  if (voice) {
+    audioUrl = await generateAndUploadAudio(text, messageId, voice);
+  } else {
+    audioUrl = await generateAndUploadAudio(text, messageId);
+  }
 
   const db = await getDefaultDatabase();
   await db

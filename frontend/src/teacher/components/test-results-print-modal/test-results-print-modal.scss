@@ -1,0 +1,82 @@
+:host {
+  display: block;
+}
+
+.modal-body {
+  background-color: #f8f9fa;
+}
+
+.preview-container {
+  width: 100%;
+  max-width: 210mm;
+  min-height: 297mm;
+  background: white;
+  font-family: "Inter", sans-serif;
+  color: #000;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+
+  body *,
+  html * {
+    visibility: hidden !important;
+  }
+
+  app-sidebar,
+  app-navbar,
+  .sidebar,
+  .navbar,
+  .header,
+  .footer,
+  aside,
+  nav,
+  .no-print,
+  .modal-backdrop,
+  .cdk-overlay-backdrop,
+  button:not(.print-only) {
+    display: none !important;
+  }
+
+  .preview-container,
+  .preview-container * {
+    visibility: visible !important;
+  }
+
+  .modal,
+  .modal-dialog,
+  .modal-content,
+  .modal-body,
+  .cdk-overlay-container,
+  .cdk-global-overlay-wrapper,
+  .cdk-overlay-pane {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    transform: none !important;
+    visibility: visible !important;
+  }
+
+  app-root {
+    display: block !important;
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+  }
+
+  .preview-container {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+}

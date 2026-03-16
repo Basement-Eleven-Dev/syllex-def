@@ -88,6 +88,11 @@ export class Sidebar {
       icon: faBallotCheck,
     },
     {
+      path: 'lessons',
+      label: 'Lezioni',
+      icon: faBook,
+    },
+    {
       path: 'banca',
       label: 'Banca Domande',
       icon: faClipboardQuestion,

@@ -1,10 +1,10 @@
 <div class="h-100 card" style="width: 250px">
   <div class="w-100 px-3 py-4 d-flex flex-column h-100">
     <div
-      class="card bg-secondary text-dark p-3 d-flex flex-column justify-content-center fw-bold overflow-hidden position-relative"
+      class="card bg-secondary text-dark p-3 d-flex flex-column fw-bold overflow-hidden position-relative"
     >
   
-      <h4 class="fw-bold mb-0">{{ selectedSubject?.name }}</h4>
+      <h4 class="fw-bold mb-0 text-truncate" [title]="selectedSubject?.name">{{ selectedSubject?.name }}</h4>
       @if (availableSubjects().length > 0) {
         <div class="d-flex align-items-center"> <div
         class="text-decoration-underline fw-light cursor-pointer d-flex flex-row  mt-2 justify-content-between align-items-center w-100 z-index-1 position-relative mb-1 small"
@@ -26,11 +26,10 @@
       <div
         #collapse="ngbCollapse"
         [ngbCollapse]="isSubjectsCollapsed()"
-        (ngbCollapseChange)="isSubjectsCollapsed.set(!isSubjectsCollapsed())"
         id="subjectsCollapse"
       >
         <hr />
-        <div class="mt-1 d-flex flex-column gap-2">
+        <div class="subjects-scroll-container mt-1 d-flex flex-column gap-2">
           @for(subject of availableSubjects(); track subject._id){
           <div
             class="p-2 fw-normal rounded-2 d-flex align-items-center gap-2 cursor-pointer materiaBtn d-flex flex-row justify-content-between align-items-center"
@@ -38,7 +37,7 @@
             (click)="selectSubject(subject)"
             role="button"
           >
-            <span class="text-truncate">{{ subject.name }} </span>
+            <span class="text-truncate" [title]="subject.name">{{ subject.name }} </span>
 
             @if (subject.uncorrectedTest != 0) {
             <span

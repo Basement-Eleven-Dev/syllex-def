@@ -3,12 +3,11 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPrint, faTimes, faFilePdf } from '@fortawesome/pro-solid-svg-icons';
 import { FormsModule } from '@angular/forms';
-import { NgFor, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-test-print-modal',
   standalone: true,
-  imports: [FontAwesomeModule, FormsModule, NgFor, NgIf],
+  imports: [FontAwesomeModule, FormsModule],
   templateUrl: './test-print-modal.html',
   styleUrl: './test-print-modal.scss'
 })

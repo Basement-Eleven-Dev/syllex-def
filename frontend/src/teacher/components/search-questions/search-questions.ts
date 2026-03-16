@@ -3,6 +3,7 @@ import {
   OnDestroy,
   OnInit,
   computed,
+  inject,
   input,
   signal,
 } from '@angular/core';
@@ -15,6 +16,7 @@ import {
   QuestionInterface,
 } from '../../../services/questions';
 import { SyllexPagination } from '../syllex-pagination/syllex-pagination';
+import { FeedbackService } from '../../../services/feedback-service';
 
 @Component({
   selector: 'app-search-questions',
@@ -58,6 +60,7 @@ export class SearchQuestions implements OnInit, OnDestroy {
   }>();
 
   constructor(private questionsService: QuestionsService) {}
+  private readonly feedbackService = inject(FeedbackService);
 
   ngOnInit(): void {
     // Setup debounced filter subscription
@@ -110,6 +113,10 @@ export class SearchQuestions implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Errore nel caricamento delle domande:', error);
+          this.feedbackService.showFeedback(
+            'Errore nel caricamento delle domande',
+            false,
+          );
           this.isLoading.set(false);
         },
       });

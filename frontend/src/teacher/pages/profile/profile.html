@@ -1,151 +1,273 @@
-<h1 class="text-dark fw-medium mb-3 display-6">Profilo</h1>
-<h5 class="text-dark mb-0 fw-normal">Da qui puoi gestire il tuo account</h5>
-
-@if(authService.user?.role === 'teacher') {
-<div class="row mt-5">
-  <div class="col-6">
-    <section class="form-section">
-      <label for="name" class="form-label text-dark">
-        <fa-icon [icon]="BuildingIcon"></fa-icon>Organizzazione</label>
-      <h4 class="fw-light text-dark" id="name">
-        {{ authService.organizationName$ | async }}
-      </h4>
-    </section>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="text-dark fw-medium mb-1 display-6">Il mio Account</h1>
+    <h5 class="text-primary mb-0 fw-normal small">Gestisci i tuoi dati personali e le preferenze di sistema</h5>
   </div>
 </div>
-} @else if(authService.user?.role === 'student') {
-<div class="row mt-5">
-  <div class="col-6">
-    <section class="form-section">
-      <label for="name" class="form-label text-dark">
-        <fa-icon [icon]="BuildingIcon"></fa-icon>La tua Istituzione</label>
-      <h4 class="fw-light text-dark" id="name">
-        {{ authService.organizationName$ | async }}
-      </h4>
-    </section>
+
+<div class="profile-tabs mb-4">
+  <button class="tab-btn" [class.active]="activeTab() === 'profile'" (click)="setTab('profile')">
+    <fa-icon [icon]="ProfileIcon" class="me-2"></fa-icon> Profilo
+  </button>
+  <button class="tab-btn" [class.active]="activeTab() === 'settings'" (click)="setTab('settings')">
+    <fa-icon [icon]="SettingsIcon" class="me-2"></fa-icon> Impostazioni
+  </button>
+</div>
+
+@if (activeTab() === 'profile') {
+<div class="animate-in">
+  @if(authService.user?.role === 'teacher') {
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <section class="form-section h-100">
+        <label for="name" class="form-label text-dark">
+          <fa-icon [icon]="BuildingIcon" class="me-2 text-primary"></fa-icon>Organizzazione</label>
+        <h4 class="fw-light text-dark mb-0">
+          {{ authService.organizationName$ | async }}
+        </h4>
+      </section>
+    </div>
   </div>
+  } @else if(authService.user?.role === 'student') {
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <section class="form-section h-100">
+        <label for="name" class="form-label text-dark">
+          <fa-icon [icon]="BuildingIcon" class="me-2 text-primary"></fa-icon>La tua Istituzione</label>
+        <h4 class="fw-light text-dark mb-0">
+          {{ authService.organizationName$ | async }}
+        </h4>
+      </section>
+    </div>
+  </div>
+  }
+
+  <div class="row mt-3">
+    <div class="col-md-6 mb-3">
+      <section class="form-section h-100">
+        <label class="form-label text-dark">Nome e Cognome</label>
+        <h4 class="fw-light text-dark mb-0">
+          {{ authService.user?.firstName }} {{ authService.user?.lastName }}
+        </h4>
+      </section>
+    </div>
+    <div class="col-md-6 mb-3">
+      <section class="form-section h-100">
+        <label class="form-label text-dark">Ruolo</label>
+        <h4 class="fw-light text-dark mb-0">
+          @switch(authService.user?.role) { @case('teacher'){Docente}
+          @case('student'){Studente} @default{ {{ authService.user?.role }} } }
+        </h4>
+      </section>
+    </div>
+  </div>
+
+  @if(authService.user?.role === 'teacher') {
+  <div class="row mt-4">
+    <div class="col-12">
+      <section class="form-section">
+        <label for="name" class="form-label text-dark mb-4 d-flex align-items-center">
+          <fa-icon [icon]="BookIcon" class="me-2 text-primary"></fa-icon>
+          Materie di insegnamento
+        </label>
+        <div class="row">
+          @for(materia of getMaterie(); track materia._id) {
+          <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card subject-card overflow-hidden position-relative">
+              <fa-icon [icon]="BookIcon" [size]="'lg'" class="book-bg-icon" />
+              <div class="card-body">
+                <h5 class="card-title mb-1">{{ materia.name }}</h5>
+                <p class="mb-0 text-muted small">
+                  {{ countClasses(materia._id) || 'Nessuna' }} class{{
+                  countClasses(materia._id) > 1 ? 'i' : 'e' }} assegnat{{
+                  countClasses(materia._id) > 1 ? 'e' : 'a' }}
+                </p>
+              </div>
+            </div>
+          </div>
+          } @empty {
+          <div class="col-12">
+            <div class="p-4 text-center bg-light rounded-3">
+              <p class="text-muted mb-0">Nessuna materia assegnata</p>
+            </div>
+          </div>
+          }
+        </div>
+      </section>
+    </div>
+  </div>
+  } @else if(authService.user?.role === 'student') {
+  <div class="row mt-4">
+    <div class="col-12">
+      <section class="form-section">
+        <label for="name" class="form-label text-dark mb-4 d-flex align-items-center">
+          <fa-icon [icon]="BookIcon" class="me-2 text-primary"></fa-icon>
+          Materie seguite
+        </label>
+        <div class="row">
+          @for(materia of getMaterie(); track materia._id) {
+          <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card subject-card overflow-hidden position-relative">
+              <fa-icon [icon]="BookIcon" [size]="'lg'" class="book-bg-icon" />
+              <div class="card-body">
+                <h5 class="card-title mb-1">{{ materia.name }}</h5>
+                <p class="mb-0 text-muted small">
+                  {{ countClasses(materia._id) || 'Nessuna' }} class{{
+                  countClasses(materia._id) > 1 ? 'i' : 'e' }}
+                </p>
+              </div>
+            </div>
+          </div>
+          } @empty {
+          <div class="col-12">
+            <div class="p-4 text-center bg-light rounded-3">
+              <p class="text-muted mb-0">Nessuna materia assegnata</p>
+            </div>
+          </div>
+          }
+        </div>
+      </section>
+    </div>
+  </div>
+  }
 </div>
 }
 
-<div class="row mt-5">
-  <div class="col-6">
-    <section class="form-section">
-      <label for="name" class="form-label text-dark">Nome e Cognome</label>
-      <h4 class="fw-light text-dark" id="name">
-        {{ authService.user?.firstName }} {{ authService.user?.lastName }}
-      </h4>
-    </section>
+@if (activeTab() === 'settings') {
+<div class="animate-in">
+  <!-- Security Section -->
+  <div class="row">
+    <div class="col-12 mb-4">
+      <h5 class="text-dark mb-3 d-flex align-items-center">
+        <fa-icon [icon]="SecurityIcon" class="me-2 text-primary"></fa-icon>
+        Sicurezza e Accesso
+      </h5>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <section class="form-section h-100">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <label class="form-label text-dark mb-0">Email</label>
+          <button class="btn btn-sm btn-outline-primary py-1 px-2" (click)="onChangeEmail()">
+            <fa-icon [icon]="EditIcon" class="me-1"></fa-icon> Modifica
+          </button>
+        </div>
+        <h4 class="fw-light text-dark mb-0 text-break">{{ authService.user?.email }}</h4>
+      </section>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <section class="form-section h-100">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <label class="form-label text-dark mb-0">Password</label>
+          <button class="btn btn-sm btn-outline-primary py-1 px-2" (click)="onChangePassword()">
+            <fa-icon [icon]="EditIcon" class="me-1"></fa-icon> Modifica
+          </button>
+        </div>
+        <h4 class="fw-light text-dark mb-0">••••••••</h4>
+      </section>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <section class="form-section h-100">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <label class="form-label text-dark mb-0">Autenticazione a due fattori (2FA)</label>
+          @if (mfaEnabled() === true) {
+          <button class="btn btn-sm btn-outline-danger py-1 px-2" (click)="onDisable2FA()">Disattiva</button>
+          } @else if (mfaEnabled() === false) {
+          <button class="btn btn-sm btn-outline-primary py-1 px-2" (click)="onSetup2FA()">Configura</button>
+          }
+        </div>
+        <div class="d-flex align-items-center">
+          @if (mfaEnabled() === null) {
+          <span class="text-muted small">Caricamento...</span>
+          } @else if (mfaEnabled()) {
+          <span class="badge bg-success px-3 py-2 rounded-pill">Attivo</span>
+          <span class="ms-3 text-muted small d-none d-sm-inline">Il tuo account è protetto</span>
+          } @else {
+          <span class="badge bg-secondary px-3 py-2 rounded-pill">Non attivo</span>
+          <span class="ms-3 text-muted small d-none d-sm-inline">Aggiungi un livello di sicurezza extra</span>
+          }
+        </div>
+      </section>
+    </div>
   </div>
-  <div class="col-6">
-    <section class="form-section">
-      <label for="name" class="form-label text-dark">Ruolo</label>
-      <h4 class="fw-light text-dark" id="name">
-        @switch(authService.user?.role) { @case('teacher'){Docente}
-        @case('student'){Studente} @default{ {{ authService.user?.role }} } }
-      </h4>
-    </section>
-  </div>
-</div>
-<div class="row mt-3">
-  <div class="col-6">
-    <section class="form-section">
-      <label for="name" class="form-label text-dark w-100 d-flex align-items-center justify-content-between">Email
-        <button class="btn btn-link p-0 ms-2" (click)="onChangeEmail()">
-          <fa-icon [icon]="EditIcon"></fa-icon> Modifica email
+
+  <!-- Notifications Section (Teacher Only) -->
+  @if(authService.user?.role === 'teacher') {
+  <div class="row mt-4">
+    <div class="col-12 mb-4">
+      <h5 class="text-dark mb-3 d-flex align-items-center">
+        <fa-icon [icon]="BellIcon" class="me-2 text-primary"></fa-icon>
+        Preferenze Notifiche Email
+      </h5>
+      <p class="text-muted small">Scegli quando ricevere notifiche email per le attività del sistema.</p>
+    </div>
+
+    @if (!settingsInitialized()) {
+    <div class="col-12 mb-4">
+      <div class="alert alert-soft-primary border-0 d-flex align-items-center justify-content-between p-4 shadow-sm">
+        <div>
+          <h6 class="fw-bold mb-1">Configura le notifiche per i tuoi studenti</h6>
+          <p class="small mb-0 opacity-75">Non hai ancora attivato le notifiche automatiche. Inizializzale ora con le impostazioni suggerite.</p>
+        </div>
+        <button class="btn btn-primary px-4" (click)="saveNotificationSettings()">
+          Attiva ora
         </button>
-      </label>
-      <h4 class="fw-light text-dark" id="email">
-        {{ authService.user?.username }}
-      </h4>
-    </section>
-  </div>
-  <div class="col-6">
-    <section class="form-section">
-      <label for="name" class="form-label text-dark w-100 d-flex align-items-center justify-content-between">Password
-        <button class="btn btn-link p-0 ms-2" (click)="onChangePassword()">
-          <fa-icon [icon]="EditIcon"></fa-icon> Modifica password
-        </button></label>
-      <h4 class="fw-light text-dark" id="name">••••••••</h4>
-    </section>
-  </div>
-</div>
-<div class="row mt-3">
-  <div class="col-6">
-    <section class="form-section">
-      <label class="form-label text-dark w-100 d-flex align-items-center justify-content-between">
-        <span>
-          <fa-icon [icon]="ShieldIcon" class="me-1"></fa-icon>
-          Autenticazione a due fattori (2FA)
-        </span>
-        @if (mfaEnabled() === true) {
-        <button class="btn btn-link p-0 ms-2 text-danger" (click)="onDisable2FA()">Disattiva</button>
-        } @else if (mfaEnabled() === false) {
-        <button class="btn btn-link p-0 ms-2" (click)="onSetup2FA()">
-          <fa-icon [icon]="EditIcon"></fa-icon> Configura
-        </button>
-        }
-      </label>
-      @if (mfaEnabled() === null) {
-      <span class="text-muted small">Caricamento...</span>
-      } @else if (mfaEnabled()) {
-      <span class="badge bg-success">Attivo</span>
-      } @else {
-      <span class="badge bg-secondary">Non attivo</span>
-      }
-    </section>
-  </div>
-</div>
-@if(authService.user?.role === 'teacher') {
-<div class="row mt-5 pb-5">
-  <div class="col-12">
-    <section class="form-section">
-      <label for="name" class="form-label text-dark mb-4">Materie di insegnamento</label>
-      <div class="row">
-        @for(materia of getMaterie(); track $index) {
-        <div class="col-4 mb-3">
-          <div class="card overflow-hidden position-relative">
-            <fa-icon [icon]="BookIcon" [size]="'lg'" id="bookIcon" />
-            <div class="card-body">
-              <h5 class="card-title">{{ materia.name }}</h5>
-              {{ countClasses(materia._id) || 'Nessuna' }} class{{
-              countClasses(materia._id) > 1 ? 'i' : 'e' }} assegnat{{
-              countClasses(materia._id) > 1 ? 'e' : 'a' }}
-            </div>
+      </div>
+    </div>
+    }
+
+    <div class="col-12" [style.opacity]="settingsInitialized() ? '1' : '0.5'" [style.pointer-events]="settingsInitialized() ? 'all' : 'none'">
+      <section class="form-section">
+        <div class="setting-item">
+          <div class="setting-info">
+            <span class="setting-title">Nuove comunicazioni</span>
+            <span class="setting-desc">Invia un'email quando viene creata una nuova comunicazione</span>
+          </div>
+          <div class="form-check form-switch custom-switch">
+            <input class="form-check-input" type="checkbox" role="switch"
+              [ngModel]="notificationSettings.newCommunication()"
+              (ngModelChange)="notificationSettings.newCommunication.set($event); saveNotificationSettings()">
           </div>
         </div>
-        } @empty {
-        <div class="col-12">
-          <p class="text-muted">Nessuna materia assegnata</p>
-        </div>
-        }
-      </div>
-    </section>
-  </div>
-</div>
-} @else if(authService.user?.role === 'student') {
-<div class="row mt-5 pb-5">
-  <div class="col-12">
-    <section class="form-section">
-      <label for="name" class="form-label text-dark mb-4">Materie seguite</label>
-      <div class="row">
-        @for(materia of getMaterie(); track $index) {
-        <div class="col-4 mb-3">
-          <div class="card overflow-hidden position-relative">
-            <fa-icon [icon]="BookIcon" [size]="'lg'" id="bookIcon" />
-            <div class="card-body">
-              <h5 class="card-title">{{ materia.name }}</h5>
-              {{ countClasses(materia._id) || 'Nessuna' }} class{{
-              countClasses(materia._id) > 1 ? 'i' : 'e' }}
-            </div>
+
+        <div class="setting-item">
+          <div class="setting-info">
+            <span class="setting-title">Nuovi eventi</span>
+            <span class="setting-desc">Invia un'email ai tuoi studenti quando viene creato un nuovo evento</span>
+          </div>
+          <div class="form-check form-switch custom-switch">
+            <input class="form-check-input" type="checkbox" role="switch" [ngModel]="notificationSettings.newEvent()"
+              (ngModelChange)="notificationSettings.newEvent.set($event); saveNotificationSettings()">
           </div>
         </div>
-        } @empty {
-        <div class="col-12">
-          <p class="text-muted">Nessuna materia assegnata</p>
+
+        <div class="setting-item">
+          <div class="setting-info">
+            <span class="setting-title">Nuovo test creato</span>
+            <span class="setting-desc">Comunica ai tuoi studenti quando viene creato un nuovo test</span>
+          </div>
+          <div class="form-check form-switch custom-switch">
+            <input class="form-check-input" type="checkbox" role="switch" [ngModel]="notificationSettings.newTest()"
+              (ngModelChange)="notificationSettings.newTest.set($event); saveNotificationSettings()">
+          </div>
         </div>
-        }
-      </div>
-    </section>
+
+        <div class="setting-item">
+          <div class="setting-info">
+            <span class="setting-title">Test corretto</span>
+            <span class="setting-desc">Comunica quando un test viene corretto</span>
+          </div>
+          <div class="form-check form-switch custom-switch">
+            <input class="form-check-input" type="checkbox" role="switch"
+              [ngModel]="notificationSettings.testCorrected()"
+              (ngModelChange)="notificationSettings.testCorrected.set($event); saveNotificationSettings()">
+          </div>
+        </div>
+      </section>
+    </div>
   </div>
+  }
 </div>
 }

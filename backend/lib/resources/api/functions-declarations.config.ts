@@ -114,7 +114,7 @@ const ADMIN_ROUTES: FunctionIntegration[] = [
     method: "get",
     role: "admin",
   },
-]
+];
 
 const SUBJECTS_ROUTES: FunctionIntegration[] = [
   {
@@ -382,7 +382,7 @@ const ASSISTANTS_ROUTES: FunctionIntegration[] = [
     method: "post",
     role: "logged",
   },
-]
+];
 
 const MATERIALS_ROUTES: FunctionIntegration[] = [
   {
@@ -456,7 +456,7 @@ const MATERIALS_ROUTES: FunctionIntegration[] = [
     method: "put",
     role: "teacher",
   },
-]
+];
 
 const TESTS_ROUTES: FunctionIntegration[] = [
   {

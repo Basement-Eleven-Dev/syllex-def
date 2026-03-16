@@ -1,6 +1,7 @@
 import {
   Component,
   ElementRef,
+  inject,
   input,
   signal,
   ViewChild,
@@ -23,6 +24,7 @@ import {
 } from '@fortawesome/pro-solid-svg-icons';
 import { faSpinner } from '@fortawesome/pro-regular-svg-icons';
 import { AgentService } from '../../../services/agent.service';
+import { FeedbackService } from '../../../services/feedback-service';
 
 export interface ChatMessage {
   _id?: string;
@@ -40,7 +42,8 @@ export interface ChatMessage {
 })
 export class AgentChat implements OnInit {
   SendIcon = faPaperPlane;
-  constructor(private agentService: AgentService) { }
+  private feedbackService = inject(FeedbackService);
+  constructor(private agentService: AgentService) {}
 
   assistantId = input.required<string>();
 
@@ -119,6 +122,10 @@ export class AgentChat implements OnInit {
       },
       error: (error) => {
         console.error('Error generating response:', error);
+        this.feedbackService.showFeedback(
+          'Errore nella generazione della risposta',
+          false,
+        );
         this.isLoading.set(false);
       },
     });
@@ -146,6 +153,10 @@ export class AgentChat implements OnInit {
       },
       error: (error) => {
         console.error('Error fetching conversation history:', error);
+        this.feedbackService.showFeedback(
+          'Errore nel caricamento della cronologia',
+          false,
+        );
       },
     });
   }
@@ -194,6 +205,10 @@ export class AgentChat implements OnInit {
         },
         error: (err) => {
           console.error('Error generating audio:', err);
+          this.feedbackService.showFeedback(
+            "Errore nella generazione dell'audio",
+            false,
+          );
           this.loadingAudioIds.update((set) => {
             const newSet = new Set(set);
             newSet.delete(messageId);

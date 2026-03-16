@@ -8,6 +8,7 @@ import { AgentSettingsForm } from '../../components/agent-settings-form/agent-se
 import { Auth } from '../../../services/auth';
 import { AgentService } from '../../../services/agent.service';
 import { CommonModule } from '@angular/common';
+import { FeedbackService } from '../../../services/feedback-service';
 
 @Component({
   selector: 'app-agent-page',
@@ -31,6 +32,7 @@ export class AgentPage {
     public materiaService: Materia,
     private authService: Auth,
     private agentService: AgentService,
+    private feedbackService: FeedbackService,
   ) {
     this.userRole.set(this.authService.user?.role || null);
 
@@ -57,6 +59,10 @@ export class AgentPage {
       },
       error: (err) => {
         console.error('Error loading assistant for student:', err);
+        this.feedbackService.showFeedback(
+          "Errore nel caricamento dell'assistente",
+          false,
+        );
         this.currentAssistantId.set(null);
       },
     });
