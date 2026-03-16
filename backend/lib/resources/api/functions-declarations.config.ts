@@ -518,6 +518,18 @@ const TESTS_ROUTES: FunctionIntegration[] = [
 
 const ATTEMPTS_ROUTES: FunctionIntegration[] = [
   {
+    apiRoute: "attempts", //dovrebbe ritornare una lista di attempts, ora ritorna solo il count
+    functionPath: "tests/countAssignmentsToGrade.ts",
+    method: "get",
+    role: "teacher"
+  },
+  {
+    apiRoute: "attempts", //student self evaluation
+    functionPath: "students/selfEvaluation/createSelfEvaluationTest.ts",
+    method: "post",
+    role: "student",
+  },
+  {
     apiRoute: "attempts/{attemptId}/details",
     functionPath: "attempts/getAttemptDetails.ts",
     method: "get",
@@ -585,23 +597,5 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
   ...ASSISTANTS_ROUTES,
   ...MATERIALS_ROUTES,
   ...ATTEMPTS_ROUTES,
-  {
-    apiRoute: "tests/assignments-to-grade/count",
-    functionPath: "tests/countAssignmentsToGrade.ts",
-    method: "get",
-    role: "teacher",
-  },
-  {
-    apiRoute: "students/test/execution",
-    functionPath: "students/tests/executeTest.ts",
-    method: "post",
-    role: "student",
-  },
-  {
-    apiRoute: "students/self-evaluation",
-    functionPath: "students/selfEvaluation/createSelfEvaluationTest.ts",
-    method: "post",
-    role: "student",
-  },
 
 ];

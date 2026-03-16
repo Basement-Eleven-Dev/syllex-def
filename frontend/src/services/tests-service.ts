@@ -118,11 +118,9 @@ export class TestsService {
   }
 
   countAssignmentsToGrade() {
-    return this.http.get<{ count: number }>('tests/assignments-to-grade/count');
+    return this.http.get<{ count: number }>('attempts');
   }
-  countPublishedTests() {
-    return this.http.get<{ count: number }>('tests/published/count');
-  }
+
 
   updateClassIds(testId: string, classIds: string[]) {
     return this.http.put<{ success: boolean; test: TestInterface }>(

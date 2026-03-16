@@ -125,7 +125,7 @@ export class StudentTestsService {
     return this.http
       .post<
         { success: boolean } & SelfEvaluationResponse
-      >('students/self-evaluation', payload)
+      >('attempts', payload)
       .pipe(map(({ testId, attemptId }) => ({ testId, attemptId })));
   }
 }
