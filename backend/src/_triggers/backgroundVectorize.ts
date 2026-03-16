@@ -1,5 +1,5 @@
 import { SQSEvent, SQSHandler } from "aws-lambda";
-import { getDefaultDatabase } from "../_helpers/getDatabase";
+import { connectDatabase } from "../_helpers/getDatabase";
 import { ObjectId } from "mongodb";
 import {
   SendMessageCommand,
@@ -8,27 +8,25 @@ import {
 } from "@aws-sdk/client-sqs";
 import { extractTextFromFile } from "../_helpers/documents/extractTextFromFile";
 import {
-  vectorizeDocument,
   VectorizeDocumentParams,
   vectorizeDocumentWithGemini,
 } from "../_helpers/AI/embeddings/vectorizeDocument";
 import { fetchBuffer } from "../_helpers/fetchBuffer";
 import { uploadContentToS3 } from "../_helpers/uploadFileToS3";
+import { Material } from "../models/material.schema";
 
 export const vectorizeMaterialAndUpdateMaterialStatus = async (
   materialId: ObjectId,
 ) => {
-  const db = await getDefaultDatabase();
-  const material = await db
-    .collection("materials")
-    .findOne({ _id: materialId });
+  await connectDatabase();
+  const material = await Material.findById(materialId);
   if (!material) {
     console.error(`Materiale con ID ${materialId} non trovato`);
     return;
   }
-  const documentUrl = material.url;
+  const documentUrl = material.url!;
   const buffer = await fetchBuffer(documentUrl);
-  const ext = material.extension;
+  const ext = material.extension!;
   const textExtracted = await extractTextFromFile(buffer, ext);
   const vectorizeParams: VectorizeDocumentParams = {
     materialId: materialId.toString(),
@@ -38,9 +36,9 @@ export const vectorizeMaterialAndUpdateMaterialStatus = async (
   };
   await vectorizeDocumentWithGemini(vectorizeParams);
   let extractedTextFileUrl = await uploadContentToS3('extracted-text' + material._id.toString() + '.txt', textExtracted, 'text/plain')
-  await db
-    .collection("materials")
-    .updateOne({ _id: materialId }, { $set: { vectorized: true, extractedTextFileUrl: extractedTextFileUrl } });
+  material.vectorized = true;
+  material.extractedTextFileUrl = extractedTextFileUrl;
+  await material.save()
 };
 
 export const startIndexingJob = async (materialId: ObjectId) => {
