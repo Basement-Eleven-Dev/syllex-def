@@ -7,7 +7,7 @@ const testQuestionSchema = new Schema({
 
 const testSchema = new Schema({
     name: { type: String, required: true },
-    availableFrom: { type: Date, required: true },
+    availableFrom: { type: Date },
     availableTo: { type: Date },
     timeLimit: { type: Number },
     password: { type: String },
