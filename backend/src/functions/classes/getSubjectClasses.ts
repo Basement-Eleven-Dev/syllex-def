@@ -1,6 +1,8 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Class } from "../../models/schemas/class.schema";
+import { TeacherAssignment } from "../../models/schemas/teacher-assignment.schema";
 
 
 const getSubjectClasses = async (
@@ -9,24 +11,18 @@ const getSubjectClasses = async (
 ) => {
   const subjectId = context.subjectId!;
   const userId = context.user?._id;
-  const db = await getDefaultDatabase();
-  if (context.user?.role == 'student') return await db
-    .collection("classes")
+  await connectDatabase();
+  if (context.user?.role == 'student') return await Class
     .find({
-      students: { $in: [userId] },
-      subjects: { $in: [subjectId] },
+      students: userId,
+      subjects: subjectId,
     })
-    .toArray();
-  const assignments = await db
-    .collection("teacher_assignments")
+  const assignments = await TeacherAssignment
     .find({ teacherId: userId, subjectId: subjectId })
-    .toArray();
 
   const classIds = assignments.map((assignment) => assignment.classId);
-  const classes = await db
-    .collection("classes")
+  const classes = await Class
     .find({ _id: { $in: classIds } })
-    .toArray();
 
   return classes;
 };

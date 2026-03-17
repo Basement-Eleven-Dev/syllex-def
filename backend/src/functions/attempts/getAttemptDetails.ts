@@ -1,39 +1,38 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import createError from "http-errors";
+import { Attempt } from "../../models/schemas/attempt.schema";
+import { SubjectView } from "../../models/schemas/subject.schema";
 
 const getAttemptDetails = async (request: APIGatewayProxyEvent) => {
   const attemptId = request.pathParameters?.attemptId;
   if (!attemptId) throw createError.BadRequest("ID tentativo mancante");
 
-  const db = await getDefaultDatabase();
+  await connectDatabase();
 
-  const result = await db
-    .collection("attempts")
-    .aggregate([
-      { $match: { _id: new ObjectId(attemptId) } },
-      {
-        $lookup: {
-          from: "tests",
-          localField: "testId",
-          foreignField: "_id",
-          as: "testInfo",
-        },
+  const result = await Attempt.aggregate([
+    { $match: { _id: new mongo.ObjectId(attemptId) } },
+    {
+      $lookup: {
+        from: "tests",
+        localField: "testId",
+        foreignField: "_id",
+        as: "testInfo",
       },
-      { $unwind: "$testInfo" },
-      {
-        $lookup: {
-          from: "users",
-          localField: "studentId",
-          foreignField: "_id",
-          as: "studentInfo",
-        },
+    },
+    { $unwind: "$testInfo" },
+    {
+      $lookup: {
+        from: "users",
+        localField: "studentId",
+        foreignField: "_id",
+        as: "studentInfo",
       },
-      { $unwind: "$studentInfo" },
-    ])
-    .toArray();
+    },
+    { $unwind: "$studentInfo" },
+  ])
 
   const attempt = result[0];
   if (!attempt) throw createError.NotFound("Tentativo non trovato");
@@ -65,17 +64,17 @@ const getAttemptDetails = async (request: APIGatewayProxyEvent) => {
       // Per le APERTE: deduciamo lo stato dal campo status, ma il punteggio è quello del DB
       const threshold = questionMaxScore / 2;
       currentScore = q.score ?? 0;
-      
+
       resultStatus = q.status;
       if (!resultStatus || resultStatus === "dubious") {
-         // Se non c'è stato o è "dubious", rimane dubious a meno che non ci sia un punteggio numerico esplicito
-         if (typeof q.score === 'number') {
-            // Se c'è un punteggio esplicito, deduciamo lo stato
-            if (currentScore >= threshold) resultStatus = "correct";
-            else resultStatus = "wrong";
-         } else {
-            resultStatus = "dubious";
-         }
+        // Se non c'è stato o è "dubious", rimane dubious a meno che non ci sia un punteggio numerico esplicito
+        if (typeof q.score === 'number') {
+          // Se c'è un punteggio esplicito, deduciamo lo stato
+          if (currentScore >= threshold) resultStatus = "correct";
+          else resultStatus = "wrong";
+        } else {
+          resultStatus = "dubious";
+        }
       }
 
       if (resultStatus === "dubious") questionsStats.dubious++;
@@ -126,8 +125,7 @@ const getAttemptDetails = async (request: APIGatewayProxyEvent) => {
   });
 
   // 4. Calcolo medie della classe per questo test
-  const classStats = await db
-    .collection("attempts")
+  const classStats = await Attempt
     .aggregate([
       { $match: { testId: attempt.testId, status: "reviewed" } },
       {
@@ -139,7 +137,6 @@ const getAttemptDetails = async (request: APIGatewayProxyEvent) => {
         },
       },
     ])
-    .toArray();
 
   const averages = classStats[0] || { avgScore: 0, avgTime: 0, count: 0 };
 
@@ -150,7 +147,7 @@ const getAttemptDetails = async (request: APIGatewayProxyEvent) => {
   );
 
   // Recupero nomi argomenti dalla materia
-  const subject = await db.collection("SUBJECTS").findOne({ _id: attempt.testInfo.subjectId });
+  const subject = await SubjectView.findOne({ _id: attempt.testInfo.subjectId });
   const topicsMap = new Map<string, string>();
   if (subject?.topics && Array.isArray(subject.topics)) {
     for (const t of subject.topics) {
@@ -164,7 +161,7 @@ const getAttemptDetails = async (request: APIGatewayProxyEvent) => {
   mappedQuestions.forEach((mq: any) => {
     const topicId = mq.question.topicId?.toString();
     const topicName = (topicId ? topicsMap.get(topicId) : null) || "Generale";
-    
+
     if (!studentTopicPerformance[topicName]) studentTopicPerformance[topicName] = { score: 0, max: 0 };
     studentTopicPerformance[topicName].score += mq.answer.score;
     studentTopicPerformance[topicName].max += mq.answer.maxScore;
@@ -176,21 +173,20 @@ const getAttemptDetails = async (request: APIGatewayProxyEvent) => {
   }));
 
   // 6. Calcolo performance della classe per argomento in questo test
-  const allAttempts = await db.collection("attempts")
+  const allAttempts = await Attempt
     .find({ testId: attempt.testId, status: "reviewed" })
-    .toArray();
 
   const classTopicPerformance: { [key: string]: { score: number; max: number } } = {};
   allAttempts.forEach((att: any) => {
     att.questions.forEach((q: any) => {
       const topicId = q.question.topicId?.toString();
       const topicName = (topicId ? topicsMap.get(topicId) : null) || "Generale";
-      
+
       const testQuestionConfig = attempt.testInfo.questions?.find(
         (tq: any) => (tq.questionId?.toString() || tq.id?.toString()) === q.question._id.toString()
       );
       const qMax = testQuestionConfig?.points ?? 1;
-      
+
       if (!classTopicPerformance[topicName]) classTopicPerformance[topicName] = { score: 0, max: 0 };
       classTopicPerformance[topicName].score += (q.score || 0);
       classTopicPerformance[topicName].max += qMax;

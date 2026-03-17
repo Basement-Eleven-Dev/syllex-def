@@ -1,9 +1,9 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
-import { Report } from "../../models/report";
+import { Types, mongo } from "mongoose";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Report } from "../../models/schemas/report.schema";
 
 const createReport = async (
   request: APIGatewayProxyEvent,
@@ -23,10 +23,9 @@ const createReport = async (
     throw createError.BadRequest("subjectId and comment are required");
   }
 
-  const db = await getDefaultDatabase();
-  const reportsCollection = db.collection<Report>("reports");
+  await connectDatabase();
 
-  const newReport: Omit<Report, "_id"> = {
+  const newReport = {
     teacherId: teacherId,
     subjectId: subjectId,
     comment,
@@ -36,11 +35,11 @@ const createReport = async (
     createdAt: new Date(),
   };
 
-  const result = await reportsCollection.insertOne(newReport as Report);
+  const result = await Report.insertOne(newReport);
 
   return {
     success: true,
-    reportId: result.insertedId,
+    reportId: result._id,
     message: "Report created successfully",
   };
 };

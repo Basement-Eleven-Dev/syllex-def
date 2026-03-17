@@ -1,9 +1,10 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
 import { generateAndUploadAudio } from "../../_helpers/whisper/generateAudio";
 import { getAssistantVoice } from "../../_helpers/AI/getAssistantVoice";
+import { Message } from "../../models/schemas/message.schema";
 
 const listenToMessage = async (
   request: APIGatewayProxyEvent,
@@ -20,10 +21,9 @@ const listenToMessage = async (
     audioUrl = await generateAndUploadAudio(text, messageId);
   }
 
-  const db = await getDefaultDatabase();
-  await db
-    .collection("messages")
-    .updateOne({ _id: new ObjectId(messageId) }, { $set: { audioUrl } });
+  await connectDatabase();
+  await Message
+    .updateOne({ _id: new mongo.ObjectId(messageId) }, { $set: { audioUrl } });
 
   return {
     success: true,

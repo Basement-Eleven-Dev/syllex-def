@@ -7,8 +7,7 @@ const attemptQuestionSchema = new Schema({
     points: { type: Number, required: true },
     status: {
         type: String,
-        enum: ['correct', 'incorrect', 'partial', 'pending'],
-        default: 'pending'
+        enum: ['correct', 'incorrect', 'partial', 'pending']
     },
     answer: { type: String },
     teacherComment: { type: String },
@@ -38,5 +37,6 @@ const attemptSchema = new Schema({
 });
 
 type Attempt = InferSchemaType<typeof attemptSchema>;
+export type AttemptQuestion = InferSchemaType<typeof attemptQuestionSchema>;
 
 export const Attempt = model<Attempt>('Attempt', attemptSchema, 'attempts');

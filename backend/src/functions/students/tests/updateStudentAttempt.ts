@@ -1,10 +1,10 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
-import { Attempt } from "../../../models/attempt";
+import { connectDatabase } from "../../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
 import { sanitizeAttemptQuestions } from "./_helpers";
+import { Attempt } from "../../../models/schemas/attempt.schema";
 
 const updateStudentAttempt = async (
   request: APIGatewayProxyEvent,
@@ -22,13 +22,12 @@ const updateStudentAttempt = async (
   }
 
   const body = JSON.parse(request.body || "{}");
-  const db = await getDefaultDatabase();
-  const attemptsCollection = db.collection<Attempt>("attempts");
+  await connectDatabase();
 
   // Verify ownership and status
-  const existing = await attemptsCollection.findOne({
-    _id: new ObjectId(attemptId),
-    studentId: new ObjectId(studentId),
+  const existing = await Attempt.findOne({
+    _id: new mongo.ObjectId(attemptId),
+    studentId: new mongo.ObjectId(studentId),
   });
 
   if (!existing) {
@@ -52,8 +51,8 @@ const updateStudentAttempt = async (
     updateFields.timeSpent = body.timeSpent;
   }
 
-  const result = await attemptsCollection.findOneAndUpdate(
-    { _id: new ObjectId(attemptId), studentId: new ObjectId(studentId) },
+  const result = await Attempt.findOneAndUpdate(
+    { _id: new mongo.ObjectId(attemptId), studentId: new mongo.ObjectId(studentId) },
     { $set: updateFields },
     { returnDocument: "after" },
   );

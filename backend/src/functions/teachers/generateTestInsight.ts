@@ -1,9 +1,11 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
 import { getGeminiClient } from "../../_helpers/AI/getClient";
+import { Test } from "../../models/schemas/test.schema";
+import { Attempt } from "../../models/schemas/attempt.schema";
 
 const generateTestInsight = async (
   request: APIGatewayProxyEvent,
@@ -11,21 +13,21 @@ const generateTestInsight = async (
 ) => {
   const testId = request.pathParameters?.testId;
 
-  if (!testId || !ObjectId.isValid(testId)) {
+  if (!testId || !mongo.ObjectId.isValid(testId)) {
     throw createError.BadRequest("Invalid or missing testId");
   }
 
-  const db = await getDefaultDatabase();
-  const testObjectId = new ObjectId(testId);
+  await connectDatabase();
+  const testObjectId = new mongo.ObjectId(testId);
 
   // 1. Get Test Info
-  const test = await db.collection("tests").findOne({ _id: testObjectId });
+  const test = await Test.findOne({ _id: testObjectId });
   if (!test) {
     throw createError.NotFound("Test not trovato");
   }
 
   // 2. Get All Reviewed Attempts with student details and questions
-  const attempts = await db.collection("attempts").aggregate([
+  const attempts = await Attempt.aggregate([
     { $match: { testId: testObjectId, status: 'reviewed' } },
     {
       $lookup: {
@@ -36,7 +38,7 @@ const generateTestInsight = async (
       }
     },
     { $unwind: "$studentData" }
-  ]).toArray();
+  ])
 
   if (attempts.length === 0) {
     return { insight: "Non ci sono ancora abbastanza tentativi corretti per generare un'analisi della classe." };
@@ -56,7 +58,7 @@ const generateTestInsight = async (
       if (!topicStats[topic]) topicStats[topic] = { total: 0, correct: 0 };
       topicStats[topic].total++;
       if (q.status === 'correct' || (q.score && q.score > 0)) { // Simple heuristic for topic performance
-         topicStats[topic].correct++;
+        topicStats[topic].correct++;
       }
     });
   });

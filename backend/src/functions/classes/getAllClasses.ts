@@ -1,8 +1,9 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { Subject } from "../../models/subject";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { Class } from "../../models/schemas/class.schema";
+import { TeacherAssignment } from "../../models/schemas/teacher-assignment.schema";
 
 
 const getAllClasses = async (
@@ -10,30 +11,24 @@ const getAllClasses = async (
   context: Context,
 ) => {
   const userId = context.user?._id;
-  const db = await getDefaultDatabase();
+  await connectDatabase();
   let assignmentMatch: any = { teacherId: userId };
   if (context.user?.role == 'student') {
-    const studentClasses = await db
-      .collection("classes")
-      .find({ students: { $in: [userId] } })
-      .toArray();
+    const studentClasses = await Class
+      .find({ students: userId })
 
     const classIds = studentClasses.map((c) => c._id);
     assignmentMatch = { classId: { $in: classIds } }
   }
 
-  const assignments = await db
-    .collection("teacher_assignments")
+  const assignments = await TeacherAssignment
     .find(assignmentMatch)
-    .toArray();
 
   const classIds = assignments.map((assignment) => assignment.classId);
-  const classes = await db
-    .collection("classes")
+  const classes = await Class
     .find({ _id: { $in: classIds } })
-    .toArray();
 
-  const findClass = (classId: ObjectId) => {
+  const findClass = (classId: Types.ObjectId) => {
     return classes.find((cls) => cls._id.equals(classId));
   };
 

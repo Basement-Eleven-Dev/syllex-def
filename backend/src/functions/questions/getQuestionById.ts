@@ -1,8 +1,8 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Question } from "../../models/schemas/question.schema";
 
 const getQuestionById = async (
   request: APIGatewayProxyEvent,
@@ -14,12 +14,9 @@ const getQuestionById = async (
     throw createError.BadRequest("questionId is required");
   }
 
-  const db = await getDefaultDatabase();
-  const questionsCollection = db.collection("questions");
+  await connectDatabase();
 
-  const question = await questionsCollection.findOne({
-    _id: new ObjectId(questionId),
-  });
+  const question = await Question.findById(questionId);
 
   if (!question) {
     throw createError.NotFound("Question not found");

@@ -1,10 +1,12 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { ObjectId } from "mongodb";
+import { Types, mongo } from "mongoose";
 import createError from "http-errors";
 import { sendEmail } from "../../_helpers/email/sendEmail";
 import { testCorrectedEmail } from "../../_helpers/email/emailTemplates";
+import { Attempt } from "../../models/schemas/attempt.schema";
+import { Subject } from "../../models/schemas/subject.schema";
+import { connectDatabase } from "../../_helpers/getDatabase";
 
 const correctAttempt = async (request: APIGatewayProxyEvent, context: Context) => {
   const attemptId = request.pathParameters?.attemptId;
@@ -12,7 +14,7 @@ const correctAttempt = async (request: APIGatewayProxyEvent, context: Context) =
 
   if (!attemptId) throw createError.BadRequest("ID tentativo mancante");
 
-  const db = await getDefaultDatabase();
+  await connectDatabase();
 
   // Creiamo l'oggetto per l'aggiornamento dinamico
   // 1. Aggiorniamo i campi di primo livello (status e score totale)
@@ -39,14 +41,13 @@ const correctAttempt = async (request: APIGatewayProxyEvent, context: Context) =
 
     // Definiamo a quale domanda corrisponde questo identificatore
     const filter: any = {};
-    filter[`${identifier}.question._id`] = new ObjectId(q.questionId);
+    filter[`${identifier}.question._id`] = new mongo.ObjectId(q.questionId);
     arrayFilters.push(filter);
   });
 
   // 3. Eseguiamo un'unica operazione di update senza aver mai fatto una "find"
-  const result = await db
-    .collection("attempts")
-    .updateOne({ _id: new ObjectId(attemptId) }, updateQuery, { arrayFilters });
+  const result = await Attempt
+    .updateOne({ _id: new mongo.ObjectId(attemptId) }, updateQuery, { arrayFilters });
 
   if (result.matchedCount === 0) {
     throw createError.NotFound("Tentativo non trovato");
@@ -58,13 +59,13 @@ const correctAttempt = async (request: APIGatewayProxyEvent, context: Context) =
     console.log("[Notify] Controllo preferenze docente:", teacher?.notificationSettings);
     if (teacher?.notificationSettings?.testCorrected) {
       console.log("[Notify] Preferenza attiva, recupero dettagli per attempt:", attemptId);
-      const attempt = await db.collection("attempts").aggregate([
-        { $match: { _id: new ObjectId(attemptId) } },
+      const attempt = await Attempt.aggregate([
+        { $match: { _id: new mongo.ObjectId(attemptId) } },
         { $lookup: { from: "tests", localField: "testId", foreignField: "_id", as: "test" } },
         { $unwind: "$test" },
         { $lookup: { from: "users", localField: "studentId", foreignField: "_id", as: "student" } },
         { $unwind: "$student" },
-      ]).toArray();
+      ]);
 
       console.log(`[Notify] Risultato aggregate: ${attempt.length} documenti trovati`);
       if (attempt[0]) {
@@ -73,7 +74,7 @@ const correctAttempt = async (request: APIGatewayProxyEvent, context: Context) =
         console.log(`[Notify] Email studente trovata: ${studentEmail}`);
 
         // Recupera nome materia
-        const subjectDoc = await db.collection("subjects").findOne({ _id: att.test.subjectId });
+        const subjectDoc = await Subject.findOne({ _id: att.test.subjectId });
         console.log(`[Notify] Materia trovata: ${subjectDoc?.name}`);
         const subjectName = subjectDoc?.name || "Materia";
 

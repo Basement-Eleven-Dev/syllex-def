@@ -1,16 +1,14 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import createHttpError from "http-errors";
-import { ObjectId } from "mongodb";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { MaterialInterface } from "../../models/material";
+import { Types, mongo } from "mongoose";
+import { connectDatabase } from "../../_helpers/getDatabase";
 import { z } from "zod";
 import { askStructuredLLM } from "../../_helpers/AI/simpleCompletion";
 
-import { Question } from "../../models/question";
-import { Topic } from "../../models/topic";
-
-import { QuestionDifficulty } from "../../models/question";
+import { Topic } from "../../models/schemas/topic.schema";
+import { Material } from "../../models/schemas/material.schema";
+import { Question } from "../../models/schemas/question.schema";
 
 //API TYPES
 const questionTypes = ["open", "true-false", "multiple"] as const;
@@ -27,7 +25,12 @@ export type AIGenQuestionInput = {
   language?: string;
   difficulty?: QuestionDifficulty;
 };
-
+export type QuestionDifficulty =
+  | "elementary"
+  | "easy"
+  | "medium"
+  | "hard"
+  | "very_hard";
 //LLM STRUCTURES
 const TrueFalseQuestionStructure = z.object({
   text: z.string(),
@@ -69,11 +72,11 @@ const QUESTION_GENERATION_MODEL_TEMPERATURE = 1;
 export const generateTrueFalseQuestion = async (
   context: Context,
   difficulty: string,
-  materialObjects: MaterialInterface[],
+  materialObjects: Material[],
   topic: Topic,
   language: string = "it",
   instructions: string = "",
-): Promise<Question> => {
+): Promise<Partial<Question>> => {
   const INSTRUCTIONS = `Create a ${difficulty} difficulty true/false quiz question about the topic "${topic.name}" based on these documents.
    ${instructions}`;
 
@@ -85,7 +88,7 @@ export const generateTrueFalseQuestion = async (
     TrueFalseQuestionStructure,
     QUESTION_GENERATION_MODEL_TEMPERATURE,
   );
-  const question: Question = {
+  const question: Partial<Question> = {
     type: "vero falso",
     text: result.text,
     explanation: result.explanation,
@@ -101,11 +104,11 @@ export const generateTrueFalseQuestion = async (
 export const generateOpenQuestion = async (
   context: Context,
   difficulty: string,
-  materialObjects: MaterialInterface[],
+  materialObjects: Material[],
   topic: Topic,
   language: string = "it",
   instructions: string = "",
-): Promise<Question> => {
+): Promise<Partial<Question>> => {
   const INSTRUCTIONS = `Create a ${difficulty} difficulty quiz question about the topic "${topic.name}" based on these documents. The quiz question must be open-answer (no choices included), and you must include the correct answer. ${instructions}`;
   const PROMPT = `${INSTRUCTIONS}
     ${getGuardrail(language)}`;
@@ -116,7 +119,7 @@ export const generateOpenQuestion = async (
     OpenQuestionStructure,
     QUESTION_GENERATION_MODEL_TEMPERATURE,
   );
-  const question: Question = {
+  const question: Partial<Question> = {
     type: "risposta aperta",
     text: result.text,
     explanation: result.correctAnswer,
@@ -131,12 +134,12 @@ export const generateOpenQuestion = async (
 export const generateMultipleChoiceQuestion = async (
   context: Context,
   difficulty: string,
-  materialObjects: MaterialInterface[],
+  materialObjects: Material[],
   topic: Topic,
   language: string = "it",
   numberOfAlternatives: number = 5,
   instructions: string = "",
-): Promise<Question> => {
+): Promise<Partial<Question>> => {
   const INSTRUCTIONS = `Create a ${difficulty} difficulty quiz question (multiple choice, only one is correct) about the topic "${topic.name}" based on these documents.
     The quiz question must contain ${numberOfAlternatives} alternatives to choose from  and you need to specify which one is correct. Avoid labels A/B/C/D/E/... in the text of the alternatives. ${instructions}`;
 
@@ -148,11 +151,11 @@ export const generateMultipleChoiceQuestion = async (
     MultipleChoiceQuestionStructure,
     QUESTION_GENERATION_MODEL_TEMPERATURE,
   );
-  const question: Question = {
+  const question: Partial<Question> = {
     type: "scelta multipla",
     text: result.text,
     explanation: result.explanation,
-    options: result.options,
+    options: result.options as Question['options'],
     policy: "private",
     aiGenerated: true,
     topicId: topic._id!,
@@ -182,23 +185,20 @@ const createAIGenQuestion = async (
       `type field is required. Accepted values: ${questionTypes.join(", ")}. You passed "${type}"`,
     );
   if (!topicId) throw createHttpError.BadRequest(`type topicId is required`);
-  let materialOIds = (materialIds || []).map((el) => new ObjectId(el));
-  const db = await getDefaultDatabase();
+  let materialOIds = (materialIds || []).map((el) => new mongo.ObjectId(el));
+  await connectDatabase();
 
-  const materialCollection = db.collection<MaterialInterface>("materials");
-  const materialObjects: MaterialInterface[] = (await materialCollection
+  const materialObjects = await Material
     .find({
       _id: { $in: materialOIds },
       subjectId: context.subjectId,
       aiGenerated: { $ne: true },
     })
-    .toArray()) as MaterialInterface[]; //forse non serve
 
   //load topic
-  const topicCollection = db.collection("topics");
-  const topic: Topic | null = (await topicCollection.findOne({
-    _id: new ObjectId(topicId),
-  })) as Topic | null;
+  const topic = (await Topic.findOne({
+    _id: new mongo.ObjectId(topicId),
+  }))
   if (!topic)
     throw createHttpError.BadRequest(`topic ${topicId} doesn't exist`);
 
@@ -207,6 +207,15 @@ const createAIGenQuestion = async (
   const question =
     type == "open"
       ? await generateOpenQuestion(
+        context,
+        difficultyPrompt,
+        materialObjects,
+        topic,
+        language,
+        instructions,
+      )
+      : type == "true-false"
+        ? await generateTrueFalseQuestion(
           context,
           difficultyPrompt,
           materialObjects,
@@ -214,28 +223,16 @@ const createAIGenQuestion = async (
           language,
           instructions,
         )
-      : type == "true-false"
-        ? await generateTrueFalseQuestion(
-            context,
-            difficultyPrompt,
-            materialObjects,
-            topic,
-            language,
-            instructions,
-          )
         : await generateMultipleChoiceQuestion(
-            context,
-            difficultyPrompt,
-            materialObjects,
-            topic,
-            language,
-            numberOfAlternatives || 5,
-            instructions,
-          );
+          context,
+          difficultyPrompt,
+          materialObjects,
+          topic,
+          language,
+          numberOfAlternatives || 5,
+          instructions,
+        );
 
-  //store question - don't store yet
-  /* const questionsCollection = db.collection("questions");
-  question._id = (await questionsCollection.insertOne(question)).insertedId; */
   return { question };
 };
 

@@ -8,7 +8,7 @@ import {
   AdminSetUserPasswordCommand,
   AdminAddUserToGroupCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
-import { Db, MongoClient, ObjectId } from "mongodb";
+import { mongo } from "mongoose";
 import { DB_NAME } from "../src/env";
 
 config();
@@ -19,23 +19,23 @@ const cognitoPoolId = "eu-south-1_IdnpEkSac";
 const MASTER_ADMIN_EMAIL = "admin@syllex.com";
 
 export interface Organization {
-  _id?: ObjectId;
+  _id?: mongo.ObjectId;
   name: string;
-  administrators: ObjectId[];
+  administrators: mongo.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
   courses?: string[];
 }
 
 export const createAndLinkUser = async (
-  db: Db,
+  db: mongo.Db,
   userData: {
     email: string;
     password?: string;
     firstName: string;
     lastName: string;
     role: "admin" | "teacher" | "student";
-    organizationIds: ObjectId[]; // Ora è un array
+    organizationIds: mongo.ObjectId[]; // Ora è un array
   },
 ) => {
   const { email, password, firstName, lastName, role, organizationIds } =
@@ -107,7 +107,7 @@ const start = async () => {
   if (!mongoConnectionString)
     throw new Error("Stringa di connessione a Mongo non trovata.");
 
-  const clientMongo = new MongoClient(mongoConnectionString);
+  const clientMongo = new mongo.MongoClient(mongoConnectionString);
   await clientMongo.connect();
   const db = clientMongo.db(DB_NAME);
   const usersCollection = db.collection("users");
@@ -145,7 +145,7 @@ const start = async () => {
           name: "orgId",
           type: "list",
           message: "Seleziona l'Organizzazione a cui appartiene l'utente:",
-          choices: allOrgs.map((org) => ({
+          choices: allOrgs.map((org: any) => ({
             name: org.name,
             value: org._id.toString(),
           })),
@@ -172,12 +172,12 @@ const start = async () => {
       firstName,
       lastName,
       role,
-      organizationIds: [new ObjectId(orgId)],
+      organizationIds: [new mongo.ObjectId(orgId)],
     });
 
     if (role === "admin") {
       await orgsCollection.updateOne(
-        { _id: new ObjectId(orgId) },
+        { _id: new mongo.ObjectId(orgId) },
         { $addToSet: { administrators: newUser._id } },
       );
     }

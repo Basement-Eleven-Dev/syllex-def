@@ -1,18 +1,18 @@
-import { ObjectId } from "mongodb";
-import { getDefaultDatabase } from "../getDatabase";
+import { Types } from "mongoose";
+import { connectDatabase } from "../getDatabase";
+import { Assistant } from "../../models/schemas/assistant.schema";
 
 export async function associateFilesToAssistant(
-  assistantId: string,
-  fileIds: string[]
+  assistantId: Types.ObjectId,
+  fileIds: Types.ObjectId[]
 ) {
-  const db = await getDefaultDatabase();
-  const collection = db.collection("assistants");
+  await connectDatabase();
 
-  await collection.updateOne(
-    { _id: new ObjectId(assistantId) },
+  await Assistant.updateOne(
+    { _id: assistantId },
     {
       $addToSet: {
-        associatedFileIds: { $each: fileIds.map(id => new ObjectId(id)) }
+        associatedFileIds: { $each: fileIds }
       }
     }
   );

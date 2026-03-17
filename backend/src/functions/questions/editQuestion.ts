@@ -1,8 +1,9 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types } from "mongoose";
+import { Question } from "../../models/schemas/question.schema";
 
 const editQuestion = async (
   request: APIGatewayProxyEvent,
@@ -16,14 +17,13 @@ const editQuestion = async (
 
   const questionData = JSON.parse(request.body || "{}");
 
-  const db = await getDefaultDatabase();
-  const questionsCollection = db.collection("questions");
+  await connectDatabase();
 
   // Verifica che la domanda esista e appartenga al teacher
-  const existingQuestion = await questionsCollection.findOne({
-    _id: new ObjectId(questionId),
+  const existingQuestion = await Question.findOne({
+    _id: questionId,
     teacherId: context.user?._id,
-  });
+  } as any);
 
   if (!existingQuestion) {
     throw createError.NotFound("Question not found or not authorized");
@@ -40,7 +40,7 @@ const editQuestion = async (
   };
 
   if (questionData.topicId) {
-    updateData.topicId = new ObjectId(questionData.topicId);
+    updateData.topicId = new Types.ObjectId(questionData.topicId);
   }
 
   if (context.subjectId) {
@@ -58,15 +58,13 @@ const editQuestion = async (
   }
 
   // Update della domanda
-  await questionsCollection.updateOne(
-    { _id: new ObjectId(questionId) },
+  await Question.updateOne(
+    { _id: questionId },
     { $set: updateData },
   );
 
   // Ritorna la domanda aggiornata
-  const updatedQuestion = await questionsCollection.findOne({
-    _id: new ObjectId(questionId),
-  });
+  const updatedQuestion = await Question.findById(questionId);
 
   return {
     question: updatedQuestion,

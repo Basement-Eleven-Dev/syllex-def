@@ -1,8 +1,9 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { Types, mongo } from "mongoose";
+import { connectDatabase } from "../../../_helpers/getDatabase";
+import { Class } from "../../../models/schemas/class.schema";
 
 const createClassHandler = async (
   request: APIGatewayProxyEvent,
@@ -14,11 +15,11 @@ const createClassHandler = async (
   const { name, year } = JSON.parse(request.body || "{}");
   if (!name) throw createError.BadRequest("Class name is required");
 
-  const db = await getDefaultDatabase();
-  
-  const result = await db.collection("classes").insertOne({
+  await connectDatabase();
+
+  const result = await Class.insertOne({
     name,
-    organizationId: new ObjectId(orgId),
+    organizationId: new mongo.ObjectId(orgId),
     year: year || new Date().getFullYear(),
     students: [],
     createdAt: new Date(),
@@ -27,7 +28,7 @@ const createClassHandler = async (
 
   return {
     success: true,
-    classId: result.insertedId.toString(),
+    classId: result._id.toString(),
     message: "Classe creata con successo"
   };
 };

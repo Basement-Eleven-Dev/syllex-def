@@ -1,14 +1,14 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Attempt } from "../../models/schemas/attempt.schema";
 
 const countAssignmentsToGrade = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
-  const db = await getDefaultDatabase();
+  await connectDatabase();
   const { onlyCount = 'true', excludeStatus = 'reviewed' } = request.queryStringParameters || {};
-  const attemptsCollection = db.collection("attempts");
   const subjectId = context.subjectId;
 
   // Costruisci il filtro
@@ -24,13 +24,13 @@ const countAssignmentsToGrade = async (
   if (JSON.parse(onlyCount)) {
 
     // Conta i documenti
-    const count = await attemptsCollection.countDocuments(filter);
+    const count = await Attempt.countDocuments(filter);
 
     return {
       count: count,
     };
   }
-  else return await attemptsCollection.find(filter).toArray();
+  else return await Attempt.find(filter);
 };
 
 export const handler = lambdaRequest(countAssignmentsToGrade);

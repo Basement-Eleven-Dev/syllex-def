@@ -1,7 +1,8 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { Types, mongo } from "mongoose";
+import { Material } from "../../models/schemas/material.schema";
+import { connectDatabase } from "../../_helpers/getDatabase";
 
 const getMaterialById = async (
   request: APIGatewayProxyEvent,
@@ -16,12 +17,11 @@ const getMaterialById = async (
   if (!materialId) {
     return { success: false, message: "materialId is required" };
   }
+  await connectDatabase();
 
-  const db = await getDefaultDatabase();
-
-  const material = await db.collection("materials").findOne({
-    _id: new ObjectId(materialId),
-  });
+  const material = await Material.findOne({
+    _id: new mongo.ObjectId(materialId) as any,
+  })
 
   if (!material) {
     return { success: false, message: "Material not found or not accessible" };

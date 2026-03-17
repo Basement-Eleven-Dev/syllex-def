@@ -1,18 +1,14 @@
-import { ObjectId } from "mongodb";
-import { getDefaultDatabase } from "../../getDatabase";
-import { _ } from "inquirer/dist/commonjs/ui/prompt";
+import { connectDatabase } from "../../getDatabase";
+import { Message } from "../../../models/schemas/message.schema";
+import { Types } from "mongoose";
 
 export async function buildConversationHistory(
-  subjectId: ObjectId,
-  userId: ObjectId,
+  subjectId: Types.ObjectId,
+  userId: Types.ObjectId,
   keepForDashboard: boolean = false,
 ) {
-  const db = await getDefaultDatabase();
-  const messages = await db
-    .collection("messages")
-    .find({ subjectId: subjectId, userId: userId })
-    .sort({ timestamp: 1 })
-    .toArray();
+  await connectDatabase();
+  const messages = await Message.find({ subjectId: subjectId, userId: userId }).sort({ timestamp: 1 })
 
   if (keepForDashboard) {
     return messages.map((msg) => ({

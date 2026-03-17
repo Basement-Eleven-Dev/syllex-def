@@ -1,7 +1,9 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Assistant } from "../../models/schemas/assistant.schema";
+import { SubjectView } from "../../models/schemas/subject.schema";
 
 interface GetAssistantRequest {
   agent: {
@@ -24,12 +26,10 @@ const getAssistant = async (
     throw createError(400, "subjectId è richiesto");
   }
 
-  const db = await getDefaultDatabase();
-  const subjectsCollection = db.collection("SUBJECTS");
-  const assistantsCollection = db.collection("assistants");
+  const db = await connectDatabase();
 
   // Trova la materia per identificare il proprietario (teacherId)
-  const subject = await subjectsCollection.findOne({ _id: subjectId });
+  const subject = await SubjectView.findOne({ _id: subjectId });
 
   if (!subject) {
     return {
@@ -40,7 +40,7 @@ const getAssistant = async (
   }
 
   // Cerca l'assistente associato a questa materia e a quel docente
-  const assistant = await assistantsCollection.findOne({
+  const assistant = await Assistant.findOne({
     subjectId: subjectId,
     teacherId: subject.teacherId,
   });

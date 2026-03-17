@@ -1,8 +1,9 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { Assistant } from "../../models/schemas/assistant.schema";
 
 const updateAssistant = async (
   request: APIGatewayProxyEvent,
@@ -18,8 +19,7 @@ const updateAssistant = async (
     throw createError.BadRequest('Header subject-id richiesto')
   }
 
-  const db = await getDefaultDatabase();
-  const assistantsCollection = db.collection("assistants");
+  await connectDatabase();
 
   const updateData: any = {
     updatedAt: new Date(),
@@ -29,13 +29,10 @@ const updateAssistant = async (
   if (agent.tone) updateData.tone = agent.tone;
   if (agent.voice) updateData.voice = agent.voice;
 
-  const result = await assistantsCollection.updateOne(
+  const result = await Assistant.updateOne(
     {
       subjectId: subjectId,
-      teacherId:
-        teacherId instanceof ObjectId
-          ? teacherId
-          : new ObjectId((teacherId as unknown as string) || ""),
+      teacherId: teacherId
     },
     { $set: updateData },
   );

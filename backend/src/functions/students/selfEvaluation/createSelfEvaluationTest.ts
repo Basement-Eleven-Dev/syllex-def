@@ -1,9 +1,12 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
-import { ObjectId } from "mongodb";
+import { Types, mongo } from "mongoose";
 import { lambdaRequest } from "../../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../../_helpers/getDatabase";
+import { connectDatabase } from "../../../_helpers/getDatabase";
 import { sanitizeAttemptQuestions } from "../tests/_helpers";
+import { Question } from "../../../models/schemas/question.schema";
+import { Test } from "../../../models/schemas/test.schema";
+import { Attempt } from "../../../models/schemas/attempt.schema";
 
 const createSelfEvaluationTest = async (
   request: APIGatewayProxyEvent,
@@ -25,20 +28,18 @@ const createSelfEvaluationTest = async (
     throw createError.BadRequest("subjectId e topicIds sono obbligatori");
   }
 
-  const db = await getDefaultDatabase();
+  await connectDatabase();
 
   // 1. Recupero domande filtrate per materia, argomenti e tipologie
-  const topicObjectIds = topicIds.map((id: string) => new ObjectId(id));
-  const subjectObjectId = new ObjectId(subjectId);
+  const topicObjectIds = topicIds.map((id: string) => new mongo.ObjectId(id));
+  const subjectObjectId = new mongo.ObjectId(subjectId);
 
-  const questions = await db
-    .collection("questions")
+  const questions = await Question
     .find({
       subjectId: subjectObjectId,
       topicId: { $in: topicObjectIds },
       ...(excludedTypes.length > 0 && { type: { $nin: excludedTypes } }),
     })
-    .toArray();
 
   if (questions.length === 0) {
     throw createError.UnprocessableEntity(
@@ -53,11 +54,11 @@ const createSelfEvaluationTest = async (
   const now = new Date();
 
   // 3. Creazione del test di auto-valutazione
-  const testResult = await db.collection("tests").insertOne({
+  const testResult = await Test.insertOne({
     name: String(name).trim() || "Auto-valutazione",
     source: "self-evaluation",
-    studentId: new ObjectId(studentId),
-    teacherId: new ObjectId(studentId), // required field — student acts as owner
+    studentId: new mongo.ObjectId(studentId),
+    teacherId: new mongo.ObjectId(studentId), // required field — student acts as owner
     subjectId: subjectObjectId,
     classIds: [],
     questions: selected.map((q) => ({ questionId: q._id, points: 1 })),
@@ -69,33 +70,31 @@ const createSelfEvaluationTest = async (
     updatedAt: now,
   });
 
-  const testId = testResult.insertedId;
+  const testId = testResult._id;
 
   // 4. Creazione dell'attempt direttamente in-progress con le domande embedded
   const attemptQuestions = sanitizeAttemptQuestions(
     selected.map((q) => ({ question: q, answer: null, points: 1 })),
   );
 
-  const attemptResult = await db.collection("attempts").insertOne({
+  const attemptResult = await Attempt.insertOne({
     testId,
     source: "self-evaluation",
     subjectId: subjectObjectId,
-    teacherId: new ObjectId(studentId),
-    studentId: new ObjectId(studentId),
+    teacherId: new mongo.ObjectId(studentId),
+    studentId: new mongo.ObjectId(studentId),
     status: "in-progress",
     startedAt: now,
-    questions: attemptQuestions,
     maxScore: selected.length,
-    score: null,
-    fitTestScore: null,
-    createdAt: now,
-    updatedAt: now,
+    score: undefined,
+    fitTestScore: undefined,
+    questions: attemptQuestions,
   });
 
   return {
     success: true,
     testId: testId.toString(),
-    attemptId: attemptResult.insertedId.toString(),
+    attemptId: attemptResult._id.toString(),
   };
 };
 

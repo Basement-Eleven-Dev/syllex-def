@@ -1,17 +1,17 @@
 import { getGeminiClient } from "./getClient";
 import { ZodType } from "zod";
-import { MaterialInterface } from "../../models/material";
 import { Part } from "@google/genai";
 import { fetchBuffer } from "../fetchBuffer";
+import { Material } from "../../models/schemas/material.schema";
 
 const askStrucuredGemini = async <T>(
   prompt: string,
-  materials: MaterialInterface[] = [],
+  materials: Material[] = [],
   model: string = "gemini-3-flash-preview",
   structure: ZodType<T>,
   temperature?: number,
 ): Promise<T> => {
-  const getMaterialPart = async (m: MaterialInterface): Promise<Part> => {
+  const getMaterialPart = async (m: Material): Promise<Part> => {
     const res = await fetch(m.url!);
     const pdfArrayBuffer = await res.arrayBuffer();
     const contentType = res.headers.get("content-type");
@@ -69,7 +69,7 @@ const askStrucuredGemini = async <T>(
 
 export const askStructuredLLM = async <T>(
   prompt: string,
-  materials: MaterialInterface[] = [],
+  materials: Material[] = [],
   structure: ZodType<T>,
   temperature?: number,
 ): Promise<T> => {

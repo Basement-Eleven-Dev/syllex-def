@@ -15,13 +15,13 @@ const materialSchema = new Schema({
     aiGenerated: { type: Boolean },
     vectorized: { type: Boolean },
     extractedTextFileUrl: { type: String },
-    generatedFrom: { type: Schema.Types.ObjectId },
+    generatedFrom: { type: [Schema.Types.ObjectId] },
     byteSize: { type: Number },
     content: { type: [Schema.Types.ObjectId] }
 }, {
     timestamps: true
 })
 
-type Material = InferSchemaType<typeof materialSchema>;
+export type Material = InferSchemaType<typeof materialSchema>;
 
 export const Material = model<Material>('Material', materialSchema, 'materials');

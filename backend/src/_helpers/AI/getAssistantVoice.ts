@@ -1,13 +1,12 @@
-import { ObjectId } from "mongodb";
-import { getDefaultDatabase } from "../getDatabase";
+import { connectDatabase } from "../getDatabase";
+import { Assistant } from "../../models/schemas/assistant.schema";
+import { Types } from "mongoose";
 
 export async function getAssistantVoice(
-  subjectId: ObjectId,
+  subjectId: Types.ObjectId,
 ): Promise<string | undefined> {
-  const db = await getDefaultDatabase();
-  const assistant = await db
-    .collection("assistants")
-    .findOne({ subjectId: subjectId });
+  await connectDatabase();
+  const assistant = await Assistant.findOne({ subjectId: subjectId });
   if (!assistant) {
     return undefined;
   }
@@ -15,7 +14,7 @@ export async function getAssistantVoice(
   return getVoiceName(assistant.voice);
 }
 
-const getVoiceName = (voiceId: string) => {
+const getVoiceName = (voiceId?: string | null) => {
   if (voiceId === "neutral") return "alloy"; // Neutra e bilanciata
   if (voiceId === "energetic") return "nova"; // Energica e chiara (La migliore per l'italiano)
   if (voiceId === "clear") return "shimmer"; // Chiara e cristallina (Ottima alternativa a 'clara')

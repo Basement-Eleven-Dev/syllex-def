@@ -1,8 +1,9 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { Types, mongo } from "mongoose";
+import { Material } from "../../models/schemas/material.schema";
+import { connectDatabase } from "../../_helpers/getDatabase";
 
 const updateMaterialClasses = async (
   request: APIGatewayProxyEvent,
@@ -19,14 +20,12 @@ const updateMaterialClasses = async (
   if (!Array.isArray(body.classIds)) {
     throw createError.BadRequest("classIds must be an array");
   }
-
-  const db = await getDefaultDatabase();
-  const materialsCollection = db.collection("materials");
+  await connectDatabase();
 
   // Verify material exists and belongs to the teacher
-  const existingMaterial = await materialsCollection.findOne({
-    _id: new ObjectId(materialId),
-    teacherId: context.user?._id,
+  const existingMaterial = await Material.findOne({
+    _id: new mongo.ObjectId(materialId) as any,
+    teacherId: context.user?._id as any,
   });
 
   if (!existingMaterial) {
@@ -34,14 +33,14 @@ const updateMaterialClasses = async (
   }
 
   // Update classIds
-  const result = await materialsCollection.updateOne(
-    { _id: new ObjectId(materialId) },
+  const result = await Material.updateOne(
+    { _id: new mongo.ObjectId(materialId) as any },
     {
       $set: {
-        classIds: body.classIds.map((id: string) => new ObjectId(id)),
+        classIds: body.classIds.map((id: string) => new mongo.ObjectId(id)),
         updatedAt: new Date(),
       },
-    },
+    }
   );
 
   if (result.modifiedCount === 0) {
@@ -49,8 +48,8 @@ const updateMaterialClasses = async (
   }
 
   // Return updated material
-  const updatedMaterial = await materialsCollection.findOne({
-    _id: new ObjectId(materialId),
+  const updatedMaterial = await Material.findOne({
+    _id: new mongo.ObjectId(materialId) as any,
   });
 
   return {

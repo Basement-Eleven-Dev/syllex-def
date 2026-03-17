@@ -1,17 +1,17 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { Subject } from "../../models/subject";
-import { Collection, Db, ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { mongo, Types } from 'mongoose'
+import { Class } from "../../models/schemas/class.schema";
+import { TeacherAssignment } from "../../models/schemas/teacher-assignment.schema";
+import { Subject, SubjectView } from "../../models/schemas/subject.schema";
 
-const getStudentSubjects = async (db: Db, userId: ObjectId) => {
-
-  const classes = await db
-    .collection("classes")
+const getStudentSubjects = async (userId: Types.ObjectId) => {
+  await connectDatabase();
+  const classes = await Class
     .find({
       students: { $in: [userId] },
     })
-    .toArray();
 
   if (classes.length === 0) {
     return { success: true, subjects: [] };
@@ -20,12 +20,10 @@ const getStudentSubjects = async (db: Db, userId: ObjectId) => {
   const classIds = classes.map((c) => c._id);
 
   // 2. Trova le materie associate a queste classi via teacher_assignments
-  const assignments = await db
-    .collection("teacher_assignments")
+  const assignments = await TeacherAssignment
     .find({
       classId: { $in: classIds },
     })
-    .toArray();
 
   if (assignments.length === 0) {
     return { success: true, subjects: [] };
@@ -35,8 +33,7 @@ const getStudentSubjects = async (db: Db, userId: ObjectId) => {
 
   // 3. Recupera i dettagli delle materie
   // Nota: Dalle ricerche precedenti il nome della collezione sembra essere "SUBJECTS"
-  const subjects = await db
-    .collection("SUBJECTS")
+  const subjects = await SubjectView
     .aggregate([
       {
         $match: {
@@ -55,7 +52,6 @@ const getStudentSubjects = async (db: Db, userId: ObjectId) => {
         },
       },
     ])
-    .toArray();
 
   return {
     success: true,
@@ -63,8 +59,8 @@ const getStudentSubjects = async (db: Db, userId: ObjectId) => {
   };
 };
 
-const getTeacherSubjects = async (coll: Collection, teacherId: ObjectId) => {
-  return await coll.aggregate([
+const getTeacherSubjects = async (teacherId: Types.ObjectId) => {
+  return await Subject.aggregate([
     {
       $match: {
         teacherId: teacherId,
@@ -112,7 +108,6 @@ const getTeacherSubjects = async (coll: Collection, teacherId: ObjectId) => {
       },
     },
   ])
-    .toArray();
 }
 
 const getSubjects = async (
@@ -121,9 +116,8 @@ const getSubjects = async (
 ) => {
   const user = context.user!;
   const userId = user!._id;
-  const db = await getDefaultDatabase();
-  if (user.role == 'teacher') return getTeacherSubjects(db.collection("subjects"), userId)
-  else return getStudentSubjects(db, userId)
+  if (user.role == 'teacher') return getTeacherSubjects(userId)
+  else return getStudentSubjects(userId)
 };
 
 export const handler = lambdaRequest(getSubjects);

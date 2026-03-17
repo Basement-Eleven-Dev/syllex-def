@@ -1,27 +1,26 @@
-import { ObjectId } from "bson";
-import { getDefaultDatabase } from "../getDatabase";
-import { Subject } from "../../models/subject";
+import { connectDatabase } from "../getDatabase";
+import { Assistant } from "../../models/schemas/assistant.schema";
+import { Subject } from "../../models/schemas/subject.schema";
+import { ObjectId, Types } from "mongoose";
 
 export async function buildAgent(
-  subjectId: ObjectId,
+  subjectId: Types.ObjectId,
   context: string,
   messagesHistory: { role: string; content: string }[],
 ) {
-  const db = await getDefaultDatabase();
+  await connectDatabase();
   const messagesContext = messagesHistory
     .map(
       (msg) =>
         `${msg.role === "user" ? "Utente" : "Assistente"}: ${msg.content}`,
     )
     .join("\n");
-  const assistant = await db
-    .collection("assistants")
-    .findOne({ subjectId: subjectId });
+  const assistant = await Assistant.findOne({ subjectId: subjectId });
   if (!assistant) {
     throw new Error("Assistant not found");
   }
   const { tone, voice, name } = assistant;
-  const subject = await db.collection<Subject>('subjects').findOne({ _id: subjectId });
+  const subject = await Subject.findById(subjectId);
 
   const systemPrompt = `
 RUOLO

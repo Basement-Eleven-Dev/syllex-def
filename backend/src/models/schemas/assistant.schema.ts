@@ -12,6 +12,6 @@ const assistantSchema = new Schema({
     timestamps: true
 });
 
-type Assistant = InferSchemaType<typeof assistantSchema>;
+export type Assistant = InferSchemaType<typeof assistantSchema>;
 
 export const Assistant = model<Assistant>('Assistant', assistantSchema, 'assistants');

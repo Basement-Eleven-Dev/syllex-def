@@ -1,8 +1,9 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
-import { ObjectId } from "mongodb";
+import { Types, mongo } from "mongoose";
 import { getCurrentUser } from "../../_helpers/getAuthCognitoUser";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { User } from "../../models/schemas/user.schema";
 
 const updateSettings = async (request: APIGatewayProxyEvent, context: Context) => {
   const user = await getCurrentUser(request);
@@ -16,10 +17,9 @@ const updateSettings = async (request: APIGatewayProxyEvent, context: Context) =
     throw new Error("Impostazioni mancanti");
   }
 
-  const db = await getDefaultDatabase();
-  const usersCollection = db.collection("users");
+  await connectDatabase();
 
-  await usersCollection.updateOne(
+  await User.updateOne(
     { _id: user._id },
     {
       $set: {

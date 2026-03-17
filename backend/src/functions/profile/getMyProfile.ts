@@ -1,24 +1,8 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
-import { ObjectId } from "mongodb";
+import { Types, mongo } from "mongoose";
 import { getCurrentUser } from "../../_helpers/getAuthCognitoUser";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
 
-export interface User {
-  _id: ObjectId;
-  username: string;
-  email?: string;
-  firstName?: string;
-  lastName?: string;
-  role: "teacher" | "student" | "admin";
-  organizationId?: ObjectId;
-  notificationSettings?: {
-    newCommunication: boolean;
-    newEvent: boolean;
-    newTest: boolean;
-    testCorrected: boolean;
-  };
-}
 
 const getProfile = async (request: APIGatewayProxyEvent, context: Context) => {
   const user = await getCurrentUser(request);
