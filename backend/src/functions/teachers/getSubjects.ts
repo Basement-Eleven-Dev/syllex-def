@@ -53,10 +53,7 @@ const getStudentSubjects = async (userId: Types.ObjectId) => {
       },
     ])
 
-  return {
-    success: true,
-    subjects,
-  };
+  return subjects
 };
 
 const getTeacherSubjects = async (teacherId: Types.ObjectId) => {
