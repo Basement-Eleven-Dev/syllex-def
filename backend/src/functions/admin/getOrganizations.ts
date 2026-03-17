@@ -11,7 +11,7 @@ const getOrganizations = async (
 
   // Per ora prendiamo tutte le organizzazioni. 
   // In futuro potremmo aggiungere paginazione e filtri.
-  const organizations = await Organization.find({}).sort({ createdAt: -1 })
+  const organizations = await Organization.find({}).sort({ createdAt: -1 }).lean()
 
   return {
     success: true,

@@ -16,7 +16,7 @@ const getCommunicationById = async (
 
   await connectDatabase();
 
-  const communication = await Communication.findById(communicationId);
+  const communication = await Communication.findById(communicationId).lean();
 
   if (!communication) {
     throw createError.NotFound("Communication not found");

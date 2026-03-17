@@ -36,7 +36,7 @@ const updateEvent = async (request: APIGatewayProxyEvent, context: Context) => {
     { $set: updateData }
   );
 
-  const updatedEvent = await Event.findById(eventId);
+  const updatedEvent = await Event.findById(eventId).lean();
 
   return {
     event: updatedEvent,

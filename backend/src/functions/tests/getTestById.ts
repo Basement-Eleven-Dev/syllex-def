@@ -18,7 +18,7 @@ const getTestById = async (request: APIGatewayProxyEvent, context: Context) => {
   const test = await Test.findOne({
     _id: new mongo.ObjectId(testId),
     teacherId: context.user?._id,
-  });
+  }).lean();
 
   if (!test) {
     throw createError.NotFound("Test not found or not authorized");

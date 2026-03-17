@@ -64,7 +64,7 @@ const editQuestion = async (
   );
 
   // Ritorna la domanda aggiornata
-  const updatedQuestion = await Question.findById(questionId);
+  const updatedQuestion = await Question.findById(questionId).lean();
 
   return {
     question: updatedQuestion,

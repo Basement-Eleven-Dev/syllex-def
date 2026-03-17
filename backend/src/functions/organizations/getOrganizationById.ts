@@ -19,7 +19,7 @@ const getOrganizationById = async (
 
   const organization = await Organization.findOne({
     _id: new mongo.ObjectId(organizationId),
-  });
+  }).lean();
 
   if (!organization) {
     throw createError.NotFound("Organization not found");

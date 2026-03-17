@@ -51,7 +51,7 @@ const updateTestClasses = async (
   // Return updated test
   const updatedTest = await Test.findOne({
     _id: new mongo.ObjectId(testId),
-  });
+  }).lean();
 
   return {
     success: true,

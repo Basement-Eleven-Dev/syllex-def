@@ -20,8 +20,8 @@ const testSchema = new Schema({
     studentId: { type: Schema.Types.ObjectId },
     status: {
         type: String,
-        enum: ['draft', 'published', 'archived'],
-        default: 'draft'
+        enum: ['bozza', 'pubblicato', 'archiviato'],
+        default: 'bozza'
     },
     source: { type: String }
 }, {

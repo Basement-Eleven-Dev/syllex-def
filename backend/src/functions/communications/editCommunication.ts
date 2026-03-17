@@ -44,7 +44,7 @@ const editCommunication = async (
     { $set: updateData },
   );
 
-  const updatedCommunication = await Communication.findById(communicationId);
+  const updatedCommunication = await Communication.findById(communicationId).lean();
 
   return { communication: updatedCommunication };
 };

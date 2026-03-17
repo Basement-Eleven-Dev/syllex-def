@@ -43,7 +43,7 @@ const getAssistant = async (
   const assistant = await Assistant.findOne({
     subjectId: subjectId,
     teacherId: subject.teacherId,
-  });
+  }).lean();
 
   return {
     success: true,

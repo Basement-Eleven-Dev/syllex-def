@@ -50,7 +50,7 @@ const updateMaterialClasses = async (
   // Return updated material
   const updatedMaterial = await Material.findOne({
     _id: new mongo.ObjectId(materialId) as any,
-  });
+  }).lean();
 
   return {
     success: true,

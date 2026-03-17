@@ -21,7 +21,7 @@ const getMaterialById = async (
 
   const material = await Material.findOne({
     _id: new mongo.ObjectId(materialId) as any,
-  })
+  }).lean()
 
   if (!material) {
     return { success: false, message: "Material not found or not accessible" };

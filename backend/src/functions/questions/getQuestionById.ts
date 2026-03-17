@@ -16,7 +16,7 @@ const getQuestionById = async (
 
   await connectDatabase();
 
-  const question = await Question.findById(questionId);
+  const question = await Question.findById(questionId).lean();
 
   if (!question) {
     throw createError.NotFound("Question not found");
