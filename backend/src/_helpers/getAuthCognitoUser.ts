@@ -66,7 +66,7 @@ export const getCurrentUser = async (
     if (!token) return null;
     const decodedToken = await getAuthCognitoUser(token);
     if (!decodedToken) return null;
-    const user = await User.findOne({ cognitoId: decodedToken.sub });
+    const user = await User.findOne({ cognitoId: decodedToken.sub }).lean();
     return user
   } catch (error) {
     return null;
