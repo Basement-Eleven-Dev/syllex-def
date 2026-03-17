@@ -283,7 +283,7 @@ const QUESTIONS_ROUTES: FunctionIntegration[] = [
     apiRoute: "questions/{questionId}",
     functionPath: "questions/getQuestionById.ts",
     method: "get",
-    role: "teacher",
+    role: "logged",
   },
   {
     apiRoute: "questions",
