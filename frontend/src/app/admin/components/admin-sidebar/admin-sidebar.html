@@ -16,6 +16,7 @@
         class="sidebarRoute w-100 gap-3 d-flex align-items-center p-3 rounded-3 cursor-pointer"
         [routerLink]="route.route"
         routerLinkActive="active"
+        [tourAnchor]="route.tourAnchor || ''"
       >
         <fa-icon [icon]="route.icon" [fixedWidth]="true"></fa-icon>
         <span class="routeLabel fw-medium">{{route.label}}</span>

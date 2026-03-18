@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { faSignOutAlt } from '@fortawesome/pro-regular-svg-icons';
+import { TourService } from 'ngx-ui-tour-ng-bootstrap';
 import { Auth } from '../../../services/auth';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -15,6 +16,7 @@ import { ReportBugForm } from '../report-bug-form/report-bug-form';
 })
 export class UserContextualMenu {
   LogoutIcon = faSignOutAlt;
+  private tourService = inject(TourService);
 
   constructor(
     public authService: Auth,
@@ -31,6 +33,15 @@ export class UserContextualMenu {
       centered: true,
     });
     modalRef.componentInstance.showCloseButton = true;
+  }
+
+  @Output() tourStarted = new EventEmitter<void>();
+
+  onStartTour() {
+    this.tourStarted.emit();
+    setTimeout(() => {
+      this.tourService.start();
+    }, 100);
   }
 
   onReportBug() {
