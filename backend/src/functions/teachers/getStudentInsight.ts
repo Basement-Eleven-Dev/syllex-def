@@ -1,10 +1,11 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
 import { getGeminiClient } from "../../_helpers/AI/getClient";
-
+import { User } from "../../models/schemas/user.schema";
+import { Attempt } from "../../models/schemas/attempt.schema";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { mongo } from 'mongoose'
 const generateStudentInsight = async (
   request: APIGatewayProxyEvent,
   context: Context,
@@ -12,36 +13,30 @@ const generateStudentInsight = async (
   const studentId = request.pathParameters?.studentId;
   const subjectId = context.subjectId!;
 
-  if (!studentId || !ObjectId.isValid(studentId)) {
+  if (!studentId || !mongo.ObjectId.isValid(studentId)) {
     throw createError.BadRequest("Invalid or missing studentId");
   }
 
-  const db = await getDefaultDatabase();
-  const studentObjectId = new ObjectId(studentId);
+  await connectDatabase();
+  const studentObjectId = new mongo.ObjectId(studentId);
 
   // 1. Get Student Info
-  const student = await db
-    .collection("users")
-    .findOne({ _id: studentObjectId });
+  const student = await User.findOne({ _id: studentObjectId });
   if (!student) {
     throw createError.NotFound("Student not found");
   }
 
-  // 2. Build match filter with optional subjectId
-  const matchFilter: any = {
-    studentId: studentObjectId,
-    status: "reviewed",
-    source: { $ne: "self-evaluation" }
-  };
-  if (subjectId && ObjectId.isValid(subjectId)) {
-    matchFilter.subjectId = new ObjectId(subjectId);
-  }
-
   // 3. Get Student Attempts with Test Names
-  const attempts = await db
-    .collection("attempts")
+  const attempts = await Attempt
     .aggregate([
-      { $match: matchFilter },
+      {
+        $match: {
+          subjectId: subjectId,
+          studentId: studentObjectId,
+          status: "reviewed",
+          source: { $ne: "self-evaluation" }
+        }
+      },
       {
         $lookup: {
           from: "tests",
@@ -54,7 +49,6 @@ const generateStudentInsight = async (
       { $sort: { deliveredAt: -1 } },
       { $limit: 15 },
     ])
-    .toArray();
 
   if (attempts.length === 0) {
     return {

@@ -5,7 +5,8 @@ import {
   Handler,
 } from "aws-lambda";
 import { getGammaExportUrl } from "../../_helpers/gammaApi";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
+import { Material } from "../../models/schemas/material.schema";
+import { connectDatabase } from "../../_helpers/getDatabase";
 
 export const handler: Handler = async (
   event: APIGatewayProxyEvent,
@@ -25,11 +26,10 @@ export const handler: Handler = async (
       body: "Not ready",
     };
   }
-  const db = await getDefaultDatabase();
-  const materialCollection = db.collection("materials");
-  await materialCollection.updateOne(
+  await connectDatabase();
+  await Material.updateOne(
     { url: fullUrl },
-    { $set: { url: gammaUrl } },
+    { $set: { url: gammaUrl } }
   );
   return {
     statusCode: 200,

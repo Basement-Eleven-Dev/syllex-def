@@ -1,8 +1,9 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase, mongoClient } from "../../_helpers/getDatabase";
+import { connectDatabase } from "../../_helpers/getDatabase";
 import { DB_NAME } from "../../env";
 import createHttpError from "http-errors";
+import { User } from "../../models/schemas/user.schema";
 
 const updateEmail = async (request: APIGatewayProxyEvent, context: Context) => {
   const user = context.user!;
@@ -14,11 +15,10 @@ const updateEmail = async (request: APIGatewayProxyEvent, context: Context) => {
     throw createHttpError.BadRequest('Email required')
   }
 
-  const db = await getDefaultDatabase();
+  await connectDatabase();
 
   try {
-    const result = await db
-      .collection("users")
+    const result = await User
       .updateOne(
         { _id: user._id },
         {

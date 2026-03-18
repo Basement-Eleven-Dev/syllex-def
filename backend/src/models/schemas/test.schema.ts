@@ -1,4 +1,4 @@
-import { InferSchemaType, model, Schema } from "mongoose";
+import { HydratedDocument, InferSchemaType, model, Schema } from "mongoose";
 
 const testQuestionSchema = new Schema({
     questionId: { type: Schema.Types.ObjectId, required: true },
@@ -7,7 +7,7 @@ const testQuestionSchema = new Schema({
 
 const testSchema = new Schema({
     name: { type: String, required: true },
-    availableFrom: { type: Date, required: true },
+    availableFrom: { type: Date },
     availableTo: { type: Date },
     timeLimit: { type: Number },
     password: { type: String },
@@ -20,14 +20,14 @@ const testSchema = new Schema({
     studentId: { type: Schema.Types.ObjectId },
     status: {
         type: String,
-        enum: ['draft', 'published', 'archived'],
-        default: 'draft'
+        enum: ['bozza', 'pubblicato', 'archiviato'],
+        default: 'bozza'
     },
     source: { type: String }
 }, {
     timestamps: true
 });
 
-type Test = InferSchemaType<typeof testSchema>;
-
+type TestRaw = InferSchemaType<typeof testSchema>;
+export type Test = HydratedDocument<TestRaw>
 export const Test = model<Test>('Test', testSchema, 'tests');

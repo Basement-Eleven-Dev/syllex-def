@@ -1,9 +1,9 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
-import { Test } from "../../models/test";
+import { Types, mongo } from "mongoose";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Test } from "../../models/schemas/test.schema";
 
 const updateTestClasses = async (
   request: APIGatewayProxyEvent,
@@ -21,12 +21,11 @@ const updateTestClasses = async (
     throw createError.BadRequest("classIds must be an array");
   }
 
-  const db = await getDefaultDatabase();
-  const testsCollection = db.collection<Test>("tests");
+  await connectDatabase();
 
   // Verify test exists and belongs to the teacher
-  const existingTest = await testsCollection.findOne({
-    _id: new ObjectId(testId),
+  const existingTest = await Test.findOne({
+    _id: new mongo.ObjectId(testId),
     teacherId: context.user?._id,
   });
 
@@ -35,11 +34,11 @@ const updateTestClasses = async (
   }
 
   // Update classIds
-  const result = await testsCollection.updateOne(
-    { _id: new ObjectId(testId) },
+  const result = await Test.updateOne(
+    { _id: new mongo.ObjectId(testId) },
     {
       $set: {
-        classIds: body.classIds.map((id: string) => new ObjectId(id)),
+        classIds: body.classIds.map((id: string) => new mongo.ObjectId(id)),
         updatedAt: new Date(),
       },
     },
@@ -50,9 +49,9 @@ const updateTestClasses = async (
   }
 
   // Return updated test
-  const updatedTest = await testsCollection.findOne({
-    _id: new ObjectId(testId),
-  });
+  const updatedTest = await Test.findOne({
+    _id: new mongo.ObjectId(testId),
+  }).lean();
 
   return {
     success: true,

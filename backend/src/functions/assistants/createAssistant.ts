@@ -1,8 +1,9 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { Assistant } from "../../models/schemas/assistant.schema";
 
 const createAssistant = async (
   request: APIGatewayProxyEvent,
@@ -23,8 +24,7 @@ const createAssistant = async (
   const teacherId = context.user?._id;
 
   // Get database connection
-  const db = await getDefaultDatabase();
-  const assistantsCollection = db.collection("assistants");
+  await connectDatabase();
   const { name, tone, voice, _id } = body.agent;
   // Prepare material data
   const assistant = {
@@ -38,8 +38,8 @@ const createAssistant = async (
   };
   delete assistant._id;
 
-  const insertResult = await assistantsCollection.insertOne(assistant);
-  assistant._id = insertResult.insertedId;
+  const insertResult = await Assistant.insertOne(assistant);
+  assistant._id = insertResult._id;
 
   return {
     success: true,

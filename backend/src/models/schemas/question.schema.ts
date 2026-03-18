@@ -1,4 +1,4 @@
-import { InferSchemaType, model, Schema } from "mongoose";
+import { HydratedDocument, InferSchemaType, model, Schema } from "mongoose";
 
 const optionSchema = new Schema({
     label: { type: String, required: true },
@@ -9,7 +9,7 @@ export const questionSchema = new Schema({
     text: { type: String, required: true },
     type: {
         type: String,
-        enum: ['multiple-choice', 'true-false', 'open-ended'],
+        enum: ['scelta multipla', 'vero falso', 'risposta aperta'],
         required: true
     },
     explanation: { type: String },
@@ -22,11 +22,12 @@ export const questionSchema = new Schema({
     subjectId: { type: Schema.Types.ObjectId, required: true },
     teacherId: { type: Schema.Types.ObjectId, required: true },
     correctAnswer: { type: Boolean },
+    aiGenerated: { type: Boolean },
     options: { type: [optionSchema], default: [] }
 }, {
     timestamps: true
 });
 
-type Question = InferSchemaType<typeof questionSchema>;
-
+export type QuestionRaw = InferSchemaType<typeof questionSchema>;
+export type Question = HydratedDocument<QuestionRaw>
 export const Question = model<Question>('Question', questionSchema, 'questions');

@@ -1,4 +1,4 @@
-import { InferSchemaType, model, Schema } from "mongoose";
+import { HydratedDocument, InferSchemaType, model, Schema } from "mongoose";
 
 const notificationSettingsSchema = new Schema({
     newCommunication: { type: Boolean, default: true },
@@ -13,6 +13,7 @@ const userSchema = new Schema({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     email: { type: String, required: true },
+    avatar: { type: String },
     role: {
         type: String,
         enum: ['student', 'teacher', 'admin'],
@@ -24,6 +25,7 @@ const userSchema = new Schema({
     timestamps: true
 });
 
-type User = InferSchemaType<typeof userSchema>;
+type UserRaw = InferSchemaType<typeof userSchema>;
+export type User = HydratedDocument<UserRaw>;
 
 export const User = model<User>('User', userSchema, 'users');

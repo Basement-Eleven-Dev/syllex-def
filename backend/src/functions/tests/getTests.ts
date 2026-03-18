@@ -1,16 +1,16 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { Test } from "../../models/test";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { Class } from "../../models/schemas/class.schema";
+import { Test } from "../../models/schemas/test.schema";
 
 const getStudentTests = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
   console.log("[BACKEND] getStudentTests chiamata!");
-  const db = await getDefaultDatabase();
-  const testsCollection = db.collection<Test>("tests");
+  await connectDatabase();
 
   // Estrai parametri per paginazione e filtri
   const {
@@ -33,16 +33,14 @@ const getStudentTests = async (
   if (!studentId) {
     return { tests: [], total: 0 };
   }
-  const classesCollection = db.collection("classes");
-  const studentClasses = await classesCollection
-    .find({ students: new ObjectId(studentId) })
-    .toArray();
+  const studentClasses = await Class
+    .find({ students: new mongo.ObjectId(studentId) })
   const classIds = studentClasses.map((c) => c._id);
 
   // Include sia i test assegnati alle classi dello studente
   // sia i test di auto-valutazione generati dallo studente stesso
   const orConditions: any[] = [
-    { source: "self-evaluation", studentId: new ObjectId(studentId) },
+    { source: "self-evaluation", studentId: new mongo.ObjectId(studentId) },
   ];
   if (classIds.length > 0) {
     orConditions.push({ classIds: { $in: classIds } });
@@ -64,7 +62,7 @@ const getStudentTests = async (
   }
 
   if (subjectId) {
-    filter.subjectId = new ObjectId(subjectId);
+    filter.subjectId = new mongo.ObjectId(subjectId);
   }
 
   if (searchTerm && searchTerm.trim() !== "") {
@@ -103,10 +101,10 @@ const getStudentTests = async (
     { $limit: currentPageSize },
   ];
 
-  const tests = await testsCollection.aggregate(pipeline).toArray();
+  const tests = await Test.aggregate(pipeline)
 
   // Conta totale per paginazione
-  const total = await testsCollection.countDocuments(filter);
+  const total = await Test.countDocuments(filter);
 
   return {
     tests,
@@ -115,8 +113,7 @@ const getStudentTests = async (
 };
 
 const getTeacherTests = async (request: APIGatewayProxyEvent, context: Context) => {
-  const db = await getDefaultDatabase();
-  const testsCollection = db.collection<Test>("tests");
+  await connectDatabase();
 
   // Estrai parametri per paginazione e filtri
   const {
@@ -155,7 +152,7 @@ const getTeacherTests = async (request: APIGatewayProxyEvent, context: Context) 
   console.log("Filter applicato:", JSON.stringify(filter));
 
   // Esegui query con aggregazione per contare i compiti da correggere
-  const tests = await testsCollection
+  const tests = await Test
     .aggregate([
       { $match: filter },
       { $sort: { createdAt: -1 } },
@@ -188,12 +185,11 @@ const getTeacherTests = async (request: APIGatewayProxyEvent, context: Context) 
         },
       },
     ])
-    .toArray();
 
   console.log(`Trovati ${tests.length} test con aggregazione e filtro:`, filter);
 
   // Conta totale per paginazione
-  const total = await testsCollection.countDocuments(filter);
+  const total = await Test.countDocuments(filter);
 
   return {
     tests,

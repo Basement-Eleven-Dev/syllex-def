@@ -1,8 +1,9 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { Assistant } from "../../models/schemas/assistant.schema";
 
 const removeMaterial = async (
   request: APIGatewayProxyEvent,
@@ -11,19 +12,18 @@ const removeMaterial = async (
   const materialId = request.pathParameters?.materialId || ''
   const teacherId = context.user?._id;
 
-  const db = await getDefaultDatabase();
-  const assistantsCollection = db.collection("assistants");
+  await connectDatabase()
 
-  const result = await assistantsCollection.updateOne(
+  const result = await Assistant.updateOne(
     {
       subjectId: context.subjectId,
       teacherId: teacherId
     },
     {
       $pull: {
-        associatedFileIds: { $in: [new ObjectId(materialId), materialId] }
+        associatedFileIds: { $in: [new mongo.ObjectId(materialId), materialId] }
       }
-    } as any
+    }
   );
 
   if (result.matchedCount === 0) {

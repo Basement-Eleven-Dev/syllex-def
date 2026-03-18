@@ -1,14 +1,15 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import createHttpError from "http-errors";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
-import { MaterialInterface } from "../../models/material";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { Material } from "../../models/schemas/material.schema";
 import { startSlidedeckGeneration } from "../../_helpers/gammaApi";
 import { uploadContentToS3 } from "../../_helpers/uploadFileToS3";
 import { getConvertedDocument } from "../../_helpers/documents/documentConversion";
 import { askStructuredLLM } from "../../_helpers/AI/simpleCompletion";
 import { z } from "zod";
+import { Organization } from "../../models/schemas/organization.schema";
 
 const documentTypes = ["slides", "map", "glossary", "summary"] as const;
 
@@ -70,6 +71,8 @@ const createAIGenMaterial = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
+  await connectDatabase();
+
   const {
     type,
     materialIds,
@@ -89,15 +92,12 @@ const createAIGenMaterial = async (
       "type materialIds is required and not empty: string[]",
     );
 
-  const db = await getDefaultDatabase();
-  const materialsCollection = db.collection("materials");
-
   // Check storage limit (1GB)
   const STORAGE_LIMIT_B = 1024 * 1024 * 1024;
-  const currentMaterials = await materialsCollection.find({
-    teacherId: context.user!._id,
+  const currentMaterials = await Material.find({
+    teacherId: context.user!._id as any,
     subjectId: context.subjectId as any,
-  }).toArray();
+  })
 
   const totalBytes = currentMaterials.reduce(
     (acc, m) => acc + (m.byteSize || 0),
@@ -110,15 +110,14 @@ const createAIGenMaterial = async (
     );
   }
 
-  const organizationCollection = db.collection("organizations");
-  const materialOIds = materialIds.map((el) => new ObjectId(el));
-  const materialObjects: MaterialInterface[] = (await materialsCollection
+  await connectDatabase();
+  const materialOIds = materialIds.map((el) => new mongo.ObjectId(el));
+  const materialObjects = await Material
     .find({
-      _id: { $in: materialOIds },
-      subjectId: context.subjectId,
+      _id: { $in: materialOIds as any },
+      subjectId: context.subjectId as any,
       aiGenerated: { $ne: true },
     })
-    .toArray()) as MaterialInterface[]; //forse non serve
 
   const prompt = getPrompt(
     type,
@@ -141,10 +140,9 @@ const createAIGenMaterial = async (
 
   console.log("LLM response:", { title, content });
 
-  const organizationId =
-    (context.user as any).organizationIds?.[0] ?? context.user!.organizationId;
+  const organizationId = context.user?.organizationIds?.[0]
 
-  const organization = await organizationCollection.findOne({
+  const organization = await Organization.findOne({
     _id: organizationId,
   });
 
@@ -155,7 +153,7 @@ const createAIGenMaterial = async (
   const organizationLogoUrl: string = organization.logoUrl ?? "";
   const organizationName: string = organization.name; //unused for now
 
-  const material: MaterialInterface = {
+  const material: Partial<Material> = {
     name: "", //find a way to get a real name
     createdAt: new Date(),
     aiGenerated: true,
@@ -218,13 +216,10 @@ const createAIGenMaterial = async (
     material.url = await uploadContentToS3(bucketKey, content, mimetype);
   }
 
-  const insertResult = await materialsCollection.insertOne(material);
+  const createdMaterial = await Material.create(material as any);
 
   return {
-    material: {
-      ...material,
-      _id: insertResult.insertedId,
-    },
+    material: createdMaterial.toObject(),
   };
 };
 

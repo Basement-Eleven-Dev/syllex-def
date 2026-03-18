@@ -1,8 +1,8 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Communication } from "../../models/schemas/communication.schema";
 
 const deleteCommunication = async (
   request: APIGatewayProxyEvent,
@@ -14,21 +14,20 @@ const deleteCommunication = async (
     throw createError.BadRequest("communicationId is required");
   }
 
-  const db = await getDefaultDatabase();
-  const communicationsCollection = db.collection("communications");
+  await connectDatabase();
 
   // Verifica che la comunicazione esista e appartenga al teacher
-  const existingCommunication = await communicationsCollection.findOne({
-    _id: new ObjectId(communicationId),
+  const existingCommunication = await Communication.findOne({
+    _id: communicationId,
     teacherId: context.user?._id,
-  });
+  } as any);
 
   if (!existingCommunication) {
     throw createError.NotFound("Communication not found or not authorized");
   }
 
-  await communicationsCollection.deleteOne({
-    _id: new ObjectId(communicationId),
+  await Communication.deleteOne({
+    _id: communicationId,
   });
 
   return { success: true, message: "Communication deleted successfully" };

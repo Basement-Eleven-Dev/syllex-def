@@ -1,8 +1,9 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../../_helpers/lambdaProxyResponse";
-import { ObjectId } from "mongodb";
+import { Types, mongo } from "mongoose";
 import createError from "http-errors";
-import { getDefaultDatabase } from "../../../_helpers/getDatabase";
+import { connectDatabase } from "../../../_helpers/getDatabase";
+import { User } from "../../../models/schemas/user.schema";
 
 const remomeUser = async (
   request: APIGatewayProxyEvent,
@@ -14,18 +15,18 @@ const remomeUser = async (
     throw createError.BadRequest("Missing organizationId or userId");
   }
 
-  const db = await getDefaultDatabase();
+  await connectDatabase();
 
-  const result = await db.collection("users").updateOne(
-    { _id: new ObjectId(userId) },
+  const result = await User.updateOne(
+    { _id: new mongo.ObjectId(userId) },
     {
       $pull: { organizationIds: organizationId } as any,
     }
   );
 
   // Also handle the legacy single organizationId if it matches
-  await db.collection("users").updateOne(
-    { _id: new ObjectId(userId), organizationId: organizationId },
+  await User.updateOne(
+    { _id: new mongo.ObjectId(userId), organizationId: organizationId },
     { $unset: { organizationId: "" } }
   );
 

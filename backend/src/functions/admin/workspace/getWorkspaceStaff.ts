@@ -1,8 +1,9 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { User } from "../../../models/schemas/user.schema";
 
 const getWorkspaceStaff = async (
   request: APIGatewayProxyEvent,
@@ -10,15 +11,15 @@ const getWorkspaceStaff = async (
 ) => {
   const organizationId = request.pathParameters?.organizationId;
 
-  if (!organizationId || !ObjectId.isValid(organizationId)) {
+  if (!organizationId || !mongo.ObjectId.isValid(organizationId)) {
     throw createError.BadRequest("Invalid or missing organizationId");
   }
 
-  const db = await getDefaultDatabase();
-  const orgObjectId = new ObjectId(organizationId);
+  await connectDatabase();
+  const orgObjectId = new mongo.ObjectId(organizationId);
 
   // Use aggregation to find users and check if they have assignments
-  const staff = await db.collection("users").aggregate([
+  const staff = await User.aggregate([
     {
       $match: {
         $or: [
@@ -55,7 +56,7 @@ const getWorkspaceStaff = async (
     },
     { $project: { assignments: 0 } },
     { $sort: { lastName: 1, firstName: 1 } }
-  ]).toArray();
+  ]);
 
   return {
     success: true,

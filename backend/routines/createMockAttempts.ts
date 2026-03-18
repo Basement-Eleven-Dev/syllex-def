@@ -1,10 +1,10 @@
 import { config } from "dotenv";
 import inquirer from "inquirer";
-import { Collection, MongoClient, ObjectId } from "mongodb";
+import { mongo } from "mongoose";
 import { DB_NAME } from "../src/env";
-import { User } from "../src/models/user";
-import { Test } from "../src/models/test";
-import { Question } from "../src/models/question";
+import { Test } from "../src/models/schemas/test.schema";
+import { User } from "../src/models/schemas/user.schema";
+import { Question } from "../src/models/schemas/question.schema";
 
 config();
 process.env.AWS_PROFILE = "pathway";
@@ -12,15 +12,15 @@ process.env.AWS_PROFILE = "pathway";
 const mongoConnectionString = process.env.DBCONNECTION as string;
 
 export interface Organization {
-    _id?: ObjectId;
+    _id?: mongo.ObjectId;
     name: string;
-    administrators: ObjectId[];
+    administrators: mongo.ObjectId[];
     createdAt: Date;
     updatedAt: Date;
     courses?: string[];
 }
 
-const generateMockTest = async (attemptsColl: Collection, student: User, test: Test, questions: Question[]) => {
+const generateMockTest = async (attemptsColl: mongo.Collection, student: User, test: Test, questions: Question[]) => {
 
     const statuses = ['empty', 'wrong', 'correct'];
     let maxScore = 0;
@@ -75,7 +75,7 @@ const start = async () => {
     if (!mongoConnectionString)
         throw new Error("Stringa di connessione a Mongo non trovata.");
 
-    const clientMongo = new MongoClient(mongoConnectionString);
+    const clientMongo = new mongo.MongoClient(mongoConnectionString);
     await clientMongo.connect();
     const db = clientMongo.db(DB_NAME);
     const orgsCollection = db.collection("organizations");
@@ -98,7 +98,7 @@ const start = async () => {
             value: org._id.toString(),
         })),
     }])
-    const subjects = await db.collection('subjects').find({ organizationId: new ObjectId(orgId as string) }).toArray();
+    const subjects = await db.collection("subjects").find({ organizationId: new mongo.ObjectId(orgId as string) }).toArray();
     const { subjectId } = await inquirer.prompt([{
         name: "subjectId",
         type: "list",
@@ -108,8 +108,8 @@ const start = async () => {
             value: sub._id.toString(),
         })),
     }])
-    const classes = await db.collection('classes').find({ organizationId: new ObjectId(orgId as string) }).toArray()
-    const tests = await db.collection('tests').find({ subjectId: new ObjectId(subjectId as string) }).toArray();
+    const classes = await db.collection("classes").find({ organizationId: new mongo.ObjectId(orgId as string) }).toArray()
+    const tests = await db.collection("tests").find({ subjectId: new mongo.ObjectId(subjectId as string) }).toArray();
     const { classObject, test } = await inquirer.prompt([
         {
             name: "classObject",
@@ -131,10 +131,10 @@ const start = async () => {
         }
     ])
     const questionIds = test.questions.map((el: any) => el.questionId);
-    const questions = await db.collection('questions').find({ _id: { $in: questionIds } }).toArray();
+    const questions = await db.collection("questions").find({ _id: { $in: questionIds } }).toArray();
     if (questions.some(el => el.type == 'risposta aperta')) throw Error('Le risposte aperte non sono supportate');
-    const students = await db.collection('users').find({ _id: { $in: classObject.students } }).toArray();
-    for (let i = 0; i < students.length; i++) await generateMockTest(db.collection('attempts'), students[i] as User, test, questions as Question[]);
+    const students = await db.collection("users").find({ _id: { $in: classObject.students } }).toArray();
+    for (let i = 0; i < students.length; i++) await generateMockTest(db.collection("attempts"), students[i] as User, test, questions as Question[]);
     await clientMongo.close();
 };
 

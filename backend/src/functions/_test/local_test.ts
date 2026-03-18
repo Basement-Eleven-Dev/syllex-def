@@ -1,9 +1,6 @@
 
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
-import { extractPDFWithGoogleDocumentAI } from "../../_helpers/AI/exctractWithGeminiVision";
 
 const runTest = async (
     event: APIGatewayProxyEvent,

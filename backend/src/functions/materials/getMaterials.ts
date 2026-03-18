@@ -1,6 +1,8 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Material } from "../../models/schemas/material.schema";
+import { Class } from "../../models/schemas/class.schema";
 
 const getMaterials = async (
   request: APIGatewayProxyEvent,
@@ -9,15 +11,11 @@ const getMaterials = async (
   const user = context.user!;
   const userId = user._id;
   const subjectId = context.subjectId!
+  await connectDatabase();
 
-  // Get database connection
-  const db = await getDefaultDatabase();
-  const materialsCollection = db.collection("materials");
   if (user.role == 'student') {
-    const classes = await db
-      .collection("classes")
+    const classes = await Class
       .find({ students: { $in: [userId] } })
-      .toArray();
 
     if (classes.length === 0) {
       return { success: true, materials: [] };
@@ -27,24 +25,22 @@ const getMaterials = async (
     console.log(classIds);
 
     // Recupera i materiali della materia selezionata che sono accessibili alle classi dello studente
-    const materials = await db
-      .collection("materials")
+    const materials = await Material
       .find({
-        subjectId: subjectId,
+        subjectId: subjectId as any,
         classIds: { $in: classIds },
         type: "file",
       })
-      .toArray();
     return { materials }
   }
   // Query per ottenere tutti i materiali del teacher e della materia
-  const query: any = { teacherId: userId };
+  const query: any = { teacherId: userId as any };
   if (subjectId) {
-    query.subjectId = subjectId;
+    query.subjectId = subjectId as any;
   }
 
   // Aggregation per ottenere materiali con stato di vettorizzazione
-  const materials = await materialsCollection
+  const materials = await Material
     .aggregate([
       { $match: query },
       {
@@ -62,8 +58,7 @@ const getMaterials = async (
         },
       },
       { $project: { embeddings: 0 } },
-    ])
-    .toArray();
+    ]);
 
   return {
     success: true,

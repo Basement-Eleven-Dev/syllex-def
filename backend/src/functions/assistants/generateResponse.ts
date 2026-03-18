@@ -1,10 +1,10 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import {
-  generateAIResponse,
   generateAIResponseGemini,
 } from "../../_helpers/AI/generateResponse";
 import { saveMessage } from "../../_helpers/DB/messages/saveMessage";
+import { Types } from "mongoose";
 
 const generateResponse = async (
   request: APIGatewayProxyEvent,

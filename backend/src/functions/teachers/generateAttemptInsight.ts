@@ -1,9 +1,10 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
 import { getGeminiClient } from "../../_helpers/AI/getClient";
+import { Attempt } from "../../models/schemas/attempt.schema";
 
 const generateAttemptInsight = async (
   request: APIGatewayProxyEvent,
@@ -11,16 +12,15 @@ const generateAttemptInsight = async (
 ) => {
   const attemptId = request.pathParameters?.attemptId;
 
-  if (!attemptId || !ObjectId.isValid(attemptId)) {
+  if (!attemptId || !mongo.ObjectId.isValid(attemptId)) {
     throw createError.BadRequest("Invalid or missing attemptId");
   }
 
-  const db = await getDefaultDatabase();
-  const attemptObjectId = new ObjectId(attemptId);
+  await connectDatabase();
+  const attemptObjectId = new mongo.ObjectId(attemptId);
 
   // 1. Get Attempt Info with Test and Student Details
-  const result = await db
-    .collection("attempts")
+  const result = await Attempt
     .aggregate([
       { $match: { _id: attemptObjectId } },
       {
@@ -42,7 +42,6 @@ const generateAttemptInsight = async (
       },
       { $unwind: "$studentInfo" },
     ])
-    .toArray();
 
   const attempt = result[0];
   if (!attempt) {
@@ -50,8 +49,7 @@ const generateAttemptInsight = async (
   }
 
   // 2. Get Class Averages for context
-  const classStats = await db
-    .collection("attempts")
+  const classStats = await Attempt
     .aggregate([
       { $match: { testId: attempt.testId, status: "reviewed" } },
       {
@@ -62,7 +60,6 @@ const generateAttemptInsight = async (
         },
       },
     ])
-    .toArray();
 
   const averages = classStats[0] || {
     avgScore: attempt.score,
@@ -131,8 +128,7 @@ const generateAttemptInsight = async (
 
     // 4. Save insight to DB
     if (response.text) {
-      await db
-        .collection("attempts")
+      await Attempt
         .updateOne(
           { _id: attemptObjectId },
           { $set: { aiInsight: response.text, updatedAt: new Date() } },

@@ -1,17 +1,20 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
 import { fetchBuffer } from "../../_helpers/fetchBuffer";
 import { extractTextFromFile } from "../../_helpers/documents/extractTextFromFile";
 import { suggestNewTopics } from "../../_helpers/AI/suggestNewTopics";
-import { Subject } from "../../models/subject";
+import { Material } from "../../models/schemas/material.schema";
+import { Subject, SubjectView } from "../../models/schemas/subject.schema";
 
 const createMaterial = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
+  await connectDatabase();
+
   // Parse and validate request body
   const body = JSON.parse(request.body || "{}");
   console.log("Received createMaterial request with body:", body);
@@ -26,16 +29,12 @@ const createMaterial = async (
 
   const teacherId = context.user?._id;
 
-  // Get database connection
-  const db = await getDefaultDatabase();
-  const materialsCollection = db.collection("materials");
-
   // Check storage limit (1GB)
   const STORAGE_LIMIT_B = 1024 * 1024 * 1024;
-  const materials = await materialsCollection.find({
-    teacherId,
+  const materials = await Material.find({
+    teacherId: teacherId as any,
     subjectId: context.subjectId as any,
-  }).toArray();
+  })
 
   const totalBytes = materials.reduce((acc, m) => acc + (m.byteSize || 0), 0);
   if (totalBytes >= STORAGE_LIMIT_B) {
@@ -43,26 +42,24 @@ const createMaterial = async (
   }
 
   // Prepare material data
-  const material = {
+  const materialData = {
     ...body.material,
-    createdAt: new Date(),
     teacherId,
     subjectId: context.subjectId,
   };
-  delete material._id;
+  delete materialData._id;
 
   // Insert material into database
-  const insertResult = await materialsCollection.insertOne(material);
-  material._id = insertResult.insertedId;
+  const material = await Material.create(materialData);
 
   // If parentId is provided, add material to parent folder
   if (body.parentId) {
-    const parentId = new ObjectId(body.parentId as string);
+    const parentId = new mongo.ObjectId(body.parentId as string);
 
     // Validate parent folder exists and belongs to the teacher
-    const parentFolder = await materialsCollection.findOne({
-      _id: parentId,
-      teacherId,
+    const parentFolder = await Material.findOne({
+      _id: parentId as any,
+      teacherId: teacherId as any,
       type: "folder",
     });
 
@@ -71,30 +68,30 @@ const createMaterial = async (
     }
 
     // Add material to parent folder's content
-    await materialsCollection.updateOne({ _id: parentId, teacherId }, {
-      $push: { content: material._id },
-    } as any);
+    await Material.updateOne(
+      { _id: parentId as any, teacherId: teacherId as any },
+      { $push: { content: material._id } }
+    );
   }
   let suggestedTopics: string[] = [];
   if (material.type !== "folder" && material.url) {
     try {
       // Start indexing in background (existing logic)
       const { startIndexingJob } = await import("../../_triggers/backgroundVectorize");
-      await startIndexingJob(material._id);
+      await startIndexingJob(material._id as any);
 
       // Topic Discovery
-      const subject = (await db
-        .collection("subjects")
-        .findOne({ _id: context.subjectId as any })) as Subject;
+      const subject = (await SubjectView
+        .findOne({ _id: context.subjectId as any }));
 
-      if (subject) {
+      if (subject && material.url) {
         const buffer = await fetchBuffer(material.url);
-        const textExtracted = await extractTextFromFile(buffer, material.extension);
-        
+        const textExtracted = await extractTextFromFile(buffer, material.extension || '');
+
         if (textExtracted && textExtracted.trim().length > 0) {
           suggestedTopics = await suggestNewTopics(
             textExtracted,
-            subject.topics || [],
+            subject.topics.map(el => el.name),
             subject.name
           );
         }
@@ -107,7 +104,7 @@ const createMaterial = async (
 
   return {
     success: true,
-    material,
+    material: material.toObject(),
     suggestedTopics,
   };
 };

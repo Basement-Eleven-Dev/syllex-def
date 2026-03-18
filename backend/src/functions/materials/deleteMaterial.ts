@@ -1,25 +1,26 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { Material } from "../../models/schemas/material.schema";
+import { FileEmbedding } from "../../models/schemas/file-embedding.schema";
+import { Communication } from "../../models/schemas/communication.schema";
 
 const deleteMaterial = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
+  await connectDatabase();
+
   // Validate and parse input
-  const materialId = new ObjectId(request.pathParameters!.materialId!);
+  const materialId = new mongo.ObjectId(request.pathParameters!.materialId!);
   const teacherId = context.user?._id;
 
-  // Get database connection
-  const db = await getDefaultDatabase();
-  const materialsCollection = db.collection("materials");
-
   // Verify the material exists and belongs to the teacher
-  const material = await materialsCollection.findOne({
-    _id: materialId,
-    teacherId,
+  const material = await Material.findOne({
+    _id: materialId as any,
+    teacherId: teacherId as any,
   });
 
   if (!material) {
@@ -27,31 +28,29 @@ const deleteMaterial = async (
   }
 
   // Delete the material
-  const deleteResult = await materialsCollection.deleteOne({
-    _id: materialId,
-    teacherId,
+  const deleteResult = await Material.deleteOne({
+    _id: materialId as any,
+    teacherId: teacherId as any,
   });
 
   if (deleteResult.deletedCount > 0) {
     // eliminiamo la referenza al materiale da tutte le comunicazioni che lo contengonoo
-    const communicationsCollection = db.collection("communications");
-    await communicationsCollection.updateMany({ materialIds: materialId }, {
+    await Communication.updateMany({ materialIds: materialId }, {
       $pull: { materialIds: materialId },
     } as any);
   }
 
   // Remove material reference from all parent folders
-  const removeFromParentsResult = await materialsCollection.updateMany(
+  const removeFromParentsResult = await Material.updateMany(
     {
-      content: materialId,
-      teacherId,
+      content: materialId as any,
+      teacherId: teacherId as any,
     },
-    { $pull: { content: materialId } } as any,
+    { $pull: { content: materialId } }
   );
 
   //rimuovi gli embeddings del materiale
-  const embeddingsCollection = db.collection("file_embeddings");
-  await embeddingsCollection.deleteMany({ referenced_file_id: materialId });
+  await FileEmbedding.deleteMany({ referenced_file_id: materialId });
   return {
     success: true,
     deleted: deleteResult.deletedCount > 0,

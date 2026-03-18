@@ -1,8 +1,13 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { User } from "../../models/schemas/user.schema";
+import { Class } from "../../models/schemas/class.schema";
+import { Test } from "../../models/schemas/test.schema";
+import { Attempt } from "../../models/schemas/attempt.schema";
+import { TeacherAssignment } from "../../models/schemas/teacher-assignment.schema";
 
 const getOrganizationStats = async (
   request: APIGatewayProxyEvent,
@@ -10,33 +15,33 @@ const getOrganizationStats = async (
 ) => {
   const organizationId = request.pathParameters?.organizationId;
 
-  if (!organizationId || !ObjectId.isValid(organizationId)) {
+  if (!organizationId || !mongo.ObjectId.isValid(organizationId)) {
     throw createError.BadRequest("Invalid or missing organizationId");
   }
 
-  const db = await getDefaultDatabase();
-  const orgObjectId = new ObjectId(organizationId);
+  await connectDatabase();
+  const orgObjectId = new mongo.ObjectId(organizationId);
 
   // 1. KPI Counts
   // Users may store the org in either `organizationId` (singular) or `organizationIds` (array)
   const orgFilter = { $or: [{ organizationId: orgObjectId }, { organizationIds: orgObjectId }] };
 
-  const totalStudents = await db.collection("users").countDocuments({
+  const totalStudents = await User.countDocuments({
     ...orgFilter,
     role: "student"
   });
 
-  const totalTeachers = await db.collection("users").countDocuments({
+  const totalTeachers = await User.countDocuments({
     ...orgFilter,
     role: "teacher"
   });
 
-  const activeClasses = await db.collection("classes").countDocuments({
+  const activeClasses = await Class.countDocuments({
     organizationId: orgObjectId
   });
 
   // Tests belong to an organization via their subjectId
-  const publishedTests = await db.collection("tests").aggregate([
+  const publishedTests = await Test.aggregate([
     {
       $lookup: {
         from: "subjects",
@@ -53,10 +58,10 @@ const getOrganizationStats = async (
       }
     },
     { $count: "total" }
-  ]).toArray();
+  ]);
 
   // Engagement KPIs: Total attempts and active students for the org
-  const engagementData = await db.collection("attempts").aggregate([
+  const engagementData = await Attempt.aggregate([
     {
       $lookup: {
         from: "subjects",
@@ -80,10 +85,10 @@ const getOrganizationStats = async (
         activeStudents: { $size: "$activeStudents" }
       }
     }
-  ]).toArray();
+  ]);
 
   // Inactive Classes: Classes in the org that have 0 students in their array
-  const classes = await db.collection("classes").find({ organizationId: orgObjectId }).toArray();
+  const classes = await Class.find({ organizationId: orgObjectId });
   const inactiveClassesCount = classes.filter(cls => !cls.students || cls.students.length === 0).length;
 
   const kpis = {
@@ -97,9 +102,9 @@ const getOrganizationStats = async (
   };
 
   // 2. Teaching Activity
-  
+
   // Tests by Subject
-  const testsBySubject = await db.collection("tests").aggregate([
+  const testsBySubject = await Test.aggregate([
     {
       $lookup: {
         from: "subjects",
@@ -128,10 +133,10 @@ const getOrganizationStats = async (
         count: 1
       }
     }
-  ]).toArray();
+  ]);
 
   // Teacher Load
-  const teacherLoad = await db.collection("teacher_assignments").aggregate([
+  const teacherLoad = await TeacherAssignment.aggregate([
     { $match: { organizationId: orgObjectId } },
     {
       $group: {
@@ -175,11 +180,11 @@ const getOrganizationStats = async (
         assignedSubjects: "$subjects.name"
       }
     }
-  ]).toArray();
+  ]);
 
   // Upcoming Tests
   const now = new Date();
-  const upcomingTests = await db.collection("tests").aggregate([
+  const upcomingTests = await Test.aggregate([
     {
       $lookup: {
         from: "subjects",
@@ -205,9 +210,9 @@ const getOrganizationStats = async (
         availableFrom: 1
       }
     }
-  ]).toArray();
+  ]);
   // Average Grades by Subject
-  const avgGradesBySubject = await db.collection("attempts").aggregate([
+  const avgGradesBySubject = await Attempt.aggregate([
     {
       $match: {
         status: "reviewed",
@@ -245,7 +250,7 @@ const getOrganizationStats = async (
       }
     },
     { $sort: { subject: 1 } }
-  ]).toArray();
+  ]);
 
   return {
     kpis,

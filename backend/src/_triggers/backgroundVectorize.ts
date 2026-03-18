@@ -1,6 +1,6 @@
 import { SQSEvent, SQSHandler } from "aws-lambda";
 import { connectDatabase } from "../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { Types, mongo } from "mongoose";
 import {
   SendMessageCommand,
   SendMessageCommandInput,
@@ -13,10 +13,10 @@ import {
 } from "../_helpers/AI/embeddings/vectorizeDocument";
 import { fetchBuffer } from "../_helpers/fetchBuffer";
 import { uploadContentToS3 } from "../_helpers/uploadFileToS3";
-import { Material } from "../models/material.schema";
+import { Material } from "../models/schemas/material.schema";
 
 export const vectorizeMaterialAndUpdateMaterialStatus = async (
-  materialId: ObjectId,
+  materialId: Types.ObjectId,
 ) => {
   await connectDatabase();
   const material = await Material.findById(materialId);
@@ -29,7 +29,7 @@ export const vectorizeMaterialAndUpdateMaterialStatus = async (
   const ext = material.extension!;
   const textExtracted = await extractTextFromFile(buffer, ext);
   const vectorizeParams: VectorizeDocumentParams = {
-    materialId: materialId.toString(),
+    materialId: materialId,
     subjectId: material.subjectId,
     teacherId: material.teacherId,
     documentText: textExtracted,
@@ -41,7 +41,7 @@ export const vectorizeMaterialAndUpdateMaterialStatus = async (
   await material.save()
 };
 
-export const startIndexingJob = async (materialId: ObjectId) => {
+export const startIndexingJob = async (materialId: Types.ObjectId) => {
   console.log(process.env, "enviroment");
   if (!process.env.INDEXING_QUEUE_URL) {
     await vectorizeMaterialAndUpdateMaterialStatus(materialId);
@@ -57,6 +57,6 @@ export const startIndexingJob = async (materialId: ObjectId) => {
 
 export const handler: SQSHandler = async (event: SQSEvent) => {
   if (event.Records.length == 0) return;
-  let materialId: ObjectId = new ObjectId(event.Records[0].body as string);
+  let materialId: Types.ObjectId = new mongo.ObjectId(event.Records[0].body as string);
   await vectorizeMaterialAndUpdateMaterialStatus(materialId);
 };

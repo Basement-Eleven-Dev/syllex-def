@@ -1,9 +1,9 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
-import { Test } from "../../models/test";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { Test } from "../../models/schemas/test.schema";
 
 const getClassAssignedTests = async (
   request: APIGatewayProxyEvent,
@@ -20,17 +20,15 @@ const getClassAssignedTests = async (
     throw createError.BadRequest("subjectId is required");
   }
 
-  const db = await getDefaultDatabase();
-  const testsCollection = db.collection<Test>("tests");
+  await connectDatabase();
 
   // Find tests that have the specified classId in their classIds array
   // and match the specified subjectId
-  const tests = await testsCollection
+  const tests = await Test
     .find({
-      classIds: new ObjectId(classId),
+      classIds: new mongo.ObjectId(classId),
       subjectId: subjectId,
     })
-    .toArray();
 
   return {
     tests,

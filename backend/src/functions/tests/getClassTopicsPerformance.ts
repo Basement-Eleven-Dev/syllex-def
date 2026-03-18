@@ -1,8 +1,11 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { Attempt } from "../../models/schemas/attempt.schema";
+import { Class } from "../../models/schemas/class.schema";
+import { SubjectView } from "../../models/schemas/subject.schema";
 
 interface TopicPerformance {
   topicId: string;
@@ -20,27 +23,22 @@ const getClassTopicsPerformance = async (
   if (!classId) throw createError.BadRequest("classId is required");
   if (!subjectId) throw createError.BadRequest("Subject-Id header is required");
 
-  const db = await getDefaultDatabase();
+  await connectDatabase()
 
   // 1. Get class students
-  const classData = await db
-    .collection("classes")
-    .findOne({ _id: new ObjectId(classId) });
+  const classData = await Class
+    .findOne({ _id: new mongo.ObjectId(classId) });
 
   if (!classData) throw createError.NotFound("Class not found");
 
-  const studentIds = (classData.students || []).map((id: string | ObjectId) =>
-    typeof id === "string" ? new ObjectId(id) : id,
-  );
+  const studentIds = (classData.students || [])
   // 2. Get all reviewed attempts for these students in the selected subject
-  const attempts = await db
-    .collection("attempts")
+  const attempts = await Attempt
     .find({
       studentId: { $in: studentIds },
       subjectId: subjectId,
       status: "reviewed",
     })
-    .toArray();
 
   if (attempts.length === 0) {
     return { topicsPerformance: [] };
@@ -70,7 +68,7 @@ const getClassTopicsPerformance = async (
   }
 
   // 4. Fetch subject to resolve topic names
-  const subject = await db.collection("SUBJECTS").findOne({ _id: subjectId });
+  const subject = await SubjectView.findOne({ _id: subjectId });
 
   const topicsMap = new Map<string, string>();
   if (subject?.topics && Array.isArray(subject.topics)) {

@@ -1,6 +1,8 @@
-import { Db, ObjectId } from "mongodb";
-import { getDefaultDatabase } from "../getDatabase";
+import { mongo, Types } from "mongoose";
+import { connectDatabase } from "../getDatabase";
 import { sendBulkEmail } from "./emailQueue";
+import { Class } from "../../models/schemas/class.schema";
+import { User } from "../../models/schemas/user.schema";
 
 /**
  * Recupera le email degli studenti dato un array di classIds.
@@ -8,16 +10,12 @@ import { sendBulkEmail } from "./emailQueue";
  * poi dalla collection "users" recupera gli username (= email Cognito).
  */
 export async function getStudentEmailsByClassIds(
-  db: Db,
-  classIds: ObjectId[]
+  classIds: Types.ObjectId[]
 ): Promise<string[]> {
   if (!classIds || classIds.length === 0) return [];
 
   // Recupera tutti gli studenti dalle classi
-  const classes = await db
-    .collection("classes")
-    .find({ _id: { $in: classIds } })
-    .toArray();
+  const classes = await Class.find({ _id: { $in: classIds } })
 
   // Raccoglie tutti gli studentId unici
   const studentIdSet = new Set<string>();
@@ -29,16 +27,14 @@ export async function getStudentEmailsByClassIds(
 
   if (studentIdSet.size === 0) return [];
 
-  const studentIds = Array.from(studentIdSet).map((id) => new ObjectId(id));
+  const studentIds = Array.from(studentIdSet).map((id) => new mongo.ObjectId(id));
 
   // Recupera le email (username o email) degli studenti
-  const students = await db
-    .collection("users")
+  const students = await User
     .find(
       { _id: { $in: studentIds }, role: "student" },
       { projection: { username: 1, email: 1 } }
     )
-    .toArray();
 
   return students
     .map((s) => s.username || s.email)
@@ -71,7 +67,7 @@ export async function notifyStudentsIfEnabled(params: {
   /** Quale preferenza controllare */
   preference: NotificationPreference;
   /** ClassIds coinvolti */
-  classIds: ObjectId[];
+  classIds: Types.ObjectId[];
   /** Subject dell'email */
   subject: string;
   /** Body HTML dell'email */
@@ -89,8 +85,8 @@ export async function notifyStudentsIfEnabled(params: {
     }
 
     // 2. Recupera le email degli studenti
-    const db = await getDefaultDatabase();
-    const studentEmails = await getStudentEmailsByClassIds(db, classIds);
+    await connectDatabase();
+    const studentEmails = await getStudentEmailsByClassIds(classIds);
 
     if (studentEmails.length === 0) {
       console.log(
