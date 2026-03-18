@@ -75,7 +75,6 @@ export class LoginForm {
       }
       this.hasResult = result;
       if (result.success) {
-        this.authService.setLogrocketIdentity();
         this.handleSuccessfulLogin();
       }
     });

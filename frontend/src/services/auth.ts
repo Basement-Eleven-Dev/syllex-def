@@ -79,11 +79,11 @@ export class Auth {
       (!user.organizationIds || user.organizationIds.length === 0)
     );
   }
-  setLogrocketIdentity() {
-    if (this.user) {
+  setLogrocketIdentity(user?: User | null) {
+    if (user) {
 
-      LogRocket.identify(this.user._id || "anonymous", {
-        name: this.user.email || "anonymous"
+      LogRocket.identify(user._id || "anonymous", {
+        name: user.email || "anonymous"
       });
     }
     else LogRocket.identify('logged-out')
@@ -112,6 +112,7 @@ export class Auth {
   }
 
   constructor(private http: HttpClient) {
+    this.user$.subscribe(user => this.setLogrocketIdentity(user))
     this.checkCurrentUser();
     throw 'Attenzione: test'
   }
@@ -392,7 +393,6 @@ export class Auth {
     try {
       await signOut();
       this.user$.next(null);
-      this.setLogrocketIdentity()
       window.location.reload();
       return { success: true, message: 'Logout riuscito' };
     } catch (error: any) {
