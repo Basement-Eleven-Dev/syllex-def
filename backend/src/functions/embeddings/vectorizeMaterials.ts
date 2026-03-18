@@ -1,15 +1,18 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
 import { associateFilesToAssistant } from "../../_helpers/documents/associateFileToAssistant";
+import { Material } from "../../models/schemas/material.schema";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { mongo } from "mongoose"
 
 const associateMaterials = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
+  await connectDatabase();
+
   const body = JSON.parse(request.body || "{}");
-  const { materialIds, assistantId } = body;
+  const { materialIds, assistantId } = body as { materialIds?: string[], assistantId?: string };
   const teacherId = context.user?._id;
 
   if (!materialIds || !Array.isArray(materialIds)) {
@@ -26,16 +29,13 @@ const associateMaterials = async (
     };
   }
 
-  const db = await getDefaultDatabase();
-  const materialsCollection = db.collection("materials");
-
   const results = [];
 
   for (const id of materialIds) {
     try {
-      const material = await materialsCollection.findOne({
-        _id: new ObjectId(id),
-        teacherId: new ObjectId(teacherId),
+      const material = await Material.findOne({
+        _id: new mongo.ObjectId(id) as any,
+        teacherId: new mongo.ObjectId(teacherId) as any,
       });
 
       if (!material) {
@@ -62,7 +62,7 @@ const associateMaterials = async (
 
   // Associazione dei file all'assistente
   if (assistantId && materialIds.length > 0) {
-    await associateFilesToAssistant(assistantId, materialIds);
+    await associateFilesToAssistant(new mongo.ObjectId(assistantId), materialIds.map(el => new mongo.ObjectId(el)));
   }
 
   return {

@@ -1,8 +1,8 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Event } from "../../models/schemas/event.schema";
 
 const updateEvent = async (request: APIGatewayProxyEvent, context: Context) => {
   const eventId = request.pathParameters?.eventId;
@@ -12,13 +12,12 @@ const updateEvent = async (request: APIGatewayProxyEvent, context: Context) => {
     throw createError.BadRequest("eventId is required");
   }
 
-  const db = await getDefaultDatabase();
-  const eventsCollection = db.collection("events");
+  await connectDatabase();
 
-  const existingEvent = await eventsCollection.findOne({
-    _id: new ObjectId(eventId),
+  const existingEvent = await Event.findOne({
+    _id: eventId,
     teacherId: context.user?._id,
-  });
+  } as any);
 
   if (!existingEvent) {
     throw createError.NotFound("Event not found or not authorized");
@@ -32,17 +31,15 @@ const updateEvent = async (request: APIGatewayProxyEvent, context: Context) => {
     updatedAt: new Date(),
   };
 
-  await eventsCollection.updateOne(
-    { _id: new ObjectId(eventId) },
+  await Event.updateOne(
+    { _id: eventId },
     { $set: updateData }
   );
 
+  const updatedEvent = await Event.findById(eventId).lean();
+
   return {
-    event: {
-      ...existingEvent,
-      ...updateData,
-      _id: eventId,
-    },
+    event: updatedEvent,
   };
 };
 

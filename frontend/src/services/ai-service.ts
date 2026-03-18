@@ -19,13 +19,15 @@ const MATERIAL_TYPE_MAP: Record<MaterialType, BackendMaterialType> = {
   'mappe-concettuali': 'map',
 };
 
+import { QuestionDifficulty } from '../types/question.types';
+
 export interface GenerateQuestionRequest {
   topicId: string;
   materialIds: string[];
   type: BackendQuestionType;
   instructions?: string;
   language?: string;
-  difficulty?: 1 | 2 | 3;
+  difficulty?: QuestionDifficulty;
   numberOfAlternatives?: number;
 }
 
@@ -46,6 +48,7 @@ export interface GenerateMaterialRequest {
   type: BackendMaterialType;
   materialIds: string[];
   numberOfSlides?: number;
+  format?: 'pdf' | 'pptx';
   additionalInstructions?: string;
   language?: string;
 }
@@ -72,7 +75,7 @@ export class AiService {
     type: QuestionType;
     instructions?: string;
     language?: string;
-    difficulty?: 1 | 2 | 3;
+    difficulty?: QuestionDifficulty;
     numberOfAlternatives?: number;
   }): Promise<GeneratedQuestion> {
     const payload: GenerateQuestionRequest = {
@@ -115,6 +118,7 @@ export class AiService {
     type: MaterialType;
     materialIds: string[];
     numberOfSlides?: number;
+    format?: 'pdf' | 'pptx';
     additionalInstructions?: string;
     language?: string;
   }): Promise<GeneratedMaterial> {
@@ -122,6 +126,7 @@ export class AiService {
       type: MATERIAL_TYPE_MAP[data.type],
       materialIds: data.materialIds,
       numberOfSlides: data.numberOfSlides,
+      format: data.format,
       additionalInstructions: data.additionalInstructions || undefined,
       language: data.language,
     };

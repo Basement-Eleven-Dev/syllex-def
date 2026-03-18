@@ -16,7 +16,7 @@ import { Calendario } from '../../components/calendario/calendario';
 import { Router, RouterModule } from '@angular/router';
 import { Auth } from '../../../services/auth';
 import { ClassiService } from '../../../services/classi-service';
-import { MaterialiService } from '../../../services/materiali-service';
+import { MaterialiService } from '../../../services/materiali/materiali-service';
 import {
   ComunicazioneInterface,
   ComunicazioniService,

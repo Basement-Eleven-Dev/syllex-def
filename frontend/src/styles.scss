@@ -140,6 +140,8 @@ $select-focus-box-shadow: none;
 $input-focus-border-color: $primary;
 $form-select-focus-box-shadow: none;
 
+$border-color: rgba(0, 0, 0, 0.077);
+
 @import "bootstrap/scss/bootstrap";
 
 
@@ -502,6 +504,25 @@ section {
   }
 }
 
+.btn-red{
+  background-color:#FFD4DA ;
+  color: var(--bs-danger);
+  &:hover{
+    background-color: #f64b62;
+    color: white;
+  }
+}
+
+.btn-blue{
+  background-color: #EEEEFF;
+  color: var(--bs-primary);
+  &:hover{
+    background-color: #4141fc;
+    color: white;
+  }
+}
+
+
 /* Offcanvas customizations */
 .offcanvas-large {
   width: 600px !important;
@@ -637,6 +658,11 @@ section {
     transform: translateY(1px);
   }
 }
+
+.bg-syllex-light{
+  background-color: #f5f5fd;
+}
+
 
 .btn-delete {
   background-color: transparent;

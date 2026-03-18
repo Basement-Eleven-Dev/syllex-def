@@ -19,10 +19,12 @@ import { HttpClient } from '@angular/common/http';
 import mermaid from 'mermaid';
 import svgPanZoom from 'svg-pan-zoom';
 
+import { SafePipe } from '../../../app/_pipes/safe.pipe';
+
 @Component({
   selector: 'app-file-viewer',
   standalone: true,
-  imports: [CommonModule, NgxDocViewerModule, FontAwesomeModule],
+  imports: [CommonModule, NgxDocViewerModule, FontAwesomeModule, SafePipe],
   templateUrl: './file-viewer.html',
   styleUrl: './file-viewer.scss',
 })

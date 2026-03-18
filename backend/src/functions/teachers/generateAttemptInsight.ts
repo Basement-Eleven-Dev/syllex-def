@@ -1,9 +1,10 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
 import { getGeminiClient } from "../../_helpers/AI/getClient";
+import { Attempt } from "../../models/schemas/attempt.schema";
 
 const generateAttemptInsight = async (
   request: APIGatewayProxyEvent,
@@ -11,35 +12,36 @@ const generateAttemptInsight = async (
 ) => {
   const attemptId = request.pathParameters?.attemptId;
 
-  if (!attemptId || !ObjectId.isValid(attemptId)) {
+  if (!attemptId || !mongo.ObjectId.isValid(attemptId)) {
     throw createError.BadRequest("Invalid or missing attemptId");
   }
 
-  const db = await getDefaultDatabase();
-  const attemptObjectId = new ObjectId(attemptId);
+  await connectDatabase();
+  const attemptObjectId = new mongo.ObjectId(attemptId);
 
   // 1. Get Attempt Info with Test and Student Details
-  const result = await db.collection("attempts").aggregate([
-    { $match: { _id: attemptObjectId } },
-    {
-      $lookup: {
-        from: "tests",
-        localField: "testId",
-        foreignField: "_id",
-        as: "testInfo"
-      }
-    },
-    { $unwind: "$testInfo" },
-    {
-      $lookup: {
-        from: "users",
-        localField: "studentId",
-        foreignField: "_id",
-        as: "studentInfo"
-      }
-    },
-    { $unwind: "$studentInfo" }
-  ]).toArray();
+  const result = await Attempt
+    .aggregate([
+      { $match: { _id: attemptObjectId } },
+      {
+        $lookup: {
+          from: "tests",
+          localField: "testId",
+          foreignField: "_id",
+          as: "testInfo",
+        },
+      },
+      { $unwind: "$testInfo" },
+      {
+        $lookup: {
+          from: "users",
+          localField: "studentId",
+          foreignField: "_id",
+          as: "studentInfo",
+        },
+      },
+      { $unwind: "$studentInfo" },
+    ])
 
   const attempt = result[0];
   if (!attempt) {
@@ -47,18 +49,22 @@ const generateAttemptInsight = async (
   }
 
   // 2. Get Class Averages for context
-  const classStats = await db.collection("attempts").aggregate([
-    { $match: { testId: attempt.testId, status: 'reviewed' } },
-    {
-      $group: {
-        _id: "$testId",
-        avgScore: { $avg: "$score" },
-        avgTime: { $avg: "$timeSpent" }
-      }
-    }
-  ]).toArray();
+  const classStats = await Attempt
+    .aggregate([
+      { $match: { testId: attempt.testId, status: "reviewed" } },
+      {
+        $group: {
+          _id: "$testId",
+          avgScore: { $avg: "$score" },
+          avgTime: { $avg: "$timeSpent" },
+        },
+      },
+    ])
 
-  const averages = classStats[0] || { avgScore: attempt.score, avgTime: attempt.timeSpent };
+  const averages = classStats[0] || {
+    avgScore: attempt.score,
+    avgTime: attempt.timeSpent,
+  };
 
   // 3. Prepare data for AI
   const studentData = {
@@ -68,14 +74,14 @@ const generateAttemptInsight = async (
     timeSpent: attempt.timeSpent,
     questions: attempt.questions.map((q: any) => ({
       topic: q.question?.topic || "Generale",
-      isCorrect: q.status === 'correct' || (q.score && q.score > 0),
-      studentAnswer: q.answer
-    }))
+      isCorrect: q.status === "correct" || (q.score && q.score > 0),
+      studentAnswer: q.answer,
+    })),
   };
 
   const classContext = {
     avgScore: averages.avgScore,
-    avgTime: averages.avgTime
+    avgTime: averages.avgTime,
   };
 
   const prompt = `Sei un esperto pedagogista. Analizza la performance dello studente ${studentData.name} in questo specifico test per fornire un feedback al docente.
@@ -104,7 +110,12 @@ const generateAttemptInsight = async (
     const ai = await getGeminiClient();
     const response = await ai.models.generateContent({
       model: "gemini-2.0-flash",
-      contents: [{ role: "user", parts: [{ text: "Genera l'analisi individuale del tentativo." }] }],
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: "Genera l'analisi individuale del tentativo." }],
+        },
+      ],
       config: {
         systemInstruction: prompt,
         temperature: 0.7,
@@ -112,22 +123,26 @@ const generateAttemptInsight = async (
       },
     });
 
-    const insightContent = response.text || "Impossibile generare l'analisi individuale al momento.";
+    const insightContent =
+      response.text || "Impossibile generare l'analisi individuale al momento.";
 
     // 4. Save insight to DB
     if (response.text) {
-      await db.collection("attempts").updateOne(
-        { _id: attemptObjectId },
-        { $set: { aiInsight: response.text, updatedAt: new Date() } }
-      );
+      await Attempt
+        .updateOne(
+          { _id: attemptObjectId },
+          { $set: { aiInsight: response.text, updatedAt: new Date() } },
+        );
     }
 
     return {
-      insight: insightContent
+      insight: insightContent,
     };
   } catch (error) {
     console.error("Errore generazione attempt insight:", error);
-    return { insight: "Errore durante la generazione dell'analisi IA del compito." };
+    return {
+      insight: "Errore durante la generazione dell'analisi IA del compito.",
+    };
   }
 };
 

@@ -9,6 +9,10 @@ import {
 import { Materia } from '../../../services/materia';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faXmark } from '@fortawesome/pro-solid-svg-icons';
+import {
+  DIFFICULTY_OPTIONS,
+  QuestionDifficulty,
+} from '../../../types/question.types';
 
 @Component({
   selector: 'app-questions-search-filters',
@@ -23,10 +27,14 @@ export class QuestionsSearchFilters implements OnInit {
     type?: 'scelta multipla' | 'vero falso' | 'risposta aperta';
     policy?: 'public' | 'private';
     topicId?: string;
+    difficulty?: QuestionDifficulty;
   }>();
 
   // Icons
   protected readonly ClearIcon = faXmark;
+
+  // Data
+  protected readonly DifficultyOptions = DIFFICULTY_OPTIONS;
 
   // Dependency Injection
   protected readonly materiaService = inject(Materia);
@@ -36,6 +44,7 @@ export class QuestionsSearchFilters implements OnInit {
     type: new FormControl(''),
     policy: new FormControl(''),
     topicId: new FormControl(''),
+    difficulty: new FormControl(''),
   });
 
   ngOnInit(): void {
@@ -52,6 +61,7 @@ export class QuestionsSearchFilters implements OnInit {
       type: '',
       policy: '',
       topicId: '',
+      difficulty: '',
     });
   }
 
@@ -62,11 +72,13 @@ export class QuestionsSearchFilters implements OnInit {
     const type = this.SearchForm.get('type')?.value;
     const policy = this.SearchForm.get('policy')?.value;
     const topicId = this.SearchForm.get('topicId')?.value;
+    const difficulty = this.SearchForm.get('difficulty')?.value;
 
     if (searchTerm) filters.searchTerm = searchTerm;
     if (type) filters.type = type;
     if (policy) filters.policy = policy;
     if (topicId) filters.topicId = topicId;
+    if (difficulty) filters.difficulty = difficulty;
 
     this.filtersChanged.emit(filters);
   }

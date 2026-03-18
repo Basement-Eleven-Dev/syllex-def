@@ -9,7 +9,7 @@
     type="file"
     class="d-none"
     (change)="onFileSelected($event)"
-    [accept]="'.pdf,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.txt,.pptx'"
+    [accept]="acceptedExtensions"
   />
   <div>
     <input
@@ -27,7 +27,7 @@
     (click)="clearFilters()"
     title="Pulisci filtri"
   >
-    <fa-icon [icon]="ClearIcon"></fa-icon>
+    <fa-icon [icon]="icons.clear"></fa-icon>
   </button>
 
   <app-view-type-toggle
@@ -37,6 +37,8 @@
     (viewTypeChange)="onChangeViewType($event)"
   />
 </section>
+
+<app-storage-limit-bar />
 
 <section class="form-section">
   <div class="d-flex flex-row align-items-center justify-content-between mb-4">
@@ -53,36 +55,33 @@
         <span [class.fw-bold]="last">{{ dir }}</span>
       </a>
       @if(!last){
-      <fa-icon [icon]="chevronRightIcon" class="text-muted"></fa-icon>
+      <fa-icon [icon]="icons.chevronRight" class="text-muted"></fa-icon>
       } }
     </div>
     <div class="d-flex flex-row align-items-center gap-3">
-      @if(selectionService.selectedIds().size > 0) {
+      @if(selectedCount() > 0) {
       <button
         class="btn btn-outline-secondary icon-btn"
         (click)="onDeselectAll()"
       >
         Deseleziona tutte
       </button>
-      <button class="btn btn-outline-danger icon-btn" (click)="onDeleteSelection()">
-        <fa-icon [icon]="TrashIcon"></fa-icon> Elimina selezionati ({{
-        selectionService.selectedIds().size }})
+      <button
+        class="btn btn-outline-danger icon-btn"
+        (click)="onDeleteSelection()"
+      >
+        <fa-icon [icon]="icons.trash"></fa-icon> Elimina selezionati ({{
+        selectedCount() }})
       </button>
       }
-      <button
-        class="btn btn-outline-primary icon-btn"
-        (click)="onCreateNewFolder()"
-      >
-        <fa-icon [icon]="plusIcon"></fa-icon> Nuova cartella
+      <button class="btn btn-blue icon-btn" (click)="onCreateNewFolder()">
+        <fa-icon [icon]="icons.plus"></fa-icon> Nuova cartella
       </button>
-      <button
-        class="btn btn-outline-primary icon-btn"
-        (click)="onRequestUpload()"
-      >
-        <fa-icon [icon]="uploadIcon"></fa-icon> Carica file
+      <button class="btn btn-blue icon-btn" (click)="onRequestUpload()" [disabled]="isStorageFull()">
+        <fa-icon [icon]="icons.upload"></fa-icon> Carica file
       </button>
-      <button class="btn ai icon-btn" (click)="onRequestGenerate()">
-        <fa-icon [icon]="sparklesIcon"></fa-icon> Genera con AI
+      <button class="btn ai icon-btn" (click)="onRequestGenerate()" [disabled]="isStorageFull()">
+        <fa-icon [icon]="icons.sparkles"></fa-icon> Genera con AI
       </button>
     </div>
   </div>
@@ -178,7 +177,7 @@
           <td>
             @if (isAIGenerated(item)) {
             <fa-icon
-              [icon]="robotIcon"
+              [icon]="icons.robot"
               class="me-3"
               style="color: #9664c8"
               size="lg"
@@ -204,7 +203,7 @@
                 (click)="$event.stopPropagation()"
                 ngbDropdownToggle
               >
-                <fa-icon [icon]="threeDotsIcon" />
+                <fa-icon [icon]="icons.threeDots" />
               </button>
               <div ngbDropdownMenu>
                 <app-materiale-contextual-menu

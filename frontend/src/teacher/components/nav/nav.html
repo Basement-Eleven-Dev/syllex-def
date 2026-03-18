@@ -32,13 +32,14 @@
         class="d-flex flex-row align-items-center gap-2 h-100"
       >
         <a
-          class="d-flex align-items-center justify-content-center text-white p-0"
+          class="d-flex align-items-center justify-content-center text-white p-0 text-decoration-none"
         >
-          <fa-icon
+        <span class="bg-secondary text-primary rounded-circle fw-bold tracking-wide" style="width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center; ">{{getInitals() | async | uppercase }}</span>
+<!--           <fa-icon
             [icon]="UserProfileIcon"
             class="text-secondary"
             [size]="'2x'"
-          ></fa-icon>
+          ></fa-icon> -->
         </a>
       </div>
       <div

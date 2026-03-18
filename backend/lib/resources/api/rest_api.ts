@@ -53,6 +53,7 @@ export class RestApiGateway extends Construct {
         cognitoPoolId: this.cognitoPool.userPoolId,
         cognitoClientId: this.cognitoClient.userPoolClientId,
         indexingQueueUrl: this.indexingQueueUrl,
+        emailQueueUrl: this.emailQueueUrl,
       });
       this.methods.push(...nestedStack.methods);
     });
@@ -154,6 +155,7 @@ export class RestApiGateway extends Construct {
     private cognitoClient: UserPoolClient,
     private defaultRole: Role,
     private indexingQueueUrl: string,
+    private emailQueueUrl: string,
   ) {
     super(scope, name);
     this.apiGateway = new RestApi(this, name + "API", {

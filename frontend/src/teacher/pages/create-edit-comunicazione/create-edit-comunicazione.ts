@@ -18,8 +18,9 @@ import {
   ComunicazioniService,
   ComunicazioneInterface,
 } from '../../../services/comunicazioni-service';
-import { MaterialInterface } from '../../../services/materiali-service';
+import { MaterialInterface } from '../../../services/materiali/materiali-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FeedbackService } from '../../../services/feedback-service';
 
 @Component({
   selector: 'app-create-edit-comunicazione',
@@ -43,6 +44,7 @@ export class CreateEditComunicazione {
   private readonly router = inject(Router);
   readonly classiService = inject(ClassiService);
   private readonly comunicazioniService = inject(ComunicazioniService);
+  private readonly feedbackService = inject(FeedbackService);
   private readonly destroyRef = inject(DestroyRef);
 
   // Icons
@@ -101,6 +103,10 @@ export class CreateEditComunicazione {
         },
         error: (error) => {
           console.error('Error loading communication:', error);
+          this.feedbackService.showFeedback(
+            'Errore nel caricamento della comunicazione',
+            false,
+          );
           this.IsLoading.set(false);
         },
       });
@@ -132,10 +138,18 @@ export class CreateEditComunicazione {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
+          this.feedbackService.showFeedback(
+            'Comunicazione eliminata con successo',
+            true,
+          );
           this.router.navigate(['/t/comunicazioni']);
         },
         error: (error) => {
           console.error('Error deleting communication:', error);
+          this.feedbackService.showFeedback(
+            "Errore durante l'eliminazione della comunicazione",
+            false,
+          );
           this.IsLoading.set(false);
         },
       });
@@ -158,10 +172,20 @@ export class CreateEditComunicazione {
 
     serviceCall.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
+        this.feedbackService.showFeedback(
+          this.IsEditMode()
+            ? 'Comunicazione aggiornata con successo'
+            : 'Comunicazione creata con successo',
+          true,
+        );
         this.router.navigate(['/t/comunicazioni']);
       },
       error: (error) => {
         console.error('Error saving communication:', error);
+        this.feedbackService.showFeedback(
+          'Errore durante il salvataggio della comunicazione',
+          false,
+        );
         this.IsLoading.set(false);
       },
     });

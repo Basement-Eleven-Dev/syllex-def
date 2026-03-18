@@ -1,6 +1,7 @@
 import {
   Component,
   ElementRef,
+  inject,
   input,
   signal,
   ViewChild,
@@ -23,6 +24,7 @@ import {
 } from '@fortawesome/pro-solid-svg-icons';
 import { faSpinner } from '@fortawesome/pro-regular-svg-icons';
 import { AgentService } from '../../../services/agent.service';
+import { FeedbackService } from '../../../services/feedback-service';
 
 export interface ChatMessage {
   _id?: string;
@@ -40,11 +42,12 @@ export interface ChatMessage {
 })
 export class AgentChat implements OnInit {
   SendIcon = faPaperPlane;
+  private feedbackService = inject(FeedbackService);
   constructor(private agentService: AgentService) {}
 
   assistantId = input.required<string>();
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   // Effetto: scrolla sempre in fondo quando cambia la lista dei messaggi
   private scrollEffect = effect(() => {
@@ -100,7 +103,7 @@ export class AgentChat implements OnInit {
 
     this.isLoading.set(true);
 
-    this.agentService.generateResponse(this.assistantId(), text).subscribe({
+    this.agentService.generateResponse(text).subscribe({
       next: (response) => {
         if (response.success) {
           this.messages.update((msgs) => [
@@ -119,6 +122,10 @@ export class AgentChat implements OnInit {
       },
       error: (error) => {
         console.error('Error generating response:', error);
+        this.feedbackService.showFeedback(
+          'Errore nella generazione della risposta',
+          false,
+        );
         this.isLoading.set(false);
       },
     });
@@ -134,20 +141,22 @@ export class AgentChat implements OnInit {
   async initializeChatHistory() {
     this.agentService.getConversationHistory().subscribe({
       next: (response) => {
-        if (response.success) {
-          const history = response.conversationHistory.map((msg: any) => ({
-            _id: msg._id,
-            role: msg.role,
-            content: msg.content,
-            timestamp: msg.timestamp,
-            audioUrl: msg.audioUrl || null,
-          }));
-          this.messages.set(history);
-          this.scrollToBottom();
-        }
+        const history = response.map((msg: any) => ({
+          _id: msg._id,
+          role: msg.role,
+          content: msg.content,
+          timestamp: msg.timestamp,
+          audioUrl: msg.audioUrl || null,
+        }));
+        this.messages.set(history);
+        this.scrollToBottom();
       },
       error: (error) => {
         console.error('Error fetching conversation history:', error);
+        this.feedbackService.showFeedback(
+          'Errore nel caricamento della cronologia',
+          false,
+        );
       },
     });
   }
@@ -176,7 +185,7 @@ export class AgentChat implements OnInit {
     this.loadingAudioIds.update((set) => new Set(set).add(messageId));
 
     this.agentService
-      .listenToMessage(messageId, message.content, this.assistantId())
+      .listenToMessage(messageId, message.content)
       .subscribe({
         next: (res) => {
           if (res.success && res.audioUrl) {
@@ -196,6 +205,10 @@ export class AgentChat implements OnInit {
         },
         error: (err) => {
           console.error('Error generating audio:', err);
+          this.feedbackService.showFeedback(
+            "Errore nella generazione dell'audio",
+            false,
+          );
           this.loadingAudioIds.update((set) => {
             const newSet = new Set(set);
             newSet.delete(messageId);

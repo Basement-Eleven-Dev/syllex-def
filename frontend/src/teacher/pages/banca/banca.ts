@@ -1,6 +1,7 @@
 import { Component, signal, computed, effect, inject } from '@angular/core';
 import { QuestionsSearchFilters } from '../../components/questions-search-filters/questions-search-filters';
 import { QuestionCard } from '../../components/question-card/question-card';
+import { QuestionTable } from '../../components/question-table/question-table';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPlus } from '@fortawesome/pro-solid-svg-icons';
 import { RouterModule } from '@angular/router';
@@ -11,16 +12,23 @@ import {
   QuestionInterface,
 } from '../../../services/questions';
 import { Materia } from '../../../services/materia';
+import {
+  ViewTypeToggle,
+  ViewType,
+} from '../../components/view-type-toggle/view-type-toggle';
+import { FeedbackService } from '../../../services/feedback-service';
 
 @Component({
   selector: 'app-banca',
   imports: [
     QuestionsSearchFilters,
     QuestionCard,
+    QuestionTable,
     FontAwesomeModule,
     RouterModule,
     SyllexPagination,
     FormsModule,
+    ViewTypeToggle,
   ],
   templateUrl: './banca.html',
   styleUrl: './banca.scss',
@@ -32,6 +40,10 @@ export class Banca {
   // Dependency Injection
   private readonly questionsService = inject(QuestionsService);
   protected readonly materiaService = inject(Materia);
+  private readonly feedbackService = inject(FeedbackService);
+
+  // View type
+  ViewType: ViewType = this.loadViewTypePreference() || 'grid';
 
   // Signals
   private RawQuestions = signal<QuestionInterface[]>([]);
@@ -44,6 +56,7 @@ export class Banca {
     type?: 'scelta multipla' | 'vero falso' | 'risposta aperta';
     policy?: 'public' | 'private';
     topicId?: string;
+    difficulty?: string;
   }>({});
 
   Questions = computed<QuestionInterface[]>(() => {
@@ -71,6 +84,7 @@ export class Banca {
           currentFilters.policy,
           currentPage,
           currentPageSize,
+          currentFilters.difficulty,
         );
       }
     });
@@ -81,17 +95,46 @@ export class Banca {
     type?: 'scelta multipla' | 'vero falso' | 'risposta aperta';
     policy?: 'public' | 'private';
     topicId?: string;
+    difficulty?: string;
   }): void {
     this.Filters.set(filters);
     this.Page.set(1);
   }
 
-  /** Optimistically removes a question from the visible list. */
+  /** Deletes a question from the backend, then removes it from the visible list. */
   onDeleteQuestion(questionId: string): void {
-    this.RawQuestions.update((list) =>
-      list.filter((q) => q._id !== questionId),
-    );
-    this.CollectionSize.update((n) => n - 1);
+    this.questionsService.deleteQuestion(questionId).subscribe({
+      next: () => {
+        this.RawQuestions.update((list) =>
+          list.filter((q) => q._id !== questionId),
+        );
+        this.CollectionSize.update((n) => n - 1);
+        this.feedbackService.showFeedback(
+          'Domanda eliminata con successo',
+          true,
+        );
+      },
+      error: (err) => {
+        console.error('Errore nella cancellazione della domanda:', err);
+        this.feedbackService.showFeedback(
+          'Errore nella cancellazione della domanda',
+          false,
+        );
+      },
+    });
+  }
+
+  onChangeViewType(type: ViewType): void {
+    this.ViewType = type;
+  }
+
+  private loadViewTypePreference(): ViewType | null {
+    try {
+      const saved = localStorage.getItem('viewType_banca');
+      return saved === 'grid' || saved === 'table' ? saved : null;
+    } catch {
+      return null;
+    }
   }
 
   private loadQuestions(
@@ -101,6 +144,7 @@ export class Banca {
     policy?: 'public' | 'private',
     page?: number,
     pageSize?: number,
+    difficulty?: string,
   ): void {
     console.log('Caricamento domande con i seguenti parametri:', {
       searchTerm,
@@ -118,6 +162,7 @@ export class Banca {
         policy,
         page || 1,
         pageSize || 10,
+        difficulty,
       )
       .subscribe({
         next: (response) => {
@@ -127,6 +172,10 @@ export class Banca {
         },
         error: (err) => {
           console.error('Errore nel caricamento delle domande:', err);
+          this.feedbackService.showFeedback(
+            'Errore nel caricamento delle domande',
+            false,
+          );
         },
       });
   }

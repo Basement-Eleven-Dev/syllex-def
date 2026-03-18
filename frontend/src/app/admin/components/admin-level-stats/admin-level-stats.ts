@@ -2,11 +2,12 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { StatsService, AdminStats } from '../../service/stats-service';
 import { Auth } from '../../../../services/auth';
+import { FeedbackService } from '../../../../services/feedback-service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { 
-  faUserGraduate, 
-  faChalkboardTeacher, 
-  faSchool, 
+import {
+  faUserGraduate,
+  faChalkboardTeacher,
+  faSchool,
   faFileLines,
   faChartBar,
   faCalendarCheck,
@@ -17,7 +18,7 @@ import {
   faChartPie,
   faPlusCircle,
   faTriangleExclamation,
-  faArrowTrendUp
+  faArrowTrendUp,
 } from '@fortawesome/free-solid-svg-icons';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData } from 'chart.js';
@@ -32,6 +33,7 @@ import { ChartConfiguration, ChartData } from 'chart.js';
 export class AdminLevelStats implements OnInit {
   private statsService = inject(StatsService);
   private authService = inject(Auth);
+  private feedbackService = inject(FeedbackService);
 
   public stats?: AdminStats;
   public loading = true;
@@ -51,7 +53,7 @@ export class AdminLevelStats implements OnInit {
     faChartPie,
     faPlusCircle,
     faTriangleExclamation,
-    faArrowTrendUp
+    faArrowTrendUp,
   };
 
   // Chart Configuration
@@ -62,23 +64,25 @@ export class AdminLevelStats implements OnInit {
       legend: { display: false },
       tooltip: {
         callbacks: {
-          label: (context) => `Test: ${context.parsed.y}`
-        }
-      }
+          label: (context) => `Test: ${context.parsed.y}`,
+        },
+      },
     },
     scales: {
       y: { beginAtZero: true, ticks: { stepSize: 1 } },
-      x: { grid: { display: false } }
-    }
+      x: { grid: { display: false } },
+    },
   };
 
   public barChartData: ChartData<'bar'> = {
     labels: [],
-    datasets: [{
-      data: [],
-      backgroundColor: '#3931ce',
-      borderRadius: 6
-    }]
+    datasets: [
+      {
+        data: [],
+        backgroundColor: '#3931ce',
+        borderRadius: 6,
+      },
+    ],
   };
 
   // Grades Chart
@@ -90,22 +94,24 @@ export class AdminLevelStats implements OnInit {
       legend: { display: false },
       tooltip: {
         callbacks: {
-          label: (context) => `Media: ${context.parsed.x}%`
-        }
-      }
+          label: (context) => `Media: ${context.parsed.x}%`,
+        },
+      },
     },
     scales: {
       x: { min: 0, max: 100, ticks: { callback: (value) => `${value}%` } },
-      y: { grid: { display: false } }
-    }
+      y: { grid: { display: false } },
+    },
   };
 
   public gradesChartData: ChartData<'bar'> = {
     labels: [],
-    datasets: [{
-      data: [],
-      borderRadius: 6
-    }]
+    datasets: [
+      {
+        data: [],
+        borderRadius: 6,
+      },
+    ],
   };
 
   ngOnInit() {
@@ -113,7 +119,9 @@ export class AdminLevelStats implements OnInit {
   }
 
   private loadStats() {
-    const orgId = this.authService.user?.organizationId || this.authService.user?.organizationIds?.[0];
+    const orgId =
+      this.authService.user?.organizationId ||
+      this.authService.user?.organizationIds?.[0];
     if (orgId) {
       this.statsService.getOrganizationStats(orgId.toString()).subscribe({
         next: (data) => {
@@ -123,8 +131,12 @@ export class AdminLevelStats implements OnInit {
         },
         error: (err) => {
           console.error('Error loading stats:', err);
+          this.feedbackService.showFeedback(
+            'Errore nel caricamento delle statistiche',
+            false,
+          );
           this.loading = false;
-        }
+        },
       });
     } else {
       this.loading = false;
@@ -133,35 +145,53 @@ export class AdminLevelStats implements OnInit {
 
   // Curated color palette for subjects
   private subjectColors = [
-    '#3931ce', '#ef4444', '#16a34a', '#f59e0b', '#8b5cf6',
-    '#0d9488', '#ea580c', '#2563eb', '#db2777', '#0891b2',
-    '#65a30d', '#f97316', '#475569', '#92400e', '#84cc16'
+    '#3931ce',
+    '#ef4444',
+    '#16a34a',
+    '#f59e0b',
+    '#8b5cf6',
+    '#0d9488',
+    '#ea580c',
+    '#2563eb',
+    '#db2777',
+    '#0891b2',
+    '#65a30d',
+    '#f97316',
+    '#475569',
+    '#92400e',
+    '#84cc16',
   ];
 
   private prepareChart() {
     if (this.stats?.teachingActivity.testsBySubject) {
       const data = this.stats.teachingActivity.testsBySubject;
       this.barChartData = {
-        labels: data.map(item => item.subject),
-        datasets: [{
-          data: data.map(item => item.count),
-          backgroundColor: data.map((_, i) => this.subjectColors[i % this.subjectColors.length]),
-          borderRadius: 6,
-          label: 'Test per Materia'
-        }]
+        labels: data.map((item) => item.subject),
+        datasets: [
+          {
+            data: data.map((item) => item.count),
+            backgroundColor: data.map(
+              (_, i) => this.subjectColors[i % this.subjectColors.length],
+            ),
+            borderRadius: 6,
+            label: 'Test per Materia',
+          },
+        ],
       };
     }
 
     if (this.stats?.teachingActivity.avgGradesBySubject) {
       const grades = this.stats.teachingActivity.avgGradesBySubject;
       this.gradesChartData = {
-        labels: grades.map(g => g.subject),
-        datasets: [{
-          data: grades.map(g => g.avgScore),
-          backgroundColor: grades.map(g => this.getScoreColor(g.avgScore)),
-          borderRadius: 6,
-          label: 'Media Voti'
-        }]
+        labels: grades.map((g) => g.subject),
+        datasets: [
+          {
+            data: grades.map((g) => g.avgScore),
+            backgroundColor: grades.map((g) => this.getScoreColor(g.avgScore)),
+            borderRadius: 6,
+            label: 'Media Voti',
+          },
+        ],
       };
     }
   }
@@ -172,4 +202,3 @@ export class AdminLevelStats implements OnInit {
     return '#dc3545'; // Red
   }
 }
-

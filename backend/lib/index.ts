@@ -12,6 +12,7 @@ import { DefaultLambdaRole } from "./resources/roles";
 import { DeployStack } from "./resources/api/api_stage";
 import { MainBucket } from "./resources/bucket";
 import { VectorizingResources } from "./resources/background/vectorizingConstruct";
+import { EmailResources } from "./resources/background/emailConstruct";
 
 export class CdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -22,16 +23,17 @@ export class CdkStack extends cdk.Stack {
     let bucket = new MainBucket(this, BUCKET_NAME).bucket;
     let cognito = new CognitoUserPool(this, POOL_NAME);
     let indexingTriggerStack = new VectorizingResources(this, 'material_background_vectorization', role);
+    let emailStack = new EmailResources(this, 'bulk_email_background', role);
     let apiGatewayInstance = new RestApiGateway(
       this,
       API_NAME,
       cognito.cognitoPool,
       cognito.cognitoPoolClient,
       role,
-      indexingTriggerStack.queue.queueUrl.toString()
+      indexingTriggerStack.queue.queueUrl.toString(),
+      emailStack.queue.queueUrl.toString()
     );
     new DeployStack(this, { restApiId: apiGatewayInstance.apiGateway.restApiId, methods: apiGatewayInstance.methods })
-
   }
 }
 

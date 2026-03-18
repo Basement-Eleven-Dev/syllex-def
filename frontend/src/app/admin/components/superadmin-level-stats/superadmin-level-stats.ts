@@ -2,11 +2,12 @@ import { CommonModule } from '@angular/common';
 import { StatsService, SuperAdminStats } from '../../service/stats-service';
 import { Component, inject, OnInit } from '@angular/core';
 import { Auth } from '../../../../services/auth';
+import { FeedbackService } from '../../../../services/feedback-service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { 
-  faBuilding, 
-  faUsers, 
-  faDatabase, 
+import {
+  faBuilding,
+  faUsers,
+  faDatabase,
   faMicrochip,
   faChartLine,
   faArrowRight,
@@ -21,7 +22,7 @@ import {
   faCheckCircle,
   faExclamationTriangle,
   faArrowTrendUp,
-  faClock
+  faClock,
 } from '@fortawesome/free-solid-svg-icons';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData } from 'chart.js';
@@ -36,6 +37,7 @@ import { ChartConfiguration, ChartData } from 'chart.js';
 export class SuperadminLevelStats implements OnInit {
   private statsService = inject(StatsService);
   public authService = inject(Auth);
+  private feedbackService = inject(FeedbackService);
 
   public stats?: SuperAdminStats;
   public loading = true;
@@ -57,7 +59,7 @@ export class SuperadminLevelStats implements OnInit {
     faWandMagicSparkles,
     faEuroSign,
     faArrowTrendUp,
-    faClock
+    faClock,
   };
 
   // Top Organizations Chart
@@ -68,24 +70,27 @@ export class SuperadminLevelStats implements OnInit {
       legend: { display: false },
       tooltip: {
         callbacks: {
-          label: (context) => `Tokens: ${context.parsed.y?.toLocaleString() || 0}`
-        }
-      }
+          label: (context) =>
+            `Tokens: ${context.parsed.y?.toLocaleString() || 0}`,
+        },
+      },
     },
     scales: {
       y: { beginAtZero: true },
-      x: { grid: { display: false } }
-    }
+      x: { grid: { display: false } },
+    },
   };
 
   public orgChartData: ChartData<'bar'> = {
     labels: [],
-    datasets: [{
-      data: [],
-      backgroundColor: '#3931ce',
-      borderRadius: 6,
-      label: 'Token per Organizzazione'
-    }]
+    datasets: [
+      {
+        data: [],
+        backgroundColor: '#3931ce',
+        borderRadius: 6,
+        label: 'Token per Organizzazione',
+      },
+    ],
   };
 
   // Heavy Subjects Chart
@@ -97,27 +102,30 @@ export class SuperadminLevelStats implements OnInit {
       legend: { display: false },
       tooltip: {
         callbacks: {
-          label: (context) => `Tokens: ${context.parsed.x?.toLocaleString() || 0}`
-        }
-      }
+          label: (context) =>
+            `Tokens: ${context.parsed.x?.toLocaleString() || 0}`,
+        },
+      },
     },
     scales: {
       x: { beginAtZero: true },
-      y: { grid: { display: false } }
-    }
+      y: { grid: { display: false } },
+    },
   };
 
   public subjectsChartData: ChartData<'bar'> = {
     labels: [],
-    datasets: [{
-      data: [],
-      backgroundColor: '#e74c3c',
-      borderRadius: 6,
-      label: 'Token per Materia'
-    }]
+    datasets: [
+      {
+        data: [],
+        backgroundColor: '#e74c3c',
+        borderRadius: 6,
+        label: 'Token per Materia',
+      },
+    ],
   };
 
-  // Top AI Producers Chart 
+  // Top AI Producers Chart
   public producersChartOptions: ChartConfiguration['options'] = {
     responsive: true,
     maintainAspectRatio: false,
@@ -125,24 +133,27 @@ export class SuperadminLevelStats implements OnInit {
       legend: { display: false },
       tooltip: {
         callbacks: {
-          label: (context) => `Materiali: ${context.parsed.y?.toLocaleString() || 0}`
-        }
-      }
+          label: (context) =>
+            `Materiali: ${context.parsed.y?.toLocaleString() || 0}`,
+        },
+      },
     },
     scales: {
       y: { beginAtZero: true },
-      x: { grid: { display: false } }
-    }
+      x: { grid: { display: false } },
+    },
   };
 
   public producersChartData: ChartData<'bar'> = {
     labels: [],
-    datasets: [{
-      data: [],
-      backgroundColor: '#8e44ad',
-      borderRadius: 6,
-      label: 'Materiali Generati'
-    }]
+    datasets: [
+      {
+        data: [],
+        backgroundColor: '#8e44ad',
+        borderRadius: 6,
+        label: 'Materiali Generati',
+      },
+    ],
   };
 
   ngOnInit() {
@@ -158,8 +169,12 @@ export class SuperadminLevelStats implements OnInit {
       },
       error: (err) => {
         console.error('Error loading superadmin stats:', err);
+        this.feedbackService.showFeedback(
+          'Errore nel caricamento delle statistiche',
+          false,
+        );
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -167,38 +182,49 @@ export class SuperadminLevelStats implements OnInit {
     if (this.stats?.organizations) {
       const topOrgs = this.stats.organizations.slice(0, 8);
       this.orgChartData = {
-        labels: topOrgs.map(o => o.name),
-        datasets: [{
-          data: topOrgs.map(o => o.estimatedTokens),
-          backgroundColor: '#3931ce',
-          borderRadius: 6,
-          label: 'Token per Organizzazione'
-        }]
+        labels: topOrgs.map((o) => o.name),
+        datasets: [
+          {
+            data: topOrgs.map((o) => o.estimatedTokens),
+            backgroundColor: '#3931ce',
+            borderRadius: 6,
+            label: 'Token per Organizzazione',
+          },
+        ],
       };
     }
 
     if (this.stats?.technicalAnalysis.heavySubjects) {
-      const topSubjects = this.stats.technicalAnalysis.heavySubjects.slice(0, 8);
+      const topSubjects = this.stats.technicalAnalysis.heavySubjects.slice(
+        0,
+        8,
+      );
       this.subjectsChartData = {
-        labels: topSubjects.map(s => s.name),
-        datasets: [{
-          data: topSubjects.map(s => s.estimatedTokens),
-          backgroundColor: '#e74c3c',
-          borderRadius: 6,
-          label: 'Token per Materia'
-        }]
+        labels: topSubjects.map((s) => s.name),
+        datasets: [
+          {
+            data: topSubjects.map((s) => s.estimatedTokens),
+            backgroundColor: '#e74c3c',
+            borderRadius: 6,
+            label: 'Token per Materia',
+          },
+        ],
       };
     }
 
     if (this.stats?.technicalAnalysis.topAiProducers) {
       this.producersChartData = {
-        labels: this.stats.technicalAnalysis.topAiProducers.map(p => p.name),
-        datasets: [{
-          data: this.stats.technicalAnalysis.topAiProducers.map(p => p.count),
-          backgroundColor: '#8e44ad',
-          borderRadius: 6,
-          label: 'Materiali Generati'
-        }]
+        labels: this.stats.technicalAnalysis.topAiProducers.map((p) => p.name),
+        datasets: [
+          {
+            data: this.stats.technicalAnalysis.topAiProducers.map(
+              (p) => p.count,
+            ),
+            backgroundColor: '#8e44ad',
+            borderRadius: 6,
+            label: 'Materiali Generati',
+          },
+        ],
       };
     }
   }
@@ -206,7 +232,8 @@ export class SuperadminLevelStats implements OnInit {
   get chunkHealth(): number {
     if (!this.stats?.technicalAnalysis.metrics.avgChunkSize) return 0;
     // Targeting 1500 chars per chunk as per backend logic
-    const health = (this.stats.technicalAnalysis.metrics.avgChunkSize / 1500) * 100;
+    const health =
+      (this.stats.technicalAnalysis.metrics.avgChunkSize / 1500) * 100;
     return Math.min(Math.round(health), 100);
   }
 
@@ -226,8 +253,18 @@ export class SuperadminLevelStats implements OnInit {
   downloadReport() {
     if (!this.stats?.organizations) return;
 
-    const headers = ['ID', 'Nome', 'Utenti', 'Documenti', 'Chunks', 'Tokens', 'Materiali AI', 'Costo Stimato ($)', 'Stato Onboarding'];
-    const rows = this.stats.organizations.map(org => [
+    const headers = [
+      'ID',
+      'Nome',
+      'Utenti',
+      'Documenti',
+      'Chunks',
+      'Tokens',
+      'Materiali AI',
+      'Costo Stimato ($)',
+      'Stato Onboarding',
+    ];
+    const rows = this.stats.organizations.map((org) => [
       org.organizationId,
       org.name,
       org.userCount,
@@ -236,12 +273,12 @@ export class SuperadminLevelStats implements OnInit {
       org.estimatedTokens,
       org.aiMaterialCount,
       org.estimatedCost,
-      org.onboardingStatus
+      org.onboardingStatus,
     ]);
 
     const csvContent = [
       headers.join(','),
-      ...rows.map(row => row.join(','))
+      ...rows.map((row) => row.join(',')),
     ].join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });

@@ -1,9 +1,9 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
-import { Test } from "../../models/test";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { Test } from "../../models/schemas/test.schema";
 
 const editTest = async (request: APIGatewayProxyEvent, context: Context) => {
   const testId = request.pathParameters?.testId;
@@ -14,12 +14,11 @@ const editTest = async (request: APIGatewayProxyEvent, context: Context) => {
 
   const testData = JSON.parse(request.body || "{}");
 
-  const db = await getDefaultDatabase();
-  const testsCollection = db.collection<Test>("tests");
+  await connectDatabase();
 
   // Verifica che il test esista e appartenga al teacher
-  const existingTest = await testsCollection.findOne({
-    _id: new ObjectId(testId),
+  const existingTest = await Test.findOne({
+    _id: new mongo.ObjectId(testId),
     teacherId: context.user?._id,
   });
 
@@ -38,13 +37,13 @@ const editTest = async (request: APIGatewayProxyEvent, context: Context) => {
     updateData.availableTo = new Date(testData.availableTo);
   if (testData.classIds)
     updateData.classIds = testData.classIds.map(
-      (id: string) => new ObjectId(id),
+      (id: string) => new mongo.ObjectId(id),
     );
   if (testData.password) updateData.password = testData.password;
   if (testData.questions)
     updateData.questions = testData.questions.map(
       (q: { questionId: string; points: number }) => ({
-        questionId: new ObjectId(q.questionId),
+        questionId: new mongo.ObjectId(q.questionId),
         points: q.points,
       }),
     );
@@ -52,8 +51,16 @@ const editTest = async (request: APIGatewayProxyEvent, context: Context) => {
   if (testData.timeLimit) updateData.timeLimit = testData.timeLimit;
   if (context.subjectId) updateData.subjectId = context.subjectId;
 
-  const result = await testsCollection.findOneAndUpdate(
-    { _id: new ObjectId(testId), teacherId: context.user?._id },
+  // Explicitly handle boolean flags
+  if (testData.randomizeQuestions !== undefined) {
+    updateData.randomizeQuestions = testData.randomizeQuestions === true;
+  }
+  if (testData.oneShotAnswers !== undefined) {
+    updateData.oneShotAnswers = testData.oneShotAnswers === true;
+  }
+
+  const result = await Test.findOneAndUpdate(
+    { _id: new mongo.ObjectId(testId), teacherId: context.user?._id },
     { $set: updateData },
     { returnDocument: "after" },
   );

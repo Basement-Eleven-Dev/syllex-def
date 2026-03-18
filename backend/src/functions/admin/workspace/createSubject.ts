@@ -1,9 +1,12 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
 import { createCognitoUser } from "../../../_helpers/cognito/userManagement";
+import { User } from "../../../models/schemas/user.schema";
+import { Subject } from "../../../models/schemas/subject.schema";
+import { Assistant } from "../../../models/schemas/assistant.schema";
 
 const createSubjectHandler = async (
   request: APIGatewayProxyEvent,
@@ -15,10 +18,10 @@ const createSubjectHandler = async (
   const { name, teacherId, newTeacherData } = JSON.parse(request.body || "{}");
   if (!name) throw createError.BadRequest("Subject name is required");
 
-  const db = await getDefaultDatabase();
-  const orgObjectId = new ObjectId(orgId);
-  
-  let finalTeacherId: ObjectId | null = null;
+  await connectDatabase();
+  const orgObjectId = new mongo.ObjectId(orgId);
+
+  let finalTeacherId: Types.ObjectId | null = null;
 
   if (newTeacherData) {
     const { firstName, lastName, email } = newTeacherData;
@@ -30,7 +33,7 @@ const createSubjectHandler = async (
     const cognitoId = await createCognitoUser(email, firstName, lastName, "teacher");
 
     // 2. Create in MongoDB
-    const userResult = await db.collection("users").insertOne({
+    const userResult = await User.insertOne({
       cognitoId,
       email: email.toLowerCase().trim(),
       firstName,
@@ -40,9 +43,9 @@ const createSubjectHandler = async (
       createdAt: new Date(),
       updatedAt: new Date(),
     });
-    finalTeacherId = userResult.insertedId;
+    finalTeacherId = userResult._id;
   } else if (teacherId) {
-    finalTeacherId = new ObjectId(teacherId);
+    finalTeacherId = new mongo.ObjectId(teacherId);
   }
 
   const subjectData: any = {
@@ -53,15 +56,15 @@ const createSubjectHandler = async (
     updatedAt: new Date(),
   };
 
-  const result = await db.collection("subjects").insertOne(subjectData);
-  const subjectIdResult = result.insertedId;
+  const result = await Subject.insertOne(subjectData);
+  const subjectIdResult = result._id;
 
   // Initialize Assistant for this subject
-  await db.collection("assistants").insertOne({
+  await Assistant.insertOne({
     name: "Anna",
     tone: "friendly",
     voice: "neutral",
-    teacherId: finalTeacherId,
+    teacherId: finalTeacherId!,
     subjectId: subjectIdResult,
     organizationId: orgObjectId,
     associatedFileIds: [],

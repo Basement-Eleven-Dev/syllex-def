@@ -1,14 +1,10 @@
 import {
   APIGatewayProxyEvent,
-  APIGatewayProxyResult,
-  Handler,
 } from "aws-lambda";
-import { ObjectId } from "mongodb";
-import { mongoClient } from "./getDatabase";
-import { DB_NAME } from "../env";
-import { User } from "../models/user";
+import { User } from "../models/schemas/user.schema";
 import { CognitoJwtVerifier } from "aws-jwt-verify";
 import { CognitoIdTokenPayload } from "aws-jwt-verify/jwt-model";
+import { connectDatabase } from "./getDatabase";
 
 export type LoggedUserClaims = {
   sub: string;
@@ -62,7 +58,7 @@ export const getAuthCognitoUser = async (
 export const getCurrentUser = async (
   request: APIGatewayProxyEvent,
 ): Promise<User | null> => {
-  const client = await mongoClient();
+  await connectDatabase()
   try {
     const token = (
       request.headers.authorization || request.headers.Authorization
@@ -70,11 +66,8 @@ export const getCurrentUser = async (
     if (!token) return null;
     const decodedToken = await getAuthCognitoUser(token);
     if (!decodedToken) return null;
-    const user = await client
-      .db(DB_NAME)
-      .collection("users")
-      .findOne({ cognitoId: decodedToken.sub });
-    return user as User | null;
+    const user = await User.findOne({ cognitoId: decodedToken.sub }).lean();
+    return user
   } catch (error) {
     return null;
   }

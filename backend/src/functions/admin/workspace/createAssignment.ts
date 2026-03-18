@@ -1,8 +1,12 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { Types, mongo } from "mongoose";
+import { connectDatabase } from "../../../_helpers/getDatabase";
+import { User } from "../../../models/schemas/user.schema";
+import { Subject } from "../../../models/schemas/subject.schema";
+import { Class } from "../../../models/schemas/class.schema";
+import { TeacherAssignment } from "../../../models/schemas/teacher-assignment.schema";
 
 const createAssignment = async (
   request: APIGatewayProxyEvent,
@@ -11,7 +15,7 @@ const createAssignment = async (
   const organizationId = request.pathParameters?.organizationId;
   const { teacherId, subjectId, classId } = JSON.parse(request.body || '{}');
 
-  if (!organizationId || !ObjectId.isValid(organizationId)) {
+  if (!organizationId || !mongo.ObjectId.isValid(organizationId)) {
     throw createError.BadRequest("Invalid or missing organizationId");
   }
 
@@ -19,24 +23,24 @@ const createAssignment = async (
     throw createError.BadRequest("Missing required fields: teacherId, subjectId, classId");
   }
 
-  const db = await getDefaultDatabase();
-  const orgObjectId = new ObjectId(organizationId);
+  await connectDatabase();
+  const orgObjectId = new mongo.ObjectId(organizationId);
 
   // Verify entities belongs to organization
-  const teacher = await db.collection("users").findOne({ _id: new ObjectId(teacherId), organizationIds: orgObjectId });
+  const teacher = await User.findOne({ _id: new mongo.ObjectId(teacherId), organizationIds: orgObjectId });
   if (!teacher) throw createError.NotFound("Docente non trovato in questa organizzazione");
 
-  const subject = await db.collection("subjects").findOne({ _id: new ObjectId(subjectId), organizationId: orgObjectId });
+  const subject = await Subject.findOne({ _id: new mongo.ObjectId(subjectId), organizationId: orgObjectId });
   if (!subject) throw createError.NotFound("Materia non trovata");
 
-  const classData = await db.collection("classes").findOne({ _id: new ObjectId(classId), organizationId: orgObjectId });
+  const classData = await Class.findOne({ _id: new mongo.ObjectId(classId), organizationId: orgObjectId });
   if (!classData) throw createError.NotFound("Classe non trovata");
 
   // Check if assignment already exists
-  const existing = await db.collection("teacher_assignments").findOne({
-    teacherId: new ObjectId(teacherId),
-    subjectId: new ObjectId(subjectId),
-    classId: new ObjectId(classId),
+  const existing = await TeacherAssignment.findOne({
+    teacherId: new mongo.ObjectId(teacherId),
+    subjectId: new mongo.ObjectId(subjectId),
+    classId: new mongo.ObjectId(classId),
     organizationId: orgObjectId
   });
 
@@ -44,10 +48,10 @@ const createAssignment = async (
     throw createError.Conflict("Questo docente è già associato a questa materia per questa classe");
   }
 
-  const result = await db.collection("teacher_assignments").insertOne({
-    teacherId: new ObjectId(teacherId),
-    subjectId: new ObjectId(subjectId),
-    classId: new ObjectId(classId),
+  const result = await TeacherAssignment.insertOne({
+    teacherId: new mongo.ObjectId(teacherId),
+    subjectId: new mongo.ObjectId(subjectId),
+    classId: new mongo.ObjectId(classId),
     organizationId: orgObjectId,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -55,7 +59,7 @@ const createAssignment = async (
 
   return {
     success: true,
-    assignmentId: result.insertedId.toString(),
+    assignmentId: result._id.toString(),
     message: "Associazione creata con successo"
   };
 };

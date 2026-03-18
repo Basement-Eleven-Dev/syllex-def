@@ -19,7 +19,7 @@ type AttemptStatus = 'in-progress' | 'delivered' | 'reviewed';
 @Component({
   selector: 'app-student-test-card-compact',
   standalone: true,
-  imports: [CommonModule, DatePipe, FontAwesomeModule, RouterModule],
+  imports: [CommonModule, FontAwesomeModule, RouterModule],
   templateUrl: './student-test-card-compact.html',
   styleUrl: './student-test-card-compact.scss',
 })

@@ -12,7 +12,7 @@ import {
   getIconColor,
   isTextFile,
 } from '../../../app/_utils/file-icons';
-import { MaterialInterface } from '../../../services/materiali-service';
+import { MaterialInterface } from '../../../services/materiali/materiali-service';
 
 @Component({
   selector: 'app-materiali-item',

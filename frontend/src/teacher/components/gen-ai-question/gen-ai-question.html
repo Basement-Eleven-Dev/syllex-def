@@ -1,8 +1,6 @@
 <form [formGroup]="genAiQuestionForm" (ngSubmit)="onGenerate()">
   <div class="offcanvas-body dvh-100 overflow-scroll py-4">
-    <div
-      class="h-100 d-flex flex-column gap-3 justify-content-between "
-    >
+    <div class="h-100 d-flex flex-column gap-3 justify-content-between">
       <section class="form-section">
         <app-type-selector
           [options]="questionTypeOptions"
@@ -48,9 +46,11 @@
               formControlName="difficulty"
               aria-label="Seleziona difficoltà"
             >
-              <option [value]="1">Facile</option>
-              <option [value]="2">Media</option>
-              <option [value]="3">Difficile</option>
+              <option value="elementary">Elementare</option>
+              <option value="easy">Facile</option>
+              <option value="medium">Media</option>
+              <option value="hard">Difficile</option>
+              <option value="very_hard">Molto difficile</option>
             </select>
           </div>
         </div>

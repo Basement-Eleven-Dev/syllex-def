@@ -1,8 +1,14 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { Organization } from "../../../models/schemas/organization.schema";
+import { Subject } from "../../../models/schemas/subject.schema";
+import { Class } from "../../../models/schemas/class.schema";
+import { User } from "../../../models/schemas/user.schema";
+import { Test } from "../../../models/schemas/test.schema";
+import { Attempt } from "../../../models/schemas/attempt.schema";
 
 const getWorkspaceDetails = async (
   request: APIGatewayProxyEvent,
@@ -10,21 +16,21 @@ const getWorkspaceDetails = async (
 ) => {
   const organizationId = request.pathParameters?.organizationId;
 
-  if (!organizationId || !ObjectId.isValid(organizationId)) {
+  if (!organizationId || !mongo.ObjectId.isValid(organizationId)) {
     throw createError.BadRequest("Invalid or missing organizationId");
   }
 
-  const db = await getDefaultDatabase();
-  const orgObjectId = new ObjectId(organizationId);
+  await connectDatabase();
+  const orgObjectId = new mongo.ObjectId(organizationId);
 
   // 1. Get Organization basic info
-  const organization = await db.collection("organizations").findOne({ _id: orgObjectId });
+  const organization = await Organization.findOne({ _id: orgObjectId });
   if (!organization) {
     throw createError.NotFound("Organization not found");
   }
 
   // 2. Base Stats (Total counts)
-  const staffCount = await db.collection("users").countDocuments({ 
+  const staffCount = await User.countDocuments({
     $or: [
       { organizationId: orgObjectId },
       { organizationIds: orgObjectId }
@@ -32,7 +38,7 @@ const getWorkspaceDetails = async (
     role: { $in: ["teacher", "admin"] }
   });
 
-  const studentsCount = await db.collection("users").countDocuments({ 
+  const studentsCount = await User.countDocuments({
     $or: [
       { organizationId: orgObjectId },
       { organizationIds: orgObjectId }
@@ -40,53 +46,53 @@ const getWorkspaceDetails = async (
     role: "student"
   });
 
-  const classesCount = await db.collection("classes").countDocuments({ 
+  const classesCount = await Class.countDocuments({
     organizationId: orgObjectId
   });
 
-  const subjectsCount = await db.collection("subjects").countDocuments({ 
+  const subjectsCount = await Subject.countDocuments({
     organizationId: orgObjectId
   });
 
   // 3. Performance Trend (Average Score over last 15 days)
-  const subjects = await db.collection("subjects").find({ organizationId: orgObjectId }).project({ _id: 1 }).toArray();
+  const subjects = await Subject.find({ organizationId: orgObjectId }, { _id: 1 })
   const subjectIds = subjects.map(s => s._id);
-  const tests = await db.collection("tests").find({ subjectId: { $in: subjectIds } }).project({ _id: 1 }).toArray();
+  const tests = await Test.find({ subjectId: { $in: subjectIds } }, { _id: 1 });
   const testIds = tests.map(t => t._id);
 
   const fifteenDaysAgo = new Date();
   fifteenDaysAgo.setDate(fifteenDaysAgo.getDate() - 15);
-  
-  const performanceTrend = await db.collection("attempts").aggregate([
-    { 
-      $match: { 
+
+  const performanceTrend = await Attempt.aggregate([
+    {
+      $match: {
         testId: { $in: testIds },
         deliveredAt: { $gte: fifteenDaysAgo }
-      } 
+      }
     },
     {
       $group: {
         _id: { $dateToString: { format: "%Y-%m-%d", date: "$deliveredAt" } },
-        avgScore: { 
-          $avg: { 
+        avgScore: {
+          $avg: {
             $cond: [
               { $gt: ["$maxScore", 0] },
               { $multiply: [{ $divide: ["$score", "$maxScore"] }, 100] },
               0
             ]
-          } 
+          }
         }
       }
     },
     { $sort: { "_id": 1 } }
-  ]).toArray();
+  ]);
 
   // 4. Role Distribution
-  const roleDistribution = await db.collection("users").aggregate([
-    { 
-      $match: { 
-        $or: [{ organizationId: orgObjectId }, { organizationIds: orgObjectId }] 
-      } 
+  const roleDistribution = await User.aggregate([
+    {
+      $match: {
+        $or: [{ organizationId: orgObjectId }, { organizationIds: orgObjectId }]
+      }
     },
     {
       $group: {
@@ -94,17 +100,17 @@ const getWorkspaceDetails = async (
         count: { $sum: 1 }
       }
     }
-  ]).toArray();
+  ]);
 
   // 5. Overall Content Totals
-  const totalTests = await db.collection("tests").countDocuments({ subjectId: { $in: subjectIds } });
-  const totalAttempts = await db.collection("attempts").countDocuments({ testId: { $in: testIds } });
+  const totalTests = await Test.countDocuments({ subjectId: { $in: subjectIds } });
+  const totalAttempts = await Attempt.countDocuments({ testId: { $in: testIds } });
 
   return {
     success: true,
     organization: {
-        ...organization,
-        _id: organization._id.toString()
+      ...organization,
+      _id: organization._id.toString()
     },
     stats: {
       staffCount,

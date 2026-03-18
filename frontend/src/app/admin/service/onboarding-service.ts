@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class OnboardingService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   submitOnboarding(payload: any): Observable<any> {
     return this.http.post('admin/onboarding', payload);
@@ -41,7 +41,7 @@ export class OnboardingService {
   }
 
   bulkImportStudents(orgId: string, classId: string, students: any[]): Observable<any> {
-    return this.http.post(`admin/organizations/${orgId}/students/bulk`, { classId, students });
+    return this.http.post(`admin/organizations/${orgId}/import-students`, { classId, students });
   }
 
   getClassDetail(orgId: string, classId: string): Observable<any> {

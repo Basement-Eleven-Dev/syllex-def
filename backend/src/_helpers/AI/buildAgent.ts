@@ -1,31 +1,30 @@
-import { ObjectId } from "bson";
-import { getDefaultDatabase } from "../getDatabase";
-import { getSubjectById } from "../DB/subjects/getSubjectById";
+import { connectDatabase } from "../getDatabase";
+import { Assistant } from "../../models/schemas/assistant.schema";
+import { Subject } from "../../models/schemas/subject.schema";
+import { ObjectId, Types } from "mongoose";
 
 export async function buildAgent(
-  assistantId: string,
+  subjectId: Types.ObjectId,
   context: string,
   messagesHistory: { role: string; content: string }[],
 ) {
-  const db = await getDefaultDatabase();
+  await connectDatabase();
   const messagesContext = messagesHistory
     .map(
       (msg) =>
         `${msg.role === "user" ? "Utente" : "Assistente"}: ${msg.content}`,
     )
     .join("\n");
-  const assistant = await db
-    .collection("assistants")
-    .findOne({ _id: new ObjectId(assistantId) });
+  const assistant = await Assistant.findOne({ subjectId: subjectId });
   if (!assistant) {
     throw new Error("Assistant not found");
   }
-  const { tone, voice, subjectId, name } = assistant;
-  const subject = await getSubjectById(subjectId);
+  const { tone, voice, name } = assistant;
+  const subject = await Subject.findById(subjectId);
 
   const systemPrompt = `
 RUOLO
-Agisci come ${name}, assistente didattico specializzato in ${subject.name}. Il tuo obiettivo è supportare il docente con un tono ${tone} e una voce ${voice}.
+Agisci come ${name}, assistente didattico specializzato in ${subject!.name}. Il tuo obiettivo è supportare il docente con un tono ${tone} e una voce ${voice}.
 
 FONTI DI CONOSCENZA (RAG Strict)
 Hai accesso a due sole fonti di verità. Considerale in questo ordine di priorità:
@@ -38,7 +37,7 @@ REGOLE DI COMPORTAMENTO (Mandatorie)
 
 Vincolo di Conoscenza: Rispondi esclusivamente basandoti sulle fonti sopra citate. Se l'informazione non è presente o il contesto è vuoto, dichiara con cortesia: "Mi dispiace, ma i materiali a mia disposizione non contengono informazioni su questo argomento."
 
-Pertinenza: Se la domanda esula dalla materia (${subject.name}) o dai documenti forniti, declina la risposta spiegando che il tuo supporto è limitato all'ambito specifico.
+Pertinenza: Se la domanda esula dalla materia (${subject!.name}) o dai documenti forniti, declina la risposta spiegando che il tuo supporto è limitato all'ambito specifico.
 
 Niente Conoscenza Esterna: Non integrare con dati provenienti dal tuo addestramento generale, anche se sembrano corretti. Non inventare mai.
 

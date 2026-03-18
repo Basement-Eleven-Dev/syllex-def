@@ -1,4 +1,4 @@
-import { DatePipe, TitleCasePipe } from '@angular/common';
+import { DatePipe, syncPipe, TitleCasePipe, UpperCasePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject, ViewChild } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -15,9 +15,10 @@ import {
   NgbDropdownItem,
   NgbModal,
 } from '@ng-bootstrap/ng-bootstrap';
-import { Auth } from '../../../services/auth';
+import { Auth, User } from '../../../services/auth';
 import { Calendario } from '../calendario/calendario';
 import { UserContextualMenu } from '../user-contextual-menu/user-contextual-menu';
+import { map, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-nav',
@@ -29,9 +30,10 @@ import { UserContextualMenu } from '../user-contextual-menu/user-contextual-menu
     NgbDropdown,
     NgbDropdownToggle,
     NgbDropdownMenu,
-    NgbDropdownItem,
     UserContextualMenu,
     TourAnchorNgBootstrapDirective,
+    AsyncPipe,
+    UpperCasePipe
   ],
   templateUrl: './nav.html',
   styleUrl: './nav.scss',
@@ -42,12 +44,25 @@ export class Nav implements OnInit, OnDestroy {
   now: number = Date.now();
   private intervalId?: number;
   UserProfileIcon = faUserCircle;
+  user: Observable<User | null>;
 
   constructor(
     public authService: Auth,
     private modalService: NgbModal,
-  ) {}
+  ) {
+    this.user = this.authService.user$;
+  }
 
+  getInitals() {
+    return this.authService.user$.pipe(
+      map((user) => {
+        if (!user || !user.firstName || !user.lastName) {
+          return '';
+        }
+        return user.firstName.charAt(0) + user.lastName.charAt(0);
+      })
+    );
+  }
   ngOnInit() {
     this.intervalId = window.setInterval(() => {
       this.now = Date.now();

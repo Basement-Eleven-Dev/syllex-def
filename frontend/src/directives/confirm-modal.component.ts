@@ -27,7 +27,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
       </button>
       <button
         type="button"
-        class="btn btn-danger"
+        class="btn btn-red"
         (click)="activeModal.close('confirm')"
       >
         {{ confirmText }}

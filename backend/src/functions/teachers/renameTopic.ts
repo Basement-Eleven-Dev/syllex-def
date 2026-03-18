@@ -1,12 +1,16 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { Topic } from "../../models/schemas/topic.schema";
 
 const renameTopic = async (request: APIGatewayProxyEvent, context: Context) => {
-  const subjectId = new ObjectId(request.pathParameters!.subjectId!);
-  const topicId = new ObjectId(request.pathParameters!.topicId!);
+  const subjectId = context.subjectId;
+  if (!subjectId) {
+    throw createError.BadRequest('Subject-Id header is required')
+  }
+  const topicId = new mongo.ObjectId(request.pathParameters!.topicId!);
   const body = JSON.parse(request.body || "{}");
   const name = body.name?.trim();
 
@@ -15,10 +19,9 @@ const renameTopic = async (request: APIGatewayProxyEvent, context: Context) => {
   }
 
   try {
-    let db = await getDefaultDatabase();
-    let topicsCollection = db.collection("topics");
+    await connectDatabase();
 
-    let result = await topicsCollection.updateOne(
+    let result = await Topic.updateOne(
       { _id: topicId, subjectId },
       { $set: { name } },
     );

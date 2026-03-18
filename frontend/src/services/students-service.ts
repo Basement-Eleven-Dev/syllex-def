@@ -1,17 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { User } from './auth';
 import { Observable } from 'rxjs/internal/Observable';
 
 @Injectable({
   providedIn: 'root',
 })
 export class StudentsService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  getStudents(studentIds: string[]): Observable<{ students: User[] }> {
-    return this.http.post<{ students: User[] }>('students', { studentIds });
-  }
 
   getStudentDetails(
     studentId: string,
@@ -25,19 +21,15 @@ export class StudentsService {
     if (subjectId) params.subjectId = subjectId;
     params.page = page.toString();
     params.limit = limit.toString();
-    return this.http.get(`teacher/students/${studentId}/details`, { params });
+    return this.http.get(`students/${studentId}`, { params });
   }
 
   getStudentInsight(
     studentId: string,
     subjectId?: string,
   ): Observable<{ insight: string }> {
-    const params: any = {};
-    if (subjectId) params.subjectId = subjectId;
-    return this.http.post<{ insight: string }>(
-      `teacher/students/${studentId}/insight`,
-      {},
-      { params },
+    return this.http.get<{ insight: string }>(
+      `students/${studentId}/insight`
     );
   }
 }

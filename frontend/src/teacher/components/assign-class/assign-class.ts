@@ -5,8 +5,9 @@ import { TestsService, TestInterface } from '../../../services/tests-service';
 import {
   MaterialiService,
   MaterialInterface,
-} from '../../../services/materiali-service';
+} from '../../../services/materiali/materiali-service';
 import { ClassiService } from '../../../services/classi-service';
+import { FeedbackService } from '../../../services/feedback-service';
 
 type ResourceType = 'test' | 'material';
 type Resource = TestInterface | MaterialInterface;
@@ -22,6 +23,7 @@ export class AssignClass implements OnInit {
   private readonly testsService = inject(TestsService);
   private readonly materialsService = inject(MaterialiService);
   readonly classiService = inject(ClassiService);
+  private readonly feedbackService = inject(FeedbackService);
 
   // Public properties for NgbModal compatibility
   resourceType!: ResourceType;
@@ -66,6 +68,10 @@ export class AssignClass implements OnInit {
           },
           error: (err: unknown) => {
             console.error('Error updating class assignment:', err);
+            this.feedbackService.showFeedback(
+              "Errore nell'aggiornamento dell'assegnazione",
+              false,
+            );
             this.ErrorMessage.set('Failed to update class assignment');
             this.IsSaving.set(false);
           },
@@ -85,6 +91,10 @@ export class AssignClass implements OnInit {
           },
           error: (err: unknown) => {
             console.error('Error updating class assignment:', err);
+            this.feedbackService.showFeedback(
+              "Errore nell'aggiornamento dell'assegnazione",
+              false,
+            );
             this.ErrorMessage.set('Failed to update class assignment');
             this.IsSaving.set(false);
           },

@@ -11,8 +11,7 @@ export type FunctionIntegration = {
   extensionLayers?: { name: string; arn: string }[];
 };
 
-export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
-  //rotte per ADMIN
+const ADMIN_ROUTES: FunctionIntegration[] = [
   {
     apiRoute: "admin/onboarding",
     functionPath: "admin/onboarding/createOnboarding.ts",
@@ -56,7 +55,7 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "admin",
   },
   {
-    apiRoute: "admin/organizations/{organizationId}/students/bulk",
+    apiRoute: "admin/organizations/{organizationId}/import-students",
     functionPath: "admin/workspace/bulkImportStudents.ts",
     method: "post",
     role: "admin",
@@ -110,65 +109,104 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "admin",
   }, */
   {
-    apiRoute: "admin/stats/global",
+    apiRoute: "admin/global-stats",
     functionPath: "admin/stats/getSuperAdminStats.ts",
     method: "get",
     role: "admin",
   },
+];
+
+const SUBJECTS_ROUTES: FunctionIntegration[] = [
   {
-    apiRoute: "teachers/{teacherId}/subjects",
+    apiRoute: "subjects",
     functionPath: "teachers/getSubjects.ts",
     method: "get",
-    role: "teacher",
+    role: "logged",
   },
   {
-    apiRoute: "subjects/{subjectId}/topics",
+    apiRoute: "topics",
     functionPath: "teachers/addTopic.ts",
     method: "post",
     role: "teacher",
   },
   {
-    apiRoute: "subjects/{subjectId}/topics/{topicId}",
+    apiRoute: "topics/{topicId}",
     functionPath: "teachers/renameTopic.ts",
     method: "put",
     role: "teacher",
   },
+
+]
+
+const CLASSES_ROUTES: FunctionIntegration[] = [
   {
-    apiRoute: "teacher/subject/classes",
-    functionPath: "teachers/getSubjectClasses.ts",
+    apiRoute: "classes",
+    functionPath: "classes/getSubjectClasses.ts",
+    method: "get",
+    role: "logged",
+  },
+  {
+    apiRoute: "classes/{classId}/students",
+    functionPath: "students/getClassStudents.ts",
     method: "get",
     role: "teacher",
   },
   {
-    apiRoute: "teacher/classes",
-    functionPath: "teachers/getAllClasses.ts",
+    apiRoute: "classes/{classId}/attempts",
+    functionPath: "tests/getClassAttempts.ts",
     method: "get",
     role: "teacher",
   },
   {
-    apiRoute: "students",
-    functionPath: "students/getStudents.ts",
+    apiRoute: "classes/{classId}/topics-performance",
+    functionPath: "tests/getClassTopicsPerformance.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "classes/{classId}/tests",
+    functionPath: "tests/getClassAssignedTests.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "assignments",
+    functionPath: "classes/getAllClasses.ts",
+    method: "get",
+    role: "logged",
+  },
+
+
+]
+
+const EVENTS_ROUTES: FunctionIntegration[] = [
+  {
+    apiRoute: "events",
+    functionPath: "events/getEvents.ts",
+    method: "get",
+    role: "logged",
+  },
+  {
+    apiRoute: "events",
+    functionPath: "events/createEvent.ts",
     method: "post",
     role: "teacher",
   },
   {
-    apiRoute: "teacher/classes/all",
-    functionPath: "teachers/getAllTeacherClasses.ts",
-    method: "get",
+    apiRoute: "events/{eventId}",
+    functionPath: "events/deleteEvent.ts",
+    method: "delete",
     role: "teacher",
   },
   {
-    apiRoute: "student/classes/all",
-    functionPath: "students/getAllStudentClasses.ts",
-    method: "get",
-    role: "student",
+    apiRoute: "events/{eventId}",
+    functionPath: "events/updateEvent.ts",
+    method: "put",
+    role: "teacher",
   },
-  {
-    apiRoute: "student/subject/classes",
-    functionPath: "students/getStudentSubjectClasses.ts",
-    method: "get",
-    role: "student",
-  },
+]
+
+const MISC_ROUTES: FunctionIntegration[] = [
   {
     apiRoute: "profile",
     functionPath: "profile/getMyProfile.ts",
@@ -188,89 +226,20 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "open",
   },
   {
-    apiRoute: "files/upload",
-    functionPath: "files/createUpload.ts",
-    method: "post",
-    role: "open", //!!!DA RIMETTERE A ROLE:TEACHER
-  },
-  {
-    apiRoute: "questions",
-    functionPath: "questions/getQuestions.ts",
+    apiRoute: "organizations/{organizationId}",
+    functionPath: "organizations/getOrganizationById.ts",
     method: "get",
-    role: "teacher",
+    role: "logged",
   },
   {
-    apiRoute: "questions/{questionId}",
-    functionPath: "questions/getQuestionById.ts",
-    method: "get",
-    role: "logged", //!!!DA RIMETTERE A ROLE:TEACHER
-  },
-  {
-    apiRoute: "questions",
-    functionPath: "questions/createQuestion.ts",
+    apiRoute: "reports",
+    functionPath: "reports/createReport.ts",
     method: "post",
     role: "teacher",
   },
-  {
-    apiRoute: "questions/{questionId}/edit",
-    functionPath: "questions/editQuestion.ts",
-    method: "put",
-    role: "teacher",
-  },
-  {
-    apiRoute: "materials/subject",
-    functionPath: "materials/getMaterials.ts",
-    method: "get",
-    role: "teacher",
-  },
-  {
-    apiRoute: "materials",
-    functionPath: "materials/createMaterial.ts",
-    method: "post",
-    role: "teacher",
-  },
-  {
-    apiRoute: "materials/{materialId}",
-    functionPath: "materials/deleteMaterial.ts",
-    method: "delete",
-    role: "teacher",
-  },
-  {
-    apiRoute: "materials/{materialId}",
-    functionPath: "materials/getMaterialById.ts",
-    method: "get",
-    role: "student",
-  },
-  {
-    apiRoute: "materials/{materialId}/move",
-    functionPath: "materials/moveMaterial.ts",
-    method: "post",
-    role: "teacher",
-  },
-  {
-    apiRoute: "materials/move-batch",
-    functionPath: "materials/moveMaterialsBatch.ts",
-    method: "post",
-    role: "teacher",
-  },
-  {
-    apiRoute: "materials/delete-batch",
-    functionPath: "materials/deleteMaterialsBatch.ts",
-    method: "post",
-    role: "teacher",
-  },
-  {
-    apiRoute: "materials/{materialId}/rename",
-    functionPath: "materials/renameMaterial.ts",
-    method: "put",
-    role: "teacher",
-  },
-  {
-    apiRoute: "materials/{materialId}/classes",
-    functionPath: "materials/updateMaterialClasses.ts",
-    method: "put",
-    role: "teacher",
-  },
+]
+
+const COMMUNICATIONS_ROUTES: FunctionIntegration[] = [
   {
     apiRoute: "communications",
     functionPath: "communications/getCommunications.ts",
@@ -301,21 +270,210 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     method: "delete",
     role: "teacher",
   },
+]
+
+const QUESTIONS_ROUTES: FunctionIntegration[] = [
   {
-    apiRoute: "organizations/{organizationId}",
-    functionPath: "organizations/getOrganizationById.ts",
+    apiRoute: "questions",
+    functionPath: "questions/getQuestions.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "questions/{questionId}",
+    functionPath: "questions/getQuestionById.ts",
+    method: "get",
+    role: "logged",
+  },
+  {
+    apiRoute: "questions",
+    functionPath: "questions/createQuestion.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "questions/{questionId}",
+    functionPath: "questions/editQuestion.ts",
+    method: "put",
+    role: "teacher",
+  },
+]
+
+const AI_ROUTES: FunctionIntegration[] = [
+  {
+    apiRoute: "ai/questions",
+    functionPath: "ai/createAiGenQuestion.ts",
+    method: "post",
+    role: "open",
+  }, {
+    apiRoute: "ai/materials",
+    functionPath: "ai/createAiGenMaterial.ts",
+    method: "post",
+    role: "teacher",
+    extensionLayers: [
+      {
+        name: "pandoc",
+        arn: "arn:aws:lambda:eu-south-1:851725509686:layer:pandoc:1",
+      } /*, {
+      name: "wkhtml",
+      arn: "arn:aws:lambda:eu-south-1:851725509686:layer:wkhtmltox:1"
+    }*/,
+    ],
+  }
+]
+
+const STUDENTS_ROUTES: FunctionIntegration[] = [
+  {
+    apiRoute: "students/{studentId}",
+    functionPath: "teachers/getStudentDetails.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "students/{studentId}/insight",
+    functionPath: "teachers/getStudentInsight.ts",
+    method: "get",
+    role: "teacher",
+  },
+
+
+]
+
+const ASSISTANTS_ROUTES: FunctionIntegration[] = [
+  {
+    apiRoute: "assistant",
+    functionPath: "assistants/createAssistant.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "assistant",
+    functionPath: "assistants/getAssistant.ts",
+    method: "get",
+    role: "logged",
+  },
+  {
+    apiRoute: "assistant",
+    functionPath: "assistants/updateAssistant.ts",
+    method: "put",
+    role: "teacher",
+  },
+  {
+    apiRoute: "assistant/response",
+    functionPath: "assistants/generateResponse.ts",
+    method: "post",
+    role: "logged",
+  },
+  {
+    apiRoute: "assistant/materials/{materialId}",
+    functionPath: "assistants/removeMaterial.ts",
+    method: "delete",
+    role: "teacher",
+  },
+  {
+    apiRoute: "messages",
+    functionPath: "messages/getConversationHistory.ts",
+    method: "get",
+    role: "logged",
+  },
+  {
+    apiRoute: "messages/{messageId}/generate-audio",
+    functionPath: "messages/listenToMessage.ts",
+    method: "post",
+    role: "logged",
+  },
+];
+
+const MATERIALS_ROUTES: FunctionIntegration[] = [
+  {
+    apiRoute: "files/upload",
+    functionPath: "files/createUpload.ts",
+    method: "post",
+    role: "teacher",
+  }, {
+    apiRoute: "proxy/gamma/{generationId}",
+    functionPath: "ai/gammaGenerationProxy.ts",
+    method: "get",
+    role: "open",
+  },
+  {
+    apiRoute: "materials",
+    functionPath: "materials/getMaterials.ts",
+    method: "get",
+    role: "logged",
+  },
+  {
+    apiRoute: "materials",
+    functionPath: "materials/createMaterial.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "materials/{materialId}",
+    functionPath: "materials/deleteMaterial.ts",
+    method: "delete",
+    role: "teacher",
+  },
+  {
+    apiRoute: "materials/{materialId}",
+    functionPath: "materials/getMaterialById.ts",
+    method: "get",
+    role: "student",
+  },
+  {
+    apiRoute: "materials/{materialId}/move",
+    functionPath: "materials/moveMaterial.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "materials/{materialId}/rename",
+    functionPath: "materials/renameMaterial.ts",
+    method: "put",
+    role: "teacher",
+  },
+  {
+    apiRoute: "batch/materials/move",
+    functionPath: "materials/moveMaterialsBatch.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "batch/materials/delete",
+    functionPath: "materials/deleteMaterialsBatch.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "batch/materials/vectorize",
+    functionPath: "embeddings/vectorizeMaterials.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "materials/{materialId}/classes",
+    functionPath: "materials/updateMaterialClasses.ts",
+    method: "put",
+    role: "teacher",
+  },
+];
+
+const TESTS_ROUTES: FunctionIntegration[] = [
+  {
+    apiRoute: "tests",
+    functionPath: "tests/getTests.ts",
     method: "get",
     role: "logged",
   },
   {
     apiRoute: "tests",
-    functionPath: "tests/getTests.ts",
-    method: "get",
+    functionPath: "tests/createTest.ts",
+    method: "post",
     role: "teacher",
   },
   {
-    apiRoute: "tests",
-    functionPath: "tests/createTest.ts",
+    apiRoute: "tests/{testId}/insight",
+    functionPath: "teachers/generateTestInsight.ts",
     method: "post",
     role: "teacher",
   },
@@ -344,222 +502,35 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
-    apiRoute: "tests/assignments-to-grade/count",
-    functionPath: "tests/countAssignmentsToGrade.ts",
-    method: "get",
-    role: "teacher",
-  },
-  {
-    apiRoute: "teacher/students/{studentId}/details",
-    functionPath: "teachers/getStudentDetails.ts",
-    method: "get",
-    role: "teacher",
-  },
-  {
-    apiRoute: "teacher/students/{studentId}/insight",
-    functionPath: "teachers/generateStudentInsight.ts",
-    method: "post",
-    role: "teacher",
-  },
-
-  {
     apiRoute: "tests/{testId}/classes",
     functionPath: "tests/updateTestClasses.ts",
     method: "put",
     role: "teacher",
   },
+  {
+    apiRoute: "test/{testId}/attempts-details",
+    functionPath: "tests/getTestAttemptsDetails.ts",
+    method: "get",
+    role: "teacher",
+  },
 
+]
+
+const ATTEMPTS_ROUTES: FunctionIntegration[] = [
   {
-    apiRoute: "ai/materials",
-    functionPath: "ai/createAiGenMaterial.ts",
-    method: "post",
-    role: "teacher",
-    extensionLayers: [
-      {
-        name: "pandoc",
-        arn: "arn:aws:lambda:eu-south-1:851725509686:layer:pandoc:1",
-      } /*, {
-      name: "wkhtml",
-      arn: "arn:aws:lambda:eu-south-1:851725509686:layer:wkhtmltox:1"
-    }*/,
-    ],
-  },
-  {
-    apiRoute: "ai/questions",
-    functionPath: "ai/createAiGenQuestion.ts",
-    method: "post",
-    role: "open",
-  },
-  {
-    apiRoute: "proxy/gamma/{generationId}",
-    functionPath: "ai/gammaGenerationProxy.ts",
+    apiRoute: "attempts", //dovrebbe ritornare una lista di attempts, ora ritorna solo il count
+    functionPath: "tests/countAssignmentsToGrade.ts",
     method: "get",
-    role: "open",
+    role: "teacher"
   },
   {
-    apiRoute: "reports",
-    functionPath: "reports/createReport.ts",
-    method: "post",
-    role: "teacher",
-  },
-  {
-    apiRoute: "class/{classId}/students",
-    functionPath: "students/getClassStudents.ts",
-    method: "get",
-    role: "teacher",
-  },
-  {
-    apiRoute: "class/{classId}/tests",
-    functionPath: "tests/getClassAssignedTests.ts",
-    method: "get",
-    role: "teacher",
-  },
-  {
-    apiRoute: "attempts/class/{classId}",
-    functionPath: "tests/getClassAttempts.ts",
-    method: "get",
-    role: "teacher",
-  },
-  {
-    apiRoute: "attempts/class/{classId}/topics-performance",
-    functionPath: "tests/getClassTopicsPerformance.ts",
-    method: "get",
-    role: "teacher",
-  },
-  {
-    apiRoute: "events",
-    functionPath: "events/getEvents.ts",
-    method: "get",
-    role: "logged",
-  },
-  {
-    apiRoute: "events",
-    functionPath: "events/createEvent.ts",
-    method: "post",
-    role: "teacher",
-  },
-  {
-    apiRoute: "assistants/create",
-    functionPath: "assistants/createAssistant.ts",
-    method: "post",
-    role: "teacher",
-  },
-  {
-    apiRoute: "events/{eventId}",
-    functionPath: "events/deleteEvent.ts",
-    method: "delete",
-    role: "teacher",
-  },
-  {
-    apiRoute: "events/{eventId}",
-    functionPath: "events/updateEvent.ts",
-    method: "put",
-    role: "teacher",
-  },
-  {
-    apiRoute: "assistants/get",
-    functionPath: "assistants/getAssistant.ts",
-    method: "post",
-    role: "logged",
-  },
-  {
-    apiRoute: "assistants/response",
-    functionPath: "assistants/generateResponse.ts",
-    method: "post",
-    role: "logged",
-  },
-  {
-    apiRoute: "assistants/update",
-    functionPath: "assistants/updateAssistant.ts",
-    method: "post",
-    role: "teacher",
-  },
-  {
-    apiRoute: "materials/vectorize",
-    functionPath: "embeddings/vectorizeMaterials.ts",
-    method: "post",
-    role: "teacher",
-  },
-  {
-    apiRoute: "messages/history",
-    functionPath: "messages/getConversationHistory.ts",
-    method: "post",
-    role: "logged",
-  },
-  {
-    apiRoute: "messages/listen",
-    functionPath: "messages/listenToMessage.ts",
-    method: "post",
-    role: "logged",
-  },
-  {
-    apiRoute: "students/me/subjects",
-    functionPath: "students/getStudentSubjects.ts",
-    method: "get",
-    role: "student",
-  },
-  {
-    apiRoute: "students/me/materials",
-    functionPath: "students/getStudentMaterials.ts",
-    method: "get",
-    role: "student",
-  },
-  {
-    apiRoute: "students/tests",
-    functionPath: "students/tests/getStudentTests.ts",
-    method: "get",
-    role: "student",
-  },
-  {
-    apiRoute: "students/test/execution",
-    functionPath: "students/tests/executeTest.ts",
-    method: "post",
-    role: "student",
-  },
-  {
-    apiRoute: "students/test/{testId}/attempt",
-    functionPath: "students/tests/getStudentAttempt.ts",
-    method: "get",
-    role: "student",
-  },
-  {
-    apiRoute: "students/test/attempt",
-    functionPath: "students/tests/createStudentAttempt.ts",
-    method: "post",
-    role: "student",
-  },
-  {
-    apiRoute: "students/test/attempt/{attemptId}",
-    functionPath: "students/tests/updateStudentAttempt.ts",
-    method: "put",
-    role: "student",
-  },
-  {
-    apiRoute: "students/test/attempt/{attemptId}/submit",
-    functionPath: "students/tests/submitStudentAttempt.ts",
-    method: "post",
-    role: "student",
-  },
-  {
-    apiRoute: "students/self-evaluation",
+    apiRoute: "attempts", //student self evaluation
     functionPath: "students/selfEvaluation/createSelfEvaluationTest.ts",
     method: "post",
     role: "student",
   },
   {
-    apiRoute: "assistants/remove-material",
-    functionPath: "assistants/removeMaterial.ts",
-    method: "post",
-    role: "teacher",
-  },
-  {
-    apiRoute: "test/attempts/details/{testId}",
-    functionPath: "tests/getTestAttemptsDetails.ts",
-    method: "get",
-    role: "teacher",
-  },
-  {
-    apiRoute: "attempts/details/{attemptId}",
+    apiRoute: "attempts/{attemptId}/details",
     functionPath: "attempts/getAttemptDetails.ts",
     method: "get",
     role: "teacher",
@@ -571,21 +542,60 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
     role: "teacher",
   },
   {
-    apiRoute: "attempts/{attemptId}/{questionId}/correction/ai",
+    apiRoute: "attempts/{attemptId}/questions/{questionId}/ai-correction",
     functionPath: "attempts/correctAttemptWithAI.ts",
     method: "post",
     role: "teacher",
   },
   {
-    apiRoute: "test/insight/{testId}",
-    functionPath: "teachers/generateTestInsight.ts",
-    method: "post",
+    apiRoute: "attempts/{attemptId}/insight",
+    functionPath: "teachers/generateAttemptInsight.ts",
+    method: "get",
     role: "teacher",
   },
   {
-    apiRoute: "attempts/insight/{attemptId}",
-    functionPath: "teachers/generateAttemptInsight.ts",
-    method: "post",
-    role: "teacher",
+    apiRoute: "test/{testId}/attempt", //missing /{attemptId}?
+    functionPath: "students/tests/getStudentAttempt.ts",
+    method: "get",
+    role: "student",
   },
+  {
+    apiRoute: "test/{testId}/attempt",
+    functionPath: "students/tests/createStudentAttempt.ts",
+    method: "post",
+    role: "student",
+  },
+  {
+    apiRoute: "test/{testId}/attempt/{attemptId}",
+    functionPath: "students/tests/updateStudentAttempt.ts",
+    method: "put",
+    role: "student",
+  },
+  {
+    apiRoute: "test/{testId}/attempt/{attemptId}/submit",
+    functionPath: "students/tests/submitStudentAttempt.ts",
+    method: "post",
+    role: "student",
+  },
+]
+
+
+
+
+
+export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
+  ...MISC_ROUTES,
+  ...ADMIN_ROUTES,
+  ...EVENTS_ROUTES,
+  ...TESTS_ROUTES,
+  ...SUBJECTS_ROUTES,
+  ...CLASSES_ROUTES,
+  ...COMMUNICATIONS_ROUTES,
+  ...QUESTIONS_ROUTES,
+  ...AI_ROUTES,
+  ...STUDENTS_ROUTES,
+  ...ASSISTANTS_ROUTES,
+  ...MATERIALS_ROUTES,
+  ...ATTEMPTS_ROUTES,
+
 ];

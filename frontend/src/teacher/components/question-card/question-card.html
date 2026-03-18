@@ -39,8 +39,8 @@
 
     <!-- ── Question text ── -->
     <section>
-<!--       <p class="mb-0 ">Domanda</p> -->
-      <p class="mb-0 mt-1" style="font-size: 1.05rem;">{{ question.text }}</p>
+      <!--       <p class="mb-0 ">Domanda</p> -->
+      <p class="mb-0 mt-1" style="font-size: 1.05rem">{{ question.text }}</p>
     </section>
 
     <!-- ── Options ── -->
@@ -172,7 +172,9 @@
     <!-- ── Correzione (banca / ai-review) ── -->
     @if (mode === 'banca' || mode === 'ai-review') {
     <section>
-      <p class="mb-0 fw-bold  mt-2 text-muted" style="font-size: 0.8rem">Correzione</p>
+      <p class="mb-0 fw-bold mt-2 text-muted" style="font-size: 0.8rem">
+        Correzione
+      </p>
       <p class="mb-0 text-muted">{{ question.explanation }}</p>
     </section>
     }
@@ -222,7 +224,11 @@
       type="button"
       class="btn btn-delete"
       title="Elimina"
-      (click)="removeMe.emit(question._id)"
+      confirmAction
+      [confirmMessage]="'Vuoi eliminare questa domanda? L\'azione non può essere annullata.'"
+      [confirmTitle]="'Elimina domanda'"
+      [confirmButtonText]="'Elimina'"
+      (confirmed)="removeMe.emit(question._id)"
     >
       <fa-icon [icon]="TrashIcon"></fa-icon>
     </button>

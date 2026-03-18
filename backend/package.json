@@ -16,6 +16,7 @@
     "create:mock:attempts": "npx ts-node routines/createMockAttempts.ts",
     "create:users": "npx ts-node routines/createUsers.ts",
     "dev": "AWS_PROFILE=pathway nodemon --exec tsx ./local/local-dev.ts",
+    "check-types": "tsc --noEmit",
     "test": "jest"
   },
   "devDependencies": {
@@ -76,7 +77,7 @@
     "jszip": "^3.10.1",
     "mammoth": "^1.10.0",
     "mermaid": "^10.0.0",
-    "mongodb": "^6.17.0",
+    "mongoose": "^9.3.0",
     "nodemailer": "^8.0.1",
     "officeparser": "^6.0.4",
     "openai": "^6.22.0",

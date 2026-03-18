@@ -91,6 +91,11 @@ export class Sidebar {
       tourAnchor: 'teacher-tests'
     },
     {
+      path: 'lessons',
+      label: 'Lezioni',
+      icon: faBook,
+    },
+    {
       path: 'banca',
       label: 'Banca Domande',
       icon: faClipboardQuestion,

@@ -17,7 +17,7 @@ import { FeedbackService } from '../../../services/feedback-service';
             <fa-icon [icon]="icons.faLightbulb" class="me-2"></fa-icon>
             {{ mode() === 'test' ? 'Analisi IA della Classe' : 'Feedback IA' }}
           </h5>
-          <button (click)="generateInsight()" class="btn btn-sm btn-outline-primary rounded-pill px-3" 
+          <button (click)="generateInsight()" class="btn btn-sm btn-blue rounded-pill px-3" 
                   [disabled]="loading()">
             @if (loading()) {
               <fa-icon [icon]="icons.faSyncAlt" [animation]="'spin'" class="me-1"></fa-icon>

@@ -103,6 +103,8 @@ export class CreateEditTest implements OnInit {
     password: new FormControl(''),
     requiredScore: new FormControl(0, [Validators.min(1)]),
     time: new FormControl(0),
+    randomizeQuestions: new FormControl(false),
+    oneShotAnswers: new FormControl(false),
   });
 
   ngOnInit() {
@@ -168,6 +170,8 @@ export class CreateEditTest implements OnInit {
       password: test.password || '',
       requiredScore: test.fitScore || 0,
       time: test.timeLimit !== undefined ? test.timeLimit : null,
+      randomizeQuestions: test.randomizeQuestions ?? false,
+      oneShotAnswers: test.oneShotAnswers ?? false,
     });
 
     if (test.questions && test.questions.length > 0) {
@@ -304,6 +308,9 @@ export class CreateEditTest implements OnInit {
     if (formValue.time > 0) {
       testData.timeLimit = formValue.time;
     }
+
+    testData.randomizeQuestions = !!formValue.randomizeQuestions;
+    testData.oneShotAnswers = !!formValue.oneShotAnswers;
 
     return testData;
   }

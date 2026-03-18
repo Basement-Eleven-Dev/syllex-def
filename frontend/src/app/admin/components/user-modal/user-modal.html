@@ -72,9 +72,11 @@
                             }
                         </select>
                     </div>
-                    <p class="extra-small text-danger mt-1 mb-0" *ngIf="userForm.get('classId')?.touched && userForm.get('classId')?.invalid">
-                        Lo studente deve essere associato a una classe.
-                    </p>
+                    @if (userForm.get('classId')?.touched && userForm.get('classId')?.invalid) {
+                        <p class="extra-small text-danger mt-1 mb-0">
+                            Lo studente deve essere associato a una classe.
+                        </p>
+                    }
                 </div>
             }
 

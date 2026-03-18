@@ -13,6 +13,7 @@ import {
   ViewType,
 } from '../../components/view-type-toggle/view-type-toggle';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
+import { FeedbackService } from '../../../services/feedback-service';
 
 type TestStatus = 'bozza' | 'pubblicato' | 'archiviato' | '';
 
@@ -38,6 +39,7 @@ export class Test implements OnDestroy {
 
   // Dependency Injection
   private testsService = inject(TestsService);
+  private feedbackService = inject(FeedbackService);
 
   // Signals
   Tests = signal<TestInterface[]>([]);
@@ -122,9 +124,14 @@ export class Test implements OnDestroy {
     this.testsService.deleteTest(testId).subscribe({
       next: () => {
         this.removeTestFromList(testId);
+        this.feedbackService.showFeedback('Test eliminato con successo', true);
       },
       error: (err: Error) => {
         console.error('Errore durante la cancellazione del test:', err);
+        this.feedbackService.showFeedback(
+          'Errore durante la cancellazione del test',
+          false,
+        );
       },
     });
   }
@@ -167,9 +174,14 @@ export class Test implements OnDestroy {
       next: (response) => {
         this.Tests.update((tests) => [response.test, ...tests]);
         this.CollectionSize.update((size) => size + 1);
+        this.feedbackService.showFeedback('Test duplicato con successo', true);
       },
       error: (err: Error) => {
         console.error('Errore durante la duplicazione del test:', err);
+        this.feedbackService.showFeedback(
+          'Errore durante la duplicazione del test',
+          false,
+        );
       },
     });
   }
@@ -182,9 +194,14 @@ export class Test implements OnDestroy {
             t._id === testId ? { ...t, status: 'pubblicato' } : t,
           ),
         );
+        this.feedbackService.showFeedback('Test pubblicato con successo', true);
       },
       error: (err: Error) => {
         console.error('Errore durante la pubblicazione del test:', err);
+        this.feedbackService.showFeedback(
+          'Errore durante la pubblicazione del test',
+          false,
+        );
       },
     });
   }

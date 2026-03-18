@@ -46,13 +46,12 @@
         class="badge"
         style="cursor: help;"
         [ngClass]="{
-          'bg-danger': data.answer.aiProbability > 70,
-          'bg-warning text-dark': data.answer.aiProbability > 30 && data.answer.aiProbability <= 70,
-          'bg-success': data.answer.aiProbability <= 30
+          'bg-danger': data.answer.aiProbability > 50,
+          'bg-success': data.answer.aiProbability <= 50
         }"
         ngbTooltip="Indica quanto è probabile che questo testo sia stato scritto da un'intelligenza artificiale (es: ChatGPT)"
       >
-        Probabilità Generazione IA: {{ data.answer.aiProbability }}%
+      {{ getAiProbabilityLabel(data.answer.aiProbability) }}
       </span>
       }
     </label>
