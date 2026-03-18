@@ -51,7 +51,7 @@ export class LoginForm {
   constructor(
     private router: Router,
     private authService: Auth,
-  ) {}
+  ) { }
 
   onSingIn() {
     this.loading = true;
@@ -75,6 +75,7 @@ export class LoginForm {
       }
       this.hasResult = result;
       if (result.success) {
+        this.authService.setLogrocketIdentity();
         this.handleSuccessfulLogin();
       }
     });

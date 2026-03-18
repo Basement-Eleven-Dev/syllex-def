@@ -19,6 +19,7 @@ import {
   fetchMFAPreference,
 } from 'aws-amplify/auth';
 import { HttpClient } from '@angular/common/http';
+import LogRocket from 'logrocket';
 
 Amplify.configure({
   Auth: {
@@ -78,7 +79,15 @@ export class Auth {
       (!user.organizationIds || user.organizationIds.length === 0)
     );
   }
+  setLogrocketIdentity() {
+    if (this.user) {
 
+      LogRocket.identify(this.user._id || "anonymous", {
+        name: this.user.email || "anonymous"
+      });
+    }
+    else LogRocket.identify('logged-out')
+  }
   get isSuperAdmin(): boolean {
     const user = this.user$.value; // Use raw value for checking role
     if (!user || user.role !== 'admin') return false;
@@ -104,6 +113,7 @@ export class Auth {
 
   constructor(private http: HttpClient) {
     this.checkCurrentUser();
+    throw 'Attenzione: test'
   }
 
   async initiateMfaSetup(): Promise<string> {
@@ -382,6 +392,7 @@ export class Auth {
     try {
       await signOut();
       this.user$.next(null);
+      this.setLogrocketIdentity()
       window.location.reload();
       return { success: true, message: 'Logout riuscito' };
     } catch (error: any) {
@@ -481,12 +492,12 @@ export class Auth {
       await firstValueFrom(
         this.http.patch('profile/settings', { notificationSettings: settings }),
       );
-      
+
       const currentUser = this.user$.value;
       if (currentUser) {
         this.user$.next({ ...currentUser, notificationSettings: settings });
       }
-      
+
       return { success: true, message: 'Impostazioni aggiornate con successo' };
     } catch (error: any) {
       return {

@@ -4,6 +4,7 @@ import {
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection,
   importProvidersFrom,
+  ErrorHandler,
 } from '@angular/core';
 import { provideRouter, withViewTransitions } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
@@ -16,6 +17,7 @@ import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from '../interceptors/auth.interceptor';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
+import { LogRocketErrorHandler } from '../errors/error-handler';
 
 registerLocaleData(localeIt);
 
@@ -38,6 +40,7 @@ export const appConfig: ApplicationConfig = {
     { provide: LOCALE_ID, useValue: 'it-IT' },
     provideMarkdown(),
     provideCharts(withDefaultRegisterables()),
+    { provide: ErrorHandler, useClass: LogRocketErrorHandler },
     importProvidersFrom(TourNgBootstrapModule),
   ],
 };

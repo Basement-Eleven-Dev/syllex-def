@@ -1,4 +1,4 @@
-import { DatePipe, syncPipe, TitleCasePipe, UpperCasePipe } from '@angular/common';
+import { DatePipe, AsyncPipe, TitleCasePipe, UpperCasePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject, ViewChild } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
