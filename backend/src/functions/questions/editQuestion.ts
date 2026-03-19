@@ -3,34 +3,20 @@ import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import { connectDatabase } from "../../_helpers/getDatabase";
 import { Types } from "mongoose";
-import { Question } from "../../models/schemas/question.schema";
+import { Question, QuestionUpdate } from "../../models/schemas/question.schema";
 
 const editQuestion = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
-  const questionId = request.pathParameters?.questionId;
-
-  if (!questionId) {
-    throw createError.BadRequest("questionId is required");
-  }
+  const questionId = request.pathParameters!.questionId!;
 
   const questionData = JSON.parse(request.body || "{}");
 
   await connectDatabase();
 
-  // Verifica che la domanda esista e appartenga al teacher
-  const existingQuestion = await Question.findOne({
-    _id: questionId,
-    teacherId: context.user?._id,
-  } as any);
-
-  if (!existingQuestion) {
-    throw createError.NotFound("Question not found or not authorized");
-  }
-
   // Prepara i dati per l'update
-  const updateData: any = {
+  const updateData: QuestionUpdate = {
     text: questionData.text,
     type: questionData.type,
     explanation: questionData.explanation,
@@ -57,14 +43,16 @@ const editQuestion = async (
     updateData.options = questionData.options;
   }
 
-  // Update della domanda
-  await Question.updateOne(
-    { _id: questionId },
+  // Update della domanda (atomic: include ownership in filter)
+  const updatedQuestion = await Question.findOneAndUpdate(
+    { _id: questionId, teacherId: context.user?._id } as any,
     { $set: updateData },
-  );
+    { new: true, runValidators: true }
+  ).lean();
 
-  // Ritorna la domanda aggiornata
-  const updatedQuestion = await Question.findById(questionId).lean();
+  if (!updatedQuestion) {
+    throw createError.NotFound("Question not found or not authorized");
+  }
 
   return {
     question: updatedQuestion,

@@ -9,7 +9,7 @@ const updateMaterialClasses = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
-  const materialId = request.pathParameters?.materialId;
+  const materialId = request.pathParameters!.materialId;
 
   if (!materialId) {
     throw createError.BadRequest("materialId is required");
@@ -22,35 +22,21 @@ const updateMaterialClasses = async (
   }
   await connectDatabase();
 
-  // Verify material exists and belongs to the teacher
-  const existingMaterial = await Material.findOne({
-    _id: new mongo.ObjectId(materialId) as any,
-    teacherId: context.user?._id as any,
-  });
-
-  if (!existingMaterial) {
-    throw createError.NotFound("Material not found or not authorized");
-  }
-
-  // Update classIds
-  const result = await Material.updateOne(
-    { _id: new mongo.ObjectId(materialId) as any },
+  // Update classIds atomically and return updated doc
+  const updatedMaterial = await Material.findOneAndUpdate(
+    { _id: new mongo.ObjectId(materialId) as any, teacherId: context.user?._id as any },
     {
       $set: {
         classIds: body.classIds.map((id: string) => new mongo.ObjectId(id)),
         updatedAt: new Date(),
       },
-    }
-  );
+    },
+    { new: true, runValidators: true }
+  ).lean();
 
-  if (result.modifiedCount === 0) {
-    throw createError.InternalServerError("Failed to update material classes");
+  if (!updatedMaterial) {
+    throw createError.NotFound("Material not found or not authorized");
   }
-
-  // Return updated material
-  const updatedMaterial = await Material.findOne({
-    _id: new mongo.ObjectId(materialId) as any,
-  }).lean();
 
   return {
     success: true,
