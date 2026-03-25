@@ -3,13 +3,13 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import createError from "http-errors";
-import { BUCKET_NAME } from "../../../environment";
+import { BUCKET_NAME, AWS_REGION } from "../../../environment";
 
 const generateUploadUrl = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
-  const s3Client = new S3Client({});
+  const s3Client = new S3Client({ region: AWS_REGION });
   // Since it's a proxy, body is a string
   const body = JSON.parse(request.body || "{}");
 

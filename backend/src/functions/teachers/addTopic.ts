@@ -7,7 +7,7 @@ import { Topic } from "../../models/schemas/topic.schema";
 
 const addTopic = async (request: APIGatewayProxyEvent, context: Context) => {
   try {
-    const subjectId = new mongo.ObjectId(request.pathParameters!.subjectId!);
+    const subjectId = context.subjectId;
     const body = JSON.parse(request.body || "{}");
     const name = body.name?.trim();
 

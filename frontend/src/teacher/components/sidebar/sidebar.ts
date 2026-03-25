@@ -39,7 +39,13 @@ interface SidebarRoute {
 
 @Component({
   selector: 'app-sidebar',
-  imports: [FontAwesomeModule, RouterModule, NgbCollapseModule, FormsModule, TourAnchorNgBootstrapDirective],
+  imports: [
+    FontAwesomeModule,
+    RouterModule,
+    NgbCollapseModule,
+    FormsModule,
+    TourAnchorNgBootstrapDirective,
+  ],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.scss',
 })
@@ -88,18 +94,18 @@ export class Sidebar {
       path: 'tests',
       label: 'Test',
       icon: faBallotCheck,
-      tourAnchor: 'teacher-tests'
+      tourAnchor: 'teacher-tests',
     },
-    {
+    /*     {
       path: 'lessons',
       label: 'Lezioni',
       icon: faBook,
-    },
+    }, */
     {
       path: 'banca',
       label: 'Banca Domande',
       icon: faClipboardQuestion,
-      tourAnchor: 'teacher-banca'
+      tourAnchor: 'teacher-banca',
     },
     {
       path: 'classi',

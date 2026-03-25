@@ -81,12 +81,10 @@ export class Auth {
   }
   setLogrocketIdentity(user?: User | null) {
     if (user) {
-
-      LogRocket.identify(user._id || "anonymous", {
-        name: user.email || "anonymous"
+      LogRocket.identify(user._id || 'anonymous', {
+        name: user.email || 'anonymous',
       });
-    }
-    else LogRocket.identify('logged-out')
+    } else LogRocket.identify('logged-out');
   }
   get isSuperAdmin(): boolean {
     const user = this.user$.value; // Use raw value for checking role
@@ -112,18 +110,17 @@ export class Auth {
   }
 
   constructor(private http: HttpClient) {
-    this.user$.subscribe(user => this.setLogrocketIdentity(user))
+    this.user$.subscribe((user) => this.setLogrocketIdentity(user));
     this.checkCurrentUser();
-    throw 'Attenzione: test'
   }
 
   async initiateMfaSetup(): Promise<string> {
     try {
       const totpSetupDetails = await setUpTOTP();
 
-      // This URI is what you feed into a QR code generator library 
+      // This URI is what you feed into a QR code generator library
       // Example: qrcode.react or similar
-      const appName = "Syllex";
+      const appName = 'Syllex';
       const setupUri = totpSetupDetails.getSetupUri(appName);
 
       // 1. Show setupUri as a QR Code
@@ -131,18 +128,26 @@ export class Auth {
       return setupUri.toString();
     } catch (error) {
       console.error('Error starting MFA setup:', error);
-      return ""
+      return '';
     }
   }
 
-  async finalizeMfa(userEnteredCode: string): Promise<{ success: boolean; message: string }> {
+  async finalizeMfa(
+    userEnteredCode: string,
+  ): Promise<{ success: boolean; message: string }> {
     try {
       await verifyTOTPSetup({ code: userEnteredCode });
       await updateMFAPreference({ totp: 'PREFERRED' });
-      return { success: true, message: 'Autenticazione a due fattori attivata con successo' };
+      return {
+        success: true,
+        message: 'Autenticazione a due fattori attivata con successo',
+      };
     } catch (error: any) {
       console.error('Verification failed. The code might be expired.', error);
-      return { success: false, message: 'Codice non valido o scaduto. Riprova.' };
+      return {
+        success: false,
+        message: 'Codice non valido o scaduto. Riprova.',
+      };
     }
   }
 
@@ -151,7 +156,10 @@ export class Auth {
       await updateMFAPreference({ totp: 'NOT_PREFERRED' });
       return { success: true, message: '2FA disattivato con successo' };
     } catch (error: any) {
-      return { success: false, message: error.message || 'Errore durante la disattivazione del 2FA' };
+      return {
+        success: false,
+        message: error.message || 'Errore durante la disattivazione del 2FA',
+      };
     }
   }
 
@@ -164,12 +172,16 @@ export class Auth {
     }
   }
 
-  async confirmSignInWithMfaCode(code: string): Promise<{ success: boolean; message: string }> {
+  async confirmSignInWithMfaCode(
+    code: string,
+  ): Promise<{ success: boolean; message: string }> {
     try {
       const { nextStep } = await confirmSignIn({ challengeResponse: code });
       if (nextStep.signInStep === 'DONE') {
         await fetchAuthSession({ forceRefresh: true });
-        const user = await firstValueFrom(this.http.get<User | null>('profile'));
+        const user = await firstValueFrom(
+          this.http.get<User | null>('profile'),
+        );
         if (user) {
           this.user$.next(user);
           const orgId = user.organizationId || user.organizationIds?.[0];
@@ -177,11 +189,16 @@ export class Auth {
           return { success: true, message: 'Login effettuato con successo' };
         }
       }
-      return { success: false, message: 'Errore durante la verifica del codice MFA' };
+      return {
+        success: false,
+        message: 'Errore durante la verifica del codice MFA',
+      };
     } catch (error: any) {
       let message = 'Codice non valido';
-      if (error.name === 'CodeMismatchException') message = 'Codice non corretto';
-      if (error.name === 'ExpiredCodeException') message = 'Codice scaduto, attendi il prossimo';
+      if (error.name === 'CodeMismatchException')
+        message = 'Codice non corretto';
+      if (error.name === 'ExpiredCodeException')
+        message = 'Codice scaduto, attendi il prossimo';
       return { success: false, message };
     }
   }
@@ -193,7 +210,7 @@ export class Auth {
       // Effettuiamo un signOut silenzioso prima di procedere.
       try {
         await signOut();
-      } catch (_) { }
+      } catch (_) {}
       const { nextStep } = await signIn(credentials);
 
       if (nextStep.signInStep === 'DONE') {
@@ -223,9 +240,7 @@ export class Auth {
           message: 'Nuova password richiesta',
           challenge: 'NEW_PASSWORD_REQUIRED',
         };
-      } else if (
-        nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_TOTP_CODE'
-      ) {
+      } else if (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_TOTP_CODE') {
         return {
           success: true,
           message: 'Inserisci il codice dalla tua app di autenticazione',
@@ -502,7 +517,8 @@ export class Auth {
     } catch (error: any) {
       return {
         success: false,
-        message: error.message || 'Errore durante l\'aggiornamento delle impostazioni',
+        message:
+          error.message || "Errore durante l'aggiornamento delle impostazioni",
       };
     }
   }

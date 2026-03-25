@@ -2,7 +2,11 @@ import { z } from "zod";
 import { askStructuredLLM } from "./simpleCompletion";
 
 const TopicDiscoverySchema = z.object({
-  suggestedTopics: z.array(z.string()).describe("A list of new, relevant topics found in the text that are not present in the existing topics list."),
+  suggestedTopics: z
+    .array(z.string())
+    .describe(
+      "A list of new, relevant topics found in the text that are not present in the existing topics list.",
+    ),
 });
 
 /**
@@ -15,7 +19,7 @@ const TopicDiscoverySchema = z.object({
 export async function suggestNewTopics(
   text: string,
   existingTopics: string[],
-  subjectName: string
+  subjectName: string,
 ): Promise<string[]> {
   const prompt = `
     Sei un assistente didattico esperto. Analizza il seguente testo estratto da un materiale didattico per la materia "${subjectName}".
@@ -33,8 +37,11 @@ export async function suggestNewTopics(
   try {
     const result = await askStructuredLLM(prompt, [], TopicDiscoverySchema);
     // Filtra eventuali duplicati o argomenti troppo simili se necessario
-    return result.suggestedTopics.filter(topic => 
-      !existingTopics.some(existing => existing.toLowerCase() === topic.toLowerCase())
+    return result.suggestedTopics.filter(
+      (topic) =>
+        !existingTopics.some(
+          (existing) => existing.toLowerCase() === topic.toLowerCase(),
+        ),
     );
   } catch (error) {
     console.error("Error suggesting new topics:", error);
