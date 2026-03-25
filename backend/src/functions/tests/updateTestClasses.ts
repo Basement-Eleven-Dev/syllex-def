@@ -9,11 +9,7 @@ const updateTestClasses = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
-  const testId = request.pathParameters?.testId;
-
-  if (!testId) {
-    throw createError.BadRequest("testId is required");
-  }
+  const testId = request.pathParameters!.testId!;
 
   const body = JSON.parse(request.body || "{}");
 
@@ -23,35 +19,21 @@ const updateTestClasses = async (
 
   await connectDatabase();
 
-  // Verify test exists and belongs to the teacher
-  const existingTest = await Test.findOne({
-    _id: new mongo.ObjectId(testId),
-    teacherId: context.user?._id,
-  });
-
-  if (!existingTest) {
-    throw createError.NotFound("Test not found or not authorized");
-  }
-
-  // Update classIds
-  const result = await Test.updateOne(
-    { _id: new mongo.ObjectId(testId) },
+  // Update classIds atomically and return updated doc
+  const updatedTest = await Test.findOneAndUpdate(
+    { _id: new mongo.ObjectId(testId), teacherId: context.user?._id },
     {
       $set: {
         classIds: body.classIds.map((id: string) => new mongo.ObjectId(id)),
         updatedAt: new Date(),
       },
     },
-  );
+    { new: true, runValidators: true }
+  ).lean();
 
-  if (result.modifiedCount === 0) {
-    throw createError.InternalServerError("Failed to update test classes");
+  if (!updatedTest) {
+    throw createError.NotFound("Test not found or not authorized");
   }
-
-  // Return updated test
-  const updatedTest = await Test.findOne({
-    _id: new mongo.ObjectId(testId),
-  }).lean();
 
   return {
     success: true,

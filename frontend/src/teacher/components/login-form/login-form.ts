@@ -51,7 +51,7 @@ export class LoginForm {
   constructor(
     private router: Router,
     private authService: Auth,
-  ) {}
+  ) { }
 
   onSingIn() {
     this.loading = true;

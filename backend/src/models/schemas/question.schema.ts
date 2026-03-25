@@ -1,4 +1,4 @@
-import { HydratedDocument, InferSchemaType, model, Schema } from "mongoose";
+import { HydratedDocument, InferSchemaType, model, Schema, UpdateQuery } from "mongoose";
 
 const optionSchema = new Schema({
     label: { type: String, required: true },
@@ -30,4 +30,5 @@ export const questionSchema = new Schema({
 
 export type QuestionRaw = InferSchemaType<typeof questionSchema>;
 export type Question = HydratedDocument<QuestionRaw>
+export type QuestionUpdate = UpdateQuery<QuestionRaw>
 export const Question = model<Question>('Question', questionSchema, 'questions');
