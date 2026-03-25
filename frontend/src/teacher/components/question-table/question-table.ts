@@ -1,7 +1,7 @@
 import { Component, inject, input, output } from '@angular/core';
 import { TitleCasePipe } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faPencilAlt, faTrash } from '@fortawesome/pro-solid-svg-icons';
+import { faPencilAlt, faTrash, faUser } from '@fortawesome/pro-solid-svg-icons';
 import { RouterModule } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { QuestionInterface } from '../../../services/questions';
@@ -25,6 +25,7 @@ import { ConfirmActionDirective } from '../../../directives/confirm-action.direc
 export class QuestionTable {
   protected readonly EditIcon = faPencilAlt;
   protected readonly TrashIcon = faTrash;
+  protected readonly UserIcon = faUser;
 
   protected readonly materiaService = inject(Materia);
   private readonly modalService = inject(NgbModal);

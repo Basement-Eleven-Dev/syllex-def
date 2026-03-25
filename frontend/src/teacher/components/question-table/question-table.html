@@ -6,6 +6,7 @@
         <th class="text-muted fw-light">Argomento</th>
         <th class="text-muted fw-light">Tipologia</th>
         <th class="text-muted fw-light">Visibilità</th>
+        <th class="text-muted fw-light text-center">Produzione</th>
         <th class="text-muted fw-light text-end">Azioni</th>
       </tr>
     </thead>
@@ -22,6 +23,21 @@
             <div [class]="'status-pill ' + question.policy"></div>
             {{ question.policy | titlecase }}
           </div>
+        </td>
+        <td class="text-center">
+          @if(question.aiGenerated) {
+          <span
+            class="ai-badge"
+            style="background-color: #9664c8; font-size: 0.65rem"
+            >IA</span
+          >
+          } @else {
+          <fa-icon
+            class="text-primary"
+            [icon]="UserIcon"
+            style="font-size: 0.75rem"
+          ></fa-icon>
+          }
         </td>
         <td class="text-end" (click)="$event.stopPropagation()">
           <div class="d-flex flex-row justify-content-end gap-1">

@@ -1,4 +1,9 @@
-import { DatePipe, syncPipe, TitleCasePipe, UpperCasePipe } from '@angular/common';
+import {
+  DatePipe,
+  AsyncPipe,
+  TitleCasePipe,
+  UpperCasePipe,
+} from '@angular/common';
 import { Component, OnDestroy, OnInit, inject, ViewChild } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -33,7 +38,7 @@ import { map, Observable } from 'rxjs';
     UserContextualMenu,
     TourAnchorNgBootstrapDirective,
     AsyncPipe,
-    UpperCasePipe
+    UpperCasePipe,
   ],
   templateUrl: './nav.html',
   styleUrl: './nav.scss',
@@ -60,7 +65,7 @@ export class Nav implements OnInit, OnDestroy {
           return '';
         }
         return user.firstName.charAt(0) + user.lastName.charAt(0);
-      })
+      }),
     );
   }
   ngOnInit() {

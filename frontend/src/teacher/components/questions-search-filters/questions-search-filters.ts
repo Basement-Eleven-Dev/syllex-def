@@ -28,6 +28,7 @@ export class QuestionsSearchFilters implements OnInit {
     policy?: 'public' | 'private';
     topicId?: string;
     difficulty?: QuestionDifficulty;
+    aiGenerated?: boolean;
   }>();
 
   // Icons
@@ -45,6 +46,7 @@ export class QuestionsSearchFilters implements OnInit {
     policy: new FormControl(''),
     topicId: new FormControl(''),
     difficulty: new FormControl(''),
+    aiGenerated: new FormControl(''),
   });
 
   ngOnInit(): void {
@@ -62,6 +64,7 @@ export class QuestionsSearchFilters implements OnInit {
       policy: '',
       topicId: '',
       difficulty: '',
+      aiGenerated: '',
     });
   }
 
@@ -73,13 +76,23 @@ export class QuestionsSearchFilters implements OnInit {
     const policy = this.SearchForm.get('policy')?.value;
     const topicId = this.SearchForm.get('topicId')?.value;
     const difficulty = this.SearchForm.get('difficulty')?.value;
+    const aiGeneratedRaw = this.SearchForm.get('aiGenerated')?.value;
 
     if (searchTerm) filters.searchTerm = searchTerm;
     if (type) filters.type = type;
     if (policy) filters.policy = policy;
     if (topicId) filters.topicId = topicId;
     if (difficulty) filters.difficulty = difficulty;
+    if (
+      aiGeneratedRaw !== '' &&
+      aiGeneratedRaw !== null &&
+      aiGeneratedRaw !== undefined
+    ) {
+      filters.aiGenerated =
+        aiGeneratedRaw === true || aiGeneratedRaw === 'true';
+    }
 
+    console.log('Emettendo filtri:', filters);
     this.filtersChanged.emit(filters);
   }
 }

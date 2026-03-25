@@ -57,6 +57,7 @@ export class Banca {
     policy?: 'public' | 'private';
     topicId?: string;
     difficulty?: string;
+    aiGenerated?: boolean;
   }>({});
 
   Questions = computed<QuestionInterface[]>(() => {
@@ -85,6 +86,7 @@ export class Banca {
           currentPage,
           currentPageSize,
           currentFilters.difficulty,
+          currentFilters.aiGenerated,
         );
       }
     });
@@ -96,6 +98,7 @@ export class Banca {
     policy?: 'public' | 'private';
     topicId?: string;
     difficulty?: string;
+    aiGenerated?: boolean;
   }): void {
     this.Filters.set(filters);
     this.Page.set(1);
@@ -145,6 +148,7 @@ export class Banca {
     page?: number,
     pageSize?: number,
     difficulty?: string,
+    aiGenerated?: boolean,
   ): void {
     console.log('Caricamento domande con i seguenti parametri:', {
       searchTerm,
@@ -153,7 +157,11 @@ export class Banca {
       policy,
       page,
       pageSize,
+      difficulty,
+      aiGenerated,
     });
+
+    console.log(aiGenerated);
     this.questionsService
       .loadPagedQuestions(
         searchTerm,
@@ -163,6 +171,7 @@ export class Banca {
         page || 1,
         pageSize || 10,
         difficulty,
+        aiGenerated,
       )
       .subscribe({
         next: (response) => {

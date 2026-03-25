@@ -6,22 +6,33 @@
 >
   <div class="card-body d-flex flex-column gap-2">
     <!-- ── Header: policy (banca) | index (test-composition) | topic | type ── -->
-    <div class="d-flex align-items-center gap-2">
-      @if (mode === 'banca') {
-      <div class="d-flex flex-row gap-2 align-items-center me-2">
-        <div [class]="'status-pill ' + question.policy"></div>
-        <span class="text-muted small">{{ question.policy | titlecase }}</span>
+    <div class="d-flex flex-row align-items-center justify-content-between">
+      <div class="d-flex align-items-center gap-2">
+        @if (mode === 'banca') {
+        <div class="d-flex flex-row gap-2 align-items-center me-2">
+          <div [class]="'status-pill ' + question.policy"></div>
+          <span class="text-muted small"
+            >{{ question.policy | titlecase }}</span
+          >
+        </div>
+        } @if (mode === 'test-composition') {
+        <span class="badge bg-dark"># {{ index + 1 }}</span>
+        } @if (mode === 'student' && showIndex) {
+        <span class="badge bg-dark"># {{ index + 1 }}</span>
+        }
+        <span class="text-muted"
+          >{{ materiaService.getTopicName(question.topicId) }}</span
+        >
+        <span class="text-muted">|</span>
+        <span class="text-primary">{{ question.type }}</span>
       </div>
-      } @if (mode === 'test-composition') {
-      <span class="badge bg-dark"># {{ index + 1 }}</span>
-      } @if (mode === 'student' && showIndex) {
-      <span class="badge bg-dark"># {{ index + 1 }}</span>
-      }
-      <span class="text-muted"
-        >{{ materiaService.getTopicName(question.topicId) }}</span
+      @if(!question.aiGenerated) {
+      <span
+        class="ai-badge float-end"
+        style="background-color: #9664c8; font-size: 0.65rem"
+        >IA</span
       >
-      <span class="text-muted">|</span>
-      <span class="text-primary">{{ question.type }}</span>
+      }
     </div>
 
     <!-- ── Optional image ── -->

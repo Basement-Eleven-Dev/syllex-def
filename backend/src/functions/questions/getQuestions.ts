@@ -19,6 +19,7 @@ const getQuestions = async (
     difficulty = "",
     page = "1",
     pageSize = "10",
+    aiGenerated = "",
   } = request.queryStringParameters || {};
 
   const currentPage = parseInt(page, 10);
@@ -58,14 +59,21 @@ const getQuestions = async (
     filter.difficulty = difficulty;
   }
 
+  if (aiGenerated !== undefined && aiGenerated !== "") {
+    if (aiGenerated === "true") {
+      filter.aiGenerated = aiGenerated === "true"; // Converti stringa a booleano
+    } else if (aiGenerated === "false") {
+      filter.aiGenerated = { $exists: false }; // Converti stringa a booleano
+    }
+  }
+
   console.log("Filtro per getQuestions:", filter);
 
   // Query con paginazione
-  const questions = await Question
-    .find(filter)
+  const questions = await Question.find(filter)
     .skip(skip)
     .limit(currentPageSize)
-    .sort({ createdAt: -1, _id: -1 })
+    .sort({ createdAt: -1, _id: -1 });
 
   // Conto il totale per la paginazione
   const total = await Question.countDocuments(filter);

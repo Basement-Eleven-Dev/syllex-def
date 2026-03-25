@@ -45,6 +45,16 @@
       }
     </select>
   </div>
+  <div>
+    <select
+      class="form-select custom-input filter"
+      formControlName="aiGenerated"
+    >
+      <option value="">AI Generata</option>
+      <option [value]="true">Sì</option>
+      <option [value]="false">No</option>
+    </select>
+  </div>
   <button
     type="button"
     class="btn btn-outline-danger"

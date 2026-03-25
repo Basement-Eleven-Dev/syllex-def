@@ -1,5 +1,16 @@
-import { Component, signal, inject, effect, OnInit, OnDestroy } from '@angular/core';
-import { TourAnchorNgBootstrapDirective, TourService, TourStepTemplateComponent } from 'ngx-ui-tour-ng-bootstrap';
+import {
+  Component,
+  signal,
+  inject,
+  effect,
+  OnInit,
+  OnDestroy,
+} from '@angular/core';
+import {
+  TourAnchorNgBootstrapDirective,
+  TourService,
+  TourStepTemplateComponent,
+} from 'ngx-ui-tour-ng-bootstrap';
 import { Sidebar } from '../../components/sidebar/sidebar';
 import { Nav } from '../../components/nav/nav';
 import { RouterOutlet } from '@angular/router';
@@ -18,7 +29,14 @@ import { FeedbackService } from '../../../services/feedback-service';
 
 @Component({
   selector: 'app-teacher-layout',
-  imports: [Sidebar, Nav, RouterOutlet, FontAwesomeModule, TourStepTemplateComponent, CommonModule],
+  imports: [
+    Sidebar,
+    Nav,
+    RouterOutlet,
+    FontAwesomeModule,
+    TourStepTemplateComponent,
+    CommonModule,
+  ],
   templateUrl: './teacher-layout.html',
   styleUrl: './teacher-layout.scss',
 })
@@ -26,7 +44,7 @@ export class TeacherLayout implements OnInit, OnDestroy {
   showLoading = signal<boolean>(false);
   public materia = inject(Materia);
   private feedbackService = inject(FeedbackService);
-  public tourService = inject(TourService);
+  public tourService: TourService = inject(TourService) as TourService;
   private destroy$ = new Subject<void>();
 
   SpinnerIcon = faSpinnerThird;
@@ -58,44 +76,50 @@ export class TeacherLayout implements OnInit, OnDestroy {
       {
         anchorId: 'teacher-subject-select',
         title: 'Materia Corrente',
-        content: 'Tutto ciò che vedi è filtrato per la materia selezionata. Clicca qui per cambiarla.',
+        content:
+          'Tutto ciò che vedi è filtrato per la materia selezionata. Clicca qui per cambiarla.',
         placement: 'right',
-        route: '/t/dashboard'
+        route: '/t/dashboard',
       },
       {
         anchorId: 'teacher-banca',
         title: 'Banca Domande',
-        content: 'Organizza il tuo archivio personale di domande da riutilizzare ai test o nelle esercitazioni libere della classe.',
+        content:
+          'Organizza il tuo archivio personale di domande da riutilizzare ai test o nelle esercitazioni libere della classe.',
         placement: 'right',
-        route: '/t/banca'
+        route: '/t/banca',
       },
       {
         anchorId: 'teacher-tests',
         title: 'Test',
-        content: 'Crea e correggi compiti in classe o esercitazioni. Sfrutta l\'AI per generare domande al volo o pescale dalla tua Banca.',
+        content:
+          "Crea e correggi compiti in classe o esercitazioni. Sfrutta l'AI per generare domande al volo o pescale dalla tua Banca.",
         placement: 'right',
-        route: '/t/tests'
+        route: '/t/tests',
       },
       {
         anchorId: 'teacher-agent',
         title: 'Agente AI',
-        content: 'Il tuo assistente personale: un Agente esperto della tua materia pronto ad aiutarti a preparare lezioni e materiali.',
+        content:
+          'Il tuo assistente personale: un Agente esperto della tua materia pronto ad aiutarti a preparare lezioni e materiali.',
         placement: 'right',
-        route: '/t/agente'
+        route: '/t/agente',
       },
       {
         anchorId: 'teacher-ai-lab',
         title: 'Laboratorio AI',
-        content: 'Sperimenta con strumenti avanzati basati sull\'AI per creare contenuti didattici interattivi.',
+        content:
+          "Sperimenta con strumenti avanzati basati sull'AI per creare contenuti didattici interattivi.",
         placement: 'right',
-        route: '/t/laboratorio-ai'
+        route: '/t/laboratorio-ai',
       },
       {
         anchorId: 'teacher-profile',
         title: 'Profilo Docente',
-        content: 'Da qui puoi accedere alle tue impostazioni, calendario o segnalare un problema.',
-        placement: 'bottom'
-      }
+        content:
+          'Da qui puoi accedere alle tue impostazioni, calendario o segnalare un problema.',
+        placement: 'bottom',
+      },
     ]);
 
     if (!localStorage.getItem('syllex_teacher_tour_completed')) {
