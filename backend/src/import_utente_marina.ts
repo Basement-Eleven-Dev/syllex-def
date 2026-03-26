@@ -380,7 +380,6 @@ async function main() {
     for (let s of cs.students) {
       console.log(s.name, s.surname, s.email);
     }
-
     console.log("--------------------------------");
   }
 }
