@@ -97,7 +97,7 @@ const createAIGenMaterial = async (
   const currentMaterials = await Material.find({
     teacherId: context.user!._id as any,
     subjectId: context.subjectId as any,
-  })
+  });
 
   const totalBytes = currentMaterials.reduce(
     (acc, m) => acc + (m.byteSize || 0),
@@ -112,12 +112,11 @@ const createAIGenMaterial = async (
 
   await connectDatabase();
   const materialOIds = materialIds.map((el) => new mongo.ObjectId(el));
-  const materialObjects = await Material
-    .find({
-      _id: { $in: materialOIds as any },
-      subjectId: context.subjectId as any,
-      aiGenerated: { $ne: true },
-    })
+  const materialObjects = await Material.find({
+    _id: { $in: materialOIds as any },
+    subjectId: context.subjectId as any,
+    aiGenerated: { $ne: true },
+  });
 
   const prompt = getPrompt(
     type,
@@ -140,7 +139,7 @@ const createAIGenMaterial = async (
 
   console.log("LLM response:", { title, content });
 
-  const organizationId = context.user?.organizationIds?.[0]
+  const organizationId = context.user?.organizationIds?.[0];
 
   const organization = await Organization.findOne({
     _id: organizationId,
@@ -201,6 +200,11 @@ const createAIGenMaterial = async (
         },
       },
     });
+
+    console.log("\n\n");
+    console.log("Gamma API response:", res);
+    console.log("\n\n");
+
     const prefix = process.env.LOCAL_TESTING ? "http://" : "https://";
     material.url = `${prefix}${request.requestContext.domainName}${request.requestContext.stage ? "/" + request.requestContext.stage : ""}/proxy/gamma/${res.generationId}`;
     material.extension = format || "pptx";

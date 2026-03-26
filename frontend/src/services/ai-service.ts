@@ -93,24 +93,23 @@ export class AiService {
     return response.question;
   }
 
-  /** Generates N questions in parallel using the same parameters.
-   * Uses allSettled so that individual failures don't abort the whole batch.
+  /** Generates N questions sequentially to avoid Gemini rate limits.
    * Returns the fulfilled questions plus the number of failed requests.
    */
   async generateQuestions(
     data: Parameters<AiService['generateQuestion']>[0],
     count: number,
   ): Promise<{ questions: GeneratedQuestion[]; failedCount: number }> {
-    const results = await Promise.allSettled(
-      Array.from({ length: count }, () => this.generateQuestion(data)),
-    );
-    const questions = results
-      .filter(
-        (r): r is PromiseFulfilledResult<GeneratedQuestion> =>
-          r.status === 'fulfilled',
-      )
-      .map((r) => r.value);
-    const failedCount = results.filter((r) => r.status === 'rejected').length;
+    const questions: GeneratedQuestion[] = [];
+    let failedCount = 0;
+    for (let i = 0; i < count; i++) {
+      try {
+        const q = await this.generateQuestion(data);
+        questions.push(q);
+      } catch {
+        failedCount++;
+      }
+    }
     return { questions, failedCount };
   }
 
