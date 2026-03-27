@@ -3,6 +3,7 @@ import {
   OnDestroy,
   OnInit,
   computed,
+  inject,
   input,
   signal,
 } from '@angular/core';
@@ -15,17 +16,12 @@ import {
   QuestionInterface,
 } from '../../../services/questions';
 import { SyllexPagination } from '../syllex-pagination/syllex-pagination';
+import { FeedbackService } from '../../../services/feedback-service';
 
 @Component({
   selector: 'app-search-questions',
   standalone: true,
-  imports: [
-    DragDropModule,
-    CdkDrag,
-    QuestionCard,
-    QuestionsSearchFilters,
-    SyllexPagination,
-  ],
+  imports: [DragDropModule, CdkDrag, QuestionCard, SyllexPagination],
   templateUrl: './search-questions.html',
   styleUrl: './search-questions.scss',
 })
@@ -51,6 +47,7 @@ export class SearchQuestions implements OnInit, OnDestroy {
     type?: 'scelta multipla' | 'vero falso' | 'risposta aperta';
     policy?: 'public' | 'private';
     topicId?: string;
+    difficulty?: string;
   } = {};
 
   private destroy$ = new Subject<void>();
@@ -59,9 +56,11 @@ export class SearchQuestions implements OnInit, OnDestroy {
     type?: 'scelta multipla' | 'vero falso' | 'risposta aperta';
     policy?: 'public' | 'private';
     topicId?: string;
+    difficulty?: string;
   }>();
 
   constructor(private questionsService: QuestionsService) {}
+  private readonly feedbackService = inject(FeedbackService);
 
   ngOnInit(): void {
     // Setup debounced filter subscription
@@ -87,6 +86,7 @@ export class SearchQuestions implements OnInit, OnDestroy {
     type?: 'scelta multipla' | 'vero falso' | 'risposta aperta';
     policy?: 'public' | 'private';
     topicId?: string;
+    difficulty?: string;
   }): void {
     this.filtersChanged$.next(filters);
   }
@@ -102,6 +102,7 @@ export class SearchQuestions implements OnInit, OnDestroy {
         this.currentFilters.policy,
         this.currentPage(),
         this.pageSize,
+        this.currentFilters.difficulty,
       )
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -112,6 +113,10 @@ export class SearchQuestions implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Errore nel caricamento delle domande:', error);
+          this.feedbackService.showFeedback(
+            'Errore nel caricamento delle domande',
+            false,
+          );
           this.isLoading.set(false);
         },
       });

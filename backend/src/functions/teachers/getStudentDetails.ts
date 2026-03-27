@@ -1,8 +1,13 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { User } from "../../models/schemas/user.schema";
+import { Class } from "../../models/schemas/class.schema";
+import { TeacherAssignment } from "../../models/schemas/teacher-assignment.schema";
+import { Attempt } from "../../models/schemas/attempt.schema";
+import { SubjectView } from "../../models/schemas/subject.schema";
 
 const getStudentDetails = async (
   request: APIGatewayProxyEvent,
@@ -19,17 +24,16 @@ const getStudentDetails = async (
     `Fetching details for student: ${studentId}, class: ${classId}, subject: ${subjectIdParam}, page: ${page}, limit: ${limit}`,
   );
 
-  if (!studentId || !ObjectId.isValid(studentId)) {
+  if (!studentId || !mongo.ObjectId.isValid(studentId)) {
     console.error("Invalid studentId provided:", studentId);
     throw createError.BadRequest("Invalid or missing studentId");
   }
 
-  const db = await getDefaultDatabase();
-  const studentObjectId = new ObjectId(studentId);
+  await connectDatabase();
+  const studentObjectId = new mongo.ObjectId(studentId);
 
   // 1. Get Student Info
-  const student = await db
-    .collection("users")
+  const student = await User
     .findOne({ _id: studentObjectId });
   if (!student) {
     console.error("Student not found in users collection:", studentId);
@@ -37,21 +41,19 @@ const getStudentDetails = async (
   }
 
   // 2. Resolve subjectId context (priority: direct param > classId resolution)
-  let subjectId: ObjectId | null = null;
+  let subjectId: Types.ObjectId | null = null;
 
-  if (subjectIdParam && ObjectId.isValid(subjectIdParam)) {
-    subjectId = new ObjectId(subjectIdParam);
-  } else if (classId && ObjectId.isValid(classId)) {
-    const classData = await db
-      .collection("classes")
-      .findOne({ _id: new ObjectId(classId) });
+  if (subjectIdParam && mongo.ObjectId.isValid(subjectIdParam)) {
+    subjectId = new mongo.ObjectId(subjectIdParam);
+  } else if (classId && mongo.ObjectId.isValid(classId)) {
+    const classData = await Class
+      .findOne({ _id: new mongo.ObjectId(classId) });
     if (classData) {
       // Find the subjectId from teacher_assignments
-      const assignment = await db
-        .collection("teacher_assignments")
-        .findOne({ classId: new ObjectId(classId) });
+      const assignment = await TeacherAssignment
+        .findOne({ classId: new mongo.ObjectId(classId) });
       if (assignment?.subjectId) {
-        subjectId = new ObjectId(assignment.subjectId);
+        subjectId = new mongo.ObjectId(assignment.subjectId);
       }
     }
   }
@@ -68,12 +70,10 @@ const getStudentDetails = async (
   console.log("Searching attempts with match:", JSON.stringify(attemptMatch));
 
   // Get total count for pagination (of all filtered attempts)
-  const totalAttempts = await db
-    .collection("attempts")
+  const totalAttempts = await Attempt
     .countDocuments(attemptMatch);
 
-  const attempts = await db
-    .collection("attempts")
+  const attempts = await Attempt
     .aggregate([
       { $match: attemptMatch },
       {
@@ -89,7 +89,6 @@ const getStudentDetails = async (
       { $skip: skip },
       { $limit: limit },
     ])
-    .toArray();
 
   console.log(
     `Found ${attempts.length} attempts for student (total: ${totalAttempts})`,
@@ -97,8 +96,7 @@ const getStudentDetails = async (
 
   // 4. Calculate Stats & Info for Charts (using ALL attempts for this subject/student context, not just the paged ones)
   // To get accurate stats, we need to know performance across all attempts in this context
-  const allAttemptsInContext = await db
-    .collection("attempts")
+  const allAttemptsInContext = await Attempt
     .aggregate([
       { $match: attemptMatch },
       {
@@ -111,7 +109,6 @@ const getStudentDetails = async (
       },
       { $unwind: { path: "$testData", preserveNullAndEmptyArrays: true } },
     ])
-    .toArray();
 
   const completedAttempts = allAttemptsInContext.filter(
     (a) =>
@@ -141,14 +138,12 @@ const getStudentDetails = async (
         .filter(Boolean)
         .map((id: any) => id.toString()),
     ),
-  ].map((id) => new ObjectId(id));
+  ].map((id) => new mongo.ObjectId(id));
 
   const subjects =
     currentSubjectIds.length > 0
-      ? await db
-          .collection("SUBJECTS")
-          .find({ _id: { $in: currentSubjectIds } })
-          .toArray()
+      ? await SubjectView
+        .find({ _id: { $in: currentSubjectIds } })
       : [];
 
   const topicsNameMap = new Map<string, string>();

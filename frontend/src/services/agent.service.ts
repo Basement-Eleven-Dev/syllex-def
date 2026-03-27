@@ -9,57 +9,55 @@ interface Agent {
 
 @Injectable({ providedIn: 'root' })
 export class AgentService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getAssistant() {
-    return this.http.post<{
+    return this.http.get<{
       success: boolean;
       exists: boolean;
       assistant: any;
-    }>('assistants/get', {});
+    }>('assistant');
   }
 
   createAgent(agent: Agent) {
     return this.http.post<{ success: boolean; assistantId: string }>(
-      'assistants/create',
+      'assistant',
       { agent },
     );
   }
 
-  updateAgent(assistantId: string, agent: any) {
-    return this.http.post<{ success: boolean }>(
-      'assistants/update', // Note: Need to verify if this route exists or create it
-      { assistantId, agent },
+  updateAgent(agent: any) {
+    return this.http.put<{ success: boolean }>(
+      'assistant', // Note: Need to verify if this route exists or create it
+      agent,
     );
   }
 
-  generateResponse(assistantId: string, query: string) {
+  generateResponse(query: string) {
     return this.http.post<{
       success: boolean;
       aiResponse: any;
       _id: string;
       audioUrl?: string | null;
-    }>('assistants/response', { assistantId, query });
+    }>('assistant/response', { query });
   }
 
   getConversationHistory() {
-    return this.http.post<{ success: boolean; conversationHistory: any[] }>(
-      'messages/history',
-      {},
+    return this.http.get<any[]>(
+      'messages'
     );
   }
 
-  listenToMessage(messageId: string, text: string, assistantId: string) {
+  listenToMessage(messageId: string, text: string) {
     return this.http.post<{ success: boolean; audioUrl: string }>(
-      'messages/listen',
-      { messageId, text, assistantId },
+      'messages/' + messageId + '/generate-audio',
+      { text },
     );
   }
 
-  removeMaterial(assistantId: string, materialId: string) {
-    return this.http.post<{ success: boolean; message: string }>(
-      'assistants/remove-material',
-      { assistantId, materialId },
+  removeMaterial(materialId: string) {
+    return this.http.delete<{ success: boolean; message: string }>(
+      'assistant/materials/' + materialId
     );
   }
 }

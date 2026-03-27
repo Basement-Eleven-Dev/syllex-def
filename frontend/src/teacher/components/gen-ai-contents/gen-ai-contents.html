@@ -93,9 +93,11 @@
             formControlName="difficulty"
             aria-label="Difficoltà"
           >
-            <option [value]="1">Facile</option>
-            <option [value]="2">Media</option>
-            <option [value]="3">Difficile</option>
+            <option value="elementary">Elementare</option>
+            <option value="easy">Facile</option>
+            <option value="medium">Media</option>
+            <option value="hard">Difficile</option>
+            <option value="very_hard">Molto difficile</option>
           </select>
         </div>
       </div>
@@ -110,7 +112,7 @@
       >
       <div class="row g-3">
         @if (IsSlides()) {
-        <div class="col-6 col-md-4">
+        <div class="col-6 col-md-3">
           <label class="form-label text-dark">N° slide</label>
           <input
             type="number"
@@ -122,7 +124,7 @@
           />
         </div>
         }
-        <div class="col-6 col-md-4">
+        <div class="col-6 col-md-3">
           <label class="form-label text-dark">Lingua</label>
           <select
             class="form-select custom-input"
@@ -136,6 +138,50 @@
             <option value="tedesco">Deutsch</option>
           </select>
         </div>
+
+        @if (IsSlides()) {
+        <div class="col-12">
+          <label class="form-label text-dark">Formato slide</label>
+          <div class="d-flex gap-4 pt-1">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                value="pptx"
+                id="formatPPTX"
+                formControlName="format"
+              />
+              <label
+                class="form-check-label text-dark"
+                for="formatPPTX"
+                style="cursor: pointer"
+              >
+                <span class="fw-bold">PPTX</span>
+                <span class="text-muted small ms-1">(Modificabile)</span>
+              </label>
+            </div>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                value="pdf"
+                id="formatPDF"
+                formControlName="format"
+              />
+              <label
+                class="form-check-label text-dark"
+                for="formatPDF"
+                style="cursor: pointer"
+              >
+                <span class="fw-bold">PDF</span>
+                <span class="text-muted small ms-1"
+                  >(Genera documento statico)</span
+                >
+              </label>
+            </div>
+          </div>
+        </div>
+        }
       </div>
     </section>
 
@@ -202,11 +248,7 @@
         <fa-icon [icon]="TimesIcon" class="me-1"></fa-icon>
         Nuova generazione
       </button>
-      <button
-        class="btn icon-btn btn-outline-primary"
-        type="button"
-        (click)="toggleAll()"
-      >
+      <button class="btn icon-btn btn-blue" type="button" (click)="toggleAll()">
         <fa-icon [icon]="CheckAllIcon" class="me-1"></fa-icon>
         {{ AllSelected() ? 'Deseleziona tutte' : 'Seleziona tutte' }}
       </button>
@@ -259,6 +301,17 @@
 
   }
 </div>
+
+<app-ai-overlay
+  [visible]="IsGenerating()"
+  [success]="GenerationSuccess()"
+  loadingTitle="Generazione in corso..."
+  loadingSubtitle="Non tornare indietro e non chiudere la pagina,&#10;altrimenti la generazione andrà perduta."
+  successTitle="Generazione completata!"
+  successMessage="Il tuo materiale è pronto per essere consultato."
+  ctaLabel="Vai ai materiali"
+  (ctaClick)="onReturnToMaterials()"
+></app-ai-overlay>
 
 <!-- ─── MATERIAL SUCCESS MODAL ──────────────────────────────────────────── -->
 <ng-template #materialSuccessModal let-modal>

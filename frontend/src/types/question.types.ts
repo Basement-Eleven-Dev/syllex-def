@@ -16,6 +16,32 @@ export type MaterialType =
   | 'glossario'
   | 'mappe-concettuali';
 
+export type QuestionDifficulty =
+  | 'elementary'
+  | 'easy'
+  | 'medium'
+  | 'hard'
+  | 'very_hard';
+
+export const DIFFICULTY_OPTIONS: {
+  value: QuestionDifficulty;
+  label: string;
+}[] = [
+  { value: 'elementary', label: 'Elementare' },
+  { value: 'easy', label: 'Facile' },
+  { value: 'medium', label: 'Media' },
+  { value: 'hard', label: 'Difficile' },
+  { value: 'very_hard', label: 'Molto difficile' },
+];
+
+export const DIFFICULTY_LABEL_MAP: Record<QuestionDifficulty, string> = {
+  elementary: 'Elementare',
+  easy: 'Facile',
+  medium: 'Media',
+  hard: 'Difficile',
+  very_hard: 'Molto difficile',
+};
+
 export const QUESTION_TYPE_OPTIONS: TypeOption[] = [
   {
     label: 'Scelta multipla',

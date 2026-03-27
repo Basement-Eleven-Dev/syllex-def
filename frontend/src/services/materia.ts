@@ -25,41 +25,18 @@ export class Materia {
   shouldReload = signal<boolean>(false);
 
   constructor(
-    private http: HttpClient,
-    private authService: Auth,
+    private http: HttpClient
   ) {
-    if (this.authService.user?.role === 'student') {
-      this.getMaterieStudent();
-    } else {
-      this.getMaterieTeacher();
-    }
+    this.getMaterie();
   }
 
-  getMaterieStudent(): void {
+  getMaterie(): void {
     this.http
-      .get<{
-        success: boolean;
-        subjects: MateriaObject[];
-      }>('students/me/subjects')
-      .subscribe((res) => {
-        if (res.success) {
-          this.allMaterie.set(res.subjects);
-          console.log('Materie dello studente:', res.subjects);
-          this.loadSavedSubject();
-        }
-      });
-  }
-
-  getMaterieTeacher(): MateriaObject[] {
-    let teacherId = this.authService.user?._id;
-    this.http
-      .get<MateriaObject[]>(`teachers/${teacherId}/subjects`)
+      .get<MateriaObject[]>('subjects')
       .subscribe((materie) => {
         this.allMaterie.set(materie);
         this.loadSavedSubject();
       });
-
-    return this.allMaterie();
   }
 
   /**
@@ -116,7 +93,7 @@ export class Materia {
       .post<{
         success: boolean;
         topic: TopicObject;
-      }>(`subjects/${subjectId}/topics`, { name })
+      }>(`topics`, { name })
       .pipe(
         tap((res) => {
           if (res.success) {
@@ -146,7 +123,7 @@ export class Materia {
       .put<{
         success: boolean;
         renamed: boolean;
-      }>(`subjects/${subjectId}/topics/${topicId}`, { name })
+      }>(`topics/${topicId}`, { name })
       .pipe(
         tap((res) => {
           if (res.success) {

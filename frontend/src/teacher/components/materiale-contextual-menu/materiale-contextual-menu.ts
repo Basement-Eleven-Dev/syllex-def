@@ -3,9 +3,10 @@ import { ConfirmActionDirective } from '../../../directives/confirm-action.direc
 import { NgbDropdownItem, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { RenameModal } from '../rename-modal/rename-modal';
 import { DatePipe } from '@angular/common';
-import { MaterialInterface } from '../../../services/materiali-service';
+import { MaterialInterface } from '../../../services/materiali/materiali-service';
 import { FileViewer } from '../file-viewer/file-viewer';
 import { AssignClass } from '../assign-class/assign-class';
+import { PptxPresenter } from '../pptx-presenter/pptx-presenter';
 
 @Component({
   selector: 'app-materiale-contextual-menu',
@@ -47,6 +48,11 @@ export class MaterialeContextualMenu {
     modalRef.componentInstance.resource = this.item;
   }
 
+  get isPptx(): boolean {
+    const ext = this.item.extension?.toLowerCase();
+    return ext === 'pptx' || ext === 'ppt';
+  }
+
   onRequestViewItem() {
     let modalRef = this.modalService.open(FileViewer, {
       centered: true,
@@ -54,6 +60,17 @@ export class MaterialeContextualMenu {
     });
     modalRef.componentInstance.docUrl = this.item.url;
     modalRef.componentInstance.extension = this.item.extension;
+  }
+
+  onRequestPresent() {
+    const modalRef = this.modalService.open(PptxPresenter, {
+      fullscreen: true,
+      backdrop: 'static',
+      keyboard: true,
+      windowClass: 'presenter-modal',
+    });
+    modalRef.componentInstance.docUrl = this.item.url;
+    modalRef.componentInstance.title = this.item.name;
   }
 
   onRequestDeleteItem() {

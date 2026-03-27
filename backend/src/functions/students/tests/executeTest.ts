@@ -1,19 +1,19 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../../_helpers/getDatabase";
+import { connectDatabase } from "../../../_helpers/getDatabase";
 import { precorrectTest } from "../../../_helpers/student-test/precorrectTest";
+import { Attempt } from "../../../models/schemas/attempt.schema";
 
 const executeTests = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
-  const db = await getDefaultDatabase();
-  const attemptsCollection = db.collection("attempts");
+  await connectDatabase();
   const testExecutedData = JSON.parse(request.body || "{}");
 
   // Prova precorrezione automatica
-  let score = null;
-  let fitTestScore = null;
+  let score = undefined;
+  let fitTestScore = undefined;
   let status = testExecutedData.status || "processing";
   let maxScore = testExecutedData.questions?.length || null;
   const fitScore =
@@ -49,10 +49,10 @@ const executeTests = async (
     // altri campi opzionali se servono
   };
 
-  const result = await attemptsCollection.insertOne(attempt);
+  const result = await Attempt.insertOne(attempt);
   return {
     success: true,
-    attemptId: result.insertedId,
+    attemptId: result._id,
   };
 };
 

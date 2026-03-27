@@ -1,5 +1,5 @@
-<nav class="admin-navbar-soft d-flex align-items-center justify-content-end px-3 py-2">
-    <div ngbDropdown placement="bottom-end" class="d-inline-block">
+<nav class="admin-navbar-soft d-flex align-items-center justify-content-end px-3 py-2 gap-3">
+    <div ngbDropdown placement="bottom-end" class="d-inline-block" tourAnchor="admin-profile">
         <button class="btn btn-link icon-link p-0 border-0 text-decoration-none" id="profileDropdown" ngbDropdownToggle>
             <div class="d-flex align-items-center gap-2">
                 @if (user$ | async; as user) {
@@ -26,6 +26,10 @@
             <button ngbDropdownItem (click)="onChangePassword()" class="d-flex align-items-center gap-3 py-2">
                 <fa-icon [icon]="faKey" class="text-muted"></fa-icon>
                 <span>Modifica Password</span>
+            </button>
+            <button ngbDropdownItem (click)="onStartTour()" class="d-flex align-items-center gap-3 py-2">
+                <fa-icon [icon]="faInfoCircle" class="text-muted"></fa-icon>
+                <span>Tour della piattaforma</span>
             </button>
             <div class="dropdown-divider"></div>
             <button ngbDropdownItem (click)="onLogout()" class="d-flex align-items-center gap-3 py-2 text-danger">

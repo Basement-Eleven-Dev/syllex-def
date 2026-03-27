@@ -1,8 +1,13 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { Test } from "../../models/schemas/test.schema";
+import { User } from "../../models/schemas/user.schema";
+import { Class } from "../../models/schemas/class.schema";
+import { Attempt } from "../../models/schemas/attempt.schema";
+import { SubjectView } from "../../models/schemas/subject.schema";
 
 const getTestAttemptsDetails = async (
   request: APIGatewayProxyEvent,
@@ -14,10 +19,10 @@ const getTestAttemptsDetails = async (
     throw createError.BadRequest("testId is required");
   }
 
-  const db = await getDefaultDatabase();
+  await connectDatabase();
 
-  const test = await db.collection("tests").findOne({
-    _id: new ObjectId(testId),
+  const test = await Test.findOne({
+    _id: new mongo.ObjectId(testId),
   });
 
   if (!test) {
@@ -27,20 +32,17 @@ const getTestAttemptsDetails = async (
   const fitScore = test.fitScore || 0;
   // 1. Prendi i classIds (che potrebbero essere stringhe)
   const classIdsRaw = test.classIds || [];
-  const distinctClasses = await db
-    .collection("users")
+  const distinctClasses = await User
     .distinct("organizationIds", { role: "student" });
   console.log(
     "ID delle classi che hanno almeno uno studente:",
     distinctClasses,
   );
 
-  const classIds = (test.classIds || []).map((id: any) => new ObjectId(id));
+  const classIds = (test.classIds || []).map((id: any) => new mongo.ObjectId(id));
 
-  const associatedClasses = await db
-    .collection("classes")
+  const associatedClasses = await Class
     .find({ _id: { $in: classIds } })
-    .toArray();
 
   const uniqueStudentIds = new Set();
 
@@ -58,11 +60,10 @@ const getTestAttemptsDetails = async (
   console.log(
     `Il test è assegnato a ${associatedClasses.length} classi per un totale di ${totalAssignments} studenti.`,
   );
-  const attemptsWithStudents = await db
-    .collection("attempts")
+  const attemptsWithStudents = await Attempt
     .aggregate([
       {
-        $match: { testId: new ObjectId(testId) },
+        $match: { testId: new mongo.ObjectId(testId) },
       },
       {
         $lookup: {
@@ -81,6 +82,7 @@ const getTestAttemptsDetails = async (
       {
         $project: {
           _id: 1,
+          studentId: 1,
           score: 1,
           maxScore: 1,
           deliveredAt: 1,
@@ -88,13 +90,11 @@ const getTestAttemptsDetails = async (
           timeSpent: 1,
           studentName: "$studentDetails.firstName",
           studentLastName: "$studentDetails.lastName",
-
           questions: 1,
         },
       },
       { $sort: { deliveredAt: -1 } },
     ])
-    .toArray();
 
   const totalDeliveries = attemptsWithStudents.length;
   let totalScore = 0;
@@ -130,7 +130,7 @@ const getTestAttemptsDetails = async (
 
   // Risolvi i nomi degli argomenti dalla materia del test
   const subject = test.subjectId
-    ? await db.collection("SUBJECTS").findOne({ _id: test.subjectId })
+    ? await SubjectView.findOne({ _id: test.subjectId })
     : null;
   const topicsMap = new Map<string, string>();
   if (subject?.topics && Array.isArray(subject.topics)) {
@@ -156,6 +156,35 @@ const getTestAttemptsDetails = async (
     })),
   }));
 
+  // Studenti assegnati senza attempt: includi con status "not-started"
+  const attemptStudentIds = new Set(
+    attemptsWithStudents.map((a: any) => a.studentId?.toString()),
+  );
+  const missingStudentIds = [...uniqueStudentIds].filter(
+    (id) => !attemptStudentIds.has(id as string),
+  );
+
+  let missingStudents: any[] = [];
+  if (missingStudentIds.length > 0) {
+    const students = await User
+      .find({
+        _id: { $in: missingStudentIds.map((id) => new mongo.ObjectId(id as string)) },
+      }, { firstName: 1, lastName: 1 })
+
+    missingStudents = students.map((s) => ({
+      _id: null,
+      status: "not-started",
+      studentName: s.firstName,
+      studentLastName: s.lastName,
+      score: null,
+      maxScore: null,
+      deliveredAt: null,
+      questions: [],
+    }));
+  }
+
+  const allAssignees = [...attemptsWithTopics, ...missingStudents];
+
   return {
     test: {
       _id: test._id,
@@ -176,7 +205,7 @@ const getTestAttemptsDetails = async (
       { title: "Tempo medio", value: formatTime(avgTimeSpent), icon: "clock" },
       { title: "Assegnazioni", value: totalAssignments, icon: "users" },
     ],
-    attempts: attemptsWithTopics,
+    attempts: allAssignees,
   };
 };
 

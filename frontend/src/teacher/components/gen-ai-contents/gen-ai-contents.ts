@@ -25,6 +25,7 @@ import {
   MATERIAL_TYPE_OPTIONS,
   MaterialType,
   QuestionType,
+  QuestionDifficulty,
 } from '../../../types/question.types';
 import {
   FormControl,
@@ -47,6 +48,7 @@ import { Auth } from '../../../services/auth';
 import { FeedbackService } from '../../../services/feedback-service';
 import { forkJoin } from 'rxjs';
 import { QuestionCard } from '../question-card/question-card';
+import { AiOverlay } from '../ai-overlay/ai-overlay';
 
 interface ReviewQuestion {
   readonly TempId: string;
@@ -63,6 +65,7 @@ interface ReviewQuestion {
     TypeSelector,
     ReactiveFormsModule,
     QuestionCard,
+    AiOverlay,
   ],
   templateUrl: './gen-ai-contents.html',
   styleUrl: './gen-ai-contents.scss',
@@ -98,6 +101,7 @@ export class GenAiContents implements OnInit {
   readonly SelectedType = signal<string>('');
   readonly Types = signal<TypeOption[]>([]);
   readonly IsGenerating = signal<boolean>(false);
+  readonly GenerationSuccess = signal<boolean>(false);
   readonly IsSaving = signal<boolean>(false);
   readonly IsOffcanvasMode = signal<boolean>(false);
   readonly ReviewQuestions = signal<ReviewQuestion[]>([]);
@@ -135,8 +139,11 @@ export class GenAiContents implements OnInit {
       Validators.min(3),
       Validators.max(30),
     ]),
+    format: new FormControl('pptx'),
     language: new FormControl('italiano', [Validators.required]),
-    difficulty: new FormControl<1 | 2 | 3>(2, [Validators.required]),
+    difficulty: new FormControl<QuestionDifficulty>('medium', [
+      Validators.required,
+    ]),
     numberOfAlternatives: new FormControl(4),
     instructions: new FormControl(''),
   });
@@ -192,7 +199,6 @@ export class GenAiContents implements OnInit {
         'Errore durante la generazione. Riprova.',
         false,
       );
-    } finally {
       this.IsGenerating.set(false);
     }
   }
@@ -239,10 +245,11 @@ export class GenAiContents implements OnInit {
       ),
     );
     this.ReviewMode.set(true);
+    this.IsGenerating.set(false);
   }
 
   private async submitMaterialGeneration(): Promise<void> {
-    const { selectedType, numberOfSlides, language, instructions } =
+    const { selectedType, numberOfSlides, format, language, instructions } =
       this.genForm.value;
 
     const materialIds = [...this.materialiSelector.selectedMaterialIds()];
@@ -251,16 +258,20 @@ export class GenAiContents implements OnInit {
       type: selectedType as MaterialType,
       materialIds,
       numberOfSlides: this.IsSlides() ? numberOfSlides : undefined,
+      format: this.IsSlides() ? format : undefined,
       additionalInstructions: instructions || undefined,
-      language,
+      language: language,
     });
 
     this.GeneratedMaterial.set(material);
-    this.feedbackService.showFeedback('Materiale generato con successo!', true);
-    this.modalService.open(this.materialSuccessModal, {
-      centered: true,
-      size: 'sm',
-    });
+    this.GenerationSuccess.set(true);
+  }
+
+  onReturnToMaterials(): void {
+    this.IsGenerating.set(false);
+    this.GenerationSuccess.set(false);
+    this.GeneratedMaterial.set(null);
+    this.navigateToResources();
   }
 
   navigateToResources(): void {
@@ -341,11 +352,14 @@ export class GenAiContents implements OnInit {
     teacherId: string,
   ): ReviewQuestion {
     const tempId = crypto.randomUUID();
+    const difficulty = this.genForm.controls['difficulty']
+      .value as QuestionDifficulty;
     const data: QuestionInterface = {
       _id: tempId,
       text: q.text,
       type: q.type,
       explanation: q.explanation,
+      difficulty,
       options: q.options,
       policy: 'private',
       topicId,

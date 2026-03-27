@@ -1,11 +1,11 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
-
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Class } from "../../models/schemas/class.schema";
+import { TeacherAssignment } from "../../models/schemas/teacher-assignment.schema";
+import { Event } from '../../models/schemas/event.schema'
 const getEvents = async (request: APIGatewayProxyEvent, context: Context) => {
-  const db = await getDefaultDatabase();
-  const eventsCollection = db.collection("events");
+  await connectDatabase();
 
   const { month, year } = request.queryStringParameters || {};
 
@@ -18,16 +18,12 @@ const getEvents = async (request: APIGatewayProxyEvent, context: Context) => {
       filter.teacherId = context.user._id;
     } else if (context.user.role === "student") {
       // Uno studente vede solo gli eventi delle materie in cui è iscritto
-      const studentClasses = await db
-        .collection("classes")
-        .find({ students: { $in: [context.user._id] } })
-        .toArray();
+      const studentClasses = await Class
+        .find({ students: context.user._id } as any)
 
       const classIds = studentClasses.map((c) => c._id);
-      const assignments = await db
-        .collection("teacher_assignments")
-        .find({ classId: { $in: classIds } })
-        .toArray();
+      const assignments = await TeacherAssignment
+        .find({ classId: { $in: classIds } } as any)
 
       const subjectIds = assignments.map((a) => a.subjectId);
       filter.subjectId = { $in: subjectIds };
@@ -48,10 +44,9 @@ const getEvents = async (request: APIGatewayProxyEvent, context: Context) => {
     };
   }
 
-  const events = await eventsCollection
+  const events = await Event
     .find(filter)
     .sort({ date: 1 })
-    .toArray();
 
   return { events };
 };

@@ -30,7 +30,6 @@ import { ɵɵDir } from '@angular/cdk/scrolling';
     NgbDropdown,
     NgbDropdownToggle,
     NgbDropdownMenu,
-    ɵɵDir,
     TitleCasePipe,
   ],
   templateUrl: './test-card.html',

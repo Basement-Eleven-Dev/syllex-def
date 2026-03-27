@@ -9,23 +9,13 @@ const getConversationHistory = async (
   const subjectId = context.subjectId;
   const userId = context.user?._id;
 
-  console.log(
-    "recuperando conversazione per subjectId:",
-    subjectId,
-    "e userId:",
-    context.user?._id,
-  );
-
   const keepForDashboard = true;
   const conversationHistory = await buildConversationHistory(
     subjectId!,
     userId!,
     keepForDashboard,
   );
-  return {
-    success: true,
-    conversationHistory,
-  };
+  return conversationHistory;
 };
 
 export const handler = lambdaRequest(getConversationHistory);

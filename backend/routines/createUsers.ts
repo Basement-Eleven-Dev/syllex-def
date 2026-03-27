@@ -1,6 +1,6 @@
 import { config } from "dotenv";
 import inquirer from "inquirer";
-import { MongoClient, ObjectId } from "mongodb";
+import { mongo } from "mongoose";
 import { DB_NAME } from "../src/env";
 import { createAndLinkUser } from "./createUser";
 
@@ -12,9 +12,9 @@ const cognitoPoolId = "eu-south-1_IdnpEkSac";
 const MASTER_ADMIN_EMAIL = "admin@syllex.com";
 
 export interface Organization {
-    _id?: ObjectId;
+    _id?: mongo.ObjectId;
     name: string;
-    administrators: ObjectId[];
+    administrators: mongo.ObjectId[];
     createdAt: Date;
     updatedAt: Date;
     courses?: string[];
@@ -27,7 +27,7 @@ const start = async () => {
     if (!mongoConnectionString)
         throw new Error("Stringa di connessione a Mongo non trovata.");
 
-    const clientMongo = new MongoClient(mongoConnectionString);
+    const clientMongo = new mongo.MongoClient(mongoConnectionString);
     await clientMongo.connect();
     const db = clientMongo.db(DB_NAME);
     const orgsCollection = db.collection("organizations");
@@ -50,7 +50,7 @@ const start = async () => {
             value: org._id.toString(),
         })),
     }])
-    const classes = await db.collection('classes').find({ organizationId: new ObjectId(orgId as string) }).toArray()
+    const classes = await db.collection("classes").find({ organizationId: new mongo.ObjectId(orgId as string) }).toArray()
     const { prefix, count, classId } =
         await inquirer.prompt([
 
@@ -66,7 +66,7 @@ const start = async () => {
                 })),
             },
         ]);
-    let userIds: ObjectId[] = [];
+    let userIds: mongo.ObjectId[] = [];
     for (let i = 0; i < count; i++) {
         const host = prefix + (i + 1).toString()
         const email = host + '@syllex.org';
@@ -82,7 +82,7 @@ const start = async () => {
         userIds.push(creation._id)
     }
     //@ts-ignore
-    await db.collection('classes').updateOne({ _id: new ObjectId(classId as string) }, { $push: { students: { $each: userIds } } })
+    await db.collection("classes").updateOne({ _id: new ObjectId(classId as string) }, { $push: { students: { $each: userIds } } })
 
     await clientMongo.close();
 };

@@ -1,9 +1,12 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
-import { Test } from "../../models/test";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { notifyStudentsIfEnabled } from "../../_helpers/email/notifyStudents";
+import { newTestEmail } from "../../_helpers/email/emailTemplates";
+import { Test } from "../../models/schemas/test.schema";
+import { Subject } from "../../models/schemas/subject.schema";
 
 const createTest = async (request: APIGatewayProxyEvent, context: Context) => {
   const testData = JSON.parse(request.body || "{}");
@@ -16,8 +19,7 @@ const createTest = async (request: APIGatewayProxyEvent, context: Context) => {
     throw createError.Unauthorized("User not authenticated");
   }
 
-  const db = await getDefaultDatabase();
-  const testsCollection = db.collection<Test>("tests");
+  await connectDatabase();
 
   const computeMaxScore = (
     questions: { questionId: string; points: number }[],
@@ -29,10 +31,10 @@ const createTest = async (request: APIGatewayProxyEvent, context: Context) => {
   const newTest: any = {
     name: testData.name,
     availableFrom: new Date(testData.availableFrom),
-    classIds: testData.classIds.map((id: string) => new ObjectId(id)),
+    classIds: testData.classIds.map((id: string) => new mongo.ObjectId(id)),
     questions: testData.questions.map(
       (q: { questionId: string; points: number }) => ({
-        questionId: new ObjectId(q.questionId),
+        questionId: new mongo.ObjectId(q.questionId),
         points: q.points,
       }),
     ),
@@ -58,12 +60,43 @@ const createTest = async (request: APIGatewayProxyEvent, context: Context) => {
     newTest.timeLimit = testData.timeLimit;
   }
 
-  const result = await testsCollection.insertOne(newTest as Test);
+  if (testData.randomizeQuestions === true) {
+    newTest.randomizeQuestions = true;
+  }
+
+  if (testData.oneShotAnswers === true) {
+    newTest.oneShotAnswers = true;
+  }
+
+  const result = await Test.insertOne(newTest);
+
+  // Notifica email agli studenti (asincrono, non blocca la risposta)
+  const teacherName = `${context.user?.firstName || ""} ${context.user?.lastName || ""}`.trim();
+
+  // Recupera il nome della materia
+  const subject_doc = await Subject
+    .findOne({ _id: new mongo.ObjectId(context.subjectId) });
+  const subjectName = subject_doc?.name || "Materia";
+
+  const { subject, html } = newTestEmail({
+    teacherName,
+    testTitle: testData.name,
+    subjectName,
+    questionCount: testData.questions?.length,
+  });
+  console.log("prima del processo di notifica");
+  notifyStudentsIfEnabled({
+    teacher: context.user,
+    preference: "newTest",
+    classIds: newTest.classIds,
+    subject,
+    html,
+  });
 
   return {
     test: {
       ...newTest,
-      _id: result.insertedId,
+      _id: result._id,
     },
   };
 };

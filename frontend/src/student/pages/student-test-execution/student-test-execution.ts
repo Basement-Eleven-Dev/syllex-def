@@ -137,8 +137,32 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
   }
 
   onAnswerChange(questionId: string, value: number | string): void {
+    const test = this.TestData();
+    const question = this.Questions().find((q) => q._id === questionId);
+
+    // One-shot restriction: handle only if enabled and it's a closed question
+    if (test?.oneShotAnswers && question && question.type !== 'risposta aperta') {
+      const existing = this.Answers()[questionId];
+      if (existing !== null && existing !== undefined && existing !== '') {
+        // Already answered, block changes
+        return;
+      }
+    }
+
     this.Answers.update((a) => ({ ...a, [questionId]: value }));
     this.scheduleSave();
+  }
+
+  isQuestionLocked(question: QuestionInterface): boolean {
+    if (this.TimerExpired()) return true;
+
+    const test = this.TestData();
+    if (test?.oneShotAnswers && question.type !== 'risposta aperta') {
+      const answer = this.Answers()[question._id];
+      return answer !== null && answer !== undefined && answer !== '';
+    }
+
+    return false;
   }
 
   onSubmit(): void {
@@ -156,7 +180,7 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
       .subscribe({
         next: () => {
           this.testsService
-            .submitTestAttempt(attempt._id!)
+            .submitTestAttempt(attempt._id!, this.TestId)
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe({
               next: () => {
@@ -245,12 +269,22 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (results) => {
-          const loaded = results.filter(
+          let loaded = results.filter(
             (q): q is QuestionInterface => q !== null,
           );
-          loaded.sort(
-            (a, b) => questionIds.indexOf(a._id) - questionIds.indexOf(b._id),
-          );
+
+          if (test.randomizeQuestions) {
+            // Fisher-Yates shuffle
+            for (let i = loaded.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              [loaded[i], loaded[j]] = [loaded[j], loaded[i]];
+            }
+          } else {
+            loaded.sort(
+              (a, b) => questionIds.indexOf(a._id) - questionIds.indexOf(b._id),
+            );
+          }
+
           this.Questions.set(loaded);
           this.IsLoading.set(false);
           this.checkExistingAttempt();

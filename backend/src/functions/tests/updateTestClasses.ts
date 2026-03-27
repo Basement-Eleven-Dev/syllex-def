@@ -1,19 +1,15 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
-import { Test } from "../../models/test";
+import { Types, mongo } from "mongoose";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Test } from "../../models/schemas/test.schema";
 
 const updateTestClasses = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
-  const testId = request.pathParameters?.testId;
-
-  if (!testId) {
-    throw createError.BadRequest("testId is required");
-  }
+  const testId = request.pathParameters!.testId!;
 
   const body = JSON.parse(request.body || "{}");
 
@@ -21,38 +17,23 @@ const updateTestClasses = async (
     throw createError.BadRequest("classIds must be an array");
   }
 
-  const db = await getDefaultDatabase();
-  const testsCollection = db.collection<Test>("tests");
+  await connectDatabase();
 
-  // Verify test exists and belongs to the teacher
-  const existingTest = await testsCollection.findOne({
-    _id: new ObjectId(testId),
-    teacherId: context.user?._id,
-  });
-
-  if (!existingTest) {
-    throw createError.NotFound("Test not found or not authorized");
-  }
-
-  // Update classIds
-  const result = await testsCollection.updateOne(
-    { _id: new ObjectId(testId) },
+  // Update classIds atomically and return updated doc
+  const updatedTest = await Test.findOneAndUpdate(
+    { _id: new mongo.ObjectId(testId), teacherId: context.user?._id },
     {
       $set: {
-        classIds: body.classIds.map((id: string) => new ObjectId(id)),
+        classIds: body.classIds.map((id: string) => new mongo.ObjectId(id)),
         updatedAt: new Date(),
       },
     },
-  );
+    { new: true, runValidators: true }
+  ).lean();
 
-  if (result.modifiedCount === 0) {
-    throw createError.InternalServerError("Failed to update test classes");
+  if (!updatedTest) {
+    throw createError.NotFound("Test not found or not authorized");
   }
-
-  // Return updated test
-  const updatedTest = await testsCollection.findOne({
-    _id: new ObjectId(testId),
-  });
 
   return {
     success: true,

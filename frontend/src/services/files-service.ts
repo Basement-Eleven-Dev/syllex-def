@@ -20,16 +20,21 @@ export class FilesService {
         headers: {
           'Content-Type': file.type || 'application/octet-stream',
         },
-      }).then((response) => {
-        if (!response.ok) {
+      })
+        .catch((err) => {
           throw new Error(
-            `Upload failed: ${response.status} ${response.statusText}`,
+            `Upload S3 non riuscito (possibile errore CORS/rete): ${err.message}`,
           );
-        }
-        // Estrae l'URL pubblico rimuovendo i parametri di query
-        const url = new URL(uploadUrl);
-        return `${url.origin}${url.pathname}`;
-      }),
+        })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(
+              `Upload failed: ${response.status} ${response.statusText}`,
+            );
+          }
+          const url = new URL(uploadUrl);
+          return `${url.origin}${url.pathname}`;
+        }),
     );
   }
 

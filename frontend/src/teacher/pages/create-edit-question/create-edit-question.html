@@ -35,6 +35,19 @@
   </section>
 
   <section class="form-section">
+    <label class="form-label text-dark">Difficoltà</label>
+    <select
+      class="form-select custom-input w-auto"
+      formControlName="difficulty"
+      aria-label="Seleziona difficoltà"
+    >
+      @for(opt of DifficultyOptions; track opt.value) {
+      <option [value]="opt.value">{{ opt.label }}</option>
+      }
+    </select>
+  </section>
+
+  <section class="form-section">
     <div
       class="d-flex flex-row justify-content-between align-items-center mb-5"
     >
@@ -99,7 +112,7 @@
             <div class="image-actions d-flex gap-2 mt-2">
               <button
                 type="button"
-                class="btn btn-sm btn-outline-primary flex-fill"
+                class="btn btn-sm btn-blue flex-fill"
                 (click)="fileInput?.click(); $event.stopPropagation()"
               >
                 Cambia immagine
@@ -183,6 +196,38 @@
       rows="4"
       placeholder="Inserisci una commento sulla risposta corretta..."
     ></textarea>
+  </section>
+
+  <section class="form-section">
+    <label class="form-label text-dark">Tag</label>
+    <p class="text-dark fw-light mb-2">
+      Aggiungi dei tag per organizzare e ritrovare più facilmente le domande.
+      Premi <kbd>Invio</kbd> o <kbd>,</kbd> per aggiungere un tag.
+    </p>
+    <div class="d-flex flex-wrap gap-2 mb-2">
+      @for(tag of QuestionForm.get('tags')?.value; track tag) {
+      <span class="badge tag-badge d-flex align-items-center gap-1">
+        <fa-icon [icon]="TagIcon" size="xs"></fa-icon>
+        {{ tag }}
+        <button
+          type="button"
+          class="btn-close btn-close-white ms-1"
+          aria-label="Rimuovi tag"
+          (click)="removeTag(tag)"
+        ></button>
+      </span>
+      }
+    </div>
+    <input
+      type="text"
+      class="form-control custom-input"
+      style="max-width: 300px"
+      placeholder="Scrivi un tag e premi Invio..."
+      [ngModel]="TagInput()"
+      (ngModelChange)="TagInput.set($event)"
+      [ngModelOptions]="{ standalone: true }"
+      (keydown)="onTagKeydown($event)"
+    />
   </section>
 
   <section class="form-section">

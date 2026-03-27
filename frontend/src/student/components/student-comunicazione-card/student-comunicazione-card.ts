@@ -5,7 +5,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { IconDefinition } from '@fortawesome/pro-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ComunicazioneInterface } from '../../../services/comunicazioni-service';
-import { MaterialInterface } from '../../../services/materiali-service';
+import { MaterialInterface } from '../../../services/materiali/materiali-service';
 import { FileViewer } from '../.././../teacher/components/file-viewer/file-viewer';
 import { getFileIcon } from '../../../app/_utils/file-icons';
 import { Materia } from '../../../services/materia';

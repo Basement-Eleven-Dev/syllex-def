@@ -30,10 +30,11 @@ import { firstValueFrom } from 'rxjs';
 import {
   MaterialInterface,
   MaterialiService,
-} from '../../../services/materiali-service';
+} from '../../../services/materiali/materiali-service';
 import { EmbeddingsService } from '../../../services/embeddings.service';
 import { Materia } from '../../../services/materia';
 import { AgentService } from '../../../services/agent.service';
+import { FeedbackService } from '../../../services/feedback-service';
 
 @Component({
   selector: 'app-agent-settings-form',
@@ -93,6 +94,7 @@ export class AgentSettingsForm implements OnInit {
     private materiaService: Materia,
     private agentService: AgentService,
     private materialiService: MaterialiService,
+    private feedbackService: FeedbackService,
   ) {
     effect(() => {
       const subject = this.materiaService.materiaSelected();
@@ -135,6 +137,10 @@ export class AgentSettingsForm implements OnInit {
       },
       error: (err) => {
         console.error('Error loading assistant:', err);
+        this.feedbackService.showFeedback(
+          "Errore nel caricamento dell'assistente",
+          false,
+        );
         this.isLoading.set(false);
       },
     });
@@ -154,7 +160,7 @@ export class AgentSettingsForm implements OnInit {
     const assistantId = this.assistantId();
     if (!assistantId) return;
 
-    this.agentService.removeMaterial(assistantId, materialId).subscribe({
+    this.agentService.removeMaterial(materialId).subscribe({
       next: (res) => {
         if (res.success) {
           this.associatedMaterialIds.update((ids) =>
@@ -163,7 +169,13 @@ export class AgentSettingsForm implements OnInit {
           this.materialiService.loadMaterials();
         }
       },
-      error: (err) => console.error('Error removing material:', err),
+      error: (err) => {
+        console.error('Error removing material:', err);
+        this.feedbackService.showFeedback(
+          'Errore nella rimozione del materiale',
+          false,
+        );
+      },
     });
   }
 
@@ -213,7 +225,7 @@ export class AgentSettingsForm implements OnInit {
         if (assistantId) {
           // UPDATE
           await firstValueFrom(
-            this.agentService.updateAgent(assistantId, formData),
+            this.agentService.updateAgent(formData),
           );
           console.log('Agent updated successfully');
         } else {
@@ -238,6 +250,10 @@ export class AgentSettingsForm implements OnInit {
               },
               error: (err) => {
                 console.error('Vectorization error:', err);
+                this.feedbackService.showFeedback(
+                  'Errore durante la vettorizzazione dei materiali',
+                  false,
+                );
                 this.isSaving.set(false);
               },
             });
@@ -246,6 +262,10 @@ export class AgentSettingsForm implements OnInit {
         }
       } catch (error) {
         console.error('Error during agent save or vectorization:', error);
+        this.feedbackService.showFeedback(
+          "Errore durante il salvataggio dell'assistente",
+          false,
+        );
         this.isSaving.set(false);
       }
     } else {
@@ -258,6 +278,7 @@ export class AgentSettingsForm implements OnInit {
     this.materialiService.loadMaterials();
     // Ricarica l'assistente per sicurezza
     this.loadAssistant();
+    this.feedbackService.showFeedback('Assistente salvato con successo', true);
     this.isSaving.set(false);
   }
 }

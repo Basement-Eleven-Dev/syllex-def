@@ -1,20 +1,21 @@
-import { ObjectId } from "mongodb";
-import { getDefaultDatabase } from "../../getDatabase";
+import { Types } from "mongoose";
+import { connectDatabase } from "../../getDatabase";
+import { Message } from "../../../models/schemas/message.schema";
 
 export async function saveMessage(
-  subjectId: ObjectId,
-  userId: ObjectId,
+  subjectId: Types.ObjectId,
+  userId: Types.ObjectId,
   role: "user" | "agent",
   content: string,
 ) {
-  const db = await getDefaultDatabase();
+  await connectDatabase();
   const message = {
     subjectId: subjectId,
-    userId: new ObjectId(userId),
+    userId: userId,
     role,
     content,
     timestamp: new Date(),
   };
-  const result = await db.collection("messages").insertOne(message);
-  return result.insertedId.toString();
+  const result = await Message.insertOne(message);
+  return result._id;
 }

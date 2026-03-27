@@ -1,8 +1,11 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { Class } from "../../../models/schemas/class.schema";
+import { User } from "../../../models/schemas/user.schema";
+import { TeacherAssignment } from "../../../models/schemas/teacher-assignment.schema";
 
 const getClassDetail = async (
   request: APIGatewayProxyEvent,
@@ -11,22 +14,22 @@ const getClassDetail = async (
   const organizationId = request.pathParameters?.organizationId;
   const classId = request.pathParameters?.classId;
 
-  if (!organizationId || !ObjectId.isValid(organizationId)) {
+  if (!organizationId || !mongo.ObjectId.isValid(organizationId)) {
     throw createError.BadRequest("Invalid or missing organizationId");
   }
 
-  if (!classId || !ObjectId.isValid(classId)) {
+  if (!classId || !mongo.ObjectId.isValid(classId)) {
     throw createError.BadRequest("Invalid or missing classId");
   }
 
-  const db = await getDefaultDatabase();
-  const orgObjectId = new ObjectId(organizationId);
-  const classObjectId = new ObjectId(classId);
+  await connectDatabase();
+  const orgObjectId = new mongo.ObjectId(organizationId);
+  const classObjectId = new mongo.ObjectId(classId);
 
   // 1. Get Class info
-  const classData = await db.collection("classes").findOne({ 
+  const classData = await Class.findOne({
     _id: classObjectId,
-    organizationId: orgObjectId 
+    organizationId: orgObjectId
   });
 
   if (!classData) {
@@ -36,12 +39,12 @@ const getClassDetail = async (
   }
 
   // 2. Get Students detail
-  const students = await db.collection("users").find({
+  const students = await User.find({
     _id: { $in: classData.students || [] }
-  }).toArray();
+  });
 
   // 3. Get Assignments for this class
-  const assignments = await db.collection("teacher_assignments").aggregate([
+  const assignments = await TeacherAssignment.aggregate([
     { $match: { classId: classObjectId } },
     {
       $lookup: {
@@ -61,7 +64,7 @@ const getClassDetail = async (
     },
     { $unwind: "$teacher" },
     { $unwind: "$subject" }
-  ]).toArray();
+  ]);
 
   return {
     success: true,

@@ -10,6 +10,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DestroyRef } from '@angular/core';
 import { StudentTestCard } from '../../components/student-test-card/student-test-card';
 import { Materia } from '../../../services/materia';
+import { FeedbackService } from '../../../services/feedback-service';
 
 type AttemptStatus = 'in-progress' | 'delivered' | 'reviewed';
 
@@ -24,6 +25,7 @@ export class StudentTestsList implements OnInit {
   private readonly testsService = inject(StudentTestsService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly materiaService = inject(Materia);
+  private readonly feedbackService = inject(FeedbackService);
 
   readonly ClearIcon = faBroom;
   readonly PlusIcon = faPlus;
@@ -53,6 +55,10 @@ export class StudentTestsList implements OnInit {
         },
         error: (err) => {
           console.error('Errore nel caricamento dei test:', err);
+          this.feedbackService.showFeedback(
+            'Errore nel caricamento dei test',
+            false,
+          );
           this.Tests.set([]);
         },
       });

@@ -1,37 +1,29 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { Assistant } from "../../models/schemas/assistant.schema";
 
 const removeMaterial = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
-  const { assistantId, materialId } = JSON.parse(request.body || "{}");
+  const materialId = request.pathParameters?.materialId || ''
   const teacherId = context.user?._id;
 
-  if (!assistantId || !materialId) {
-    throw createError(400, "assistantId e materialId sono richiesti");
-  }
+  await connectDatabase()
 
-  if (!teacherId) {
-    throw createError(401, "Utente non autenticato");
-  }
-
-  const db = await getDefaultDatabase();
-  const assistantsCollection = db.collection("assistants");
-
-  const result = await assistantsCollection.updateOne(
-    { 
-        _id: new ObjectId(assistantId), 
-        teacherId: teacherId instanceof ObjectId ? teacherId : new ObjectId(teacherId as string) 
+  const result = await Assistant.updateOne(
+    {
+      subjectId: context.subjectId,
+      teacherId: teacherId
     },
-    { 
-      $pull: { 
-        associatedFileIds: { $in: [new ObjectId(materialId), materialId] } 
-      } 
-    } as any
+    {
+      $pull: {
+        associatedFileIds: { $in: [new mongo.ObjectId(materialId), materialId] }
+      }
+    }
   );
 
   if (result.matchedCount === 0) {

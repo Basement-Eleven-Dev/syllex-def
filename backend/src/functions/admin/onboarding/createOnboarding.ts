@@ -1,10 +1,16 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
 import { createCognitoUser } from "../../../_helpers/cognito/userManagement";
 import { uploadContentToS3 } from "../../../_helpers/uploadFileToS3";
+import { connectDatabase } from "../../../_helpers/getDatabase";
+import { mongo, Types } from "mongoose";
+import { Organization } from "../../../models/schemas/organization.schema";
+import { User } from "../../../models/schemas/user.schema";
+import { Subject as SubjectModel } from "../../../models/schemas/subject.schema";
+import { Assistant } from "../../../models/schemas/assistant.schema";
+import { Class } from "../../../models/schemas/class.schema";
+import { TeacherAssignment } from "../../../models/schemas/teacher-assignment.schema";
 
 
 interface StaffMember {
@@ -61,8 +67,8 @@ const onboardingHandler = async (
     throw createError.BadRequest("Organization name is required");
   }
 
-  const db = await getDefaultDatabase();
-  
+  await connectDatabase();
+
   // 0. Handle Logo Upload if present (Base64 from frontend)
   let logoUrl = payload.orgData.logoUrl;
   if (logoUrl && logoUrl.startsWith('data:image')) {
@@ -71,8 +77,8 @@ const onboardingHandler = async (
       const mimeType = logoUrl.split(';')[0].split(':')[1];
       const extension = mimeType.split('/')[1];
       const buffer = Buffer.from(base64Data, 'base64');
-      const key = `logos/${new ObjectId().toString()}.${extension}`;
-      
+      const key = `logos/${new mongo.ObjectId().toString()}.${extension}`;
+
       const s3Url = await uploadContentToS3(key, buffer, mimeType);
       if (s3Url) logoUrl = s3Url;
     } catch (s3Err) {
@@ -81,26 +87,26 @@ const onboardingHandler = async (
   }
 
   // 1. Create Organization
-  const orgResult = await db.collection("organizations").insertOne({
+  const orgResult = await Organization.insertOne({
     name: payload.orgData.name,
     logoUrl: logoUrl,
     createdAt: new Date(),
     updatedAt: new Date(),
     administrators: [] // Will populate later
   });
-  const orgId = orgResult.insertedId;
+  const orgId = orgResult._id;
 
   // Mapping from temp frontend IDs to real MongoDB ObjectIds
-  const staffIdMap = new Map<string, ObjectId>();
-  const subjectIdMap = new Map<string, ObjectId>();
-  const classIdMap = new Map<string, ObjectId>();
-  const studentIdMap = new Map<string, ObjectId>();
+  const staffIdMap = new Map<string, Types.ObjectId>();
+  const subjectIdMap = new Map<string, Types.ObjectId>();
+  const classIdMap = new Map<string, Types.ObjectId>();
+  const studentIdMap = new Map<string, Types.ObjectId>();
 
   // 2. Process Staff
-  const adminIds: ObjectId[] = [];
+  const adminIds: Types.ObjectId[] = [];
   for (const staff of payload.staffList) {
     const cognitoId = await createCognitoUser(staff.email, staff.firstName, staff.lastName, staff.role);
-    const userResult = await db.collection("users").insertOne({
+    const userResult = await User.insertOne({
       cognitoId,
       email: staff.email.toLowerCase(),
       firstName: staff.firstName,
@@ -110,13 +116,13 @@ const onboardingHandler = async (
       createdAt: new Date(),
       updatedAt: new Date(),
     });
-    const realId = userResult.insertedId;
+    const realId = userResult._id;
     if (staff._id) staffIdMap.set(staff._id, realId);
     if (staff.role === 'admin') adminIds.push(realId);
   }
 
   // Update Org with admins
-  await db.collection("organizations").updateOne(
+  await Organization.updateOne(
     { _id: orgId },
     { $set: { administrators: adminIds } }
   );
@@ -126,18 +132,18 @@ const onboardingHandler = async (
     const teacherId = staffIdMap.get(sub.teacherId);
     if (!teacherId) continue;
 
-    const subResult = await db.collection("subjects").insertOne({
+    const subResult = await SubjectModel.insertOne({
       name: sub.name,
       teacherId,
       organizationId: orgId,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
-    const subRealId = subResult.insertedId;
+    const subRealId = subResult._id;
     if (sub._id) subjectIdMap.set(sub._id, subRealId);
 
     // Initialize Assistant for this subject
-    await db.collection("assistants").insertOne({
+    await Assistant.insertOne({
       name: "Gianfilippo",
       tone: "friendly",
       voice: "neutral",
@@ -152,11 +158,11 @@ const onboardingHandler = async (
 
   // 4. Process Classes & Students
   for (const cls of payload.classesList) {
-    const studentIds: ObjectId[] = [];
-    
+    const studentIds: Types.ObjectId[] = [];
+
     for (const std of cls.students) {
       const cognitoId = await createCognitoUser(std.email, std.firstName, std.lastName, 'student');
-      const userResult = await db.collection("users").insertOne({
+      const userResult = await User.insertOne({
         cognitoId,
         email: std.email.toLowerCase(),
         firstName: std.firstName,
@@ -166,10 +172,10 @@ const onboardingHandler = async (
         createdAt: new Date(),
         updatedAt: new Date(),
       });
-      studentIds.push(userResult.insertedId);
+      studentIds.push(userResult._id);
     }
 
-    const classResult = await db.collection("classes").insertOne({
+    const classResult = await Class.insertOne({
       name: cls.name,
       organizationId: orgId,
       students: studentIds,
@@ -177,7 +183,7 @@ const onboardingHandler = async (
       createdAt: new Date(),
       updatedAt: new Date(),
     });
-    if (cls._id) classIdMap.set(cls._id, classResult.insertedId);
+    if (cls._id) classIdMap.set(cls._id, classResult._id);
   }
 
   // 5. Create Assignments
@@ -187,7 +193,7 @@ const onboardingHandler = async (
     const classId = classIdMap.get(asg.classId);
 
     if (teacherId && subjectId && classId) {
-      await db.collection("teacher_assignments").insertOne({
+      await TeacherAssignment.insertOne({
         teacherId,
         subjectId,
         classId,

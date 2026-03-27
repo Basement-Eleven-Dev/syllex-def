@@ -34,6 +34,10 @@ export class QuestionCorrection {
     return labels[value] || '';
   }
 
+  getAiProbabilityLabel(value: number): string {
+    return value > 50 ? 'Probabile IA' : 'Probabilmente non IA';
+  }
+
   get isOpenTypeQuestion(): boolean {
     return this.data.question.type === 'risposta aperta';
   }

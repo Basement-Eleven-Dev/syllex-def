@@ -1,14 +1,15 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import createHttpError from "http-errors";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
-import { MaterialInterface } from "../../models/material";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { Material } from "../../models/schemas/material.schema";
 import { startSlidedeckGeneration } from "../../_helpers/gammaApi";
 import { uploadContentToS3 } from "../../_helpers/uploadFileToS3";
 import { getConvertedDocument } from "../../_helpers/documents/documentConversion";
 import { askStructuredLLM } from "../../_helpers/AI/simpleCompletion";
 import { z } from "zod";
+import { Organization } from "../../models/schemas/organization.schema";
 
 const documentTypes = ["slides", "map", "glossary", "summary"] as const;
 
@@ -23,6 +24,7 @@ export type AIGenMaterialInput = {
   type: DocumentType;
   materialIds: string[];
   numberOfSlides?: number;
+  format?: "pptx" | "pdf";
   additionalInstructions?: string;
   language?: string;
 };
@@ -69,10 +71,13 @@ const createAIGenMaterial = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
+  await connectDatabase();
+
   const {
     type,
     materialIds,
     numberOfSlides,
+    format,
     additionalInstructions,
     language,
   } = JSON.parse(request.body || "{}") as AIGenMaterialInput;
@@ -87,17 +92,31 @@ const createAIGenMaterial = async (
       "type materialIds is required and not empty: string[]",
     );
 
-  const db = await getDefaultDatabase();
-  const materialCollection = db.collection("materials");
-  const organizationCollection = db.collection("organizations");
-  const materialOIds = materialIds.map((el) => new ObjectId(el));
-  const materialObjects: MaterialInterface[] = (await materialCollection
-    .find({
-      _id: { $in: materialOIds },
-      subjectId: context.subjectId,
-      aiGenerated: { $ne: true },
-    })
-    .toArray()) as MaterialInterface[]; //forse non serve
+  // Check storage limit (1GB)
+  const STORAGE_LIMIT_B = 1024 * 1024 * 1024;
+  const currentMaterials = await Material.find({
+    teacherId: context.user!._id as any,
+    subjectId: context.subjectId as any,
+  });
+
+  const totalBytes = currentMaterials.reduce(
+    (acc, m) => acc + (m.byteSize || 0),
+    0,
+  );
+  if (totalBytes >= STORAGE_LIMIT_B) {
+    throw createHttpError(
+      400,
+      "Limite di archiviazione (1GB) raggiunto per questa materia.",
+    );
+  }
+
+  await connectDatabase();
+  const materialOIds = materialIds.map((el) => new mongo.ObjectId(el));
+  const materialObjects = await Material.find({
+    _id: { $in: materialOIds as any },
+    subjectId: context.subjectId as any,
+    aiGenerated: { $ne: true },
+  });
 
   const prompt = getPrompt(
     type,
@@ -120,10 +139,9 @@ const createAIGenMaterial = async (
 
   console.log("LLM response:", { title, content });
 
-  const organizationId =
-    (context.user as any).organizationIds?.[0] ?? context.user!.organizationId;
+  const organizationId = context.user?.organizationIds?.[0];
 
-  const organization = await organizationCollection.findOne({
+  const organization = await Organization.findOne({
     _id: organizationId,
   });
 
@@ -134,7 +152,7 @@ const createAIGenMaterial = async (
   const organizationLogoUrl: string = organization.logoUrl ?? "";
   const organizationName: string = organization.name; //unused for now
 
-  const material: MaterialInterface = {
+  const material: Partial<Material> = {
     name: "", //find a way to get a real name
     createdAt: new Date(),
     aiGenerated: true,
@@ -158,6 +176,7 @@ const createAIGenMaterial = async (
       destinationFilename,
     );
     material.name = destinationFilename;
+    material.byteSize = pdfFile.length;
     let bucketKey = "ai_gen/" + material.name;
     material.url = await uploadContentToS3(bucketKey, pdfFile, mimetype);
   }
@@ -167,7 +186,7 @@ const createAIGenMaterial = async (
       inputText: content,
       numCards: numberOfSlides || 10,
       textMode: "preserve",
-      exportAs: "pptx",
+      exportAs: format || "pptx",
       imageOptions: {
         source: "aiGenerated",
       },
@@ -181,27 +200,30 @@ const createAIGenMaterial = async (
         },
       },
     });
+
+    console.log("\n\n");
+    console.log("Gamma API response:", res);
+    console.log("\n\n");
+
     const prefix = process.env.LOCAL_TESTING ? "http://" : "https://";
     material.url = `${prefix}${request.requestContext.domainName}${request.requestContext.stage ? "/" + request.requestContext.stage : ""}/proxy/gamma/${res.generationId}`;
-    material.extension = "pptx";
+    material.extension = format || "pptx";
     material.name = title + "." + material.extension;
   }
   if (type == "map") {
     material.extension = "txt";
     material.name = title + "." + material.extension;
+    material.byteSize = Buffer.byteLength(content, "utf8");
     let bucketKey = "ai_gen/" + material.name;
     let mimetype = "text/plain; charset=utf-8";
     material.isMap = true;
     material.url = await uploadContentToS3(bucketKey, content, mimetype);
   }
 
-  const insertResult = await materialCollection.insertOne(material);
+  const createdMaterial = await Material.create(material as any);
 
   return {
-    material: {
-      ...material,
-      _id: insertResult.insertedId,
-    },
+    material: createdMaterial.toObject(),
   };
 };
 

@@ -1,45 +1,32 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types } from "mongoose";
+import { Question, QuestionUpdate } from "../../models/schemas/question.schema";
 
 const editQuestion = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
-  const questionId = request.pathParameters?.questionId;
-
-  if (!questionId) {
-    throw createError.BadRequest("questionId is required");
-  }
+  const questionId = request.pathParameters!.questionId!;
 
   const questionData = JSON.parse(request.body || "{}");
 
-  const db = await getDefaultDatabase();
-  const questionsCollection = db.collection("questions");
-
-  // Verifica che la domanda esista e appartenga al teacher
-  const existingQuestion = await questionsCollection.findOne({
-    _id: new ObjectId(questionId),
-    teacherId: context.user?._id,
-  });
-
-  if (!existingQuestion) {
-    throw createError.NotFound("Question not found or not authorized");
-  }
+  await connectDatabase();
 
   // Prepara i dati per l'update
-  const updateData: any = {
+  const updateData: QuestionUpdate = {
     text: questionData.text,
     type: questionData.type,
     explanation: questionData.explanation,
+    difficulty: questionData.difficulty || undefined,
     policy: questionData.policy,
     updatedAt: new Date(),
   };
 
   if (questionData.topicId) {
-    updateData.topicId = new ObjectId(questionData.topicId);
+    updateData.topicId = new Types.ObjectId(questionData.topicId);
   }
 
   if (context.subjectId) {
@@ -56,16 +43,16 @@ const editQuestion = async (
     updateData.options = questionData.options;
   }
 
-  // Update della domanda
-  await questionsCollection.updateOne(
-    { _id: new ObjectId(questionId) },
+  // Update della domanda (atomic: include ownership in filter)
+  const updatedQuestion = await Question.findOneAndUpdate(
+    { _id: questionId, teacherId: context.user?._id } as any,
     { $set: updateData },
-  );
+    { new: true, runValidators: true }
+  ).lean();
 
-  // Ritorna la domanda aggiornata
-  const updatedQuestion = await questionsCollection.findOne({
-    _id: new ObjectId(questionId),
-  });
+  if (!updatedQuestion) {
+    throw createError.NotFound("Question not found or not authorized");
+  }
 
   return {
     question: updatedQuestion,

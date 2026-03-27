@@ -1,26 +1,16 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { Test } from "../../models/test";
-import { ObjectId } from "mongodb";
+import { Types, mongo } from "mongoose";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Test } from "../../models/schemas/test.schema";
 
 const countPublishedTests = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
-  const db = await getDefaultDatabase();
-  const testsCollection = db.collection<Test>("tests");
+  await connectDatabase();
 
   const subjectId = context.subjectId;
-
-  if (!subjectId) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({
-        error: "subjectId is required",
-      }),
-    };
-  }
 
   // Costruisci il filtro
   const filter: any = {
@@ -34,7 +24,7 @@ const countPublishedTests = async (
   }
 
   // Conta i documenti
-  const count = await testsCollection.countDocuments(filter);
+  const count = await Test.countDocuments(filter);
 
   return {
     count: count,

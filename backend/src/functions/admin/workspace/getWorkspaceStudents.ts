@@ -1,8 +1,9 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { User } from "../../../models/schemas/user.schema";
 
 const getWorkspaceStudents = async (
   request: APIGatewayProxyEvent,
@@ -10,20 +11,20 @@ const getWorkspaceStudents = async (
 ) => {
   const organizationId = request.pathParameters?.organizationId;
 
-  if (!organizationId || !ObjectId.isValid(organizationId)) {
+  if (!organizationId || !mongo.ObjectId.isValid(organizationId)) {
     throw createError.BadRequest("Invalid or missing organizationId");
   }
 
-  const db = await getDefaultDatabase();
-  const orgObjectId = new ObjectId(organizationId);
+  await connectDatabase();
+  const orgObjectId = new mongo.ObjectId(organizationId);
 
-  const students = await db.collection("users").find({ 
+  const students = await User.find({
     $or: [
       { organizationId: orgObjectId },
       { organizationIds: orgObjectId }
     ],
     role: "student"
-  }).sort({ lastName: 1, firstName: 1 }).toArray();
+  }).sort({ lastName: 1, firstName: 1 });
 
   return {
     success: true,

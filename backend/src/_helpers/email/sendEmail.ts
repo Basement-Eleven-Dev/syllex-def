@@ -3,6 +3,7 @@ import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
 const sesClient = new SESClient({ region: "eu-south-1" });
 
 export async function sendEmail(to: string, subject: string, html: string) {
+  console.log("Invio email a:", to);  
   const command = new SendEmailCommand({
     Destination: {
       ToAddresses: [to],

@@ -1,11 +1,11 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
-import { Attempt } from "../../../models/attempt";
+import { connectDatabase } from "../../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
 import { precorrectTest } from "../../../_helpers/student-test/precorrectTest";
 import { correctStudentQuestion } from "../../../_helpers/AI/correctStudentQuestion";
+import { Attempt } from "../../../models/schemas/attempt.schema";
 
 const submitStudentAttempt = async (
   request: APIGatewayProxyEvent,
@@ -22,12 +22,11 @@ const submitStudentAttempt = async (
     throw createError.Unauthorized("User not authenticated");
   }
 
-  const db = await getDefaultDatabase();
-  const attemptsCollection = db.collection<Attempt>("attempts");
+  await connectDatabase();
 
-  const attempt = await attemptsCollection.findOne({
-    _id: new ObjectId(attemptId),
-    studentId: new ObjectId(studentId),
+  const attempt = await Attempt.findOne({
+    _id: new mongo.ObjectId(attemptId),
+    studentId: new mongo.ObjectId(studentId),
   });
 
   if (!attempt) {
@@ -39,7 +38,7 @@ const submitStudentAttempt = async (
   }
 
   const now = new Date();
-  const startedAt = new Date(attempt.startedAt).getTime();
+  const startedAt = attempt.startedAt!.getTime();
   const timeSpent = Math.floor((now.getTime() - startedAt) / 1000);
 
   // ── Self-evaluation: correzione automatica completa (chiuse + AI per le aperte) ──
@@ -99,8 +98,8 @@ const submitStudentAttempt = async (
       0,
     );
 
-    const result = await attemptsCollection.findOneAndUpdate(
-      { _id: new ObjectId(attemptId) },
+    const result = await Attempt.findOneAndUpdate(
+      { _id: new mongo.ObjectId(attemptId) },
       { $set },
       { returnDocument: "after" },
     );
@@ -142,8 +141,8 @@ const submitStudentAttempt = async (
     }
   }
 
-  const result = await attemptsCollection.findOneAndUpdate(
-    { _id: new ObjectId(attemptId) },
+  const result = await Attempt.findOneAndUpdate(
+    { _id: new mongo.ObjectId(attemptId) },
     { $set: updateFields },
     { returnDocument: "after" },
   );

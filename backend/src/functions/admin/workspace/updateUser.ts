@@ -1,9 +1,11 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
 import { updateCognitoUser } from "../../../_helpers/cognito/userManagement";
+import { User } from "../../../models/schemas/user.schema";
+import { Class } from "../../../models/schemas/class.schema";
 
 const updateUser = async (
   request: APIGatewayProxyEvent,
@@ -13,11 +15,11 @@ const updateUser = async (
   const userId = request.pathParameters?.userId;
   const { firstName, lastName, role, classId, subjectId } = JSON.parse(request.body || '{}');
 
-  if (!organizationId || !ObjectId.isValid(organizationId)) {
+  if (!organizationId || !mongo.ObjectId.isValid(organizationId)) {
     throw createError.BadRequest("Invalid or missing organizationId");
   }
 
-  if (!userId || !ObjectId.isValid(userId)) {
+  if (!userId || !mongo.ObjectId.isValid(userId)) {
     throw createError.BadRequest("Invalid or missing userId");
   }
 
@@ -25,12 +27,12 @@ const updateUser = async (
     throw createError.BadRequest("Missing required fields: firstName, lastName, role");
   }
 
-  const db = await getDefaultDatabase();
-  const userObjectId = new ObjectId(userId);
-  const orgObjectId = new ObjectId(organizationId);
+  await connectDatabase();
+  const userObjectId = new mongo.ObjectId(userId);
+  const orgObjectId = new mongo.ObjectId(organizationId);
 
   // 1. Get current user to check email
-  const currentUser = await db.collection("users").findOne({ _id: userObjectId });
+  const currentUser = await User.findOne({ _id: userObjectId });
   if (!currentUser) {
     throw createError.NotFound("User not found");
   }
@@ -39,7 +41,7 @@ const updateUser = async (
   await updateCognitoUser(currentUser.email, firstName, lastName);
 
   // 3. Update in MongoDB
-  await db.collection("users").updateOne(
+  await User.updateOne(
     { _id: userObjectId },
     {
       $set: {
@@ -54,14 +56,14 @@ const updateUser = async (
   // 4. Update Associations (if student, update class)
   if (role === 'student') {
     // Remove from all classes and add to new one
-    await db.collection("classes").updateMany(
+    await Class.updateMany(
       { organizationId: orgObjectId },
       { $pull: { students: userObjectId } as any }
     );
-    
-    if (classId && ObjectId.isValid(classId)) {
-      await db.collection("classes").updateOne(
-        { _id: new ObjectId(classId) },
+
+    if (classId && mongo.ObjectId.isValid(classId)) {
+      await Class.updateOne(
+        { _id: new mongo.ObjectId(classId) },
         { $addToSet: { students: userObjectId } as any }
       );
     }

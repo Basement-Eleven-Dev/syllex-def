@@ -2,35 +2,40 @@
   <div class="w-100 px-3 py-4 d-flex flex-column h-100">
     <div
       class="card bg-secondary text-dark p-3 d-flex flex-column justify-content-center fw-bold overflow-hidden position-relative"
+      tourAnchor="teacher-subject-select"
     >
-  
-      <h4 class="fw-bold mb-0">{{ selectedSubject?.name }}</h4>
+      <h4 class="fw-bold mb-0" [title]="selectedSubject?.name">
+        {{ selectedSubject?.name }}
+      </h4>
       @if (availableSubjects().length > 0) {
-        <div class="d-flex align-items-center"> <div
-        class="text-decoration-underline fw-light cursor-pointer d-flex flex-row  mt-2 justify-content-between align-items-center w-100 z-index-1 position-relative mb-1 small"
-        style="z-index: 1"
-        (click)="toggleSubjectsCollapse()"
-        [attr.aria-expanded]="!isSubjectsCollapsed()"
-        aria-controls="subjectsCollapse"
-      >
-        Cambia materia
-           
-      </div>
-       <div class="text-start">
-        <a class="text-small opacity-75" (click)="onRequestSubjectSettings()">
-          <fa-icon [icon]="GearIcon" class="text-dark" [size]="'1x'"></fa-icon>
-        </a></div>
-     
+      <div class="d-flex align-items-center">
+        <div
+          class="text-decoration-underline fw-light cursor-pointer d-flex flex-row mt-2 justify-content-between align-items-center w-100 z-index-1 position-relative mb-1 small"
+          style="z-index: 1"
+          (click)="toggleSubjectsCollapse()"
+          [attr.aria-expanded]="!isSubjectsCollapsed()"
+          aria-controls="subjectsCollapse"
+        >
+          Cambia materia
+        </div>
+        <div class="text-start">
+          <a class="text-small opacity-75" (click)="onRequestSubjectSettings()">
+            <fa-icon
+              [icon]="GearIcon"
+              class="text-dark"
+              [size]="'1x'"
+            ></fa-icon>
+          </a>
+        </div>
       </div>
 
       <div
         #collapse="ngbCollapse"
         [ngbCollapse]="isSubjectsCollapsed()"
-        (ngbCollapseChange)="isSubjectsCollapsed.set(!isSubjectsCollapsed())"
         id="subjectsCollapse"
       >
         <hr />
-        <div class="mt-1 d-flex flex-column gap-2">
+        <div class="subjects-scroll-container mt-1 d-flex flex-column gap-2">
           @for(subject of availableSubjects(); track subject._id){
           <div
             class="p-2 fw-normal rounded-2 d-flex align-items-center gap-2 cursor-pointer materiaBtn d-flex flex-row justify-content-between align-items-center"
@@ -38,7 +43,9 @@
             (click)="selectSubject(subject)"
             role="button"
           >
-            <span class="text-truncate">{{ subject.name }} </span>
+            <span class="text-truncate" [title]="subject.name"
+              >{{ subject.name }}
+            </span>
 
             @if (subject.uncorrectedTest != 0) {
             <span
@@ -60,6 +67,7 @@
         class="sidebarRoute w-100 gap-2 d-flex align-items-center"
         [routerLink]="route.path"
         routerLinkActive="active"
+        [tourAnchor]="route.tourAnchor || ''"
       >
         <fa-icon [icon]="route.icon"></fa-icon>
         <span class="routeLabel">{{route.label}}</span>
@@ -69,6 +77,7 @@
     <div
       class="btn text-start ai d-flex flex-column justify-content-center position-relative py-4 mb-2"
       routerLink="/t/agente"
+      tourAnchor="teacher-agent"
     >
       <fa-icon [icon]="HeadSideBrainIcon" id="sparkleIcon"></fa-icon>
       <h5 class="mb-0">Agente AI di {{ selectedSubject?.name }}</h5>
@@ -76,6 +85,7 @@
     <div
       class="btn text-start ai d-flex flex-column justify-content-center position-relative py-4"
       routerLink="/t/laboratorio-ai"
+      tourAnchor="teacher-ai-lab"
     >
       <fa-icon [icon]="SparklesIcon" id="sparkleIcon"></fa-icon>
       <h5 class="mb-0">Laboratorio AI</h5>

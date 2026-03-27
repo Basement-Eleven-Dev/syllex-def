@@ -1,10 +1,13 @@
 <form
-  [formGroup]="loginForm"
-  (ngSubmit)="isChallenge ? onConfirmChallenge() : onSingIn()"
+  [formGroup]="isMfaChallenge ? mfaCodeForm : loginForm"
+  (ngSubmit)="isMfaChallenge ? onConfirmMfa() : (isChallenge ? onConfirmChallenge() : onSingIn())"
   class="d-flex flex-column gap-3"
 >
-  <h3 class="text-dark">{{ isChallenge ? 'Attivazione Account' : 'Bentornato' }}</h3>
-  <div [hidden]="isChallenge">
+  <h3 class="text-dark">
+    {{ isMfaChallenge ? 'Verifica identità' : (isChallenge ? 'Attivazione
+    Account' : 'Bentornato') }}
+  </h3>
+  <div [hidden]="isChallenge || isMfaChallenge">
     <label for="email" class="form-label text-dark">Email</label>
     <input
       type="text"
@@ -13,7 +16,7 @@
       formControlName="email"
     />
   </div>
-  <div>
+  <div [hidden]="isMfaChallenge">
     <label for="password" class="form-label text-dark">Password</label>
     <div class="input-group input-group-custom">
       <input
@@ -31,23 +34,60 @@
       </button>
     </div>
   </div>
-  @if (!isChallenge) {
-    <div class="text-end mb-4">
-      <a href="#" class="text-dark fw-semibold" routerLink="/password-reset"
-        >Hai dimenticato la password?</a
+
+  @if (isMfaChallenge) {
+  <div>
+    <label for="mfa-code" class="form-label text-dark"
+      >Codice dall'app (6 cifre)</label
+    >
+    <input
+      [formControl]="mfaCodeForm.controls.code"
+      type="text"
+      id="mfa-code"
+      class="form-control custom-input text-center fw-bold"
+      placeholder="000000"
+      maxlength="6"
+      inputmode="numeric"
+      autocomplete="one-time-code"
+    />
+  </div>
+  } @if (!isChallenge && !isMfaChallenge) {
+  <div class="text-end mb-4">
+    <a href="#" class="text-dark fw-semibold" routerLink="/password-reset"
+      >Hai dimenticato la password?</a
+    >
+  </div>
+  <div class="form-check">
+    <input
+      type="checkbox"
+      class="form-check-input"
+      id="privacyAccepted"
+      formControlName="privacyAccepted"
+    />
+    <label class="form-check-label small text-dark" for="privacyAccepted">
+      Dichiaro di aver preso visione della
+      <a
+        href="https://www.iubenda.com/privacy-policy/45755357"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-dark fw-semibold"
+        >Privacy Policy</a
       >
-    </div>
+      relativa al trattamento dei dati personali.
+    </label>
+  </div>
   }
   <button
     type="submit"
     class="btn btn-gradient-primary btn-lg w-100"
-    [disabled]="loginForm.invalid || loading"
+    [disabled]="(isMfaChallenge ? mfaCodeForm.invalid : loginForm.invalid) || loading"
   >
     <fa-icon
       [icon]="loading ? SpinnerIcon : LoginIcon"
       [animation]="loading ? 'spin' : undefined"
     ></fa-icon>
-    {{ isChallenge ? 'Conferma e Accedi' : 'Login' }}
+    {{ isMfaChallenge ? 'Verifica' : (isChallenge ? 'Conferma e Accedi' :
+    'Login') }}
   </button>
   @if(hasResult){
   <div
