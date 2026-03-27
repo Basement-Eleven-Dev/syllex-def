@@ -77,10 +77,18 @@
       <button class="btn btn-blue icon-btn" (click)="onCreateNewFolder()">
         <fa-icon [icon]="icons.plus"></fa-icon> Nuova cartella
       </button>
-      <button class="btn btn-blue icon-btn" (click)="onRequestUpload()" [disabled]="isStorageFull()">
+      <button
+        class="btn btn-blue icon-btn"
+        (click)="onRequestUpload()"
+        [disabled]="isStorageFull()"
+      >
         <fa-icon [icon]="icons.upload"></fa-icon> Carica file
       </button>
-      <button class="btn ai icon-btn" (click)="onRequestGenerate()" [disabled]="isStorageFull()">
+      <button
+        class="btn ai icon-btn"
+        (click)="onRequestGenerate()"
+        [disabled]="isStorageFull()"
+      >
         <fa-icon [icon]="icons.sparkles"></fa-icon> Genera con AI
       </button>
     </div>
@@ -227,3 +235,9 @@
   </div>
   }
 </section>
+
+<app-ai-overlay
+  [visible]="isUploading()"
+  loadingTitle="Caricamento in corso..."
+  loadingSubtitle="Non chiudere la pagina,&#10;altrimenti il caricamento andrà perduto."
+></app-ai-overlay>

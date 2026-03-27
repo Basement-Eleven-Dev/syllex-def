@@ -135,8 +135,7 @@ const SUBJECTS_ROUTES: FunctionIntegration[] = [
     method: "put",
     role: "teacher",
   },
-
-]
+];
 
 const CLASSES_ROUTES: FunctionIntegration[] = [
   {
@@ -175,9 +174,7 @@ const CLASSES_ROUTES: FunctionIntegration[] = [
     method: "get",
     role: "logged",
   },
-
-
-]
+];
 
 const EVENTS_ROUTES: FunctionIntegration[] = [
   {
@@ -204,7 +201,7 @@ const EVENTS_ROUTES: FunctionIntegration[] = [
     method: "put",
     role: "teacher",
   },
-]
+];
 
 const MISC_ROUTES: FunctionIntegration[] = [
   {
@@ -216,6 +213,12 @@ const MISC_ROUTES: FunctionIntegration[] = [
   {
     apiRoute: "profile/email",
     functionPath: "profile/updateEmail.ts",
+    method: "patch",
+    role: "logged",
+  },
+  {
+    apiRoute: "profile/policies",
+    functionPath: "profile/acceptPolicies.ts",
     method: "patch",
     role: "logged",
   },
@@ -237,7 +240,7 @@ const MISC_ROUTES: FunctionIntegration[] = [
     method: "post",
     role: "teacher",
   },
-]
+];
 
 const COMMUNICATIONS_ROUTES: FunctionIntegration[] = [
   {
@@ -270,7 +273,7 @@ const COMMUNICATIONS_ROUTES: FunctionIntegration[] = [
     method: "delete",
     role: "teacher",
   },
-]
+];
 
 const QUESTIONS_ROUTES: FunctionIntegration[] = [
   {
@@ -297,7 +300,7 @@ const QUESTIONS_ROUTES: FunctionIntegration[] = [
     method: "put",
     role: "teacher",
   },
-]
+];
 
 const AI_ROUTES: FunctionIntegration[] = [
   {
@@ -305,7 +308,8 @@ const AI_ROUTES: FunctionIntegration[] = [
     functionPath: "ai/createAiGenQuestion.ts",
     method: "post",
     role: "open",
-  }, {
+  },
+  {
     apiRoute: "ai/materials",
     functionPath: "ai/createAiGenMaterial.ts",
     method: "post",
@@ -319,8 +323,8 @@ const AI_ROUTES: FunctionIntegration[] = [
       arn: "arn:aws:lambda:eu-south-1:851725509686:layer:wkhtmltox:1"
     }*/,
     ],
-  }
-]
+  },
+];
 
 const STUDENTS_ROUTES: FunctionIntegration[] = [
   {
@@ -335,9 +339,7 @@ const STUDENTS_ROUTES: FunctionIntegration[] = [
     method: "get",
     role: "teacher",
   },
-
-
-]
+];
 
 const ASSISTANTS_ROUTES: FunctionIntegration[] = [
   {
@@ -390,7 +392,8 @@ const MATERIALS_ROUTES: FunctionIntegration[] = [
     functionPath: "files/createUpload.ts",
     method: "post",
     role: "teacher",
-  }, {
+  },
+  {
     apiRoute: "proxy/gamma/{generationId}",
     functionPath: "ai/gammaGenerationProxy.ts",
     method: "get",
@@ -513,15 +516,14 @@ const TESTS_ROUTES: FunctionIntegration[] = [
     method: "get",
     role: "teacher",
   },
-
-]
+];
 
 const ATTEMPTS_ROUTES: FunctionIntegration[] = [
   {
     apiRoute: "attempts", //dovrebbe ritornare una lista di attempts, ora ritorna solo il count
     functionPath: "tests/countAssignmentsToGrade.ts",
     method: "get",
-    role: "teacher"
+    role: "teacher",
   },
   {
     apiRoute: "attempts", //student self evaluation
@@ -577,11 +579,7 @@ const ATTEMPTS_ROUTES: FunctionIntegration[] = [
     method: "post",
     role: "student",
   },
-]
-
-
-
-
+];
 
 export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
   ...MISC_ROUTES,
@@ -597,5 +595,4 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
   ...ASSISTANTS_ROUTES,
   ...MATERIALS_ROUTES,
   ...ATTEMPTS_ROUTES,
-
 ];

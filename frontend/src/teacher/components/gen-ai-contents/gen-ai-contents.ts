@@ -48,6 +48,7 @@ import { Auth } from '../../../services/auth';
 import { FeedbackService } from '../../../services/feedback-service';
 import { forkJoin } from 'rxjs';
 import { QuestionCard } from '../question-card/question-card';
+import { AiOverlay } from '../ai-overlay/ai-overlay';
 
 interface ReviewQuestion {
   readonly TempId: string;
@@ -64,6 +65,7 @@ interface ReviewQuestion {
     TypeSelector,
     ReactiveFormsModule,
     QuestionCard,
+    AiOverlay,
   ],
   templateUrl: './gen-ai-contents.html',
   styleUrl: './gen-ai-contents.scss',

@@ -39,6 +39,8 @@ export interface User {
   role: 'teacher' | 'student' | 'admin';
   organizationId?: string;
   organizationIds?: string[];
+  privacyPolicyAccepted?: boolean;
+  aiPolicyAccepted?: boolean;
   notificationSettings?: {
     newCommunication: boolean;
     newEvent: boolean;
@@ -519,6 +521,29 @@ export class Auth {
         success: false,
         message:
           error.message || "Errore durante l'aggiornamento delle impostazioni",
+      };
+    }
+  }
+
+  async acceptPolicies(): Promise<{ success: boolean; message: string }> {
+    try {
+      await firstValueFrom(this.http.patch('profile/policies', {}));
+
+      const currentUser = this.user$.value;
+      if (currentUser) {
+        this.user$.next({
+          ...currentUser,
+          privacyPolicyAccepted: true,
+          aiPolicyAccepted: true,
+        });
+      }
+
+      return { success: true, message: 'Politiche accettate con successo' };
+    } catch (error: any) {
+      return {
+        success: false,
+        message:
+          error.message || "Errore durante l'accettazione delle politiche",
       };
     }
   }

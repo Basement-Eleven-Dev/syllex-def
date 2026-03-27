@@ -51,6 +51,7 @@ import {
   getAllowedExtensionsLabel,
 } from '../../../app/_utils/file-validation.utils';
 import { StorageLimitBar } from '../../components/storage-limit-bar/storage-limit-bar';
+import { AiOverlay } from '../../components/ai-overlay/ai-overlay';
 import { SuggestedTopicsModal } from '../../components/suggested-topics-modal/suggested-topics-modal';
 import { effect, untracked } from '@angular/core';
 import { FeedbackService } from '../../../services/feedback-service';
@@ -68,6 +69,7 @@ import { FeedbackService } from '../../../services/feedback-service';
     NgbDropdownMenu,
     MaterialeContextualMenu,
     StorageLimitBar,
+    AiOverlay,
   ],
   templateUrl: './materiali.html',
   styleUrl: './materiali.scss',
@@ -117,6 +119,7 @@ export class Materiali {
   // ── UI-only state ─────────────────────────────────────────────────
   protected readonly viewType = signal<ViewType>('grid');
   protected readonly acceptedExtensions = FILE_INPUT_ACCEPT;
+  protected readonly isUploading = signal(false);
 
   // ── View Type ─────────────────────────────────────────────────────
 
@@ -149,10 +152,15 @@ export class Materiali {
       return;
     }
 
+    this.isUploading.set(true);
     this.facade.uploadFile(file).subscribe({
-      next: () => (input.value = ''),
+      next: () => {
+        input.value = '';
+        this.isUploading.set(false);
+      },
       error: (err) => {
         console.error('Errore durante il caricamento:', err);
+        this.isUploading.set(false);
         this.feedbackService.showFeedback(
           'Errore durante il caricamento del file',
           false,

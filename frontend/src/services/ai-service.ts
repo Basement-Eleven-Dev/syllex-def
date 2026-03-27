@@ -100,16 +100,16 @@ export class AiService {
     data: Parameters<AiService['generateQuestion']>[0],
     count: number,
   ): Promise<{ questions: GeneratedQuestion[]; failedCount: number }> {
-    const questions: GeneratedQuestion[] = [];
-    let failedCount = 0;
-    for (let i = 0; i < count; i++) {
-      try {
-        const q = await this.generateQuestion(data);
-        questions.push(q);
-      } catch {
-        failedCount++;
-      }
-    }
+    const results = await Promise.allSettled(
+      Array.from({ length: count }, () => this.generateQuestion(data)),
+    );
+    const questions = results
+      .filter(
+        (r): r is PromiseFulfilledResult<GeneratedQuestion> =>
+          r.status === 'fulfilled',
+      )
+      .map((r) => r.value);
+    const failedCount = results.filter((r) => r.status === 'rejected').length;
     return { questions, failedCount };
   }
 

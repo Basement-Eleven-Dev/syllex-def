@@ -5,7 +5,7 @@ import {
   UpperCasePipe,
 } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject, ViewChild } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faCalendar,
@@ -43,19 +43,24 @@ import { map, Observable } from 'rxjs';
   templateUrl: './nav.html',
   styleUrl: './nav.scss',
 })
-export class Nav implements OnInit, OnDestroy {
+export class Nav {
   LogoutIcon = faSignOutAlt;
   CalendarIcon = faCalendar;
   now: number = Date.now();
-  private intervalId?: number;
   UserProfileIcon = faUserCircle;
   user: Observable<User | null>;
 
   constructor(
     public authService: Auth,
     private modalService: NgbModal,
+    private router: Router,
   ) {
     this.user = this.authService.user$;
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.closeDropdown();
+      }
+    });
   }
 
   getInitals() {
@@ -67,17 +72,6 @@ export class Nav implements OnInit, OnDestroy {
         return user.firstName.charAt(0) + user.lastName.charAt(0);
       }),
     );
-  }
-  ngOnInit() {
-    this.intervalId = window.setInterval(() => {
-      this.now = Date.now();
-    }, 60000); // Update every minute
-  }
-
-  ngOnDestroy() {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-    }
   }
 
   onLogout() {
