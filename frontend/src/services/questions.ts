@@ -20,6 +20,7 @@ export interface QuestionInterface {
   options?: { label: string; isCorrect: boolean }[];
   correctAnswer?: boolean;
   aiGenerated?: boolean;
+  tags?: string[];
 }
 
 @Injectable({
@@ -88,6 +89,7 @@ export class QuestionsService {
     pageSize: number = 10,
     difficulty?: string,
     aiGenerated?: boolean,
+    tag?: string,
   ): Observable<{ questions: QuestionInterface[]; total: number }> {
     const params = new URLSearchParams();
 
@@ -100,6 +102,7 @@ export class QuestionsService {
     if (difficulty) params.append('difficulty', difficulty);
     if (aiGenerated !== undefined)
       params.append('aiGenerated', aiGenerated.toString());
+    if (tag) params.append('tag', tag);
 
     params.append('page', page.toString());
     params.append('pageSize', pageSize.toString());

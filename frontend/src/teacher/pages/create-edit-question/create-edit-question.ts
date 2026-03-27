@@ -15,7 +15,9 @@ import {
   faSave,
   faSparkles,
   faSpinnerThird,
+  faTag,
   faUsers,
+  faXmark,
 } from '@fortawesome/pro-solid-svg-icons';
 import { MultipleChoiceOptions } from '../../components/multiple-choice-options/multiple-choice-options';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
@@ -68,7 +70,9 @@ export class CreateEditQuestion {
   readonly GraduationIcon = faGraduationCap;
   readonly SaveIcon = faSave;
   readonly SpinnerIcon = faSpinnerThird;
-  readonly WinkIcon = faFaceGrinWink; // Sostituisci con l'icona appropriata
+  readonly WinkIcon = faFaceGrinWink;
+  readonly TagIcon = faTag;
+  readonly RemoveIcon = faXmark;
 
   // Data
   readonly QuestionTypeOptions = QUESTION_TYPE_OPTIONS;
@@ -113,7 +117,32 @@ export class CreateEditQuestion {
     ]),
     policy: new FormControl('public'),
     correctAnswer: new FormControl(null),
+    tags: new FormControl<string[]>([]),
   });
+
+  readonly TagInput = signal<string>('');
+
+  addTag(): void {
+    const value = this.TagInput().trim().toLowerCase();
+    if (!value) return;
+    const current: string[] = this.QuestionForm.get('tags')?.value || [];
+    if (!current.includes(value)) {
+      this.QuestionForm.patchValue({ tags: [...current, value] });
+    }
+    this.TagInput.set('');
+  }
+
+  removeTag(tag: string): void {
+    const current: string[] = this.QuestionForm.get('tags')?.value || [];
+    this.QuestionForm.patchValue({ tags: current.filter((t) => t !== tag) });
+  }
+
+  onTagKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter' || event.key === ',') {
+      event.preventDefault();
+      this.addTag();
+    }
+  }
 
   constructor() {
     if (this.QuestionId) {
@@ -193,6 +222,10 @@ export class CreateEditQuestion {
 
     if (question.imageUrl) {
       this.ImagePreview.set(question.imageUrl);
+    }
+
+    if (question.tags) {
+      this.QuestionForm.patchValue({ tags: question.tags });
     }
   }
 

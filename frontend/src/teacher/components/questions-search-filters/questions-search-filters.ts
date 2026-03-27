@@ -29,6 +29,7 @@ export class QuestionsSearchFilters implements OnInit {
     topicId?: string;
     difficulty?: QuestionDifficulty;
     aiGenerated?: boolean;
+    tag?: string;
   }>();
 
   // Icons
@@ -47,6 +48,7 @@ export class QuestionsSearchFilters implements OnInit {
     topicId: new FormControl(''),
     difficulty: new FormControl(''),
     aiGenerated: new FormControl(''),
+    tag: new FormControl(''),
   });
 
   ngOnInit(): void {
@@ -65,6 +67,7 @@ export class QuestionsSearchFilters implements OnInit {
       topicId: '',
       difficulty: '',
       aiGenerated: '',
+      tag: '',
     });
   }
 
@@ -77,12 +80,14 @@ export class QuestionsSearchFilters implements OnInit {
     const topicId = this.SearchForm.get('topicId')?.value;
     const difficulty = this.SearchForm.get('difficulty')?.value;
     const aiGeneratedRaw = this.SearchForm.get('aiGenerated')?.value;
+    const tag = this.SearchForm.get('tag')?.value;
 
     if (searchTerm) filters.searchTerm = searchTerm;
     if (type) filters.type = type;
     if (policy) filters.policy = policy;
     if (topicId) filters.topicId = topicId;
     if (difficulty) filters.difficulty = difficulty;
+    if (tag) filters.tag = tag;
     if (
       aiGeneratedRaw !== '' &&
       aiGeneratedRaw !== null &&

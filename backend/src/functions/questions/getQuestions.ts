@@ -20,6 +20,7 @@ const getQuestions = async (
     page = "1",
     pageSize = "10",
     aiGenerated = "",
+    tag = "",
   } = request.queryStringParameters || {};
 
   const currentPage = parseInt(page, 10);
@@ -65,6 +66,10 @@ const getQuestions = async (
     } else if (aiGenerated === "false") {
       filter.aiGenerated = { $exists: false }; // Converti stringa a booleano
     }
+  }
+
+  if (tag) {
+    filter.tags = { $regex: tag, $options: "i" };
   }
 
   console.log("Filtro per getQuestions:", filter);
