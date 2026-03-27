@@ -1,6 +1,8 @@
 <div class="d-flex flex-row align-items-center mb-5">
   <div>
-    <h1 class="text-dark fw-medium mb-3 display-6">Banca Domande</h1>
+    <h1 class="text-dark fw-medium mb-3 display-6">
+      Banca Domande ({{ CollectionSize() }})
+    </h1>
     <h5 class="text-dark mb-0 fw-normal">
       Qui puoi trovare tutte le domande con cui comporre i test di
       <span class="fw-bold">{{ materiaService.materiaSelected()?.name }}</span

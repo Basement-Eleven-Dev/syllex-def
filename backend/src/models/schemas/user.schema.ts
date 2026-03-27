@@ -10,6 +10,15 @@ const notificationSettingsSchema = new Schema(
   { _id: false },
 );
 
+const acceptationSchema = new Schema(
+  {
+    accepted: { type: Boolean, default: false },
+    timestamp: { type: Date },
+    version: { type: String },
+  },
+  { _id: false },
+);
+
 const userSchema = new Schema(
   {
     username: { type: String, required: true },
@@ -25,8 +34,8 @@ const userSchema = new Schema(
     },
     organizationIds: { type: [Schema.Types.ObjectId], default: [] },
     notificationSettings: { type: notificationSettingsSchema },
-    aiPolicyAccepted: { type: Boolean },
-    privacyPolicyAccepted: { type: Boolean },
+    termsAcceptation: { type: acceptationSchema },
+    privacyAcceptation: { type: acceptationSchema },
   },
   {
     timestamps: true,

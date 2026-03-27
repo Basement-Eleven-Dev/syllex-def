@@ -3,12 +3,9 @@ import { getCurrentUser } from "../../_helpers/getAuthCognitoUser";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import { connectDatabase } from "../../_helpers/getDatabase";
 import { User } from "../../models/schemas/user.schema";
-import { PRIVACY_VERSION } from "../../_helpers/privacyVersion";
+import { TERMS_VERSION } from "../../_helpers/termsVersion";
 
-const acceptPolicies = async (
-  request: APIGatewayProxyEvent,
-  context: Context,
-) => {
+const acceptTerms = async (request: APIGatewayProxyEvent, context: Context) => {
   const user = await getCurrentUser(request);
   if (!user) {
     throw new Error("Utente non trovato nel database");
@@ -20,12 +17,10 @@ const acceptPolicies = async (
     { _id: user._id },
     {
       $set: {
-        privacyPolicyAccepted: true,
-        aiPolicyAccepted: true,
-        privacyAcceptation: {
+        termsAcceptation: {
           accepted: true,
           timestamp: new Date(),
-          version: PRIVACY_VERSION,
+          version: TERMS_VERSION,
         },
       },
     },
@@ -33,8 +28,8 @@ const acceptPolicies = async (
 
   return {
     success: true,
-    message: "Politiche accettate con successo",
+    message: "Termini accettati con successo",
   };
 };
 
-export const handler = lambdaRequest(acceptPolicies);
+export const handler = lambdaRequest(acceptTerms);

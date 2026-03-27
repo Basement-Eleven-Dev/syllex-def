@@ -1,0 +1,57 @@
+<div class="modal-header border-0 pb-0">
+  <h5 class="modal-title fw-semibold">Termini di Utilizzo</h5>
+</div>
+
+<div class="modal-body">
+  <p class="text-muted mb-3">
+    Per accedere alla piattaforma è necessario leggere e accettare i Termini di
+    Utilizzo.
+  </p>
+
+  <div class="content-box mb-4 p-3 rounded border">
+    @if (role === "teacher") {
+      <h6 class="content-box__title mb-3">Termini per i Docenti</h6>
+      <app-terms-teacher-content />
+    } @else {
+      <h6 class="content-box__title mb-3">Termini per gli Studenti</h6>
+      <app-terms-student-content />
+    }
+  </div>
+
+  <div class="form-check">
+    <input
+      class="form-check-input"
+      type="checkbox"
+      id="termsDeclaration"
+      [(ngModel)]="termsAccepted"
+    />
+    <label class="form-check-label small" for="termsDeclaration">
+      @if (role === "teacher") {
+        Dichiaro di aver letto e accettato i Termini di Utilizzo della
+        piattaforma Syllex, di operare per conto dell'Ente e sotto la sua
+        responsabilità, e di utilizzare gli strumenti di Intelligenza
+        Artificiale esclusivamente come supporto, con verifica e supervisione
+        professionale.
+      } @else {
+        Dichiaro di utilizzare la piattaforma Syllex esclusivamente per finalità
+        didattiche, nel rispetto delle regole dell'Ente, e di aver preso visione
+        delle condizioni di utilizzo e delle informazioni sull'uso
+        dell'Intelligenza Artificiale.
+      }
+    </label>
+  </div>
+</div>
+
+<div class="modal-footer border-0">
+  <button
+    type="button"
+    class="btn btn-primary w-100"
+    [disabled]="loading() || !termsAccepted"
+    (click)="confirm()"
+  >
+    @if (loading()) {
+      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+    }
+    Accetta e continua
+  </button>
+</div>

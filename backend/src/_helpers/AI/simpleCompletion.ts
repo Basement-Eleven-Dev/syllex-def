@@ -15,6 +15,8 @@ const askStrucuredGemini = async <T>(
   model: string = "gemini-3-flash-preview",
   structure: ZodType<T>,
   temperature?: number,
+  topP?: number,
+  topK?: number,
 ): Promise<T> => {
   const validMaterials = materials.filter((m) => m.extractedTextFileUrl);
 
@@ -54,6 +56,8 @@ const askStrucuredGemini = async <T>(
           responseMimeType: "application/json",
           responseJsonSchema: structure.toJSONSchema(),
           temperature: temperature,
+          topP: topP,
+          topK: topK,
         },
       });
       return structure.parse(JSON.parse(response.text!));
@@ -77,6 +81,8 @@ export const askStructuredLLM = async <T>(
   materials: Material[] = [],
   structure: ZodType<T>,
   temperature?: number,
+  topP?: number,
+  topK?: number,
 ): Promise<T> => {
   return await askStrucuredGemini(
     prompt,
@@ -84,5 +90,7 @@ export const askStructuredLLM = async <T>(
     undefined,
     structure,
     temperature,
+    topP,
+    topK,
   );
 };

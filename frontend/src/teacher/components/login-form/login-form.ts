@@ -8,7 +8,12 @@ import {
 } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faSignIn, faSpinnerThird, faEye, faEyeSlash } from '@fortawesome/pro-solid-svg-icons';
+import {
+  faSignIn,
+  faSpinnerThird,
+  faEye,
+  faEyeSlash,
+} from '@fortawesome/pro-solid-svg-icons';
 import { Auth } from '../../../services/auth';
 
 @Component({
@@ -31,6 +36,7 @@ export class LoginForm {
       Validators.required,
       Validators.minLength(8),
     ]),
+    privacyAccepted: new FormControl(false, [Validators.requiredTrue]),
   });
 
   hasResult: { success: boolean; message: string } | null = null;
@@ -51,7 +57,7 @@ export class LoginForm {
   constructor(
     private router: Router,
     private authService: Auth,
-  ) { }
+  ) {}
 
   onSingIn() {
     this.loading = true;
@@ -65,7 +71,10 @@ export class LoginForm {
         this.isChallenge = true;
         this.challengeType = result.challenge;
         this.loginForm.get('password')?.setValue('');
-        this.hasResult = { success: true, message: 'Inserisci una nuova password per completare l\'attivazione' };
+        this.hasResult = {
+          success: true,
+          message: "Inserisci una nuova password per completare l'attivazione",
+        };
         return;
       }
       if (result.success && result.challenge === 'SOFTWARE_TOKEN_MFA') {
@@ -106,6 +115,9 @@ export class LoginForm {
   }
 
   private handleSuccessfulLogin() {
+    if (this.loginForm.value.privacyAccepted) {
+      this.authService.acceptPolicies();
+    }
     setTimeout(() => {
       const user = this.authService.user;
       if (user?.role === 'admin') {

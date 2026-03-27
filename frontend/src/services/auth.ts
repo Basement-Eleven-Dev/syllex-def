@@ -41,6 +41,16 @@ export interface User {
   organizationIds?: string[];
   privacyPolicyAccepted?: boolean;
   aiPolicyAccepted?: boolean;
+  termsAcceptation?: {
+    accepted?: boolean;
+    timestamp?: string;
+    version?: string;
+  };
+  privacyAcceptation?: {
+    accepted?: boolean;
+    timestamp?: string;
+    version?: string;
+  };
   notificationSettings?: {
     newCommunication: boolean;
     newEvent: boolean;
@@ -535,6 +545,11 @@ export class Auth {
           ...currentUser,
           privacyPolicyAccepted: true,
           aiPolicyAccepted: true,
+          privacyAcceptation: {
+            accepted: true,
+            timestamp: new Date().toISOString(),
+            version: '1.0',
+          },
         });
       }
 
@@ -544,6 +559,33 @@ export class Auth {
         success: false,
         message:
           error.message || "Errore durante l'accettazione delle politiche",
+      };
+    }
+  }
+
+  async acceptTerms(
+    version: string,
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      await firstValueFrom(this.http.patch('profile/terms', {}));
+
+      const currentUser = this.user$.value;
+      if (currentUser) {
+        this.user$.next({
+          ...currentUser,
+          termsAcceptation: {
+            accepted: true,
+            timestamp: new Date().toISOString(),
+            version,
+          },
+        });
+      }
+
+      return { success: true, message: 'Termini accettati con successo' };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message || "Errore durante l'accettazione dei termini",
       };
     }
   }

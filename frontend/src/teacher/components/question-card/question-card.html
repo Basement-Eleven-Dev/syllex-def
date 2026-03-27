@@ -7,7 +7,7 @@
   <div class="card-body d-flex flex-column gap-2">
     <!-- ── Header: policy (banca) | index (test-composition) | topic | type ── -->
     <div class="d-flex flex-row align-items-center justify-content-between">
-      <div class="d-flex align-items-center gap-2">
+      <div class="d-flex align-items-center gap-2 text-truncate">
         @if (mode === 'banca') {
         <div class="d-flex flex-row gap-2 align-items-center me-2">
           <div [class]="'status-pill ' + question.policy"></div>
@@ -20,7 +20,9 @@
         } @if (mode === 'student' && showIndex) {
         <span class="badge bg-dark"># {{ index + 1 }}</span>
         }
-        <span class="text-muted"
+        <span
+          class="text-muted text-truncate"
+          [attr.title]="materiaService.getTopicName(question.topicId)"
           >{{ materiaService.getTopicName(question.topicId) }}</span
         >
         <span class="text-muted">|</span>
