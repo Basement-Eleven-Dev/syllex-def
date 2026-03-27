@@ -17,33 +17,28 @@ export class App {
   protected readonly feedbackService = inject(FeedbackService);
   protected readonly authService = inject(Auth);
   private readonly modalService = inject(NgbModal);
-  private policyModalOpen = false;
+  private termsModalOpen = false;
 
   ngOnInit() {
     this.authService.user$.subscribe((user) => {
       if (!user) return;
       const needsAcceptance = user.termsAcceptation?.version !== TERMS_VERSION;
-      if (needsAcceptance && !this.policyModalOpen) {
+      if (needsAcceptance && !this.termsModalOpen) {
         this.openPolicyModal();
       }
     });
   }
 
   private openPolicyModal() {
-    this.policyModalOpen = true;
+    this.termsModalOpen = true;
     const ref = this.modalService.open(TermsModalComponent, {
       centered: true,
       backdrop: 'static',
       keyboard: false,
       size: 'lg',
     });
-    ref.result.then(
-      () => {
-        this.policyModalOpen = false;
-      },
-      () => {
-        this.policyModalOpen = false;
-      },
-    );
+    ref.result.then(() => {
+      this.termsModalOpen = false;
+    });
   }
 }

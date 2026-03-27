@@ -15,7 +15,9 @@ import { Sidebar } from '../../components/sidebar/sidebar';
 import { Nav } from '../../components/nav/nav';
 import { RouterOutlet } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, filter, take } from 'rxjs';
+import { Auth } from '../../../services/auth';
+import { TERMS_VERSION } from '../../../app/_utils/terms-version';
 import {
   faSpinnerThird,
   faUserCircle,
@@ -45,6 +47,7 @@ export class TeacherLayout implements OnInit, OnDestroy {
   public materia = inject(Materia);
   private feedbackService = inject(FeedbackService);
   public tourService: TourService = inject(TourService) as TourService;
+  private authService = inject(Auth);
   private destroy$ = new Subject<void>();
 
   SpinnerIcon = faSpinnerThird;
@@ -123,7 +126,18 @@ export class TeacherLayout implements OnInit, OnDestroy {
     ]);
 
     if (!localStorage.getItem('syllex_teacher_tour_completed')) {
-      setTimeout(() => this.tourService.start(), 500);
+      this.authService.user$
+        .pipe(
+          filter(
+            (user) =>
+              !!user && user.termsAcceptation?.version === TERMS_VERSION,
+          ),
+          take(1),
+          takeUntil(this.destroy$),
+        )
+        .subscribe(() => {
+          setTimeout(() => this.tourService.start(), 500);
+        });
     }
   }
 
