@@ -27,8 +27,6 @@ const getStudentAttempt = async (
     studentId: new mongo.ObjectId(studentId),
   }).sort({ _id: -1 });
 
-  console.log("Attempt found:", attempt);
-
   return { attempt: attempt ?? null };
 };
 
