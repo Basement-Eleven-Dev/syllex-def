@@ -24,8 +24,8 @@ import LogRocket from 'logrocket';
 Amplify.configure({
   Auth: {
     Cognito: {
-      userPoolId: 'eu-south-1_IdnpEkSac',
-      userPoolClientId: '7n2b7ueleckpvil3f7834oabsu',
+      userPoolId: 'eu-south-1_w77iyt3xa',
+      userPoolClientId: '4tc0qd18cvu46tbkccoi1nc12e',
     },
   },
 });
@@ -222,7 +222,7 @@ export class Auth {
       // Effettuiamo un signOut silenzioso prima di procedere.
       try {
         await signOut();
-      } catch (_) {}
+      } catch (_) { }
       const { nextStep } = await signIn(credentials);
 
       if (nextStep.signInStep === 'DONE') {

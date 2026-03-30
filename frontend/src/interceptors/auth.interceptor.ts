@@ -6,14 +6,14 @@ import {
 import { inject } from '@angular/core';
 import { from, switchMap } from 'rxjs';
 import { fetchAuthSession } from 'aws-amplify/auth';
-import { apiUrl as BACKEND_URL } from '../environments/environment';
+import { apiUrl as BACKEND_URL } from '../environments/environment.stg';
 
 export const authInterceptor: HttpInterceptorFn = (
   req: HttpRequest<any>,
   next: HttpHandlerFn,
 ) => {
   const subjectId = localStorage.getItem('selectedSubjectId') || undefined;
-  
+
   // Costruiamo l'URL finale
   const apiUrl = req.url.startsWith('http')
     ? req.url
