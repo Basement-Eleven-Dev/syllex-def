@@ -3,5 +3,5 @@ export const environment = {
 };
 
 export const apiUrl =
-    'https://bkwshpcns1.execute-api.eu-south-1.amazonaws.com/prod';
+    'https://webqzh6z3m.execute-api.eu-south-1.amazonaws.com/prod';
 export const logRocketId = 'r2d4zg/syllex'
