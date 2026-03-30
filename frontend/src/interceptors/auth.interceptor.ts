@@ -6,7 +6,7 @@ import {
 import { inject } from '@angular/core';
 import { from, switchMap } from 'rxjs';
 import { fetchAuthSession } from 'aws-amplify/auth';
-import { apiUrl as BACKEND_URL } from '../environments/environment.stg';
+import { apiUrl as BACKEND_URL } from '../environments/environment';
 
 export const authInterceptor: HttpInterceptorFn = (
   req: HttpRequest<any>,
