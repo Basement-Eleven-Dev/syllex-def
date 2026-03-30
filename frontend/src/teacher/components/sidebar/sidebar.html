@@ -43,13 +43,16 @@
             (click)="selectSubject(subject)"
             role="button"
           >
-            <span class="text-truncate" [title]="subject.name"
-              >{{ subject.name }}
-            </span>
+            <span
+              class="text-truncate"
+              [title]="subject.name"
+              style="min-width: 0"
+              >{{ subject.name }}</span
+            >
 
             @if (subject.uncorrectedTest != 0) {
             <span
-              class="status-pill warning d-flex align-items-center justify-content-center text-white fw-bold"
+              class="status-pill warning d-flex p-2 align-items-center justify-content-center text-white fw-bold flex-shrink-0"
             >
               <span>{{ subject.uncorrectedTest }}</span></span
             >
