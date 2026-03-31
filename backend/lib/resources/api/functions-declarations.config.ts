@@ -544,6 +544,12 @@ const ATTEMPTS_ROUTES: FunctionIntegration[] = [
     role: "student",
   },
   {
+    apiRoute: "attempts/questions-count",
+    functionPath: "students/selfEvaluation/countQuestions.ts",
+    method: "get",
+    role: "student",
+  },
+  {
     apiRoute: "attempts/{attemptId}/details",
     functionPath: "attempts/getAttemptDetails.ts",
     method: "get",

@@ -131,9 +131,22 @@ export class StudentTestsService {
     payload: SelfEvaluationPayload,
   ): Observable<SelfEvaluationResponse> {
     return this.http
-      .post<
-        { success: boolean } & SelfEvaluationResponse
-      >('attempts', payload)
+      .post<{ success: boolean } & SelfEvaluationResponse>('attempts', payload)
       .pipe(map(({ testId, attemptId }) => ({ testId, attemptId })));
+  }
+
+  countQuestions(
+    subjectId: string,
+    topicIds: string[],
+    excludedTypes: string[],
+  ): Observable<{ count: number }> {
+    const params: any = {
+      subjectId,
+      topicIds: topicIds.join(','),
+      excludedTypes: excludedTypes.join(','),
+    };
+    return this.http.get<{ count: number }>('attempts/questions-count', {
+      params,
+    });
   }
 }

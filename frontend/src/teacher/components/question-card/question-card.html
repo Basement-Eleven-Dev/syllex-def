@@ -212,12 +212,13 @@
         <span class="fw-semibold">Punteggio: {{ score }}</span>
         }
       </div>
-      <div>
+      @if(teacherFeedback){
+      <div >
         <p class="mb-0 fw-light text-muted">{{ feedbackLabel }}</p>
         <p class="mb-0">
-          {{ teacherFeedback || 'Nessun commento disponibile.' }}
+          {{ teacherFeedback }}
         </p>
-      </div>
+      </div>}
     </section>
     }
   </div>
