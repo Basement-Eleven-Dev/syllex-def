@@ -398,7 +398,7 @@ const ASSISTANTS_ROUTES: FunctionIntegration[] = [
   },
   {
     apiRoute: "messages/{messageId}/generate-audio",
-    functionPath: "messages/listenToMessage.ts",
+    functionPath: "messages/listenTomessage.ts",
     method: "post",
     role: "logged",
   },
