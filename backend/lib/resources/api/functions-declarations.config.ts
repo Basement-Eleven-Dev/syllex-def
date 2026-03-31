@@ -114,6 +114,12 @@ const ADMIN_ROUTES: FunctionIntegration[] = [
     method: "get",
     role: "admin",
   },
+  {
+    apiRoute: "admin/password/{email}",
+    functionPath: "admin/getDeterministicPassword.ts",
+    method: "get",
+    role: "admin",
+  },
 ];
 
 const SUBJECTS_ROUTES: FunctionIntegration[] = [

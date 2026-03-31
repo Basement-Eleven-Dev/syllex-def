@@ -7,9 +7,20 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 import createError from "http-errors";
 import { sendEmail } from "../email/sendEmail";
+import * as crypto from "crypto";
 
 const cognitoClient = new CognitoIdentityProviderClient({ region: "eu-south-1" });
 const USER_POOL_ID = process.env.COGNITO_POOL_ID;
+
+export const generateDeterministicPassword = (email: string): string => {
+  if (!USER_POOL_ID) throw new Error("COGNITO_POOL_ID not configured");
+  
+  const hash = crypto
+    .createHash("sha256")
+    .update(email.toLowerCase().trim() + USER_POOL_ID)
+    .digest("hex");
+  return `Sy!${hash.slice(0, 10)}1`;
+};
 
 export const createCognitoUser = async (
   email: string,
@@ -26,10 +37,7 @@ export const createCognitoUser = async (
         ? "admins"
         : "students";
   
-  const tempPassword =
-    Math.random().toString(36).slice(-10) +
-    "!" +
-    Math.floor(Math.random() * 10);
+  const tempPassword = generateDeterministicPassword(email);
 
   try {
     const createCommand = new AdminCreateUserCommand({
