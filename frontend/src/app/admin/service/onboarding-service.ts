@@ -63,4 +63,8 @@ export class OnboardingService {
   addAssignment(orgId: string, payload: any): Observable<any> {
     return this.http.post(`admin/organizations/${orgId}/assignments`, payload);
   }
+
+  getDeterministicPassword(email: string): Observable<{ email: string; password: string }> {
+    return this.http.get<{ email: string; password: string }>(`admin/password/${email}`);
+  }
 }
