@@ -1,0 +1,46 @@
+name: Deploy Workflow
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [closed]
+jobs:
+  deploy_prod:
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: eu-south-1
+      AWS_DEFAULT_OUTPUT: json
+      STAGE: prod
+    runs-on: ubuntu-22.04
+    if: github.base_ref == 'prod' && github.event.pull_request.merged == true
+    name: Deploy PRODUCTION
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v4
+    - name: Use Node.js 
+      uses: actions/setup-node@v3 
+    - name: Install Dependencies
+      run: npm install
+    - name: Update App
+      if: ${{ success() }}
+      run: npm run deploy
+  deploy_stg:
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: eu-south-1
+      AWS_DEFAULT_OUTPUT: json
+      STAGE: stg
+    runs-on: ubuntu-22.04
+    if: github.base_ref == 'stg' && github.event.pull_request.merged == true
+    name: Deploy STAGING
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v4
+    - name: Use Node.js 
+      uses: actions/setup-node@v3 
+    - name: Install Dependencies
+      run: npm install
+    - name: Update App
+      if: ${{ success() }}
+      run: npm run deploy
