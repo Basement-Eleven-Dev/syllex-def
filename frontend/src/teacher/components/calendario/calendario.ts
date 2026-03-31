@@ -246,9 +246,9 @@ export class Calendario implements OnInit {
       );
 
     if (this.studentMode()) {
-      this.studentTestsService.getAvailableTests().subscribe((tests) => {
-        const mapped = tests.map(
-          (t) =>
+      this.studentTestsService.getAvailableTests().subscribe((res) => {
+        const mapped = res.tests.map(
+          (t: any) =>
             ({
               _id: t._id,
               name: t.name,
@@ -256,7 +256,7 @@ export class Calendario implements OnInit {
               availableFrom: t.availableFrom
                 ? new Date(t.availableFrom)
                 : undefined,
-            }) as TestInterface,
+            } as TestInterface),
         );
         this.Tests.set(mapped);
       });
@@ -267,7 +267,7 @@ export class Calendario implements OnInit {
           this.Tests.set(res.tests),
         );
     }
-    
+
     if (this.studentMode()) {
       this.comunicazioniService
         .getPagedComunicazioni('', '', '', 1, 100, undefined)

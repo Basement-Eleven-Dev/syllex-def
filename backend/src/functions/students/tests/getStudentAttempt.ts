@@ -2,7 +2,7 @@ import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../../_helpers/lambdaProxyResponse";
 import { connectDatabase } from "../../../_helpers/getDatabase";
-import { Types, mongo } from "mongoose"
+import { Types, mongo } from "mongoose";
 import { Attempt } from "../../../models/schemas/attempt.schema";
 
 const getStudentAttempt = async (
@@ -22,13 +22,10 @@ const getStudentAttempt = async (
 
   await connectDatabase();
 
-  const attempt = await Attempt.findOne(
-    {
-      testId: new mongo.ObjectId(testId),
-      studentId: new mongo.ObjectId(studentId),
-    },
-    { sort: { _id: -1 } },
-  );
+  const attempt = await Attempt.findOne({
+    testId: new mongo.ObjectId(testId),
+    studentId: new mongo.ObjectId(studentId),
+  }).sort({ _id: -1 });
 
   return { attempt: attempt ?? null };
 };

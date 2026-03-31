@@ -6,7 +6,7 @@ import {
   RestApi,
   TokenAuthorizer,
 } from "aws-cdk-lib/aws-apigateway";
-import { UserPool, UserPoolClient } from "aws-cdk-lib/aws-cognito";
+import { IUserPool, IUserPoolClient } from "aws-cdk-lib/aws-cognito";
 import { LambdaConstruct } from "../lambda";
 import { Role } from "aws-cdk-lib/aws-iam";
 import { Duration } from "aws-cdk-lib";
@@ -16,8 +16,6 @@ import {
   FUNCTION_INTEGRATIONS,
 } from "./functions-declarations.config";
 import { RouteConstruct } from "./api_route";
-import { SqsQueue } from "aws-cdk-lib/aws-events-targets";
-import { Queue } from "aws-cdk-lib/aws-sqs";
 
 export class RestApiGateway extends Construct {
   apiGateway: RestApi;
@@ -151,8 +149,8 @@ export class RestApiGateway extends Construct {
   constructor(
     scope: Construct,
     name: string,
-    private cognitoPool: UserPool,
-    private cognitoClient: UserPoolClient,
+    private cognitoPool: IUserPool,
+    private cognitoClient: IUserPoolClient,
     private defaultRole: Role,
     private indexingQueueUrl: string,
     private emailQueueUrl: string,

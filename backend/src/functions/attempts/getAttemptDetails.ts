@@ -32,7 +32,7 @@ const getAttemptDetails = async (request: APIGatewayProxyEvent) => {
       },
     },
     { $unwind: "$studentInfo" },
-  ])
+  ]);
 
   const attempt = result[0];
   if (!attempt) throw createError.NotFound("Tentativo non trovato");
@@ -61,25 +61,19 @@ const getAttemptDetails = async (request: APIGatewayProxyEvent) => {
       currentScore = 0;
       questionsStats.empty++;
     } else if (isOpenQuestion) {
-      // Per le APERTE: deduciamo lo stato dal campo status, ma il punteggio è quello del DB
-      const threshold = questionMaxScore / 2;
+      // Per le APERTE: lo stato è "dubious" finché AI o docente non correggono esplicitamente
       currentScore = q.score ?? 0;
 
-      resultStatus = q.status;
-      if (!resultStatus || resultStatus === "dubious") {
-        // Se non c'è stato o è "dubious", rimane dubious a meno che non ci sia un punteggio numerico esplicito
-        if (typeof q.score === 'number') {
-          // Se c'è un punteggio esplicito, deduciamo lo stato
-          if (currentScore >= threshold) resultStatus = "correct";
-          else resultStatus = "wrong";
-        } else {
-          resultStatus = "dubious";
-        }
+      if (q.status === "correct" || q.status === "wrong") {
+        // Stato impostato esplicitamente da AI o docente
+        resultStatus = q.status;
+        if (resultStatus === "correct") questionsStats.correct++;
+        else questionsStats.wrong++;
+      } else {
+        // Non ancora corretto → dubious
+        resultStatus = "dubious";
+        questionsStats.dubious++;
       }
-
-      if (resultStatus === "dubious") questionsStats.dubious++;
-      else if (resultStatus === "correct") questionsStats.correct++;
-      else questionsStats.wrong++;
     } else {
       // Per le CHIUSE: deduciamo tutto dal confronto answer <-> options / correctAnswer
       let isCorrect = false;
@@ -125,18 +119,17 @@ const getAttemptDetails = async (request: APIGatewayProxyEvent) => {
   });
 
   // 4. Calcolo medie della classe per questo test
-  const classStats = await Attempt
-    .aggregate([
-      { $match: { testId: attempt.testId, status: "reviewed" } },
-      {
-        $group: {
-          _id: "$testId",
-          avgScore: { $avg: "$score" },
-          avgTime: { $avg: "$timeSpent" },
-          count: { $sum: 1 },
-        },
+  const classStats = await Attempt.aggregate([
+    { $match: { testId: attempt.testId, status: "reviewed" } },
+    {
+      $group: {
+        _id: "$testId",
+        avgScore: { $avg: "$score" },
+        avgTime: { $avg: "$timeSpent" },
+        count: { $sum: 1 },
       },
-    ])
+    },
+  ]);
 
   const averages = classStats[0] || { avgScore: 0, avgTime: 0, count: 0 };
 
@@ -147,7 +140,9 @@ const getAttemptDetails = async (request: APIGatewayProxyEvent) => {
   );
 
   // Recupero nomi argomenti dalla materia
-  const subject = await SubjectView.findOne({ _id: attempt.testInfo.subjectId });
+  const subject = await SubjectView.findOne({
+    _id: attempt.testInfo.subjectId,
+  });
   const topicsMap = new Map<string, string>();
   if (subject?.topics && Array.isArray(subject.topics)) {
     for (const t of subject.topics) {
@@ -157,46 +152,62 @@ const getAttemptDetails = async (request: APIGatewayProxyEvent) => {
     }
   }
 
-  const studentTopicPerformance: { [key: string]: { score: number; max: number } } = {};
+  const studentTopicPerformance: {
+    [key: string]: { score: number; max: number };
+  } = {};
   mappedQuestions.forEach((mq: any) => {
     const topicId = mq.question.topicId?.toString();
     const topicName = (topicId ? topicsMap.get(topicId) : null) || "Generale";
 
-    if (!studentTopicPerformance[topicName]) studentTopicPerformance[topicName] = { score: 0, max: 0 };
+    if (!studentTopicPerformance[topicName])
+      studentTopicPerformance[topicName] = { score: 0, max: 0 };
     studentTopicPerformance[topicName].score += mq.answer.score;
     studentTopicPerformance[topicName].max += mq.answer.maxScore;
   });
 
-  const studentTopics = Object.entries(studentTopicPerformance).map(([name, stats]) => ({
-    name,
-    percentage: stats.max > 0 ? Math.round((stats.score / stats.max) * 100) : 0
-  }));
+  const studentTopics = Object.entries(studentTopicPerformance).map(
+    ([name, stats]) => ({
+      name,
+      percentage:
+        stats.max > 0 ? Math.round((stats.score / stats.max) * 100) : 0,
+    }),
+  );
 
   // 6. Calcolo performance della classe per argomento in questo test
-  const allAttempts = await Attempt
-    .find({ testId: attempt.testId, status: "reviewed" })
+  const allAttempts = await Attempt.find({
+    testId: attempt.testId,
+    status: "reviewed",
+  });
 
-  const classTopicPerformance: { [key: string]: { score: number; max: number } } = {};
+  const classTopicPerformance: {
+    [key: string]: { score: number; max: number };
+  } = {};
   allAttempts.forEach((att: any) => {
     att.questions.forEach((q: any) => {
       const topicId = q.question.topicId?.toString();
       const topicName = (topicId ? topicsMap.get(topicId) : null) || "Generale";
 
       const testQuestionConfig = attempt.testInfo.questions?.find(
-        (tq: any) => (tq.questionId?.toString() || tq.id?.toString()) === q.question._id.toString()
+        (tq: any) =>
+          (tq.questionId?.toString() || tq.id?.toString()) ===
+          q.question._id.toString(),
       );
       const qMax = testQuestionConfig?.points ?? 1;
 
-      if (!classTopicPerformance[topicName]) classTopicPerformance[topicName] = { score: 0, max: 0 };
-      classTopicPerformance[topicName].score += (q.score || 0);
+      if (!classTopicPerformance[topicName])
+        classTopicPerformance[topicName] = { score: 0, max: 0 };
+      classTopicPerformance[topicName].score += q.score || 0;
       classTopicPerformance[topicName].max += qMax;
     });
   });
 
-  const classTopics = Object.entries(classTopicPerformance).map(([name, stats]) => ({
-    name,
-    percentage: stats.max > 0 ? Math.round((stats.score / stats.max) * 100) : 0
-  }));
+  const classTopics = Object.entries(classTopicPerformance).map(
+    ([name, stats]) => ({
+      name,
+      percentage:
+        stats.max > 0 ? Math.round((stats.score / stats.max) * 100) : 0,
+    }),
+  );
 
   return {
     testId: attempt.testId,

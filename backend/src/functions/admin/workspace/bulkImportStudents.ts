@@ -18,7 +18,10 @@ const bulkImportStudents = async (
   context: Context,
 ) => {
   const organizationId = request.pathParameters?.organizationId;
-  const { classId, students } = JSON.parse(request.body || '{}') as { classId: string, students: ImportStudent[] };
+  const { classId, students } = JSON.parse(request.body || "{}") as {
+    classId: string;
+    students: ImportStudent[];
+  };
 
   if (!organizationId || !mongo.ObjectId.isValid(organizationId)) {
     throw createError.BadRequest("Invalid or missing organizationId");
@@ -32,7 +35,7 @@ const bulkImportStudents = async (
     throw createError.BadRequest("Missing or invalid students list");
   }
 
-  await connectDatabase()
+  await connectDatabase();
   const orgObjectId = new mongo.ObjectId(organizationId);
   const classObjectId = new mongo.ObjectId(classId);
 
@@ -48,20 +51,29 @@ const bulkImportStudents = async (
         // Update user to ensure they are in this organization
         await User.updateOne(
           { _id: user._id },
-          { $addToSet: { organizationIds: orgObjectId }, $set: { updatedAt: new Date() } }
+          {
+            $addToSet: { organizationIds: orgObjectId },
+            $set: { updatedAt: new Date() },
+          },
         );
         studentIdsToAssign.push(user._id);
       } else {
         // 2. Create new user
         try {
-          const cognitoId = await createCognitoUser(email, std.firstName, std.lastName, 'student');
+          const cognitoId = await createCognitoUser(
+            email,
+            std.firstName,
+            std.lastName,
+            "student",
+          );
 
           const userResult = await User.insertOne({
             cognitoId,
             email,
+            username: email,
             firstName: std.firstName,
             lastName: std.lastName,
-            role: 'student',
+            role: "student",
             organizationIds: [orgObjectId],
             createdAt: new Date(),
             updatedAt: new Date(),
@@ -70,8 +82,10 @@ const bulkImportStudents = async (
           studentIdsToAssign.push(userResult._id);
         } catch (cognitoError: any) {
           // If Cognito user already exists but not in our DB (unlikely but possible)
-          if (cognitoError.name === 'UsernameExistsException') {
-            console.log(`Cognito user already exists for ${email}, manual sync needed or handle specifically`);
+          if (cognitoError.name === "UsernameExistsException") {
+            console.log(
+              `Cognito user already exists for ${email}, manual sync needed or handle specifically`,
+            );
           }
           throw cognitoError;
         }
@@ -86,14 +100,14 @@ const bulkImportStudents = async (
   if (studentIdsToAssign.length > 0) {
     await Class.updateOne(
       { _id: classObjectId, organizationId: orgObjectId },
-      { $addToSet: { students: { $each: studentIdsToAssign } } }
+      { $addToSet: { students: { $each: studentIdsToAssign } } },
     );
   }
 
   return {
     success: true,
     count: studentIdsToAssign.length,
-    message: `${studentIdsToAssign.length} studenti processati correttamente.`
+    message: `${studentIdsToAssign.length} studenti processati correttamente.`,
   };
 };
 

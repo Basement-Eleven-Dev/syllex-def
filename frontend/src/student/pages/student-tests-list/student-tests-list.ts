@@ -1,4 +1,4 @@
-import { Component, signal, OnInit, inject } from '@angular/core';
+import { Component, signal, inject, effect } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faBroom, faPlus } from '@fortawesome/pro-solid-svg-icons';
@@ -11,17 +11,25 @@ import { DestroyRef } from '@angular/core';
 import { StudentTestCard } from '../../components/student-test-card/student-test-card';
 import { Materia } from '../../../services/materia';
 import { FeedbackService } from '../../../services/feedback-service';
+import { SyllexPagination } from '../../../teacher/components/syllex-pagination/syllex-pagination';
+import { FormsModule } from '@angular/forms';
 
 type AttemptStatus = 'in-progress' | 'delivered' | 'reviewed';
 
 @Component({
   selector: 'app-student-tests-list',
   standalone: true,
-  imports: [FontAwesomeModule, RouterModule, StudentTestCard],
+  imports: [
+    FontAwesomeModule,
+    RouterModule,
+    StudentTestCard,
+    SyllexPagination,
+    FormsModule,
+  ],
   templateUrl: './student-tests-list.html',
   styleUrl: './student-tests-list.scss',
 })
-export class StudentTestsList implements OnInit {
+export class StudentTestsList {
   private readonly testsService = inject(StudentTestsService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly materiaService = inject(Materia);
@@ -35,23 +43,33 @@ export class StudentTestsList implements OnInit {
   readonly SearchTerm = signal('');
   readonly SelectedSubject = signal('');
 
+  // Pagination
+  readonly Page = signal(1);
+  readonly PageSize = signal(10);
+  readonly CollectionSize = signal(0);
+
   readonly Subjects = this.materiaService.allMaterie;
 
-  private allTests = signal<StudentTestInterface[]>([]);
-
-  ngOnInit() {
-    this.loadTests();
+  constructor() {
+    effect(() => {
+      this.loadTests();
+    });
   }
 
   loadTests() {
     this.testsService
-      .getAvailableTests(this.SearchTerm())
+      .getAvailableTests(
+        this.SearchTerm(),
+        this.SelectedSubject(),
+        this.Page(),
+        this.PageSize(),
+      )
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (tests) => {
-          this.allTests.set(tests);
-          this.applyFilters();
-          this.checkAttemptStatuses(tests);
+        next: (res) => {
+          this.Tests.set(res.tests);
+          this.CollectionSize.set(res.total);
+          this.checkAttemptStatuses(res.tests);
         },
         error: (err) => {
           console.error('Errore nel caricamento dei test:', err);
@@ -60,35 +78,25 @@ export class StudentTestsList implements OnInit {
             false,
           );
           this.Tests.set([]);
+          this.CollectionSize.set(0);
         },
       });
   }
 
-  private applyFilters() {
-    let filtered = this.allTests();
-
-    const selectedSubject = this.SelectedSubject();
-    if (selectedSubject) {
-      filtered = filtered.filter((test) => test.subjectId === selectedSubject);
-    }
-
-    this.Tests.set(filtered);
-  }
-
   onSearchTermChange(term: string) {
     this.SearchTerm.set(term);
-    this.loadTests();
+    this.Page.set(1);
   }
 
   onSubjectChange(subjectId: string) {
     this.SelectedSubject.set(subjectId);
-    this.applyFilters();
+    this.Page.set(1);
   }
 
   clearFilters() {
     this.SearchTerm.set('');
     this.SelectedSubject.set('');
-    this.loadTests();
+    this.Page.set(1);
   }
 
   getAttemptStatus(testId: string): AttemptStatus | null {
@@ -97,6 +105,7 @@ export class StudentTestsList implements OnInit {
 
   private checkAttemptStatuses(tests: StudentTestInterface[]): void {
     for (const test of tests) {
+      if (this.AttemptStatusMap().has(test._id)) continue;
       this.testsService
         .getAttemptByTestId(test._id)
         .pipe(takeUntilDestroyed(this.destroyRef))

@@ -15,13 +15,13 @@ export class EmailResources extends Construct {
     super(scope, name);
 
     // Dead Letter Queue per i messaggi falliti dopo 3 tentativi
-    const dlq = new Queue(this, "bulk-email-dlq", {
+    const dlq = new Queue(this, EMAIL_QUEUE_NAME + "-DLQ", {
       queueName: EMAIL_QUEUE_NAME + "-DLQ",
       retentionPeriod: Duration.days(14),
     });
 
     // Coda principale per i job di invio email
-    this.queue = new Queue(this, "bulk-email-queue", {
+    this.queue = new Queue(this, EMAIL_QUEUE_NAME, {
       queueName: EMAIL_QUEUE_NAME,
       visibilityTimeout: Duration.seconds(600), // Deve essere >= al timeout della Lambda (600s di default)
       deadLetterQueue: {

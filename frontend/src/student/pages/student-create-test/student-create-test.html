@@ -147,6 +147,16 @@
           <span>15</span>
           <span>20</span>
         </div>
+
+        @if (AvailableQuestionsCount() !== null && AvailableQuestionsCount()! > 0) {
+        <div class="mt-3 d-flex align-items-center gap-2">
+          <fa-icon [icon]="CheckIcon" class="text-success small" />
+          <span class="text-muted small">
+            Abbiamo trovato <strong>{{ AvailableQuestionsCount() }}</strong>
+            domande per questi argomenti.
+          </span>
+        </div>
+        }
       </div>
     </div>
 
@@ -286,6 +296,25 @@
 
       <hr />
 
+      @if (ShowCountWarning()) {
+      <div
+        class="alert alert-warning mb-3 py-2 small d-flex align-items-center gap-2"
+      >
+        <fa-icon [icon]="RemoveIcon" class="text-warning" />
+        <span>
+          Ne abbiamo trovate solo {{ AvailableQuestionsCount() }}. Vuoi
+          proseguire comunque?
+        </span>
+      </div>
+      } @if (AvailableQuestionsCount() === 0 && SelectedTopicIds().size > 0) {
+      <div
+        class="alert alert-danger mb-3 py-2 small d-flex align-items-center gap-2"
+      >
+        <fa-icon [icon]="RemoveIcon" />
+        <span>Nessuna domanda trovata per i criteri scelti.</span>
+      </div>
+      }
+
       <button
         type="button"
         class="btn btn-gradient-primary w-100 py-3"
@@ -297,7 +326,9 @@
           class="spinner-border spinner-border-sm me-2"
           role="status"
         ></span>
-        Generazione in corso... } @else {
+        Generazione in corso... } @else if (ShowCountWarning()) {
+        <fa-icon [icon]="CheckIcon" class="me-2" />
+        Crea comunque ({{ AvailableQuestionsCount() }} dom.) } @else {
         <fa-icon [icon]="CheckIcon" class="me-2" />
         Crea il test }
       </button>

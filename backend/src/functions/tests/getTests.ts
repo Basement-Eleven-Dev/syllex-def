@@ -94,6 +94,7 @@ const getStudentTests = async (
         isPasswordProtected: {
           $cond: [{ $gt: ["$password", null] }, true, false],
         },
+        _id: { $toString: "$_id" },
       },
     },
     { $project: { _subject: 0, password: 0 } },
@@ -168,6 +169,7 @@ const getTeacherTests = async (request: APIGatewayProxyEvent, context: Context) 
       },
       {
         $addFields: {
+          _id: { $toString: "$_id" },
           uncorrectedCount: {
             $size: {
               $filter: {

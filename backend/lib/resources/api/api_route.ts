@@ -15,7 +15,7 @@ import {
 import { Duration, NestedStack, NestedStackProps } from "aws-cdk-lib";
 import { AppRole, FunctionIntegration } from "./functions-declarations.config";
 import { Role } from "aws-cdk-lib/aws-iam";
-import { FUNCTIONS_PATH } from "../../../environment";
+import { FUNCTIONS_PATH, STAGE_NAME } from "../../../environment";
 import { LambdaConstruct } from "../lambda";
 import { DefaultLambdaRole } from "../roles";
 import { API_GATEWAY_TIMEOUT, AUTHORIZED_API_HEADERS } from "../../../src/env";
@@ -130,7 +130,7 @@ export class RouteConstruct extends NestedStack {
 
     constructor(scope: Construct, private name: string, public props: RouteConstructProps) {
         super(scope, name);
-        this.role = new DefaultLambdaRole(this, this.name + 'Role').role
+        this.role = new DefaultLambdaRole(this, this.name + 'LambdaRole' + STAGE_NAME).role
         this.api = RestApi.fromRestApiAttributes(this, 'RestApi', {
             restApiId: this.props.apiId,
             rootResourceId: this.props.rootResourceId,

@@ -141,7 +141,11 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
     const question = this.Questions().find((q) => q._id === questionId);
 
     // One-shot restriction: handle only if enabled and it's a closed question
-    if (test?.oneShotAnswers && question && question.type !== 'risposta aperta') {
+    if (
+      test?.oneShotAnswers &&
+      question &&
+      question.type !== 'risposta aperta'
+    ) {
       const existing = this.Answers()[questionId];
       if (existing !== null && existing !== undefined && existing !== '') {
         // Already answered, block changes
@@ -233,10 +237,11 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
     this.Error.set(null);
 
     this.testsService
-      .getAvailableTests()
+      .getAvailableTests('', '', 1, 100)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (tests) => {
+        next: (res) => {
+          const tests = res.tests;
           const found = tests.find((t) => t._id === this.TestId);
           if (!found) {
             this.Error.set('Test non trovato');

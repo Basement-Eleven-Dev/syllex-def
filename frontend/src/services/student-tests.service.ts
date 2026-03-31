@@ -67,15 +67,23 @@ export class StudentTestsService {
 
   getAvailableTests(
     searchTerm: string = '',
-  ): Observable<StudentTestInterface[]> {
-    const params: any = {};
+    subjectId: string = '',
+    page: number = 1,
+    pageSize: number = 5,
+  ): Observable<{ tests: StudentTestInterface[]; total: number }> {
+    const params: any = {
+      page: page.toString(),
+      pageSize: pageSize.toString(),
+    };
     if (searchTerm) params.searchTerm = searchTerm;
+    if (subjectId) params.subjectId = subjectId;
 
-    return this.http
-      .get<{ tests: StudentTestInterface[]; total: number }>('tests', {
+    return this.http.get<{ tests: StudentTestInterface[]; total: number }>(
+      'tests',
+      {
         params,
-      })
-      .pipe(map((res) => res.tests || []));
+      },
+    );
   }
 
   getAttemptByTestId(
@@ -123,9 +131,22 @@ export class StudentTestsService {
     payload: SelfEvaluationPayload,
   ): Observable<SelfEvaluationResponse> {
     return this.http
-      .post<
-        { success: boolean } & SelfEvaluationResponse
-      >('attempts', payload)
+      .post<{ success: boolean } & SelfEvaluationResponse>('attempts', payload)
       .pipe(map(({ testId, attemptId }) => ({ testId, attemptId })));
+  }
+
+  countQuestions(
+    subjectId: string,
+    topicIds: string[],
+    excludedTypes: string[],
+  ): Observable<{ count: number }> {
+    const params: any = {
+      subjectId,
+      topicIds: topicIds.join(','),
+      excludedTypes: excludedTypes.join(','),
+    };
+    return this.http.get<{ count: number }>('attempts/questions-count', {
+      params,
+    });
   }
 }
