@@ -15,6 +15,7 @@ import {
   faEyeSlash,
 } from '@fortawesome/pro-solid-svg-icons';
 import { Auth } from '../../../services/auth';
+import { isStaging } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login-form',
@@ -27,7 +28,7 @@ export class LoginForm {
   SpinnerIcon = faSpinnerThird;
   EyeIcon = faEye;
   EyeSlashIcon = faEyeSlash;
-
+  isStaging = isStaging;
   showPassword = false;
 
   loginForm = new FormGroup({
@@ -57,7 +58,7 @@ export class LoginForm {
   constructor(
     private router: Router,
     private authService: Auth,
-  ) {}
+  ) { }
 
   onSingIn() {
     this.loading = true;
