@@ -11,19 +11,26 @@ import { Assistant } from "../../../models/schemas/assistant.schema";
 import { TeacherAssignment } from "../../../models/schemas/teacher-assignment.schema";
 
 // Questo è l'entry point per la creazione degli utenti lato admin (Workspace)
-const createUser = async (
-  request: APIGatewayProxyEvent,
-  context: Context,
-) => {
+const createUser = async (request: APIGatewayProxyEvent, context: Context) => {
   const organizationId = request.pathParameters?.organizationId;
-  const { firstName, lastName, email, role, classId, subjectId, newSubjectName } = JSON.parse(request.body || '{}');
+  const {
+    firstName,
+    lastName,
+    email,
+    role,
+    classId,
+    subjectId,
+    newSubjectName,
+  } = JSON.parse(request.body || "{}");
 
   if (!organizationId || !mongo.ObjectId.isValid(organizationId)) {
     throw createError.BadRequest("Invalid or missing organizationId");
   }
 
   if (!firstName || !lastName || !email || !role) {
-    throw createError.BadRequest("Missing required fields: firstName, lastName, email, role");
+    throw createError.BadRequest(
+      "Missing required fields: firstName, lastName, email, role",
+    );
   }
 
   await connectDatabase();
@@ -31,11 +38,13 @@ const createUser = async (
 
   // 1. Create in Cognito (includes email)
   const cognitoId = await createCognitoUser(email, firstName, lastName, role);
+  console.log(`Cognito user created with ID: ${cognitoId} for email: ${email}`);
 
   // 2. Create in MongoDB
   const userResult = await User.insertOne({
     cognitoId,
     email: email.toLowerCase().trim(),
+    username: email.toLowerCase().trim(),
     firstName,
     lastName,
     role,
@@ -44,15 +53,19 @@ const createUser = async (
     updatedAt: new Date(),
   });
 
+  console.log(
+    `MongoDB user created with ID: ${userResult._id} for email: ${email}`,
+  );
+
   // 3. Optional Associations
-  if (role === 'student' && classId && mongo.ObjectId.isValid(classId)) {
+  if (role === "student" && classId && mongo.ObjectId.isValid(classId)) {
     await Class.updateOne(
       { _id: new mongo.ObjectId(classId) },
-      { $addToSet: { students: userResult._id } }
+      { $addToSet: { students: userResult._id } },
     );
   }
 
-  if (role === 'teacher') {
+  if (role === "teacher") {
     let finalSubjectId: Types.ObjectId | null = null;
 
     if (newSubjectName) {
@@ -82,7 +95,7 @@ const createUser = async (
       finalSubjectId = new mongo.ObjectId(subjectId);
       await Subject.updateOne(
         { _id: finalSubjectId },
-        { $set: { teacherId: userResult._id } }
+        { $set: { teacherId: userResult._id } },
       );
     }
 
@@ -107,8 +120,8 @@ const createUser = async (
       firstName,
       lastName,
       email: email.toLowerCase().trim(),
-      role
-    }
+      role,
+    },
   };
 };
 
