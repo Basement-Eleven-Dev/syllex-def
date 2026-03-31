@@ -67,15 +67,23 @@ export class StudentTestsService {
 
   getAvailableTests(
     searchTerm: string = '',
-  ): Observable<StudentTestInterface[]> {
-    const params: any = {};
+    subjectId: string = '',
+    page: number = 1,
+    pageSize: number = 5,
+  ): Observable<{ tests: StudentTestInterface[]; total: number }> {
+    const params: any = {
+      page: page.toString(),
+      pageSize: pageSize.toString(),
+    };
     if (searchTerm) params.searchTerm = searchTerm;
+    if (subjectId) params.subjectId = subjectId;
 
-    return this.http
-      .get<{ tests: StudentTestInterface[]; total: number }>('tests', {
+    return this.http.get<{ tests: StudentTestInterface[]; total: number }>(
+      'tests',
+      {
         params,
-      })
-      .pipe(map((res) => res.tests || []));
+      },
+    );
   }
 
   getAttemptByTestId(

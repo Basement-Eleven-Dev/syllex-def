@@ -87,7 +87,8 @@ export class StudentDashboard implements OnInit {
     this.testsService
       .getAvailableTests()
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((tests) => {
+      .subscribe((res) => {
+        const tests = res.tests;
         // Sort by availability and take top 3
         const sorted = tests.sort((a, b) => {
           const dateA = a.availableFrom

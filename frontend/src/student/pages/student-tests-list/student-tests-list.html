@@ -63,3 +63,25 @@
   </div>
   }
 </div>
+
+<div
+  class="mt-5 d-flex flex-row justify-content-between align-items-center mb-5"
+>
+  <app-syllex-pagination
+    [collectionSize]="CollectionSize()"
+    [page]="Page()"
+    [pageSize]="PageSize()"
+    (pageChange)="Page.set($event)"
+  />
+
+  <select
+    class="form-select custom-input"
+    style="width: auto"
+    [ngModel]="PageSize()"
+    (ngModelChange)="PageSize.set($event); Page.set(1)"
+  >
+    <option [ngValue]="5">5 per pagina</option>
+    <option [ngValue]="10">10 per pagina</option>
+    <option [ngValue]="20">20 per pagina</option>
+  </select>
+</div>
