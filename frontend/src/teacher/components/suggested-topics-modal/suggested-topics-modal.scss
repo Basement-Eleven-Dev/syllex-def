@@ -1,0 +1,40 @@
+.icon-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.topic-chip {
+  border-color: #e2e8f0 !important;
+  min-height: 36px;
+  
+  &:hover {
+    border-color: #646cff !important;
+    background-color: #f8fafc !important;
+  }
+}
+
+.chip-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: rgba(0,0,0,0.05);
+  }
+}
+
+.bg-light-hover {
+  transition: all 0.2s ease;
+}
+
+.transition-all {
+  transition: all 0.2s ease;
+}

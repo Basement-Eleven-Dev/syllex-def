@@ -4,17 +4,18 @@ import { Context, Handler } from "aws-lambda";
 import cors from "@middy/http-cors";
 import httpErrorHandler from "@middy/http-error-handler";
 import { getCurrentUser } from "./getAuthCognitoUser";
-import { User } from "../models/user";
-import { ObjectId } from "mongodb";
+import { AUTHORIZED_API_HEADERS } from "../env";
+import { mongo, Types } from "mongoose";
+import { User } from "../models/schemas/user.schema";
 
 declare module "aws-lambda" {
   interface Context {
     user?: User | null;
-    subjectId?: ObjectId;
+    subjectId?: Types.ObjectId;
   }
 }
 
-export const lambdaRequest = (handler: any) => {
+export const lambdaRequest = (handler: Handler) => {
   return middy(handler)
     .use({
       before: async (request) => {
@@ -22,7 +23,7 @@ export const lambdaRequest = (handler: any) => {
           request.event.headers["Subject-Id"] ||
           request.event.headers["subject-id"];
         request.context.subjectId = subjectIdHeader
-          ? new ObjectId(subjectIdHeader as string)
+          ? new mongo.ObjectId(subjectIdHeader as string)
           : undefined;
         request.context.user = await getCurrentUser(request.event);
       },
@@ -39,5 +40,10 @@ export const lambdaRequest = (handler: any) => {
       }),
     )
     .use(httpErrorHandler())
-    .use(cors({ origin: "*" }));
+    .use(
+      cors({
+        origin: "*",
+        headers: AUTHORIZED_API_HEADERS.join(','),
+      }),
+    );
 };

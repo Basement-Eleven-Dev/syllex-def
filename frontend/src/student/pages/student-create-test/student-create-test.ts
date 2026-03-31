@@ -1,5 +1,8 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, effect } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
+import { toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { of } from 'rxjs';
+import { debounceTime, switchMap } from 'rxjs/operators';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faArrowLeft,
@@ -34,6 +37,7 @@ export class StudentCreateTest {
     'risposta aperta',
   ];
 
+  readonly TestName = signal<string>('Auto-valutazione');
   readonly SelectedSubjectId = signal<string>('');
   readonly SelectedTopicIds = signal<Set<string>>(new Set());
   readonly QuestionCount = signal<number>(10);
@@ -41,6 +45,7 @@ export class StudentCreateTest {
   readonly TimeLimitEnabled = signal<boolean>(false);
   readonly TimeLimit = signal<number>(30);
   readonly IsSubmitting = signal<boolean>(false);
+  readonly AvailableQuestionsCount = signal<number | null>(null);
 
   readonly SelectedSubject = computed(
     () =>
@@ -52,12 +57,47 @@ export class StudentCreateTest {
     () => this.SelectedSubject()?.topics ?? [],
   );
 
+  readonly ShowCountWarning = computed(() => {
+    const count = this.QuestionCount();
+    const available = this.AvailableQuestionsCount();
+    return available !== null && count > available;
+  });
+
+  constructor() {
+    const filter$ = toObservable(
+      computed(() => ({
+        subjectId: this.SelectedSubjectId(),
+        topicIds: Array.from(this.SelectedTopicIds()),
+        excludedTypes: Array.from(this.ExcludedTypes()),
+      })),
+    );
+
+    filter$
+      .pipe(
+        debounceTime(300),
+        switchMap((f) => {
+          if (f.subjectId && f.topicIds.length > 0) {
+            return this.testsService.countQuestions(
+              f.subjectId,
+              f.topicIds,
+              f.excludedTypes,
+            );
+          }
+          return of({ count: 0 });
+        }),
+        takeUntilDestroyed(),
+      )
+      .subscribe((res) => this.AvailableQuestionsCount.set(res.count));
+  }
+
   readonly IsFormValid = computed(
     () =>
+      this.TestName().trim().length > 0 &&
       this.SelectedSubjectId().length > 0 &&
       this.SelectedTopicIds().size > 0 &&
       this.QuestionCount() >= 1 &&
       this.QuestionCount() <= 100 &&
+      this.AvailableQuestionsCount() !== 0 &&
       (!this.TimeLimitEnabled() || this.TimeLimit() >= 1),
   );
 
@@ -113,6 +153,7 @@ export class StudentCreateTest {
 
     this.testsService
       .createSelfEvaluation({
+        name: this.TestName().trim() || 'Auto-valutazione',
         subjectId: this.SelectedSubjectId(),
         topicIds: Array.from(this.SelectedTopicIds()),
         questionCount: this.QuestionCount(),

@@ -24,6 +24,15 @@
   right: 10px;
   z-index: 5;
   pointer-events: none;
+  border-radius: 100%;
+  aspect-ratio: 1/1;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
 }
 
 .folder-card:hover .selection-checkbox,

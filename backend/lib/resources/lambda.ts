@@ -50,6 +50,7 @@ export class LambdaConstruct extends Construct {
       handler: "index.handler",
       bundling: {
         minify: true,
+        sourceMap: true
       },
       environment: withSecretLayerEnvironmentVariables({
         ...additionalEnvironment,
@@ -59,6 +60,7 @@ export class LambdaConstruct extends Construct {
       }),
       role: role,
       entry: fileName,
+      tracing: lambda.Tracing.ACTIVE
     });
   }
 }

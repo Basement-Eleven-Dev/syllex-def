@@ -80,7 +80,12 @@ li {
 }
 
 .question-card.locked {
-  textarea,
+  textarea[readonly] {
+    background-color: var(--bs-light);
+    cursor: default;
+    border-color: var(--bs-border-color);
+  }
+
   input[type="radio"] {
     pointer-events: none;
   }
@@ -109,4 +114,16 @@ li {
   &:hover {
     cursor: pointer;
   }
+}
+
+.ai-badge {
+  border-radius: 100%;
+  aspect-ratio: 1/1;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
 }

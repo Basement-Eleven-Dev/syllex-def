@@ -1,14 +1,15 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types } from "mongoose";
+import { Class } from "../../models/schemas/class.schema";
+import { Communication } from "../../models/schemas/communication.schema";
 
 const getCommunications = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
-  const db = await getDefaultDatabase();
-  const communicationsCollection = db.collection("communications");
+  await connectDatabase();
 
   // Estraggo i parametri dalla query string
   const {
@@ -34,10 +35,8 @@ const getCommunications = async (
       filter.teacherId = context.user._id;
     } else if (context.user.role === "student") {
       // Uno studente vede solo le comunicazioni delle sue classi
-      const studentClasses = await db
-        .collection("classes")
-        .find({ students: { $in: [context.user._id] } })
-        .toArray();
+      const studentClasses = await Class
+        .find({ students: context.user._id } as any)
 
       const classIds = studentClasses.map((c) => c._id);
       filter.classIds = { $in: classIds };
@@ -46,7 +45,7 @@ const getCommunications = async (
 
   // Filtraggio per materia
   if (subjectId) {
-    filter.subjectId = new ObjectId(subjectId);
+    filter.subjectId = new Types.ObjectId(subjectId);
   } else if (context.subjectId) {
     // se non è passata via query, ma c'è nel contesto (es. endpoint annidato), filtro per quella
     filter.subjectId = context.subjectId;
@@ -63,7 +62,7 @@ const getCommunications = async (
 
   // Filtro per classe specifica (se richiesto esplicitamente oltre al filtro di ruolo)
   if (classId) {
-    const targetClassId = new ObjectId(classId);
+    const targetClassId = new Types.ObjectId(classId);
     if (filter.classIds) {
       // se c'è già un filtro (es. studente), facciamo intersezione manuale o usiamo $and
       filter.$and = [{ classIds: targetClassId }, { classIds: filter.classIds }];
@@ -84,15 +83,14 @@ const getCommunications = async (
   }
 
   // Query con paginazione, ordinata per data (più recenti prima)
-  const communications = await communicationsCollection
+  const communications = await Communication
     .find(filter)
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(currentPageSize)
-    .toArray();
 
   // Conto il totale per la paginazione
-  const total = await communicationsCollection.countDocuments(filter);
+  const total = await Communication.countDocuments(filter);
 
   return {
     communications,

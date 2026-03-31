@@ -1,9 +1,9 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
-import { Attempt } from "../../../models/attempt";
+import { connectDatabase } from "../../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { Attempt } from "../../../models/schemas/attempt.schema";
 
 const getStudentAttempt = async (
   request: APIGatewayProxyEvent,
@@ -20,16 +20,12 @@ const getStudentAttempt = async (
     throw createError.Unauthorized("User not authenticated");
   }
 
-  const db = await getDefaultDatabase();
-  const attemptsCollection = db.collection<Attempt>("attempts");
+  await connectDatabase();
 
-  const attempt = await attemptsCollection.findOne(
-    {
-      testId: new ObjectId(testId),
-      studentId: new ObjectId(studentId),
-    },
-    { sort: { _id: -1 } },
-  );
+  const attempt = await Attempt.findOne({
+    testId: new mongo.ObjectId(testId),
+    studentId: new mongo.ObjectId(studentId),
+  }).sort({ _id: -1 });
 
   return { attempt: attempt ?? null };
 };

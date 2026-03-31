@@ -1,0 +1,32 @@
+.modal-header,
+.modal-footer {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.modal-body {
+  padding: 1rem 1.5rem;
+}
+
+.content-box {
+  max-height: 260px;
+  overflow-y: auto;
+
+  &__title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--bs-border-color);
+    padding-bottom: 0.4rem;
+  }
+}
+
+:host ::ng-deep .terms-section-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--bs-body-color);
+  margin-bottom: 0.25rem;
+}

@@ -1,14 +1,15 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import createHttpError from "http-errors";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
-import { MaterialInterface } from "../../models/material";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { Material } from "../../models/schemas/material.schema";
 import { startSlidedeckGeneration } from "../../_helpers/gammaApi";
 import { uploadContentToS3 } from "../../_helpers/uploadFileToS3";
 import { getConvertedDocument } from "../../_helpers/documents/documentConversion";
 import { askStructuredLLM } from "../../_helpers/AI/simpleCompletion";
 import { z } from "zod";
+import { Organization } from "../../models/schemas/organization.schema";
 
 const documentTypes = ["slides", "map", "glossary", "summary"] as const;
 
@@ -23,6 +24,7 @@ export type AIGenMaterialInput = {
   type: DocumentType;
   materialIds: string[];
   numberOfSlides?: number;
+  format?: "pptx" | "pdf";
   additionalInstructions?: string;
   language?: string;
 };
@@ -34,13 +36,13 @@ const getPrompt = (
   additionalInstructions?: string,
 ) => {
   const guardRails: string = `
-    Use the ${language} language.
-    Give the response a brief title. 
-    Answer the query using only the information provided in the attached documents.
-    Do not use any outside knowledge, facts, or assumptions not explicitly stated in these files.`;
+    Scrivi tutto il contenuto in ${language}.
+    Dai alla risposta un titolo breve.
+    Rispondi alla query utilizzando solo le informazioni fornite nei documenti allegati.
+    Non utilizzare conoscenze esterne, fatti o supposizioni non esplicitamente indicati in questi file.`;
 
   const prompts: Record<DocumentType, string> = {
-    slides: `Write me a ${numberOfSlides || 10}-slides content based on these documents.`,
+    slides: `Scrivimi ${numberOfSlides || 10} diapositive basate sui documenti forniti. In 'content' inserisci tutto il testo che dovrebbe essere presente compreso di titoli delle slide e specifiche su come presentare le informazioni, senza alcuna spiegazione o testo aggiuntivo. Mantieni il testo conciso e adatto a una presentazione visiva in ambito educativo. Se necessario, organizza le informazioni in punti ed elenchi.`,
     map: `
 Write a valid mermaid.js diagram based on these documents.
 
@@ -54,19 +56,28 @@ STRICT RULES:
     glossary: `Write me a glossary based on these documents. Use Markdown.`,
     summary: `Write me a medium length summary of these documents. Use Markdown.`,
   };
-  return (
-    prompts[type] + "\n" + (additionalInstructions || "\n") + "\n" + guardRails
-  );
+
+  let promptResult = prompts[type];
+  if (additionalInstructions) {
+    promptResult +=
+      `\nWhat you should focus on when creating the ${type}: ` +
+      additionalInstructions;
+  }
+  promptResult += "\n" + guardRails;
+  return promptResult;
 };
 
 const createAIGenMaterial = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
+  await connectDatabase();
+
   const {
     type,
     materialIds,
     numberOfSlides,
+    format,
     additionalInstructions,
     language,
   } = JSON.parse(request.body || "{}") as AIGenMaterialInput;
@@ -81,17 +92,31 @@ const createAIGenMaterial = async (
       "type materialIds is required and not empty: string[]",
     );
 
-  const db = await getDefaultDatabase();
-  const materialCollection = db.collection("materials");
-  const organizationCollection = db.collection("organizations");
-  const materialOIds = materialIds.map((el) => new ObjectId(el));
-  const materialObjects: MaterialInterface[] = (await materialCollection
-    .find({
-      _id: { $in: materialOIds },
-      subjectId: context.subjectId,
-      aiGenerated: { $ne: true },
-    })
-    .toArray()) as MaterialInterface[]; //forse non serve
+  // Check storage limit (1GB)
+  const STORAGE_LIMIT_B = 1024 * 1024 * 1024;
+  const currentMaterials = await Material.find({
+    teacherId: context.user!._id as any,
+    subjectId: context.subjectId as any,
+  });
+
+  const totalBytes = currentMaterials.reduce(
+    (acc, m) => acc + (m.byteSize || 0),
+    0,
+  );
+  if (totalBytes >= STORAGE_LIMIT_B) {
+    throw createHttpError(
+      400,
+      "Limite di archiviazione (1GB) raggiunto per questa materia.",
+    );
+  }
+
+  await connectDatabase();
+  const materialOIds = materialIds.map((el) => new mongo.ObjectId(el));
+  const materialObjects = await Material.find({
+    _id: { $in: materialOIds as any },
+    subjectId: context.subjectId as any,
+    aiGenerated: { $ne: true },
+  });
 
   const prompt = getPrompt(
     type,
@@ -99,6 +124,8 @@ const createAIGenMaterial = async (
     numberOfSlides,
     additionalInstructions,
   );
+
+  console.log("Generated prompt for LLM:", prompt);
   //LLM STRUCTURES
   const DocumentSchema = z.object({
     title: z.string(),
@@ -110,10 +137,11 @@ const createAIGenMaterial = async (
     DocumentSchema,
   );
 
-  const organizationId =
-    (context.user as any).organizationIds?.[0] ?? context.user!.organizationId;
+  console.log("LLM response:", { title, content });
 
-  const organization = await organizationCollection.findOne({
+  const organizationId = context.user?.organizationIds?.[0];
+
+  const organization = await Organization.findOne({
     _id: organizationId,
   });
 
@@ -124,7 +152,7 @@ const createAIGenMaterial = async (
   const organizationLogoUrl: string = organization.logoUrl ?? "";
   const organizationName: string = organization.name; //unused for now
 
-  const material: MaterialInterface = {
+  const material: Partial<Material> = {
     name: "", //find a way to get a real name
     createdAt: new Date(),
     aiGenerated: true,
@@ -148,6 +176,7 @@ const createAIGenMaterial = async (
       destinationFilename,
     );
     material.name = destinationFilename;
+    material.byteSize = pdfFile.length;
     let bucketKey = "ai_gen/" + material.name;
     material.url = await uploadContentToS3(bucketKey, pdfFile, mimetype);
   }
@@ -157,9 +186,9 @@ const createAIGenMaterial = async (
       inputText: content,
       numCards: numberOfSlides || 10,
       textMode: "preserve",
-      exportAs: "pptx",
+      exportAs: format || "pptx",
       imageOptions: {
-        source: "webFreeToUse",
+        source: "aiGenerated",
       },
       cardOptions: {
         headerFooter: {
@@ -171,27 +200,30 @@ const createAIGenMaterial = async (
         },
       },
     });
+
+    console.log("\n\n");
+    console.log("Gamma API response:", res);
+    console.log("\n\n");
+
     const prefix = process.env.LOCAL_TESTING ? "http://" : "https://";
-    material.url = `${prefix}${request.requestContext.domainName}/${request.requestContext.stage}/proxy/gamma/${res.generationId}`;
-    material.extension = "pptx";
+    material.url = `${prefix}${request.requestContext.domainName}${request.requestContext.stage ? "/" + request.requestContext.stage : ""}/proxy/gamma/${res.generationId}`;
+    material.extension = format || "pptx";
     material.name = title + "." + material.extension;
   }
   if (type == "map") {
     material.extension = "txt";
     material.name = title + "." + material.extension;
+    material.byteSize = Buffer.byteLength(content, "utf8");
     let bucketKey = "ai_gen/" + material.name;
     let mimetype = "text/plain; charset=utf-8";
     material.isMap = true;
     material.url = await uploadContentToS3(bucketKey, content, mimetype);
   }
 
-  const insertResult = await materialCollection.insertOne(material);
+  const createdMaterial = await Material.create(material as any);
 
   return {
-    material: {
-      ...material,
-      _id: insertResult.insertedId,
-    },
+    material: createdMaterial.toObject(),
   };
 };
 

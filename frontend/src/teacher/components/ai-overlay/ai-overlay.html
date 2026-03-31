@@ -1,0 +1,25 @@
+@if (visible()) {
+<div class="ai-overlay fade-in">
+  @if (!success()) {
+  <fa-icon [icon]="SpinnerIcon" [animation]="'spin'" size="3x"></fa-icon>
+  <h2 class="mt-4">{{ loadingTitle() }}</h2>
+  <p class="text-white-50 mt-2" style="white-space: pre-line">
+    {{ loadingSubtitle() }}
+  </p>
+  } @else {
+  <div class="text-center bounce-in">
+    <fa-icon [icon]="SparklesIcon" size="4x" class="text-warning"></fa-icon>
+    <h2 class="mt-4">{{ successTitle() }}</h2>
+    <p class="text-white-50 mt-2">{{ successMessage() }}</p>
+    @if (ctaLabel()) {
+    <button
+      class="btn btn-light btn-lg mt-4 px-5 rounded-pill shadow"
+      (click)="ctaClick.emit()"
+    >
+      {{ ctaLabel() }}
+    </button>
+    }
+  </div>
+  }
+</div>
+}

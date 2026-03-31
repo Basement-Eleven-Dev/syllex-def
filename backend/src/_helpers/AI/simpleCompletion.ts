@@ -1,78 +1,30 @@
-import { getGeminiClient, getOpenAIClient } from "./getClient";
+import { getGeminiClient } from "./getClient";
 import { ZodType } from "zod";
-import { zodTextFormat } from "openai/helpers/zod";
-import {
-  ResponseInput,
-  ResponseInputContent,
-  ResponseInputFile,
-} from "openai/resources/responses/responses";
-import { MaterialInterface } from "../../models/material";
-import { getOpenAiFileId } from "./openAiFileUpload";
 import { Part } from "@google/genai";
-import { extractTextFromFile } from "../documents/extractTextFromFile";
 import { fetchBuffer } from "../fetchBuffer";
-import { text } from "stream/consumers";
+import { Material } from "../../models/schemas/material.schema";
 
-const DEFAULT_PROVIDER: "gemini" | "openai" = "gemini";
+const MAX_RETRIES = 3;
+const BASE_DELAY_MS = 2000;
 
-const askStrucuredGpt = async <T>(
-  prompt: string,
-  materials: MaterialInterface[] = [],
-  model: string = "gpt-4o",
-  structure: ZodType<T>,
-  temperature?: number,
-): Promise<T> => {
-  console.log("ask gpt", prompt);
-  const aiClient = await getOpenAIClient();
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-  // 1. Prepare the content array with your text prompt
-  const fileIds: string[] = await Promise.all(
-    materials.map((el) => getOpenAiFileId(el)),
-  );
-  const fileInputs: ResponseInputFile[] = fileIds.map((el) => ({
-    type: "input_file",
-    file_id: el,
-  }));
-  const content: ResponseInputContent[] = fileInputs;
-  content.push({ type: "input_text", text: prompt });
-  const input: ResponseInput = [{ role: "user", content: content }];
-  const response = await aiClient.responses.parse({
-    temperature: temperature,
-    store: false,
-    model: model, // Must use gpt-4o or gpt-4o-mini
-    input: input,
-    text: {
-      format: zodTextFormat(structure, "question_type"),
-    },
-  });
-
-  return response.output_parsed!;
-};
 const askStrucuredGemini = async <T>(
   prompt: string,
-  materials: MaterialInterface[] = [],
+  materials: Material[] = [],
   model: string = "gemini-3-flash-preview",
   structure: ZodType<T>,
   temperature?: number,
+  topP?: number,
+  topK?: number,
 ): Promise<T> => {
-  const getMaterialPart = async (m: MaterialInterface): Promise<Part> => {
-    const res = await fetch(m.url!);
-    const pdfArrayBuffer = await res.arrayBuffer();
-    const contentType = res.headers.get("content-type");
-    const mimeType = contentType?.split(";")[0];
-    return {
-      inlineData: {
-        mimeType: mimeType,
-        data: Buffer.from(pdfArrayBuffer).toString("base64"),
-      },
-    };
-  };
+  const validMaterials = materials.filter((m) => m.extractedTextFileUrl);
 
   const textFileBuffer = await Promise.all(
-    materials.map((m) => fetchBuffer(m.extractedTextFileUrl!)),
+    validMaterials.map((m) => fetchBuffer(m.extractedTextFileUrl!)),
   );
 
-  const textFileParts: Part[] = textFileBuffer.map((buffer, index) => ({
+  const textFileParts: Part[] = textFileBuffer.map((buffer) => ({
     inlineData: {
       mimeType: "text/plain",
       data: buffer.toString("base64"),
@@ -81,48 +33,64 @@ const askStrucuredGemini = async <T>(
 
   const client = await getGeminiClient();
 
-  const response = await client.models.generateContent({
-    model: model,
-    contents: [
-      {
-        role: "user",
-        parts: [
+  console.log("ask gemini", prompt);
+  console.log("length of text parts", prompt.length);
+  console.log("number of text file parts", textFileParts.length);
+
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const response = await client.models.generateContent({
+        model: model,
+        contents: [
           {
-            text: prompt,
+            role: "user",
+            parts: [
+              {
+                text: prompt,
+              },
+              ...textFileParts,
+            ],
           },
-          ...textFileParts,
         ],
-      },
-    ],
-    config: {
-      responseMimeType: "application/json",
-      responseJsonSchema: structure.toJSONSchema(),
-      temperature: temperature,
-    },
-  });
-  return structure.parse(JSON.parse(response.text!));
+        config: {
+          responseMimeType: "application/json",
+          responseJsonSchema: structure.toJSONSchema(),
+          temperature: temperature,
+          topP: topP,
+          topK: topK,
+        },
+      });
+      return structure.parse(JSON.parse(response.text!));
+    } catch (error: any) {
+      if (error?.status === 429 && attempt < MAX_RETRIES) {
+        const delay = BASE_DELAY_MS * Math.pow(2, attempt);
+        console.warn(
+          `Gemini rate limited (429). Retry ${attempt + 1}/${MAX_RETRIES} after ${delay}ms`,
+        );
+        await sleep(delay);
+        continue;
+      }
+      throw error;
+    }
+  }
+  throw new Error("Unexpected: exceeded max retries");
 };
 
 export const askStructuredLLM = async <T>(
   prompt: string,
-  materials: MaterialInterface[] = [],
+  materials: Material[] = [],
   structure: ZodType<T>,
   temperature?: number,
+  topP?: number,
+  topK?: number,
 ): Promise<T> => {
-  if (DEFAULT_PROVIDER == "gemini")
-    return await askStrucuredGemini(
-      prompt,
-      materials,
-      undefined,
-      structure,
-      temperature,
-    );
-  else
-    return await askStrucuredGpt(
-      prompt,
-      materials,
-      undefined,
-      structure,
-      temperature,
-    );
+  return await askStrucuredGemini(
+    prompt,
+    materials,
+    undefined,
+    structure,
+    temperature,
+    topP,
+    topK,
+  );
 };

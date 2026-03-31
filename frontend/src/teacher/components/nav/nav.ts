@@ -1,12 +1,18 @@
-import { DatePipe, TitleCasePipe } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import {
+  DatePipe,
+  AsyncPipe,
+  TitleCasePipe,
+  UpperCasePipe,
+} from '@angular/common';
+import { Component, OnDestroy, OnInit, inject, ViewChild } from '@angular/core';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faCalendar,
   faSignOutAlt,
   faUserCircle,
 } from '@fortawesome/pro-solid-svg-icons';
+import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 import {
   NgbDropdown,
   NgbDropdownToggle,
@@ -14,9 +20,10 @@ import {
   NgbDropdownItem,
   NgbModal,
 } from '@ng-bootstrap/ng-bootstrap';
-import { Auth } from '../../../services/auth';
+import { Auth, User } from '../../../services/auth';
 import { Calendario } from '../calendario/calendario';
 import { UserContextualMenu } from '../user-contextual-menu/user-contextual-menu';
+import { map, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-nav',
@@ -28,34 +35,43 @@ import { UserContextualMenu } from '../user-contextual-menu/user-contextual-menu
     NgbDropdown,
     NgbDropdownToggle,
     NgbDropdownMenu,
-    NgbDropdownItem,
     UserContextualMenu,
+    TourAnchorNgBootstrapDirective,
+    AsyncPipe,
+    UpperCasePipe,
   ],
   templateUrl: './nav.html',
   styleUrl: './nav.scss',
 })
-export class Nav implements OnInit, OnDestroy {
+export class Nav {
   LogoutIcon = faSignOutAlt;
   CalendarIcon = faCalendar;
   now: number = Date.now();
-  private intervalId?: number;
   UserProfileIcon = faUserCircle;
+  user: Observable<User | null>;
 
   constructor(
     public authService: Auth,
     private modalService: NgbModal,
-  ) {}
-
-  ngOnInit() {
-    this.intervalId = window.setInterval(() => {
-      this.now = Date.now();
-    }, 60000); // Update every minute
+    private router: Router,
+  ) {
+    this.user = this.authService.user$;
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.closeDropdown();
+      }
+    });
   }
 
-  ngOnDestroy() {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-    }
+  getInitals() {
+    return this.authService.user$.pipe(
+      map((user) => {
+        if (!user || !user.firstName || !user.lastName) {
+          return '';
+        }
+        return user.firstName.charAt(0) + user.lastName.charAt(0);
+      }),
+    );
   }
 
   onLogout() {
@@ -70,5 +86,13 @@ export class Nav implements OnInit, OnDestroy {
       centered: true,
     });
     modalRef.componentInstance.showCloseButton = true;
+  }
+
+  @ViewChild(NgbDropdown) profileDropdown!: NgbDropdown;
+
+  closeDropdown() {
+    if (this.profileDropdown) {
+      this.profileDropdown.close();
+    }
   }
 }

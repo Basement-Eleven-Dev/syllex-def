@@ -1,9 +1,9 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
-import { Test } from "../../models/test";
+import { Types, mongo } from "mongoose"; import { connectDatabase } from "../../_helpers/getDatabase";
+import { Test } from "../../models/schemas/test.schema";
+;
 
 const duplicateTest = async (
   request: APIGatewayProxyEvent,
@@ -19,11 +19,10 @@ const duplicateTest = async (
     throw createError.Unauthorized("User not authenticated");
   }
 
-  const db = await getDefaultDatabase();
-  const testsCollection = db.collection<Test>("tests");
+  await connectDatabase();
 
-  const existingTest = await testsCollection.findOne({
-    _id: new ObjectId(testId),
+  const existingTest = await Test.findOne({
+    _id: new mongo.ObjectId(testId),
     teacherId: context.user._id,
   });
 
@@ -42,13 +41,10 @@ const duplicateTest = async (
     updatedAt: new Date(),
   };
 
-  const result = await testsCollection.insertOne(duplicatedTest as Test);
+  const result = await Test.insertOne(duplicatedTest);
 
   return {
-    test: {
-      ...duplicatedTest,
-      _id: result.insertedId,
-    },
+    test: result
   };
 };
 

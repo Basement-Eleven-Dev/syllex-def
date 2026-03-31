@@ -1,0 +1,74 @@
+<div class="table-responsive">
+  <table class="table table-hover table-striped align-middle">
+    <thead>
+      <tr>
+        <th class="text-muted fw-light">Domanda</th>
+        <th class="text-muted fw-light">Argomento</th>
+        <th class="text-muted fw-light">Tipologia</th>
+        <th class="text-muted fw-light">Visibilità</th>
+        <th class="text-muted fw-light text-center">Produzione</th>
+        <th class="text-muted fw-light text-end">Azioni</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (question of questions(); track question._id) {
+      <tr (click)="onOpenPreview(question)" style="cursor: pointer">
+        <td class="text-truncate" style="max-width: 400px">
+          {{ question.text }}
+        </td>
+        <td>{{ materiaService.getTopicName(question.topicId) }}</td>
+        <td>{{ question.type | titlecase }}</td>
+        <td>
+          <div class="d-flex flex-row align-items-center gap-2">
+            <div [class]="'status-pill ' + question.policy"></div>
+            {{ question.policy | titlecase }}
+          </div>
+        </td>
+        <td class="text-center">
+          @if(question.aiGenerated) {
+          <span
+            class="ai-badge"
+            style="background-color: #9664c8; font-size: 0.65rem"
+            >IA</span
+          >
+          } @else {
+          <fa-icon
+            class="text-primary"
+            [icon]="UserIcon"
+            style="font-size: 0.75rem"
+          ></fa-icon>
+          }
+        </td>
+        <td class="text-end" (click)="$event.stopPropagation()">
+          <div class="d-flex flex-row justify-content-end gap-1">
+            <button
+              class="btn btn-sm btn-edit"
+              title="Modifica"
+              [routerLink]="'/t/edit-question/' + question._id"
+            >
+              <fa-icon [icon]="EditIcon"></fa-icon>
+            </button>
+            <button
+              class="btn btn-sm btn-delete"
+              title="Elimina"
+              confirmAction
+              [confirmMessage]="'Vuoi eliminare questa domanda? L\'azione non può essere annullata.'"
+              [confirmTitle]="'Elimina domanda'"
+              [confirmButtonText]="'Elimina'"
+              (confirmed)="removeMe.emit(question._id)"
+            >
+              <fa-icon [icon]="TrashIcon"></fa-icon>
+            </button>
+          </div>
+        </td>
+      </tr>
+      } @empty {
+      <tr>
+        <td colspan="5" class="text-center text-muted py-4">
+          Nessuna domanda trovata.
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</div>

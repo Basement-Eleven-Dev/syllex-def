@@ -1,6 +1,19 @@
 <div class="chart-container">
   <h5 class="fw-semibold text-dark">Performance della classe</h5>
-  <div style="position: relative; height: 400px; width: 100%">
-    <canvas #chart></canvas>
-  </div>
+
+  @if (IsLoading()) {
+    <div class="d-flex justify-content-center align-items-center" style="height: 400px;">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Caricamento...</span>
+      </div>
+    </div>
+  } @else if (IsEmpty()) {
+    <div class="d-flex justify-content-center align-items-center border rounded bg-light" style="height: 400px;">
+      <p class="text-muted mb-0">Nessun dato di performance disponibile per questa classe.</p>
+    </div>
+  } @else {
+    <div style="position: relative; height: 400px; width: 100%">
+      <canvas #chart></canvas>
+    </div>
+  }
 </div>

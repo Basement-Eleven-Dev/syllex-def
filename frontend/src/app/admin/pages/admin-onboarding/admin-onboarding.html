@@ -67,7 +67,7 @@
                     </div>
                     <p class="mb-1 fw-bold">Trascina qui il logo</p>
                     <p class="text-muted small mb-3">Supporta PNG, JPG (Max 2MB)</p>
-                    <button class="btn btn-outline-primary btn-sm px-4" (click)="logoInput.click()">Sfoglia File</button>
+                    <button class="btn btn-blue btn-sm px-4" (click)="logoInput.click()">Sfoglia File</button>
                     <input type="file" #logoInput class="d-none" (change)="onLogoSelected($event)" accept="image/*">
                   </div>
                 </div>
@@ -150,7 +150,7 @@
                             </td>
                             <td class="text-muted">{{ member.email }}</td>
                             <td class="text-end px-3">
-                              <button class="btn btn-sm btn-outline-danger border-0 p-2" (click)="removeStaffMember(i)">
+                              <button class="btn btn-sm btn-delete border-0 p-2" (click)="removeStaffMember(i)">
                                 <fa-icon [icon]="icons.faTrashCan"></fa-icon>
                               </button>
                             </td>

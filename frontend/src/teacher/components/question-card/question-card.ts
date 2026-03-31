@@ -12,6 +12,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { RouterModule } from '@angular/router';
 import { Materia } from '../../../services/materia';
 import { TitleCasePipe } from '@angular/common';
+import { ConfirmActionDirective } from '../../../directives/confirm-action.directive';
 
 /** Controls what the card renders and which actions are visible. */
 export type QuestionCardMode =
@@ -30,6 +31,7 @@ export type QuestionCardMode =
     FormsModule,
     RouterModule,
     TitleCasePipe,
+    ConfirmActionDirective,
   ],
   templateUrl: './question-card.html',
   styleUrl: './question-card.scss',
@@ -64,6 +66,7 @@ export class QuestionCard {
   @Input() score: number | null = null;
   @Input() questionStatus: 'correct' | 'wrong' | 'semi-correct' | null = null;
   @Input() teacherFeedback: string | null = null;
+  @Input() feedbackLabel: string = 'Commento del docente';
   @Output() answerChange = new EventEmitter<number | string>();
 
   onExpandImage(img: string): void {

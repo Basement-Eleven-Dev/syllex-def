@@ -1,8 +1,10 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { Materia } from '../../../services/materia';
-import { MaterialiService, MaterialInterface } from '../../../services/materiali-service';
+import {
+  MaterialiService,
+  MaterialInterface,
+} from '../../../services/materiali/materiali-service';
 import { MaterialeCard } from '../../../teacher/components/materiale-card/materiale-card';
-
 
 @Component({
   selector: 'app-materiali',

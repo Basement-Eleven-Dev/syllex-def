@@ -184,6 +184,37 @@
     </div>
   </section>
 
+  <section class="form-section">
+    <label class="form-label fw-light text-dark">Opzioni extra</label>
+    <div class="form-check form-switch">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        role="switch"
+        id="randomize-questions"
+        formControlName="randomizeQuestions"
+      />
+      <label class="form-check-label text-dark" for="randomize-questions">
+        Randomizza ordine domande
+        <small class="text-muted d-block fw-light">Se attivo, ogni studente vedrà le domande in un ordine diverso e casuale</small>
+      </label>
+    </div>
+    
+    <div class="form-check form-switch mt-3">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        role="switch"
+        id="one-shot-answers"
+        formControlName="oneShotAnswers"
+      />
+      <label class="form-check-label text-dark" for="one-shot-answers">
+        One-shot (risposta secca)
+        <small class="text-muted d-block fw-light">Se attivo, lo studente non potrà cambiare la sua scelta una volta data (solo domande chiuse)</small>
+      </label>
+    </div>
+  </section>
+
   <div class="d-flex flex-row justify-content-end mt-5 gap-3">
     <button
       class="btn btn-link btn-lg"

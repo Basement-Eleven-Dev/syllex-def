@@ -13,14 +13,19 @@ import {
   resetPassword,
   confirmResetPassword,
   confirmSignIn,
+  setUpTOTP,
+  verifyTOTPSetup,
+  updateMFAPreference,
+  fetchMFAPreference,
 } from 'aws-amplify/auth';
 import { HttpClient } from '@angular/common/http';
+import LogRocket from 'logrocket';
 
 Amplify.configure({
   Auth: {
     Cognito: {
-      userPoolId: 'eu-south-1_IdnpEkSac',
-      userPoolClientId: '7n2b7ueleckpvil3f7834oabsu',
+      userPoolId: 'eu-south-1_w77iyt3xa',
+      userPoolClientId: '4tc0qd18cvu46tbkccoi1nc12e',
     },
   },
 });
@@ -34,6 +39,24 @@ export interface User {
   role: 'teacher' | 'student' | 'admin';
   organizationId?: string;
   organizationIds?: string[];
+  privacyPolicyAccepted?: boolean;
+  aiPolicyAccepted?: boolean;
+  termsAcceptation?: {
+    accepted?: boolean;
+    timestamp?: string;
+    version?: string;
+  };
+  privacyAcceptation?: {
+    accepted?: boolean;
+    timestamp?: string;
+    version?: string;
+  };
+  notificationSettings?: {
+    newCommunication: boolean;
+    newEvent: boolean;
+    newTest: boolean;
+    testCorrected: boolean;
+  };
 }
 
 export interface OrganizationInterface {
@@ -68,7 +91,13 @@ export class Auth {
       (!user.organizationIds || user.organizationIds.length === 0)
     );
   }
-
+  setLogrocketIdentity(user?: User | null) {
+    if (user) {
+      LogRocket.identify(user._id || 'anonymous', {
+        name: user.email || 'anonymous',
+      });
+    } else LogRocket.identify('logged-out');
+  }
   get isSuperAdmin(): boolean {
     const user = this.user$.value; // Use raw value for checking role
     if (!user || user.role !== 'admin') return false;
@@ -93,9 +122,98 @@ export class Auth {
   }
 
   constructor(private http: HttpClient) {
+    this.user$.subscribe((user) => this.setLogrocketIdentity(user));
     this.checkCurrentUser();
   }
 
+  async initiateMfaSetup(): Promise<string> {
+    try {
+      const totpSetupDetails = await setUpTOTP();
+
+      // This URI is what you feed into a QR code generator library
+      // Example: qrcode.react or similar
+      const appName = 'Syllex';
+      const setupUri = totpSetupDetails.getSetupUri(appName);
+
+      // 1. Show setupUri as a QR Code
+      // 2. Show a text input for the user to type the 6-digit code from their app
+      return setupUri.toString();
+    } catch (error) {
+      console.error('Error starting MFA setup:', error);
+      return '';
+    }
+  }
+
+  async finalizeMfa(
+    userEnteredCode: string,
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      await verifyTOTPSetup({ code: userEnteredCode });
+      await updateMFAPreference({ totp: 'PREFERRED' });
+      return {
+        success: true,
+        message: 'Autenticazione a due fattori attivata con successo',
+      };
+    } catch (error: any) {
+      console.error('Verification failed. The code might be expired.', error);
+      return {
+        success: false,
+        message: 'Codice non valido o scaduto. Riprova.',
+      };
+    }
+  }
+
+  async disableMfa(): Promise<{ success: boolean; message: string }> {
+    try {
+      await updateMFAPreference({ totp: 'NOT_PREFERRED' });
+      return { success: true, message: '2FA disattivato con successo' };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message || 'Errore durante la disattivazione del 2FA',
+      };
+    }
+  }
+
+  async getMfaPreference(): Promise<boolean> {
+    try {
+      const preference = await fetchMFAPreference();
+      return preference.preferred === 'TOTP';
+    } catch {
+      return false;
+    }
+  }
+
+  async confirmSignInWithMfaCode(
+    code: string,
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      const { nextStep } = await confirmSignIn({ challengeResponse: code });
+      if (nextStep.signInStep === 'DONE') {
+        await fetchAuthSession({ forceRefresh: true });
+        const user = await firstValueFrom(
+          this.http.get<User | null>('profile'),
+        );
+        if (user) {
+          this.user$.next(user);
+          const orgId = user.organizationId || user.organizationIds?.[0];
+          if (orgId) this.getOrganizationById(orgId);
+          return { success: true, message: 'Login effettuato con successo' };
+        }
+      }
+      return {
+        success: false,
+        message: 'Errore durante la verifica del codice MFA',
+      };
+    } catch (error: any) {
+      let message = 'Codice non valido';
+      if (error.name === 'CodeMismatchException')
+        message = 'Codice non corretto';
+      if (error.name === 'ExpiredCodeException')
+        message = 'Codice scaduto, attendi il prossimo';
+      return { success: false, message };
+    }
+  }
   async login(
     credentials: SignInInput,
   ): Promise<{ success: boolean; message: string; challenge?: string }> {
@@ -104,7 +222,7 @@ export class Auth {
       // Effettuiamo un signOut silenzioso prima di procedere.
       try {
         await signOut();
-      } catch (_) {}
+      } catch (_) { }
       const { nextStep } = await signIn(credentials);
 
       if (nextStep.signInStep === 'DONE') {
@@ -133,6 +251,12 @@ export class Auth {
           success: true,
           message: 'Nuova password richiesta',
           challenge: 'NEW_PASSWORD_REQUIRED',
+        };
+      } else if (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_TOTP_CODE') {
+        return {
+          success: true,
+          message: 'Inserisci il codice dalla tua app di autenticazione',
+          challenge: 'SOFTWARE_TOKEN_MFA',
         };
       } else {
         return {
@@ -381,6 +505,87 @@ export class Auth {
       return {
         success: false,
         message: error.message || message,
+      };
+    }
+  }
+
+  async updateNotificationSettings(settings: {
+    newCommunication: boolean;
+    newEvent: boolean;
+    newTest: boolean;
+    testCorrected: boolean;
+  }): Promise<{ success: boolean; message: string }> {
+    try {
+      await firstValueFrom(
+        this.http.patch('profile/settings', { notificationSettings: settings }),
+      );
+
+      const currentUser = this.user$.value;
+      if (currentUser) {
+        this.user$.next({ ...currentUser, notificationSettings: settings });
+      }
+
+      return { success: true, message: 'Impostazioni aggiornate con successo' };
+    } catch (error: any) {
+      return {
+        success: false,
+        message:
+          error.message || "Errore durante l'aggiornamento delle impostazioni",
+      };
+    }
+  }
+
+  async acceptPolicies(): Promise<{ success: boolean; message: string }> {
+    try {
+      await firstValueFrom(this.http.patch('profile/policies', {}));
+
+      const currentUser = this.user$.value;
+      if (currentUser) {
+        this.user$.next({
+          ...currentUser,
+          privacyPolicyAccepted: true,
+          aiPolicyAccepted: true,
+          privacyAcceptation: {
+            accepted: true,
+            timestamp: new Date().toISOString(),
+            version: '1.0',
+          },
+        });
+      }
+
+      return { success: true, message: 'Politiche accettate con successo' };
+    } catch (error: any) {
+      return {
+        success: false,
+        message:
+          error.message || "Errore durante l'accettazione delle politiche",
+      };
+    }
+  }
+
+  async acceptTerms(
+    version: string,
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      await firstValueFrom(this.http.patch('profile/terms', {}));
+
+      const currentUser = this.user$.value;
+      if (currentUser) {
+        this.user$.next({
+          ...currentUser,
+          termsAcceptation: {
+            accepted: true,
+            timestamp: new Date().toISOString(),
+            version,
+          },
+        });
+      }
+
+      return { success: true, message: 'Termini accettati con successo' };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message || "Errore durante l'accettazione dei termini",
       };
     }
   }

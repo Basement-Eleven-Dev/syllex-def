@@ -1,14 +1,14 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import createHttpError from "http-errors";
-import { ObjectId } from "mongodb";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { MaterialInterface } from "../../models/material";
+import { Types, mongo } from "mongoose";
+import { connectDatabase } from "../../_helpers/getDatabase";
 import { z } from "zod";
 import { askStructuredLLM } from "../../_helpers/AI/simpleCompletion";
 
-import { Question } from "../../models/question";
-import { Topic } from "../../models/topic";
+import { Topic } from "../../models/schemas/topic.schema";
+import { Material } from "../../models/schemas/material.schema";
+import { Question } from "../../models/schemas/question.schema";
 
 //API TYPES
 const questionTypes = ["open", "true-false", "multiple"] as const;
@@ -23,9 +23,14 @@ export type AIGenQuestionInput = {
   instructions?: string;
   type: QuestionType;
   language?: string;
-  difficulty?: 1 | 2 | 3;
+  difficulty?: QuestionDifficulty;
 };
-
+export type QuestionDifficulty =
+  | "elementary"
+  | "easy"
+  | "medium"
+  | "hard"
+  | "very_hard";
 //LLM STRUCTURES
 const TrueFalseQuestionStructure = z.object({
   text: z.string(),
@@ -35,10 +40,12 @@ const TrueFalseQuestionStructure = z.object({
 const MultipleChoiceQuestionStructure = z.object({
   text: z.string(),
   explanation: z.string(),
-  options: z.array(z.object({
-    label: z.string(),
-    isCorrect: z.boolean(),
-  })),
+  options: z.array(
+    z.object({
+      label: z.string(),
+      isCorrect: z.boolean(),
+    }),
+  ),
 });
 const OpenQuestionStructure = z.object({
   text: z.string(),
@@ -46,40 +53,53 @@ const OpenQuestionStructure = z.object({
 });
 
 //MAPS
-const DIFFICULTY_MAP: Record<1 | 2 | 3, string> = {
-  1: "low",
-  2: "medium",
-  3: "high",
+const DIFFICULTY_PROMPT_MAP: Record<QuestionDifficulty, string> = {
+  elementary: "very easy (elementary level)",
+  easy: "easy",
+  medium: "medium",
+  hard: "hard",
+  very_hard: "very hard (expert level)",
 };
 
-//GUARDRAILS
-const getGuardrail = (language: string = "it") => `
-    Use the ${language || "it"} language.
-    Answer the query using only the information provided in the attached documents.
-    Do not use any outside knowledge, facts, or assumptions not explicitly stated in these files.`;
+//SYSTEM PROMPT
+const getSystemPrompt = (
+  language: string = "it",
+) => `You are a teacher creating quiz questions.
+Write everything in ${language || "it"} language.
+
+CRITICAL RULES:
+- Base questions and answers ONLY on the content of the attached documents.
+- Do NOT use any outside knowledge not explicitly stated in those documents.
+- NEVER reference the source material. Do NOT use phrases like "secondo il testo", "in base al documento", "come indicato nel materiale", "il testo afferma", "dal brano si evince", "come riportato", "stando a quanto scritto", or any similar expression.
+- Explanations must be CONCISE and DIRECT: go straight to the point, state the fact, no rhetorical introductions, no greetings, no filler phrases like "ricordate che", "fate attenzione", "cari ragazzi", "è importante notare".
+- Maximum 2-3 sentences per explanation. State the correct concept plainly.
+- VARIETY: each question must use a different angle, perspective, or aspect of the topic. Vary the sentence structure, vocabulary, and the specific concept tested. Never repeat the same pattern or phrasing across questions.`;
 
 // 0.8-2 for high randomness
-const QUESTION_GENERATION_MODEL_TEMPERATURE = 1;
+const QUESTION_GENERATION_MODEL_TEMPERATURE = 1.4;
 export const generateTrueFalseQuestion = async (
   context: Context,
   difficulty: string,
-  materialObjects: MaterialInterface[],
+  materialObjects: Material[],
   topic: Topic,
   language: string = "it",
   instructions: string = "",
-): Promise<Question> => {
-  const INSTRUCTIONS = `Create a ${difficulty} difficulty true/false quiz question about the topic "${topic.name}" based on these documents.
-   ${instructions}`;
+): Promise<Partial<Question>> => {
+  const PROMPT = `${getSystemPrompt(language)}
 
-  const PROMPT = `${INSTRUCTIONS}
-    ${getGuardrail(language)}`;
+Create a true/false quiz question about the topic "${topic.name}" with ${difficulty} difficulty.
+The question must be a clear declarative statement that is either true or false.
+In the "explanation" field, state concisely (2-3 sentences max) why the statement is true or false. Go straight to the factual explanation, no preambles.
+${instructions ? `\nAdditional instructions from the teacher: ${instructions}` : ""}`;
   const result = await askStructuredLLM(
     PROMPT,
     materialObjects,
     TrueFalseQuestionStructure,
     QUESTION_GENERATION_MODEL_TEMPERATURE,
+    0.95,
+    64,
   );
-  const question: Question = {
+  const question: Partial<Question> = {
     type: "vero falso",
     text: result.text,
     explanation: result.explanation,
@@ -91,25 +111,31 @@ export const generateTrueFalseQuestion = async (
     subjectId: context.subjectId!,
   };
   return question;
-}
+};
 export const generateOpenQuestion = async (
   context: Context,
   difficulty: string,
-  materialObjects: MaterialInterface[],
+  materialObjects: Material[],
   topic: Topic,
   language: string = "it",
   instructions: string = "",
-): Promise<Question> => {
-  const INSTRUCTIONS = `Create a ${difficulty} difficulty quiz question about the topic "${topic.name}" based on these documents. The quiz question must be open-answer (no choices included), and you must include the correct answer. ${instructions}`;
-  const PROMPT = `${INSTRUCTIONS}
-    ${getGuardrail(language)}`;
+): Promise<Partial<Question>> => {
+  const PROMPT = `${getSystemPrompt(language)}
+
+Create an open-answer quiz question about the topic "${topic.name}" with ${difficulty} difficulty.
+The question must NOT include any answer choices — the student must formulate the answer independently.
+In the "correctAnswer" field, provide a concise but complete model answer. Go straight to the content, no preambles or rhetorical phrases.
+${instructions ? `\nAdditional instructions from the teacher: ${instructions}` : ""}`;
+
   const result = await askStructuredLLM(
     PROMPT,
     materialObjects,
     OpenQuestionStructure,
     QUESTION_GENERATION_MODEL_TEMPERATURE,
+    0.95,
+    64,
   );
-  const question: Question = {
+  const question: Partial<Question> = {
     type: "risposta aperta",
     text: result.text,
     explanation: result.correctAnswer,
@@ -124,29 +150,34 @@ export const generateOpenQuestion = async (
 export const generateMultipleChoiceQuestion = async (
   context: Context,
   difficulty: string,
-  materialObjects: MaterialInterface[],
+  materialObjects: Material[],
   topic: Topic,
   language: string = "it",
   numberOfAlternatives: number = 5,
   instructions: string = "",
-): Promise<Question> => {
-  const INSTRUCTIONS = `Create a ${difficulty} difficulty quiz question (multiple choice, only one is correct) about the topic "${topic.name}" based on these documents.
-    The quiz question must contain ${numberOfAlternatives} alternatives to choose from  and you need to specify which one is correct. Avoid labels A/B/C/D/E/... in the text of the alternatives. ${instructions}`;
+): Promise<Partial<Question>> => {
+  const PROMPT = `${getSystemPrompt(language)}
 
-
-  const PROMPT = `${INSTRUCTIONS}
-    ${getGuardrail(language)}`;
+Create a multiple-choice quiz question about the topic "${topic.name}" with ${difficulty} difficulty.
+Requirements:
+- Exactly ${numberOfAlternatives} answer options, with exactly ONE correct.
+- Do NOT prefix options with labels like A/B/C/D/E.
+- Wrong options must be plausible but clearly incorrect based on the content.
+- In the "explanation" field, state concisely (2-3 sentences max) why the correct answer is right. Go straight to the factual explanation, no preambles.
+${instructions ? `\nAdditional instructions from the teacher: ${instructions}` : ""}`;
   const result = await askStructuredLLM(
     PROMPT,
     materialObjects,
     MultipleChoiceQuestionStructure,
     QUESTION_GENERATION_MODEL_TEMPERATURE,
+    0.95,
+    64,
   );
-  const question: Question = {
+  const question: Partial<Question> = {
     type: "scelta multipla",
     text: result.text,
     explanation: result.explanation,
-    options: result.options,
+    options: result.options as Question["options"],
     policy: "private",
     aiGenerated: true,
     topicId: topic._id!,
@@ -176,53 +207,53 @@ const createAIGenQuestion = async (
       `type field is required. Accepted values: ${questionTypes.join(", ")}. You passed "${type}"`,
     );
   if (!topicId) throw createHttpError.BadRequest(`type topicId is required`);
-  let materialOIds = (materialIds || []).map((el) => new ObjectId(el));
-  const db = await getDefaultDatabase();
+  let materialOIds = (materialIds || []).map((el) => new mongo.ObjectId(el));
+  await connectDatabase();
 
-  const materialCollection = db.collection<MaterialInterface>("materials");
-  const materialObjects: MaterialInterface[] = await materialCollection.find({ _id: { $in: materialOIds }, subjectId: context.subjectId, aiGenerated: { $ne: true } }).toArray() as MaterialInterface[]; //forse non serve
+  const materialObjects = await Material.find({
+    _id: { $in: materialOIds },
+    subjectId: context.subjectId,
+    aiGenerated: { $ne: true },
+  });
 
   //load topic
-  const topicCollection = db.collection("topics");
-  const topic: Topic | null = (await topicCollection.findOne({
-    _id: new ObjectId(topicId),
-  })) as Topic | null;
+  const topic = await Topic.findOne({
+    _id: new mongo.ObjectId(topicId),
+  });
   if (!topic)
     throw createHttpError.BadRequest(`topic ${topicId} doesn't exist`);
 
   //create question
+  const difficultyPrompt = DIFFICULTY_PROMPT_MAP[difficulty || "medium"];
   const question =
     type == "open"
       ? await generateOpenQuestion(
-        context,
-        DIFFICULTY_MAP[difficulty || 2],
-        materialObjects,
-        topic,
-        language,
-        instructions,
-      )
-      : (
-        type == 'true-false' ? await generateTrueFalseQuestion(
           context,
-          DIFFICULTY_MAP[difficulty || 2],
+          difficultyPrompt,
           materialObjects,
           topic,
           language,
-          instructions
-        ) : await generateMultipleChoiceQuestion(
-          context,
-          DIFFICULTY_MAP[difficulty || 2],
-          materialObjects,
-          topic,
-          language,
-          numberOfAlternatives || 5,
           instructions,
         )
-      );
+      : type == "true-false"
+        ? await generateTrueFalseQuestion(
+            context,
+            difficultyPrompt,
+            materialObjects,
+            topic,
+            language,
+            instructions,
+          )
+        : await generateMultipleChoiceQuestion(
+            context,
+            difficultyPrompt,
+            materialObjects,
+            topic,
+            language,
+            numberOfAlternatives || 5,
+            instructions,
+          );
 
-  //store question - don't store yet
-  /* const questionsCollection = db.collection("questions");
-  question._id = (await questionsCollection.insertOne(question)).insertedId; */
   return { question };
 };
 

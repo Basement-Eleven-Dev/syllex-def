@@ -1,17 +1,17 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import {
-  generateAIResponse,
   generateAIResponseGemini,
 } from "../../_helpers/AI/generateResponse";
 import { saveMessage } from "../../_helpers/DB/messages/saveMessage";
+import { Types } from "mongoose";
 
 const generateResponse = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
   const body = JSON.parse(request.body || "{}");
-  const { assistantId, query } = body;
+  const { query } = body;
   const subjectId = context.subjectId;
 
   if (!subjectId) {
@@ -30,7 +30,6 @@ const generateResponse = async (
   }
   await saveMessage(subjectId, userId, "user", query);
   const aiResponse = await generateAIResponseGemini(
-    assistantId,
     query,
     subjectId,
     userId,

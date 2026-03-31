@@ -1,0 +1,54 @@
+<div class="presenter-wrapper" #presenterContainer>
+  <div class="presenter-header" (mousedown)="$event.preventDefault()">
+    <div class="d-flex align-items-center gap-2">
+      <button
+        class="control-btn"
+        (click)="openInNewTab()"
+        title="Apri in una nuova scheda"
+      >
+        <fa-icon [icon]="ExternalIcon"></fa-icon>
+      </button>
+    </div>
+    <span class="header-title">{{ title }}</span>
+    <div class="d-flex align-items-center gap-2">
+      <button
+        class="control-btn"
+        (click)="toggleFullscreen()"
+        [title]="isFullscreen() ? 'Esci da schermo intero' : 'Schermo intero'"
+      >
+        <fa-icon
+          [icon]="isFullscreen() ? ExitFullscreenIcon : FullscreenIcon"
+        ></fa-icon>
+      </button>
+      <button
+        class="control-btn"
+        (click)="activeModal.dismiss()"
+        title="Chiudi"
+      >
+        <fa-icon [icon]="CloseIcon"></fa-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="presenter-body">
+    @if (isLoading()) {
+    <div class="loading-overlay">
+      <fa-icon
+        [icon]="SpinnerIcon"
+        [animation]="'spin'"
+        size="3x"
+        class="text-white"
+      ></fa-icon>
+    </div>
+    } @if (embedUrl) {
+    <iframe
+      #slideIframe
+      [src]="embedUrl"
+      (load)="onIframeLoad()"
+      frameborder="0"
+      allowfullscreen
+      allow="fullscreen"
+    ></iframe>
+    }
+  </div>
+</div>

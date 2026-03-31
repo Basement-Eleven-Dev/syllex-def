@@ -1,23 +1,27 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { Material } from "../../../models/schemas/material.schema";
+import { Organization } from "../../../models/schemas/organization.schema";
+import { User } from "../../../models/schemas/user.schema";
+import { FileEmbedding } from "../../../models/schemas/file-embedding.schema";
+import { Subject } from "../../../models/schemas/subject.schema";
 
 const getSuperAdminStats = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
-  const db = await getDefaultDatabase();
-
+  await connectDatabase();
   // 1. Global KPIs
-  const totalOrganizations = await db.collection("organizations").countDocuments({});
-  const totalUsers = await db.collection("users").countDocuments({ role: { $ne: "superadmin" } });
-  
+  const totalOrganizations = await Organization.countDocuments({});
+  const totalUsers = await User.countDocuments({ role: { $ne: "superadmin" } });
+
   // AI Knowledge Base Size (Total chunks)
-  const totalChunks = await db.collection("file_embeddings").countDocuments({});
+  const totalChunks = await FileEmbedding.countDocuments({});
 
   // Estimated Total Tokens (Approx 1 token every 4 characters)
-  const tokenEstimation = await db.collection("file_embeddings").aggregate([
+  const tokenEstimation = await FileEmbedding.aggregate([
     {
       $project: {
         tokenCount: { $divide: [{ $strLenCP: "$text" }, 4] }
@@ -29,14 +33,14 @@ const getSuperAdminStats = async (
         totalTokens: { $sum: "$tokenCount" }
       }
     }
-  ]).toArray();
+  ]);
 
   // Cost Constants
   const COST_PER_1M_TOKENS = 0.03;
   const COST_PER_MATERIAL = 0.005;
 
   // AI Generated Materials
-  const totalAiMaterials = await db.collection("materials").countDocuments({ aiGenerated: true });
+  const totalAiMaterials = await Material.countDocuments({ aiGenerated: true });
 
   const estimatedTotalTokens = Math.round(tokenEstimation[0]?.totalTokens || 0);
   const totalEstimatedCost = (estimatedTotalTokens / 1000000) * COST_PER_1M_TOKENS + (totalAiMaterials * COST_PER_MATERIAL);
@@ -51,7 +55,7 @@ const getSuperAdminStats = async (
   };
 
   // 2. Multi-Tenant Overview (Top Organizations by Usage)
-  const orgStats = await db.collection("file_embeddings").aggregate([
+  const orgStats = await FileEmbedding.aggregate([
     {
       $lookup: {
         from: "subjects",
@@ -114,10 +118,10 @@ const getSuperAdminStats = async (
       }
     },
     { $sort: { estimatedTokens: -1 } }
-  ]).toArray() as any[];
+  ]) as any[];
 
   // 2.1 AI Materials count per organization
-  const aiMaterialsByOrg = await db.collection("materials").aggregate([
+  const aiMaterialsByOrg = await Material.aggregate([
     { $match: { aiGenerated: true } },
     {
       $lookup: {
@@ -134,7 +138,7 @@ const getSuperAdminStats = async (
         count: { $sum: 1 }
       }
     }
-  ]).toArray();
+  ]);
 
   const aiMaterialsMap = new Map(aiMaterialsByOrg.map(item => [item._id.toString(), item.count]));
 
@@ -147,17 +151,18 @@ const getSuperAdminStats = async (
   });
 
   // Add organizations that might not have any embeddings yet (they won't appear in the above aggregation)
-  const allOrgs = await db.collection("organizations").find({}).toArray();
+  const allOrgs = await Organization.find({});
   const existingOrgIds = orgStats.map(o => o.organizationId.toString());
-  
+
   for (const org of allOrgs) {
+
     if (!existingOrgIds.includes(org._id.toString())) {
       // Check if this org has subjects
-      const subjectCount = await db.collection("subjects").countDocuments({ organizationId: org._id });
-      
+      const subjectCount = await Subject.countDocuments({ organizationId: org._id });
+
       // Check user count
-      const userCount = await db.collection("users").countDocuments({ 
-        $or: [{ organizationId: org._id }, { organizationIds: org._id }] 
+      const userCount = await User.countDocuments({
+        $or: [{ organizationId: org._id }, { organizationIds: org._id }]
       });
 
       const aiMaterialCount = aiMaterialsMap.get(org._id.toString()) || 0;
@@ -179,7 +184,7 @@ const getSuperAdminStats = async (
   }
 
   // 3. Technical Analysis: Heavy Subjects
-  const heavySubjects = await db.collection("file_embeddings").aggregate([
+  const heavySubjects = await FileEmbedding.aggregate([
     {
       $group: {
         _id: "$subject",
@@ -207,10 +212,10 @@ const getSuperAdminStats = async (
     },
     { $sort: { estimatedTokens: -1 } },
     { $limit: 10 }
-  ]).toArray();
+  ]);
 
   // 4. Most Active Teachers (by uploads/chunks)
-  const activeTeachers = await db.collection("file_embeddings").aggregate([
+  const activeTeachers = await FileEmbedding.aggregate([
     {
       $group: {
         _id: "$teacher_id",
@@ -238,10 +243,10 @@ const getSuperAdminStats = async (
     },
     { $sort: { chunkCount: -1 } },
     { $limit: 10 }
-  ]).toArray();
+  ]);
 
   // 5. Technical Metrics: Text vs Embedding
-  const technicalMetrics = await db.collection("file_embeddings").aggregate([
+  const technicalMetrics = await FileEmbedding.aggregate([
     {
       $group: {
         _id: null,
@@ -260,7 +265,7 @@ const getSuperAdminStats = async (
         totalDocuments: { $size: "$uniqueDocuments" }
       }
     }
-  ]).toArray();
+  ]);
 
   // 6. Usage Trends and AI Health
   const now = new Date();
@@ -270,10 +275,10 @@ const getSuperAdminStats = async (
 
   // Helper to get count by time range using ObjectId
   const getMaterialCountInPeriod = async (start: Date, end: Date) => {
-    const startId = ObjectId.createFromTime(Math.floor(start.getTime() / 1000));
-    const endId = ObjectId.createFromTime(Math.floor(end.getTime() / 1000));
-    return await db.collection("materials").countDocuments({
-      _id: { $gte: startId, $lt: endId },
+    const startId = mongo.ObjectId.createFromTime(Math.floor(start.getTime() / 1000));
+    const endId = mongo.ObjectId.createFromTime(Math.floor(end.getTime() / 1000));
+    return await Material.countDocuments({
+      _id: { $gte: startId as any, $lt: endId as any },
       aiGenerated: true
     });
   };

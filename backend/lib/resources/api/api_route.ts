@@ -15,10 +15,10 @@ import {
 import { Duration, NestedStack, NestedStackProps } from "aws-cdk-lib";
 import { AppRole, FunctionIntegration } from "./functions-declarations.config";
 import { Role } from "aws-cdk-lib/aws-iam";
-import { FUNCTIONS_PATH } from "../../../environment";
+import { FUNCTIONS_PATH, STAGE_NAME } from "../../../environment";
 import { LambdaConstruct } from "../lambda";
 import { DefaultLambdaRole } from "../roles";
-import { API_GATEWAY_TIMEOUT } from "../../../src/env";
+import { API_GATEWAY_TIMEOUT, AUTHORIZED_API_HEADERS } from "../../../src/env";
 import { writeFile } from "fs/promises";
 import { LayerVersion } from "aws-cdk-lib/aws-lambda";
 
@@ -30,11 +30,13 @@ export interface RouteConstructProps extends NestedStackProps {
         logged?: Authorizer,
         teacher?: Authorizer,
         student?: Authorizer
+        admin?: Authorizer
     },
     validator?: RequestValidator,
     cognitoPoolId: string,
     cognitoClientId: string,
-    indexingQueueUrl: string
+    indexingQueueUrl: string,
+    emailQueueUrl: string
 
 }
 
@@ -47,6 +49,7 @@ export class RouteConstruct extends NestedStack {
         if (appRole == 'logged') return this.props.authorizers.logged!;
         if (appRole == 'teacher') return this.props.authorizers.teacher!;
         if (appRole == 'student') return this.props.authorizers.student!;
+        if (appRole == 'admin') return this.props.authorizers.admin!;
         return undefined
     }
 
@@ -55,7 +58,7 @@ export class RouteConstruct extends NestedStack {
             integrationResponses: [{
                 statusCode: '200',
                 responseParameters: {
-                    'method.response.header.Access-Control-Allow-Headers': "'*'",
+                    'method.response.header.Access-Control-Allow-Headers': `'${AUTHORIZED_API_HEADERS.join(',')}'`,
                     'method.response.header.Access-Control-Allow-Origin': "'*'",
                     'method.response.header.Access-Control-Allow-Credentials': "'false'",
                     'method.response.header.Access-Control-Allow-Methods': "'OPTIONS,GET,PUT,POST,DELETE,PATCH'",
@@ -91,7 +94,8 @@ export class RouteConstruct extends NestedStack {
                 new LambdaConstruct(this, functionName, FUNCTIONS_PATH + functionPath, this.role, {
                     COGNITO_POOL_ID: this.props.cognitoPoolId,
                     COGNITO_CLIENT_ID: this.props.cognitoClientId,
-                    INDEXING_QUEUE_URL: this.props.indexingQueueUrl
+                    INDEXING_QUEUE_URL: this.props.indexingQueueUrl,
+                    EMAIL_QUEUE_URL: this.props.emailQueueUrl
                 },
                     layers?.map(l => LayerVersion.fromLayerVersionArn(this, l.name, l.arn))
                 ).lambda,
@@ -126,7 +130,7 @@ export class RouteConstruct extends NestedStack {
 
     constructor(scope: Construct, private name: string, public props: RouteConstructProps) {
         super(scope, name);
-        this.role = new DefaultLambdaRole(this, this.name + 'Role').role
+        this.role = new DefaultLambdaRole(this, this.name + 'LambdaRole' + STAGE_NAME).role
         this.api = RestApi.fromRestApiAttributes(this, 'RestApi', {
             restApiId: this.props.apiId,
             rootResourceId: this.props.rootResourceId,

@@ -14,9 +14,9 @@ export interface AdminStats {
   };
   teachingActivity: {
     testsBySubject: Array<{ subject: string; count: number }>;
-    teacherLoad: Array<{ 
-      name: string; 
-      classesCount: number; 
+    teacherLoad: Array<{
+      name: string;
+      classesCount: number;
       subjectsCount: number;
       assignedClasses: string[];
       assignedSubjects: string[];
@@ -98,6 +98,6 @@ export class StatsService {
   }
 
   getSuperAdminStats(): Observable<SuperAdminStats> {
-    return this.http.get<SuperAdminStats>('admin/stats/global');
+    return this.http.get<SuperAdminStats>('admin/global-stats');
   }
 }

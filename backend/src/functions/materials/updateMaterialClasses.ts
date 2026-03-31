@@ -1,14 +1,15 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { Types, mongo } from "mongoose";
+import { Material } from "../../models/schemas/material.schema";
+import { connectDatabase } from "../../_helpers/getDatabase";
 
 const updateMaterialClasses = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
-  const materialId = request.pathParameters?.materialId;
+  const materialId = request.pathParameters!.materialId;
 
   if (!materialId) {
     throw createError.BadRequest("materialId is required");
@@ -19,39 +20,23 @@ const updateMaterialClasses = async (
   if (!Array.isArray(body.classIds)) {
     throw createError.BadRequest("classIds must be an array");
   }
+  await connectDatabase();
 
-  const db = await getDefaultDatabase();
-  const materialsCollection = db.collection("materials");
-
-  // Verify material exists and belongs to the teacher
-  const existingMaterial = await materialsCollection.findOne({
-    _id: new ObjectId(materialId),
-    teacherId: context.user?._id,
-  });
-
-  if (!existingMaterial) {
-    throw createError.NotFound("Material not found or not authorized");
-  }
-
-  // Update classIds
-  const result = await materialsCollection.updateOne(
-    { _id: new ObjectId(materialId) },
+  // Update classIds atomically and return updated doc
+  const updatedMaterial = await Material.findOneAndUpdate(
+    { _id: new mongo.ObjectId(materialId) as any, teacherId: context.user?._id as any },
     {
       $set: {
-        classIds: body.classIds.map((id: string) => new ObjectId(id)),
+        classIds: body.classIds.map((id: string) => new mongo.ObjectId(id)),
         updatedAt: new Date(),
       },
     },
-  );
+    { new: true, runValidators: true }
+  ).lean();
 
-  if (result.modifiedCount === 0) {
-    throw createError.InternalServerError("Failed to update material classes");
+  if (!updatedMaterial) {
+    throw createError.NotFound("Material not found or not authorized");
   }
-
-  // Return updated material
-  const updatedMaterial = await materialsCollection.findOne({
-    _id: new ObjectId(materialId),
-  });
 
   return {
     success: true,

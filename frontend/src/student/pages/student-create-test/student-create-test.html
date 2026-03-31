@@ -17,6 +17,28 @@
 <div class="row g-4">
   <!-- Colonna sinistra: configurazione -->
   <div class="col-12 col-xl-8">
+    <!-- Nome del test -->
+    <div class="config-card mb-4">
+      <div class="config-card__header">
+        <div>
+          <h5 class="mb-0 fw-semibold">Nome del test</h5>
+          <p class="text-muted small mb-0">
+            Assegna un nome personalizzato al test (default: Auto-valutazione)
+          </p>
+        </div>
+      </div>
+      <div class="config-card__body">
+        <input
+          type="text"
+          class="form-control custom-input"
+          placeholder="Auto-valutazione"
+          maxlength="100"
+          [value]="TestName()"
+          (input)="TestName.set($any($event.target).value)"
+        />
+      </div>
+    </div>
+
     <!-- Step 1: Materia -->
     <div class="config-card mb-4">
       <div class="config-card__header">
@@ -56,7 +78,7 @@
         <div class="d-flex gap-2 ms-auto align-items-center">
           <button
             type="button"
-            class="btn btn-outline-primary btn-sm"
+            class="btn btn-blue btn-sm"
             (click)="selectAllTopics()"
           >
             Tutti
@@ -125,6 +147,16 @@
           <span>15</span>
           <span>20</span>
         </div>
+
+        @if (AvailableQuestionsCount() !== null && AvailableQuestionsCount()! > 0) {
+        <div class="mt-3 d-flex align-items-center gap-2">
+          <fa-icon [icon]="CheckIcon" class="text-success small" />
+          <span class="text-muted small">
+            Abbiamo trovato <strong>{{ AvailableQuestionsCount() }}</strong>
+            domande per questi argomenti.
+          </span>
+        </div>
+        }
       </div>
     </div>
 
@@ -214,6 +246,13 @@
       <h6 class="fw-semibold mb-3">Riepilogo</h6>
 
       <div class="summary-row">
+        <span class="summary-label">Nome</span>
+        <span class="summary-value fw-semibold"
+          >{{ TestName().trim() || 'Auto-valutazione' }}</span
+        >
+      </div>
+
+      <div class="summary-row">
         <span class="summary-label">Materia</span>
         <span class="summary-value">
           @if (SelectedSubject()) { {{ SelectedSubject()!.name }} } @else {
@@ -257,6 +296,25 @@
 
       <hr />
 
+      @if (ShowCountWarning()) {
+      <div
+        class="alert alert-warning mb-3 py-2 small d-flex align-items-center gap-2"
+      >
+        <fa-icon [icon]="RemoveIcon" class="text-warning" />
+        <span>
+          Ne abbiamo trovate solo {{ AvailableQuestionsCount() }}. Vuoi
+          proseguire comunque?
+        </span>
+      </div>
+      } @if (AvailableQuestionsCount() === 0 && SelectedTopicIds().size > 0) {
+      <div
+        class="alert alert-danger mb-3 py-2 small d-flex align-items-center gap-2"
+      >
+        <fa-icon [icon]="RemoveIcon" />
+        <span>Nessuna domanda trovata per i criteri scelti.</span>
+      </div>
+      }
+
       <button
         type="button"
         class="btn btn-gradient-primary w-100 py-3"
@@ -268,7 +326,9 @@
           class="spinner-border spinner-border-sm me-2"
           role="status"
         ></span>
-        Generazione in corso... } @else {
+        Generazione in corso... } @else if (ShowCountWarning()) {
+        <fa-icon [icon]="CheckIcon" class="me-2" />
+        Crea comunque ({{ AvailableQuestionsCount() }} dom.) } @else {
         <fa-icon [icon]="CheckIcon" class="me-2" />
         Crea il test }
       </button>

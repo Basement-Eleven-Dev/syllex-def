@@ -1,35 +1,33 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { Types, mongo } from "mongoose";
+import { Material } from "../../models/schemas/material.schema";
+import { connectDatabase } from "../../_helpers/getDatabase";
 
 const renameMaterial = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
   // Validate and parse input
-  const materialId = new ObjectId(request.pathParameters!.materialId!);
+  const materialId = new Types.ObjectId(request.pathParameters!.materialId!);
   const body = JSON.parse(request.body || "{}");
   const newName = body.newName?.trim();
 
   if (!newName) {
     throw createError(400, "Il nuovo nome è richiesto");
   }
+  await connectDatabase();
 
   const teacherId = context.user?._id;
 
-  // Get database connection
-  const db = await getDefaultDatabase();
-  const materialsCollection = db.collection("materials");
-
   // Update material name
-  const updateResult = await materialsCollection.updateOne(
+  const updateResult = await Material.updateOne(
     {
-      _id: materialId,
-      teacherId,
+      _id: materialId as any,
+      teacherId: teacherId as any,
     },
-    { $set: { name: newName } },
+    { $set: { name: newName } }
   );
 
   if (updateResult.matchedCount === 0) {

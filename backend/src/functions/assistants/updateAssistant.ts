@@ -1,27 +1,25 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { Assistant } from "../../models/schemas/assistant.schema";
 
 const updateAssistant = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
-  const body = JSON.parse(request.body || "{}");
-  const { assistantId, agent } = body;
+  const agent = JSON.parse(request.body || "{}");
   const teacherId = context.user?._id;
-
-  if (!assistantId) {
-    throw createError(400, "assistantId è richiesto");
-  }
-
+  const subjectId = context.subjectId
   if (!agent) {
     throw createError(400, "Dati dell'agente richiesti");
   }
+  if (!subjectId) {
+    throw createError.BadRequest('Header subject-id richiesto')
+  }
 
-  const db = await getDefaultDatabase();
-  const assistantsCollection = db.collection("assistants");
+  await connectDatabase();
 
   const updateData: any = {
     updatedAt: new Date(),
@@ -30,15 +28,11 @@ const updateAssistant = async (
   if (agent.name) updateData.name = agent.name;
   if (agent.tone) updateData.tone = agent.tone;
   if (agent.voice) updateData.voice = agent.voice;
-  if (context.subjectId) updateData.subjectId = context.subjectId;
 
-  const result = await assistantsCollection.updateOne(
+  const result = await Assistant.updateOne(
     {
-      _id: new ObjectId(assistantId),
-      teacherId:
-        teacherId instanceof ObjectId
-          ? teacherId
-          : new ObjectId((teacherId as unknown as string) || ""),
+      subjectId: subjectId,
+      teacherId: teacherId
     },
     { $set: updateData },
   );

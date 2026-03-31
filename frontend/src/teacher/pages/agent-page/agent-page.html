@@ -1,15 +1,16 @@
 <div class="d-flex flex-column h-100 overflow-hidden">
   <div class="mb-4">
-    <h1 class="text-dark fw-bold mb-1 display-6">Agente AI</h1>
+    <h1 class="text-dark fw-medium mb-3 display-6">Agente AI</h1>
+
     @if (userRole() === 'teacher') {
-    <p class="text-muted mb-0">
+    <h5 class="text-dark mb-0 fw-normal">
       Interagisci e imposta l'agente AI per la materia
       <strong>{{ materiaService.materiaSelected()?.name }}</strong>.
-    </p>
+    </h5>
     } @else {
-    <p class="text-muted mb-0">
+    <h5 class="text-dark mb-0 fw-normal">
       Scegli una materia per consultare il tuo assistente di studio personale.
-    </p>
+    </h5>
     }
   </div>
 

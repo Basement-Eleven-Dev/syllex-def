@@ -1,15 +1,14 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
-import { Question } from "../../models/question";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types } from "mongoose";
+import { Question } from "../../models/schemas/question.schema";
 
 const getQuestions = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
-  const db = await getDefaultDatabase();
-  const questionsCollection = db.collection<Question>("questions");
+  await connectDatabase();
 
   // Estraggo i parametri dalla query string
   const {
@@ -17,8 +16,11 @@ const getQuestions = async (
     type = "",
     topicId = "",
     policy = "",
+    difficulty = "",
     page = "1",
     pageSize = "10",
+    aiGenerated = "",
+    tag = "",
   } = request.queryStringParameters || {};
 
   const currentPage = parseInt(page, 10);
@@ -47,23 +49,39 @@ const getQuestions = async (
   }
 
   if (topicId) {
-    filter.topicId = new ObjectId(topicId);
+    filter.topicId = new Types.ObjectId(topicId);
   }
 
   if (policy && (policy === "public" || policy === "private")) {
     filter.policy = policy;
   }
 
+  if (difficulty) {
+    filter.difficulty = difficulty;
+  }
+
+  if (aiGenerated !== undefined && aiGenerated !== "") {
+    if (aiGenerated === "true") {
+      filter.aiGenerated = aiGenerated === "true"; // Converti stringa a booleano
+    } else if (aiGenerated === "false") {
+      filter.aiGenerated = { $exists: false }; // Converti stringa a booleano
+    }
+  }
+
+  if (tag) {
+    filter.tags = { $regex: tag, $options: "i" };
+  }
+
+  console.log("Filtro per getQuestions:", filter);
+
   // Query con paginazione
-  const questions = await questionsCollection
-    .find(filter)
+  const questions = await Question.find(filter)
     .skip(skip)
     .limit(currentPageSize)
-    .sort({ createdAt: -1, _id: -1 })
-    .toArray();
+    .sort({ createdAt: -1, _id: -1 });
 
   // Conto il totale per la paginazione
-  const total = await questionsCollection.countDocuments(filter);
+  const total = await Question.countDocuments(filter);
 
   return {
     questions,

@@ -1,29 +1,32 @@
-import { PutObjectCommand, PutObjectCommandInput, S3Client } from "@aws-sdk/client-s3";
-import { BUCKET_NAME } from "../../environment";
+import {
+  PutObjectCommand,
+  PutObjectCommandInput,
+  S3Client,
+} from "@aws-sdk/client-s3";
+import { BUCKET_NAME, AWS_REGION } from "../../environment";
 
 export const uploadContentToS3 = async (
-    key: string,
-    content: Buffer | string,
-    mimeType: string,
+  key: string,
+  content: Buffer | string,
+  mimeType: string,
 ): Promise<string | undefined> => {
+  const s3Client = new S3Client({ region: AWS_REGION });
 
-    const s3Client = new S3Client();
+  const params: PutObjectCommandInput = {
+    Bucket: BUCKET_NAME,
+    Key: key,
+    Body: content,
+    ContentType: mimeType,
+  };
 
-    const params: PutObjectCommandInput = {
-        Bucket: BUCKET_NAME,
-        Key: key,
-        Body: content,
-        ContentType: mimeType
-    };
+  try {
+    const command = new PutObjectCommand(params);
+    const response = await s3Client.send(command);
 
-    try {
-        const command = new PutObjectCommand(params);
-        const response = await s3Client.send(command);
-
-        console.log(`File uploaded successfully. ETag: ${response.ETag}`);
-        return `https://${BUCKET_NAME}.s3.eu-south-1.amazonaws.com/${key}`
-    } catch (error) {
-        console.error("Error uploading to S3:", error);
-        throw error;
-    }
-}
+    console.log(`File uploaded successfully. ETag: ${response.ETag}`);
+    return `https://${BUCKET_NAME}.s3.eu-south-1.amazonaws.com/${key}`;
+  } catch (error) {
+    console.error("Error uploading to S3:", error);
+    throw error;
+  }
+};

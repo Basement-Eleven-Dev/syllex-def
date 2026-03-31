@@ -10,8 +10,8 @@
 ```
 LOCAL_TESTING=true
 STAGE=stg
-COGNITO_POOL_ID=eu-south-1_IdnpEkSac
-COGNITO_CLIENT_ID=7n2b7ueleckpvil3f7834oabsu
+COGNITO_POOL_ID=eu-south-1_w77iyt3xa
+COGNITO_CLIENT_ID=4tc0qd18cvu46tbkccoi1nc12e
 DB_CONNECTION={database connection string}
 ```
 2. Lanciare `npm run dev`

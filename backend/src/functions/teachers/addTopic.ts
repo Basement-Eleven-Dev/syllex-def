@@ -1,12 +1,13 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { Topic } from "../../models/schemas/topic.schema";
 
 const addTopic = async (request: APIGatewayProxyEvent, context: Context) => {
   try {
-    const subjectId = new ObjectId(request.pathParameters!.subjectId!);
+    const subjectId = context.subjectId;
     const body = JSON.parse(request.body || "{}");
     const name = body.name?.trim();
 
@@ -14,10 +15,9 @@ const addTopic = async (request: APIGatewayProxyEvent, context: Context) => {
       throw createError(400, "Il nome del topic è richiesto");
     }
 
-    let db = await getDefaultDatabase();
-    let topicsCollection = db.collection("topics");
+    await connectDatabase();
 
-    let result = await topicsCollection.insertOne({
+    let result = await Topic.insertOne({
       name,
       subjectId,
     });
@@ -25,7 +25,7 @@ const addTopic = async (request: APIGatewayProxyEvent, context: Context) => {
     return {
       success: true,
       topic: {
-        _id: result.insertedId,
+        _id: result._id,
         name,
       },
     };

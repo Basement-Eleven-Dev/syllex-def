@@ -15,6 +15,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faArrowLeft,
   faClock,
+  faLock,
   faPlay,
   faRotateRight,
   faSpinnerThird,
@@ -55,6 +56,7 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
   readonly PlayIcon = faPlay;
   readonly BackIcon = faArrowLeft;
   readonly ResumeIcon = faRotateRight;
+  readonly LockIcon = faLock;
 
   // State
   private readonly TestId = this.route.snapshot.paramMap.get('testId')!;
@@ -68,6 +70,9 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
   readonly RemainingSeconds = signal(0);
   readonly TestStarted = signal(false);
   readonly IsResuming = signal(false);
+  readonly IsStarting = signal(false);
+  readonly PasswordInput = signal('');
+  readonly PasswordError = signal<string | null>(null);
 
   private CurrentAttempt = signal<StudentAttemptInterface | null>(null);
 
@@ -76,6 +81,9 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
 
   // Computed
   readonly HasTimeLimit = computed(() => (this.TestData()?.timeLimit ?? 0) > 0);
+  readonly IsPasswordProtected = computed(
+    () => !!this.TestData()?.isPasswordProtected,
+  );
   readonly TimerExpired = computed(
     () => this.HasTimeLimit() && this.RemainingSeconds() <= 0,
   );
@@ -110,17 +118,55 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
   }
 
   onStartTest(): void {
-    this.TestStarted.set(true);
+    // Se il test è protetto da password e non stiamo riprendendo, valida prima
+    if (this.IsPasswordProtected() && !this.IsResuming()) {
+      if (!this.PasswordInput().trim()) {
+        this.PasswordError.set('Inserisci la password per avviare il test');
+        return;
+      }
+    }
+    this.PasswordError.set(null);
     if (this.IsResuming()) {
+      // Ripristino locale: nessuna API da attendere, transizione immediata
+      this.TestStarted.set(true);
       this.restoreFromAttempt(this.CurrentAttempt()!);
     } else {
+      // TestStarted verrà impostato SOLO dopo conferma del server
       this.createAttemptOnDb();
     }
   }
 
   onAnswerChange(questionId: string, value: number | string): void {
+    const test = this.TestData();
+    const question = this.Questions().find((q) => q._id === questionId);
+
+    // One-shot restriction: handle only if enabled and it's a closed question
+    if (
+      test?.oneShotAnswers &&
+      question &&
+      question.type !== 'risposta aperta'
+    ) {
+      const existing = this.Answers()[questionId];
+      if (existing !== null && existing !== undefined && existing !== '') {
+        // Already answered, block changes
+        return;
+      }
+    }
+
     this.Answers.update((a) => ({ ...a, [questionId]: value }));
     this.scheduleSave();
+  }
+
+  isQuestionLocked(question: QuestionInterface): boolean {
+    if (this.TimerExpired()) return true;
+
+    const test = this.TestData();
+    if (test?.oneShotAnswers && question.type !== 'risposta aperta') {
+      const answer = this.Answers()[question._id];
+      return answer !== null && answer !== undefined && answer !== '';
+    }
+
+    return false;
   }
 
   onSubmit(): void {
@@ -138,7 +184,7 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
       .subscribe({
         next: () => {
           this.testsService
-            .submitTestAttempt(attempt._id!)
+            .submitTestAttempt(attempt._id!, this.TestId)
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe({
               next: () => {
@@ -191,10 +237,11 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
     this.Error.set(null);
 
     this.testsService
-      .getAvailableTests()
+      .getAvailableTests('', '', 1, 100)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (tests) => {
+        next: (res) => {
+          const tests = res.tests;
           const found = tests.find((t) => t._id === this.TestId);
           if (!found) {
             this.Error.set('Test non trovato');
@@ -227,12 +274,22 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (results) => {
-          const loaded = results.filter(
+          let loaded = results.filter(
             (q): q is QuestionInterface => q !== null,
           );
-          loaded.sort(
-            (a, b) => questionIds.indexOf(a._id) - questionIds.indexOf(b._id),
-          );
+
+          if (test.randomizeQuestions) {
+            // Fisher-Yates shuffle
+            for (let i = loaded.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              [loaded[i], loaded[j]] = [loaded[j], loaded[i]];
+            }
+          } else {
+            loaded.sort(
+              (a, b) => questionIds.indexOf(a._id) - questionIds.indexOf(b._id),
+            );
+          }
+
           this.Questions.set(loaded);
           this.IsLoading.set(false);
           this.checkExistingAttempt();
@@ -307,21 +364,28 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
       }),
     };
 
+    this.IsStarting.set(true);
     this.testsService
-      .createAttempt(attempt)
+      .createAttempt(attempt, this.PasswordInput() || undefined)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (created) => {
+          this.IsStarting.set(false);
           this.CurrentAttempt.set(created);
+          this.TestStarted.set(true);
           const startedAt = new Date(created.startedAt).getTime();
           this.startTimer(test.timeLimit, startedAt);
         },
         error: (err) => {
-          this.feedbackService.showFeedback(
-            "Errore nell'avvio del test: " + (err?.message || err),
-            false,
-          );
-          this.TestStarted.set(false);
+          this.IsStarting.set(false);
+          if (err?.status === 403) {
+            this.PasswordError.set('Password errata. Riprova.');
+          } else {
+            this.feedbackService.showFeedback(
+              "Errore nell'avvio del test: " + (err?.message || err),
+              false,
+            );
+          }
         },
       });
   }

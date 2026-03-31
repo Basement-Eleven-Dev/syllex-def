@@ -4,7 +4,7 @@
   height: 90dvh;
   display: flex;
   flex-direction: column;
-  background-color: #f8f9fa;
+  background-color: #ffffff; // Tutto bianco
   overflow: hidden;
 
   .loading-overlay {
@@ -16,24 +16,75 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(255, 255, 255, 0.9);
     z-index: 100;
     color: var(--bs-primary);
   }
 
-  .mermaid-viewer {
+  .file-content-body {
     flex: 1;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+    overflow-y: auto;
+    background-color: #ffffff;
+    padding: 0; // Rimosso padding esterno che incorniciava
     display: flex;
     flex-direction: column;
-    background-color: #e2e8f0; // Grigio freddo tecnico per contrasto massimo
-    cursor: grab;
+    position: relative;
+    scrollbar-width: thin;
 
-    &:active {
-      cursor: grabbing;
+    &::-webkit-scrollbar {
+      display: block;
+      width: 6px;
     }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 10px;
+    }
+
+    .document-wrapper {
+      width: 100%;
+      height: 100%;
+      flex: 1;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      
+      .previewer-frame {
+        width: 100%;
+        height: 100%;
+        border: none; // Rimosso ogni bordo
+        outline: none;
+      }
+
+      ::ng-deep iframe {
+        border: none !important;
+        outline: none !important;
+      }
+    }
+
+    .image-wrapper {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+
+      img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+      }
+    }
+  }
+
+  .mermaid-viewer {
+    // Mantieni lo stile esistente ma adattalo al nuovo flex container se necessario
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
 
     .mermaid-container {
       width: 100%;

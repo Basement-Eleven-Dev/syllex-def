@@ -25,7 +25,7 @@
           </tr>
         </thead>
         <tbody>
-          @for(assignment of filteredAssignments(); track assignment._id) {
+          @for(assignment of paginatedAssignments(); track $index) {
           <tr>
             <td>
               <div class="avatar avatar-sm">
@@ -40,7 +40,9 @@
             <td>{{ assignment.studentName }}</td>
             <td>{{ assignment.studentLastName }}</td>
             <td>
-              @if(assignment.score == null) {
+              @if(assignment.status === 'not-started') {
+              <span class="text-muted">Non iniziato</span>
+              } @else if(assignment.score == null) {
               <span class="text-warning fw-bold">da correggere</span>
               } @else {
               <span
@@ -55,6 +57,7 @@
               '/' }}
             </td>
             <td class="text-end">
+              @if(assignment._id) {
               <button
                 class="btn icon-btn"
                 [routerLink]="'/t/correzione/' + assignment._id"
@@ -64,6 +67,7 @@
                 {{ assignment.status !== 'reviewed' ? 'Correggi' : 'Visualizza'
                 }}
               </button>
+              }
             </td>
           </tr>
           }
@@ -75,9 +79,9 @@
     >
       <app-syllex-pagination
         [collectionSize]="collectionSize"
-        [page]="page"
+        [page]="page()"
         [pageSize]="pageSize"
-        (pageChange)="page = $event; onNewPageRequested()"
+        (pageChange)="page.set($event)"
       />
     </div>
     } @else {

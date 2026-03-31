@@ -49,13 +49,19 @@ export class TestAssignments implements OnChanges {
   // Signal per gestire i dati filtrati
   filteredAssignments = signal<any[]>([]);
 
+  // Computed: solo gli elementi della pagina corrente
+  paginatedAssignments = computed(() => {
+    const start = (this.page() - 1) * this.pageSize;
+    return this.filteredAssignments().slice(start, start + this.pageSize);
+  });
+
   filtersForm: FormGroup = new FormGroup({
     text: new FormControl(''),
     class: new FormControl(''),
     status: new FormControl(''),
   });
 
-  page: number = 1;
+  page = signal(1);
   pageSize: number = 5;
   fileIcon = faFile;
 
@@ -87,18 +93,21 @@ export class TestAssignments implements OnChanges {
 
     // Filtro Stato
     if (status) {
-      data = data.filter((a) =>
-        status === 'delivered'
-          ? a.status === 'delivered'
-          : a.status !== 'delivered',
-      );
+      if (status === 'delivered') {
+        data = data.filter(
+          (a) => a.status === 'delivered' || a.status === 'reviewed',
+        );
+      } else if (status === 'not-started') {
+        data = data.filter((a) => a.status === 'not-started');
+      } else {
+        data = data.filter(
+          (a) => a.status !== 'delivered' && a.status !== 'reviewed',
+        );
+      }
     }
 
+    this.page.set(1);
     this.filteredAssignments.set(data);
-  }
-
-  onNewPageRequested() {
-    // Logica paginazione (opzionale se gestita lato client)
   }
 
   resetFilters(): void {

@@ -1,0 +1,16 @@
+.storage-container {
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+
+  .progress-bar {
+    &.bg-primary {
+      background: linear-gradient(90deg, #646cff 0%, #a855f7 100%) !important;
+    }
+    &.bg-danger {
+      background: linear-gradient(90deg, #ef4444 0%, #f87171 100%) !important;
+    }
+  }
+}

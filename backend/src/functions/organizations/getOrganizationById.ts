@@ -1,8 +1,9 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { Organization } from "../../models/schemas/organization.schema";
 
 const getOrganizationById = async (
   request: APIGatewayProxyEvent,
@@ -10,16 +11,15 @@ const getOrganizationById = async (
 ) => {
   const organizationId = request.pathParameters?.organizationId;
 
-  if (!organizationId || !ObjectId.isValid(organizationId)) {
+  if (!organizationId || !mongo.ObjectId.isValid(organizationId)) {
     throw createError.BadRequest("Invalid or missing organizationId");
   }
 
-  const db = await getDefaultDatabase();
-  const organizationsCollection = db.collection("organizations");
+  const db = await connectDatabase()
 
-  const organization = await organizationsCollection.findOne({
-    _id: new ObjectId(organizationId),
-  });
+  const organization = await Organization.findOne({
+    _id: new mongo.ObjectId(organizationId),
+  }).lean();
 
   if (!organization) {
     throw createError.NotFound("Organization not found");

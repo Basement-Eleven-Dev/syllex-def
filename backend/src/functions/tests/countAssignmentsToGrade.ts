@@ -1,29 +1,19 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Attempt } from "../../models/schemas/attempt.schema";
 
 const countAssignmentsToGrade = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
-  const db = await getDefaultDatabase();
-  const attemptsCollection = db.collection("attempts");
-
+  await connectDatabase();
+  const { onlyCount = 'true', excludeStatus = 'reviewed' } = request.queryStringParameters || {};
   const subjectId = context.subjectId;
-
-  if (!subjectId) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({
-        error: "subjectId is required",
-      }),
-    };
-  }
 
   // Costruisci il filtro
   const filter: any = {
-    status: { $ne: "reviewed" },
+    status: { $ne: excludeStatus },
     subjectId: subjectId,
   };
 
@@ -31,13 +21,16 @@ const countAssignmentsToGrade = async (
   if (context.user?._id) {
     filter.teacherId = context.user._id;
   }
+  if (JSON.parse(onlyCount)) {
 
-  // Conta i documenti
-  const count = await attemptsCollection.countDocuments(filter);
+    // Conta i documenti
+    const count = await Attempt.countDocuments(filter);
 
-  return {
-    count: count,
-  };
+    return {
+      count: count,
+    };
+  }
+  else return await Attempt.find(filter);
 };
 
 export const handler = lambdaRequest(countAssignmentsToGrade);

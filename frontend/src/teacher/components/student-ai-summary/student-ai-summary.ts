@@ -22,7 +22,7 @@ import {
           </h5>
           <button
             (click)="generateInsight()"
-            class="btn btn-sm btn-outline-primary rounded-pill px-3"
+            class="btn btn-sm btn-blue rounded-pill px-3"
             [disabled]="loading()"
           >
             <fa-icon

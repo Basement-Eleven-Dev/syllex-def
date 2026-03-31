@@ -11,6 +11,7 @@ import {
   ComunicazioneInterface,
 } from '../../../services/comunicazioni-service';
 import { ClassiService } from '../../../services/classi-service';
+import { FeedbackService } from '../../../services/feedback-service';
 
 @Component({
   selector: 'app-comunicazioni',
@@ -33,6 +34,7 @@ export class Comunicazioni {
   protected readonly materiaService = inject(Materia);
   protected readonly classiService = inject(ClassiService);
   private readonly comunicazioniService = inject(ComunicazioniService);
+  private readonly feedbackService = inject(FeedbackService);
 
   // Signals
   private RawComunicazioni = signal<ComunicazioneInterface[]>([]);
@@ -116,6 +118,10 @@ export class Comunicazioni {
         },
         error: (err) => {
           console.error('Errore nel caricamento delle comunicazioni:', err);
+          this.feedbackService.showFeedback(
+            'Errore nel caricamento delle comunicazioni',
+            false,
+          );
         },
       });
   }

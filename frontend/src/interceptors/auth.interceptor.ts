@@ -13,7 +13,7 @@ export const authInterceptor: HttpInterceptorFn = (
   next: HttpHandlerFn,
 ) => {
   const subjectId = localStorage.getItem('selectedSubjectId') || undefined;
-  
+
   // Costruiamo l'URL finale
   const apiUrl = req.url.startsWith('http')
     ? req.url

@@ -18,6 +18,7 @@ import { SyllexPagination } from '../syllex-pagination/syllex-pagination';
 import { SlicePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TestsService } from '../../../services/tests-service';
+import { FeedbackService } from '../../../services/feedback-service';
 
 Chart.register(...registerables);
 
@@ -40,6 +41,7 @@ export class TestStats implements OnInit, AfterViewInit, OnChanges {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly testsService = inject(TestsService);
+  private readonly feedbackService = inject(FeedbackService);
 
   readonly data = signal<any | null>(null);
   readonly isLoading = signal<boolean>(true);
@@ -146,8 +148,7 @@ export class TestStats implements OnInit, AfterViewInit, OnChanges {
     this.topicPerformanceData = Array.from(topicStatsMap.entries()).map(
       ([topicName, stats]) => ({
         topicName,
-        percentage:
-          stats.total > 0 ? (stats.correct / stats.total) * 100 : 0,
+        percentage: stats.total > 0 ? (stats.correct / stats.total) * 100 : 0,
       }),
     );
   }
@@ -316,6 +317,10 @@ export class TestStats implements OnInit, AfterViewInit, OnChanges {
       },
       error: (err) => {
         console.error('Errore:', err);
+        this.feedbackService.showFeedback(
+          'Errore nel caricamento delle statistiche',
+          false,
+        );
         this.isLoading.set(false);
       },
     });

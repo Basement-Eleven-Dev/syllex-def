@@ -1,9 +1,11 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
 import { createCognitoUser } from "../../../_helpers/cognito/userManagement";
+import { User } from "../../../models/schemas/user.schema";
+import { Class } from "../../../models/schemas/class.schema";
 
 interface ImportStudent {
   firstName: string;
@@ -16,13 +18,16 @@ const bulkImportStudents = async (
   context: Context,
 ) => {
   const organizationId = request.pathParameters?.organizationId;
-  const { classId, students } = JSON.parse(request.body || '{}') as { classId: string, students: ImportStudent[] };
+  const { classId, students } = JSON.parse(request.body || "{}") as {
+    classId: string;
+    students: ImportStudent[];
+  };
 
-  if (!organizationId || !ObjectId.isValid(organizationId)) {
+  if (!organizationId || !mongo.ObjectId.isValid(organizationId)) {
     throw createError.BadRequest("Invalid or missing organizationId");
   }
 
-  if (!classId || !ObjectId.isValid(classId)) {
+  if (!classId || !mongo.ObjectId.isValid(classId)) {
     throw createError.BadRequest("Invalid or missing classId");
   }
 
@@ -30,46 +35,57 @@ const bulkImportStudents = async (
     throw createError.BadRequest("Missing or invalid students list");
   }
 
-  const db = await getDefaultDatabase();
-  const orgObjectId = new ObjectId(organizationId);
-  const classObjectId = new ObjectId(classId);
+  await connectDatabase();
+  const orgObjectId = new mongo.ObjectId(organizationId);
+  const classObjectId = new mongo.ObjectId(classId);
 
-  const studentIdsToAssign: ObjectId[] = [];
+  const studentIdsToAssign: Types.ObjectId[] = [];
 
   for (const std of students) {
     const email = std.email.toLowerCase().trim();
     try {
       // 1. Check if user already exists
-      let user = await db.collection("users").findOne({ email });
+      let user = await User.findOne({ email });
 
       if (user) {
         // Update user to ensure they are in this organization
-        await db.collection("users").updateOne(
+        await User.updateOne(
           { _id: user._id },
-          { $addToSet: { organizationIds: orgObjectId }, $set: { updatedAt: new Date() } }
+          {
+            $addToSet: { organizationIds: orgObjectId },
+            $set: { updatedAt: new Date() },
+          },
         );
         studentIdsToAssign.push(user._id);
       } else {
         // 2. Create new user
         try {
-          const cognitoId = await createCognitoUser(email, std.firstName, std.lastName, 'student');
-          
-          const userResult = await db.collection("users").insertOne({
+          const cognitoId = await createCognitoUser(
+            email,
+            std.firstName,
+            std.lastName,
+            "student",
+          );
+
+          const userResult = await User.insertOne({
             cognitoId,
             email,
+            username: email,
             firstName: std.firstName,
             lastName: std.lastName,
-            role: 'student',
+            role: "student",
             organizationIds: [orgObjectId],
             createdAt: new Date(),
             updatedAt: new Date(),
           });
 
-          studentIdsToAssign.push(userResult.insertedId);
+          studentIdsToAssign.push(userResult._id);
         } catch (cognitoError: any) {
           // If Cognito user already exists but not in our DB (unlikely but possible)
-          if (cognitoError.name === 'UsernameExistsException') {
-            console.log(`Cognito user already exists for ${email}, manual sync needed or handle specifically`);
+          if (cognitoError.name === "UsernameExistsException") {
+            console.log(
+              `Cognito user already exists for ${email}, manual sync needed or handle specifically`,
+            );
           }
           throw cognitoError;
         }
@@ -82,16 +98,16 @@ const bulkImportStudents = async (
 
   // 3. Update class students array with ALL processed students
   if (studentIdsToAssign.length > 0) {
-    await db.collection("classes").updateOne(
+    await Class.updateOne(
       { _id: classObjectId, organizationId: orgObjectId },
-      { $addToSet: { students: { $each: studentIdsToAssign } } }
+      { $addToSet: { students: { $each: studentIdsToAssign } } },
     );
   }
 
   return {
     success: true,
     count: studentIdsToAssign.length,
-    message: `${studentIdsToAssign.length} studenti processati correttamente.`
+    message: `${studentIdsToAssign.length} studenti processati correttamente.`,
   };
 };
 

@@ -15,12 +15,18 @@ import {
   faSave,
   faSparkles,
   faSpinnerThird,
+  faTag,
   faUsers,
+  faXmark,
 } from '@fortawesome/pro-solid-svg-icons';
 import { MultipleChoiceOptions } from '../../components/multiple-choice-options/multiple-choice-options';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { GenAiQuestion } from '../../components/gen-ai-question/gen-ai-question';
-import { QUESTION_TYPE_OPTIONS } from '../../../types/question.types';
+import {
+  QUESTION_TYPE_OPTIONS,
+  DIFFICULTY_OPTIONS,
+  QuestionDifficulty,
+} from '../../../types/question.types';
 import { BackTo } from '../../components/back-to/back-to';
 import { TypeSelector } from '../../components/type-selector/type-selector';
 import { Materia } from '../../../services/materia';
@@ -64,10 +70,13 @@ export class CreateEditQuestion {
   readonly GraduationIcon = faGraduationCap;
   readonly SaveIcon = faSave;
   readonly SpinnerIcon = faSpinnerThird;
-  readonly WinkIcon = faFaceGrinWink; // Sostituisci con l'icona appropriata
+  readonly WinkIcon = faFaceGrinWink;
+  readonly TagIcon = faTag;
+  readonly RemoveIcon = faXmark;
 
   // Data
   readonly QuestionTypeOptions = QUESTION_TYPE_OPTIONS;
+  readonly DifficultyOptions = DIFFICULTY_OPTIONS;
   private readonly QuestionId = this.activatedRoute.snapshot.paramMap.get('id');
   private CurrentQuestionId = signal<string | null>(null);
 
@@ -97,6 +106,7 @@ export class CreateEditQuestion {
     type: new FormControl('scelta multipla', Validators.required),
     text: new FormControl('', Validators.required),
     topicId: new FormControl('', Validators.required),
+    difficulty: new FormControl<QuestionDifficulty>('medium'),
     explanation: new FormControl('', Validators.required),
     options: new FormControl([
       { label: 'Opzione 1', isCorrect: false },
@@ -107,7 +117,32 @@ export class CreateEditQuestion {
     ]),
     policy: new FormControl('public'),
     correctAnswer: new FormControl(null),
+    tags: new FormControl<string[]>([]),
   });
+
+  readonly TagInput = signal<string>('');
+
+  addTag(): void {
+    const value = this.TagInput().trim().toLowerCase();
+    if (!value) return;
+    const current: string[] = this.QuestionForm.get('tags')?.value || [];
+    if (!current.includes(value)) {
+      this.QuestionForm.patchValue({ tags: [...current, value] });
+    }
+    this.TagInput.set('');
+  }
+
+  removeTag(tag: string): void {
+    const current: string[] = this.QuestionForm.get('tags')?.value || [];
+    this.QuestionForm.patchValue({ tags: current.filter((t) => t !== tag) });
+  }
+
+  onTagKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter' || event.key === ',') {
+      event.preventDefault();
+      this.addTag();
+    }
+  }
 
   constructor() {
     if (this.QuestionId) {
@@ -163,6 +198,7 @@ export class CreateEditQuestion {
       type: question.type,
       text: question.text,
       topicId: question.topicId,
+      difficulty: question.difficulty || 'medium',
       explanation: question.explanation,
       policy: question.policy,
     });
@@ -186,6 +222,10 @@ export class CreateEditQuestion {
 
     if (question.imageUrl) {
       this.ImagePreview.set(question.imageUrl);
+    }
+
+    if (question.tags) {
+      this.QuestionForm.patchValue({ tags: question.tags });
     }
   }
 
@@ -211,14 +251,14 @@ export class CreateEditQuestion {
     const questionData = this.prepareQuestionData();
     const serviceCall = this.CurrentQuestionId()
       ? this.questionsService.editQuestion(
-        this.CurrentQuestionId()!,
-        questionData,
-        this.UploadedImageFile() || undefined,
-      )
+          this.CurrentQuestionId()!,
+          questionData,
+          this.UploadedImageFile() || undefined,
+        )
       : this.questionsService.createQuestion(
-        questionData,
-        this.UploadedImageFile() || undefined,
-      );
+          questionData,
+          this.UploadedImageFile() || undefined,
+        );
 
     serviceCall.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
@@ -227,6 +267,8 @@ export class CreateEditQuestion {
           : 'Domanda salvata con successo!';
         this.feedbackService.showFeedback(message, true);
         this.IsLoading.set(false);
+        // go back to the page you came from
+        window.history.back();
       },
       error: (error) => {
         console.error('Error saving question:', error);
@@ -282,8 +324,8 @@ export class CreateEditQuestion {
       this.SelectedQuestionType(),
     );
     offCanvasRef.componentInstance.genAiQuestionForm.patchValue({
-      type: this.SelectedQuestionType()
-    })
+      type: this.SelectedQuestionType(),
+    });
 
     offCanvasRef.dismissed.subscribe((result) => {
       if (result) {
@@ -293,12 +335,14 @@ export class CreateEditQuestion {
   }
 
   private populateFormFromAI(result: any): void {
-    console.log(result)
+    console.log(result);
     this.QuestionForm.patchValue({
       topicId: result.topic?._id || result.topic,
       type: result.type,
       text: result.content,
       explanation: result.explanation,
+      difficulty:
+        result.difficulty || this.QuestionForm.get('difficulty')?.value,
     });
 
     this.SelectedQuestionType.set(result.type);
@@ -313,8 +357,8 @@ export class CreateEditQuestion {
       this.QuestionForm.patchValue({ options });
     }
     if (result.type === 'vero falso') {
-      console.log(result.correctAnswer)
-      this.QuestionForm.patchValue({ correctAnswer: result.correctAnswer })
+      console.log(result.correctAnswer);
+      this.QuestionForm.patchValue({ correctAnswer: result.correctAnswer });
     }
   }
 

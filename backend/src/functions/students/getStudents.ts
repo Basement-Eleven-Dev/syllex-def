@@ -1,22 +1,21 @@
 import { APIGatewayProxyEvent, Context, Handler } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { User } from "../../models/schemas/user.schema";
 
 const getStudents = async (request: APIGatewayProxyEvent, context: Context) => {
   const body = JSON.parse(request.body || "{}");
 
   let studentIds = body.studentIds;
-  studentIds = studentIds.map((id: string) => new ObjectId(id));
+  studentIds = studentIds.map((id: string) => new mongo.ObjectId(id));
 
-  const db = await getDefaultDatabase();
-  const studentsCollection = db.collection("students");
-  const studentsData = await studentsCollection
+  await connectDatabase();
+  const studentsData = await User
     .find({
       _id: { $in: studentIds },
     })
-    .toArray();
 
   return {
     students: studentsData,

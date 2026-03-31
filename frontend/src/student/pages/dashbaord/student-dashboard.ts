@@ -34,7 +34,6 @@ import { StatCardData } from '../../../teacher/components/stat-card/stat-card';
     RouterModule,
     FontAwesomeModule,
     StudentTestCardCompact,
-    StudentComunicazioneCard,
   ],
   templateUrl: './student-dashboard.html',
   styleUrl: './student-dashboard.scss',
@@ -57,6 +56,9 @@ export class StudentDashboard implements OnInit {
   AttemptStatusMap = signal<
     Map<string, 'in-progress' | 'delivered' | 'reviewed'>
   >(new Map());
+  AttemptScoreMap = signal<Map<string, { score: number; maxScore: number }>>(
+    new Map(),
+  );
 
   RecentComunicazioni = signal<ComunicazioneInterface[]>([]);
 
@@ -76,12 +78,17 @@ export class StudentDashboard implements OnInit {
     return this.AttemptStatusMap().get(testId) ?? null;
   }
 
+  getAttemptScore(testId: string): { score: number; maxScore: number } | null {
+    return this.AttemptScoreMap().get(testId) ?? null;
+  }
+
   private loadDashboardData() {
     // 1. Load recent tests
     this.testsService
       .getAvailableTests()
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((tests) => {
+      .subscribe((res) => {
+        const tests = res.tests;
         // Sort by availability and take top 3
         const sorted = tests.sort((a, b) => {
           const dateA = a.availableFrom
@@ -106,6 +113,28 @@ export class StudentDashboard implements OnInit {
                   newMap.set(test._id, attempt.status);
                   return newMap;
                 });
+
+                if (attempt.status === 'reviewed') {
+                  const score =
+                    attempt.score != null
+                      ? attempt.score
+                      : attempt.questions.reduce(
+                          (sum, q) => sum + (q.score ?? 0),
+                          0,
+                        );
+                  const maxScore =
+                    attempt.maxScore != null
+                      ? attempt.maxScore
+                      : attempt.questions.reduce(
+                          (sum, q) => sum + (q.points ?? 0),
+                          0,
+                        );
+                  this.AttemptScoreMap.update((map) => {
+                    const newMap = new Map(map);
+                    newMap.set(test._id, { score, maxScore });
+                    return newMap;
+                  });
+                }
               }
             });
         });

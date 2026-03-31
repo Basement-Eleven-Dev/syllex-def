@@ -1,4 +1,4 @@
-<div [class]="showCloseButton ? 'modal-body' : ''">
+<div [class]="showCloseButton ? 'modal-body p-4 pt-5' : ''">
   @if (showCloseButton) {
   <button
     type="button"
@@ -98,7 +98,7 @@
         </div>
         @if (!readonly()) {
         <button
-          class="btn btn-outline-primary btn-sm"
+          class="btn btn-blue btn-sm"
           (click)="openAddEventModal()"
         >
           <fa-icon [icon]="PlusIcon"></fa-icon> Nuovo Evento

@@ -39,8 +39,23 @@
     class="p-3 rounded-3 border-start border-4"
     [ngClass]="{'border-success bg-success-subtle': data.answer.isCorrect, 'border-danger bg-danger-subtle': !data.answer.isCorrect && data.answer.result !== 'dubious', 'border-warning bg-warning-subtle': data.answer.result === 'dubious'}"
   >
-    <label class="form-label text-dark fw-bold">Risposta dello studente:</label>
-    <p class="mb-0 fs-5">{{ data.answer.answer || 'Nessuna risposta' }}</p>
+    <label class="form-label text-dark fw-bold d-flex align-items-center gap-2 mb-2">
+      Risposta dello studente:
+      @if (data?.answer?.aiProbability !== null && data?.answer?.aiProbability !== undefined) {
+      <span
+        class="badge"
+        style="cursor: help;"
+        [ngClass]="{
+          'bg-danger': data.answer.aiProbability > 50,
+          'bg-success': data.answer.aiProbability <= 50
+        }"
+        ngbTooltip="Indica quanto è probabile che questo testo sia stato scritto da un'intelligenza artificiale (es: ChatGPT)"
+      >
+      {{ getAiProbabilityLabel(data.answer.aiProbability) }}
+      </span>
+      }
+    </label>
+    <p class="mb-0 fs-5">{{ data?.answer?.answer || 'Nessuna risposta' }}</p>
   </section>
 
   <div class="row mt-3 g-3">

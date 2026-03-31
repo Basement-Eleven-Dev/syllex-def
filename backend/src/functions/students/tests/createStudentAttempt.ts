@@ -1,10 +1,11 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
-import { Attempt } from "../../../models/attempt";
+import { connectDatabase } from "../../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
 import { sanitizeAttemptQuestions } from "./_helpers";
+import { Test } from "../../../models/schemas/test.schema";
+import { Attempt } from "../../../models/schemas/attempt.schema";
 
 const createStudentAttempt = async (
   request: APIGatewayProxyEvent,
@@ -21,13 +22,25 @@ const createStudentAttempt = async (
     throw createError.BadRequest("testId is required");
   }
 
-  const db = await getDefaultDatabase();
-  const attemptsCollection = db.collection<Attempt>("attempts");
+  const db = await connectDatabase();
+
+  // Validate password if the test is password-protected
+  const test = await Test.findOne({
+    _id: new mongo.ObjectId(body.testId),
+  });
+  if (!test) {
+    throw createError.NotFound("Test non trovato");
+  }
+  if (test.password) {
+    if (!body.password || body.password !== test.password) {
+      throw createError.Forbidden("Password del test non corretta");
+    }
+  }
 
   // Prevent duplicate in-progress attempts for the same test
-  const existing = await attemptsCollection.findOne({
-    testId: new ObjectId(body.testId),
-    studentId: new ObjectId(studentId),
+  const existing = await Attempt.findOne({
+    testId: new mongo.ObjectId(body.testId),
+    studentId: new mongo.ObjectId(studentId),
     status: "in-progress",
   });
 
@@ -65,7 +78,7 @@ const createStudentAttempt = async (
         0,
       );
 
-      await attemptsCollection.updateOne(
+      await Attempt.updateOne(
         { _id: existing._id },
         {
           $set: {
@@ -89,11 +102,11 @@ const createStudentAttempt = async (
   }
 
   const now = new Date();
-  const attempt: Omit<Attempt, "_id"> = {
-    testId: new ObjectId(body.testId),
-    subjectId: body.subjectId ? new ObjectId(body.subjectId) : undefined!,
-    teacherId: body.teacherId ? new ObjectId(body.teacherId) : undefined!,
-    studentId: new ObjectId(studentId),
+  const attempt = {
+    testId: new mongo.ObjectId(body.testId),
+    subjectId: body.subjectId ? new mongo.ObjectId(body.subjectId) : undefined!,
+    teacherId: body.teacherId ? new mongo.ObjectId(body.teacherId) : undefined!,
+    studentId: new mongo.ObjectId(studentId),
     status: "in-progress",
     startedAt: body.startedAt ? new Date(body.startedAt) : now,
     timeSpent: 0,
@@ -109,13 +122,10 @@ const createStudentAttempt = async (
     updatedAt: now,
   };
 
-  const result = await attemptsCollection.insertOne(attempt as any);
+  const result = await Attempt.insertOne(attempt as any);
 
   return {
-    attempt: {
-      _id: result.insertedId,
-      ...attempt,
-    },
+    attempt: result,
   };
 };
 

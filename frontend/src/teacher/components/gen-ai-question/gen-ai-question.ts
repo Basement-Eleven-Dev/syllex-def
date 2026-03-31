@@ -13,7 +13,10 @@ import {
   faSpinnerThird,
 } from '@fortawesome/pro-solid-svg-icons';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
-import { QUESTION_TYPE_OPTIONS } from '../../../types/question.types';
+import {
+  QUESTION_TYPE_OPTIONS,
+  QuestionDifficulty,
+} from '../../../types/question.types';
 import { AiService } from '../../../services/ai-service';
 import {
   FormControl,
@@ -61,7 +64,10 @@ export class GenAiQuestion {
     topicId: new FormControl('', Validators.required),
     instructions: new FormControl(''),
     language: new FormControl('it', Validators.required),
-    difficulty: new FormControl<1 | 2 | 3>(2, Validators.required),
+    difficulty: new FormControl<QuestionDifficulty>(
+      'medium',
+      Validators.required,
+    ),
     numberOfAlternatives: new FormControl(4),
   });
 
@@ -111,7 +117,8 @@ export class GenAiQuestion {
         content: question.text,
         explanation: question.explanation,
         choices: question.options,
-        correctAnswer: question.correctAnswer
+        correctAnswer: question.correctAnswer,
+        difficulty,
       });
     } finally {
       this.IsLoading.set(false);

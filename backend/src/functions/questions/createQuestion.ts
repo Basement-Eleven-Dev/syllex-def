@@ -1,23 +1,24 @@
 import { APIGatewayProxyEvent, Context, Handler } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { getDefaultDatabase } from "../../_helpers/getDatabase";
-import { ObjectId } from "mongodb";
+import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types } from "mongoose";
+import { Question } from "../../models/schemas/question.schema";
 
 //free logic
 const getStatus = async (request: APIGatewayProxyEvent, context: Context) => {
   const question = JSON.parse(request.body || "{}");
 
-  const db = await getDefaultDatabase();
-  const questionsCollection = db.collection("questions");
+  await connectDatabase();
 
-  question.topicId = new ObjectId(question.topicId);
+  question.topicId = new Types.ObjectId(question.topicId);
   question.teacherId = context.user?._id;
   question.subjectId = context.subjectId;
   question.createdAt = new Date();
   question.updatedAt = new Date();
 
-  question._id = (await questionsCollection.insertOne(question)).insertedId;
+  const result = await Question.create(question);
+  question._id = result._id;
 
   return {
     question: question,
