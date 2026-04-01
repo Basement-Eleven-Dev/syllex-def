@@ -22,7 +22,6 @@ export class DeployStack extends cdk.NestedStack {
             //nested stack
             deployment.node.addDependency(method);
         }
-        //roba strana
         new Stage(this, STAGE_NAME, {
             deployment: deployment,
             loggingLevel: MethodLoggingLevel.INFO, // Enable Execution Logs (INFO for details, ERROR for errors only)

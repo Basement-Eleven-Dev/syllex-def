@@ -47,3 +47,26 @@ export const lambdaRequest = (handler: Handler) => {
       }),
     );
 };
+
+export const lambdaPublicRequest = (handler: Handler) => {
+  return middy(handler)
+    .use(
+      httpResponseSerializer({
+        serializers: [
+          {
+            regex: /^application\/json$/,
+            serializer: ({ body }) => JSON.stringify(body),
+          },
+        ],
+        defaultContentType: "application/json",
+      }),
+    )
+    .use(httpErrorHandler())
+    .use(
+      cors({
+        origin: "*",
+        headers: AUTHORIZED_API_HEADERS.join(','),
+      }),
+    );
+};
+
