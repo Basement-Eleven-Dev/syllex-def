@@ -211,6 +211,12 @@ const EVENTS_ROUTES: FunctionIntegration[] = [
 
 const MISC_ROUTES: FunctionIntegration[] = [
   {
+    apiRoute: "health",
+    functionPath: "health/health.ts",
+    method: "get",
+    role: "open",
+  },
+  {
     apiRoute: "profile",
     functionPath: "profile/getMyProfile.ts",
     method: "get",
@@ -398,7 +404,7 @@ const ASSISTANTS_ROUTES: FunctionIntegration[] = [
   },
   {
     apiRoute: "messages/{messageId}/generate-audio",
-    functionPath: "messages/listenToMessage.ts",
+    functionPath: "messages/listenTomessage.ts",
     method: "post",
     role: "logged",
   },

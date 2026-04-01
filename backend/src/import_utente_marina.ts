@@ -3,9 +3,9 @@ import { Types } from "mongoose";
 import { Class } from "./models/schemas/class.schema";
 
 const classIds: Types.ObjectId[] = [
-  new Types.ObjectId("69c3fcde4b451bf4dad7d87c"), //26° NMRS SSC/ECG
-  new Types.ObjectId("69c3fcde4b451bf4dad7d87e"), //28° Corso N.MRS - Np e Np/OP
-  new Types.ObjectId("69c3fcdf4b451bf4dad7d880"), //SSP/TM e NP/MS
+  new Types.ObjectId("69c3fcde4b451bf4dad7d87c"), //26° NMRS SSC/ECG Acustica Subaquea
+  new Types.ObjectId("69c3fcde4b451bf4dad7d87e"), //28° Corso N.MRS - Np e Np/OP Diritto umanitario
+  new Types.ObjectId("69c3fcdf4b451bf4dad7d880"), //SSP/TM e NP/MS Impianti di bordo 2
 ];
 
 interface Student {
@@ -383,5 +383,8 @@ async function main() {
     console.log("--------------------------------");
   }
 }
+
+
+
 
 main();
