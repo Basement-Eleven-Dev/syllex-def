@@ -19,7 +19,12 @@ export async function sendEmail(to: string, subject: string, html: string, opera
       MessageBody: JSON.stringify(payload),
     };
     const sqsClient = new SQSClient();
-    await sqsClient.send(new SendMessageCommand(messageInput));
+    try {
+      await sqsClient.send(new SendMessageCommand(messageInput));
+    }
+    catch (error) {
+      console.error("Errore invio email alla coda SQS:", error);
+    }
     return;
   }
   console.log("Invio email a:", to);
