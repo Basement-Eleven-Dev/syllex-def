@@ -36,11 +36,12 @@ export class LambdaConstruct extends Construct {
     role: Role,
     additionalEnvironment: { [k: string]: string } = {},
     layerArns?: lambda.ILayerVersion[],
+    timeout: Duration = Duration.seconds(600)
   ) {
     super(scope, name);
     this.lambda = new NodejsFunction(this, name, {
       runtime: default_lambda_runtime,
-      timeout: Duration.seconds(600), //optimize
+      timeout: timeout, //optimize
       memorySize: 1024,
       paramsAndSecrets: lambda.ParamsAndSecretsLayerVersion.fromVersionArn(
         "arn:aws:lambda:eu-south-1:325218067255:layer:AWS-Parameters-and-Secrets-Lambda-Extension:16"

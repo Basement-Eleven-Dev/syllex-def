@@ -19,8 +19,7 @@
     </div>
   </div>
   <!-- Hidden file input -->
-  <input #fileInput type="file" class="d-none" (change)="onFileSelected($event)"
-    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.mp4,.avi,.mov" />
+  <input #fileInput type="file" class="d-none" (change)="onFileSelected($event)" accept=".pdf,.docx,.xlsx,.pptx,.txt" />
   <!-- Already Processed Materials Section -->
   @if (embeddingCreationMode && processedMaterials().length > 0) {
   <div class="mb-3">
