@@ -7,10 +7,11 @@ import {
   faSparkles,
 } from '@fortawesome/pro-solid-svg-icons';
 import { GenAiContents } from '../../components/gen-ai-contents/gen-ai-contents';
+import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 
 @Component({
   selector: 'app-laboratorio-ai',
-  imports: [FontAwesomeModule, GenAiContents],
+  imports: [FontAwesomeModule, GenAiContents, TourAnchorNgBootstrapDirective],
   templateUrl: './laboratorio-ai.html',
   styleUrl: './laboratorio-ai.scss',
 })

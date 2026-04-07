@@ -1,4 +1,7 @@
-<h1 class="text-dark fw-medium mb-3 display-6">
+<h1
+  tourAnchor="laboratorio_ai_header"
+  class="text-dark fw-medium mb-3 display-6"
+>
   Crea utilizzando l'AI di Syllex
 </h1>
 <h5 class="text-dark mb-0 fw-normal">
@@ -6,8 +9,12 @@
 </h5>
 
 <label class="fw-semibold fs-4 text-dark mt-5 mb-3">Cosa vuoi creare?</label>
-<div class="d-flex flex-row align-items-stretch gap-4">
+<div
+  tourAnchor="laboratorio_ai_type_cards"
+  class="d-flex flex-row align-items-stretch gap-4"
+>
   <div
+    tourAnchor="laboratorio_ai_card_materials"
     class="card py-3 ai syllex-shadow"
     [class.not-selected]="!isMaterialsHovered()"
     [class.selected]="selectedCreationType === 'materials'"
@@ -24,6 +31,7 @@
     </div>
   </div>
   <div
+    tourAnchor="laboratorio_ai_card_questions"
     class="card py-3 ai"
     [class.not-selected]="!isQuestionsHovered()"
     [class.selected]="selectedCreationType === 'questions'"
@@ -42,7 +50,7 @@
   </div>
 </div>
 
-<section class="mt-5">
+<section tourAnchor="laboratorio_ai_content" class="mt-5">
   @if(selectedCreationType == 'questions'){
   <app-gen-ai-contents [type]="'questions'"></app-gen-ai-contents>
   } @else {

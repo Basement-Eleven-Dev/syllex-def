@@ -1,4 +1,4 @@
-<div class="d-flex flex-row align-items-center mb-5">
+<div tourAnchor="test_header" class="d-flex flex-row align-items-center mb-5">
   <div>
     <h1 class="text-dark fw-medium mb-3 display-6">Lista dei test</h1>
     <h5 class="text-dark mb-0 fw-normal">
@@ -6,6 +6,7 @@
     </h5>
   </div>
   <button
+    tourAnchor="test_new_button"
     class="btn btn-gradient-secondary btn-lg ms-auto py-3 icon-btn"
     routerLink="/t/tests/new"
   >
@@ -14,7 +15,7 @@
   </button>
 </div>
 
-<section class="d-flex flex-row mb-5 gap-3">
+<section tourAnchor="test_filters" class="d-flex flex-row mb-5 gap-3">
   <div>
     <input
       type="text"
@@ -66,8 +67,11 @@
 />
 } @else {
 <div class="row">
-  @for(test of Tests(); track test._id) {
-  <div class="col-12 col-lg-6 col-xl-4 mb-3">
+  @for(test of Tests(); track test._id; let first = $first) {
+  <div
+    class="col-12 col-lg-6 col-xl-4 mb-3"
+    [tourAnchor]="first ? 'test_first_card' : ''"
+  >
     <app-test-card
       [test]="test"
       (delete)="onDeleteTest($event)"
@@ -85,7 +89,10 @@
 </div>
 }
 
-<div class="mt-5 d-flex flex-row justify-content-between align-items-center">
+<div
+  tourAnchor="test_pagination"
+  class="mt-5 d-flex flex-row justify-content-between align-items-center"
+>
   <app-syllex-pagination
     [collectionSize]="CollectionSize()"
     [page]="Page()"

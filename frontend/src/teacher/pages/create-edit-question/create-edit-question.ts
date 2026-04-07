@@ -34,6 +34,7 @@ import { QuestionsService } from '../../../services/questions';
 import { FeedbackService } from '../../../services/feedback-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DestroyRef } from '@angular/core';
+import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 
 export interface AnswerOption {
   label: string;
@@ -50,6 +51,7 @@ export interface AnswerOption {
     FormsModule,
     ReactiveFormsModule,
     BackTo,
+    TourAnchorNgBootstrapDirective,
   ],
   templateUrl: './create-edit-question.html',
   styleUrl: './create-edit-question.scss',
