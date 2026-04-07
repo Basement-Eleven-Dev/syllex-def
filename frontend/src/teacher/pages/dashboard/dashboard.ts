@@ -4,6 +4,7 @@ import {
   FontAwesomeModule,
   IconDefinition,
 } from '@fortawesome/angular-fontawesome';
+import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 import {
   faBallotCheck,
   faCheck,
@@ -42,7 +43,13 @@ interface DashboardAction {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [FontAwesomeModule, DatePipe, Calendario, RouterModule],
+  imports: [
+    FontAwesomeModule,
+    DatePipe,
+    Calendario,
+    RouterModule,
+    TourAnchorNgBootstrapDirective,
+  ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })

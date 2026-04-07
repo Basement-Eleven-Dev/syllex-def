@@ -30,6 +30,7 @@ import {
   ComunicazioniService,
 } from '../../../services/comunicazioni-service';
 import { AddEventModal } from '../add-event-modal/add-event-modal';
+import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 
 export interface DayBox {
   day: number | null;
@@ -46,6 +47,7 @@ export interface DayBox {
     CalendarTestCard,
     CalendarEventCard,
     StudentComunicazioneCard,
+    TourAnchorNgBootstrapDirective,
   ],
   templateUrl: './calendario.html',
   styleUrl: './calendario.scss',
@@ -256,7 +258,7 @@ export class Calendario implements OnInit {
               availableFrom: t.availableFrom
                 ? new Date(t.availableFrom)
                 : undefined,
-            } as TestInterface),
+            }) as TestInterface,
         );
         this.Tests.set(mapped);
       });

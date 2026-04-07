@@ -9,7 +9,7 @@
     (ngSubmit)="onSubmit()"
     class="d-flex flex-column gap-4"
   >
-    <section class="form-section">
+    <section tourAnchor="gen_ai_type_selector" class="form-section">
       <label class="form-label text-dark mb-3">
         Che tipo di {{ TypeMode() === 'questions' ? 'domande' : 'materiale' }}
         vuoi creare?
@@ -25,7 +25,7 @@
 
     @if (TypeMode() === 'questions') {
 
-    <section class="form-section">
+    <section tourAnchor="gen_ai_q_topic" class="form-section">
       <label class="form-label text-dark mb-2">
         Su che argomento di {{ materiaService.materiaSelected()?.name }} vuoi
         che si concentri l'AI?
@@ -43,7 +43,7 @@
       </select>
     </section>
 
-    <section class="form-section">
+    <section tourAnchor="gen_ai_q_params" class="form-section">
       <label class="form-label text-dark mb-2 fw-light"
         >Parametri di generazione</label
       >
@@ -106,7 +106,7 @@
     } @else {
 
     <!-- ─── MATERIALS specific parameters ─────────────────────────────── -->
-    <section class="form-section">
+    <section tourAnchor="gen_ai_m_params" class="form-section">
       <label class="form-label text-dark mb-2 fw-light"
         >Parametri di generazione</label
       >
@@ -187,14 +187,14 @@
 
     }
 
-    <section class="form-section">
+    <section tourAnchor="gen_ai_support_files" class="form-section">
       <label class="form-label text-dark mb-2 fw-light">
         File e risorse di supporto per la generazione
       </label>
       <app-materiali-selector></app-materiali-selector>
     </section>
 
-    <section class="form-section">
+    <section tourAnchor="gen_ai_instructions" class="form-section">
       <label class="form-label text-dark mb-2">Istruzioni aggiuntive</label>
       <textarea
         class="form-control custom-input"
@@ -208,6 +208,7 @@
 
     <div class="text-end">
       <button
+        tourAnchor="gen_ai_submit"
         type="submit"
         class="btn btn-primary ai btn-lg icon-btn"
         [disabled]="genForm.invalid || IsGenerating()"
@@ -239,7 +240,10 @@
       >
     </div>
     }
-    <div class="d-flex align-items-center justify-content-between">
+    <div
+      tourAnchor="gen_ai_review_controls"
+      class="d-flex align-items-center justify-content-between"
+    >
       <button
         class="btn btn-link p-0 text-muted small"
         type="button"
@@ -279,7 +283,10 @@
     </div>
     }
 
-    <div class="d-flex justify-content-end mt-2">
+    <div
+      tourAnchor="gen_ai_review_save"
+      class="d-flex justify-content-end mt-2"
+    >
       <button
         class="btn ai btn-lg"
         type="button"

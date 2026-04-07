@@ -1,5 +1,5 @@
 <div class="d-flex flex-column h-100 overflow-hidden">
-  <div class="mb-4">
+  <div class="mb-4" tourAnchor="assistente_ai_header">
     <h1 class="text-dark fw-medium mb-3 display-6">Agente AI</h1>
 
     @if (userRole() === 'teacher') {
@@ -18,7 +18,10 @@
     <!-- Colonna di SINISTRA -->
     <div class="col-12 col-lg-4 d-flex flex-column h-100">
       @if (userRole() === 'teacher') {
-      <div class="flex-fill overflow-auto pe-1">
+      <div
+        class="flex-fill overflow-auto pe-1"
+        tourAnchor="assistente_ai_settings"
+      >
         <app-agent-settings-form
           (assistantLoaded)="onAssistantLoaded($event)"
         ></app-agent-settings-form>
@@ -73,7 +76,10 @@
     <!-- Colonna di DESTRA: Chat -->
     <div class="col-12 col-lg-8 d-flex flex-column h-100">
       @if (currentAssistantId()) {
-      <div class="flex-fill h-100 position-relative">
+      <div
+        class="flex-fill h-100 position-relative"
+        tourAnchor="assistente_ai_chat"
+      >
         <app-agent-chat [assistantId]="currentAssistantId()!"></app-agent-chat>
       </div>
       } @else {

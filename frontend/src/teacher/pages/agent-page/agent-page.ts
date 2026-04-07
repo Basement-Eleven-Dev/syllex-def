@@ -9,6 +9,7 @@ import { Auth } from '../../../services/auth';
 import { AgentService } from '../../../services/agent.service';
 import { CommonModule } from '@angular/common';
 import { FeedbackService } from '../../../services/feedback-service';
+import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 
 @Component({
   selector: 'app-agent-page',
@@ -19,6 +20,7 @@ import { FeedbackService } from '../../../services/feedback-service';
     AgentChat,
     AgentSettingsForm,
     CommonModule,
+    TourAnchorNgBootstrapDirective,
   ],
   templateUrl: './agent-page.html',
   styleUrl: './agent-page.scss',

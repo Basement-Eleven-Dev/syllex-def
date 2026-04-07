@@ -22,6 +22,7 @@
     </div>
     }
     <div
+      tourAnchor="calendario_nav"
       class="d-flex flex-row align-items-center gap-0 border border-primary rounded-syllex"
     >
       <button
@@ -42,7 +43,7 @@
 
   <div class="row">
     <!-- Calendar grid -->
-    <div class="col-12 col-lg-6 mb-3">
+    <div tourAnchor="calendario_griglia" class="col-12 col-lg-6 mb-3">
       <div class="d-flex flex-row mb-3">
         @for (day of ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom']; track
         $index) {
@@ -97,10 +98,7 @@
           </h4>
         </div>
         @if (!readonly()) {
-        <button
-          class="btn btn-blue btn-sm"
-          (click)="openAddEventModal()"
-        >
+        <button class="btn btn-blue btn-sm" (click)="openAddEventModal()">
           <fa-icon [icon]="PlusIcon"></fa-icon> Nuovo Evento
         </button>
         }
@@ -108,6 +106,7 @@
 
       <div
         class="flex-fill p-3 rounded-syllex bg-white"
+        tourAnchor="calendario_dettaglio_giorno"
         id="calendarDayDetailCard"
       >
         <!-- Scrollable Content Section -->

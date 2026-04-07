@@ -1,14 +1,20 @@
-<h1 class="text-dark fw-medium mb-3 display-6">
-  Ciao {{ authService.user?.firstName }}
-</h1>
-<h5 class="text-dark mb-0 fw-normal">
-  Qui puoi gestire i contenuti e i test per la materia {{
-  materiaService.materiaSelected()?.name}}.
-</h5>
+<div tourAnchor="dashboard_welcome">
+  <h1 class="text-dark fw-medium mb-3 display-6">
+    Ciao {{ authService.user?.firstName }}
+  </h1>
+  <h5 class="text-dark mb-0 fw-normal">
+    Qui puoi gestire i contenuti e i test per la materia {{
+    materiaService.materiaSelected()?.name}}.
+  </h5>
+</div>
 
 <div class="row mt-5">
   <div class="col-12 col-lg-6 d-flex flex-column mb-3">
-    <div class="card p-4 flex-fill" id="startWorkingCard">
+    <div
+      class="card p-4 flex-fill"
+      id="startWorkingCard"
+      tourAnchor="dashboard_quick_actions"
+    >
       <div class="card-body d-flex flex-column gap-4">
         <div>
           <span class="display-5 fw-medium text-dark" style="line-height: 1"
@@ -36,7 +42,11 @@
     </div>
   </div>
   <div class="col-12 col-lg-6 d-flex flex-column mb-3">
-    <div class="card overflow-scroll flex-fill p-4" style="height: 300px">
+    <div
+      class="card overflow-scroll flex-fill p-4"
+      style="height: 300px"
+      tourAnchor="dashboard_communications"
+    >
       <div class="card-body">
         <div class="d-flex flex-row justify-content-between text-dark">
           <h4 class="text-primary fw-semibold mb-3">
@@ -55,9 +65,9 @@
               <div
                 class="mb-1 d-flex flex-row justify-content-between align-items-center"
               >
-                <p class="mb-0 text-primary ">{{ c.title }}</p>
+                <p class="mb-0 text-primary">{{ c.title }}</p>
                 @if(c.materialIds && c.materialIds.length > 0){
- <!--                <small>
+                <!--                <small>
                   <fa-icon [icon]="AttachmentIcon"></fa-icon>
                   {{ c.materialIds.length }} Allegato
                 </small> -->
@@ -74,6 +84,6 @@
   </div>
 </div>
 
-<section class="mt-3 mb-5 card form-section">
+<section class="mt-3 mb-5 card form-section" tourAnchor="dashboard_calendar">
   <app-calendario></app-calendario>
 </section>

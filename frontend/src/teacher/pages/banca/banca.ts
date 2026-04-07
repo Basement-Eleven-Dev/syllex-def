@@ -17,6 +17,7 @@ import {
   ViewType,
 } from '../../components/view-type-toggle/view-type-toggle';
 import { FeedbackService } from '../../../services/feedback-service';
+import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 
 @Component({
   selector: 'app-banca',
@@ -29,6 +30,7 @@ import { FeedbackService } from '../../../services/feedback-service';
     SyllexPagination,
     FormsModule,
     ViewTypeToggle,
+    TourAnchorNgBootstrapDirective,
   ],
   templateUrl: './banca.html',
   styleUrl: './banca.scss',
