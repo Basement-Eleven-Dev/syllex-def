@@ -126,10 +126,7 @@ export class MaterialiItemComponent {
   checkIcon = faCheckCircle;
 
   isFolder(item: MaterialInterface): boolean {
-    return (
-      item.type === 'folder' ||
-      (item.content !== undefined && item.content !== null)
-    );
+    return item.type === 'folder' || (item.content?.length ?? 0) > 0;
   }
 
   getIconColor(item: MaterialInterface): string {
