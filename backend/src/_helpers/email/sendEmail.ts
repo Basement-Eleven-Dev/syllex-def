@@ -4,7 +4,9 @@ import { SendMessageCommand, SendMessageCommandInput, SQSClient } from "@aws-sdk
 
 const sesClient = new SESClient({ region: "eu-south-1" });
 
-
+/**
+ * Invia una singola email tramite AWS SES o mettendola in coda SQS.
+ */
 export async function sendEmail(to: string, subject: string, html: string, operation: 'send' | 'queue' = 'queue') {
   const queueUrl = process.env.EMAIL_QUEUE_URL;
   if (operation === 'queue' && queueUrl) {
@@ -22,6 +24,7 @@ export async function sendEmail(to: string, subject: string, html: string, opera
     await sqsClient.send(new SendMessageCommand(messageInput));
     return;
   }
+  
   console.log("Invio email a:", to);
   const command = new SendEmailCommand({
     Destination: {
@@ -49,4 +52,27 @@ export async function sendEmail(to: string, subject: string, html: string, opera
     console.error("Errore invio email SES:", error);
     throw error;
   }
+}
+
+/**
+ * Invia email in bulk caricando ogni destinatario nella coda SQS.
+ */
+export async function sendBulkEmail(params: {
+  subject: string;
+  html: string;
+  recipients: string[];
+}): Promise<number> {
+  const { subject, html, recipients } = params;
+  let sentCount = 0;
+
+  for (const recipient of recipients) {
+    try {
+      await sendEmail(recipient, subject, html, "queue");
+      sentCount++;
+    } catch (err) {
+      console.error(`[EmailBulk] Errore inserimento in coda per ${recipient}:`, err);
+    }
+  }
+
+  return sentCount;
 }

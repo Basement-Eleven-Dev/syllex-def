@@ -17,12 +17,15 @@ import {
   faArrowDown
 } from '@fortawesome/free-solid-svg-icons';
 import { RouterModule } from '@angular/router';
-import { DeterministicPasswordTool } from './deterministic-password-tool';
 
 @Component({
   selector: 'app-dashboard-super-admin',
   standalone: true,
-  imports: [CommonModule, FontAwesomeModule, RouterModule, DeterministicPasswordTool],
+  imports: [
+    CommonModule, 
+    FontAwesomeModule, 
+    RouterModule
+  ],
   templateUrl: './dashboard-super-admin.html',
   styleUrls: ['../../pages/admin-dashboard/admin-dashboard.scss'] // Reusing original styles
 })

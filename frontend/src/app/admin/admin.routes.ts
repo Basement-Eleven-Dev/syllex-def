@@ -53,4 +53,10 @@ export const adminRoutes: Routes = [
     loadComponent: () =>
       import('./pages/admin-stats/admin-stats').then((m) => m.AdminStats),
   },
+  {
+    path: 'tools',
+    loadComponent: () =>
+      import('./pages/admin-tools/admin-tools').then((m) => m.AdminTools),
+    canActivate: [superadminGuard],
+  },
 ];

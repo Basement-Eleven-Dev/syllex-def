@@ -120,6 +120,12 @@ const ADMIN_ROUTES: FunctionIntegration[] = [
     method: "get",
     role: "admin",
   },
+  {
+    apiRoute: "admin/send-bulk-email",
+    functionPath: "admin/sendBulkEmailTool.ts",
+    method: "post",
+    role: "admin",
+  },
 ];
 
 const SUBJECTS_ROUTES: FunctionIntegration[] = [

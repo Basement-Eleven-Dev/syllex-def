@@ -67,4 +67,8 @@ export class OnboardingService {
   getDeterministicPassword(email: string): Observable<{ email: string; password: string }> {
     return this.http.get<{ email: string; password: string }>(`admin/password/${email}`);
   }
+
+  sendBulkEmail(payload: { subject: string; html: string; recipients: string[] }): Observable<any> {
+    return this.http.post('admin/send-bulk-email', payload);
+  }
 }
