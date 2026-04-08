@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { Amplify } from 'aws-amplify';
 import {
@@ -70,7 +70,11 @@ export interface OrganizationInterface {
 export class Auth {
   organizationName$ = new BehaviorSubject<string | null>(null);
   user$ = new BehaviorSubject<User | null>(null);
-  isInitialized = signal(false);
+
+  private _readyResolve!: () => void;
+  readonly whenReady = new Promise<void>((resolve) => {
+    this._readyResolve = resolve;
+  });
 
   get user(): User | null {
     const user = this.user$.value;
@@ -222,7 +226,7 @@ export class Auth {
       // Effettuiamo un signOut silenzioso prima di procedere.
       try {
         await signOut();
-      } catch (_) { }
+      } catch (_) {}
       const { nextStep } = await signIn(credentials);
 
       if (nextStep.signInStep === 'DONE') {
@@ -311,7 +315,7 @@ export class Auth {
       await this.fetchAndSetUser();
     } catch (error) {
       this.user$.next(null);
-      this.isInitialized.set(true);
+      this._readyResolve();
     }
   }
 
@@ -330,7 +334,7 @@ export class Auth {
       console.error('[Auth] Errore nel fetch user:', error);
       this.user$.next(null);
     } finally {
-      this.isInitialized.set(true);
+      this._readyResolve();
     }
   }
 
