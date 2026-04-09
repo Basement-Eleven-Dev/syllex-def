@@ -15,6 +15,7 @@
     "create:user": "npx ts-node routines/createUser.ts",
     "create:mock:attempts": "npx ts-node routines/createMockAttempts.ts",
     "create:users": "npx ts-node routines/createUsers.ts",
+    "regenerate:extracted-text": "npx ts-node routines/regenerateExtractedTextUrls.ts",
     "dev": "AWS_PROFILE=pathway nodemon --exec tsx ./local/local-dev.ts",
     "check-types": "tsc --noEmit",
     "test": "jest"
