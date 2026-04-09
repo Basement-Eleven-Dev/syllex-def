@@ -24,14 +24,17 @@ const updateMaterialClasses = async (
 
   // Update classIds atomically and return updated doc
   const updatedMaterial = await Material.findOneAndUpdate(
-    { _id: new mongo.ObjectId(materialId) as any, teacherId: context.user?._id as any },
+    {
+      _id: new mongo.ObjectId(materialId) as any,
+      teacherId: context.user?._id as any,
+    },
     {
       $set: {
         classIds: body.classIds.map((id: string) => new mongo.ObjectId(id)),
         updatedAt: new Date(),
       },
     },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   ).lean();
 
   if (!updatedMaterial) {
