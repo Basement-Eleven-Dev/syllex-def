@@ -6,6 +6,7 @@ import {
   faPencil,
   faPlus,
   faXmark,
+  faTrash,
 } from '@fortawesome/pro-solid-svg-icons';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Materia, TopicObject } from '../../../services/materia';
@@ -26,6 +27,7 @@ export class SubjectSettingsModal {
   readonly CheckIcon = faCheck;
   readonly XmarkIcon = faXmark;
   readonly PlusIcon = faPlus;
+  readonly TrashIcon = faTrash;
 
   readonly Subject = computed(() => this.MateriaService.materiaSelected());
   readonly Topics = computed(() => this.Subject()?.topics ?? []);
@@ -71,6 +73,28 @@ export class SubjectSettingsModal {
         this.IsSaving.set(false);
         this.feedbackService.showFeedback(
           "Errore nel rinominare l'argomento.",
+          false,
+        );
+      },
+    });
+  }
+
+  deleteTopic(topicId: string): void {
+    const subjectId = this.Subject()?._id;
+    if (!subjectId) return;
+
+    if (!confirm('Sei sicuro di voler eliminare questo argomento?')) return;
+
+    this.MateriaService.deleteTopic(subjectId, topicId).subscribe({
+      next: () => {
+        this.feedbackService.showFeedback(
+          'Argomento eliminato con successo!',
+          true,
+        );
+      },
+      error: () => {
+        this.feedbackService.showFeedback(
+          "Errore nell'eliminare l'argomento.",
           false,
         );
       },

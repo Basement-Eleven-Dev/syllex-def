@@ -141,6 +141,12 @@ const SUBJECTS_ROUTES: FunctionIntegration[] = [
     method: "put",
     role: "teacher",
   },
+  {
+    apiRoute: "topics/{topicId}",
+    functionPath: "teachers/deleteTopic.ts",
+    method: "delete",
+    role: "teacher",
+  },
 ];
 
 const CLASSES_ROUTES: FunctionIntegration[] = [

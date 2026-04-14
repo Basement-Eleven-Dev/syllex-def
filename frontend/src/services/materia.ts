@@ -24,19 +24,15 @@ export class Materia {
   /** Signal che indica se il prossimo cambio di materia richiede un reload */
   shouldReload = signal<boolean>(false);
 
-  constructor(
-    private http: HttpClient
-  ) {
+  constructor(private http: HttpClient) {
     this.getMaterie();
   }
 
   getMaterie(): void {
-    this.http
-      .get<MateriaObject[]>('subjects')
-      .subscribe((materie) => {
-        this.allMaterie.set(materie);
-        this.loadSavedSubject();
-      });
+    this.http.get<MateriaObject[]>('subjects').subscribe((materie) => {
+      this.allMaterie.set(materie);
+      this.loadSavedSubject();
+    });
   }
 
   /**
@@ -139,6 +135,34 @@ export class Materia {
             if (this.materiaSelected()?._id === subjectId) {
               this.materiaSelected.update((s) =>
                 s ? { ...s, topics: updateTopics(s.topics) } : s,
+              );
+            }
+          }
+        }),
+      );
+  }
+
+  deleteTopic(
+    subjectId: string,
+    topicId: string,
+  ): Observable<{ success: boolean; deleted: boolean }> {
+    return this.http
+      .delete<{ success: boolean; deleted: boolean }>(`topics/${topicId}`)
+      .pipe(
+        tap((res) => {
+          if (res.success) {
+            const filterTopics = (topics: TopicObject[]) =>
+              topics.filter((t) => t._id !== topicId);
+            this.allMaterie.update((materie) =>
+              materie.map((m) =>
+                m._id === subjectId
+                  ? { ...m, topics: filterTopics(m.topics) }
+                  : m,
+              ),
+            );
+            if (this.materiaSelected()?._id === subjectId) {
+              this.materiaSelected.update((s) =>
+                s ? { ...s, topics: filterTopics(s.topics) } : s,
               );
             }
           }
