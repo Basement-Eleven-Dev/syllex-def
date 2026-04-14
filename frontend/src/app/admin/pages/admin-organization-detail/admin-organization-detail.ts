@@ -3,11 +3,11 @@ import { CommonModule } from '@angular/common';
 import { Observable, tap } from 'rxjs';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import {
-  faLandmark,
-  faUserTie,
-  faUsers,
-  faBook,
+import { 
+  faLandmark, 
+  faUserTie, 
+  faUsers, 
+  faBook, 
   faArrowLeft,
   faPlus,
   faEnvelope,
@@ -18,8 +18,7 @@ import {
   faEdit,
   faTrash,
   faCopy,
-  faExclamationCircle,
-  faUserSecret,
+  faExclamationCircle
 } from '@fortawesome/pro-solid-svg-icons';
 import { OnboardingService } from '../../service/onboarding-service';
 import { FeedbackService } from '../../../../services/feedback-service';
@@ -39,13 +38,7 @@ type TabType = 'overview' | 'staff' | 'didactics' | 'students';
 @Component({
   selector: 'app-admin-organization-detail',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterModule,
-    FontAwesomeModule,
-    NgbDropdownModule,
-    AdminAnalyticsComponent,
-  ],
+  imports: [CommonModule, RouterModule, FontAwesomeModule, NgbDropdownModule, AdminAnalyticsComponent],
   templateUrl: './admin-organization-detail.html',
   styleUrl: './admin-organization-detail.scss',
 })
@@ -69,7 +62,7 @@ export class AdminOrganizationDetail implements OnInit {
   staffList: any[] = [];
   didactics: any = null;
   studentsList: any[] = [];
-
+  
   icons = {
     faLandmark,
     faUserTie,
@@ -85,8 +78,7 @@ export class AdminOrganizationDetail implements OnInit {
     faEdit,
     faTrash,
     faCopy,
-    faExclamationCircle,
-    faUserSecret,
+    faExclamationCircle
   };
 
   ngOnInit() {
@@ -100,10 +92,8 @@ export class AdminOrganizationDetail implements OnInit {
   setActiveTab(tab: TabType) {
     this.activeTab = tab;
     if (tab === 'staff' && this.staffList.length === 0) this.loadStaff();
-    if (tab === 'didactics' && !this.didactics)
-      this.loadDidactics().subscribe();
-    if (tab === 'students' && this.studentsList.length === 0)
-      this.loadStudents();
+    if (tab === 'didactics' && !this.didactics) this.loadDidactics().subscribe();
+    if (tab === 'students' && this.studentsList.length === 0) this.loadStudents();
   }
 
   loadWorkspaceDetails() {
@@ -115,161 +105,128 @@ export class AdminOrganizationDetail implements OnInit {
         this.loading = false;
       },
       error: (err) => {
-        this.feedbackService.showFeedback(
-          'Errore nel caricamento del workspace',
-          false,
-        );
+        this.feedbackService.showFeedback('Errore nel caricamento del workspace', false);
         this.loading = false;
-      },
+      }
     });
   }
 
   loadStaff() {
     this.onboardingService.getWorkspaceStaff(this.orgId!).subscribe({
-      next: (res) => (this.staffList = res.staff),
-      error: () =>
-        this.feedbackService.showFeedback('Errore caricamento staff', false),
+      next: (res) => this.staffList = res.staff,
+      error: () => this.feedbackService.showFeedback('Errore caricamento staff', false)
     });
   }
 
   loadDidactics() {
     this.didacticsLoading = true;
     return this.onboardingService.getWorkspaceDidactics(this.orgId!).pipe(
-      tap((res) => {
+      tap(res => {
         this.didactics = res;
         this.didacticsLoading = false;
-      }),
+      })
     );
   }
 
   loadStudents() {
     this.onboardingService.getWorkspaceStudents(this.orgId!).subscribe({
-      next: (res) => (this.studentsList = res.students),
-      error: () =>
-        this.feedbackService.showFeedback('Errore caricamento studenti', false),
+      next: (res) => this.studentsList = res.students,
+      error: () => this.feedbackService.showFeedback('Errore caricamento studenti', false)
     });
   }
 
   openAddStaffModal() {
     const openModal = () => {
-      const modalRef = this.modalService.open(UserModal, { centered: true });
-      modalRef.componentInstance.orgId = this.orgId;
-      modalRef.componentInstance.title = 'Aggiungi Personale';
-      modalRef.componentInstance.subjects = this.didactics?.subjects || [];
-      modalRef.componentInstance.classes = this.didactics?.classes || [];
-      modalRef.result.then(
-        (newUser) => {
-          if (newUser) {
-            this.staffList = [newUser, ...this.staffList];
-            this.stats.staffCount++;
-          }
-        },
-        () => {},
-      );
+        const modalRef = this.modalService.open(UserModal, { centered: true });
+        modalRef.componentInstance.orgId = this.orgId;
+        modalRef.componentInstance.title = 'Aggiungi Personale';
+        modalRef.componentInstance.subjects = this.didactics?.subjects || [];
+        modalRef.componentInstance.classes = this.didactics?.classes || [];
+        modalRef.result.then((newUser) => {
+            if (newUser) {
+                this.staffList = [newUser, ...this.staffList];
+                this.stats.staffCount++;
+            }
+        }, () => {});
     };
 
     if (!this.didactics) {
-      this.loadDidactics().subscribe({
-        next: () => openModal(),
-        error: () =>
-          this.feedbackService.showFeedback(
-            'Impossibile caricare i dati della struttura',
-            false,
-          ),
-      });
+        this.loadDidactics().subscribe({
+            next: () => openModal(),
+            error: () => this.feedbackService.showFeedback('Impossibile caricare i dati della struttura', false)
+        });
     } else {
-      openModal();
+        openModal();
     }
   }
 
   openAddStudentModal() {
     const openModal = () => {
-      const modalRef = this.modalService.open(UserModal, { centered: true });
-      modalRef.componentInstance.orgId = this.orgId;
-      modalRef.componentInstance.title = 'Aggiungi Studente';
-      modalRef.componentInstance.fixedRole = 'student';
-      modalRef.componentInstance.classes = this.didactics?.classes || [];
-      modalRef.componentInstance.subjects = this.didactics?.subjects || [];
-      modalRef.result.then(
-        (newUser) => {
-          if (newUser) {
-            this.studentsList = [newUser, ...this.studentsList];
-            this.stats.studentsCount++;
-          }
-        },
-        () => {},
-      );
+        const modalRef = this.modalService.open(UserModal, { centered: true });
+        modalRef.componentInstance.orgId = this.orgId;
+        modalRef.componentInstance.title = 'Aggiungi Studente';
+        modalRef.componentInstance.fixedRole = 'student';
+        modalRef.componentInstance.classes = this.didactics?.classes || [];
+        modalRef.componentInstance.subjects = this.didactics?.subjects || [];
+        modalRef.result.then((newUser) => {
+            if (newUser) {
+                this.studentsList = [newUser, ...this.studentsList];
+                this.stats.studentsCount++;
+            }
+        }, () => {});
     };
 
     if (!this.didactics) {
-      this.loadDidactics().subscribe({
-        next: () => openModal(),
-        error: () =>
-          this.feedbackService.showFeedback(
-            'Impossibile caricare i dati della struttura',
-            false,
-          ),
-      });
+        this.loadDidactics().subscribe({
+            next: () => openModal(),
+            error: () => this.feedbackService.showFeedback('Impossibile caricare i dati della struttura', false)
+        });
     } else {
-      openModal();
+        openModal();
     }
   }
 
   openAddClassModal() {
     const modalRef = this.modalService.open(ClassModal, { centered: true });
     modalRef.componentInstance.orgId = this.orgId;
-    modalRef.result.then(
-      (res) => {
+    modalRef.result.then((res) => {
         if (res) {
-          this.loadDidactics();
-          this.stats.classesCount++;
+            this.loadDidactics();
+            this.stats.classesCount++;
         }
-      },
-      () => {},
-    );
+    }, () => {});
   }
 
   openAddSubjectModal() {
     if (!this.staffList || this.staffList.length === 0) {
-      this.loadStaff();
+        this.loadStaff();
     }
     const modalRef = this.modalService.open(SubjectModal, { centered: true });
     modalRef.componentInstance.orgId = this.orgId;
-    modalRef.componentInstance.teachers = this.staffList.filter(
-      (u) => u.role === 'teacher',
-    );
-    modalRef.result.then(
-      (res) => {
+    modalRef.componentInstance.teachers = this.staffList.filter(u => u.role === 'teacher');
+    modalRef.result.then((res) => {
         if (res) {
-          this.loadDidactics().subscribe();
-          this.stats.subjectsCount++;
+            this.loadDidactics().subscribe();
+            this.stats.subjectsCount++;
         }
-      },
-      () => {},
-    );
+    }, () => {});
   }
 
-  openAssignmentModal(preData?: { teacherId?: string; classId?: string }) {
-    const modalRef = this.modalService.open(AssignmentModal, {
-      centered: true,
-    });
+  openAssignmentModal(preData?: { teacherId?: string, classId?: string }) {
+    const modalRef = this.modalService.open(AssignmentModal, { centered: true });
     modalRef.componentInstance.orgId = this.orgId;
-    if (preData?.teacherId)
-      modalRef.componentInstance.fixedTeacherId = preData.teacherId;
+    if (preData?.teacherId) modalRef.componentInstance.fixedTeacherId = preData.teacherId;
     if (preData?.classId) modalRef.componentInstance.classId = preData.classId;
-
-    modalRef.result.then(
-      (res) => {
+    
+    modalRef.result.then((res) => {
         if (res) {
-          this.loadDidactics().subscribe();
-          if (preData?.teacherId) {
-            // Refresh staff to update "Without Class" status
-            this.loadStaff();
-          }
+            this.loadDidactics().subscribe();
+            if (preData?.teacherId) {
+                // Refresh staff to update "Without Class" status
+                this.loadStaff();
+            }
         }
-      },
-      () => {},
-    );
+    }, () => {});
   }
 
   openAssignmentFromStaff(user: any) {
@@ -278,65 +235,48 @@ export class AdminOrganizationDetail implements OnInit {
 
   openEditUserModal(user: any, listType: 'staff' | 'student') {
     const openModal = () => {
-      const modalRef = this.modalService.open(UserModal, { centered: true });
-      modalRef.componentInstance.orgId = this.orgId;
-      modalRef.componentInstance.user = user;
-      modalRef.componentInstance.subjects = this.didactics?.subjects || [];
-      modalRef.componentInstance.classes = this.didactics?.classes || [];
-      modalRef.result.then(
-        (updatedUser) => {
-          if (updatedUser) {
-            if (listType === 'staff') {
-              this.staffList = this.staffList.map((u) =>
-                u._id === updatedUser._id ? { ...u, ...updatedUser } : u,
-              );
-            } else {
-              this.studentsList = this.studentsList.map((u) =>
-                u._id === updatedUser._id ? { ...u, ...updatedUser } : u,
-              );
+        const modalRef = this.modalService.open(UserModal, { centered: true });
+        modalRef.componentInstance.orgId = this.orgId;
+        modalRef.componentInstance.user = user;
+        modalRef.componentInstance.subjects = this.didactics?.subjects || [];
+        modalRef.componentInstance.classes = this.didactics?.classes || [];
+        modalRef.result.then((updatedUser) => {
+            if (updatedUser) {
+                if (listType === 'staff') {
+                    this.staffList = this.staffList.map(u => u._id === updatedUser._id ? { ...u, ...updatedUser } : u);
+                } else {
+                    this.studentsList = this.studentsList.map(u => u._id === updatedUser._id ? { ...u, ...updatedUser } : u);
+                }
             }
-          }
-        },
-        () => {},
-      );
+        }, () => {});
     };
 
     if (!this.didactics) {
-      this.loadDidactics().subscribe({
-        next: () => openModal(),
-        error: () =>
-          this.feedbackService.showFeedback(
-            'Impossibile caricare i dati della struttura',
-            false,
-          ),
-      });
+        this.loadDidactics().subscribe({
+            next: () => openModal(),
+            error: () => this.feedbackService.showFeedback('Impossibile caricare i dati della struttura', false)
+        });
     } else {
-      openModal();
+        openModal();
     }
   }
 
   openBulkImportModal(classId?: string) {
     if (!this.didactics && this.activeTab !== 'didactics') {
-      this.loadDidactics();
+        this.loadDidactics();
     }
-
-    const modalRef = this.modalService.open(BulkImportModal, {
-      centered: true,
-      size: 'lg',
-    });
+    
+    const modalRef = this.modalService.open(BulkImportModal, { centered: true, size: 'lg' });
     modalRef.componentInstance.orgId = this.orgId;
     modalRef.componentInstance.classes = this.didactics?.classes || [];
     modalRef.componentInstance.targetClassId = classId;
-    modalRef.result.then(
-      (success) => {
+    modalRef.result.then((success) => {
         if (success) {
-          this.loadStudents();
-          this.loadWorkspaceDetails(); // Refresh stats
-          if (this.activeTab === 'didactics') this.loadDidactics();
+            this.loadStudents();
+            this.loadWorkspaceDetails(); // Refresh stats
+            if (this.activeTab === 'didactics') this.loadDidactics();
         }
-      },
-      () => {},
-    );
+    }, () => {});
   }
 
   goToClassDetail(classId: string) {
@@ -344,33 +284,20 @@ export class AdminOrganizationDetail implements OnInit {
   }
 
   removeUser(userId: string, role: 'staff' | 'student') {
-    if (
-      confirm(
-        "Sei sicuro di voler rimuovere questo utente dall'organizzazione?",
-      )
-    ) {
-      this.onboardingService.removeUser(this.orgId!, userId).subscribe({
-        next: () => {
-          this.feedbackService.showFeedback(
-            'Utente rimosso con successo',
-            true,
-          );
-          if (role === 'staff') {
-            this.staffList = this.staffList.filter((u) => u._id !== userId);
-            this.stats.staffCount--;
-          } else {
-            this.studentsList = this.studentsList.filter(
-              (u) => u._id !== userId,
-            );
-            this.stats.studentsCount--;
-          }
-        },
-        error: () =>
-          this.feedbackService.showFeedback(
-            "Errore durante la rimozione dell'utente",
-            false,
-          ),
-      });
+    if (confirm('Sei sicuro di voler rimuovere questo utente dall\'organizzazione?')) {
+        this.onboardingService.removeUser(this.orgId!, userId).subscribe({
+            next: () => {
+                this.feedbackService.showFeedback('Utente rimosso con successo', true);
+                if (role === 'staff') {
+                    this.staffList = this.staffList.filter(u => u._id !== userId);
+                    this.stats.staffCount--;
+                } else {
+                    this.studentsList = this.studentsList.filter(u => u._id !== userId);
+                    this.stats.studentsCount--;
+                }
+            },
+            error: () => this.feedbackService.showFeedback('Errore durante la rimozione dell\'utente', false)
+        });
     }
   }
 

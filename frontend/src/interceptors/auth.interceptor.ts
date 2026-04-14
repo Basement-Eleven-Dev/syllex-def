@@ -41,11 +41,6 @@ export const authInterceptor: HttpInterceptorFn = (
         headers['Subject-Id'] = subjectId;
       }
 
-      const impersonatedUserId = localStorage.getItem('impersonatedUserId');
-      if (impersonatedUserId) {
-        headers['X-Impersonate-User-Id'] = impersonatedUserId;
-      }
-
       const authReq = req.clone({
         url: apiUrl,
         setHeaders: headers,
