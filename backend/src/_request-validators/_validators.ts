@@ -26,6 +26,8 @@ export const canInvoke = async (
     // and verifies expiration/audience/issuer.
     const payload = await verifier.verify(token);
     if (cognitoGroup) {
+      // Admins can access any route (needed for user impersonation)
+      if (payload["cognito:groups"]?.includes("admins")) return payload;
       if (payload["cognito:groups"]?.includes(cognitoGroup)) return payload;
       else return null;
     }
@@ -51,16 +53,14 @@ export const checkValidation = async (
   const methodArnParts = event.methodArn.split("/");
   const wildcardArn = `${methodArnParts[0]}/${methodArnParts[1]}/*/*`;
 
-
-
   return !authorizedPayload
     ? generatePolicy("unauthorized", "Deny", wildcardArn)
     : generatePolicy(
-      authorizedPayload.sub,
-      "Allow",
-      wildcardArn,
-      authorizedPayload,
-    );
+        authorizedPayload.sub,
+        "Allow",
+        wildcardArn,
+        authorizedPayload,
+      );
 };
 
 const generatePolicy = (
@@ -84,10 +84,10 @@ const generatePolicy = (
     // The 'context' object only supports flat Key-Value pairs (strings, numbers, booleans)
     context: contextData
       ? {
-        email: contextData.email,
-        sub: contextData.sub,
-        groups: JSON.stringify(contextData["cognito:groups"] || []),
-      }
+          email: contextData.email,
+          sub: contextData.sub,
+          groups: JSON.stringify(contextData["cognito:groups"] || []),
+        }
       : undefined,
   };
 };

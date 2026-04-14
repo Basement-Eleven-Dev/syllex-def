@@ -1,3 +1,22 @@
+@if (authService.isImpersonatingUser) {
+<div
+  class="impersonation-banner d-flex align-items-center justify-content-center gap-3 px-3 py-2 bg-warning text-dark fw-bold small position-fixed top-0 start-0 end-0"
+  style="z-index: 9999"
+>
+  <span
+    >Stai visualizzando come
+    <strong>{{ authService.impersonatedUserName }}</strong></span
+  >
+  <button
+    class="btn btn-dark btn-sm py-0 px-3 fw-bold"
+    (click)="authService.stopImpersonatingUser()"
+  >
+    Esci
+  </button>
+</div>
+<div style="height: 40px"></div>
+}
+
 <router-outlet></router-outlet>
 
 <!-- Toast container -->

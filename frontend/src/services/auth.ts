@@ -112,7 +112,22 @@ export class Auth {
   }
 
   get isImpersonating(): boolean {
+    return (
+      !!localStorage.getItem('impersonatedOrgId') ||
+      !!localStorage.getItem('impersonatedUserId')
+    );
+  }
+
+  get isImpersonatingOrg(): boolean {
     return !!localStorage.getItem('impersonatedOrgId');
+  }
+
+  get isImpersonatingUser(): boolean {
+    return !!localStorage.getItem('impersonatedUserId');
+  }
+
+  get impersonatedUserName(): string | null {
+    return localStorage.getItem('impersonatedUserName');
   }
 
   impersonate(orgId: string) {
@@ -123,6 +138,18 @@ export class Auth {
   stopImpersonating() {
     localStorage.removeItem('impersonatedOrgId');
     window.location.reload();
+  }
+
+  impersonateUser(userId: string, userName: string) {
+    localStorage.setItem('impersonatedUserId', userId);
+    localStorage.setItem('impersonatedUserName', userName);
+    window.location.href = '/';
+  }
+
+  stopImpersonatingUser() {
+    localStorage.removeItem('impersonatedUserId');
+    localStorage.removeItem('impersonatedUserName');
+    window.location.href = '/a';
   }
 
   constructor(private http: HttpClient) {
