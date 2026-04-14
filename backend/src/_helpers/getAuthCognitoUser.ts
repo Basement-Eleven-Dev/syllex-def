@@ -1,10 +1,9 @@
-import {
-  APIGatewayProxyEvent,
-} from "aws-lambda";
+import { APIGatewayProxyEvent } from "aws-lambda";
 import { User } from "../models/schemas/user.schema";
 import { CognitoJwtVerifier } from "aws-jwt-verify";
 import { CognitoIdTokenPayload } from "aws-jwt-verify/jwt-model";
 import { connectDatabase } from "./getDatabase";
+import mongoose from "mongoose";
 
 export type LoggedUserClaims = {
   sub: string;
@@ -58,7 +57,7 @@ export const getAuthCognitoUser = async (
 export const getCurrentUser = async (
   request: APIGatewayProxyEvent,
 ): Promise<User | null> => {
-  await connectDatabase()
+  await connectDatabase();
   try {
     const token = (
       request.headers.authorization || request.headers.Authorization
@@ -66,8 +65,26 @@ export const getCurrentUser = async (
     if (!token) return null;
     const decodedToken = await getAuthCognitoUser(token);
     if (!decodedToken) return null;
+
+    // Admin impersonation: if the caller is an admin and provides the header,
+    // return the target user instead of the admin.
+    const impersonateUserId =
+      request.headers["x-impersonate-user-id"] ||
+      request.headers["X-Impersonate-User-Id"];
+    if (impersonateUserId) {
+      const isAdmin = decodedToken["cognito:groups"]?.includes("admins");
+      if (!isAdmin) return null;
+      if (!mongoose.Types.ObjectId.isValid(impersonateUserId)) return null;
+      const targetUser = await User.findById(impersonateUserId).lean();
+      if (!targetUser) return null;
+      console.log(
+        `[Impersonation] Admin ${decodedToken.sub} impersonating user ${impersonateUserId}`,
+      );
+      return targetUser;
+    }
+
     const user = await User.findOne({ cognitoId: decodedToken.sub }).lean();
-    return user
+    return user;
   } catch (error) {
     return null;
   }
