@@ -1,9 +1,14 @@
 <nav class="navbar-student">
   <div class="navbar-student__container">
-    <div class="navbar-student__logo" routerLink="/s/dashboard">
+    <div
+      class="navbar-student__logo"
+      routerLink="/s/dashboard"
+      (click)="closeMenu()"
+    >
       <img src="/images/logotipo.svg" alt="Syllex Logo" height="40" />
     </div>
 
+    <!-- Desktop links (≥992px) -->
     <div class="navbar-student__links">
       @for(route of routes; track $index){
       <a
@@ -23,13 +28,73 @@
     </div>
 
     <div class="navbar-student__actions">
+      <!-- Logout button: icon-only on tablet/mobile, icon+label on desktop -->
       <a class="navbar-student__logout" (click)="onLogout()">
         <fa-icon
           [icon]="LogoutIcon"
           class="navbar-student__logout-icon"
         ></fa-icon>
-        <span>Logout</span>
+        <span class="navbar-student__logout-label">Logout</span>
       </a>
+
+      <!-- Hamburger toggle (hidden on desktop) -->
+      <button
+        class="navbar-student__hamburger"
+        (click)="toggleMenu()"
+        [attr.aria-expanded]="menuOpen()"
+        aria-label="Apri menu di navigazione"
+      >
+        <fa-icon [icon]="menuOpen() ? XmarkIcon : BarsIcon"></fa-icon>
+      </button>
     </div>
   </div>
 </nav>
+
+<!-- Mobile/tablet overlay -->
+@if(menuOpen()){
+<div class="navbar-student__overlay" (click)="closeMenu()"></div>
+
+<!-- Side drawer -->
+<div
+  class="navbar-student__drawer"
+  role="dialog"
+  aria-label="Menu di navigazione"
+>
+  <div class="navbar-student__drawer-header">
+    <img src="/images/logotipo.svg" alt="Syllex Logo" height="36" />
+    <button
+      class="navbar-student__drawer-close"
+      (click)="closeMenu()"
+      aria-label="Chiudi menu"
+    >
+      <fa-icon [icon]="XmarkIcon"></fa-icon>
+    </button>
+  </div>
+
+  <nav class="navbar-student__drawer-nav">
+    @for(route of routes; track $index){
+    <a
+      [routerLink]="route.route"
+      class="navbar-student__drawer-link"
+      [routerLinkActive]="'active'"
+      [routerLinkActiveOptions]="{ exact: true }"
+      (click)="closeMenu()"
+    >
+      <fa-icon
+        [fixedWidth]="true"
+        [icon]="route.icon"
+        class="navbar-student__drawer-icon"
+      ></fa-icon>
+      <span>{{ route.label }}</span>
+    </a>
+    }
+  </nav>
+
+  <div class="navbar-student__drawer-footer">
+    <a class="navbar-student__drawer-logout" (click)="onLogout()">
+      <fa-icon [icon]="LogoutIcon"></fa-icon>
+      <span>Logout</span>
+    </a>
+  </div>
+</div>
+}

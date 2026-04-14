@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import {
   FontAwesomeModule,
@@ -12,6 +12,8 @@ import {
   faRobot,
   faUser,
   faArrowRightFromBracket,
+  faBars,
+  faXmark,
 } from '@fortawesome/pro-solid-svg-icons';
 import { Auth } from '../../../services/auth';
 
@@ -20,6 +22,7 @@ export interface NavRoute {
   icon: IconDefinition;
   route: string;
 }
+
 @Component({
   selector: 'app-nav',
   imports: [FontAwesomeModule, RouterModule],
@@ -28,7 +31,13 @@ export interface NavRoute {
 })
 export class Nav {
   private authService = inject(Auth);
+
   readonly LogoutIcon = faArrowRightFromBracket;
+  readonly BarsIcon = faBars;
+  readonly XmarkIcon = faXmark;
+
+  menuOpen = signal(false);
+
   routes: NavRoute[] = [
     { label: 'Dashboard', icon: faHouse, route: '/s/dashboard' },
     {
@@ -42,7 +51,16 @@ export class Nav {
     { label: 'Profilo', icon: faUser, route: '/s/profilo' },
   ];
 
+  toggleMenu(): void {
+    this.menuOpen.update((v) => !v);
+  }
+
+  closeMenu(): void {
+    this.menuOpen.set(false);
+  }
+
   onLogout(): void {
     this.authService.logout();
+    this.closeMenu();
   }
 }
