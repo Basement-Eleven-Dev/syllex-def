@@ -29,6 +29,7 @@ export class AgentPage {
   HeadSideBrainIcon = faHeadSideBrain;
   currentAssistantId = signal<string | null>(null);
   userRole = signal<'teacher' | 'student' | 'admin' | null>(null);
+  activeTab = signal<'subjects' | 'chat'>('subjects');
 
   constructor(
     public materiaService: Materia,
@@ -77,5 +78,6 @@ export class AgentPage {
   selectMateria(materia: any) {
     this.currentAssistantId.set(null); // Forza lo svuotamento della UI
     this.materiaService.setSelectedSubject(materia);
+    this.activeTab.set('chat');
   }
 }
