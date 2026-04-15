@@ -307,6 +307,12 @@ const QUESTIONS_ROUTES: FunctionIntegration[] = [
     role: "teacher",
   },
   {
+    apiRoute: "questions/all",
+    functionPath: "questions/getAllQuestions.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
     apiRoute: "questions/{questionId}",
     functionPath: "questions/deleteQuestion.ts",
     method: "delete",
