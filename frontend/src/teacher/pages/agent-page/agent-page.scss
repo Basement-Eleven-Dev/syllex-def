@@ -53,6 +53,42 @@
   transition: all 0.25s ease;
 }
 
+// Stili per il selettore mobile
+.nav-switcher {
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  
+  .btn {
+    border: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    
+    &:focus {
+      box-shadow: none;
+    }
+  }
+}
+
+.btn-white {
+  background-color: #fff !important;
+  color: var(--bs-primary) !important;
+}
+
+// Utility per mobile
+@media (max-width: 991.98px) {
+  .fs-2-mobile {
+    font-size: 1.75rem !important;
+  }
+  
+  .small-mobile {
+    font-size: 0.9rem !important;
+  }
+  
+  :host {
+    padding-bottom: 0 !important;
+    padding-top: 0 !important;
+  }
+}
+
 // Assicurati che le colonne bootstrap prendano tutta l'altezza
 .row.flex-fill {
   min-height: 0;

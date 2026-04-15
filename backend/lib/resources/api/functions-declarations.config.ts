@@ -141,6 +141,12 @@ const SUBJECTS_ROUTES: FunctionIntegration[] = [
     method: "put",
     role: "teacher",
   },
+  {
+    apiRoute: "topics/{topicId}",
+    functionPath: "teachers/deleteTopic.ts",
+    method: "delete",
+    role: "teacher",
+  },
 ];
 
 const CLASSES_ROUTES: FunctionIntegration[] = [
@@ -297,6 +303,12 @@ const QUESTIONS_ROUTES: FunctionIntegration[] = [
   {
     apiRoute: "questions",
     functionPath: "questions/getQuestions.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
+    apiRoute: "questions/all",
+    functionPath: "questions/getAllQuestions.ts",
     method: "get",
     role: "teacher",
   },

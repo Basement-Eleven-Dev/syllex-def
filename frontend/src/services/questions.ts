@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 import { FilesService } from './files-service';
 
 import { QuestionDifficulty } from '../types/question.types';
@@ -115,4 +115,15 @@ export class QuestionsService {
   deleteQuestion(id: string): Observable<{ deleted: boolean }> {
     return this.http.delete<{ deleted: boolean }>(`questions/${id}`);
   }
+
+  getAllQuestions(){
+       return this.http.get<{ questions: QuestionInterface[]; total: number }>(
+      `questions/all`,
+    );
+  }
+  hasQuestions(topicId: string): Observable<boolean> {
+  return this.getAllQuestions().pipe(
+    map(res => res.questions.some(q => q.topicId === topicId))
+  );
+}
 }
