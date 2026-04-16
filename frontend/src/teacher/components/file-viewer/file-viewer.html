@@ -1,62 +1,57 @@
 <div class="file-viewer-container">
   @if (isLoading()) {
-    <div class="loading-overlay">
-      <fa-icon
-        [icon]="SpinnerIcon"
-        [animation]="'spin'"
-        size="3x">
-      </fa-icon>
-    </div>
+  <div class="loading-overlay">
+    <fa-icon [icon]="SpinnerIcon" [animation]="'spin'" size="3x"> </fa-icon>
+  </div>
   }
 
   <div class="file-content-body">
     @if (mermaidContent()) {
-      <div class="mermaid-viewer">
-        <div #mermaidContainer class="mermaid-container"></div>
-        
-        <div class="zoom-controls">
-          <button (click)="resetZoom()" title="Reset vista">
-            <fa-icon [icon]="ResetIcon"></fa-icon>
-          </button>
-        </div>
+    <div class="mermaid-viewer">
+      <div #mermaidContainer class="mermaid-container"></div>
+
+      <div class="zoom-controls">
+        <button (click)="resetZoom()" title="Reset vista">
+          <fa-icon [icon]="ResetIcon"></fa-icon>
+        </button>
+        <button (click)="downloadAsPng()" title="Scarica PNG">
+          <fa-icon [icon]="DownloadIcon"></fa-icon>
+        </button>
       </div>
-    }
-    @else if (isPdf() && !isBlobUrl()) {
-      <div class="document-wrapper">
-        <iframe
-          [src]="docUrl | safe: 'resourceUrl'"
-          (load)="onLoad()"
-          class="previewer-frame">
-        </iframe>
-      </div>
-    }
-    @else if (isImage()) {
-      <div class="image-wrapper">
-        <img
-          [src]="docUrl"
-          (load)="onLoad()"
-        />
-      </div>
-    }
-    @else if (isBlobUrl()) {
-      <div class="document-wrapper">
-        <ngx-doc-viewer
-          [url]="docUrl"
-          viewer="url"
-          (loaded)="onLoad()"
-          class="previewer-frame">
-        </ngx-doc-viewer>
-      </div>
-    }
-    @else {
-      <div class="document-wrapper">
-        <ngx-doc-viewer
-          [url]="docUrl"
-          viewer="office"
-          (loaded)="onLoad()"
-          class="previewer-frame">
-        </ngx-doc-viewer>
-      </div>
+    </div>
+    } @else if (isPdf() && !isBlobUrl()) {
+    <div class="document-wrapper">
+      <iframe
+        [src]="docUrl | safe: 'resourceUrl'"
+        (load)="onLoad()"
+        class="previewer-frame"
+      >
+      </iframe>
+    </div>
+    } @else if (isImage()) {
+    <div class="image-wrapper">
+      <img [src]="docUrl" (load)="onLoad()" />
+    </div>
+    } @else if (isBlobUrl()) {
+    <div class="document-wrapper">
+      <ngx-doc-viewer
+        [url]="docUrl"
+        viewer="url"
+        (loaded)="onLoad()"
+        class="previewer-frame"
+      >
+      </ngx-doc-viewer>
+    </div>
+    } @else {
+    <div class="document-wrapper">
+      <ngx-doc-viewer
+        [url]="docUrl"
+        viewer="office"
+        (loaded)="onLoad()"
+        class="previewer-frame"
+      >
+      </ngx-doc-viewer>
+    </div>
     }
   </div>
 </div>
