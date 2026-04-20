@@ -19,16 +19,17 @@ const askSyllexHelpAssistant = async (
     throw createError.Unauthorized("User not found in context");
   }
 
-  // Mappa il ruolo dell'utente per il RAG (admin viene trattato come teacher)
-  const userRole: "student" | "teacher" = user.role === "student" ? "student" : "teacher";
+  // Mappa il ruolo dell'utente per il RAG (admin viene trattato come teacher o gestito via sitemap)
+  const userRole = user.role as "student" | "teacher" | "admin";
 
-  // Genera la risposta (stateless, non salva nulla a DB come richiesto)
-  const response = await generateHelpResponseGemini(query, history || [], userRole);
+  // Genera la risposta con eventuale azione suggerita (stateless)
+  const result = await generateHelpResponseGemini(query, history || [], userRole);
 
   return {
     success: true,
     data: {
-      content: response
+      content: result.content,
+      suggestedAction: result.suggestedAction
     }
   };
 };

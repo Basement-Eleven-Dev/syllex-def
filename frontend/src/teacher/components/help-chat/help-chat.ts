@@ -6,30 +6,29 @@ import {
   ViewChild,
   ElementRef,
   effect,
+  HostListener,
 } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { FormsModule } from '@angular/forms';
 import { faTimes } from '@fortawesome/pro-solid-svg-icons';
-import { faPaperPlane } from '@fortawesome/pro-regular-svg-icons';
+import { faPaperPlane, faChevronRight } from '@fortawesome/pro-regular-svg-icons';
 import { Auth } from '../../../services/auth';
+import { HelpChat as HelpChatService } from '../../../services/help-chat';
+import { Router } from '@angular/router';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   timestamp: number;
+  suggestedAction?: {
+    type: string;
+    path: string;
+    label: string;
+  } | null;
 }
 
 const LS_KEY = 'help_chat_messages';
 const TTL_MS = 24 * 60 * 60 * 1000;
-
-const MOCK_REPLIES = [
-  'Certo! Posso aiutarti con quello.',
-  'Ottima domanda! Fammi vedere cosa posso fare.',
-  'Ho capito, ti aiuto subito.',
-  'Puoi darmi qualche dettaglio in più?',
-  'Perfetto, ci penso io!',
-  'Interessante richiesta, lasciami elaborare una risposta.',
-];
 
 @Component({
   selector: 'app-help-chat',
@@ -41,18 +40,32 @@ export class HelpChat implements OnInit {
   @ViewChild('chatBottom') private chatBottom!: ElementRef<HTMLDivElement>;
 
   private authService = inject(Auth);
+  private helpService = inject(HelpChatService);
+  private router = inject(Router);
+  private elementRef = inject(ElementRef);
 
   readonly timesIcon = faTimes;
   readonly sendIcon = faPaperPlane;
+  readonly actionIcon = faChevronRight;
 
   chatVisible = signal<boolean>(false);
+  hasUnread = signal<boolean>(false);
   messages = signal<ChatMessage[]>([]);
   currentMessage = '';
   isSending = signal<boolean>(false);
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    if (!this.chatVisible()) return;
+
+    const clickedInside = this.elementRef.nativeElement.contains(event.target);
+    if (!clickedInside) {
+      this.closeChat();
+    }
+  }
+
   constructor() {
     effect(() => {
-      // Run after messages or isSending change; scroll to bottom
       this.messages();
       this.isSending();
       setTimeout(() => this.scrollToBottom(), 0);
@@ -90,6 +103,9 @@ export class HelpChat implements OnInit {
 
   toggleChat(): void {
     this.chatVisible.set(!this.chatVisible());
+    if (this.chatVisible()) {
+      this.hasUnread.set(false);
+    }
   }
 
   closeChat(): void {
@@ -100,24 +116,52 @@ export class HelpChat implements OnInit {
     const text = this.currentMessage.trim();
     if (!text || this.isSending()) return;
 
-    this.messages.update((msgs) => [
-      ...msgs,
-      { role: 'user', content: text, timestamp: Date.now() },
-    ]);
+    // Aggiungi messaggio utente
+    const userMsg: ChatMessage = { role: 'user', content: text, timestamp: Date.now() };
+    this.messages.update((msgs) => [...msgs, userMsg]);
     this.currentMessage = '';
     this.isSending.set(true);
     this.saveToStorage();
 
-    const delay = 1000 + Math.random() * 1000;
-    setTimeout(() => {
-      const reply =
-        MOCK_REPLIES[Math.floor(Math.random() * MOCK_REPLIES.length)];
-      this.messages.update((msgs) => [
-        ...msgs,
-        { role: 'assistant', content: reply, timestamp: Date.now() },
-      ]);
-      this.isSending.set(false);
-      this.saveToStorage();
-    }, delay);
+    // Mapping storia per il backend (ultimi 15 messaggi)
+    const history = this.messages()
+      .slice(-15)
+      .map(m => ({
+        role: m.role === 'assistant' ? 'agent' : 'user',
+        content: m.content
+      }));
+
+    this.helpService.askHelp(text, history).subscribe({
+      next: (res) => {
+        const assistantMsg: ChatMessage = {
+          role: 'assistant',
+          content: res.data.content,
+          suggestedAction: res.data.suggestedAction,
+          timestamp: Date.now()
+        };
+        this.messages.update((msgs) => [...msgs, assistantMsg]);
+        this.isSending.set(false);
+        this.saveToStorage();
+
+        if (!this.chatVisible()) {
+          this.hasUnread.set(true);
+        }
+      },
+      error: (err) => {
+        console.error('Errore chat assistenza:', err);
+        const errorMsg: ChatMessage = {
+          role: 'assistant',
+          content: 'Scusa, si è verificato un errore tecnico. Riprova più tardi.',
+          timestamp: Date.now()
+        };
+        this.messages.update((msgs) => [...msgs, errorMsg]);
+        this.isSending.set(false);
+      }
+    });
+  }
+
+  navigateToAction(path: string): void {
+    this.router.navigateByUrl(path);
+    this.closeChat();
   }
 }

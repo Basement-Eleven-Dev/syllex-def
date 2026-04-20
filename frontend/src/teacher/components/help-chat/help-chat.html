@@ -5,6 +5,9 @@
   (click)="toggleChat()"
 >
   <img src="/images/logo_primary.png" alt="Logo" height="30" />
+  @if (hasUnread()) {
+  <span class="notification-dot"></span>
+  }
 </div>
 
 <div
@@ -51,9 +54,19 @@
         [class.user]="msg.role === 'user'"
         [class.assistant]="msg.role === 'assistant'"
       >
-        <span class="message-bubble py-2 px-3 rounded-3"
-          >{{ msg.content }}</span
+        <span class="message-bubble py-2 px-3 rounded-3" [innerHTML]="msg.content"></span
         >
+        @if (msg.role === 'assistant' && msg.suggestedAction) {
+        <div class="mt-2 text-start">
+          <button
+            class="suggested-action-btn d-inline-flex align-items-center gap-2"
+            (click)="navigateToAction(msg.suggestedAction.path)"
+          >
+            <fa-icon [icon]="actionIcon"></fa-icon>
+            <span>{{ msg.suggestedAction.label }}</span>
+          </button>
+        </div>
+        }
       </div>
       } } @if (isSending()) {
       <div class="message assistant mb-2">

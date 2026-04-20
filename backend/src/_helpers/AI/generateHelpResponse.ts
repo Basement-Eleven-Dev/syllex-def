@@ -1,6 +1,7 @@
 import { getGeminiClient } from "./getClient";
 import { retrieveRelevantSyllexKnowledge } from "./embeddings/retrieveRelevantSyllexKnowledge";
 import { buildHelpAgent } from "./buildHelpAgent";
+import { getSitemapForRole } from "./helpSitemap";
 
 /**
  * Generatore di risposte per la chat di assistenza Syllex.
@@ -9,13 +10,16 @@ import { buildHelpAgent } from "./buildHelpAgent";
 export async function generateHelpResponseGemini(
   query: string,
   history: { role: string; content: string }[],
-  userRole: "student" | "teacher"
+  userRole: "student" | "teacher" | "admin"
 ) {
   try {
     const ai = await getGeminiClient();
 
     // 1. RAG: Recupero dei frammenti rilevanti dal manuale globale
-    const relevantChunks = await retrieveRelevantSyllexKnowledge(query, userRole);
+    const relevantChunks = await retrieveRelevantSyllexKnowledge(
+      query, 
+      userRole === 'admin' ? 'teacher' : userRole
+    );
     const contextString = relevantChunks
       .map((item) => item.text)
       .join("\n\n---\n\n");
@@ -31,7 +35,7 @@ export async function generateHelpResponseGemini(
 
     // 3. Generazione Risposta con Gemini
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview", // Usiamo l'ultimo modello flash per velocità
+      model: "gemini-3-flash-preview",
       contents: [
         {
           role: "user",
@@ -40,13 +44,36 @@ export async function generateHelpResponseGemini(
       ],
       config: {
         systemInstruction: systemPrompt,
-        temperature: 0.2, // Più basso per maggiore precisione tecnica
+        temperature: 0.1, // Più basso per maggiore precisione tecnica
       },
     });
 
-    return (
-      response.text || "Mi dispiace, non sono riuscito a generare una risposta al momento."
-    );
+    let text = response.text || "Mi dispiace, non sono riuscito a generare una risposta al momento.";
+    let suggestedAction = null;
+
+    // Estrazione del tag [NAVIGATE:KEY]
+    const navigateMatch = text.match(/\[NAVIGATE:(\w+)\]/);
+    if (navigateMatch) {
+      const key = navigateMatch[1];
+      const sitemap = getSitemapForRole(userRole);
+      const page = sitemap.find(p => p.key === key);
+      
+      if (page) {
+        suggestedAction = {
+          type: 'NAVIGATE',
+          path: page.path,
+          label: page.label
+        };
+      }
+      
+      // Pulizia del testo dal tag
+      text = text.replace(/\[NAVIGATE:\w+\]/g, '').trim();
+    }
+
+    return {
+      content: text,
+      suggestedAction
+    };
   } catch (error) {
     console.error("Errore nella generazione risposta Help Chat:", error);
     throw error;
