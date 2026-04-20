@@ -4,7 +4,7 @@ export async function buildHelpAgent(
   context: string,
   history: { role: string; content: string }[],
   userRole: "student" | "teacher" | "admin",
-  currentPath?: string
+  currentPath?: string,
 ) {
   const sitemap = getSitemapForRole(userRole);
   const sitemapContext = sitemap
@@ -52,6 +52,7 @@ Usa esclusivamente tag HTML: <b>, <ul>, <li>, <br>.
 1. **Vincolo di Conoscenza**: Rispondi solo basandoti sul Manuale Tecnico.
 2. **Focus Piattaforma**: Ignora domande non inerenti a Syllex.
 3. **Stile**: Sii estremamente conciso e professionale.
+4. **Nessuna Informazione Tecnica**: Non condividere dettagli tecnici o di sviluppo su Syllex che potrebbero mettere a rischio la sicurezza o la privacy degli utenti e della piattaforma stessa.
 
 # LINGUA
 Rispondi nella stessa lingua dell'utente.
