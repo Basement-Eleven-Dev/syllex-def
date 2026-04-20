@@ -23,6 +23,14 @@ export const adminRoutes: Routes = [
     canActivate: [superadminGuard],
   },
   {
+    path: 'knowledge-source',
+    loadComponent: () =>
+      import('./pages/knowledge-source-admin/knowledge-source-admin').then(
+        (m) => m.KnowledgeSourceAdmin,
+      ),
+    canActivate: [superadminGuard],
+  },
+  {
     path: 'organizzazioni',
     loadComponent: () =>
       import('./pages/admin-organizations/admin-organizations').then(
