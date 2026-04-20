@@ -49,6 +49,7 @@ export class MaterialiSelector {
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   @Input() embeddingCreationMode: boolean = false;
+  @Input() showAiGenerated: boolean = false;
 
   private readonly feedbackService = inject(FeedbackService);
 
@@ -86,10 +87,12 @@ export class MaterialiSelector {
   filteredMaterials = computed(() => {
     const all = this.allMaterials();
     const associatedIds = new Set(this.associatedMaterialIds());
-    if (!this.embeddingCreationMode) return all;
+    if (!this.embeddingCreationMode)
+      return all.filter((m) => this.showAiGenerated || !m.aiGenerated);
     return all.filter((m) => {
       // Escludi cartelle e filtra solo file testuali NON ancora associati a QUESTO assistente
       if (m.type === 'folder' || (m as any).content?.length > 0) return false;
+      if (!this.showAiGenerated && m.aiGenerated === true) return false;
       return isTextFile(m.extension || '') && !associatedIds.has(m._id);
     });
   });
@@ -109,9 +112,10 @@ export class MaterialiSelector {
           // Escludi cartelle (che hanno content) e filtra solo file testuali NON processati
           if (m.type === 'folder' || (m as any).content?.length > 0)
             return false;
+          if (!this.showAiGenerated && m.aiGenerated === true) return false;
           return isTextFile(m.extension || '') && !m.isVectorized;
         })
-      : all;
+      : all.filter((m) => this.showAiGenerated || !m.aiGenerated);
     return filtered.filter((m) => m.name.toLowerCase().includes(query));
   });
 

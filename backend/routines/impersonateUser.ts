@@ -1,18 +1,16 @@
 import { config } from "dotenv";
 import { mongo } from "mongoose";
 import { DB_NAME } from "../src/env";
-import { execSync } from "child_process";
 
 config();
 process.env.AWS_PROFILE = "pathway";
 
-const mongoConnectionString = process.env.DBCONNECTION as string;
-const FRONTEND_URL = "http://localhost:4200";
+const mongoConnectionString = process.env.DB_CONNECTION as string;
 
 const main = async () => {
   const email = process.argv[2];
   if (!email) {
-    console.error("Usage: npx ts-node routines/impersonateUser.ts <email>");
+    console.error("Usage: npm run impersonate <email>");
     process.exit(1);
   }
 
@@ -40,7 +38,6 @@ const main = async () => {
     process.exit(1);
   }
 
-  const userId = user._id.toString();
   const userName =
     `${user.firstName || ""} ${user.lastName || ""}`.trim() || email;
 
@@ -48,75 +45,23 @@ const main = async () => {
   console.log(`   Nome:  ${userName}`);
   console.log(`   Email: ${user.email}`);
   console.log(`   Ruolo: ${user.role}`);
-  console.log(`   ID:    ${userId}\n`);
+  console.log(`   Org:   ${user.organizationId || "nessuna"}\n`);
 
-  const jsCommand = `localStorage.setItem('impersonatedUserId','${userId}');localStorage.setItem('impersonatedUserName','${userName}');window.location.href='/';`;
-
-  // Tenta automazione via AppleScript su Chrome (macOS)
-  const automate = process.argv.includes("--auto");
-  if (automate) {
-    try {
-      const escapedJs = jsCommand.replace(/'/g, "\\'").replace(/"/g, '\\"');
-      const appleScript = `tell application "Google Chrome"
-  set targetTab to null
-  repeat with w in windows
-    repeat with t in tabs of w
-      if URL of t starts with "${FRONTEND_URL}" then
-        set targetTab to t
-        set active tab index of w to (index of t)
-        set index of w to 1
-        exit repeat
-      end if
-    end repeat
-    if targetTab is not null then exit repeat
-  end repeat
-  if targetTab is null then
-    tell front window to set targetTab to make new tab with properties {URL:"${FRONTEND_URL}"}
-    delay 2
-  end if
-  tell targetTab to execute javascript "${escapedJs}"
-end tell`;
-      execSync(`osascript -e '${appleScript.replace(/'/g, "'\\''")}'`, {
-        stdio: "pipe",
-      });
-      console.log("✅ Impersonation applicata in Chrome!");
-      console.log(`   Ora stai navigando come: ${userName}\n`);
-      console.log(
-        "   Per uscire dall'impersonation, esegui nella console del browser:",
-      );
-      console.log(
-        "   localStorage.removeItem('impersonatedUserId');localStorage.removeItem('impersonatedUserName');window.location.href='/a';",
-      );
-    } catch (err: any) {
-      console.warn("⚠️  Automazione Chrome fallita. Assicurati che:");
-      console.warn("   1. Chrome sia aperto con localhost:4200");
-      console.warn(
-        '   2. "Allow JavaScript from Apple Events" sia attivo (View > Developer)\n',
-      );
-      printManualInstructions(jsCommand);
-    }
-  } else {
-    printManualInstructions(jsCommand);
-  }
+  console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+  console.log(`🔑 Come usare l'impersonation:`);
+  console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
+  console.log(`1. Fai login come ADMIN (super-admin senza organizzazione)`);
+  console.log(
+    `2. Installa l'estensione Chrome "ModHeader" o usa la console DevTools`,
+  );
+  console.log(`3. Aggiungi l'header:\n`);
+  console.log(`   X-Impersonate-User: ${user.email}\n`);
+  console.log(`4. Ricarica la pagina. Ora navighi come ${userName}.\n`);
+  console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+  console.log(`🔙 Per smettere: rimuovi l'header e ricarica.`);
+  console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
 
   await client.close();
-};
-
-const printManualInstructions = (jsCommand: string) => {
-  console.log(
-    "📋 Copia e incolla nella console del browser (devi essere loggato come admin):\n",
-  );
-  console.log(jsCommand);
-  console.log(
-    "\n💡 Usa --auto per tentare l'automazione diretta su Chrome (macOS).",
-  );
-  console.log(
-    "   Esempio: npx ts-node routines/impersonateUser.ts user@email.com --auto\n",
-  );
-  console.log("🔙 Per uscire dall'impersonation:");
-  console.log(
-    "   localStorage.removeItem('impersonatedUserId');localStorage.removeItem('impersonatedUserName');window.location.href='/a';",
-  );
 };
 
 main().catch((err) => {

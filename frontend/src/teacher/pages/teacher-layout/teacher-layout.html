@@ -1,4 +1,4 @@
-@if (hasTourForRoute()) {
+<!-- @if (hasTourForRoute()) {
 <div
   class="qMark d-flex flex-row align-items-center gap-2 shadow px-3 p-2 rounded-pill"
   (click)="startTour()"
@@ -6,7 +6,9 @@
   <fa-icon [icon]="questionMarkIcon" class="text-primary"></fa-icon>
   Come funziona?
 </div>
-}
+} -->
+
+<app-help-chat></app-help-chat>
 
 <div class="w-100 dvh-100 d-flex flex-row">
   @if (showLoading()) {
