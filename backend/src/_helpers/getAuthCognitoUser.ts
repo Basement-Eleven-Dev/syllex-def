@@ -1,6 +1,4 @@
-import {
-  APIGatewayProxyEvent,
-} from "aws-lambda";
+import { APIGatewayProxyEvent } from "aws-lambda";
 import { User } from "../models/schemas/user.schema";
 import { CognitoJwtVerifier } from "aws-jwt-verify";
 import { CognitoIdTokenPayload } from "aws-jwt-verify/jwt-model";
@@ -58,7 +56,7 @@ export const getAuthCognitoUser = async (
 export const getCurrentUser = async (
   request: APIGatewayProxyEvent,
 ): Promise<User | null> => {
-  await connectDatabase()
+  await connectDatabase();
   try {
     const token = (
       request.headers.authorization || request.headers.Authorization
@@ -66,9 +64,37 @@ export const getCurrentUser = async (
     if (!token) return null;
     const decodedToken = await getAuthCognitoUser(token);
     if (!decodedToken) return null;
-    const user = await User.findOne({ cognitoId: decodedToken.sub }).lean();
-    return user
+    const caller = await User.findOne({ cognitoId: decodedToken.sub }).lean();
+    if (!caller) return null;
+
+    // Impersonation: solo super-admin (admin senza organizationId/organizationIds)
+    const impersonateHeader =
+      request.headers["x-impersonate-user"] ||
+      request.headers["X-Impersonate-User"];
+    if (impersonateHeader && isSuperAdmin(caller)) {
+      const impersonated = await User.findOne({
+        email: {
+          $regex: new RegExp(`^${escapeRegex(impersonateHeader.trim())}$`, "i"),
+        },
+      }).lean();
+      if (impersonated) {
+        console.log(
+          `[Impersonation] Admin ${caller.email} → ${impersonated.email}`,
+        );
+        return impersonated;
+      }
+      console.warn(`[Impersonation] Utente non trovato: ${impersonateHeader}`);
+    }
+
+    return caller;
   } catch (error) {
     return null;
   }
 };
+
+const isSuperAdmin = (user: User): boolean =>
+  user.role === "admin" &&
+  (!user.organizationIds || user.organizationIds.length === 0);
+
+const escapeRegex = (str: string): string =>
+  str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

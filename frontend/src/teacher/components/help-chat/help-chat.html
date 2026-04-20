@@ -1,0 +1,91 @@
+<div
+  class="btn rounded rounded-circle shadow p-2 position-fixed bottom-0 end-0 m-3"
+  id="tutorialAgentBtn"
+  style="z-index: 1050"
+  (click)="toggleChat()"
+>
+  <img src="/images/logo_primary.png" alt="Logo" height="30" />
+</div>
+
+<div
+  id="chat"
+  role="dialog"
+  aria-label="Assistant chat"
+  [class.open]="chatVisible()"
+  [attr.aria-hidden]="!chatVisible()"
+  class="d-flex flex-column"
+>
+  <div
+    class="chat-header d-flex align-items-center justify-content-between px-4 pt-3 pb-2 border-bottom"
+  >
+    <div class="d-flex align-items-center gap-2">
+      <span class="fw-semibold small">Assistente Syllex</span>
+    </div>
+    <a
+      class="text-dark chat-close-btn"
+      (click)="closeChat()"
+      aria-label="Chiudi chat"
+      title="Chiudi"
+      role="button"
+    >
+      <fa-icon [icon]="timesIcon"></fa-icon>
+    </a>
+  </div>
+
+  <div class="flex-fill position-relative overflow-hidden">
+    <div class="chat-body px-4 py-3">
+      @if (messages().length === 0) {
+      <div class="empty-state">
+        <img
+          src="/images/logo_primary.png"
+          alt=""
+          height="52"
+          class="mb-3 opacity-50"
+        />
+        <p class="fw-semibold mb-1">Ciao {{ userName }},</p>
+        <p class="text-muted small mb-0">come posso aiutarti?</p>
+      </div>
+      } @else { @for (msg of messages(); track $index) {
+      <div
+        class="message mb-2"
+        [class.user]="msg.role === 'user'"
+        [class.assistant]="msg.role === 'assistant'"
+      >
+        <span class="message-bubble py-2 px-3 rounded-3"
+          >{{ msg.content }}</span
+        >
+      </div>
+      } } @if (isSending()) {
+      <div class="message assistant mb-2">
+        <span class="message-bubble typing-indicator py-2 px-3 rounded-3">
+          <span></span><span></span><span></span>
+        </span>
+      </div>
+      }
+      <div #chatBottom></div>
+    </div>
+  </div>
+
+  <div class="chat-input px-3 py-3 border-top">
+    <div class="input-group">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Scrivi un messaggio…"
+        [(ngModel)]="currentMessage"
+        (keydown.enter)="sendMessage()"
+        [disabled]="isSending()"
+        aria-label="Messaggio"
+      />
+      <button
+        class="btn btn-primary"
+        type="button"
+        (click)="sendMessage()"
+        [disabled]="!currentMessage.trim() || isSending()"
+        aria-label="Invia messaggio"
+      >
+        <fa-icon [icon]="sendIcon"></fa-icon>
+      </button>
+    </div>
+  </div>
+</div>

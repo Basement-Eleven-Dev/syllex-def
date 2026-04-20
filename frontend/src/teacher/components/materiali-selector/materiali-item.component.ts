@@ -72,6 +72,7 @@ import { MaterialInterface } from '../../../services/materiali/materiali-service
                 <app-materiali-item
                   [item]="childItem"
                   [embeddingCreationMode]="embeddingCreationMode()"
+                  [showAiGenerated]="showAiGenerated()"
                   [expandedFolders]="expandedFolders()"
                   [selectedMaterialIds]="selectedMaterialIds()"
                   [associatedMaterialIds]="associatedMaterialIds()"
@@ -114,6 +115,7 @@ import { MaterialInterface } from '../../../services/materiali/materiali-service
 export class MaterialiItemComponent {
   item = input.required<MaterialInterface>();
   embeddingCreationMode = input<boolean>(false);
+  showAiGenerated = input<boolean>(false);
   expandedFolders = input.required<Set<string>>();
   selectedMaterialIds = input.required<Set<string>>();
   associatedMaterialIds = input.required<string[]>();
@@ -153,6 +155,8 @@ export class MaterialiItemComponent {
 
   shouldShow(): boolean {
     const item = this.item();
+    // Sempre nascosto se aiGenerated e showAiGenerated è false
+    if (!this.showAiGenerated() && item.aiGenerated === true) return false;
     if (!this.embeddingCreationMode()) return true;
 
     const associatedIds = new Set(this.associatedMaterialIds());
@@ -170,6 +174,7 @@ export class MaterialiItemComponent {
   ): boolean {
     if (!folder.content) return false;
     return folder.content.some((child) => {
+      if (!this.showAiGenerated() && child.aiGenerated === true) return false;
       if (this.isFolder(child)) {
         return this.hasTextFileInFolder(child, associatedIds);
       }
@@ -184,6 +189,11 @@ export class MaterialiItemComponent {
     if (!this.isFolder(item)) return [];
 
     let content = item.content || [];
+
+    // Filtra sempre i materiali aiGenerated se showAiGenerated è false
+    if (!this.showAiGenerated()) {
+      content = content.filter((child) => child.aiGenerated !== true);
+    }
 
     // Filtra per embedding mode
     if (this.embeddingCreationMode()) {
