@@ -77,23 +77,7 @@ export class Auth {
   });
 
   get user(): User | null {
-    const user = this.user$.value;
-    if (!user) return null;
-
-    const impersonatedOrgId = localStorage.getItem('impersonatedOrgId');
-    if (impersonatedOrgId && this.isSuperAdminInternal(user)) {
-      return { ...user, organizationId: impersonatedOrgId };
-    }
-
-    return user;
-  }
-
-  private isSuperAdminInternal(user: User): boolean {
-    return (
-      user.role === 'admin' &&
-      !user.organizationId &&
-      (!user.organizationIds || user.organizationIds.length === 0)
-    );
+    return this.user$.value;
   }
   setLogrocketIdentity(user?: User | null) {
     if (user) {
@@ -109,20 +93,6 @@ export class Auth {
       !user.organizationId &&
       (!user.organizationIds || user.organizationIds.length === 0)
     );
-  }
-
-  get isImpersonating(): boolean {
-    return !!localStorage.getItem('impersonatedOrgId');
-  }
-
-  impersonate(orgId: string) {
-    localStorage.setItem('impersonatedOrgId', orgId);
-    window.location.reload();
-  }
-
-  stopImpersonating() {
-    localStorage.removeItem('impersonatedOrgId');
-    window.location.reload();
   }
 
   constructor(private http: HttpClient) {

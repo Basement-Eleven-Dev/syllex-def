@@ -13,6 +13,7 @@ import {
 } from 'ngx-ui-tour-ng-bootstrap';
 import { Sidebar } from '../../components/sidebar/sidebar';
 import { Nav } from '../../components/nav/nav';
+import { HelpChat } from '../../components/help-chat/help-chat';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { Subject, takeUntil, filter, take } from 'rxjs';
@@ -44,6 +45,7 @@ import { crea_domanda_steps } from '../../../tours/tour_crea_domanda';
   imports: [
     Sidebar,
     Nav,
+    HelpChat,
     RouterOutlet,
     FontAwesomeModule,
     TourStepTemplateComponent,

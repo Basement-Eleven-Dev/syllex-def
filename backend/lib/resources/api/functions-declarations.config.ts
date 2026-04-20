@@ -120,6 +120,38 @@ const ADMIN_ROUTES: FunctionIntegration[] = [
     method: "get",
     role: "admin",
   },
+
+  //syllex knowledge
+  {
+    apiRoute: "admin/knowledge-source",
+    functionPath: "admin/knowledge-source/getKnowledgeDocuments.ts",
+    method: "get",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/knowledge-source/{id}",
+    functionPath: "admin/knowledge-source/deleteKnowledgeDocument.ts",
+    method: "delete",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/knowledge-source/{id}",
+    functionPath: "admin/knowledge-source/updateKnowledgeDocument.ts",
+    method: "patch",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/knowledge-source/upload",
+    functionPath: "admin/knowledge-source/uploadKnowledgeSource.ts",
+    method: "post",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/knowledge-source/save",
+    functionPath: "admin/knowledge-source/saveKnowledgeDocument.ts",
+    method: "post",
+    role: "admin",
+  },
 ];
 
 const SUBJECTS_ROUTES: FunctionIntegration[] = [
@@ -383,6 +415,12 @@ const ASSISTANTS_ROUTES: FunctionIntegration[] = [
     functionPath: "assistants/createAssistant.ts",
     method: "post",
     role: "teacher",
+  },
+  {
+    apiRoute: "ai/help-chat",
+    functionPath: "ai/askSyllexHelpAssistant.ts",
+    method: "post",
+    role: "logged",
   },
   {
     apiRoute: "assistant",

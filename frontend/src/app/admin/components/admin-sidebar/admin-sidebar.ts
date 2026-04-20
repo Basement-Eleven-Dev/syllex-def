@@ -45,6 +45,7 @@ export class AdminSidebar {
       tourAnchor: 'admin-organizations'
     },
     { label: 'Statistiche', icon: faChartBar, route: '/a/stats', tourAnchor: 'admin-stats' },
+    { label: 'Knowledge Source', icon: faBook, route: '/a/knowledge-source', tourAnchor: 'admin-knowledge-source' },
   ];
 
   get routes(): AdminNavRoute[] {

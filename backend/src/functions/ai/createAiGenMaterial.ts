@@ -38,8 +38,8 @@ const getPrompt = (
   const guardRails: string = `
     Scrivi tutto il contenuto in ${language}.
     Dai alla risposta un titolo breve.
-    Rispondi alla query utilizzando solo le informazioni fornite nei documenti allegati.
-    Non utilizzare conoscenze esterne, fatti o supposizioni non esplicitamente indicati in questi file.`;
+    Rispondi utilizzando ESCLUSIVAMENTE le informazioni fornite nel prompt. Nessuna informazione non direttamente fornita in questo prompt può essere utilizzata per generare la risposta. Non utilizzare conoscenze pregresse o esterne a quanto fornito. Quanto fornito deve essere sufficente per generare la risposta completa.
+    `;
 
   const prompts: Record<DocumentType, string> = {
     slides: `Scrivimi ${numberOfSlides || 10} diapositive basate sui documenti forniti. In 'content' inserisci tutto il testo che dovrebbe essere presente compreso di titoli delle slide e specifiche su come presentare le informazioni, senza alcuna spiegazione o testo aggiuntivo. Mantieni il testo conciso e adatto a una presentazione visiva in ambito educativo. Se necessario, organizza le informazioni in punti ed elenchi.`,
@@ -60,7 +60,7 @@ STRICT RULES:
   let promptResult = prompts[type];
   if (additionalInstructions) {
     promptResult +=
-      `\nWhat you should focus on when creating the ${type}: ` +
+      `\nHere are some additional instructions to must follow when creating the ${type}: ` +
       additionalInstructions;
   }
   promptResult += "\n" + guardRails;

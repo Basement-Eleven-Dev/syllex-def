@@ -1,0 +1,166 @@
+<div class="container-fluid p-4">
+  <input
+    #fileInput
+    type="file"
+    class="d-none"
+    (change)="onFileSelected($event)"
+    [accept]="acceptedExtensions"
+  />
+
+  <!-- Header -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+    <div>
+      <h2 class="fw-bold mb-1 d-flex align-items-center gap-3">
+        <fa-icon [icon]="icons.faBookOpen" class="text-primary"></fa-icon>
+        Knowledge Base Syllex
+      </h2>
+      <p class="text-muted small mb-0">Gestisci la documentazione globale consultabile dall'AI per docenti e studenti</p>
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+      <div class="d-flex flex-column">
+        <label class="small text-muted mb-1">Destinatari per nuovo upload:</label>
+        <select class="form-select form-select-sm" (change)="onRoleChange($event)" [disabled]="isUploading()">
+          <option value="both">Entrambi (Studenti e Docenti)</option>
+          <option value="teacher">Solo Docenti</option>
+          <option value="student">Solo Studenti</option>
+        </select>
+      </div>
+      <button 
+        class="btn btn-primary d-flex align-items-center gap-2 px-4 py-2 fw-bold shadow-sm align-self-end" 
+        (click)="onRequestUpload()"
+        [disabled]="isUploading()"
+      >
+        @if(isUploading()){
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        } @else {
+          <fa-icon [icon]="icons.faCloudArrowUp"></fa-icon>
+        }
+        {{ isUploading() ? 'Caricamento...' : 'Aggiungi Documento' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="card border-0 shadow-sm overflow-hidden">
+    <div class="card-body p-0">
+      @if (isLoading()) {
+        <div class="p-5 text-center">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Caricamento...</span>
+          </div>
+          <p class="mt-3 text-muted">Recupero documenti in corso...</p>
+        </div>
+      } @else if (knowledgeDocuments().length === 0) {
+        <div class="p-5 text-center">
+          <fa-icon [icon]="icons.faBookOpen" size="4x" class="text-muted opacity-25"></fa-icon>
+          <h4 class="mt-3 fw-bold">Nessun documento trovato</h4>
+          <p class="text-muted">Inizia a caricare della documentazione per popolare la knowledge base.</p>
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+              <tr>
+                <th class="ps-4 border-0 text-uppercase small fw-bold text-muted">Documento</th>
+                <th class="border-0 text-uppercase small fw-bold text-muted text-center">Destinatari</th>
+                <th class="border-0 text-uppercase small fw-bold text-muted">Data caricamento</th>
+                <th class="border-0 text-uppercase small fw-bold text-muted text-center">Stato</th>
+                <th class="border-0 text-uppercase small fw-bold text-muted text-center">Dimensione</th>
+                <th class="pe-4 border-0 text-uppercase small fw-bold text-muted text-end">Azioni</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (doc of knowledgeDocuments(); track doc._id) {
+                <tr>
+                  <td class="ps-4 py-3">
+                    <div>
+                      <h6 class="mb-0 fw-bold">{{ doc.name }}</h6>
+                      <span class="text-muted small text-uppercase">{{ doc.extension }}</span>
+                    </div>
+                  </td>
+                  <td class="text-center">
+                    <span class="badge rounded-pill px-3 py-2" [ngClass]="{
+                      'bg-primary-subtle text-primary border border-primary-subtle': doc.role === 'both',
+                      'bg-success-subtle text-success border border-success-subtle': doc.role === 'teacher',
+                      'bg-info-subtle text-info border border-info-subtle': doc.role === 'student'
+                    }">
+                      <fa-icon 
+                        [icon]="doc.role === 'both' ? icons.faUsers : (doc.role === 'teacher' ? icons.faUserTie : icons.faUserGraduate)" 
+                        class="me-1"
+                      ></fa-icon>
+                      {{ doc.role === 'both' ? 'Tutti' : (doc.role === 'teacher' ? 'Docenti' : 'Studenti') }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="text-muted small">{{ doc.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                  </td>
+                  <td class="text-center">
+                    @if (doc.vectorized) {
+                      <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1">
+                        <fa-icon [icon]="icons.faCheckCircle" class="me-1"></fa-icon> Pronto
+                      </span>
+                    } @else {
+                      <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-1">
+                        <fa-icon [icon]="icons.faHourglassHalf" class="me-1"></fa-icon> Indicizzazione...
+                      </span>
+                    }
+                  </td>
+                  <td class="text-center">
+                    <span class="text-muted small">{{ formatBytes(doc.byteSize) }}</span>
+                  </td>
+                  <td class="pe-4 text-end">
+                    <div class="d-flex justify-content-end gap-2">
+                      <a [href]="doc.url" target="_blank" class="btn btn-secondary shadow-sm" title="Visualizza">
+                        <fa-icon [icon]="icons.faEye"></fa-icon>
+                      </a>
+                      <button (click)="onEditDocument(doc, editModal)" class="btn btn-primary shadow-sm" title="Modifica">
+                        <fa-icon [icon]="icons.faPencil"></fa-icon>
+                      </button>
+                      <button (click)="onDeleteDocument(doc)" class="btn btn-danger shadow-sm" title="Elimina">
+                        <fa-icon [icon]="icons.faTrash"></fa-icon>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Edit Modal Template -->
+  <ng-template #editModal let-modal>
+    <div class="modal-header border-0 pb-0">
+      <h5 class="modal-title fw-bold">Modifica Documento</h5>
+      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('cancel')"></button>
+    </div>
+    <div class="modal-body py-4">
+      @if (editingDoc) {
+        <div class="mb-4">
+          <label class="form-label small text-uppercase fw-bold text-muted">Nome Documento</label>
+          <input type="text" class="form-control" [(ngModel)]="editingDoc.name" placeholder="Inserisci nome...">
+        </div>
+        <div>
+          <label class="form-label small text-uppercase fw-bold text-muted">Destinatari</label>
+          <select class="form-select" [(ngModel)]="editingDoc.role">
+            <option value="both">Entrambi (Studenti e Docenti)</option>
+            <option value="teacher">Solo Docenti</option>
+            <option value="student">Solo Studenti</option>
+          </select>
+        </div>
+      }
+    </div>
+    <div class="modal-footer border-0 pt-0">
+      <button type="button" class="btn btn-light px-4" (click)="modal.dismiss('cancel')">Annulla</button>
+      <button type="button" class="btn btn-primary px-4 fw-bold shadow-sm" [disabled]="isSavingEdit()" (click)="modal.close('save')">
+        @if (isSavingEdit()) {
+          <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+        }
+        Salva Modifiche
+      </button>
+    </div>
+  </ng-template>
+</div>
