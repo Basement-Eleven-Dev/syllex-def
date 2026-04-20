@@ -54,8 +54,10 @@
         [class.user]="msg.role === 'user'"
         [class.assistant]="msg.role === 'assistant'"
       >
-        <span class="message-bubble py-2 px-3 rounded-3" [innerHTML]="msg.content"></span
-        >
+        <span
+          class="message-bubble py-2 px-3 rounded-3"
+          [innerHTML]="msg.content"
+        ></span>
         @if (msg.role === 'assistant' && msg.suggestedAction) {
         <div class="mt-2 text-start">
           <button
