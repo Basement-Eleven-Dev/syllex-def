@@ -25,7 +25,12 @@ export class HelpChat {
   askHelp(
     query: string,
     history: { role: string; content: string }[],
+    currentPath?: string,
   ): Observable<HelpChatResponse> {
-    return this.http.post<HelpChatResponse>('ai/help-chat', { query, history });
+    return this.http.post<HelpChatResponse>('ai/help-chat', {
+      query,
+      history,
+      currentPath,
+    });
   }
 }

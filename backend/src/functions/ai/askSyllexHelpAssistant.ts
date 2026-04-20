@@ -8,7 +8,7 @@ const askSyllexHelpAssistant = async (
   context: Context,
 ) => {
   const body = JSON.parse(request.body || "{}");
-  const { query, history } = body;
+  const { query, history, currentPath } = body;
 
   if (!query) {
     throw createError.BadRequest("Query is required");
@@ -23,7 +23,7 @@ const askSyllexHelpAssistant = async (
   const userRole = user.role as "student" | "teacher" | "admin";
 
   // Genera la risposta con eventuale azione suggerita (stateless)
-  const result = await generateHelpResponseGemini(query, history || [], userRole);
+  const result = await generateHelpResponseGemini(query, history || [], userRole, currentPath);
 
   return {
     success: true,

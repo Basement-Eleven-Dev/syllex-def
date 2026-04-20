@@ -3,7 +3,8 @@ import { getSitemapForRole } from "./helpSitemap";
 export async function buildHelpAgent(
   context: string,
   history: { role: string; content: string }[],
-  userRole: "student" | "teacher" | "admin"
+  userRole: "student" | "teacher" | "admin",
+  currentPath?: string
 ) {
   const sitemap = getSitemapForRole(userRole);
   const sitemapContext = sitemap
@@ -20,6 +21,10 @@ export async function buildHelpAgent(
   const systemPrompt = `
 # RUOLO
 Agisci come l'Assistente virtuale di supporto tecnico di Syllex. Il tuo obiettivo è aiutare gli utenti (attualmente stai parlando con un ${userRole}) a navigare e utilizzare la piattaforma Syllex.
+
+# CONTESTO POSIZIONE
+L'utente si trova attualmente in questa pagina della piattaforma:
+"${currentPath || "Sconosciuta"}"
 
 # FONTI DI CONOSCENZA (RAG Strict)
 Rispondi esclusivamente basandoti sulle seguenti informazioni:

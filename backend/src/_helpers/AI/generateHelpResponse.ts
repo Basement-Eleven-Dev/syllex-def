@@ -10,8 +10,12 @@ import { getSitemapForRole } from "./helpSitemap";
 export async function generateHelpResponseGemini(
   query: string,
   history: { role: string; content: string }[],
-  userRole: "student" | "teacher" | "admin"
-) {
+  userRole: "student" | "teacher" | "admin",
+  currentPath?: string
+): Promise<{
+  content: string;
+  suggestedAction: { type: string; path: string; label: string } | null;
+}> {
   try {
     const ai = await getGeminiClient();
 
@@ -30,7 +34,8 @@ export async function generateHelpResponseGemini(
     const systemPrompt = await buildHelpAgent(
       contextString,
       history,
-      userRole
+      userRole,
+      currentPath
     );
 
     // 3. Generazione Risposta con Gemini
@@ -58,7 +63,7 @@ export async function generateHelpResponseGemini(
       const sitemap = getSitemapForRole(userRole);
       const page = sitemap.find(p => p.key === key);
       
-      if (page) {
+      if (page && page.path !== currentPath) {
         suggestedAction = {
           type: 'NAVIGATE',
           path: page.path,

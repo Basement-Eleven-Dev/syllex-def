@@ -70,6 +70,12 @@ export class HelpChat implements OnInit {
       this.isSending();
       setTimeout(() => this.scrollToBottom(), 0);
     });
+
+    // Effetto per persistere la visibilità della chat
+    effect(() => {
+      const visible = this.chatVisible();
+      localStorage.setItem('help_chat_visible', JSON.stringify(visible));
+    });
   }
 
   get userName(): string {
@@ -79,6 +85,11 @@ export class HelpChat implements OnInit {
 
   ngOnInit(): void {
     this.loadFromStorage();
+    // Carica stato visibilità
+    const savedVisible = localStorage.getItem('help_chat_visible');
+    if (savedVisible) {
+      this.chatVisible.set(JSON.parse(savedVisible));
+    }
   }
 
   private loadFromStorage(): void {
@@ -123,7 +134,7 @@ export class HelpChat implements OnInit {
     this.isSending.set(true);
     this.saveToStorage();
 
-    // Mapping storia per il backend (ultimi 15 messaggi)
+    // Mapping storia per il backend
     const history = this.messages()
       .slice(-15)
       .map(m => ({
@@ -131,7 +142,8 @@ export class HelpChat implements OnInit {
         content: m.content
       }));
 
-    this.helpService.askHelp(text, history).subscribe({
+    // Passiamo anche la rotta corrente
+    this.helpService.askHelp(text, history, this.router.url).subscribe({
       next: (res) => {
         const assistantMsg: ChatMessage = {
           role: 'assistant',
@@ -162,6 +174,6 @@ export class HelpChat implements OnInit {
 
   navigateToAction(path: string): void {
     this.router.navigateByUrl(path);
-    this.closeChat();
+    // Non chiudiamo più la chat automaticamente
   }
 }
