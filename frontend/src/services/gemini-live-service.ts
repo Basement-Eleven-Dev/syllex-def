@@ -4,10 +4,6 @@ import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 import { firstValueFrom } from 'rxjs';
 import { Materia } from './materia';
 
-export interface ChatMessage {
-  sender: 'user' | 'ai';
-  text: string;
-}
 
 @Injectable({
   providedIn: 'root',
@@ -18,11 +14,15 @@ export class GeminiLiveService {
 
   // --- STATO REATTIVO (Signals) ---
   public isConnected = signal<boolean>(false);
+  public isReady = signal<boolean>(false);
   public isSpeaking = signal<boolean>(false);
-  public messages = signal<ChatMessage[]>([]);
+  public isSearching = signal<boolean>(false);
 
   private wsSubject: WebSocketSubject<any> | null = null;
   private audioContext: AudioContext | null = null;
+  private activeSource: AudioBufferSourceNode | null = null;
+  private aiTurnStartTime = 0; // Per gestire il grace period del barge-in
+  private isDiscardingAudio = false; // Flag per scartare audio orfano dopo interruzione
   private audioQueue: AudioBuffer[] = [];
   private isPlayingAudio = false;
 
@@ -130,6 +130,7 @@ export class GeminiLiveService {
   private cleanupState(): void {
     this.wsSubject = null;
     this.isConnected.set(false);
+    this.isReady.set(false);
     this.isSpeaking.set(false);
     this.audioQueue = [];
     this.isPlayingAudio = false;
@@ -154,6 +155,7 @@ export class GeminiLiveService {
     }
 
     this.isConnected.set(false);
+    this.isReady.set(false);
     this.isSpeaking.set(false);
     this.audioQueue = [];
     this.isPlayingAudio = false;
@@ -193,7 +195,7 @@ export class GeminiLiveService {
               {
                 name: 'search_knowledge_base',
                 description:
-                  'Cerca nel database vettoriale e nei documenti del professore per rispondere a domande specifiche.',
+                  'Cerca nei documenti del professore. Usala SOLO per domande specifiche sulla materia, MAI per saluti, convenevoli o domande generiche.',
                 parameters: {
                   type: 'OBJECT',
                   properties: {
@@ -222,7 +224,7 @@ export class GeminiLiveService {
         systemInstruction: {
           parts: [
             {
-              text: `Sei un assistente vocale intelligente alla docenza della materia ${this.materiaService.materiaSelected()}. Se ti vengono chieste informazioni specifiche sulla materia e i suoi argomenti, usa SEMPRE lo strumento search_knowledge_base prima di rispondere. Rispondi nella lingua utilizzata dall'utente in modo discorsivo e naturale.`,
+              text: `Sei l'assistente vocale per "${this.materiaService.materiaSelected()?.name}". Rispondi a saluti e convenevoli direttamente senza usare strumenti. Per domande specifiche sul contenuto della materia, prima di chiamare 'search_knowledge_base' di' sempre brevemente che stai cercando (es: "Un attimo...", "Controllo subito..."). Se non trovi nulla, dillo. NON inventare. Sii breve e naturale.`,
             },
           ],
         },
@@ -237,9 +239,11 @@ export class GeminiLiveService {
   }
 
   private handleServerMessage(message: any): void {
-    // Frame binario: PCM16 raw direttamente come ArrayBuffer
-
     if (message.toolCall) {
+      // L'IA ha deciso di usare un tool: resetta lo scarto audio
+      // perché qualsiasi audio futuro sarà della nuova risposta
+      this.isDiscardingAudio = false;
+
       const call = message.toolCall.functionCalls[0];
       if (call.name === 'search_knowledge_base') {
         console.log(
@@ -251,6 +255,7 @@ export class GeminiLiveService {
       return;
     }
 
+    // Frame binario: PCM16 raw direttamente come ArrayBuffer
     if (message._binaryAudio) {
       this.playPcmArrayBuffer(message._binaryAudio);
       return;
@@ -261,33 +266,41 @@ export class GeminiLiveService {
       console.log(
         '✅ Setup accettato dal server Vertex AI! Pronto a ricevere audio.',
       );
+      this.isReady.set(true); // <--- ORA PUOI INVIARE AUDIO
       return;
     }
 
-    if (message.serverContent?.modelTurn?.parts) {
-      const textPart = message.serverContent.modelTurn.parts.find(
-        (p: any) => p.text,
-      );
-      if (textPart) {
-        this.messages.update((msgs) => [
-          ...msgs,
-          { sender: 'ai', text: textPart.text },
-        ]);
-      }
+    // GESTIONE INTERRUZIONE (Barge-in)
+    // Se il server dice "interrupted", obbediamo SEMPRE. Nessuna condizione locale.
+    if (message.serverContent?.interrupted) {
+      console.warn('🛑 [Barge-in] Segnale INTERRUPTED ricevuto dal server. Stop immediato.');
+      this.isDiscardingAudio = true;
+      this.stopAudioPlayback();
+      return;
+    }
 
-      // Audio base64 nel body JSON (fallback, per compatibilità)
-      const audioPart = message.serverContent.modelTurn.parts.find(
-        (p: any) => p.inlineData,
-      );
-      if (audioPart?.inlineData?.data) {
-        this.enqueueAudio(audioPart.inlineData.data);
+    if (message.serverContent) {
+      const { modelTurn } = message.serverContent;
+
+      // Risposta IA: smetti di scartare audio
+      if (modelTurn) {
+        this.isDiscardingAudio = false;
+
+        if (modelTurn.parts) {
+          // Audio base64 nel body JSON (fallback per compatibilità)
+          const audioPart = modelTurn.parts.find((p: any) => p.inlineData);
+          if (audioPart?.inlineData?.data) {
+            this.enqueueAudio(audioPart.inlineData.data);
+          }
+        }
       }
     }
   }
 
+
   // Riproduce direttamente un ArrayBuffer di PCM16 raw (frame binario dal server)
   private playPcmArrayBuffer(buffer: ArrayBuffer): void {
-    if (!this.audioContext) return;
+    if (!this.audioContext || this.isDiscardingAudio) return;
 
     const pcm16 = new Int16Array(buffer);
     const float32 = new Float32Array(pcm16.length);
@@ -308,10 +321,9 @@ export class GeminiLiveService {
     }
   }
 
-  // FIX: decodeAudioData non gestisce PCM16 raw.
   // Il server manda PCM 16-bit little-endian signed → va convertito in Float32.
   private enqueueAudio(base64Pcm: string): void {
-    if (!this.audioContext) return;
+    if (!this.audioContext || this.isDiscardingAudio) return;
 
     const binaryString = window.atob(base64Pcm);
     const bytes = new Uint8Array(binaryString.length);
@@ -342,7 +354,13 @@ export class GeminiLiveService {
     if (!this.audioContext || this.audioQueue.length === 0) {
       this.isPlayingAudio = false;
       this.isSpeaking.set(false);
+      this.activeSource = null;
       return;
+    }
+
+    // Segnamo l'inizio del turno solo quando si passa da "silenzio" a "parlando"
+    if (!this.isPlayingAudio) {
+      this.aiTurnStartTime = performance.now();
     }
 
     this.isPlayingAudio = true;
@@ -350,10 +368,33 @@ export class GeminiLiveService {
 
     const buffer = this.audioQueue.shift()!;
     const source = this.audioContext.createBufferSource();
+    this.activeSource = source;
+    
     source.buffer = buffer;
     source.connect(this.audioContext.destination);
-    source.onended = () => this.playNextInQueue();
+    source.onended = () => {
+      if (this.activeSource === source) {
+        this.activeSource = null;
+        this.playNextInQueue();
+      }
+    };
     source.start(0);
+  }
+
+  // Ferma immediatamente ogni riproduzione audio e svuota la coda
+  private stopAudioPlayback(): void {
+    if (this.activeSource) {
+      try {
+        this.activeSource.stop();
+        this.activeSource.disconnect();
+      } catch (e) {
+        // Già fermo o errore gestito
+      }
+      this.activeSource = null;
+    }
+    this.audioQueue = [];
+    this.isPlayingAudio = false;
+    this.isSpeaking.set(false);
   }
 
   private async executeRagSearch(
@@ -362,20 +403,35 @@ export class GeminiLiveService {
     query: string,
   ): Promise<void> {
     try {
+      this.isSearching.set(true);
       console.log('⏳ Esecuzione RAG in corso per:', query);
-      // 1. Chiama la tua Lambda RAG (sostituisci con il tuo endpoint reale)
+      const ragStart = performance.now();
+      
       const response = await firstValueFrom(
-        this.http.post<any>('ai/rag-search', { query }),
+        this.http.post<any>('ai/rag-search', { query, limit: 4 }),
       );
-      const ragTestoTrovato = response.text;
+      
+      console.log(`⏱️ RAG completato in ${Math.round(performance.now() - ragStart)}ms`);
+      
+      const docs = response.relevantDocuments || [];
+      let ragTestoTrovato = "";
 
-      // 2. Format della risposta richiesta dalla Live API
+      if (docs.length > 0) {
+        // Tronca ogni doc a max 500 caratteri per velocizzare la risposta di Gemini
+        ragTestoTrovato = docs.map((d: any) => {
+          const text = d.text || '';
+          return text.length > 500 ? text.substring(0, 500) + '...' : text;
+        }).join("\n\n---\n\n");
+      } else {
+        ragTestoTrovato = `Nessuna informazione trovata per la materia "${this.materiaService.materiaSelected()?.name}" riguardo a: ${query}`;
+      }
+
       const toolResponsePayload = {
         toolResponse: {
           functionResponses: [
             {
-              id: callId, // Obbligatorio: serve a Gemini per ricollegare la risposta alla domanda
-              name: functionName, // search_knowledge_base
+              id: callId,
+              name: functionName,
               response: {
                 result: ragTestoTrovato,
               },
@@ -384,13 +440,12 @@ export class GeminiLiveService {
         },
       };
 
+      // Resetta il flag prima di inviare: la prossima audio sarà la risposta
+      this.isDiscardingAudio = false;
       console.log('📨 Invio risultati RAG a Gemini:', toolResponsePayload);
-
-      // 3. Invia la risposta sul WebSocket
       this.wsSubject?.next(toolResponsePayload);
     } catch (error) {
       console.error('Errore durante la ricerca RAG:', error);
-      // Se fallisce, dì a Gemini che c'è stato un problema così può scusarsi a voce
       this.wsSubject?.next({
         toolResponse: {
           functionResponses: [
@@ -402,6 +457,8 @@ export class GeminiLiveService {
           ],
         },
       });
+    } finally {
+      this.isSearching.set(false);
     }
   }
 }

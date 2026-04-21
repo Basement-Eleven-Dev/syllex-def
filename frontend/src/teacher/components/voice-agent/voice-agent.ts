@@ -31,13 +31,18 @@ export class VoiceAgentComponent implements OnDestroy {
         sampleRate: 16000,
       });
 
-      const source = this.audioContext.createMediaStreamSource(
-        this.mediaStream,
-      );
-      this.processor = this.audioContext.createScriptProcessor(4096, 1, 1);
+      console.log('🎙️ AudioContext SampleRate:', this.audioContext.sampleRate);
+      if (this.audioContext.sampleRate !== 16000) {
+        console.warn('⚠️ SampleRate non corrispondente a 16000! Google potrebbe rifiutare l\'audio.');
+      }
+
+      const source = this.audioContext.createMediaStreamSource(this.mediaStream);
+      // Buffer più piccolo (2048) per ridurre la latenza
+      this.processor = this.audioContext.createScriptProcessor(2048, 1, 1);
 
       this.processor.onaudioprocess = (e) => {
-        if (!this.voice.isConnected()) return;
+        // Fondamentale: non inviare nulla finché Google non conferma 'setupComplete'
+        if (!this.voice.isReady()) return;
 
         const inputData = e.inputBuffer.getChannelData(0);
         const pcm16 = new Int16Array(inputData.length);
@@ -47,12 +52,14 @@ export class VoiceAgentComponent implements OnDestroy {
           pcm16[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
         }
 
-        const buffer = new Uint8Array(pcm16.buffer);
+        // Metodo performante per Base64 binario
+        const uint8Array = new Uint8Array(pcm16.buffer);
         let binary = '';
-        for (let i = 0; i < buffer.byteLength; i++) {
-          binary += String.fromCharCode(buffer[i]);
+        const len = uint8Array.byteLength;
+        for (let i = 0; i < len; i++) {
+          binary += String.fromCharCode(uint8Array[i]);
         }
-
+        
         this.voice.sendAudioChunk(window.btoa(binary));
       };
 
