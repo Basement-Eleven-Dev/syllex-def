@@ -74,6 +74,7 @@
     "constructs": "^10.0.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
+    "google-auth-library": "^10.6.2",
     "http-errors": "^2.0.1",
     "js-tiktoken": "^1.0.21",
     "jszip": "^3.10.1",

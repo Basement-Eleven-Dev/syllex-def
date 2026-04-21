@@ -12,6 +12,13 @@ export const teacherRoutes: Routes = [
       import('./pages/dashboard/dashboard').then((m) => m.Dashboard),
   },
   {
+    path: 'voice',
+    loadComponent: () =>
+      import('./components/voice-agent/voice-agent').then(
+        (m) => m.VoiceAgentComponent,
+      ),
+  },
+  {
     path: 'banca',
     loadComponent: () => import('./pages/banca/banca').then((m) => m.Banca),
   },

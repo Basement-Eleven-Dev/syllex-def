@@ -372,6 +372,18 @@ const QUESTIONS_ROUTES: FunctionIntegration[] = [
 
 const AI_ROUTES: FunctionIntegration[] = [
   {
+    apiRoute: "ai/generatetoken",
+    functionPath: "ai/generateGeminiToken.ts",
+    method: "post",
+    role: "logged",
+  },
+  {
+    apiRoute: "ai/rag-search",
+    functionPath: "ai/ragSearch.ts",
+    method: "post",
+    role: "logged",
+  },
+  {
     apiRoute: "ai/questions",
     functionPath: "ai/createAiGenQuestion.ts",
     method: "post",
