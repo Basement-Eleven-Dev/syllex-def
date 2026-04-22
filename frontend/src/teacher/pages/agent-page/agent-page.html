@@ -110,6 +110,7 @@
     </div>
 
     <!-- Colonna di DESTRA: Chat -->
+
     <div
       class="col-12 col-lg-8 d-lg-flex flex-column h-100"
       [class.d-none]="userRole() === 'student' && activeTab() !== 'chat'"
@@ -120,7 +121,29 @@
         class="flex-fill h-100 position-relative"
         tourAnchor="assistente_ai_chat"
       >
+        <div class="btn-group mb-3 d-flex" role="group">
+          <button
+            type="button"
+            class="btn btn-outline-primary"
+            [class.active]="interactionMode() === 'chat'"
+            (click)="interactionMode.set('chat')"
+          >
+            Chat
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline-primary"
+            [class.active]="interactionMode() === 'voice'"
+            (click)="interactionMode.set('voice')"
+          >
+            Voice
+          </button>
+        </div>
+        @if(interactionMode() === 'chat') {
         <app-agent-chat [assistantId]="currentAssistantId()!"></app-agent-chat>
+        } @else if (interactionMode() === 'voice') {
+        <app-voice-agent></app-voice-agent>
+        }
       </div>
       } @else {
       <div

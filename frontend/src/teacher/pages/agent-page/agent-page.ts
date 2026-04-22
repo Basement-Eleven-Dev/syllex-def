@@ -10,6 +10,7 @@ import { AgentService } from '../../../services/agent.service';
 import { CommonModule } from '@angular/common';
 import { FeedbackService } from '../../../services/feedback-service';
 import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
+import { VoiceAgentComponent } from '../../components/voice-agent/voice-agent';
 
 @Component({
   selector: 'app-agent-page',
@@ -21,6 +22,7 @@ import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
     AgentSettingsForm,
     CommonModule,
     TourAnchorNgBootstrapDirective,
+    VoiceAgentComponent,
   ],
   templateUrl: './agent-page.html',
   styleUrl: './agent-page.scss',
@@ -30,6 +32,8 @@ export class AgentPage {
   currentAssistantId = signal<string | null>(null);
   userRole = signal<'teacher' | 'student' | 'admin' | null>(null);
   activeTab = signal<'subjects' | 'chat'>('subjects');
+
+  interactionMode = signal<'chat' | 'voice'>('chat'); // Nuovo stato per modalità di interazione
 
   constructor(
     public materiaService: Materia,

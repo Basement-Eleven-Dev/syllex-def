@@ -4,7 +4,7 @@ import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-voice-agent',
-  imports: [NgClass],
+  imports: [NgClass], // Necessario per le classi dinamiche
   templateUrl: './voice-agent.html',
   styleUrl: './voice-agent.scss',
 })
@@ -17,10 +17,10 @@ export class VoiceAgentComponent implements OnDestroy {
 
   async start() {
     try {
-      // 1. Connette il WebSocket (chiamerà la tua Lambda prima)
+      // 1. Connette il WebSocket
       await this.voice.connect();
 
-      // 2. Ottiene i permessi e avvia la cattura audio a 16kHz (richiesto da Google)
+      // 2. Ottiene i permessi e avvia la cattura audio a 16kHz
       this.mediaStream = await navigator.mediaDevices.getUserMedia({
         audio: { sampleRate: 16000, channelCount: 1, echoCancellation: true },
       });
@@ -33,11 +33,14 @@ export class VoiceAgentComponent implements OnDestroy {
 
       console.log('🎙️ AudioContext SampleRate:', this.audioContext.sampleRate);
       if (this.audioContext.sampleRate !== 16000) {
-        console.warn('⚠️ SampleRate non corrispondente a 16000! Google potrebbe rifiutare l\'audio.');
+        console.warn(
+          "⚠️ SampleRate non corrispondente a 16000! Google potrebbe rifiutare l'audio.",
+        );
       }
 
-      const source = this.audioContext.createMediaStreamSource(this.mediaStream);
-      // Buffer più piccolo (2048) per ridurre la latenza
+      const source = this.audioContext.createMediaStreamSource(
+        this.mediaStream,
+      );
       this.processor = this.audioContext.createScriptProcessor(2048, 1, 1);
 
       this.processor.onaudioprocess = (e) => {
@@ -52,14 +55,13 @@ export class VoiceAgentComponent implements OnDestroy {
           pcm16[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
         }
 
-        // Metodo performante per Base64 binario
         const uint8Array = new Uint8Array(pcm16.buffer);
         let binary = '';
         const len = uint8Array.byteLength;
         for (let i = 0; i < len; i++) {
           binary += String.fromCharCode(uint8Array[i]);
         }
-        
+
         this.voice.sendAudioChunk(window.btoa(binary));
       };
 
@@ -85,5 +87,24 @@ export class VoiceAgentComponent implements OnDestroy {
 
   ngOnDestroy() {
     this.stop();
+  }
+
+  // --- HELPER PER LA NUOVA UI ---
+  // Leggono direttamente lo stato del tuo service in tempo reale
+
+  get statusText(): string {
+    if (!this.voice.isConnected()) return 'Tocca per iniziare';
+    if (!this.voice.isReady()) return 'Connessione in corso...';
+    if (this.voice.isSpeaking()) return 'Assistente in riproduzione...';
+    if (this.voice.isSearching()) return 'Sto pensando...';
+    return 'In ascolto...';
+  }
+
+  get orbClass(): string {
+    if (!this.voice.isConnected()) return 'offline';
+    if (!this.voice.isReady()) return 'connecting';
+    if (this.voice.isSpeaking()) return 'speaking';
+    if (this.voice.isSearching()) return 'searching';
+    return 'listening';
   }
 }
