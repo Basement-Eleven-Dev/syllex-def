@@ -49,6 +49,7 @@ import { FeedbackService } from '../../../services/feedback-service';
 import { forkJoin } from 'rxjs';
 import { QuestionCard } from '../question-card/question-card';
 import { AiOverlay } from '../ai-overlay/ai-overlay';
+import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 
 interface ReviewQuestion {
   readonly TempId: string;
@@ -66,6 +67,7 @@ interface ReviewQuestion {
     ReactiveFormsModule,
     QuestionCard,
     AiOverlay,
+    TourAnchorNgBootstrapDirective,
   ],
   templateUrl: './gen-ai-contents.html',
   styleUrl: './gen-ai-contents.scss',

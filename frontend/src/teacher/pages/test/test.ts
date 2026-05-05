@@ -14,6 +14,7 @@ import {
 } from '../../components/view-type-toggle/view-type-toggle';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
 import { FeedbackService } from '../../../services/feedback-service';
+import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 
 type TestStatus = 'bozza' | 'pubblicato' | 'archiviato' | '';
 
@@ -28,6 +29,7 @@ type TestStatus = 'bozza' | 'pubblicato' | 'archiviato' | '';
     SyllexPagination,
     FormsModule,
     ViewTypeToggle,
+    TourAnchorNgBootstrapDirective,
   ],
   templateUrl: './test.html',
   styleUrl: './test.scss',

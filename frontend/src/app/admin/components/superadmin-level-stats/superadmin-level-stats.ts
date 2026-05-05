@@ -291,12 +291,4 @@ export class SuperadminLevelStats implements OnInit {
     link.click();
     document.body.removeChild(link);
   }
-
-  loginAsAdmin(orgId: string) {
-    this.authService.impersonate(orgId);
-  }
-
-  stopImpersonation() {
-    this.authService.stopImpersonating();
-  }
 }

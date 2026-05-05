@@ -120,6 +120,38 @@ const ADMIN_ROUTES: FunctionIntegration[] = [
     method: "get",
     role: "admin",
   },
+
+  //syllex knowledge
+  {
+    apiRoute: "admin/knowledge-source",
+    functionPath: "admin/knowledge-source/getKnowledgeDocuments.ts",
+    method: "get",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/knowledge-source/{id}",
+    functionPath: "admin/knowledge-source/deleteKnowledgeDocument.ts",
+    method: "delete",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/knowledge-source/{id}",
+    functionPath: "admin/knowledge-source/updateKnowledgeDocument.ts",
+    method: "patch",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/knowledge-source/upload",
+    functionPath: "admin/knowledge-source/uploadKnowledgeSource.ts",
+    method: "post",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/knowledge-source/save",
+    functionPath: "admin/knowledge-source/saveKnowledgeDocument.ts",
+    method: "post",
+    role: "admin",
+  },
 ];
 
 const SUBJECTS_ROUTES: FunctionIntegration[] = [
@@ -139,6 +171,12 @@ const SUBJECTS_ROUTES: FunctionIntegration[] = [
     apiRoute: "topics/{topicId}",
     functionPath: "teachers/renameTopic.ts",
     method: "put",
+    role: "teacher",
+  },
+  {
+    apiRoute: "topics/{topicId}",
+    functionPath: "teachers/deleteTopic.ts",
+    method: "delete",
     role: "teacher",
   },
 ];
@@ -301,6 +339,12 @@ const QUESTIONS_ROUTES: FunctionIntegration[] = [
     role: "teacher",
   },
   {
+    apiRoute: "questions/all",
+    functionPath: "questions/getAllQuestions.ts",
+    method: "get",
+    role: "teacher",
+  },
+  {
     apiRoute: "questions/{questionId}",
     functionPath: "questions/deleteQuestion.ts",
     method: "delete",
@@ -327,6 +371,18 @@ const QUESTIONS_ROUTES: FunctionIntegration[] = [
 ];
 
 const AI_ROUTES: FunctionIntegration[] = [
+  {
+    apiRoute: "ai/generatetoken",
+    functionPath: "ai/generateGeminiToken.ts",
+    method: "post",
+    role: "logged",
+  },
+  {
+    apiRoute: "ai/rag-search",
+    functionPath: "ai/ragSearch.ts",
+    method: "post",
+    role: "logged",
+  },
   {
     apiRoute: "ai/questions",
     functionPath: "ai/createAiGenQuestion.ts",
@@ -371,6 +427,12 @@ const ASSISTANTS_ROUTES: FunctionIntegration[] = [
     functionPath: "assistants/createAssistant.ts",
     method: "post",
     role: "teacher",
+  },
+  {
+    apiRoute: "ai/help-chat",
+    functionPath: "ai/askSyllexHelpAssistant.ts",
+    method: "post",
+    role: "logged",
   },
   {
     apiRoute: "assistant",

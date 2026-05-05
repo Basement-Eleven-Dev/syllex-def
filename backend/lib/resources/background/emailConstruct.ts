@@ -6,6 +6,7 @@ import { LambdaConstruct } from "../lambda";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Role } from "aws-cdk-lib/aws-iam";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
+import { CfnFunction } from "aws-cdk-lib/aws-lambda";
 
 export class EmailResources extends Construct {
   queue: Queue;
@@ -23,10 +24,10 @@ export class EmailResources extends Construct {
     // Coda principale per i job di invio email
     this.queue = new Queue(this, EMAIL_QUEUE_NAME, {
       queueName: EMAIL_QUEUE_NAME,
-      visibilityTimeout: Duration.seconds(600), // Deve essere >= al timeout della Lambda (600s di default)
+      visibilityTimeout: Duration.seconds(11), // Deve essere > timeout della Lambda (10s)
       deadLetterQueue: {
         queue: dlq,
-        maxReceiveCount: 3,
+        maxReceiveCount: 10,
       },
     });
 
@@ -38,15 +39,16 @@ export class EmailResources extends Construct {
       role,
       {
         EMAIL_QUEUE_URL: this.queue.queueUrl,
-      }
+      },
+      undefined,
+      Duration.seconds(10) // Timeout massimo per l'invio di un'email
     ).lambda;
 
-    // Trigger: 1 messaggio alla volta (ogni messaggio contiene già fino a 50 destinatari)
-    // ReservedConcurrency a 5 per rispettare il sending rate di SES
     this.lambda.addEventSource(
       new SqsEventSource(this.queue, {
         batchSize: 1,
         maxConcurrency: 5,
+        reportBatchItemFailures: true,
       })
     );
   }

@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { Amplify } from 'aws-amplify';
 import {
@@ -70,26 +70,14 @@ export interface OrganizationInterface {
 export class Auth {
   organizationName$ = new BehaviorSubject<string | null>(null);
   user$ = new BehaviorSubject<User | null>(null);
-  isInitialized = signal(false);
+
+  private _readyResolve!: () => void;
+  readonly whenReady = new Promise<void>((resolve) => {
+    this._readyResolve = resolve;
+  });
 
   get user(): User | null {
-    const user = this.user$.value;
-    if (!user) return null;
-
-    const impersonatedOrgId = localStorage.getItem('impersonatedOrgId');
-    if (impersonatedOrgId && this.isSuperAdminInternal(user)) {
-      return { ...user, organizationId: impersonatedOrgId };
-    }
-
-    return user;
-  }
-
-  private isSuperAdminInternal(user: User): boolean {
-    return (
-      user.role === 'admin' &&
-      !user.organizationId &&
-      (!user.organizationIds || user.organizationIds.length === 0)
-    );
+    return this.user$.value;
   }
   setLogrocketIdentity(user?: User | null) {
     if (user) {
@@ -105,20 +93,6 @@ export class Auth {
       !user.organizationId &&
       (!user.organizationIds || user.organizationIds.length === 0)
     );
-  }
-
-  get isImpersonating(): boolean {
-    return !!localStorage.getItem('impersonatedOrgId');
-  }
-
-  impersonate(orgId: string) {
-    localStorage.setItem('impersonatedOrgId', orgId);
-    window.location.reload();
-  }
-
-  stopImpersonating() {
-    localStorage.removeItem('impersonatedOrgId');
-    window.location.reload();
   }
 
   constructor(private http: HttpClient) {
@@ -222,7 +196,7 @@ export class Auth {
       // Effettuiamo un signOut silenzioso prima di procedere.
       try {
         await signOut();
-      } catch (_) { }
+      } catch (_) {}
       const { nextStep } = await signIn(credentials);
 
       if (nextStep.signInStep === 'DONE') {
@@ -311,7 +285,7 @@ export class Auth {
       await this.fetchAndSetUser();
     } catch (error) {
       this.user$.next(null);
-      this.isInitialized.set(true);
+      this._readyResolve();
     }
   }
 
@@ -330,7 +304,7 @@ export class Auth {
       console.error('[Auth] Errore nel fetch user:', error);
       this.user$.next(null);
     } finally {
-      this.isInitialized.set(true);
+      this._readyResolve();
     }
   }
 

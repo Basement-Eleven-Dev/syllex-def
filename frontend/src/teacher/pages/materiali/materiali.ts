@@ -4,6 +4,7 @@ import {
   signal,
   ViewChild,
   ElementRef,
+  OnInit,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
@@ -55,6 +56,7 @@ import { AiOverlay } from '../../components/ai-overlay/ai-overlay';
 import { SuggestedTopicsModal } from '../../components/suggested-topics-modal/suggested-topics-modal';
 import { effect, untracked } from '@angular/core';
 import { FeedbackService } from '../../../services/feedback-service';
+import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 
 @Component({
   selector: 'app-materiali',
@@ -70,11 +72,12 @@ import { FeedbackService } from '../../../services/feedback-service';
     MaterialeContextualMenu,
     StorageLimitBar,
     AiOverlay,
+    TourAnchorNgBootstrapDirective,
   ],
   templateUrl: './materiali.html',
   styleUrl: './materiali.scss',
 })
-export class Materiali {
+export class Materiali implements OnInit {
   @ViewChild('fileInput')
   private readonly fileInput!: ElementRef<HTMLInputElement>;
 
@@ -93,6 +96,10 @@ export class Materiali {
         untracked(() => this.openSuggestedTopicsModal(topics));
       }
     });
+  }
+
+  ngOnInit(): void {
+    this.facade.reload();
   }
 
   // ── Icons ─────────────────────────────────────────────────────────

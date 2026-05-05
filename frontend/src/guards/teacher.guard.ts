@@ -1,30 +1,16 @@
 import { inject } from '@angular/core';
 import { Router, CanActivateFn } from '@angular/router';
-import { map, filter } from 'rxjs/operators';
 import { Auth } from '../services/auth';
-import { toObservable } from '@angular/core/rxjs-interop';
 
-export const teacherGuard: CanActivateFn = (route, state) => {
-  const authService = inject(Auth);
+export const teacherGuard: CanActivateFn = async () => {
+  const auth = inject(Auth);
   const router = inject(Router);
 
-  return toObservable(authService.isInitialized).pipe(
-    filter((initialized) => initialized),
-    map(() => {
-      const user = authService.user;
-      if (!user) {
-        return router.createUrlTree(['/']);
-      }
+  await auth.whenReady;
+  const user = auth.user;
 
-      if (user.role === 'teacher') {
-        return true;
-      }
-
-      if (user.role === 'admin') {
-        return router.createUrlTree(['/a']);
-      }
-
-      return router.createUrlTree(['/s']);
-    }),
-  );
+  if (!user) return router.createUrlTree(['/']);
+  if (user.role === 'teacher') return true;
+  if (user.role === 'admin') return router.createUrlTree(['/a']);
+  return router.createUrlTree(['/s']);
 };

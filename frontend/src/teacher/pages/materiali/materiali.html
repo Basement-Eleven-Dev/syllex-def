@@ -1,9 +1,11 @@
-<h1 class="text-dark fw-medium mb-3 display-6">File e Risorse</h1>
+<h1 class="text-dark fw-medium mb-3 display-6">
+  <span tourAnchor="materiali_header">File e Risorse</span>
+</h1>
 <h5 class="text-dark mb-0 fw-normal">
   Gestisci e visualizza i tuoi file e le risorse per la materia selezionata.
 </h5>
 
-<section class="d-flex flex-row gap-3 my-5">
+<section tourAnchor="materiali_search" class="d-flex flex-row gap-3 my-5">
   <input
     #fileInput
     type="file"
@@ -38,10 +40,13 @@
   />
 </section>
 
-<app-storage-limit-bar />
+<app-storage-limit-bar tourAnchor="materiali_storage_bar" />
 
 <section class="form-section">
-  <div class="d-flex flex-row align-items-center justify-content-between mb-4">
+  <div
+    tourAnchor="materiali_content"
+    class="d-flex flex-row align-items-center justify-content-between mb-4"
+  >
     <div class="d-flex flex-row align-items-center gap-2">
       @for(dir of currentPathArray(); track $index; let last = $last){
       <a
@@ -74,10 +79,15 @@
         selectedCount() }})
       </button>
       }
-      <button class="btn btn-blue icon-btn" (click)="onCreateNewFolder()">
+      <button
+        tourAnchor="materiali_new_folder"
+        class="btn btn-blue icon-btn"
+        (click)="onCreateNewFolder()"
+      >
         <fa-icon [icon]="icons.plus"></fa-icon> Nuova cartella
       </button>
       <button
+        tourAnchor="materiali_upload"
         class="btn btn-blue icon-btn"
         (click)="onRequestUpload()"
         [disabled]="isStorageFull()"
@@ -85,6 +95,7 @@
         <fa-icon [icon]="icons.upload"></fa-icon> Carica file
       </button>
       <button
+        tourAnchor="materiali_generate_ai"
         class="btn ai icon-btn"
         (click)="onRequestGenerate()"
         [disabled]="isStorageFull()"
@@ -94,17 +105,34 @@
     </div>
   </div>
 
-  @if(viewType() === 'grid') {
-  <div class="row">
-    @for(item of rootFolder().content; track item._id){
-    <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-3">
-      @if('content' in item) {
+  <div>
+    @if(viewType() === 'grid') {
+    <div class="row">
+      @for(item of rootFolder().content; track item._id; let first = $first){
       <div
-        (dragover)="onDragOver($event)"
-        (drop)="onDrop(item, $event)"
-        (dragenter)="onDragEnter($event)"
-        (dragleave)="onDragLeave($event)"
+        class="col-12 col-md-6 col-lg-4 col-xl-3 mb-3"
+        [tourAnchor]="first ? 'materiali_first_card' : ''"
       >
+        @if('content' in item) {
+        <div
+          (dragover)="onDragOver($event)"
+          (drop)="onDrop(item, $event)"
+          (dragenter)="onDragEnter($event)"
+          (dragleave)="onDragLeave($event)"
+        >
+          <app-materiale-card
+            [item]="item"
+            [highlightedItemId]="highlightedItemId()"
+            [isSelected]="isItemSelected(item._id)"
+            [draggable]="true"
+            (openItem)="onRequestOpenItem(item)"
+            (dragstart)="onDragStart(item, $event)"
+            (renameItem)="onRequestRenameItem(item, $event)"
+            (deleteItem)="onRequestDeleteItem(item)"
+            (selectItemEvent)="onSelectItem(item, $event)"
+          />
+        </div>
+        } @else {
         <app-materiale-card
           [item]="item"
           [highlightedItemId]="highlightedItemId()"
@@ -116,124 +144,112 @@
           (deleteItem)="onRequestDeleteItem(item)"
           (selectItemEvent)="onSelectItem(item, $event)"
         />
+        }
       </div>
-      } @else {
-      <app-materiale-card
-        [item]="item"
-        [highlightedItemId]="highlightedItemId()"
-        [isSelected]="isItemSelected(item._id)"
-        [draggable]="true"
-        (openItem)="onRequestOpenItem(item)"
-        (dragstart)="onDragStart(item, $event)"
-        (renameItem)="onRequestRenameItem(item, $event)"
-        (deleteItem)="onRequestDeleteItem(item)"
-        (selectItemEvent)="onSelectItem(item, $event)"
-      />
+      } @empty {
+      <div class="col-12 text-center py-5">
+        <p class="text-muted">Nessun elemento presente</p>
+      </div>
       }
     </div>
-    } @empty {
-    <div class="col-12 text-center py-5">
-      <p class="text-muted">Nessun elemento presente</p>
+    } @else {
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 40px">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                [checked]="isAllSelected()"
+                (change)="toggleSelectAll()"
+              />
+            </th>
+            <th style="width: 40px"></th>
+            <th>Nome</th>
+            <th style="width: 120px">Tipo</th>
+            <th style="width: 120px">Dimensione</th>
+            <th style="width: 180px">Data modifica</th>
+            <th style="width: 50px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(item of rootFolder().content; track item._id!){
+          <tr
+            class="cursor-pointer"
+            [class.table-active]="isItemSelected(item._id!)"
+            [class.highlight-row]="highlightedItemId() === item._id!"
+            [draggable]="true"
+            (click)="onSelectItem(item, $event)"
+            (dblclick)="onRequestOpenItem(item); $event.stopPropagation()"
+            (dragstart)="onDragStart(item, $event)"
+            (dragover)="onDragOver($event)"
+            (drop)="onDrop(item, $event)"
+            (dragenter)="onDragEnter($event)"
+            (dragleave)="onDragLeave($event)"
+          >
+            <td>
+              <input
+                type="checkbox"
+                class="form-check-input"
+                [checked]="isItemSelected(item._id!)"
+                (click)="$event.stopPropagation()"
+                (change)="onSelectItem(item, $event)"
+              />
+            </td>
+            <td>
+              @if (isAIGenerated(item)) {
+              <fa-icon
+                [icon]="icons.robot"
+                class="me-3"
+                style="color: #9664c8"
+                size="lg"
+              />
+              } @else {
+              <fa-icon
+                [icon]="getItemIcon(item)"
+                size="lg"
+                [style.color]="getItemColor(item)"
+              />
+              }
+            </td>
+            <td class="">{{ item.name }}</td>
+            <td class="text-muted">{{ getItemType(item) }}</td>
+            <td class="text-muted">{{ getItemSize(item) }}</td>
+            <td class="text-muted">
+              {{ item.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+            </td>
+            <td>
+              <div ngbDropdown class="d-inline-block">
+                <button
+                  class="btn btn-sm btn-light circle-btn"
+                  (click)="$event.stopPropagation()"
+                  ngbDropdownToggle
+                >
+                  <fa-icon [icon]="icons.threeDots" />
+                </button>
+                <div ngbDropdownMenu>
+                  <app-materiale-contextual-menu
+                    [item]="item"
+                    (renameItem)="onRequestRenameItem(item, $event)"
+                    (deleteItem)="onRequestDeleteItem(item)"
+                  />
+                </div>
+              </div>
+            </td>
+          </tr>
+          } @empty {
+          <tr>
+            <td colspan="6" class="text-center py-5">
+              <p class="text-muted">Nessun elemento presente</p>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
     </div>
     }
   </div>
-  } @else {
-  <div class="table-responsive">
-    <table class="table table-hover align-middle">
-      <thead class="table-light">
-        <tr>
-          <th style="width: 40px">
-            <input
-              type="checkbox"
-              class="form-check-input"
-              [checked]="isAllSelected()"
-              (change)="toggleSelectAll()"
-            />
-          </th>
-          <th style="width: 40px"></th>
-          <th>Nome</th>
-          <th style="width: 120px">Tipo</th>
-          <th style="width: 120px">Dimensione</th>
-          <th style="width: 180px">Data modifica</th>
-          <th style="width: 50px"></th>
-        </tr>
-      </thead>
-      <tbody>
-        @for(item of rootFolder().content; track item._id!){
-        <tr
-          class="cursor-pointer"
-          [class.table-active]="isItemSelected(item._id!)"
-          [class.highlight-row]="highlightedItemId() === item._id!"
-          [draggable]="true"
-          (click)="onSelectItem(item, $event)"
-          (dblclick)="onRequestOpenItem(item); $event.stopPropagation()"
-          (dragstart)="onDragStart(item, $event)"
-          (dragover)="onDragOver($event)"
-          (drop)="onDrop(item, $event)"
-          (dragenter)="onDragEnter($event)"
-          (dragleave)="onDragLeave($event)"
-        >
-          <td>
-            <input
-              type="checkbox"
-              class="form-check-input"
-              [checked]="isItemSelected(item._id!)"
-              (click)="$event.stopPropagation()"
-              (change)="onSelectItem(item, $event)"
-            />
-          </td>
-          <td>
-            @if (isAIGenerated(item)) {
-            <fa-icon
-              [icon]="icons.robot"
-              class="me-3"
-              style="color: #9664c8"
-              size="lg"
-            />
-            } @else {
-            <fa-icon
-              [icon]="getItemIcon(item)"
-              size="lg"
-              [style.color]="getItemColor(item)"
-            />
-            }
-          </td>
-          <td class="">{{ item.name }}</td>
-          <td class="text-muted">{{ getItemType(item) }}</td>
-          <td class="text-muted">{{ getItemSize(item) }}</td>
-          <td class="text-muted">
-            {{ item.createdAt | date: 'dd/MM/yyyy HH:mm' }}
-          </td>
-          <td>
-            <div ngbDropdown class="d-inline-block">
-              <button
-                class="btn btn-sm btn-light circle-btn"
-                (click)="$event.stopPropagation()"
-                ngbDropdownToggle
-              >
-                <fa-icon [icon]="icons.threeDots" />
-              </button>
-              <div ngbDropdownMenu>
-                <app-materiale-contextual-menu
-                  [item]="item"
-                  (renameItem)="onRequestRenameItem(item, $event)"
-                  (deleteItem)="onRequestDeleteItem(item)"
-                />
-              </div>
-            </div>
-          </td>
-        </tr>
-        } @empty {
-        <tr>
-          <td colspan="6" class="text-center py-5">
-            <p class="text-muted">Nessun elemento presente</p>
-          </td>
-        </tr>
-        }
-      </tbody>
-    </table>
-  </div>
-  }
 </section>
 
 <app-ai-overlay

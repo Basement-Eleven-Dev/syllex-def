@@ -35,6 +35,7 @@ import { EmbeddingsService } from '../../../services/embeddings.service';
 import { Materia } from '../../../services/materia';
 import { AgentService } from '../../../services/agent.service';
 import { FeedbackService } from '../../../services/feedback-service';
+import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 
 @Component({
   selector: 'app-agent-settings-form',
@@ -43,6 +44,7 @@ import { FeedbackService } from '../../../services/feedback-service';
     ReactiveFormsModule,
     FontAwesomeModule,
     MaterialiSelector,
+    TourAnchorNgBootstrapDirective,
   ],
   templateUrl: './agent-settings-form.html',
   styleUrl: './agent-settings-form.scss',
@@ -224,9 +226,7 @@ export class AgentSettingsForm implements OnInit {
 
         if (assistantId) {
           // UPDATE
-          await firstValueFrom(
-            this.agentService.updateAgent(formData),
-          );
+          await firstValueFrom(this.agentService.updateAgent(formData));
           console.log('Agent updated successfully');
         } else {
           // CREATE

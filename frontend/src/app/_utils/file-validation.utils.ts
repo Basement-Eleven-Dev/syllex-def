@@ -2,9 +2,7 @@
 export const ALLOWED_FILE_EXTENSIONS = [
   'pdf',
   'docx',
-  'doc',
   'xlsx',
-  'xls',
   'png',
   'jpg',
   'jpeg',

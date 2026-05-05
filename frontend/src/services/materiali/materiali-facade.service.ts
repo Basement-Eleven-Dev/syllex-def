@@ -131,7 +131,7 @@ export class MaterialiFacadeService {
         if (response.suggestedTopics && response.suggestedTopics.length > 0) {
           this.suggestedTopics.update((current) => {
             const newTopics = response.suggestedTopics!.filter(
-              (t) => !current.includes(t)
+              (t) => !current.includes(t),
             );
             return [...current, ...newTopics];
           });
@@ -149,16 +149,20 @@ export class MaterialiFacadeService {
       tap(() => {
         // Rimuovi il topic dai suggerimenti dopo averlo aggiunto
         this.suggestedTopics.update((current) =>
-          current.filter((t) => t !== topic)
+          current.filter((t) => t !== topic),
         );
-      })
+      }),
     );
   }
 
   dismissSuggestedTopic(topic: string): void {
     this.suggestedTopics.update((current) =>
-      current.filter((t) => t !== topic)
+      current.filter((t) => t !== topic),
     );
+  }
+
+  reload(): void {
+    this.materialiService.loadMaterials();
   }
 
   // ── CRUD ──────────────────────────────────────────────────────────

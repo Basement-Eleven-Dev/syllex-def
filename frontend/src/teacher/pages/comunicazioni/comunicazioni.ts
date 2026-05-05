@@ -12,6 +12,7 @@ import {
 } from '../../../services/comunicazioni-service';
 import { ClassiService } from '../../../services/classi-service';
 import { FeedbackService } from '../../../services/feedback-service';
+import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 
 @Component({
   selector: 'app-comunicazioni',
@@ -21,6 +22,7 @@ import { FeedbackService } from '../../../services/feedback-service';
     RouterModule,
     SyllexPagination,
     FormsModule,
+    TourAnchorNgBootstrapDirective,
   ],
   templateUrl: './comunicazioni.html',
   styleUrl: './comunicazioni.scss',

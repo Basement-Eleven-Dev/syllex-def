@@ -35,15 +35,6 @@ export class UserContextualMenu {
     modalRef.componentInstance.showCloseButton = true;
   }
 
-  @Output() tourStarted = new EventEmitter<void>();
-
-  onStartTour() {
-    this.tourStarted.emit();
-    setTimeout(() => {
-      this.tourService.start();
-    }, 100);
-  }
-
   onReportBug() {
     this.modalService.open(ReportBugForm, {
       size: 'md',

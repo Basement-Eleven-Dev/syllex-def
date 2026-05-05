@@ -1,8 +1,8 @@
 import { mongo, Types } from "mongoose";
 import { connectDatabase } from "../getDatabase";
-import { sendBulkEmail } from "./emailQueue";
 import { Class } from "../../models/schemas/class.schema";
 import { User } from "../../models/schemas/user.schema";
+import { sendEmail } from "./sendEmail";
 
 /**
  * Recupera le email degli studenti dato un array di classIds.
@@ -98,13 +98,11 @@ export async function notifyStudentsIfEnabled(params: {
     console.log(
       `[Notify] Invio '${preference}' a ${studentEmails.length} studenti`
     );
-
-    // 3. Invia le email in bulk
-    await sendBulkEmail({
-      subject,
-      html,
-      recipients: studentEmails,
-    });
+    await Promise.all(
+      studentEmails.map((recipient) =>
+        sendEmail(recipient, subject, html)
+      )
+    );
   } catch (error) {
     // Non bloccare mai il flusso principale
     console.error("[Notify] Errore durante l'invio notifiche:", error);

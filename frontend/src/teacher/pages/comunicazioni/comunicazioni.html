@@ -1,4 +1,7 @@
-<div class="d-flex flex-row align-items-center mb-5">
+<div
+  tourAnchor="comunicazioni_header"
+  class="d-flex flex-row align-items-center mb-5"
+>
   <div>
     <h1 class="text-dark fw-medium mb-3 display-6">Comunicazioni</h1>
     <h5 class="text-dark mb-0 fw-normal">
@@ -7,6 +10,7 @@
     </h5>
   </div>
   <button
+    tourAnchor="comunicazioni_new_button"
     class="btn btn-gradient-secondary btn-lg ms-auto py-3 icon-btn"
     routerLink="/t/comunicazioni/new"
   >
@@ -15,7 +19,7 @@
   </button>
 </div>
 
-<section class="d-flex flex-row mb-5 gap-3">
+<section tourAnchor="comunicazioni_filters" class="d-flex flex-row mb-5 gap-3">
   <div>
     <input
       type="text"
@@ -65,16 +69,21 @@
   </button>
 </section>
 
-@for(comunicazione of Comunicazioni(); track comunicazione._id){
+@for(comunicazione of Comunicazioni(); track comunicazione._id; let first =
+$first){
 <div
   class="mb-3"
+  [tourAnchor]="first ? 'comunicazioni_first_card' : ''"
   app-comunicazione-card
   [comunicazione]="comunicazione"
   (deleted)="onComunicazioneDeleted($event)"
 ></div>
 }
 
-<div class="mt-5 d-flex flex-row justify-content-between align-items-center">
+<div
+  tourAnchor="comunicazioni_pagination"
+  class="mt-5 d-flex flex-row justify-content-between align-items-center"
+>
   <app-syllex-pagination
     [collectionSize]="CollectionSize()"
     [page]="Page()"

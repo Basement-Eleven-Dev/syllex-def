@@ -1,3 +1,15 @@
+<!-- @if (hasTourForRoute()) {
+<div
+  class="qMark d-flex flex-row align-items-center gap-2 shadow px-3 p-2 rounded-pill"
+  (click)="startTour()"
+>
+  <fa-icon [icon]="questionMarkIcon" class="text-primary"></fa-icon>
+  Come funziona?
+</div>
+} -->
+
+<app-help-chat></app-help-chat>
+
 <div class="w-100 dvh-100 d-flex flex-row">
   @if (showLoading()) {
   <div id="loadingOverlay" animate.enter="fade-in">
@@ -32,24 +44,31 @@
     </div>
     <div class="popover-body text-center mt-2 px-3 pb-3">
       <p class="mb-4">{{ step?.content }}</p>
-      
+
       <div class="d-flex justify-content-between align-items-center mt-3">
         @if (tourService.hasPrev(step)) {
-          <button class="btn btn-outline-dark btn-sm rounded-pill px-3 opacity-75" (click)="tourService.prev()">
-            Indietro
-          </button>
+        <button
+          class="btn btn-outline-dark btn-sm rounded-pill px-3 opacity-75"
+          (click)="tourService.prev()"
+        >
+          Indietro
+        </button>
         } @else {
-          <div><!-- Spacer --></div>
-        }
-        
-        @if (tourService.hasNext(step)) {
-          <button class="btn btn-primary btn-sm rounded-pill px-3" (click)="tourService.next()">
-            Naviga
-          </button>
+        <div><!-- Spacer --></div>
+        } @if (tourService.hasNext(step)) {
+        <button
+          class="btn btn-primary btn-sm rounded-pill px-3"
+          (click)="tourService.next()"
+        >
+          Naviga
+        </button>
         } @else {
-          <button class="btn btn-primary btn-sm rounded-pill px-3" (click)="tourService.end()">
-            Fine
-          </button>
+        <button
+          class="btn btn-primary btn-sm rounded-pill px-3"
+          (click)="tourService.end()"
+        >
+          Fine
+        </button>
         }
       </div>
     </div>

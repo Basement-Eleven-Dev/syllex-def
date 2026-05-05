@@ -3,14 +3,16 @@
   [label]="'Torna alla lista delle domande'"
 ></app-back-to>
 
-<h1 class="text-dark fw-medium mb-3 display-6">{{ PageTitle() }}</h1>
+<h1 tourAnchor="crea_domanda_header" class="text-dark fw-medium mb-3 display-6">
+  {{ PageTitle() }}
+</h1>
 <h5 class="text-dark mb-0 fw-normal mb-5">{{ PageDescription() }}</h5>
 <form
   [formGroup]="QuestionForm"
   (ngSubmit)="onSaveQuestion()"
   class="d-flex flex-column gap-4 pb-5"
 >
-  <section class="form-section">
+  <section tourAnchor="crea_domanda_tipo" class="form-section">
     <label class="form-label text-dark">Tipologia di risposta</label>
     <app-type-selector
       [options]="QuestionTypeOptions"
@@ -20,7 +22,7 @@
     ></app-type-selector>
   </section>
 
-  <section class="form-section">
+  <section tourAnchor="crea_domanda_argomento" class="form-section">
     <label class="form-label text-dark">Argomento</label>
     <select
       class="form-select custom-input w-auto"
@@ -34,7 +36,7 @@
     </select>
   </section>
 
-  <section class="form-section">
+  <section tourAnchor="crea_domanda_difficolta" class="form-section">
     <label class="form-label text-dark">Difficoltà</label>
     <select
       class="form-select custom-input w-auto"
@@ -47,7 +49,7 @@
     </select>
   </section>
 
-  <section class="form-section">
+  <section tourAnchor="crea_domanda_contenuto" class="form-section">
     <div
       class="d-flex flex-row justify-content-between align-items-center mb-5"
     >
@@ -141,7 +143,7 @@
   </section>
 
   @if(SelectedQuestionType() === 'scelta multipla' ) {
-  <section class="form-section">
+  <section tourAnchor="crea_domanda_opzioni" class="form-section">
     <div class="col-8">
       <app-multiple-choice-options
         [options]="questionOptions"
@@ -150,7 +152,7 @@
     </div>
   </section>
   } @if(SelectedQuestionType() === 'vero falso' ) {
-  <section class="form-section">
+  <section tourAnchor="crea_domanda_verofalso" class="form-section">
     <label class="form-label text-dark">Risposta corretta</label>
     <p class="text-muted mb-3">Seleziona se l'affermazione è vera o falsa</p>
     <div class="d-flex gap-2">
@@ -186,7 +188,7 @@
   </section>
   }
 
-  <section class="form-section">
+  <section tourAnchor="crea_domanda_spiegazione" class="form-section">
     <label class="form-label text-dark"
       >Spiegazione della risposta corretta</label
     >
@@ -198,7 +200,7 @@
     ></textarea>
   </section>
 
-  <section class="form-section">
+  <section tourAnchor="crea_domanda_tag" class="form-section">
     <label class="form-label text-dark">Tag</label>
     <p class="text-dark fw-light mb-2">
       Aggiungi dei tag per organizzare e ritrovare più facilmente le domande.
@@ -230,7 +232,7 @@
     />
   </section>
 
-  <section class="form-section">
+  <section tourAnchor="crea_domanda_visibilita" class="form-section">
     <label class="form-label text-dark"
       >Visibilità della domanda e politiche di utilizzo</label
     >
@@ -277,7 +279,10 @@
     </section>
   </section>
 
-  <section class="d-flex flex-row justify-content-end mt-5 gap-3">
+  <section
+    tourAnchor="crea_domanda_salva"
+    class="d-flex flex-row justify-content-end mt-5 gap-3"
+  >
     <button
       class="btn btn-primary icon-btn btn-lg"
       type="submit"

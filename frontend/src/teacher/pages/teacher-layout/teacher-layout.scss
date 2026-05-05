@@ -28,3 +28,18 @@
     transform: translateY(0);
   }
 }
+
+.qMark {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 10;
+  outline: 0px solid rgba(var(--bs-primary-rgb), 0);
+  cursor: pointer;
+  transition: all 0.1s linear;
+  background-color: var(--bs-white);
+  &:hover {
+    transform: scale(1.05);
+    outline: 1px solid rgba(var(--bs-secondary-rgb), 0.5);
+  }
+}

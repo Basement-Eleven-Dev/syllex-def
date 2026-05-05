@@ -1,4 +1,4 @@
-<div class="d-flex flex-row align-items-center mb-5">
+<div tourAnchor="eventi_header" class="d-flex flex-row align-items-center mb-5">
   <div>
     <h1 class="text-dark fw-medium mb-3 display-6">Eventi</h1>
     <h5 class="text-dark mb-0 fw-normal">
@@ -8,6 +8,7 @@
   </div>
 
   <button
+    tourAnchor="eventi_new_button"
     class="btn btn-gradient-secondary btn-lg ms-auto py-3 icon-btn"
     routerLink="/t/eventi/new"
   >
@@ -15,6 +16,6 @@
     Nuovo evento
   </button>
 </div>
-<div class="card form-section p-4">
-  <app-calendario [showHeadings]="false"></app-calendario>
+<div tourAnchor="eventi_calendario" class="card form-section p-4">
+  <app-calendario [showHeadings]="false" [readonly]="true"></app-calendario>
 </div>

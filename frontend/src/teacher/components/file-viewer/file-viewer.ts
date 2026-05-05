@@ -14,7 +14,11 @@ import {
 import { CommonModule } from '@angular/common';
 import { NgxDocViewerModule } from 'ngx-doc-viewer';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faSpinnerThird, faExpandArrowsAlt } from '@fortawesome/pro-solid-svg-icons';
+import {
+  faSpinnerThird,
+  faExpandArrowsAlt,
+  faDownload,
+} from '@fortawesome/pro-solid-svg-icons';
 import { HttpClient } from '@angular/common/http';
 import mermaid from 'mermaid';
 import svgPanZoom from 'svg-pan-zoom';
@@ -40,9 +44,11 @@ export class FileViewer implements OnChanges, OnInit, OnDestroy {
   readonly isLoading = signal(true);
   readonly SpinnerIcon = faSpinnerThird;
   readonly ResetIcon = faExpandArrowsAlt;
+  readonly DownloadIcon = faDownload;
   readonly mermaidContent = signal<string | null>(null);
-  
+
   private panZoomInstance: SvgPanZoom.Instance | null = null;
+  private rawSvgForExport: string | null = null;
 
   isBlobUrl = computed(() => this.docUrl?.startsWith('blob:'));
 
@@ -83,8 +89,8 @@ export class FileViewer implements OnChanges, OnInit, OnDestroy {
         clusterBorder: '#adb5bd',
         defaultLinkColor: '#495057',
         titleColor: '#212529',
-        edgeLabelBackground: '#ffffff'
-      }
+        edgeLabelBackground: '#ffffff',
+      },
     });
   }
 
@@ -95,11 +101,7 @@ export class FileViewer implements OnChanges, OnInit, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (
-      (changes['docUrl'] || changes['isMap']) &&
-      this.docUrl &&
-      this.isMap
-    ) {
+    if ((changes['docUrl'] || changes['isMap']) && this.docUrl && this.isMap) {
       this.loadMapContent();
     }
   }
@@ -150,17 +152,16 @@ export class FileViewer implements OnChanges, OnInit, OnDestroy {
 
     this.destroyPanZoom();
 
-    
-const escapeHtml = (str: string) =>
-  str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const escapeHtml = (str: string) =>
+      str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-content = content.replace(/(\[[^"\]\n]+\])/g, (match) => {
-  const inner = match.slice(1, -1);
-  if (inner.includes(':') || inner.includes('(') || inner.includes(')')) {
-    return `["${escapeHtml(inner)}"]`;
-  }
-  return match;
-});
+    content = content.replace(/(\[[^"\]\n]+\])/g, (match) => {
+      const inner = match.slice(1, -1);
+      if (inner.includes(':') || inner.includes('(') || inner.includes(')')) {
+        return `["${escapeHtml(inner)}"]`;
+      }
+      return match;
+    });
 
     const el = this.mermaidContainer.nativeElement;
     el.innerHTML = '';
@@ -171,27 +172,31 @@ content = content.replace(/(\[[^"\]\n]+\])/g, (match) => {
       const id = `mermaid-${crypto.randomUUID()}`;
       const { svg } = await mermaid.render(id, content);
 
+      this.rawSvgForExport = svg;
       el.innerHTML = svg;
 
       const svgEl = el.querySelector('svg');
       if (svgEl) {
-        // ESPANSIONE MANUALE VIEWBOX: 
+        // ESPANSIONE MANUALE VIEWBOX:
         // Aggiungiamo spazio extra su tutti i lati per evitare clipping dei titoli
         const currentViewBox = svgEl.getAttribute('viewBox');
         if (currentViewBox) {
           const [x, y, w, h] = currentViewBox.split(' ').map(Number);
           const margin = 200; // Margine abbondante per sicurezza
-          svgEl.setAttribute('viewBox', `${x - margin} ${y - margin} ${w + margin * 2} ${h + margin * 2}`);
+          svgEl.setAttribute(
+            'viewBox',
+            `${x - margin} ${y - margin} ${w + margin * 2} ${h + margin * 2}`,
+          );
         }
 
         svgEl.style.width = '100%';
         svgEl.style.height = '100%';
         svgEl.style.maxWidth = 'none';
-        
+
         // Inizializziamo il pan-zoom
         this.panZoomInstance = svgPanZoom(svgEl, {
           zoomEnabled: true,
-          controlIconsEnabled: false, 
+          controlIconsEnabled: false,
           fit: true,
           center: true,
           minZoom: 0.1,
@@ -216,5 +221,68 @@ content = content.replace(/(\[[^"\]\n]+\])/g, (match) => {
 
   onLoad(): void {
     this.isLoading.set(false);
+  }
+
+  downloadAsPng(): void {
+    if (!this.rawSvgForExport) return;
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(this.rawSvgForExport, 'image/svg+xml');
+    const svgEl = doc.querySelector('svg') as SVGSVGElement;
+    if (!svgEl) return;
+
+    // Rimuove @import esterni per evitare che il canvas venga "tainted"
+    svgEl.querySelectorAll('style').forEach((style) => {
+      style.textContent =
+        style.textContent?.replace(/@import[^;]+;/g, '') ?? '';
+    });
+
+    const viewBox = svgEl.getAttribute('viewBox');
+    let w = 1200,
+      h = 800;
+    if (viewBox) {
+      const parts = viewBox.split(' ').map(Number);
+      w = parts[2] || w;
+      h = parts[3] || h;
+    }
+    svgEl.setAttribute('width', String(w));
+    svgEl.setAttribute('height', String(h));
+    svgEl.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+    const serializer = new XMLSerializer();
+    const svgStr = serializer.serializeToString(svgEl);
+    const dataUrl =
+      'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgStr);
+
+    const img = new Image();
+    img.onload = () => {
+      const scale = 2;
+      const canvas = document.createElement('canvas');
+      canvas.width = w * scale;
+      canvas.height = h * scale;
+      const ctx = canvas.getContext('2d')!;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.scale(scale, scale);
+      ctx.drawImage(img, 0, 0);
+
+      try {
+        const link = document.createElement('a');
+        link.download = 'mappa.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      } catch {
+        // fallback: scarica SVG se il canvas è ancora tainted
+        const blob = new Blob([svgStr], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = 'mappa.svg';
+        link.href = url;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+      }
+    };
+    img.onerror = (e) => console.error('Errore caricamento SVG per export:', e);
+    img.src = dataUrl;
   }
 }
