@@ -82,7 +82,7 @@ export class GeminiLiveService {
    */
   private tryConnectWithModel(token: string, model: string): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
-      const wsUrl = `wss://${this.LOCATION}-aiplatform.googleapis.com/ws/google.cloud.aiplatform.v1beta1.LlmBidiService/BidiGenerateContent?access_token=${token}`;
+      const wsUrl = `wss://${this.LOCATION}-aiplatform.googleapis.com/ws/google.cloud.aiplatform.v1.LlmBidiService/BidiGenerateContent?access_token=${token}`;
 
       // Timeout: se non si connette in 8 secondi, fallisce
       const timeout = setTimeout(() => {
@@ -168,7 +168,7 @@ export class GeminiLiveService {
    * Stabilisce la connessione definitiva con il modello già validato.
    */
   private establishConnection(token: string, model: string): void {
-    const wsUrl = `wss://${this.LOCATION}-aiplatform.googleapis.com/ws/google.cloud.aiplatform.v1beta1.LlmBidiService/BidiGenerateContent?access_token=${token}`;
+    const wsUrl = `wss://${this.LOCATION}-aiplatform.googleapis.com/ws/google.cloud.aiplatform.v1.LlmBidiService/BidiGenerateContent?access_token=${token}`;
 
     this.audioContext = new (
       window.AudioContext || (window as any).webkitAudioContext
@@ -333,17 +333,11 @@ export class GeminiLiveService {
 
   /**
    * Gestisce i messaggi dal server.
-   * inputTranscription e outputTranscription sono di PRIMO LIVELLO nella risposta.
+   * Con gemini-3.1-flash-live-preview: inputTranscription e outputTranscription
+   * sono campi di serverContent (non top-level).
    */
   private handleServerMessage(message: any): void {
     console.log(message);
-    // Log per debug profondo - ricalca la struttura reale
-    if (
-      message.outputTranscription ||
-      (message.serverContent && message.serverContent.modelTurn)
-    ) {
-      console.log('📦 [DEBUG SERVER MSG]:', message);
-    }
 
     // 1. Tool Call (RAG)
     if (message.toolCall) {
@@ -370,25 +364,7 @@ export class GeminiLiveService {
       return;
     }
 
-    // 4. Trascrizione INPUT (quello che diciamo noi)
-    if (message.inputTranscription) {
-      const text = message.inputTranscription.text;
-      if (text) {
-        console.log('🎤 [Trascrizione UTENTE]:', text);
-        this.userTranscript.set(text);
-      }
-    }
-
-    // 4b. Trascrizione OUTPUT (quello che dice l'AI)
-    if (message.outputTranscription) {
-      const text = message.outputTranscription.text;
-      if (text) {
-        console.log('🤖 [Trascrizione AI]:', text);
-        this.aiTranscript.update((prev) => prev + text);
-      }
-    }
-
-    // 5. Server Content (Audio, interruzioni, modelTurn, turnComplete)
+    // 4. Server Content — audio, trascrizioni, interruzioni, turnComplete
     if (message.serverContent) {
       const content = message.serverContent;
 
@@ -400,24 +376,41 @@ export class GeminiLiveService {
         return;
       }
 
+      // Trascrizione INPUT (quello che dice l'utente — da Gemini)
+      if (content.inputTranscription?.text) {
+        console.log(
+          '🎤 [Trascrizione UTENTE]:',
+          content.inputTranscription.text,
+        );
+        this.userTranscript.set(content.inputTranscription.text);
+      }
+
+      // Trascrizione OUTPUT (quello che dice l'AI)
+      if (content.outputTranscription?.text) {
+        console.log('🤖 [Trascrizione AI]:', content.outputTranscription.text);
+        this.aiTranscript.update(
+          (prev) => prev + content.outputTranscription.text,
+        );
+      }
+
       if (content.turnComplete) {
         console.log('🏁 [TURN COMPLETE]');
         this.isSpeaking.set(false);
         this.turnCompleteEvent.update((v) => v + 1);
       }
 
+      // Parti del turno AI (testo e audio in streaming)
       const modelTurn = content.modelTurn;
-      if (modelTurn && modelTurn.parts) {
-        console.log(modelTurn, ' [MODEL TURN]:', modelTurn);
+      if (modelTurn?.parts) {
         modelTurn.parts.forEach((part: any) => {
-          // Gestione TESTO dell'IA (quello che sta vocalizzando)
+          // Testo IA (usato come fallback se outputTranscription non arriva)
           if (part.text) {
-            console.log('🤖 [Testo IA]:', part.text);
+            console.log('🤖 [Testo IA via part]:', part.text);
             this.aiTranscript.update((prev) => prev + part.text);
           }
 
-          // Gestione AUDIO dell'IA
-          if (part.inlineData && part.inlineData.data) {
+          // Audio dell'IA
+          if (part.inlineData?.data) {
             this.enqueueAudio(part.inlineData.data);
           }
         });
