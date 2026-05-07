@@ -23,14 +23,14 @@
       >
         <div class="d-flex justify-content-between align-items-center">
           <span class="fw-bold small text-truncate pe-2"
-            >Chat {{ conv.timestamp | date:'dd MMM' }}</span
+            >{{ conv.title || 'Chat ' + (conv.timestamp | date:'dd MMM') }}</span
           >
           <span class="text-muted tiny"
             >{{ conv.timestamp | date:'HH:mm' }}</span
           >
         </div>
         <p class="text-muted tiny text-truncate mb-0 mt-1">
-          {{ conv.lastMessage || 'Nessun messaggio' }}
+          {{ conv.preview || 'Nessun messaggio' }}
         </p>
       </button>
       }

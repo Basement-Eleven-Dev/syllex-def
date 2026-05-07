@@ -21,6 +21,7 @@ const listConversations = async (
     { $match: { subjectId: subjectId, userId: userId } },
     { $group: { 
         _id: "$conversationId", 
+        firstMessage: { $first: "$content" },
         lastMessage: { $last: "$content" },
         timestamp: { $last: "$timestamp" }
       } 
@@ -30,6 +31,7 @@ const listConversations = async (
 
   return conversations.map(c => ({
     id: c._id,
+    title: c.firstMessage,
     preview: c.lastMessage,
     timestamp: c.timestamp
   }));
