@@ -402,6 +402,8 @@ export class GeminiLiveService {
       // Parti del turno AI (testo e audio in streaming)
       const modelTurn = content.modelTurn;
       if (modelTurn?.parts) {
+        // Nuovo turno AI in arrivo: annulla lo scarto audio impostato da un'interruzione precedente
+        this.isDiscardingAudio = false;
         modelTurn.parts.forEach((part: any) => {
           // Testo IA (usato come fallback se outputTranscription non arriva)
           if (part.text) {
@@ -472,10 +474,12 @@ export class GeminiLiveService {
 
   private playNextInQueue(): void {
     if (!this.audioContext) return;
-    
-    // Assicurati che l'AudioContext sia attivo (il browser potrebbe sospenderlo)
+
+    // Assicurati che l'AudioContext sia attivo (il browser potrebbe sospenderlo).
+    // resume() è asincrono: aspettiamo prima di procedere con la riproduzione.
     if (this.audioContext.state === 'suspended') {
-      this.audioContext.resume();
+      this.audioContext.resume().then(() => this.playNextInQueue());
+      return;
     }
 
     if (this.audioQueue.length === 0) {
