@@ -215,7 +215,7 @@ export class GeminiLiveService {
           },
         ],
         generationConfig: {
-          responseModalities: ['AUDIO', 'TEXT'],
+          responseModalities: ['AUDIO'],
           speechConfig: {
             voiceConfig: {
               prebuiltVoiceConfig: {

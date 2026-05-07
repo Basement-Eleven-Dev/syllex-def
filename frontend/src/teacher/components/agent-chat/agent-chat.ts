@@ -206,19 +206,9 @@ export class AgentChat implements OnInit, OnDestroy {
     const text = this.inputMessage.trim();
     const convId = this.currentConversationId();
 
-    if (!text) {
-      console.warn('Chat: Skip send (empty text)');
-      return;
-    }
-    if (!convId) {
-      console.warn('Chat: Skip send (no convId)');
-      return;
-    }
-    if (this.isLoading()) {
-      console.warn('Chat: Skip send (already loading)');
-      return;
-    }
+    if (!text || !convId || this.isLoading()) return;
 
+    // Aggiungi localmente il messaggio dell'utente
     this.messages.update((msgs) => [
       ...msgs,
       { role: 'user', content: text, timestamp: new Date(), inputType },
@@ -226,12 +216,11 @@ export class AgentChat implements OnInit, OnDestroy {
     this.inputMessage = '';
     this.scrollToBottom();
 
-    console.log('Sending message:', { text, convId, inputType });
     this.isLoading.set(true);
 
+    // Usa la rotta REST standard (generateResponse) per la chat testuale
     this.agentService.generateResponse(text, convId, inputType).subscribe({
       next: (response) => {
-        console.log('Received response:', response);
         if (response.success) {
           const agentMsg: ChatMessage = {
             _id: response._id,
@@ -244,7 +233,7 @@ export class AgentChat implements OnInit, OnDestroy {
           this.isLoading.set(false);
           this.scrollToBottom();
 
-          // Auto-play TTS se l'input era vocale
+          // Auto-play TTS solo se l'input era vocale (modalità classica)
           if (inputType === 'voice' && response._id) {
             this.autoPlayResponse(response._id, response.aiResponse);
           }
@@ -254,11 +243,8 @@ export class AgentChat implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('Error generating response:', error);
-        this.feedbackService.showFeedback(
-          'Errore nella generazione della risposta',
-          false,
-        );
-        this.isLoading.set(false); // Reset obbligatorio
+        this.feedbackService.showFeedback('Errore nella generazione della risposta', false);
+        this.isLoading.set(false);
       },
     });
   }
