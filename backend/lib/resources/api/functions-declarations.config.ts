@@ -465,6 +465,12 @@ const ASSISTANTS_ROUTES: FunctionIntegration[] = [
     role: "logged",
   },
   {
+    apiRoute: "messages/save",
+    functionPath: "messages/saveLiveMessage.ts",
+    method: "post",
+    role: "logged",
+  },
+  {
     apiRoute: "messages/list-conversations",
     functionPath: "messages/listConversations.ts",
     method: "get",

@@ -30,6 +30,7 @@ import {
 import { faSpinner } from '@fortawesome/pro-regular-svg-icons';
 import { AgentService } from '../../../services/agent.service';
 import { FeedbackService } from '../../../services/feedback-service';
+import { GeminiLiveService } from '../../../services/gemini-live-service';
 import { DatePipe } from '@angular/common';
 
 export interface ChatMessage {
@@ -61,9 +62,11 @@ export class AgentChat implements OnInit, OnDestroy {
   faMicrophone = faMicrophone;
   faStop = faStop;
   faGear = faGear;
+  faPaperPlane = faPaperPlane;
 
   // --- Services ---
   private feedbackService = inject(FeedbackService);
+  public geminiLiveService = inject(GeminiLiveService);
   constructor(private agentService: AgentService) {}
 
   // --- Inputs ---
@@ -82,10 +85,13 @@ export class AgentChat implements OnInit, OnDestroy {
   // Gestione Modalità UI
   voiceModeActive = signal(false); 
 
-  // Voice input state
+  // Voice input state (Realtime)
+  private mediaStream: MediaStream | null = null;
+  private audioContext: AudioContext | null = null;
+  private processor: ScriptProcessorNode | null = null;
+  public recognition: any = null; 
   isRecording = signal(false);
   liveTranscript = signal('');
-  private recognition: any = null;
 
   // Audio playback state
   loadingAudioIds = signal<Set<string>>(new Set());
@@ -100,9 +106,10 @@ export class AgentChat implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.stopRecording();
+    this.stopRealtimeVoice();
     this.pauseAudio();
   }
+
 
   // Effetto: scrolla sempre in fondo quando cambia la lista dei messaggi
   private scrollEffect = effect(() => {
@@ -118,6 +125,35 @@ export class AgentChat implements OnInit, OnDestroy {
       this.loadConversationsList();
     }
   });
+
+  // Effetto: Quando Gemini Live finisce di parlare, salviamo la trascrizione
+  private aiVoiceTranscriptEffect = effect(() => {
+    const text = this.geminiLiveService.aiTranscript();
+    const isSpeaking = this.geminiLiveService.isSpeaking();
+    
+    // Se ha smesso di parlare e c'è del testo accumulato
+    if (!isSpeaking && text.trim().length > 0) {
+      this.saveVoiceMessage('agent', text);
+      this.geminiLiveService.aiTranscript.set(''); // Reset per la prossima frase
+    }
+  });
+
+  private saveVoiceMessage(role: 'user' | 'agent', content: string) {
+    const convId = this.currentConversationId();
+    if (!convId) return;
+
+    // Aggiungi localmente per visione immediata
+    const newMsg: ChatMessage = {
+      role,
+      content,
+      timestamp: new Date(),
+      inputType: 'voice'
+    };
+    this.messages.update(prev => [...prev, newMsg]);
+
+    // Salva nel DB (silenzioso)
+    this.agentService.saveLiveMessage(role, content, convId, 'voice').subscribe();
+  }
 
   // ==================
   // CONVERSATIONS
@@ -246,27 +282,69 @@ export class AgentChat implements OnInit, OnDestroy {
   }
 
   toggleVoiceInput() {
-    if (this.isRecording()) {
-      this.stopRecording();
+    if (this.voiceModeActive()) {
+      this.stopRealtimeVoice();
       this.voiceModeActive.set(false);
     } else {
       this.voiceModeActive.set(true);
-      this.startRecording();
+      this.startRealtimeVoice();
     }
   }
 
-  private startRecording() {
-    const SpeechRecognition =
-      (window as any).SpeechRecognition ||
-      (window as any).webkitSpeechRecognition;
+  public async startRealtimeVoice() {
+    try {
+      this.isRecording.set(true);
+      this.geminiLiveService.userTranscript.set('');
+      this.geminiLiveService.aiTranscript.set('');
+      
+      await this.geminiLiveService.connect();
+      this.startUserTranscriptRecognition(); // Avvia transcrito visuale
 
-    if (!SpeechRecognition) {
-      this.feedbackService.showFeedback(
-        'Il browser non supporta il riconoscimento vocale',
-        false,
-      );
-      return;
+      this.mediaStream = await navigator.mediaDevices.getUserMedia({
+        audio: { sampleRate: 16000, channelCount: 1, echoCancellation: true },
+      });
+
+      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)({
+        sampleRate: 16000,
+      });
+
+      const source = this.audioContext.createMediaStreamSource(this.mediaStream);
+      this.processor = this.audioContext.createScriptProcessor(2048, 1, 1);
+
+      this.processor.onaudioprocess = (e) => {
+        if (!this.geminiLiveService.isReady()) return;
+
+        const inputData = e.inputBuffer.getChannelData(0);
+        const pcm16 = new Int16Array(inputData.length);
+
+        for (let i = 0; i < inputData.length; i++) {
+          const s = Math.max(-1, Math.min(1, inputData[i]));
+          pcm16[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+        }
+
+        const uint8Array = new Uint8Array(pcm16.buffer);
+        let binary = '';
+        for (let i = 0; i < uint8Array.byteLength; i++) {
+          binary += String.fromCharCode(uint8Array[i]);
+        }
+
+        this.geminiLiveService.sendAudioChunk(window.btoa(binary));
+      };
+
+      source.connect(this.processor);
+      this.processor.connect(this.audioContext.destination);
+    } catch (err) {
+      console.error('Errore avvio Realtime:', err);
+      this.feedbackService.showFeedback('Impossibile accedere al microfono', false);
+      this.voiceModeActive.set(false);
+      this.isRecording.set(false);
     }
+  }
+
+  /** Avvia il riconoscimento locale SOLO per il feedback visivo e il salvataggio testo */
+  private startUserTranscriptRecognition() {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
 
     this.recognition = new SpeechRecognition();
     this.recognition.lang = 'it-IT';
@@ -276,57 +354,39 @@ export class AgentChat implements OnInit, OnDestroy {
     this.recognition.onresult = (event: any) => {
       let interimTranscript = '';
       let finalTranscript = '';
-
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const transcript = event.results[i][0].transcript;
         if (event.results[i].isFinal) {
           finalTranscript += transcript;
+          // Quando una frase è finale, la salviamo nello storico
+          this.saveVoiceMessage('user', transcript);
         } else {
           interimTranscript += transcript;
         }
       }
-
-      // Mostra la trascrizione live
-      this.liveTranscript.set(finalTranscript || interimTranscript);
-    };
-
-    this.recognition.onerror = (event: any) => {
-      console.error('Speech recognition error:', event.error);
-      if (event.error !== 'aborted') {
-        this.feedbackService.showFeedback(
-          'Errore nel riconoscimento vocale',
-          false,
-        );
-      }
-      this.isRecording.set(false);
-      this.liveTranscript.set('');
-    };
-
-    this.recognition.onend = () => {
-      // Quando termina, invia il testo se c'è
-      const transcript = this.liveTranscript().trim();
-      if (transcript && this.isRecording()) {
-        this.inputMessage = transcript;
-        this.isRecording.set(false);
-        this.liveTranscript.set('');
-        this.sendMessage('voice');
-      } else {
-        this.isRecording.set(false);
-        this.liveTranscript.set('');
-      }
+      this.geminiLiveService.userTranscript.set(finalTranscript || interimTranscript);
     };
 
     this.recognition.start();
-    this.isRecording.set(true);
   }
 
-  stopRecording() {
+  public stopRealtimeVoice() {
+    this.geminiLiveService.disconnect();
     if (this.recognition) {
       this.recognition.stop();
       this.recognition = null;
     }
-    // Non resettiamo isRecording qui — lo fa onend per gestire il transcript finale
+    if (this.processor) this.processor.disconnect();
+    if (this.audioContext) this.audioContext.close();
+    if (this.mediaStream) this.mediaStream.getTracks().forEach((t) => t.stop());
+
+    this.processor = null;
+    this.audioContext = null;
+    this.mediaStream = null;
+    this.isRecording.set(false);
   }
+
+
 
   // ==================
   // CHAT HISTORY
@@ -442,6 +502,16 @@ export class AgentChat implements OnInit, OnDestroy {
     this.activeAudio.onended = () => {
       this.currentPlayingId.set(null);
       this.activeAudio = null;
+      
+      // Conversazionale Realtime: se siamo ancora in modalità voce, Gemini gestisce il silenzio, 
+      // ma se per qualche motivo si scollega, possiamo riattivare qui.
+      if (this.voiceModeActive()) {
+        setTimeout(() => {
+          if (this.voiceModeActive() && !this.isRecording()) {
+            this.startRealtimeVoice();
+          }
+        }, 500);
+      }
     };
   }
 

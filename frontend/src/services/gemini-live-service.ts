@@ -18,6 +18,9 @@ export class GeminiLiveService {
   public isSpeaking = signal<boolean>(false);
   public isSearching = signal<boolean>(false);
 
+  public aiTranscript = signal<string>('');
+  public userTranscript = signal<string>('');
+  
   private wsSubject: WebSocketSubject<any> | null = null;
   private audioContext: AudioContext | null = null;
   private activeSource: AudioBufferSourceNode | null = null;
@@ -212,7 +215,7 @@ export class GeminiLiveService {
           },
         ],
         generationConfig: {
-          responseModalities: ['AUDIO'],
+          responseModalities: ['AUDIO', 'TEXT'],
           speechConfig: {
             voiceConfig: {
               prebuiltVoiceConfig: {
@@ -293,10 +296,16 @@ export class GeminiLiveService {
         this.isDiscardingAudio = false;
 
         if (modelTurn.parts) {
-          // Audio base64 nel body JSON (fallback per compatibilità)
+          // 1. Audio base64 nel body JSON (fallback per compatibilità)
           const audioPart = modelTurn.parts.find((p: any) => p.inlineData);
           if (audioPart?.inlineData?.data) {
             this.enqueueAudio(audioPart.inlineData.data);
+          }
+          
+          // 2. Testo trascrizione IA
+          const textPart = modelTurn.parts.find((p: any) => p.text);
+          if (textPart?.text) {
+            this.aiTranscript.update(prev => prev + textPart.text);
           }
         }
       }

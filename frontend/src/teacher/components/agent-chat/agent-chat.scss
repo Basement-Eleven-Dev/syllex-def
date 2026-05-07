@@ -1,147 +1,134 @@
 :host {
   height: 100%;
   display: block;
+  overflow: hidden;
+  background-color: #f8f9fa;
 }
 
 .agent-chat-wrapper {
-  background-color: #f0f2f5;
-  transition: all 0.5s ease;
-  
-  &.voice-mode {
-    background-color: #d8f365;
-  }
+  height: 100%;
 }
 
-// --- SIDEBAR CONVERSAZIONI ---
+// --- SIDEBAR (ChatGPT Style) ---
 .chat-sidebar {
   width: 280px;
   flex-shrink: 0;
+  background-color: #f8f9fa;
   
-  .btn-conv-item {
+  .btn-history-item {
     border: 1px solid transparent;
     color: #444;
     font-size: 0.9rem;
+    background: transparent;
     
-    &:hover {
-      background-color: #f8f9fa;
-    }
-    
+    &:hover { background-color: #eaebec; }
     &.active {
-      background-color: #f0f4ff;
+      background-color: white;
       border-color: #4343e8;
       color: #4343e8;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
   }
 }
 
-// --- INTRO STATE ---
-.chat-intro-bg {
+// --- MAIN AREA ---
+.main-content {
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+// --- HEADER ---
+.chat-header-bar {
+  height: 65px;
+  flex-shrink: 0;
+  .status-dot { width: 10px; height: 10px; border-radius: 50%; &.online { background: #28a745; } }
+}
+
+// --- INTRO CARD (IMMAGINE 5 REVISITED) ---
+.intro-card-blue {
   background-color: #4343e8;
-  color: white;
-
-  .sparkle-bubble {
-    background: rgba(255, 255, 255, 0.2);
-    width: 60px;
-    height: 60px;
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
+  border-radius: 40px;
+  max-width: 800px;
+  margin: auto;
+  
+  .sparkle-icon-wrap {
+    background: rgba(255,255,255,0.15);
+    width: 60px; height: 60px; border-radius: 15px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem;
   }
 
-  .assistant-accent {
-    color: #d8f365;
+  h1 { 
+    font-size: 2.8rem; 
+    span { color: #d8f365; }
   }
 
-  .btn-intro-action {
-    background-color: white;
-    color: #333;
-    border: none;
-    border-radius: 50px;
-    padding: 1rem 1.5rem;
-    font-weight: 600;
-    font-size: 0.9rem;
-    text-align: left;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-
-    &:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    }
+  .btn-light-pill {
+    background: white; color: #1a1a1a; border: none; padding: 12px 30px; border-radius: 25px;
+    width: 100%; max-width: 500px; font-weight: 700; text-align: left;
+    transition: transform 0.2s;
+    &:hover { transform: scale(1.02); }
+    fa-icon { color: #4343e8; }
   }
 }
 
-// --- VOICE MODE ---
-.voice-analysis-overlay {
-  z-index: 10;
-  .voice-title { font-weight: 800; font-size: 1.8rem; }
-  .voice-status { font-weight: 500; opacity: 0.7; }
+// --- VOICE SCREEN (IMMAGINE 4 REVISITED) ---
+.voice-screen-wrap {
+  background-color: #d8f365;
+  z-index: 100;
   
-  .orb-container {
-    position: relative; width: 180px; height: 180px;
-    .orb-core { width: 100%; height: 100%; background: white; border-radius: 50%; box-shadow: 0 0 50px rgba(255, 255, 255, 0.8); animation: orbPulse 3s infinite ease-in-out; }
-    .orb-glow { position: absolute; top: -20px; left: -20px; right: -20px; bottom: -20px; background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%); border-radius: 50%; animation: orbGlow 3s infinite ease-in-out; }
+  .designer-orb {
+    width: 200px; height: 200px; background: white; border-radius: 50%;
+    box-shadow: 0 0 50px rgba(255,255,255,0.8);
+    &.pulse { animation: orbPulse 1s infinite ease-in-out; }
+  }
+
+  h2 { font-size: 2rem; color: #1a1a1a; }
+  .voice-actions .btn-dark { background: #1a1a1a; border: none; }
+}
+
+// --- INPUT AREA (FIXED BOTTOM) ---
+.input-area-container {
+  flex-shrink: 0;
+  background: white;
+
+  .input-pill-mock {
+    border-radius: 30px;
+    background: #fff;
+    transition: all 0.2s;
+    
+    &:focus-within { border-color: #4343e8 !important; box-shadow: 0 4px 15px rgba(67, 67, 232, 0.1) !important; }
+
+    textarea { padding: 10px 0; resize: none; font-weight: 500; }
+    
+    .btn-icon-round {
+      width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #666;
+      &:hover { background: #f0f0f0; color: #333; }
+    }
+    .btn-send-round {
+      width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #4343e8; color: white;
+      &:hover { background: #3232c4; }
+      &:disabled { background: #ccc; }
+    }
   }
 }
 
 // --- MESSAGES ---
-.message-bubble {
-  max-width: 85%;
-  border-radius: 18px;
-  font-size: 0.95rem;
-  line-height: 1.6;
-
-  &.bg-white { border-bottom-left-radius: 4px; }
-  &.bg-primary { border-bottom-right-radius: 4px; background-color: #4343e8 !important; }
+.msg-bubble-mock {
+  max-width: 75%; border-radius: 20px;
+  &.user { background: #d8f365; color: #1a1a1a; border-bottom-right-radius: 4px; }
+  &:not(.user) { background: #f1f3f5; color: #1a1a1a; border-bottom-left-radius: 4px; }
 }
 
-.pb-150 {
-  padding-bottom: 150px !important;
+.typing-dots {
+  display: flex; gap: 5px;
+  span { width: 8px; height: 8px; background: #adb5bd; border-radius: 50%; animation: dotPulse 1.4s infinite; &:nth-child(2) { animation-delay: 0.2s; } &:nth-child(3) { animation-delay: 0.4s; } }
 }
 
-// --- INPUT AREA ---
-.chat-input-wrapper {
-  z-index: 30;
-  background: linear-gradient(to top, #f0f2f5 70%, transparent 100%);
-  
-  .input-pill {
-    border-radius: 20px;
-    background-color: white;
-    border: 1px solid #dee2e6 !important;
-    
-    &:focus-within {
-      border-color: #4343e8 !important;
-      box-shadow: 0 10px 30px rgba(67, 67, 232, 0.15) !important;
-    }
-
-    textarea {
-      padding: 10px 0;
-      &::placeholder { color: #adb5bd; }
-    }
-
-    .btn-icon-action {
-      width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #666;
-      &:hover { background-color: #f1f3f5; color: #333; }
-      &.send { color: #4343e8; }
-    }
-  }
-}
-
-// --- SETTINGS BUTTON ---
-.btn-settings {
-  width: 40px; height: 40px;
-  background-color: rgba(0, 0, 0, 0.05);
-  color: #333;
-  border: none;
-  &:hover { background-color: rgba(0, 0, 0, 0.1); transform: rotate(45deg); }
-}
-
-@keyframes orbPulse { 0%, 100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.1); opacity: 1; } }
-@keyframes orbGlow { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.2); opacity: 0.8; } }
+@keyframes orbPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); box-shadow: 0 0 80px rgba(255,255,255,1); } }
+@keyframes dotPulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-.animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
-.w-fit { width: fit-content; }
-.typing-indicator { display: flex; gap: 4px; span { width: 6px; height: 6px; background: #ccc; border-radius: 50%; animation: typing 1s infinite; &:nth-child(2) { animation-delay: 0.2s; } &:nth-child(3) { animation-delay: 0.4s; } } }
-@keyframes typing { 0%, 100% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1); } }
+.animate-fade-in { animation: fadeIn 0.4s ease-out; }
+.tiny { font-size: 0.7rem; }
+.letter-spacing-1 { letter-spacing: 1px; }

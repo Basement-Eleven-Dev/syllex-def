@@ -52,6 +52,13 @@ export class AgentService {
     return this.http.get<any[]>('messages/list-conversations');
   }
 
+  saveLiveMessage(role: string, content: string, conversationId: string, inputType: string = 'voice') {
+    return this.http.post<{ success: boolean; _id: string }>(
+      'messages/save',
+      { role, content, conversationId, inputType }
+    );
+  }
+
   listenToMessage(messageId: string, text: string) {
     return this.http.post<{ success: boolean; audioUrl: string }>(
       'messages/' + messageId + '/generate-audio',

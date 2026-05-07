@@ -1,170 +1,135 @@
-<div class="agent-chat-wrapper h-100 d-flex overflow-hidden" [class.voice-mode]="voiceModeActive()">
+<div class="agent-chat-wrapper d-flex h-100 w-100 overflow-hidden">
   
-  <!-- SIDEBAR CONVERSAZIONI (Premium Style) -->
-  @if (!voiceModeActive()) {
-    <div class="chat-sidebar d-none d-lg-flex flex-column border-end bg-white">
-      <div class="p-4 border-bottom">
-        <button class="btn btn-primary w-100 rounded-pill py-2 fw-bold d-flex align-items-center justify-content-center gap-2" (click)="startNewChat()">
-          <fa-icon [icon]="faPlus"></fa-icon>
-          Nuova Chat
-        </button>
-      </div>
-      <div class="flex-fill overflow-auto p-3 d-flex flex-column gap-2">
-        @for (conv of conversations(); track conv.id) {
-          <button 
-            class="btn btn-conv-item text-start p-3 rounded-4 transition-all"
-            [class.active]="currentConversationId() === conv.id"
-            (click)="selectConversation(conv.id)"
-          >
-            <div class="small opacity-50 mb-1 d-flex justify-content-between">
-               <span>Chat</span>
-               <span>{{ conv.timestamp | date:'dd/MM' }}</span>
-            </div>
-            <div class="text-truncate fw-semibold small">{{ conv.preview || 'Conversazione vuota' }}</div>
-          </button>
-        }
-      </div>
+  <!-- SIDEBAR: CRONOLOGIA CONVERSAZIONI -->
+  <div class="chat-sidebar d-none d-lg-flex flex-column border-end bg-light" [class.d-none]="voiceModeActive()">
+    <div class="p-4">
+      <button class="btn btn-primary w-100 rounded-pill d-flex align-items-center justify-content-center gap-2 py-2 shadow-sm" (click)="startNewChat()">
+        <fa-icon [icon]="faPlus"></fa-icon>
+        <span>Nuova Chat</span>
+      </button>
     </div>
-  }
-
-  <!-- AREA CHAT PRINCIPALE -->
-  <div class="flex-fill d-flex flex-column position-relative h-100 bg-light overflow-hidden">
     
-    <!-- BOTTONE IMPOSTAZIONI (Floating) -->
-    @if (!voiceModeActive()) {
-      <div class="chat-header-actions position-absolute top-0 end-0 p-3" style="z-index: 20;">
-        <button class="btn btn-settings shadow-sm rounded-circle d-flex align-items-center justify-content-center" 
-                (click)="requestConfig.emit()" 
-                title="Configura Assistente">
-          <fa-icon [icon]="faGear"></fa-icon>
+    <div class="flex-fill overflow-auto px-3">
+      <div class="text-muted tiny fw-bold text-uppercase mb-3 px-2">Cronologia Chat</div>
+      @for (conv of conversations(); track conv.id) {
+        <button 
+          class="btn btn-history-item w-100 text-start mb-2 p-3 rounded-4 transition-all"
+          [class.active]="currentConversationId() === conv.id"
+          (click)="selectConversation(conv.id)">
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="fw-bold small text-truncate pe-2">Chat {{ conv.timestamp | date:'dd MMM' }}</span>
+            <span class="text-muted tiny">{{ conv.timestamp | date:'HH:mm' }}</span>
+          </div>
+          <p class="text-muted tiny text-truncate mb-0 mt-1">{{ conv.lastMessage || 'Nessun messaggio' }}</p>
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- AREA PRINCIPALE -->
+  <div class="main-content flex-fill d-flex flex-column position-relative h-100 overflow-hidden bg-white">
+    
+    <!-- SCHERMATA VOCALE (Immagine 4) -->
+    @if (voiceModeActive()) {
+      <div class="voice-screen-wrap h-100 w-100 d-flex flex-column align-items-center justify-content-between py-5 animate-fade-in">
+        <div class="text-center">
+          <h2 class="fw-bold mb-1">Analisi Vocale</h2>
+          <p class="text-muted small">Gemini Realtime Attivo</p>
+        </div>
+
+        <div class="voice-center">
+          <div class="designer-orb" [class.pulse]="geminiLiveService.isSpeaking()"></div>
+          <div class="mt-5 px-5 text-center">
+             <h4 class="text-muted small mb-3 text-uppercase letter-spacing-1">Trascrizione</h4>
+             <h2 class="fw-bold text-dark">{{ geminiLiveService.userTranscript() || 'In ascolto...' }}</h2>
+          </div>
+        </div>
+
+        <div class="voice-actions">
+           <button class="btn btn-dark rounded-pill px-5 py-3 shadow-lg d-flex align-items-center gap-3" (click)="stopRealtimeVoice(); voiceModeActive.set(false)">
+             <fa-icon [icon]="faPaperPlane" style="transform: rotate(-45deg)"></fa-icon>
+             <span class="fw-bold">Torna alla Chat Testuale</span>
+           </button>
+        </div>
+      </div>
+    }
+
+    <!-- SCHERMATA TESTUALE -->
+    @else {
+      <!-- HEADER -->
+      <div class="chat-header-bar d-flex justify-content-between align-items-center p-3 border-bottom">
+        <div class="d-flex align-items-center gap-3">
+          <div class="status-dot online"></div>
+          <h6 class="mb-0 fw-bold">{{ assistantName() }}</h6>
+        </div>
+        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" (click)="requestConfig.emit()">
+           <fa-icon [icon]="faGear" class="me-2"></fa-icon>Configura
         </button>
       </div>
-    }
-    
-    <!-- BACKGROUND LAYER (Intro) -->
-    @if (messages().length === 0 && !voiceModeActive()) {
-      <div class="chat-intro-bg flex-fill d-flex flex-column align-items-center justify-content-center p-4">
-        <div class="sparkle-bubble mb-4">
-          <fa-icon [icon]="faSparkles" class="text-white"></fa-icon>
-        </div>
-        <h1 class="text-white display-5 fw-bold mb-0 text-center">Sono <span class="assistant-accent">{{ assistantName() }}</span>,</h1>
-        <h2 class="text-white h3 fw-bold opacity-90 text-center">il tuo assistente didattico</h2>
 
-        <div class="quick-actions mt-5 d-flex flex-column gap-3 w-100 max-w-500 px-3">
-          <button (click)="setAndSendMessage('Quali sono gli argomenti principali?')" class="btn btn-intro-action">
-            <fa-icon [icon]="faBookOpen" class="me-2 text-primary"></fa-icon>
-            Argomenti principali
-          </button>
-          <button (click)="setAndSendMessage('Puoi farmi un riassunto sintetico?')" class="btn btn-intro-action">
-            <fa-icon [icon]="faLightbulb" class="me-2 text-warning"></fa-icon>
-            Riassunto sintetico
-          </button>
-          <button (click)="setAndSendMessage('Mettimi alla prova con un quiz di tre domande')" class="btn btn-intro-action">
-            <fa-icon [icon]="faSparkles" class="me-2 text-info"></fa-icon>
-            Quiz di tre domande
-          </button>
-        </div>
-      </div>
-    }
-
-    <!-- VOICE ANALYSIS OVERLAY -->
-    @if (voiceModeActive()) {
-      <div class="voice-analysis-overlay flex-fill d-flex flex-column align-items-center justify-content-center p-4">
-        <h3 class="voice-title mb-5">Analisi Vocale</h3>
-        <p class="voice-status mb-4">Ascoltando..</p>
+      <!-- MESSAGGI / INTRO -->
+      <div #scrollContent class="flex-fill overflow-auto d-flex flex-column p-4">
         
-        <div class="orb-container">
-          <div class="orb-glow"></div>
-          <div class="orb-core"></div>
-        </div>
-
-        <div class="transcript-box mt-5 text-center px-4">
-          <p class="transcript-text">{{ liveTranscript() || 'In attesa del tuo input...' }}</p>
-        </div>
-
-        <div class="voice-footer position-absolute bottom-0 w-100 p-4 d-flex justify-content-center">
-          <div class="voice-input-pill d-flex align-items-center px-4 py-2 gap-3 shadow-lg">
-            <span class="text-muted small">Scrivi qui...</span>
-            <div class="d-flex gap-2">
-              <button class="btn btn-icon-mic active" (click)="stopRecording(); voiceModeActive.set(false)">
-                <fa-icon [icon]="faMicrophone"></fa-icon>
+        @if (messages().length === 0) {
+          <div class="intro-card-blue d-flex flex-column align-items-center justify-content-center text-white p-5 m-auto w-100 shadow-lg">
+            <div class="sparkle-icon-wrap mb-4">
+              <fa-icon [icon]="faSparkles"></fa-icon>
+            </div>
+            <h1 class="display-5 fw-bold mb-4 text-center">Sono <span>{{ assistantName() }}</span>,<br>il tuo assistente didattico</h1>
+            
+            <div class="quick-pills d-flex flex-column gap-3 w-100 align-items-center">
+              <button class="btn btn-light-pill" (click)="inputMessage = 'Quali sono gli argomenti principali?'; sendMessage('text')">
+                <fa-icon [icon]="faBookOpen" class="me-3"></fa-icon>Argomenti principali
               </button>
-              <button class="btn btn-icon-close" (click)="stopRecording(); voiceModeActive.set(false)">
-                <fa-icon [icon]="faStop"></fa-icon>
+              <button class="btn btn-light-pill" (click)="inputMessage = 'Fammi un riassunto sintetico'; sendMessage('text')">
+                <fa-icon [icon]="faLightbulb" class="me-3"></fa-icon>Riassunto sintetico
+              </button>
+              <button class="btn btn-light-pill" (click)="inputMessage = 'Mettimi alla prova con un quiz di tre domande'; sendMessage('text')">
+                <fa-icon [icon]="faSparkles" class="me-3"></fa-icon>Mettimi alla prova con un quiz
               </button>
             </div>
           </div>
-        </div>
-      </div>
-    }
-
-    <!-- MESSAGES LIST -->
-    @if (messages().length > 0 && !voiceModeActive()) {
-      <div class="flex-fill overflow-hidden d-flex flex-column">
-        <div #scrollContent class="flex-fill overflow-auto d-flex flex-column gap-4 p-4 pb-150">
+        } @else {
           @for (msg of messages(); track $index) {
-            <div class="message-row d-flex" [class.justify-content-end]="msg.role === 'user'">
-              <div class="message-bubble-container" [class.user]="msg.role === 'user'">
-                <div class="message-bubble p-3 shadow-sm animate-fade-in" 
-                     [class.bg-white]="msg.role === 'agent'"
-                     [class.bg-primary]="msg.role === 'user'"
-                     [class.text-white]="msg.role === 'user'">
-                  @if (msg.role === 'agent') {
-                    <markdown [data]="msg.content"></markdown>
-                  } @else {
-                    <div class="d-flex align-items-center gap-2">
-                      @if (msg.inputType === 'voice') {
-                        <fa-icon [icon]="faMicrophone" class="opacity-50"></fa-icon>
-                      }
-                      <span>{{ msg.content }}</span>
-                    </div>
+            <div class="d-flex mb-4" [class.justify-content-end]="msg.role === 'user'">
+              <div class="msg-bubble-mock p-3 shadow-sm" [class.user]="msg.role === 'user'">
+                <markdown [data]="msg.content"></markdown>
+                <div class="tiny mt-2 opacity-50 d-flex align-items-center">
+                  <span>{{ msg.timestamp | date:'HH:mm' }}</span>
+                  @if (msg.inputType === 'voice') {
+                    <fa-icon [icon]="faMicrophone" class="ms-2"></fa-icon>
                   }
                 </div>
-                
-                @if (msg.role === 'agent') {
-                  <button class="btn btn-tts-mini mt-1 shadow-none border-0" (click)="listenMessage(msg)" [disabled]="loadingAudioIds().has(msg._id!)">
-                     <fa-icon [icon]="currentPlayingId() === msg._id ? audioPause : audioPlay"></fa-icon>
-                  </button>
-                }
               </div>
             </div>
           }
-          
           @if (isLoading()) {
-            <div class="typing-indicator-bubble p-3 bg-white shadow-sm rounded-4 w-fit animate-fade-in">
-              <div class="typing-indicator"><span></span><span></span><span></span></div>
+            <div class="typing-dots p-3 bg-light rounded-4 align-self-start mb-4">
+               <span></span><span></span><span></span>
             </div>
           }
-        </div>
+        }
       </div>
-    }
 
-    <!-- UNIFIED INPUT BAR -->
-    @if (!voiceModeActive()) {
-      <div class="chat-input-wrapper position-absolute bottom-0 w-100 p-4">
-        <div class="input-pill shadow-lg d-flex align-items-center bg-white px-4 py-2 border">
-          <textarea
-            class="form-control border-0 shadow-none bg-transparent"
+      <!-- INPUT BAR -->
+      <div class="input-area-container p-4 bg-white border-top">
+        <div class="input-pill-mock d-flex align-items-center px-4 py-2 border shadow-sm">
+          <textarea 
+            class="form-control border-0 shadow-none bg-transparent" 
             [(ngModel)]="inputMessage"
             (keydown)="onKeydown($event)"
-            placeholder="Scrivi qui..."
-            rows="1"
-            style="min-height: 45px; max-height: 150px; overflow-y: auto;"
-          ></textarea>
-          
-          <div class="d-flex align-items-center gap-2 ms-2">
-            @if (isSpeechSupported) {
-              <button class="btn btn-icon-action" (click)="toggleVoiceInput()" title="Parla">
-                <fa-icon [icon]="faMicrophone"></fa-icon>
-              </button>
-            }
-            <button class="btn btn-icon-action send" (click)="sendMessage('text')" [disabled]="!inputMessage.trim() || isLoading()">
+            placeholder="Chiedi qualsiasi cosa..."
+            rows="1"></textarea>
+          <div class="d-flex gap-2 ms-3">
+            <button class="btn btn-icon-round" (click)="toggleVoiceInput()" title="Parla con l'assistente">
+              <fa-icon [icon]="faMicrophone"></fa-icon>
+            </button>
+            <button class="btn btn-send-round" (click)="sendMessage('text')" [disabled]="!inputMessage.trim() || isLoading()">
               <fa-icon [icon]="SendIcon"></fa-icon>
             </button>
           </div>
         </div>
       </div>
     }
-
   </div>
 </div>
