@@ -82,7 +82,7 @@ export class GeminiLiveService {
    */
   private tryConnectWithModel(token: string, model: string): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
-      const wsUrl = `wss://${this.LOCATION}-aiplatform.googleapis.com/ws/google.cloud.aiplatform.v1.LlmBidiService/BidiGenerateContent?access_token=${token}`;
+      const wsUrl = `wss://${this.LOCATION}-aiplatform.googleapis.com/ws/google.cloud.aiplatform.v1beta1.LlmBidiService/BidiGenerateContent?access_token=${token}`;
 
       // Timeout: se non si connette in 8 secondi, fallisce
       const timeout = setTimeout(() => {
@@ -168,7 +168,7 @@ export class GeminiLiveService {
    * Stabilisce la connessione definitiva con il modello già validato.
    */
   private establishConnection(token: string, model: string): void {
-    const wsUrl = `wss://${this.LOCATION}-aiplatform.googleapis.com/ws/google.cloud.aiplatform.v1.LlmBidiService/BidiGenerateContent?access_token=${token}`;
+    const wsUrl = `wss://${this.LOCATION}-aiplatform.googleapis.com/ws/google.cloud.aiplatform.v1beta1.LlmBidiService/BidiGenerateContent?access_token=${token}`;
 
     this.audioContext = new (
       window.AudioContext || (window as any).webkitAudioContext
@@ -471,7 +471,14 @@ export class GeminiLiveService {
   }
 
   private playNextInQueue(): void {
-    if (!this.audioContext || this.audioQueue.length === 0) {
+    if (!this.audioContext) return;
+    
+    // Assicurati che l'AudioContext sia attivo (il browser potrebbe sospenderlo)
+    if (this.audioContext.state === 'suspended') {
+      this.audioContext.resume();
+    }
+
+    if (this.audioQueue.length === 0) {
       this.isPlayingAudio = false;
 
       // Grace period: aspetta 800ms prima di dire che ha finito davvero.
