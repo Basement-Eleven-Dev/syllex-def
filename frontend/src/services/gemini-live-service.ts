@@ -24,15 +24,53 @@ export class GeminiLiveService {
   private wsSubject: WebSocketSubject<any> | null = null;
   private audioContext: AudioContext | null = null;
   private activeSource: AudioBufferSourceNode | null = null;
-  private aiTurnStartTime = 0; // Per gestire il grace period del barge-in
-  private isDiscardingAudio = false; // Flag per scartare audio orfano dopo interruzione
+  private aiTurnStartTime = 0;
+  private isDiscardingAudio = false;
   private audioQueue: AudioBuffer[] = [];
   private isPlayingAudio = false;
+  private audioEndTimeout: any = null;
 
   private readonly PROJECT_ID = 'syllex-488315';
   private readonly LOCATION = 'us-central1';
-  // Modello corretto per il Live API su Vertex AI
-  private readonly MODEL = 'gemini-live-2.5-flash-native-audio';
+  private resolvedModel = '';
+
+  // Lista ordinata di modelli Live API da provare (dal più recente al più vecchio)
+  private readonly LIVE_MODEL_CANDIDATES = [
+    'gemini-live-2.5-flash-native-audio',
+
+  ];
+
+  /**
+   * Interroga l'API Vertex AI per elencare modelli disponibili.
+   */
+  private async discoverAvailableModels(token: string): Promise<string[]> {
+    try {
+      const url = `https://${this.LOCATION}-aiplatform.googleapis.com/v1beta1/publishers/google/models`;
+      console.log('🔍 Interrogazione modelli disponibili su Vertex AI...');
+      
+      const res = await fetch(url, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (!res.ok) {
+        console.warn(`⚠️ Impossibile elencare modelli (HTTP ${res.status}). Proverò i candidati noti.`);
+        return [];
+      }
+      
+      const data = await res.json();
+      const models = (data.models || data.publisherModels || []) as any[];
+      
+      const relevantNames = models
+        .map((m: any) => m.name || m.publisherModelTemplate || '')
+        .filter((name: string) => name.toLowerCase().includes('live') || name.toLowerCase().includes('flash'));
+      
+      console.log(`📋 Modelli rilevanti trovati (${relevantNames.length}):`, relevantNames);
+      return relevantNames;
+    } catch (err) {
+      console.warn('⚠️ Errore durante la scoperta dei modelli:', err);
+      return [];
+    }
+  }
 
   public async connect(): Promise<void> {
     if (this.wsSubject) return;
@@ -46,87 +84,170 @@ export class GeminiLiveService {
       const token = response.token;
       console.log('✅ 2. Token ottenuto con successo.');
 
-      // FIX: v1beta1 — il Live API esiste solo su questa versione, non su v1
-      const wsUrl = `wss://${this.LOCATION}-aiplatform.googleapis.com/ws/google.cloud.aiplatform.v1beta1.LlmBidiService/BidiGenerateContent?access_token=${token}`;
-
-      this.audioContext = new (
-        window.AudioContext || (window as any).webkitAudioContext
-      )({
-        sampleRate: 24000,
-      });
-
-      console.log('🔗 3. Connessione al WebSocket Vertex AI...');
-
-      // WebSocketCtor custom che imposta binaryType='arraybuffer':
-      // di default RxJS usa 'blob', che non è leggibile sincronamente nel deserializer.
-      // Con 'arraybuffer' possiamo distinguere i frame audio binari da quelli JSON testuali.
-      class ArrayBufferWebSocket extends WebSocket {
-        constructor(url: string, protocols?: string | string[]) {
-          super(url, protocols);
-          this.binaryType = 'arraybuffer';
-        }
+      // Scopri i modelli disponibili
+      const availableModels = await this.discoverAvailableModels(token);
+      if (availableModels.length > 0) {
+        console.log('📋 Modelli dal server:', availableModels);
       }
 
-      this.wsSubject = webSocket<any>({
-        url: wsUrl,
-        WebSocketCtor: ArrayBufferWebSocket as any,
-        openObserver: {
-          next: () => {
-            console.log('✅ WebSocket aperto, invio setup...');
-            this.isConnected.set(true);
-            this.sendSetupMessage();
-          },
-        },
-        closeObserver: {
-          next: (closeEvent: CloseEvent) => {
-            console.warn(
-              `🔌 WebSocket close — code: ${closeEvent.code}, reason: "${closeEvent.reason}", wasClean: ${closeEvent.wasClean}`,
-            );
-          },
-        },
-        deserializer: (e: MessageEvent) => {
-          // Vertex AI manda i frame come messaggi WebSocket binari contenenti JSON UTF-8,
-          // NON come PCM grezzo. Dobbiamo decodificare prima come testo.
-          if (e.data instanceof ArrayBuffer) {
-            try {
-              const text = new TextDecoder('utf-8').decode(e.data);
-              return JSON.parse(text);
-            } catch {
-              // Solo se non è JSON valido lo trattiamo come PCM grezzo
-              return { _binaryAudio: e.data };
+      // Prova ogni candidato fino a trovarne uno che funziona
+      for (const candidateModel of this.LIVE_MODEL_CANDIDATES) {
+        console.log(`🔗 Tentativo connessione con modello: ${candidateModel}...`);
+        const success = await this.tryConnectWithModel(token, candidateModel);
+        if (success) {
+          this.resolvedModel = candidateModel;
+          console.log(`✅ CONNESSO con successo al modello: ${candidateModel}`);
+          return;
+        }
+        console.warn(`❌ Modello ${candidateModel} non disponibile, provo il prossimo...`);
+      }
+
+      console.error('❌ NESSUN modello Live API disponibile. Modelli provati:', this.LIVE_MODEL_CANDIDATES);
+      console.error('ℹ️ Per risolvere, abilita la Vertex AI Gemini API nel progetto GCP e verifica che almeno un modello Live sia accessibile nella regione us-central1.');
+
+    } catch (error) {
+      console.error('❌ Errore durante la connessione:', error);
+    }
+  }
+
+  /**
+   * Prova a connettersi con un singolo modello.
+   * Risolve true se il setup viene accettato, false se il WebSocket chiude con errore 1008.
+   */
+  private tryConnectWithModel(token: string, model: string): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      const wsUrl = `wss://${this.LOCATION}-aiplatform.googleapis.com/ws/google.cloud.aiplatform.v1beta1.LlmBidiService/BidiGenerateContent?access_token=${token}`;
+
+      // Timeout: se non si connette in 8 secondi, fallisce
+      const timeout = setTimeout(() => {
+        console.warn(`⏱️ Timeout per modello ${model}`);
+        try { ws.close(); } catch {}
+        resolve(false);
+      }, 8000);
+
+      const ws = new WebSocket(wsUrl);
+      ws.binaryType = 'arraybuffer';
+
+      ws.onopen = () => {
+        console.log(`  ✓ WebSocket aperto, invio setup per ${model}...`);
+        const setupPayload = {
+          setup: {
+            model: `projects/${this.PROJECT_ID}/locations/${this.LOCATION}/publishers/google/models/${model}`,
+            generationConfig: {
+              responseModalities: ['AUDIO'],
+            },
+            inputAudioTranscription: {},
+            outputAudioTranscription: {},
+            systemInstruction: {
+              parts: [{
+                text: `Sei l'assistente vocale per "${this.materiaService.materiaSelected()?.name}". Rispondi in modo naturale e conciso.`
+              }]
             }
           }
-          // Frame testuale normale
-          try {
-            return JSON.parse(e.data);
-          } catch {
-            return e.data;
-          }
-        },
-      });
+        };
+        ws.send(JSON.stringify(setupPayload));
+      };
 
-      this.wsSubject.subscribe({
-        next: (msg: any) => {
-          console.log('📩 [Vertex AI]:', msg);
-          if (msg.error) {
-            console.error('❌ ERRORE DA GOOGLE:', msg.error);
-          }
-          this.handleServerMessage(msg);
-        },
-        error: (err) => {
-          console.error('💥 ERRORE WEBSOCKET (Connessione o Rete):', err);
-          this.cleanupState();
-        },
-        complete: () => {
-          console.warn('🔌 WEBSOCKET CHIUSO DAL SERVER (Complete)');
-          this.cleanupState();
-        },
-      });
-    } catch (error) {
-      console.error('❌ ERRORE CRITICO in connect():', error);
-      this.isConnected.set(false);
-      throw error;
+      ws.onmessage = (evt) => {
+        clearTimeout(timeout);
+        let data: any;
+        try {
+          const text = typeof evt.data === 'string' ? evt.data : new TextDecoder().decode(evt.data);
+          data = JSON.parse(text);
+        } catch {
+          data = evt.data;
+        }
+
+        if (data.setupComplete !== undefined) {
+          // Setup accettato! Chiudi questo WebSocket di prova e ricrea la connessione definitiva
+          ws.close();
+          console.log(`  ✓ Setup accettato per ${model}! Connessione definitiva...`);
+          this.establishConnection(token, model);
+          resolve(true);
+        }
+      };
+
+      ws.onclose = (evt) => {
+        clearTimeout(timeout);
+        if (evt.code === 1008 || evt.code === 1007) {
+          // Modello non trovato o payload non valido
+          resolve(false);
+        }
+      };
+
+      ws.onerror = () => {
+        clearTimeout(timeout);
+        resolve(false);
+      };
+    });
+  }
+
+  /**
+   * Stabilisce la connessione definitiva con il modello già validato.
+   */
+  private establishConnection(token: string, model: string): void {
+    const wsUrl = `wss://${this.LOCATION}-aiplatform.googleapis.com/ws/google.cloud.aiplatform.v1beta1.LlmBidiService/BidiGenerateContent?access_token=${token}`;
+
+    this.audioContext = new (
+      window.AudioContext || (window as any).webkitAudioContext
+    )({
+      sampleRate: 24000,
+    });
+
+    class ArrayBufferWebSocket extends WebSocket {
+      constructor(url: string, protocols?: string | string[]) {
+        super(url, protocols);
+        this.binaryType = 'arraybuffer';
+      }
     }
+
+    this.wsSubject = webSocket<any>({
+      url: wsUrl,
+      WebSocketCtor: ArrayBufferWebSocket as any,
+      openObserver: {
+        next: () => {
+          console.log('✅ WebSocket definitivo aperto, invio setup...');
+          this.isConnected.set(true);
+          this.sendSetupMessage(model);
+        },
+      },
+      closeObserver: {
+        next: (closeEvent: CloseEvent) => {
+          console.warn(`🔌 WebSocket close — code: ${closeEvent.code}, reason: "${closeEvent.reason}"`);
+          this.cleanupState();
+        },
+      },
+      deserializer: (e: MessageEvent) => {
+        if (e.data instanceof ArrayBuffer) {
+          try {
+            const text = new TextDecoder('utf-8').decode(e.data);
+            return JSON.parse(text);
+          } catch {
+            return { _binaryAudio: e.data };
+          }
+        }
+        try {
+          return JSON.parse(e.data);
+        } catch {
+          return e.data;
+        }
+      }
+    });
+
+    this.wsSubject.subscribe({
+      next: (msg) => {
+        console.log('📩 [MSG]:', JSON.stringify(msg).substring(0, 300));
+        this.handleServerMessage(msg);
+      },
+      error: (err) => {
+        console.error('❌ Errore WebSocket:', err);
+        this.cleanupState();
+      },
+      complete: () => {
+        console.log('🔌 WEBSOCKET CHIUSO DAL SERVER');
+        this.cleanupState();
+      }
+    });
   }
 
   // Pulizia stato senza tentare di inviare messaggi su un socket già chiuso
@@ -171,8 +292,7 @@ export class GeminiLiveService {
   }
 
   public sendAudioChunk(base64Pcm: string): void {
-    if (!this.wsSubject || !this.isConnected()) return;
-
+    if (!this.wsSubject) return;
     this.wsSubject.next({
       realtimeInput: {
         mediaChunks: [
@@ -185,129 +305,108 @@ export class GeminiLiveService {
     });
   }
 
-  private sendSetupMessage(): void {
-    const modelTarget = `projects/${this.PROJECT_ID}/locations/${this.LOCATION}/publishers/google/models/${this.MODEL}`;
+  /**
+   * Segnala esplicitamente la fine del turno dell'utente.
+   * Forza Gemini a rispondere e ignora ulteriori input fino alla risposta.
+   */
+  public sendEndOfTurn(): void {
+    if (!this.wsSubject) return;
+    console.log('🏁 Invio segnale FINE TURNO (User done)');
+    this.wsSubject.next({
+      realtimeInput: {
+        endOfTurn: true,
+      },
+    });
+  }
 
-    // FIX: campi in camelCase (proto-JSON richiede camelCase, non snake_case)
+  private sendSetupMessage(model: string): void {
     const setupPayload = {
       setup: {
-        model: modelTarget,
-        tools: [
-          {
-            functionDeclarations: [
-              {
-                name: 'search_knowledge_base',
-                description:
-                  'Cerca nei documenti del professore. Usala SOLO per domande specifiche sulla materia, MAI per saluti, convenevoli o domande generiche.',
-                parameters: {
-                  type: 'OBJECT',
-                  properties: {
-                    query: {
-                      type: 'STRING',
-                      description:
-                        'La domanda o le parole chiave da cercare nei documenti.',
-                    },
-                  },
-                  required: ['query'],
-                },
-              },
-            ],
-          },
-        ],
+        model: `projects/${this.PROJECT_ID}/locations/${this.LOCATION}/publishers/google/models/${model}`,
         generationConfig: {
           responseModalities: ['AUDIO'],
-          speechConfig: {
-            voiceConfig: {
-              prebuiltVoiceConfig: {
-                voiceName: 'Aoede',
-              },
-            },
-          },
         },
+        inputAudioTranscription: {},
+        outputAudioTranscription: {},
         systemInstruction: {
-          parts: [
-            {
-              text: `Sei l'assistente vocale per "${this.materiaService.materiaSelected()?.name}". 
-              REGOLE:
-              1. Rispondi a saluti e convenevoli direttamente senza usare strumenti.
-              2. Per domande tecniche o specifiche, devi SEMPRE dare un feedback verbale immediato PRIMA di attivare 'search_knowledge_base'. 
-              3. Usa frasi varie e naturali come: "Fammi consultare i documenti del professore...", "Sto cercando questa informazione nei materiali del corso, un secondo...", oppure "Controllo subito cosa dicono i testi su questo argomento".
-              4. Sii naturale e non aspettare che la ricerca finisca per parlare. 
-              5. Se non trovi nulla nei documenti, dillo chiaramente. NON usare conoscenze esterne.`,
-            },
-          ],
-        },
-      },
+          parts: [{
+            text: `Sei l'assistente vocale per "${this.materiaService.materiaSelected()?.name}". Rispondi in modo naturale e conciso.`
+          }]
+        }
+      }
     };
 
-    console.log(
-      '⚙️ Invio payload di Setup (Formato Corretto) a Vertex:',
-      setupPayload,
-    );
+    console.log('⚙️ Invio setup con modello:', model);
     this.wsSubject?.next(setupPayload);
   }
 
+  /**
+   * Gestisce i messaggi dal server.
+   * inputTranscription e outputTranscription sono di PRIMO LIVELLO nella risposta.
+   */
   private handleServerMessage(message: any): void {
+    // 1. Tool Call (RAG)
     if (message.toolCall) {
-      // L'IA ha deciso di usare un tool: resetta lo scarto audio
-      // perché qualsiasi audio futuro sarà della nuova risposta
       this.isDiscardingAudio = false;
-
       const call = message.toolCall.functionCalls[0];
       if (call.name === 'search_knowledge_base') {
-        console.log(
-          '🔍 [RAG TRIGGERED] Gemini chiede di cercare:',
-          call.args.query,
-        );
+        console.log('🔍 [RAG TRIGGERED]:', call.args.query);
+        this.isSearching.set(true);
         this.executeRagSearch(call.id, call.name, call.args.query);
       }
       return;
     }
 
-    // Frame binario: PCM16 raw direttamente come ArrayBuffer
+    // 2. Audio Binario
     if (message._binaryAudio) {
       this.playPcmArrayBuffer(message._binaryAudio);
       return;
     }
 
-    // Il server manda setupComplete quando il setup è accettato
+    // 3. Setup Complete
     if (message.setupComplete !== undefined) {
-      console.log(
-        '✅ Setup accettato dal server Vertex AI! Pronto a ricevere audio.',
-      );
-      this.isReady.set(true); // <--- ORA PUOI INVIARE AUDIO
+      console.log('✅ Setup accettato! Sessione Live pronta.');
+      this.isReady.set(true);
       return;
     }
 
-    // GESTIONE INTERRUZIONE (Barge-in)
-    // Se il server dice "interrupted", obbediamo SEMPRE. Nessuna condizione locale.
-    if (message.serverContent?.interrupted) {
-      console.warn('🛑 [Barge-in] Segnale INTERRUPTED ricevuto dal server. Stop immediato.');
-      this.isDiscardingAudio = true;
-      this.stopAudioPlayback();
-      return;
+    // 4. Trascrizione INPUT (quello che dice l'utente) — PRIMO LIVELLO
+    if (message.inputTranscription) {
+      const text = message.inputTranscription.text;
+      if (text) {
+        console.log('🎤 [Trascrizione Utente]:', text);
+        this.userTranscript.set(text);
+      }
     }
 
+    // 5. Trascrizione OUTPUT (quello che dice l'IA) — PRIMO LIVELLO
+    if (message.outputTranscription) {
+      const text = message.outputTranscription.text;
+      if (text) {
+        console.log('🤖 [Trascrizione IA]:', text);
+        this.aiTranscript.update(prev => (prev + ' ' + text).trim());
+      }
+    }
+
+    // 6. Server Content (Audio, interruzioni, modelTurn)
     if (message.serverContent) {
-      const { modelTurn } = message.serverContent;
+      const content = message.serverContent;
 
-      // Risposta IA: smetti di scartare audio
-      if (modelTurn) {
-        this.isDiscardingAudio = false;
+      if (content.interrupted) {
+        console.log('🛑 [INTERRUPTED]');
+        this.isDiscardingAudio = true;
+        this.stopAudioPlayback();
+        this.isSpeaking.set(false);
+        return;
+      }
 
-        if (modelTurn.parts) {
-          // 1. Audio base64 nel body JSON (fallback per compatibilità)
-          const audioPart = modelTurn.parts.find((p: any) => p.inlineData);
-          if (audioPart?.inlineData?.data) {
-            this.enqueueAudio(audioPart.inlineData.data);
+      const modelTurn = content.modelTurn;
+      if (modelTurn && modelTurn.parts) {
+        modelTurn.parts.forEach((part: any) => {
+          if (part.inlineData && part.inlineData.data) {
+            this.enqueueAudio(part.inlineData.data);
           }
-          
-          // 2. Testo trascrizione IA
-          const textPart = modelTurn.parts.find((p: any) => p.text);
-          if (textPart?.text) {
-            this.aiTranscript.update(prev => prev + textPart.text);
-          }
-        }
+        });
       }
     }
   }
@@ -368,12 +467,25 @@ export class GeminiLiveService {
   private playNextInQueue(): void {
     if (!this.audioContext || this.audioQueue.length === 0) {
       this.isPlayingAudio = false;
-      this.isSpeaking.set(false);
-      this.activeSource = null;
+      
+      // Grace period: aspetta 800ms prima di dire che ha finito davvero.
+      if (this.audioEndTimeout) clearTimeout(this.audioEndTimeout);
+      this.audioEndTimeout = setTimeout(() => {
+        if (!this.isPlayingAudio) {
+          console.log('🔇 [AI SILENCE CONFIRMED]');
+          this.isSpeaking.set(false);
+          this.activeSource = null;
+        }
+      }, 800);
+      
       return;
     }
 
-    // Segnamo l'inizio del turno solo quando si passa da "silenzio" a "parlando"
+    if (this.audioEndTimeout) {
+      clearTimeout(this.audioEndTimeout);
+      this.audioEndTimeout = null;
+    }
+
     if (!this.isPlayingAudio) {
       this.aiTurnStartTime = performance.now();
     }
@@ -432,7 +544,6 @@ export class GeminiLiveService {
       let ragTestoTrovato = "";
 
       if (docs.length > 0) {
-        // Tronca ogni doc a max 500 caratteri per velocizzare la risposta di Gemini
         ragTestoTrovato = docs.map((d: any) => {
           const text = d.text || '';
           return text.length > 500 ? text.substring(0, 500) + '...' : text;
@@ -455,7 +566,6 @@ export class GeminiLiveService {
         },
       };
 
-      // Resetta il flag prima di inviare: la prossima audio sarà la risposta
       this.isDiscardingAudio = false;
       console.log('📨 Invio risultati RAG a Gemini:', toolResponsePayload);
       this.wsSubject?.next(toolResponsePayload);

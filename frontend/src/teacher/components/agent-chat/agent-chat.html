@@ -1,7 +1,7 @@
 <div class="agent-chat-wrapper d-flex h-100 w-100 overflow-hidden">
   
   <!-- SIDEBAR: CRONOLOGIA CONVERSAZIONI -->
-  <div class="chat-sidebar d-none d-lg-flex flex-column border-end bg-light" [class.d-none]="voiceModeActive()">
+  <div class="chat-sidebar d-none d-lg-flex flex-column border-end bg-light">
     <div class="p-4">
       <button class="btn btn-primary w-100 rounded-pill d-flex align-items-center justify-content-center gap-2 py-2 shadow-sm" (click)="startNewChat()">
         <fa-icon [icon]="faPlus"></fa-icon>
@@ -29,33 +29,76 @@
   <!-- AREA PRINCIPALE -->
   <div class="main-content flex-fill d-flex flex-column position-relative h-100 overflow-hidden bg-white">
     
-    <!-- SCHERMATA VOCALE (Immagine 4) -->
+    <!-- SCHERMATA VOCALE (OVERLAY NELLA ZONA CHAT) -->
     @if (voiceModeActive()) {
-      <div class="voice-screen-wrap h-100 w-100 d-flex flex-column align-items-center justify-content-between py-5 animate-fade-in">
-        <div class="text-center">
-          <h2 class="fw-bold mb-1">Analisi Vocale</h2>
-          <p class="text-muted small">Gemini Realtime Attivo</p>
-        </div>
-
-        <div class="voice-center">
-          <div class="designer-orb" [class.pulse]="geminiLiveService.isSpeaking()"></div>
-          <div class="mt-5 px-5 text-center">
-             <h4 class="text-muted small mb-3 text-uppercase letter-spacing-1">Trascrizione</h4>
-             <h2 class="fw-bold text-dark">{{ geminiLiveService.userTranscript() || 'In ascolto...' }}</h2>
+      <div class="voice-screen-overlay animate-fade-in">
+        <div class="voice-screen-content d-flex flex-column align-items-center justify-content-between py-5 h-100">
+          
+          <div class="voice-header text-center">
+            <h2 class="fw-bold mb-1">Analisi Vocale</h2>
+            <p class="text-muted small">Gemini Realtime Attivo</p>
           </div>
-        </div>
 
-        <div class="voice-actions">
-           <button class="btn btn-dark rounded-pill px-5 py-3 shadow-lg d-flex align-items-center gap-3" (click)="stopRealtimeVoice(); voiceModeActive.set(false)">
-             <fa-icon [icon]="faPaperPlane" style="transform: rotate(-45deg)"></fa-icon>
-             <span class="fw-bold">Torna alla Chat Testuale</span>
-           </button>
+          <div class="voice-center-area d-flex flex-column align-items-center justify-content-center">
+            <div class="orb-container">
+              <div class="designer-orb" [class.pulse]="geminiLiveService.isSpeaking() && !isMuted()" [class.muted]="isMuted()"></div>
+            </div>
+            
+            <div class="transcript-box mt-5 px-4 text-center">
+               <h4 class="text-muted tiny text-uppercase mb-3">In ascolto</h4>
+               <h2 class="user-live-text fw-bold text-dark">{{ geminiLiveService.userTranscript() || '...' }}</h2>
+               
+               @if (geminiLiveService.isSearching()) {
+                 <div class="thinking-status mt-3 animate-pulse">
+                   <fa-icon [icon]="faSpinner" [animation]="'spin'" class="text-primary me-2"></fa-icon>
+                   <span class="text-muted small fw-bold">Consulto i documenti...</span>
+                 </div>
+               }
+               
+               @if (geminiLiveService.isSpeaking() && (messages().length === 0 || messages()[messages().length - 1].role !== 'agent')) {
+                 <div class="speaking-status mt-3 animate-pulse">
+                   <span class="text-primary small fw-bold">L'assistente sta parlando...</span>
+                 </div>
+               }
+               
+               @if (geminiLiveService.aiTranscript()) {
+                 <div class="ai-live-text mt-3 p-3 rounded-4 bg-white shadow-sm animate-fade-in">
+                   <p class="mb-0 small fw-bold text-primary">{{ assistantName() }} dice:</p>
+                   <p class="mb-0 text-dark small text-start">{{ geminiLiveService.aiTranscript() }}</p>
+                 </div>
+               }
+               
+               @if (!geminiLiveService.aiTranscript() && messages().length > 0 && messages()[messages().length - 1].role === 'agent') {
+                 <div class="ai-live-text mt-3 p-3 rounded-4 bg-white shadow-sm animate-fade-in">
+                   <p class="mb-0 small fw-bold text-primary">{{ assistantName() }} ha detto:</p>
+                   <p class="mb-0 text-dark small text-start">{{ messages()[messages().length - 1].content }}</p>
+                 </div>
+               }
+            </div>
+          </div>
+
+          <div class="voice-footer d-flex gap-3">
+             <button 
+               class="btn rounded-pill px-4 py-3 shadow-lg d-flex align-items-center gap-3 transition-all" 
+               [class.btn-success]="!isMuted()"
+               [class.btn-secondary]="isMuted()"
+               [disabled]="isMuted()"
+               (click)="finishTurn()">
+               <fa-icon [icon]="isMuted() ? faSpinner : faPaperPlane" [animation]="isMuted() ? 'spin' : undefined"></fa-icon>
+               <span class="fw-bold">{{ isMuted() ? 'Gemini sta elaborando...' : 'Ho finito, rispondi' }}</span>
+             </button>
+
+             <button class="btn btn-dark rounded-pill px-4 py-3 shadow-lg d-flex align-items-center gap-3" (click)="stopRealtimeVoice(); voiceModeActive.set(false)">
+               <fa-icon [icon]="faStop"></fa-icon>
+               <span class="fw-bold">Esci</span>
+             </button>
+          </div>
         </div>
       </div>
     }
 
     <!-- SCHERMATA TESTUALE -->
-    @else {
+    @if (!voiceModeActive()) {
       <!-- HEADER -->
       <div class="chat-header-bar d-flex justify-content-between align-items-center p-3 border-bottom">
         <div class="d-flex align-items-center gap-3">

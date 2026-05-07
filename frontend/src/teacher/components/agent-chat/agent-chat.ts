@@ -26,6 +26,7 @@ import {
   faStop,
   faGear,
   faPlus,
+  faMicrophoneSlash,
 } from '@fortawesome/pro-solid-svg-icons';
 import { faSpinner } from '@fortawesome/pro-regular-svg-icons';
 import { AgentService } from '../../../services/agent.service';
@@ -63,6 +64,7 @@ export class AgentChat implements OnInit, OnDestroy {
   faStop = faStop;
   faGear = faGear;
   faPaperPlane = faPaperPlane;
+  faMicrophoneSlash = faMicrophoneSlash;
 
   // --- Services ---
   private feedbackService = inject(FeedbackService);
@@ -88,9 +90,10 @@ export class AgentChat implements OnInit, OnDestroy {
   // Voice input state (Realtime)
   private mediaStream: MediaStream | null = null;
   private audioContext: AudioContext | null = null;
-  private processor: ScriptProcessorNode | null = null;
+  private processor: any = null;
   public recognition: any = null; 
   isRecording = signal(false);
+  isMuted = signal(false);
   liveTranscript = signal('');
 
   // Audio playback state
@@ -131,7 +134,15 @@ export class AgentChat implements OnInit, OnDestroy {
     const text = this.geminiLiveService.aiTranscript();
     const isSpeaking = this.geminiLiveService.isSpeaking();
     
-    // Se ha smesso di parlare e c'è del testo accumulato
+    // Se l'AI sta parlando, silenziamo il microfono per evitare eco/interruzioni accidentali
+    if (isSpeaking) {
+      this.isMuted.set(true);
+    } else if (this.voiceModeActive()) {
+      // Se l'AI ha finito di parlare e siamo ancora in modalità voce, riattiviamo il microfono
+      this.isMuted.set(false);
+    }
+
+    // Se ha smesso di parlare e c'è del testo accumulato, salviamo
     if (!isSpeaking && text.trim().length > 0) {
       this.saveVoiceMessage('agent', text);
       this.geminiLiveService.aiTranscript.set(''); // Reset per la prossima frase
@@ -150,6 +161,11 @@ export class AgentChat implements OnInit, OnDestroy {
       inputType: 'voice'
     };
     this.messages.update(prev => [...prev, newMsg]);
+
+    // Se è l'utente, puliamo il transcript AI precedente per far spazio al nuovo turno
+    if (role === 'user') {
+      this.geminiLiveService.aiTranscript.set('');
+    }
 
     // Salva nel DB (silenzioso)
     this.agentService.saveLiveMessage(role, content, convId, 'voice').subscribe();
@@ -271,9 +287,51 @@ export class AgentChat implements OnInit, OnDestroy {
     if (this.voiceModeActive()) {
       this.stopRealtimeVoice();
       this.voiceModeActive.set(false);
+      this.stopPollingMessages();
     } else {
       this.voiceModeActive.set(true);
       this.startRealtimeVoice();
+      this.startPollingMessages();
+    }
+  }
+
+  finishTurn() {
+    this.geminiLiveService.sendEndOfTurn();
+    this.isMuted.set(true); // Silenzia finché l'AI non inizia a parlare o finisce
+  }
+
+  private pollingInterval: any;
+  private startPollingMessages() {
+    this.stopPollingMessages();
+    this.pollingInterval = setInterval(() => {
+      const convId = this.currentConversationId();
+      if (convId && this.voiceModeActive()) {
+        this.agentService.getConversationHistory(convId).subscribe((response: any[]) => {
+          if (response && response.length > 0) {
+            const history: ChatMessage[] = response.map((msg: any) => ({
+              _id: msg._id,
+              role: msg.role,
+              content: msg.content,
+              timestamp: msg.timestamp,
+              audioUrl: msg.audioUrl || null,
+              inputType: msg.inputType || 'text',
+            }));
+            
+            // Aggiorna i messaggi solo se c'è un cambiamento (es. nuovo messaggio)
+            if (history.length !== this.messages().length || 
+                history[history.length-1].content !== this.messages()[this.messages().length-1]?.content) {
+              this.messages.set(history);
+            }
+          }
+        });
+      }
+    }, 1000); // Controlla ogni secondo
+  }
+
+  private stopPollingMessages() {
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+      this.pollingInterval = null;
     }
   }
 
@@ -294,24 +352,30 @@ export class AgentChat implements OnInit, OnDestroy {
         sampleRate: 16000,
       });
 
+      // Carica il processore AudioWorklet
+      await this.audioContext.audioWorklet.addModule('/pcm-processor.js');
+
       const source = this.audioContext.createMediaStreamSource(this.mediaStream);
-      this.processor = this.audioContext.createScriptProcessor(2048, 1, 1);
+      this.processor = new AudioWorkletNode(this.audioContext, 'pcm-processor');
 
-      this.processor.onaudioprocess = (e) => {
-        if (!this.geminiLiveService.isReady()) return;
+      this.processor.port.onmessage = (event: any) => {
+        if (!this.geminiLiveService.isReady() || this.isMuted()) return;
 
-        const inputData = e.inputBuffer.getChannelData(0);
+        const inputData = event.data; // Riceve Float32Array dal worklet
         const pcm16 = new Int16Array(inputData.length);
 
+        // Conversione in PCM 16-bit
         for (let i = 0; i < inputData.length; i++) {
           const s = Math.max(-1, Math.min(1, inputData[i]));
           pcm16[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
         }
 
-        const uint8Array = new Uint8Array(pcm16.buffer);
+        // Converti in Base64 (metodo efficiente con Uint8Array)
+        const bytes = new Uint8Array(pcm16.buffer);
         let binary = '';
-        for (let i = 0; i < uint8Array.byteLength; i++) {
-          binary += String.fromCharCode(uint8Array[i]);
+        const len = bytes.byteLength;
+        for (let i = 0; i < len; i++) {
+          binary += String.fromCharCode(bytes[i]);
         }
 
         this.geminiLiveService.sendAudioChunk(window.btoa(binary));
@@ -358,6 +422,7 @@ export class AgentChat implements OnInit, OnDestroy {
 
   public stopRealtimeVoice() {
     this.geminiLiveService.disconnect();
+    this.stopPollingMessages();
     if (this.recognition) {
       this.recognition.stop();
       this.recognition = null;
@@ -370,6 +435,7 @@ export class AgentChat implements OnInit, OnDestroy {
     this.audioContext = null;
     this.mediaStream = null;
     this.isRecording.set(false);
+    this.isMuted.set(false);
   }
 
 
