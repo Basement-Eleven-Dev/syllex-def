@@ -11,7 +11,7 @@ const listConversations = async (
   const userId = context.user?._id;
 
   if (!subjectId || !userId) {
-     return [];
+    return [];
   }
 
   await connectDatabase();
@@ -19,21 +19,22 @@ const listConversations = async (
   // Troviamo tutte le conversazioni uniche per questo utente e materia
   const conversations = await Message.aggregate([
     { $match: { subjectId: subjectId, userId: userId } },
-    { $group: { 
-        _id: "$conversationId", 
+    {
+      $group: {
+        _id: "$conversationId",
         firstMessage: { $first: "$content" },
         lastMessage: { $last: "$content" },
-        timestamp: { $last: "$timestamp" }
-      } 
+        timestamp: { $last: "$timestamp" },
+      },
     },
-    { $sort: { timestamp: -1 } }
+    { $sort: { timestamp: -1 } },
   ]);
 
-  return conversations.map(c => ({
+  return conversations.map((c) => ({
     id: c._id,
     title: c.firstMessage,
     preview: c.lastMessage,
-    timestamp: c.timestamp
+    timestamp: c.timestamp,
   }));
 };
 
