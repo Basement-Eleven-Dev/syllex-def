@@ -136,6 +136,10 @@
           @for (msg of messages(); track $index) {
             <div class="d-flex mb-4" [class.justify-content-end]="msg.role === 'user'">
               <div class="msg-bubble-mock p-3 shadow-sm" [class.user]="msg.role === 'user'">
+                <div class="d-flex align-items-center gap-2 mb-2 opacity-75 tiny fw-bold text-uppercase">
+                  <fa-icon [icon]="msg.role === 'user' ? faPlus : faSparkles"></fa-icon>
+                  <span>{{ msg.role === 'user' ? 'Tu' : assistantName() }}</span>
+                </div>
                 <markdown [data]="msg.content"></markdown>
                 <div class="tiny mt-2 opacity-50 d-flex align-items-center">
                   <span>{{ msg.timestamp | date:'HH:mm' }}</span>

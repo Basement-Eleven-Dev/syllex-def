@@ -133,21 +133,24 @@ export class AgentChat implements OnInit, OnDestroy {
   private aiVoiceTranscriptEffect = effect(() => {
     const text = this.geminiLiveService.aiTranscript();
     const isSpeaking = this.geminiLiveService.isSpeaking();
+    const voiceActive = this.voiceModeActive();
     
-    // Se l'AI sta parlando, silenziamo il microfono per evitare eco/interruzioni accidentali
-    if (isSpeaking) {
+    // Se l'AI sta parlando (audio in riproduzione), silenziamo il microfono
+    if (isSpeaking && voiceActive) {
       this.isMuted.set(true);
-    } else if (this.voiceModeActive()) {
-      // Se l'AI ha finito di parlare e siamo ancora in modalità voce, riattiviamo il microfono
+    } 
+    // Se l'AI ha smesso di parlare (audio finito), riattiviamo il microfono
+    else if (!isSpeaking && voiceActive) {
       this.isMuted.set(false);
+      
+      // Quando ha finito di parlare ED è arrivato del testo, salviamo
+      if (text.trim().length > 0) {
+        console.log('💾 [AUTO-SAVE AI MESSAGE]:', text);
+        this.saveVoiceMessage('agent', text);
+        this.geminiLiveService.aiTranscript.set(''); // Reset immediato per il prossimo turno
+      }
     }
-
-    // Se ha smesso di parlare e c'è del testo accumulato, salviamo
-    if (!isSpeaking && text.trim().length > 0) {
-      this.saveVoiceMessage('agent', text);
-      this.geminiLiveService.aiTranscript.set(''); // Reset per la prossima frase
-    }
-  });
+  }, { allowSignalWrites: true });
 
   private saveVoiceMessage(role: 'user' | 'agent', content: string) {
     const convId = this.currentConversationId();
@@ -402,6 +405,10 @@ export class AgentChat implements OnInit, OnDestroy {
     this.recognition.continuous = true;
 
     this.recognition.onresult = (event: any) => {
+      if (this.isMuted() || this.geminiLiveService.isSpeaking()) {
+        return;
+      }
+
       let interimTranscript = '';
       let finalTranscript = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {

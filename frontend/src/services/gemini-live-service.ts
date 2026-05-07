@@ -345,6 +345,12 @@ export class GeminiLiveService {
    * inputTranscription e outputTranscription sono di PRIMO LIVELLO nella risposta.
    */
   private handleServerMessage(message: any): void {
+    console.log(message);
+    // Log per debug profondo - ricalca la struttura reale
+    if (message.outputTranscription || (message.serverContent && message.serverContent.modelTurn)) {
+       console.log('📦 [DEBUG SERVER MSG]:', message);
+    }
+
     // 1. Tool Call (RAG)
     if (message.toolCall) {
       this.isDiscardingAudio = false;
@@ -370,25 +376,16 @@ export class GeminiLiveService {
       return;
     }
 
-    // 4. Trascrizione INPUT (quello che dice l'utente) — PRIMO LIVELLO
+    // 4. Trascrizione INPUT (quello che diciamo noi)
     if (message.inputTranscription) {
       const text = message.inputTranscription.text;
       if (text) {
-        console.log('🎤 [Trascrizione Utente]:', text);
+        console.log('🎤 [Trascrizione UTENTE]:', text);
         this.userTranscript.set(text);
       }
     }
 
-    // 5. Trascrizione OUTPUT (quello che dice l'IA) — PRIMO LIVELLO
-    if (message.outputTranscription) {
-      const text = message.outputTranscription.text;
-      if (text) {
-        console.log('🤖 [Trascrizione IA]:', text);
-        this.aiTranscript.update(prev => (prev + ' ' + text).trim());
-      }
-    }
-
-    // 6. Server Content (Audio, interruzioni, modelTurn)
+    // 5. Server Content (Audio, interruzioni, modelTurn, turnComplete)
     if (message.serverContent) {
       const content = message.serverContent;
 
@@ -400,9 +397,21 @@ export class GeminiLiveService {
         return;
       }
 
+      if (content.turnComplete) {
+        console.log('🏁 [TURN COMPLETE]');
+        this.isSpeaking.set(false);
+      }
+
       const modelTurn = content.modelTurn;
       if (modelTurn && modelTurn.parts) {
         modelTurn.parts.forEach((part: any) => {
+          // Gestione TESTO dell'IA (quello che sta vocalizzando)
+          if (part.text) {
+            console.log('🤖 [Testo IA]:', part.text);
+            this.aiTranscript.update(prev => (prev + part.text));
+          }
+
+          // Gestione AUDIO dell'IA
           if (part.inlineData && part.inlineData.data) {
             this.enqueueAudio(part.inlineData.data);
           }
