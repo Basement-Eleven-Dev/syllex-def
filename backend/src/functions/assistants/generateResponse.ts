@@ -11,13 +11,13 @@ const generateResponse = async (
   context: Context,
 ) => {
   const body = JSON.parse(request.body || "{}");
-  const { query } = body;
+  const { query, inputType, conversationId } = body;
   const subjectId = context.subjectId;
 
-  if (!subjectId) {
+  if (!subjectId || !conversationId) {
     return {
       success: false,
-      message: "Subject ID is required",
+      message: "Subject ID and Conversation ID are required",
     };
   }
 
@@ -28,7 +28,14 @@ const generateResponse = async (
       message: "User not authenticated",
     };
   }
-  await saveMessage(subjectId, userId, "user", query);
+  await saveMessage(
+    subjectId,
+    userId,
+    "user",
+    query,
+    inputType || "text",
+    conversationId,
+  );
   const aiResponse = await generateAIResponseGemini(
     query,
     subjectId,
@@ -41,7 +48,14 @@ const generateResponse = async (
       message: "Failed to generate AI response",
     };
   }
-  const insertId = await saveMessage(subjectId, userId, "agent", aiResponse);
+  const insertId = await saveMessage(
+    subjectId,
+    userId,
+    "agent",
+    aiResponse,
+    "text",
+    conversationId,
+  );
   return {
     success: true,
     aiResponse,

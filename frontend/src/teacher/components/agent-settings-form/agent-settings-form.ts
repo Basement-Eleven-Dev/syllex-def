@@ -35,7 +35,6 @@ import { EmbeddingsService } from '../../../services/embeddings.service';
 import { Materia } from '../../../services/materia';
 import { AgentService } from '../../../services/agent.service';
 import { FeedbackService } from '../../../services/feedback-service';
-import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 
 @Component({
   selector: 'app-agent-settings-form',
@@ -44,7 +43,6 @@ import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
     ReactiveFormsModule,
     FontAwesomeModule,
     MaterialiSelector,
-    TourAnchorNgBootstrapDirective,
   ],
   templateUrl: './agent-settings-form.html',
   styleUrl: './agent-settings-form.scss',
@@ -64,7 +62,7 @@ export class AgentSettingsForm implements OnInit {
   assistantId = signal<string | null>(null);
   associatedMaterialIds = signal<string[]>([]);
 
-  assistantLoaded = output<string | null>();
+  assistantSaved = output<string | null>(); // Emesso solo al salvataggio riuscito o reset
 
   isUpdateMode = computed(() => !!this.assistantId());
 
@@ -120,7 +118,6 @@ export class AgentSettingsForm implements OnInit {
           // Handle both string and ObjectId serialization ({$oid: ...})
           const id = res.assistant._id?.$oid || res.assistant._id;
           this.assistantId.set(id);
-          this.assistantLoaded.emit(id);
 
           this.agentSettingsForm.patchValue({
             name: res.assistant.name,
@@ -150,7 +147,7 @@ export class AgentSettingsForm implements OnInit {
 
   private resetForm() {
     this.assistantId.set(null);
-    this.assistantLoaded.emit(null);
+    this.assistantSaved.emit(null);
     this.associatedMaterialIds.set([]);
     this.agentSettingsForm.reset({
       tone: 'friendly',
@@ -235,7 +232,6 @@ export class AgentSettingsForm implements OnInit {
           );
           assistantId = response.assistantId;
           this.assistantId.set(assistantId);
-          this.assistantLoaded.emit(assistantId);
           console.log('Agent created successfully, ID:', assistantId);
         }
 
@@ -246,7 +242,8 @@ export class AgentSettingsForm implements OnInit {
             .subscribe({
               next: (res) => {
                 console.log('Vectorization successful:', res);
-                this.finishSave();
+                if (assistantId) this.assistantSaved.emit(assistantId);
+                this.isSaving.set(false);
               },
               error: (err) => {
                 console.error('Vectorization error:', err);
@@ -257,8 +254,9 @@ export class AgentSettingsForm implements OnInit {
                 this.isSaving.set(false);
               },
             });
-        } else {
-          this.finishSave();
+        } else if (assistantId) {
+          this.assistantSaved.emit(assistantId);
+          this.isSaving.set(false);
         }
       } catch (error) {
         console.error('Error during agent save or vectorization:', error);

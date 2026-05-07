@@ -79,12 +79,21 @@
       }
     </div>
     <div
-      class="btn text-start ai d-flex flex-column justify-content-center position-relative py-4 mb-2"
+      class="btn text-start ai d-flex flex-row align-items-center justify-content-between position-relative py-4 mb-2"
       routerLink="/t/agente"
       tourAnchor="teacher-agent"
     >
-      <fa-icon [icon]="HeadSideBrainIcon" id="sparkleIcon"></fa-icon>
-      <h5 class="mb-0">Agente AI</h5>
+      <div class="d-flex flex-column">
+        <fa-icon [icon]="HeadSideBrainIcon" id="sparkleIcon"></fa-icon>
+        <h5 class="mb-0">Agente AI</h5>
+      </div>
+      
+      <a class="text-white opacity-50 hover-opacity-100 p-2" 
+         [routerLink]="['/t/agente']" 
+         [queryParams]="{step: 1}"
+         (click)="$event.stopPropagation()">
+        <fa-icon [icon]="GearIcon"></fa-icon>
+      </a>
     </div>
     <div
       class="btn text-start ai d-flex flex-column justify-content-center position-relative py-4"

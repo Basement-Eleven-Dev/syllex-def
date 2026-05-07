@@ -465,6 +465,12 @@ const ASSISTANTS_ROUTES: FunctionIntegration[] = [
     role: "logged",
   },
   {
+    apiRoute: "messages/list-conversations",
+    functionPath: "messages/listConversations.ts",
+    method: "get",
+    role: "logged",
+  },
+  {
     apiRoute: "messages/{messageId}/generate-audio",
     functionPath: "messages/listenTomessage.ts",
     method: "post",

@@ -1,131 +1,147 @@
 :host {
   height: 100%;
-  overflow: scroll;
+  display: block;
 }
 
-.card {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-@media (max-width: 991.98px) {
-  .card {
-    border-radius: 0 !important;
-    padding: 0.5rem !important;
+.agent-chat-wrapper {
+  background-color: #f0f2f5;
+  transition: all 0.5s ease;
+  
+  &.voice-mode {
+    background-color: #d8f365;
   }
 }
 
-.message-bubble {
-  max-width: 75%;
-  min-width: 50px;
-  word-break: break-word;
+// --- SIDEBAR CONVERSAZIONI ---
+.chat-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  
+  .btn-conv-item {
+    border: 1px solid transparent;
+    color: #444;
+    font-size: 0.9rem;
+    
+    &:hover {
+      background-color: #f8f9fa;
+    }
+    
+    &.active {
+      background-color: #f0f4ff;
+      border-color: #4343e8;
+      color: #4343e8;
+    }
+  }
 }
 
-.user-message {
-  background-color: var(--bs-primary);
+// --- INTRO STATE ---
+.chat-intro-bg {
+  background-color: #4343e8;
   color: white;
-  text-align: left;
-  margin-left: auto;
-}
 
-.agent-message {
-  background-color: var(--bs-light);
-  color: var(--bs-dark);
-
-  ::ng-deep {
-    p:last-child {
-      margin-bottom: 0;
-    }
-  }
-}
-
-.typing-indicator {
-  span {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: var(--bs-primary);
-    animation: typing 1.4s infinite ease-in-out;
-
-    &:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-    &:nth-child(3) {
-      animation-delay: 0.4s;
-    }
-  }
-}
-
-@keyframes typing {
-  0%,
-  60%,
-  100% {
-    opacity: 0.3;
-    transform: scale(0.8);
-  }
-  30% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-textarea.form-control {
-  resize: none;
-}
-
-.btn-listen {
-  border-color: rgba(var(--bs-primary-rgb), 0.2);
-  color: var(--bs-primary);
-  background: white;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background-color: var(--bs-primary);
-    color: white;
-    transform: scale(1.1);
+  .sparkle-bubble {
+    background: rgba(255, 255, 255, 0.2);
+    width: 60px;
+    height: 60px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
   }
 
-  fa-icon {
-    line-height: 1;
+  .assistant-accent {
+    color: #d8f365;
   }
-}
-.hover-lift {
-  transition: all 0.2s ease;
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    background-color: white !important;
-    border-color: var(--bs-primary) !important;
-  }
-}
 
-.max-w-500 {
-  max-width: 500px;
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.custom-input {
-  border-radius: 20px 0 0 20px !important;
-  padding: 10px 20px;
-  background-color: #f8f9fa;
-  border: 1px solid #dee2e6;
-  &:focus {
+  .btn-intro-action {
     background-color: white;
-    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.1);
+    color: #333;
+    border: none;
+    border-radius: 50px;
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-align: left;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
   }
 }
+
+// --- VOICE MODE ---
+.voice-analysis-overlay {
+  z-index: 10;
+  .voice-title { font-weight: 800; font-size: 1.8rem; }
+  .voice-status { font-weight: 500; opacity: 0.7; }
+  
+  .orb-container {
+    position: relative; width: 180px; height: 180px;
+    .orb-core { width: 100%; height: 100%; background: white; border-radius: 50%; box-shadow: 0 0 50px rgba(255, 255, 255, 0.8); animation: orbPulse 3s infinite ease-in-out; }
+    .orb-glow { position: absolute; top: -20px; left: -20px; right: -20px; bottom: -20px; background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%); border-radius: 50%; animation: orbGlow 3s infinite ease-in-out; }
+  }
+}
+
+// --- MESSAGES ---
+.message-bubble {
+  max-width: 85%;
+  border-radius: 18px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+
+  &.bg-white { border-bottom-left-radius: 4px; }
+  &.bg-primary { border-bottom-right-radius: 4px; background-color: #4343e8 !important; }
+}
+
+.pb-150 {
+  padding-bottom: 150px !important;
+}
+
+// --- INPUT AREA ---
+.chat-input-wrapper {
+  z-index: 30;
+  background: linear-gradient(to top, #f0f2f5 70%, transparent 100%);
+  
+  .input-pill {
+    border-radius: 20px;
+    background-color: white;
+    border: 1px solid #dee2e6 !important;
+    
+    &:focus-within {
+      border-color: #4343e8 !important;
+      box-shadow: 0 10px 30px rgba(67, 67, 232, 0.15) !important;
+    }
+
+    textarea {
+      padding: 10px 0;
+      &::placeholder { color: #adb5bd; }
+    }
+
+    .btn-icon-action {
+      width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #666;
+      &:hover { background-color: #f1f3f5; color: #333; }
+      &.send { color: #4343e8; }
+    }
+  }
+}
+
+// --- SETTINGS BUTTON ---
+.btn-settings {
+  width: 40px; height: 40px;
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #333;
+  border: none;
+  &:hover { background-color: rgba(0, 0, 0, 0.1); transform: rotate(45deg); }
+}
+
+@keyframes orbPulse { 0%, 100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.1); opacity: 1; } }
+@keyframes orbGlow { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.2); opacity: 0.8; } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+.w-fit { width: fit-content; }
+.typing-indicator { display: flex; gap: 4px; span { width: 6px; height: 6px; background: #ccc; border-radius: 50%; animation: typing 1s infinite; &:nth-child(2) { animation-delay: 0.2s; } &:nth-child(3) { animation-delay: 0.4s; } } }
+@keyframes typing { 0%, 100% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1); } }

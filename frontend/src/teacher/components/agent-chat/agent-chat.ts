@@ -6,13 +6,14 @@ import {
   signal,
   ViewChild,
   OnInit,
+  OnDestroy,
   effect,
+  output,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPaperPlane } from '@fortawesome/pro-regular-svg-icons';
 import { MarkdownComponent } from 'ngx-markdown';
-import { DatePipe } from '@angular/common';
 import {
   faHeadphones,
   faPlay,
@@ -21,10 +22,15 @@ import {
   faLightbulb,
   faBookOpen,
   faQuestionCircle,
+  faMicrophone,
+  faStop,
+  faGear,
+  faPlus,
 } from '@fortawesome/pro-solid-svg-icons';
 import { faSpinner } from '@fortawesome/pro-regular-svg-icons';
 import { AgentService } from '../../../services/agent.service';
 import { FeedbackService } from '../../../services/feedback-service';
+import { DatePipe } from '@angular/common';
 
 export interface ChatMessage {
   _id?: string;
@@ -32,6 +38,7 @@ export interface ChatMessage {
   content: string;
   timestamp: Date;
   audioUrl?: string | null;
+  inputType?: 'text' | 'voice';
 }
 
 @Component({
@@ -40,18 +47,65 @@ export interface ChatMessage {
   templateUrl: './agent-chat.html',
   styleUrl: './agent-chat.scss',
 })
-export class AgentChat implements OnInit {
+export class AgentChat implements OnInit, OnDestroy {
+  // --- Icons ---
   SendIcon = faPaperPlane;
+  faHeadphones = faHeadphones;
+  audioPlay = faPlay;
+  audioPause = faPause;
+  faSpinner = faSpinner;
+  faSparkles = faSparkles;
+  faLightbulb = faLightbulb;
+  faBookOpen = faBookOpen;
+  faQuestionCircle = faQuestionCircle;
+  faMicrophone = faMicrophone;
+  faStop = faStop;
+  faGear = faGear;
+
+  // --- Services ---
   private feedbackService = inject(FeedbackService);
   constructor(private agentService: AgentService) {}
 
+  // --- Inputs ---
   assistantId = input.required<string>();
+  requestConfig = output<void>(); // Per tornare allo step 1
 
-  ngOnInit() { }
+  // --- State ---
+  messages = signal<ChatMessage[]>([]);
+  assistantName = signal<string>('Alex'); 
+  conversations = signal<any[]>([]);
+  currentConversationId = signal<string>('conv_' + Date.now()); // ID di default per evitare blocchi
+  inputMessage = '';
+  isLoading = signal(false);
+  faPlus = faPlus;    
+
+  // Gestione Modalità UI
+  voiceModeActive = signal(false); 
+
+  // Voice input state
+  isRecording = signal(false);
+  liveTranscript = signal('');
+  private recognition: any = null;
+
+  // Audio playback state
+  loadingAudioIds = signal<Set<string>>(new Set());
+  currentPlayingId = signal<string | null>(null);
+  activeAudio: HTMLAudioElement | null = null;
+
+  @ViewChild('scrollContent')
+  private scrollContent!: ElementRef<HTMLDivElement>;
+
+  ngOnInit() {
+    this.loadConversationsList();
+  }
+
+  ngOnDestroy() {
+    this.stopRecording();
+    this.pauseAudio();
+  }
 
   // Effetto: scrolla sempre in fondo quando cambia la lista dei messaggi
   private scrollEffect = effect(() => {
-    // Scroll solo se ci sono messaggi
     if (this.messages().length > 0) {
       this.scrollToBottom();
     }
@@ -61,63 +115,105 @@ export class AgentChat implements OnInit {
   private roleWatcher = effect(() => {
     const aid = this.assistantId();
     if (aid) {
-      this.messages.set([]);
-      this.initializeChatHistory();
+      this.loadConversationsList();
     }
   });
 
-  messages = signal<ChatMessage[]>([]);
-  inputMessage = '';
-  isLoading = signal(false);
-  faHeadphones = faHeadphones;
-  audioPlay = faPlay;
-  audioPause = faPause;
-  faSpinner = faSpinner;
-  faSparkles = faSparkles;
-  faLightbulb = faLightbulb;
-  faBookOpen = faBookOpen;
-  faQuestionCircle = faQuestionCircle;
+  // ==================
+  // CONVERSATIONS
+  // ==================
 
-  loadingAudioIds = signal<Set<string>>(new Set());
-  currentPlayingId = signal<string | null>(null);
-  activeAudio: HTMLAudioElement | null = null;
+  loadConversationsList() {
+    this.agentService.listConversations().subscribe({
+      next: (res) => {
+        this.conversations.set(res);
+        if (!this.currentConversationId()) {
+          if (res.length > 0) {
+            this.selectConversation(res[0].id);
+          } else {
+            this.startNewChat();
+          }
+        }
+      },
+      error: (err) => {
+        console.error('Error loading conversations:', err);
+        // Se fallisce (es. 404 prima del fix), creiamo comunque una sessione locale
+        if (!this.currentConversationId()) {
+          this.startNewChat();
+        }
+      }
+    });
+  }
 
-  @ViewChild('scrollContent')
-  private scrollContent!: ElementRef<HTMLDivElement>;
+  startNewChat() {
+    const newId = 'conv_' + Date.now();
+    this.currentConversationId.set(newId);
+    this.messages.set([]);
+    this.voiceModeActive.set(false);
+  }
+
+  selectConversation(id: string) {
+    this.currentConversationId.set(id);
+    this.initializeChatHistory(id);
+  }
+
+  // ==================
+  // MESSAGE SENDING
+  // ==================
 
   setAndSendMessage(text: string) {
     this.inputMessage = text;
-    this.sendMessage();
+    this.sendMessage('text');
   }
 
-  sendMessage() {
+  sendMessage(inputType: 'text' | 'voice' = 'text') {
     const text = this.inputMessage.trim();
-    if (!text || this.isLoading()) return;
+    const convId = this.currentConversationId();
+
+    if (!text) {
+      console.warn('Chat: Skip send (empty text)');
+      return;
+    }
+    if (!convId) {
+      console.warn('Chat: Skip send (no convId)');
+      return;
+    }
+    if (this.isLoading()) {
+      console.warn('Chat: Skip send (already loading)');
+      return;
+    }
 
     this.messages.update((msgs) => [
       ...msgs,
-      { role: 'user', content: text, timestamp: new Date() },
+      { role: 'user', content: text, timestamp: new Date(), inputType },
     ]);
     this.inputMessage = '';
     this.scrollToBottom();
 
+    console.log('Sending message:', { text, convId, inputType });
     this.isLoading.set(true);
 
-    this.agentService.generateResponse(text).subscribe({
+    this.agentService.generateResponse(text, convId, inputType).subscribe({
       next: (response) => {
+        console.log('Received response:', response);
         if (response.success) {
-          this.messages.update((msgs) => [
-            ...msgs,
-            {
-              _id: response._id,
-              role: 'agent',
-              content: response.aiResponse,
-              timestamp: new Date(),
-              audioUrl: null,
-            },
-          ]);
+          const agentMsg: ChatMessage = {
+            _id: response._id,
+            role: 'agent',
+            content: response.aiResponse,
+            timestamp: new Date(),
+            audioUrl: null,
+          };
+          this.messages.update((msgs) => [...msgs, agentMsg]);
           this.isLoading.set(false);
           this.scrollToBottom();
+
+          // Auto-play TTS se l'input era vocale
+          if (inputType === 'voice' && response._id) {
+            this.autoPlayResponse(response._id, response.aiResponse);
+          }
+        } else {
+          this.isLoading.set(false);
         }
       },
       error: (error) => {
@@ -126,7 +222,7 @@ export class AgentChat implements OnInit {
           'Errore nella generazione della risposta',
           false,
         );
-        this.isLoading.set(false);
+        this.isLoading.set(false); // Reset obbligatorio
       },
     });
   }
@@ -134,12 +230,117 @@ export class AgentChat implements OnInit {
   onKeydown(event: KeyboardEvent) {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
-      this.sendMessage();
+      this.sendMessage('text');
     }
   }
 
-  async initializeChatHistory() {
-    this.agentService.getConversationHistory().subscribe({
+  // ==================
+  // VOICE INPUT (STT)
+  // ==================
+
+  get isSpeechSupported(): boolean {
+    return !!(
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition
+    );
+  }
+
+  toggleVoiceInput() {
+    if (this.isRecording()) {
+      this.stopRecording();
+      this.voiceModeActive.set(false);
+    } else {
+      this.voiceModeActive.set(true);
+      this.startRecording();
+    }
+  }
+
+  private startRecording() {
+    const SpeechRecognition =
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      this.feedbackService.showFeedback(
+        'Il browser non supporta il riconoscimento vocale',
+        false,
+      );
+      return;
+    }
+
+    this.recognition = new SpeechRecognition();
+    this.recognition.lang = 'it-IT';
+    this.recognition.interimResults = true;
+    this.recognition.continuous = true;
+
+    this.recognition.onresult = (event: any) => {
+      let interimTranscript = '';
+      let finalTranscript = '';
+
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript;
+        } else {
+          interimTranscript += transcript;
+        }
+      }
+
+      // Mostra la trascrizione live
+      this.liveTranscript.set(finalTranscript || interimTranscript);
+    };
+
+    this.recognition.onerror = (event: any) => {
+      console.error('Speech recognition error:', event.error);
+      if (event.error !== 'aborted') {
+        this.feedbackService.showFeedback(
+          'Errore nel riconoscimento vocale',
+          false,
+        );
+      }
+      this.isRecording.set(false);
+      this.liveTranscript.set('');
+    };
+
+    this.recognition.onend = () => {
+      // Quando termina, invia il testo se c'è
+      const transcript = this.liveTranscript().trim();
+      if (transcript && this.isRecording()) {
+        this.inputMessage = transcript;
+        this.isRecording.set(false);
+        this.liveTranscript.set('');
+        this.sendMessage('voice');
+      } else {
+        this.isRecording.set(false);
+        this.liveTranscript.set('');
+      }
+    };
+
+    this.recognition.start();
+    this.isRecording.set(true);
+  }
+
+  stopRecording() {
+    if (this.recognition) {
+      this.recognition.stop();
+      this.recognition = null;
+    }
+    // Non resettiamo isRecording qui — lo fa onend per gestire il transcript finale
+  }
+
+  // ==================
+  // CHAT HISTORY
+  // ==================
+
+  async initializeChatHistory(conversationId: string) {
+    // Carichiamo prima i dettagli dell'assistente per il nome
+    this.agentService.getAssistant().subscribe(res => {
+      if (res.exists && res.assistant) {
+        this.assistantName.set(res.assistant.name);
+      }
+    });
+
+    this.agentService.getConversationHistory(conversationId).subscribe({
       next: (response) => {
         const history = response.map((msg: any) => ({
           _id: msg._id,
@@ -147,6 +348,7 @@ export class AgentChat implements OnInit {
           content: msg.content,
           timestamp: msg.timestamp,
           audioUrl: msg.audioUrl || null,
+          inputType: msg.inputType || 'text',
         }));
         this.messages.set(history);
         this.scrollToBottom();
@@ -160,6 +362,10 @@ export class AgentChat implements OnInit {
       },
     });
   }
+
+  // ==================
+  // AUDIO PLAYBACK (TTS)
+  // ==================
 
   listenMessage(message: ChatMessage) {
     const messageId = message._id;
@@ -178,6 +384,11 @@ export class AgentChat implements OnInit {
       // Altrimenti generiamolo
       this.generateAndPlayAudio(message);
     }
+  }
+
+  /** Auto-play della risposta quando l'input era vocale */
+  private autoPlayResponse(messageId: string, text: string) {
+    this.generateAndPlayAudio({ _id: messageId, role: 'agent', content: text, timestamp: new Date() });
   }
 
   private generateAndPlayAudio(message: ChatMessage) {
@@ -240,6 +451,11 @@ export class AgentChat implements OnInit {
     }
     this.currentPlayingId.set(null);
   }
+
+  // ==================
+  // UTILS
+  // ==================
+
   private scrollToBottom() {
     setTimeout(() => {
       const el = this.scrollContent?.nativeElement;

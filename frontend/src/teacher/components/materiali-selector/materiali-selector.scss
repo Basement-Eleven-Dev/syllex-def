@@ -7,3 +7,19 @@
     background-color: var(--bs-light);
   }
 }
+
+.material-bubble {
+  background-color: #e9f7ef;
+  border-radius: 50px;
+  color: #28a745;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: #d4efdf;
+    transform: translateY(-1px);
+  }
+}
+
+.ls-wide {
+  letter-spacing: 0.05em;
+}

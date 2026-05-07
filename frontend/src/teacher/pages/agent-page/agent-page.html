@@ -1,30 +1,7 @@
-<div class="d-flex flex-column h-100 overflow-hidden">
-  <!-- Header: Più compatto su mobile, scompare se in chat -->
-  <div
-    class="mb-3 mb-lg-4"
-    tourAnchor="assistente_ai_header"
-    [class.d-none]="userRole() === 'student' && activeTab() === 'chat'"
-    [class.d-lg-block]="userRole() === 'student' && activeTab() === 'chat'"
-  >
-    <h1 class="text-dark fw-medium mb-1 mb-lg-3 display-6 fs-2-mobile">
-      Agente AI
-    </h1>
-
-    @if (userRole() === 'teacher') {
-    <h5 class="text-dark mb-0 fw-normal small-mobile">
-      Interagisci e imposta l'agente AI per la materia
-      <strong>{{ materiaService.materiaSelected()?.name }}</strong>.
-    </h5>
-    } @else {
-    <h5 class="text-dark mb-0 fw-normal d-none d-lg-block">
-      Scegli una materia per consultare il tuo assistente di studio personale.
-    </h5>
-    }
-  </div>
-
+<div class="d-flex flex-column h-100 overflow-hidden bg-page">
   <!-- Mobile Tab Switcher: Solo per studenti e solo su mobile -->
-  @if (userRole() === 'student') {
-  <div class="d-lg-none mb-3" [class.mt-3]="activeTab() === 'chat'">
+  @if (userRole() === 'student' && currentStep() === 2) {
+  <div class="d-lg-none mb-3 p-3">
     <div class="nav-switcher p-1 bg-light rounded-4 d-flex">
       <button
         class="btn flex-fill rounded-4 py-2 transition-all"
@@ -46,32 +23,35 @@
   </div>
   }
 
-  <div class="row g-2 g-lg-4 flex-fill overflow-hidden">
-    <!-- Colonna di SINISTRA: Materie/Impostazioni -->
-    <div
-      class="col-12 col-lg-4 d-lg-flex flex-column h-100"
-      [class.d-none]="userRole() === 'student' && activeTab() !== 'subjects'"
-      [class.d-flex]="userRole() === 'student' && activeTab() === 'subjects'"
-    >
-      @if (userRole() === 'teacher') {
-      <div
-        class="flex-fill overflow-auto pe-1"
-        tourAnchor="assistente_ai_settings"
-      >
-        <app-agent-settings-form
-          (assistantLoaded)="onAssistantLoaded($event)"
-        ></app-agent-settings-form>
-      </div>
-      } @else {
-      <div
-        class="card border-0 shadow-sm rounded-4 flex-fill d-flex flex-column overflow-hidden bg-white"
-      >
-        <div class="card-header bg-white border-0 pt-4 px-4 pb-2">
-          <h6 class="text-primary text-uppercase ls-wide small fw-bold mb-0">
-            Le Tue Materie
-          </h6>
+  <div class="flex-fill overflow-hidden container-fluid p-0">
+    <!-- STEP 1: CONFIGURAZIONE (Image 1) -->
+    @if (currentStep() === 1) {
+    <div class="h-100 overflow-auto bg-page">
+      <div class="config-wrapper">
+        <div class="text-center mb-5">
+          <h1 class="text-primary fw-bold display-4 mb-2" style="color: #4343e8 !important;">Configura il tuo Agente AI</h1>
+          <p class="text-secondary fw-medium fs-5">Step 1</p>
         </div>
-        <div class="card-body p-3 overflow-auto">
+
+        <div class="w-100 max-w-800">
+          <app-agent-settings-form
+            (assistantSaved)="onAssistantSaved($event)"
+          ></app-agent-settings-form>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- STEP 2: CHAT UNIFICATA (Image 2, 3, 4) -->
+    @if (currentStep() === 2) {
+    <div class="row g-0 h-100 overflow-hidden">
+      <!-- Sidebar Materie (Solo Studente o se vogliamo permettere il cambio veloce) -->
+      @if (userRole() === 'student' && activeTab() === 'subjects') {
+      <div class="col-12 col-lg-3 d-flex flex-column h-100 bg-white border-end">
+        <div class="p-4 border-bottom">
+          <h6 class="text-primary text-uppercase ls-wide small fw-bold mb-0">Le Tue Materie</h6>
+        </div>
+        <div class="flex-fill overflow-auto p-3">
           <div class="d-flex flex-column gap-2">
             @for (materia of materiaService.allMaterie(); track materia._id) {
             <button
@@ -79,103 +59,52 @@
               [class.active-subject]="materiaService.materiaSelected()?._id === materia._id"
               (click)="selectMateria(materia)"
             >
-              <div class="d-flex align-items-center">
-                <div
-                  class="subject-dot me-3"
-                  [class.bg-primary]="materiaService.materiaSelected()?._id === materia._id"
-                ></div>
-                <span class="fw-semibold text-dark">{{ materia.name }}</span>
-              </div>
-              @if (materiaService.materiaSelected()?._id === materia._id) {
-              <fa-icon
-                [icon]="HeadSideBrainIcon"
-                class="text-primary opacity-50"
-              ></fa-icon>
-              }
+              <span class="fw-semibold text-dark">{{ materia.name }}</span>
             </button>
-            } @empty {
-            <div class="text-center py-5">
-              <div class="opacity-25 mb-3">
-                <fa-icon [icon]="HeadSideBrainIcon" size="3x"></fa-icon>
-              </div>
-              <p class="text-muted px-4">
-                Non sei ancora iscritto a nessuna materia.
-              </p>
-            </div>
             }
           </div>
         </div>
       </div>
       }
-    </div>
 
-    <!-- Colonna di DESTRA: Chat -->
-
-    <div
-      class="col-12 col-lg-8 d-lg-flex flex-column h-100"
-      [class.d-none]="userRole() === 'student' && activeTab() !== 'chat'"
-      [class.d-flex]="userRole() === 'student' && activeTab() === 'chat'"
-    >
-      @if (currentAssistantId()) {
+      <!-- Area Chat Principal -->
       <div
-        class="flex-fill h-100 position-relative"
-        tourAnchor="assistente_ai_chat"
+        class="col d-flex flex-column h-100 position-relative"
+        [class.d-none]="userRole() === 'student' && activeTab() !== 'chat'"
       >
-        <div class="btn-group mb-3 d-flex" role="group">
-          <button
-            type="button"
-            class="btn btn-outline-primary"
-            [class.active]="interactionMode() === 'chat'"
-            (click)="interactionMode.set('chat')"
-          >
-            Chat
-          </button>
-          <button
-            type="button"
-            class="btn btn-outline-primary"
-            [class.active]="interactionMode() === 'voice'"
-            (click)="interactionMode.set('voice')"
-          >
-            Voice
-          </button>
-        </div>
-        @if(interactionMode() === 'chat') {
-        <app-agent-chat [assistantId]="currentAssistantId()!"></app-agent-chat>
-        } @else if (interactionMode() === 'voice') {
-        <app-voice-agent></app-voice-agent>
+        <!-- Header di navigazione per Docenti -->
+        @if (userRole() === 'teacher' || userRole() === 'admin') {
+          <div class="chat-header-nav bg-white border-bottom px-4 py-3 d-flex align-items-center justify-content-between shadow-sm" style="z-index: 10;">
+            <div class="d-flex align-items-center gap-3">
+              <div class="bg-primary bg-opacity-10 p-2 rounded-3 text-primary">
+                <fa-icon [icon]="HeadSideBrainIcon"></fa-icon>
+              </div>
+              <div>
+                <h6 class="mb-0 fw-bold">Agente AI — {{ materiaService.materiaSelected()?.name }}</h6>
+                <span class="small text-muted">Modalità Interazione</span>
+              </div>
+            </div>
+            
+            <button class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold" (click)="onBackToConfig()">
+              <fa-icon [icon]="faGear" class="me-2"></fa-icon>
+              Configura
+            </button>
+          </div>
         }
-      </div>
-      } @else {
-      <div
-        class="card border-0 shadow-sm rounded-4 flex-fill d-flex flex-column align-items-center justify-content-center p-5 text-center bg-white"
-      >
-        <div class="bg-light rounded-circle p-4 mb-4">
-          <fa-icon
-            [icon]="HeadSideBrainIcon"
-            size="3x"
-            class="text-primary opacity-50"
-          ></fa-icon>
-        </div>
-        <h4 class="text-dark fw-bold mb-2">Inizia una sessione</h4>
-        @if (userRole() === 'teacher') {
-        <p class="text-muted small max-w-300 mx-auto">
-          L'agente non è ancora stato configurato. Imposta un nome e un tono
-          nella scheda a sinistra.
-        </p>
+
+        @if (currentAssistantId()) {
+          <app-agent-chat 
+            [assistantId]="currentAssistantId()!"
+            (requestConfig)="onBackToConfig()"
+          ></app-agent-chat>
         } @else {
-        <p class="text-muted small max-w-300 mx-auto">
-          Seleziona una materia per iniziare a studiare con l'intelligenza
-          artificiale.
-        </p>
-        <button
-          class="btn btn-outline-primary rounded-pill mt-4 d-lg-none"
-          (click)="activeTab.set('subjects')"
-        >
-          Scegli Materia
-        </button>
+          <!-- Fallback se per qualche motivo si arriva qui senza ID -->
+          <div class="h-100 d-flex align-items-center justify-content-center">
+             <button class="btn btn-primary" (click)="currentStep.set(1)">Torna alla configurazione</button>
+          </div>
         }
       </div>
-      }
     </div>
+    }
   </div>
 </div>
