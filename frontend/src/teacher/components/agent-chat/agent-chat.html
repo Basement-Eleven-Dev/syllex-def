@@ -50,7 +50,7 @@
       >
         <div class="voice-header text-center">
           <h2 class="fw-bold mb-1">Analisi Vocale</h2>
-          <p class="text-muted small">Gemini Realtime Attivo</p>
+          <p class="text-muted small">Assistente Attivo</p>
         </div>
 
         <div
@@ -59,8 +59,10 @@
           <div class="orb-container">
             <div
               class="designer-orb"
-              [class.pulse]="geminiLiveService.isSpeaking() && !isMuted()"
-              [class.muted]="isMuted()"
+              [class.pulse]="(isRecording() && !isMuted()) || geminiLiveService.isSpeaking()"
+              [class.muted]="isMuted() && !geminiLiveService.isSpeaking()"
+              [class.user-speaking]="isRecording() && !isMuted()"
+              [class.ai-speaking]="geminiLiveService.isSpeaking()"
             ></div>
           </div>
 
@@ -155,12 +157,7 @@
         <div class="status-dot online"></div>
         <h6 class="mb-0 fw-bold">{{ assistantName() }}</h6>
       </div>
-      <button
-        class="btn btn-outline-secondary btn-sm rounded-pill px-3"
-        (click)="requestConfig.emit()"
-      >
-        <fa-icon [icon]="faGear" class="me-2"></fa-icon>Configura
-      </button>
+
     </div>
 
     <!-- MESSAGGI / INTRO -->
