@@ -377,11 +377,13 @@ export class GeminiLiveService {
       }
 
       // Trascrizione INPUT (quello che dice l'utente — da Gemini)
+      // Quando l'utente inizia a parlare, resettiamo il transcript AI del turno precedente
       if (content.inputTranscription?.text) {
         console.log(
           '🎤 [Trascrizione UTENTE]:',
           content.inputTranscription.text,
         );
+        this.aiTranscript.set('');
         this.userTranscript.set(content.inputTranscription.text);
       }
 

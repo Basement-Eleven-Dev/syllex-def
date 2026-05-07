@@ -67,74 +67,49 @@
           </div>
 
           <div class="transcript-box mt-5 px-4 text-center">
-            <h4 class="text-muted tiny text-uppercase mb-3">In ascolto</h4>
-            <h2 class="user-live-text fw-bold text-dark">
-              {{ geminiLiveService.userTranscript() || '...' }}
-            </h2>
-
-            @if (geminiLiveService.isSearching()) {
-            <div class="thinking-status mt-3 animate-pulse">
+            @if (!geminiLiveService.isReady()) {
+            <div class="thinking-status animate-pulse">
               <fa-icon
                 [icon]="faSpinner"
                 [animation]="'spin'"
                 class="text-primary me-2"
               ></fa-icon>
-              <span class="text-muted small fw-bold"
-                >Consulto i documenti...</span
-              >
+              <span class="subtitle-text">Connessione in corso...</span>
             </div>
-            } @if (geminiLiveService.isSpeaking() && (messages().length === 0 ||
-            messages()[messages().length - 1].role !== 'agent')) {
-            <div class="speaking-status mt-3 animate-pulse">
-              <span class="text-primary small fw-bold"
-                >L'assistente sta parlando...</span
-              >
+            } @else if (geminiLiveService.isSearching()) {
+            <div class="thinking-status animate-pulse">
+              <fa-icon
+                [icon]="faSpinner"
+                [animation]="'spin'"
+                class="text-primary me-2"
+              ></fa-icon>
+              <span class="subtitle-text">Consulto i documenti...</span>
             </div>
-            } @if (geminiLiveService.aiTranscript()) {
-            <div
-              class="ai-live-text mt-3 p-3 rounded-4 bg-white shadow-sm animate-fade-in"
-            >
-              <p class="mb-0 small fw-bold text-primary">
-                {{ assistantName() }} dice:
-              </p>
-              <p class="mb-0 text-dark small text-start">
-                {{ geminiLiveService.aiTranscript() }}
-              </p>
+            } @else if (geminiLiveService.aiTranscript()) {
+            <p class="subtitle-text animate-fade-in">
+              {{ geminiLiveService.aiTranscript() }}
+            </p>
+            } @else if (geminiLiveService.isSpeaking()) { @if (messages().length
+            > 0 && messages()[messages().length - 1].role === 'agent') {
+            <p class="subtitle-text animate-fade-in">
+              {{ messages()[messages().length - 1].content }}
+            </p>
+            } @else {
+            <div class="thinking-status animate-pulse">
+              <span class="subtitle-text">...</span>
             </div>
-            } @if (!geminiLiveService.aiTranscript() && messages().length > 0 &&
-            messages()[messages().length - 1].role === 'agent') {
-            <div
-              class="ai-live-text mt-3 p-3 rounded-4 bg-white shadow-sm animate-fade-in"
-            >
-              <p class="mb-0 small fw-bold text-primary">
-                {{ assistantName() }} ha detto:
-              </p>
-              <p class="mb-0 text-dark small text-start">
-                {{ messages()[messages().length - 1].content }}
-              </p>
-            </div>
+            } } @else if (messages().length > 0 && messages()[messages().length
+            - 1].role === 'agent' && !geminiLiveService.userTranscript()) {
+            <p class="subtitle-text animate-fade-in">
+              {{ messages()[messages().length - 1].content }}
+            </p>
+            } @else {
+            <p class="subtitle-text text-muted">Parla pure...</p>
             }
           </div>
         </div>
 
         <div class="voice-footer d-flex gap-3">
-          <button
-            class="btn rounded-pill px-4 py-3 shadow-lg d-flex align-items-center gap-3 transition-all"
-            [class.btn-success]="!isMuted()"
-            [class.btn-secondary]="isMuted()"
-            [disabled]="isMuted()"
-            (click)="finishTurn()"
-          >
-            <fa-icon
-              [icon]="isMuted() ? faSpinner : faPaperPlane"
-              [animation]="isMuted() ? 'spin' : undefined"
-            ></fa-icon>
-            <span class="fw-bold"
-              >{{ isMuted() ? 'Gemini sta elaborando...' : 'Ho finito, rispondi'
-              }}</span
-            >
-          </button>
-
           <button
             class="btn btn-dark rounded-pill px-4 py-3 shadow-lg d-flex align-items-center gap-3"
             (click)="stopRealtimeVoice(); voiceModeActive.set(false)"
@@ -157,7 +132,6 @@
         <div class="status-dot online"></div>
         <h6 class="mb-0 fw-bold">{{ assistantName() }}</h6>
       </div>
-
     </div>
 
     <!-- MESSAGGI / INTRO -->

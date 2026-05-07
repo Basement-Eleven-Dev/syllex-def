@@ -78,21 +78,21 @@ export class AgentChat implements OnInit, OnDestroy {
 
   // --- State ---
   messages = signal<ChatMessage[]>([]);
-  assistantName = signal<string>('Alex'); 
+  assistantName = signal<string>('Alex');
   conversations = signal<any[]>([]);
   currentConversationId = signal<string>('conv_' + Date.now()); // ID di default per evitare blocchi
   inputMessage = '';
   isLoading = signal(false);
-  faPlus = faPlus;    
+  faPlus = faPlus;
 
   // Gestione Modalità UI
-  voiceModeActive = signal(false); 
+  voiceModeActive = signal(false);
 
   // Voice input state (Realtime)
   private mediaStream: MediaStream | null = null;
   private audioContext: AudioContext | null = null;
   private processor: any = null;
-  public recognition: any = null; 
+  public recognition: any = null;
   isRecording = signal(false);
   isMuted = signal(false);
   liveTranscript = signal('');
@@ -114,7 +114,6 @@ export class AgentChat implements OnInit, OnDestroy {
     this.pauseAudio();
   }
 
-
   // Effetto: scrolla sempre in fondo quando cambia la lista dei messaggi
   private scrollEffect = effect(() => {
     if (this.messages().length > 0) {
@@ -135,31 +134,35 @@ export class AgentChat implements OnInit, OnDestroy {
   private aiVoiceTranscriptEffect = effect(() => {
     // Ci iscriviamo in ascolto unicamente a questo evento
     this.geminiLiveService.turnCompleteEvent();
-    
+
     // Usiamo untracked per leggere l'intero testo senza innescare l'effetto ad ogni singola lettera ricevuta
     const text = untracked(() => this.geminiLiveService.aiTranscript());
-    
+
     if (text.trim().length > 0) {
       console.log('💾 [AUTO-SAVE AI MESSAGE]:', text);
-      
+
       untracked(() => {
         this.saveVoiceMessage('agent', text);
-        this.geminiLiveService.aiTranscript.set(''); // Reset pulito in vista del prossimo turno
+        // NON resettiamo aiTranscript qui: vogliamo che rimanga visibile
+        // finché l'utente non inizia a parlare di nuovo (vedi inputTranscription nel service)
       });
     }
   });
 
   // 2. Effetto puramente visivo: si occupa solo di gestire il lucchetto sul microfono
-  private muteUIEffect = effect(() => {
-    const isSpeaking = this.geminiLiveService.isSpeaking();
-    const voiceActive = this.voiceModeActive();
-    
-    if (isSpeaking && voiceActive) {
-      this.isMuted.set(true);
-    } else if (!isSpeaking && voiceActive) {
-      this.isMuted.set(false);
-    }
-  }, { allowSignalWrites: true });
+  private muteUIEffect = effect(
+    () => {
+      const isSpeaking = this.geminiLiveService.isSpeaking();
+      const voiceActive = this.voiceModeActive();
+
+      if (isSpeaking && voiceActive) {
+        this.isMuted.set(true);
+      } else if (!isSpeaking && voiceActive) {
+        this.isMuted.set(false);
+      }
+    },
+    { allowSignalWrites: true },
+  );
 
   private saveVoiceMessage(role: 'user' | 'agent', content: string) {
     const convId = this.currentConversationId();
@@ -170,9 +173,9 @@ export class AgentChat implements OnInit, OnDestroy {
       role,
       content,
       timestamp: new Date(),
-      inputType: 'voice'
+      inputType: 'voice',
     };
-    this.messages.update(prev => [...prev, newMsg]);
+    this.messages.update((prev) => [...prev, newMsg]);
 
     // Se è l'utente, puliamo il transcript AI precedente per far spazio al nuovo turno
     if (role === 'user') {
@@ -180,7 +183,9 @@ export class AgentChat implements OnInit, OnDestroy {
     }
 
     // Salva nel DB (silenzioso)
-    this.agentService.saveLiveMessage(role, content, convId, 'voice').subscribe();
+    this.agentService
+      .saveLiveMessage(role, content, convId, 'voice')
+      .subscribe();
   }
 
   // ==================
@@ -205,7 +210,7 @@ export class AgentChat implements OnInit, OnDestroy {
         if (!this.currentConversationId()) {
           this.startNewChat();
         }
-      }
+      },
     });
   }
 
@@ -271,7 +276,10 @@ export class AgentChat implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('Error generating response:', error);
-        this.feedbackService.showFeedback('Errore nella generazione della risposta', false);
+        this.feedbackService.showFeedback(
+          'Errore nella generazione della risposta',
+          false,
+        );
         this.isLoading.set(false);
       },
     });
@@ -318,27 +326,32 @@ export class AgentChat implements OnInit, OnDestroy {
     this.pollingInterval = setInterval(() => {
       const convId = this.currentConversationId();
       if (convId && this.voiceModeActive()) {
-        this.agentService.getConversationHistory(convId).subscribe((response: any[]) => {
-          if (response && response.length > 0) {
-            const history: ChatMessage[] = response.map((msg: any) => ({
-              _id: msg._id,
-              role: msg.role,
-              content: msg.content,
-              timestamp: msg.timestamp,
-              audioUrl: msg.audioUrl || null,
-              inputType: msg.inputType || 'text',
-            }));
-            
-            // Aggiorna i messaggi solo se il DB ha più messaggi di quelli locali
-            // (non sovrascrivere mai con una lista più corta: il messaggio AI potrebbe essere
-            // stato aggiunto localmente ma non ancora persistito)
-            if (history.length > this.messages().length || 
+        this.agentService
+          .getConversationHistory(convId)
+          .subscribe((response: any[]) => {
+            if (response && response.length > 0) {
+              const history: ChatMessage[] = response.map((msg: any) => ({
+                _id: msg._id,
+                role: msg.role,
+                content: msg.content,
+                timestamp: msg.timestamp,
+                audioUrl: msg.audioUrl || null,
+                inputType: msg.inputType || 'text',
+              }));
+
+              // Aggiorna i messaggi solo se il DB ha più messaggi di quelli locali
+              // (non sovrascrivere mai con una lista più corta: il messaggio AI potrebbe essere
+              // stato aggiunto localmente ma non ancora persistito)
+              if (
+                history.length > this.messages().length ||
                 (history.length === this.messages().length &&
-                 history[history.length-1]?.content !== this.messages()[this.messages().length-1]?.content)) {
-              this.messages.set(history);
+                  history[history.length - 1]?.content !==
+                    this.messages()[this.messages().length - 1]?.content)
+              ) {
+                this.messages.set(history);
+              }
             }
-          }
-        });
+          });
       }
     }, 1000); // Controlla ogni secondo
   }
@@ -355,7 +368,7 @@ export class AgentChat implements OnInit, OnDestroy {
       this.isRecording.set(true);
       this.geminiLiveService.userTranscript.set('');
       this.geminiLiveService.aiTranscript.set('');
-      
+
       await this.geminiLiveService.connect();
       this.startUserTranscriptRecognition(); // Avvia transcrito visuale
 
@@ -363,14 +376,18 @@ export class AgentChat implements OnInit, OnDestroy {
         audio: { sampleRate: 16000, channelCount: 1, echoCancellation: true },
       });
 
-      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)({
+      this.audioContext = new (
+        window.AudioContext || (window as any).webkitAudioContext
+      )({
         sampleRate: 16000,
       });
 
       // Carica il processore AudioWorklet
       await this.audioContext.audioWorklet.addModule('/pcm-processor.js');
 
-      const source = this.audioContext.createMediaStreamSource(this.mediaStream);
+      const source = this.audioContext.createMediaStreamSource(
+        this.mediaStream,
+      );
       this.processor = new AudioWorkletNode(this.audioContext, 'pcm-processor');
 
       this.processor.port.onmessage = (event: any) => {
@@ -400,7 +417,10 @@ export class AgentChat implements OnInit, OnDestroy {
       this.processor.connect(this.audioContext.destination);
     } catch (err) {
       console.error('Errore avvio Realtime:', err);
-      this.feedbackService.showFeedback('Impossibile accedere al microfono', false);
+      this.feedbackService.showFeedback(
+        'Impossibile accedere al microfono',
+        false,
+      );
       this.voiceModeActive.set(false);
       this.isRecording.set(false);
     }
@@ -408,7 +428,9 @@ export class AgentChat implements OnInit, OnDestroy {
 
   /** Avvia il riconoscimento locale SOLO per il feedback visivo e il salvataggio testo */
   private startUserTranscriptRecognition() {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition =
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) return;
 
     this.recognition = new SpeechRecognition();
@@ -433,7 +455,9 @@ export class AgentChat implements OnInit, OnDestroy {
           interimTranscript += transcript;
         }
       }
-      this.geminiLiveService.userTranscript.set(finalTranscript || interimTranscript);
+      this.geminiLiveService.userTranscript.set(
+        finalTranscript || interimTranscript,
+      );
     };
 
     this.recognition.start();
@@ -457,15 +481,13 @@ export class AgentChat implements OnInit, OnDestroy {
     this.isMuted.set(false);
   }
 
-
-
   // ==================
   // CHAT HISTORY
   // ==================
 
   async initializeChatHistory(conversationId: string) {
     // Carichiamo prima i dettagli dell'assistente per il nome
-    this.agentService.getAssistant().subscribe(res => {
+    this.agentService.getAssistant().subscribe((res) => {
       if (res.exists && res.assistant) {
         this.assistantName.set(res.assistant.name);
       }
@@ -519,45 +541,48 @@ export class AgentChat implements OnInit, OnDestroy {
 
   /** Auto-play della risposta quando l'input era vocale */
   private autoPlayResponse(messageId: string, text: string) {
-    this.generateAndPlayAudio({ _id: messageId, role: 'agent', content: text, timestamp: new Date() });
+    this.generateAndPlayAudio({
+      _id: messageId,
+      role: 'agent',
+      content: text,
+      timestamp: new Date(),
+    });
   }
 
   private generateAndPlayAudio(message: ChatMessage) {
     const messageId = message._id!;
     this.loadingAudioIds.update((set) => new Set(set).add(messageId));
 
-    this.agentService
-      .listenToMessage(messageId, message.content)
-      .subscribe({
-        next: (res) => {
-          if (res.success && res.audioUrl) {
-            // Aggiorna il messaggio locale con l'URL
-            this.messages.update((msgs) =>
-              msgs.map((m) =>
-                m._id === messageId ? { ...m, audioUrl: res.audioUrl } : m,
-              ),
-            );
-            this.playAudio(messageId, res.audioUrl);
-          }
-          this.loadingAudioIds.update((set) => {
-            const newSet = new Set(set);
-            newSet.delete(messageId);
-            return newSet;
-          });
-        },
-        error: (err) => {
-          console.error('Error generating audio:', err);
-          this.feedbackService.showFeedback(
-            "Errore nella generazione dell'audio",
-            false,
+    this.agentService.listenToMessage(messageId, message.content).subscribe({
+      next: (res) => {
+        if (res.success && res.audioUrl) {
+          // Aggiorna il messaggio locale con l'URL
+          this.messages.update((msgs) =>
+            msgs.map((m) =>
+              m._id === messageId ? { ...m, audioUrl: res.audioUrl } : m,
+            ),
           );
-          this.loadingAudioIds.update((set) => {
-            const newSet = new Set(set);
-            newSet.delete(messageId);
-            return newSet;
-          });
-        },
-      });
+          this.playAudio(messageId, res.audioUrl);
+        }
+        this.loadingAudioIds.update((set) => {
+          const newSet = new Set(set);
+          newSet.delete(messageId);
+          return newSet;
+        });
+      },
+      error: (err) => {
+        console.error('Error generating audio:', err);
+        this.feedbackService.showFeedback(
+          "Errore nella generazione dell'audio",
+          false,
+        );
+        this.loadingAudioIds.update((set) => {
+          const newSet = new Set(set);
+          newSet.delete(messageId);
+          return newSet;
+        });
+      },
+    });
   }
 
   private playAudio(messageId: string, url: string) {
@@ -573,8 +598,8 @@ export class AgentChat implements OnInit, OnDestroy {
     this.activeAudio.onended = () => {
       this.currentPlayingId.set(null);
       this.activeAudio = null;
-      
-      // Conversazionale Realtime: se siamo ancora in modalità voce, Gemini gestisce il silenzio, 
+
+      // Conversazionale Realtime: se siamo ancora in modalità voce, Gemini gestisce il silenzio,
       // ma se per qualche motivo si scollega, possiamo riattivare qui.
       if (this.voiceModeActive()) {
         setTimeout(() => {
