@@ -1,100 +1,98 @@
 /* Font Family: Figtree */
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-Regular.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-Regular.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-Italic.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-Italic.ttf") format("truetype");
   font-weight: 400;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-Medium.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-Medium.ttf") format("truetype");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-MediumItalic.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-MediumItalic.ttf") format("truetype");
   font-weight: 500;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-SemiBold.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-SemiBold.ttf") format("truetype");
   font-weight: 600;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-SemiBoldItalic.ttf")
-    format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-SemiBoldItalic.ttf") format("truetype");
   font-weight: 600;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-Bold.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-Bold.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-BoldItalic.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-BoldItalic.ttf") format("truetype");
   font-weight: 700;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-Black.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-Black.ttf") format("truetype");
   font-weight: 900;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-BlackItalic.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-BlackItalic.ttf") format("truetype");
   font-weight: 900;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-ExtraBold.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-ExtraBold.ttf") format("truetype");
   font-weight: 800;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-ExtraBoldItalic.ttf")
-    format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-ExtraBoldItalic.ttf") format("truetype");
   font-weight: 800;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-Light.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-Light.ttf") format("truetype");
   font-weight: 300;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-LightItalic.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-LightItalic.ttf") format("truetype");
   font-weight: 300;
   font-style: italic;
   font-display: swap;
@@ -111,7 +109,7 @@ $dark: #262626;
 $min-contrast-ratio: 4.5;
 $font-size-base: 0.9rem;
 $enable-gradients: false;
-$font-family-sans-serif: "Figtree", sans-serif;
+$font-family-sans-serif: "DMSans", sans-serif;
 $border-radius: 0.75rem;
 $border-radius-sm: 0.5rem;
 $border-radius-lg: 0.9rem;
@@ -154,15 +152,15 @@ body {
 }
 
 // Riduci la spaziatura tra lettere su tutto
-html,
+/* html,
 body,
 input,
 textarea,
 select,
 button {
-  letter-spacing: -0.02em;
+  letter-spacing: 0em;
 }
-
+ */
 #authRightColumn {
   background: url("/images/auth_right.png");
   background-size: cover;
