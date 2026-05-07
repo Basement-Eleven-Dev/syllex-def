@@ -8,6 +8,7 @@ import {
   OnInit,
   OnDestroy,
   effect,
+  untracked,
   output,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -130,25 +131,33 @@ export class AgentChat implements OnInit, OnDestroy {
   });
 
   // Effetto: Quando Gemini Live finisce di parlare, salviamo la trascrizione
+  // 1. Effetto per il salvataggio: si attiva SOLO al segnale di fine turno
   private aiVoiceTranscriptEffect = effect(() => {
-    const text = this.geminiLiveService.aiTranscript();
+    // Ci iscriviamo in ascolto unicamente a questo evento
+    this.geminiLiveService.turnCompleteEvent();
+    
+    // Usiamo untracked per leggere l'intero testo senza innescare l'effetto ad ogni singola lettera ricevuta
+    const text = untracked(() => this.geminiLiveService.aiTranscript());
+    
+    if (text.trim().length > 0) {
+      console.log('💾 [AUTO-SAVE AI MESSAGE]:', text);
+      
+      untracked(() => {
+        this.saveVoiceMessage('agent', text);
+        this.geminiLiveService.aiTranscript.set(''); // Reset pulito in vista del prossimo turno
+      });
+    }
+  });
+
+  // 2. Effetto puramente visivo: si occupa solo di gestire il lucchetto sul microfono
+  private muteUIEffect = effect(() => {
     const isSpeaking = this.geminiLiveService.isSpeaking();
     const voiceActive = this.voiceModeActive();
     
-    // Se l'AI sta parlando (audio in riproduzione), silenziamo il microfono
     if (isSpeaking && voiceActive) {
       this.isMuted.set(true);
-    } 
-    // Se l'AI ha smesso di parlare (audio finito), riattiviamo il microfono
-    else if (!isSpeaking && voiceActive) {
+    } else if (!isSpeaking && voiceActive) {
       this.isMuted.set(false);
-      
-      // Quando ha finito di parlare ED è arrivato del testo, salviamo
-      if (text.trim().length > 0) {
-        console.log('💾 [AUTO-SAVE AI MESSAGE]:', text);
-        this.saveVoiceMessage('agent', text);
-        this.geminiLiveService.aiTranscript.set(''); // Reset immediato per il prossimo turno
-      }
     }
   }, { allowSignalWrites: true });
 
@@ -320,9 +329,12 @@ export class AgentChat implements OnInit, OnDestroy {
               inputType: msg.inputType || 'text',
             }));
             
-            // Aggiorna i messaggi solo se c'è un cambiamento (es. nuovo messaggio)
-            if (history.length !== this.messages().length || 
-                history[history.length-1].content !== this.messages()[this.messages().length-1]?.content) {
+            // Aggiorna i messaggi solo se il DB ha più messaggi di quelli locali
+            // (non sovrascrivere mai con una lista più corta: il messaggio AI potrebbe essere
+            // stato aggiunto localmente ma non ancora persistito)
+            if (history.length > this.messages().length || 
+                (history.length === this.messages().length &&
+                 history[history.length-1]?.content !== this.messages()[this.messages().length-1]?.content)) {
               this.messages.set(history);
             }
           }

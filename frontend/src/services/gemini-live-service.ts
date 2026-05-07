@@ -4,7 +4,6 @@ import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 import { firstValueFrom } from 'rxjs';
 import { Materia } from './materia';
 
-
 @Injectable({
   providedIn: 'root',
 })
@@ -20,7 +19,8 @@ export class GeminiLiveService {
 
   public aiTranscript = signal<string>('');
   public userTranscript = signal<string>('');
-  
+  public turnCompleteEvent = signal<number>(0);
+
   private wsSubject: WebSocketSubject<any> | null = null;
   private audioContext: AudioContext | null = null;
   private activeSource: AudioBufferSourceNode | null = null;
@@ -37,40 +37,7 @@ export class GeminiLiveService {
   // Lista ordinata di modelli Live API da provare (dal più recente al più vecchio)
   private readonly LIVE_MODEL_CANDIDATES = [
     'gemini-live-2.5-flash-native-audio',
-
   ];
-
-  /**
-   * Interroga l'API Vertex AI per elencare modelli disponibili.
-   */
-  private async discoverAvailableModels(token: string): Promise<string[]> {
-    try {
-      const url = `https://${this.LOCATION}-aiplatform.googleapis.com/v1beta1/publishers/google/models`;
-      console.log('🔍 Interrogazione modelli disponibili su Vertex AI...');
-      
-      const res = await fetch(url, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      
-      if (!res.ok) {
-        console.warn(`⚠️ Impossibile elencare modelli (HTTP ${res.status}). Proverò i candidati noti.`);
-        return [];
-      }
-      
-      const data = await res.json();
-      const models = (data.models || data.publisherModels || []) as any[];
-      
-      const relevantNames = models
-        .map((m: any) => m.name || m.publisherModelTemplate || '')
-        .filter((name: string) => name.toLowerCase().includes('live') || name.toLowerCase().includes('flash'));
-      
-      console.log(`📋 Modelli rilevanti trovati (${relevantNames.length}):`, relevantNames);
-      return relevantNames;
-    } catch (err) {
-      console.warn('⚠️ Errore durante la scoperta dei modelli:', err);
-      return [];
-    }
-  }
 
   public async connect(): Promise<void> {
     if (this.wsSubject) return;
@@ -84,27 +51,26 @@ export class GeminiLiveService {
       const token = response.token;
       console.log('✅ 2. Token ottenuto con successo.');
 
-      // Scopri i modelli disponibili
-      const availableModels = await this.discoverAvailableModels(token);
-      if (availableModels.length > 0) {
-        console.log('📋 Modelli dal server:', availableModels);
-      }
-
       // Prova ogni candidato fino a trovarne uno che funziona
       for (const candidateModel of this.LIVE_MODEL_CANDIDATES) {
-        console.log(`🔗 Tentativo connessione con modello: ${candidateModel}...`);
+        console.log(
+          `🔗 Tentativo connessione con modello: ${candidateModel}...`,
+        );
         const success = await this.tryConnectWithModel(token, candidateModel);
         if (success) {
           this.resolvedModel = candidateModel;
           console.log(`✅ CONNESSO con successo al modello: ${candidateModel}`);
           return;
         }
-        console.warn(`❌ Modello ${candidateModel} non disponibile, provo il prossimo...`);
+        console.warn(
+          `❌ Modello ${candidateModel} non disponibile, provo il prossimo...`,
+        );
       }
 
-      console.error('❌ NESSUN modello Live API disponibile. Modelli provati:', this.LIVE_MODEL_CANDIDATES);
-      console.error('ℹ️ Per risolvere, abilita la Vertex AI Gemini API nel progetto GCP e verifica che almeno un modello Live sia accessibile nella regione us-central1.');
-
+      console.error(
+        '❌ NESSUN modello Live API disponibile. Modelli provati:',
+        this.LIVE_MODEL_CANDIDATES,
+      );
     } catch (error) {
       console.error('❌ Errore durante la connessione:', error);
     }
@@ -121,7 +87,9 @@ export class GeminiLiveService {
       // Timeout: se non si connette in 8 secondi, fallisce
       const timeout = setTimeout(() => {
         console.warn(`⏱️ Timeout per modello ${model}`);
-        try { ws.close(); } catch {}
+        try {
+          ws.close();
+        } catch {}
         resolve(false);
       }, 8000);
 
@@ -130,20 +98,29 @@ export class GeminiLiveService {
 
       ws.onopen = () => {
         console.log(`  ✓ WebSocket aperto, invio setup per ${model}...`);
+        // Costruiamo il percorso del modello in modo intelligente
+        const modelPath = model.startsWith('publishers/')
+          ? `projects/${this.PROJECT_ID}/locations/${this.LOCATION}/${model}`
+          : `projects/${this.PROJECT_ID}/locations/${this.LOCATION}/publishers/google/models/${model}`;
+
+        console.log(`📡 [SETUP] Modello: ${modelPath}`);
+
         const setupPayload = {
           setup: {
-            model: `projects/${this.PROJECT_ID}/locations/${this.LOCATION}/publishers/google/models/${model}`,
+            model: modelPath,
             generationConfig: {
               responseModalities: ['AUDIO'],
             },
             inputAudioTranscription: {},
             outputAudioTranscription: {},
             systemInstruction: {
-              parts: [{
-                text: `Sei l'assistente vocale per "${this.materiaService.materiaSelected()?.name}". Rispondi in modo naturale e conciso.`
-              }]
-            }
-          }
+              parts: [
+                {
+                  text: `Sei l'assistente vocale per "${this.materiaService.materiaSelected()?.name}". Rispondi in modo naturale e conciso.`,
+                },
+              ],
+            },
+          },
         };
         ws.send(JSON.stringify(setupPayload));
       };
@@ -152,7 +129,10 @@ export class GeminiLiveService {
         clearTimeout(timeout);
         let data: any;
         try {
-          const text = typeof evt.data === 'string' ? evt.data : new TextDecoder().decode(evt.data);
+          const text =
+            typeof evt.data === 'string'
+              ? evt.data
+              : new TextDecoder().decode(evt.data);
           data = JSON.parse(text);
         } catch {
           data = evt.data;
@@ -161,7 +141,9 @@ export class GeminiLiveService {
         if (data.setupComplete !== undefined) {
           // Setup accettato! Chiudi questo WebSocket di prova e ricrea la connessione definitiva
           ws.close();
-          console.log(`  ✓ Setup accettato per ${model}! Connessione definitiva...`);
+          console.log(
+            `  ✓ Setup accettato per ${model}! Connessione definitiva...`,
+          );
           this.establishConnection(token, model);
           resolve(true);
         }
@@ -213,7 +195,9 @@ export class GeminiLiveService {
       },
       closeObserver: {
         next: (closeEvent: CloseEvent) => {
-          console.warn(`🔌 WebSocket close — code: ${closeEvent.code}, reason: "${closeEvent.reason}"`);
+          console.warn(
+            `🔌 WebSocket close — code: ${closeEvent.code}, reason: "${closeEvent.reason}"`,
+          );
           this.cleanupState();
         },
       },
@@ -231,7 +215,7 @@ export class GeminiLiveService {
         } catch {
           return e.data;
         }
-      }
+      },
     });
 
     this.wsSubject.subscribe({
@@ -246,7 +230,7 @@ export class GeminiLiveService {
       complete: () => {
         console.log('🔌 WEBSOCKET CHIUSO DAL SERVER');
         this.cleanupState();
-      }
+      },
     });
   }
 
@@ -320,20 +304,27 @@ export class GeminiLiveService {
   }
 
   private sendSetupMessage(model: string): void {
+    // Costruiamo il percorso del modello in modo intelligente
+    const modelPath = model.startsWith('publishers/')
+      ? `projects/${this.PROJECT_ID}/locations/${this.LOCATION}/${model}`
+      : `projects/${this.PROJECT_ID}/locations/${this.LOCATION}/publishers/google/models/${model}`;
+
     const setupPayload = {
       setup: {
-        model: `projects/${this.PROJECT_ID}/locations/${this.LOCATION}/publishers/google/models/${model}`,
+        model: modelPath,
         generationConfig: {
           responseModalities: ['AUDIO'],
         },
         inputAudioTranscription: {},
         outputAudioTranscription: {},
         systemInstruction: {
-          parts: [{
-            text: `Sei l'assistente vocale per "${this.materiaService.materiaSelected()?.name}". Rispondi in modo naturale e conciso.`
-          }]
-        }
-      }
+          parts: [
+            {
+              text: `Sei l'assistente vocale per "${this.materiaService.materiaSelected()?.name}". Rispondi in modo naturale e conciso.`,
+            },
+          ],
+        },
+      },
     };
 
     console.log('⚙️ Invio setup con modello:', model);
@@ -347,8 +338,11 @@ export class GeminiLiveService {
   private handleServerMessage(message: any): void {
     console.log(message);
     // Log per debug profondo - ricalca la struttura reale
-    if (message.outputTranscription || (message.serverContent && message.serverContent.modelTurn)) {
-       console.log('📦 [DEBUG SERVER MSG]:', message);
+    if (
+      message.outputTranscription ||
+      (message.serverContent && message.serverContent.modelTurn)
+    ) {
+      console.log('📦 [DEBUG SERVER MSG]:', message);
     }
 
     // 1. Tool Call (RAG)
@@ -385,6 +379,15 @@ export class GeminiLiveService {
       }
     }
 
+    // 4b. Trascrizione OUTPUT (quello che dice l'AI)
+    if (message.outputTranscription) {
+      const text = message.outputTranscription.text;
+      if (text) {
+        console.log('🤖 [Trascrizione AI]:', text);
+        this.aiTranscript.update((prev) => prev + text);
+      }
+    }
+
     // 5. Server Content (Audio, interruzioni, modelTurn, turnComplete)
     if (message.serverContent) {
       const content = message.serverContent;
@@ -400,15 +403,17 @@ export class GeminiLiveService {
       if (content.turnComplete) {
         console.log('🏁 [TURN COMPLETE]');
         this.isSpeaking.set(false);
+        this.turnCompleteEvent.update((v) => v + 1);
       }
 
       const modelTurn = content.modelTurn;
       if (modelTurn && modelTurn.parts) {
+        console.log(modelTurn, ' [MODEL TURN]:', modelTurn);
         modelTurn.parts.forEach((part: any) => {
           // Gestione TESTO dell'IA (quello che sta vocalizzando)
           if (part.text) {
             console.log('🤖 [Testo IA]:', part.text);
-            this.aiTranscript.update(prev => (prev + part.text));
+            this.aiTranscript.update((prev) => prev + part.text);
           }
 
           // Gestione AUDIO dell'IA
@@ -419,7 +424,6 @@ export class GeminiLiveService {
       }
     }
   }
-
 
   // Riproduce direttamente un ArrayBuffer di PCM16 raw (frame binario dal server)
   private playPcmArrayBuffer(buffer: ArrayBuffer): void {
@@ -476,7 +480,7 @@ export class GeminiLiveService {
   private playNextInQueue(): void {
     if (!this.audioContext || this.audioQueue.length === 0) {
       this.isPlayingAudio = false;
-      
+
       // Grace period: aspetta 800ms prima di dire che ha finito davvero.
       if (this.audioEndTimeout) clearTimeout(this.audioEndTimeout);
       this.audioEndTimeout = setTimeout(() => {
@@ -486,7 +490,7 @@ export class GeminiLiveService {
           this.activeSource = null;
         }
       }, 800);
-      
+
       return;
     }
 
@@ -505,7 +509,7 @@ export class GeminiLiveService {
     const buffer = this.audioQueue.shift()!;
     const source = this.audioContext.createBufferSource();
     this.activeSource = source;
-    
+
     source.buffer = buffer;
     source.connect(this.audioContext.destination);
     source.onended = () => {
@@ -542,21 +546,25 @@ export class GeminiLiveService {
       this.isSearching.set(true);
       console.log('⏳ Esecuzione RAG in corso per:', query);
       const ragStart = performance.now();
-      
+
       const response = await firstValueFrom(
         this.http.post<any>('ai/rag-search', { query, limit: 4 }),
       );
-      
-      console.log(`⏱️ RAG completato in ${Math.round(performance.now() - ragStart)}ms`);
-      
+
+      console.log(
+        `⏱️ RAG completato in ${Math.round(performance.now() - ragStart)}ms`,
+      );
+
       const docs = response.relevantDocuments || [];
-      let ragTestoTrovato = "";
+      let ragTestoTrovato = '';
 
       if (docs.length > 0) {
-        ragTestoTrovato = docs.map((d: any) => {
-          const text = d.text || '';
-          return text.length > 500 ? text.substring(0, 500) + '...' : text;
-        }).join("\n\n---\n\n");
+        ragTestoTrovato = docs
+          .map((d: any) => {
+            const text = d.text || '';
+            return text.length > 500 ? text.substring(0, 500) + '...' : text;
+          })
+          .join('\n\n---\n\n');
       } else {
         ragTestoTrovato = `Nessuna informazione trovata per la materia "${this.materiaService.materiaSelected()?.name}" riguardo a: ${query}`;
       }
