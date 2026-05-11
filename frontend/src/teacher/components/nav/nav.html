@@ -7,14 +7,15 @@
     height="40"
     routerLink="/t/dashboard"
   />
-  <div class="d-none d-md-flex flex-fill flex-row justify-content-between">
+  <div class="d-none d-md-flex flex-fill flex-row justify-content-end gap-4">
     <div class="d-flex flex-row gap-3">
       <button
-        class="btn calendarBtn d-none d-md-block flex-shrink-0 py-3"
+        class="btn calendarBtn bg-transparent d-none d-md-block flex-shrink-0 py-3"
         (click)="openCalendarioModal()"
       >
-        <fa-icon [icon]="CalendarIcon"></fa-icon>
-        {{ now | date: 'dd - MM - yy' | titlecase }}
+        <span class="opacity-75">{{ now | date: 'EEE,' }}</span>
+        <span class="fw-bold mx-1">{{ now | date: 'd MMMM' | titlecase }}</span>
+        <span class="opacity-75">{{ now | date: 'yyyy' }}</span>
       </button>
 
       <!-- <input
@@ -34,17 +35,11 @@
         <a
           class="d-flex align-items-center justify-content-center text-white p-0 text-decoration-none"
         >
-          <span
-            class="bg-secondary text-primary rounded-circle fw-bold tracking-wide"
-            style="
-              width: 2.5rem;
-              height: 2.5rem;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-            "
-            >{{getInitals() | async | uppercase }}</span
-          >
+          <fa-icon
+            [icon]="UserProfileIcon"
+            class="bg-primary"
+            [size]="'3x'"
+          ></fa-icon>
           <!--           <fa-icon
             [icon]="UserProfileIcon"
             class="text-secondary"

@@ -4,31 +4,33 @@
       class="card bg-secondary text-dark p-3 d-flex flex-column justify-content-center fw-bold overflow-hidden position-relative"
       tourAnchor="teacher-subject-select"
     >
-      <h4 class="fw-bold mb-0" [title]="selectedSubject?.name">
-        {{ selectedSubject?.name }}
-      </h4>
-
-      <div class="d-flex align-items-center">
+      <div class="position-relative">
+        <h4
+          class="fw-bold mb-0 pe-4 subject-name"
+          [title]="selectedSubject?.name"
+        >
+          {{ selectedSubject?.name }}
+        </h4>
+        <button
+          class="btn argomenti-btn btn-sm mt-2 fw-normal w-100"
+          (click)="onRequestSubjectSettings()"
+        >
+          Argomenti
+        </button>
         @if (availableSubjects().length > 0) {
         <div
-          class="text-decoration-underline fw-light cursor-pointer d-flex flex-row mt-2 justify-content-between align-items-center w-100 z-index-1 position-relative mb-1 small"
-          style="z-index: 1"
+          class="subject-toggle-icon cursor-pointer"
           (click)="toggleSubjectsCollapse()"
           [attr.aria-expanded]="!isSubjectsCollapsed()"
           aria-controls="subjectsCollapse"
         >
-          Cambia materia
+          <fa-icon
+            [icon]="SubjectToggleIcon"
+            class="text-dark"
+            [size]="'1x'"
+          ></fa-icon>
         </div>
         }
-        <div class="text-start ms-auto">
-          <a class="text-small opacity-75" (click)="onRequestSubjectSettings()">
-            <fa-icon
-              [icon]="GearIcon"
-              class="text-dark"
-              [size]="'1x'"
-            ></fa-icon>
-          </a>
-        </div>
       </div>
 
       <div
@@ -79,29 +81,31 @@
       }
     </div>
     <div
-      class="btn text-start ai d-flex flex-row align-items-center justify-content-between position-relative py-4 mb-2"
-      routerLink="/t/agente"
-      tourAnchor="teacher-agent"
-    >
-      <div class="d-flex flex-column">
-        <fa-icon [icon]="HeadSideBrainIcon" id="sparkleIcon"></fa-icon>
-        <h5 class="mb-0">Agente AI</h5>
-      </div>
-      
-      <a class="text-white opacity-50 hover-opacity-100 p-2" 
-         [routerLink]="['/t/agente']" 
-         [queryParams]="{step: 1}"
-         (click)="$event.stopPropagation()">
-        <fa-icon [icon]="GearIcon"></fa-icon>
-      </a>
-    </div>
-    <div
-      class="btn text-start ai d-flex flex-column justify-content-center position-relative py-4"
+      class="btn text-start ai ai-sidebar-btn d-flex flex-row align-items-center justify-content-between position-relative"
       routerLink="/t/laboratorio-ai"
       tourAnchor="teacher-ai-lab"
     >
-      <fa-icon [icon]="SparklesIcon" id="sparkleIcon"></fa-icon>
-      <h5 class="mb-0">Laboratorio AI</h5>
+      <fa-icon [icon]="HeadSideBrainIcon" class="ai-deco lab-ai-deco"></fa-icon>
+      <h5 class="mb-0 position-relative lab-ai-label">Lab AI</h5>
+    </div>
+    <div
+      class="btn text-start ai ai-sidebar-btn d-flex flex-row align-items-center justify-content-between position-relative"
+      routerLink="/t/agente"
+      tourAnchor="teacher-agent"
+    >
+      <fa-icon [icon]="SparklesIcon" class="ai-deco chat-ai-deco"></fa-icon>
+      <div class="d-flex align-items-center gap-2 position-relative pe-4">
+        <h5 class="mb-0 chat-ai-label">Chat AI</h5>
+        <a
+          class="text-white opacity-50 p-0"
+          style="font-size: 1.1rem; line-height: 1"
+          [routerLink]="['/t/agente']"
+          [queryParams]="{step: 1}"
+          (click)="$event.stopPropagation()"
+        >
+          <fa-icon [icon]="GearIcon"></fa-icon>
+        </a>
+      </div>
     </div>
   </div>
 </div>

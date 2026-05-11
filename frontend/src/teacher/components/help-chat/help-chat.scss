@@ -2,10 +2,7 @@
   transition: all 0.25s linear;
   position: relative;
   &:hover {
-    background-color: var(--bs-primary);
-    img {
-      filter: brightness(0) invert(1);
-    }
+    background-color: #bdd5ff !important;
   }
 
   .notification-dot {

@@ -5,6 +5,7 @@ import {
   IconDefinition,
 } from '@fortawesome/angular-fontawesome';
 import {
+  faArrowDownBigSmall,
   faBallotCheck,
   faBook,
   faBrainCircuit,
@@ -62,6 +63,7 @@ export class Sidebar {
   ChevronUpIcon = faChevronUp;
   HeadSideBrainIcon = faHeadSideBrain;
   GearIcon = faGear;
+  SubjectToggleIcon = faArrowDownBigSmall;
   faPencil = faPencil;
 
   isSubjectsCollapsed = signal(true);
