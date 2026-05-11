@@ -68,6 +68,12 @@ export class Dashboard {
   RobotIcon = faRobot;
   faBell = faBell;
   faPlus = faPlus;
+  testsToGradeCount = 0;
+
+
+  get selectedMateriaName() {
+    return this.materiaService.materiaSelected()?.name || '';
+  }
 
   constructor(
     public authService: Auth,
@@ -84,7 +90,8 @@ export class Dashboard {
       if (selectedMateria) {
         this.loadRecentCommunications();
         this.testService.countAssignmentsToGrade().subscribe((response) => {
-          this.quickActions[3].label += ` (${response.count})`;
+          this.testsToGradeCount = response.count;
+          this.quickActions[3].label = `Da correggere (${response.count})`;
         });
       }
     });

@@ -61,8 +61,8 @@
   </div>
   <div class="col-12 col-md-3">
     <app-syllex-card
-      title="5 test"
-      description="Hai ancora delle verifiche da correggere per Diritto del Mare."
+      [title]="testsToGradeCount + ' test'"
+      [description]="'Hai ancora delle verifiche da correggere per ' + selectedMateriaName"
       [icon]="UsersIcon"
       variant="outline"
       color="primary"
