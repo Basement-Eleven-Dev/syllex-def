@@ -1,25 +1,38 @@
-.view-test-button {
-  background-color: var(--bs-primary);
-  color: white;
-  &:hover {
-    background-color: color-mix(in srgb, var(--bs-primary) 90%, black);
+// Status badge (same as test-card)
+.status-badge {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: black;
+  white-space: nowrap;
+
+  &--pubblicato {
+    background-color: #52a0ff;
   }
-  &.has-pending-corrections {
-    background-color: #ffb861;
-    color: var(--bs-dark);
-    &:hover {
-      background-color: #ffc793;
-    }
+  &--bozza {
+    background-color: #ff9a52;
+  }
+  &--archiviato {
+    background-color: #dee2e6;
   }
 }
 
-.row-with-pending-corrections {
-  td {
-    background-color: #ffb8615c !important;
-  }
+// Corrections label (same as test-card)
+.corrections-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: black;
+  flex-shrink: 0;
 }
 
-::ng-deep .circle-btn.dropdown-toggle::after {
+.bell-icon {
+  font-size: 0.75rem;
+  color: black;
+}
+
+::ng-deep .actions-btn.dropdown-toggle::after {
   display: none;
 }
 
@@ -34,6 +47,7 @@ thead > tr > th {
   border: none;
   padding: 1rem;
 }
+
 tr {
   &:hover {
     cursor: pointer;
