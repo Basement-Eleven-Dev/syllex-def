@@ -1,9 +1,8 @@
-<div tourAnchor="dashboard_welcome">
-  <h1 class="text-dark fw-medium mb-1 display-6">
-    Ciao {{ authService.user?.firstName }},
-  </h1>
-  <h6 class="fw-normal mb-5">scopri le azioni che puoi fare oggi.</h6>
-</div>
+<app-syllex-page-header
+  [title]="'Ciao, ' + authService.user?.firstName"  
+  [description]="'scopri le azioni che puoi fare oggi.'"
+  
+>  </app-syllex-page-header>
 
 <div class="row g-4 mb-4">
   <div class="col-12 col-lg-3">
