@@ -1,9 +1,14 @@
 <div class="agent-config-card shadow-lg border-0 rounded-5 p-4 p-lg-5 bg-white">
-  <form [formGroup]="agentSettingsForm" (ngSubmit)="onSubmit()" class="d-flex flex-column gap-5">
-    
+  <form
+    [formGroup]="agentSettingsForm"
+    (ngSubmit)="onSubmit()"
+    class="d-flex flex-column gap-5"
+  >
     <!-- Nome Agente -->
     <div class="form-group">
-      <label class="form-label fw-bold text-dark fs-5 mb-3">Dai un nome al tuo Agente</label>
+      <label class="form-label fw-bold text-dark fs-5 mb-3"
+        >Dai un nome al tuo Agente</label
+      >
       <input
         type="text"
         class="form-control form-control-lg custom-pill-input"
@@ -17,7 +22,10 @@
       <div class="col-12 col-md-6">
         <div class="form-group">
           <label class="form-label fw-bold text-dark fs-5 mb-3">Tono</label>
-          <select class="form-select form-control-lg custom-pill-input" formControlName="tone">
+          <select
+            class="form-select form-control-lg custom-pill-input"
+            formControlName="tone"
+          >
             <option value="friendly">Amichevole</option>
             <option value="formal">Formale</option>
             <option value="concise">Conciso</option>
@@ -28,7 +36,10 @@
       <div class="col-12 col-md-6">
         <div class="form-group">
           <label class="form-label fw-bold text-dark fs-5 mb-3">Voce</label>
-          <select class="form-select form-control-lg custom-pill-input" formControlName="voice">
+          <select
+            class="form-select form-control-lg custom-pill-input"
+            formControlName="voice"
+          >
             <option value="neutral">Neutra</option>
             <option value="energetic">Energica</option>
             <option value="clear">Chiara</option>
@@ -38,18 +49,42 @@
       </div>
     </div>
 
-    <!-- Associazione File -->
+    <!-- Materiali della materia (sola lettura) -->
     <div class="form-group">
-      <label class="form-label fw-bold text-dark fs-5 mb-4">Associa File</label>
-      
-      <div class="material-selector-container p-4 rounded-4 bg-light border-dashed">
-        <app-materiali-selector
-          [embeddingCreationMode]="true"
-          [associatedMaterialIds]="associatedMaterialIds()"
-          (selectionChange)="onMaterialSelectionChange($event)"
-          (removeMaterial)="onRemoveMaterial($event)"
-        />
+      <label class="form-label fw-bold text-dark fs-5 mb-1"
+        >Materiali disponibili</label
+      >
+      <p class="text-muted small mb-3">
+        Il tutor ha accesso a tutti i materiali caricati per questa materia.
+      </p>
+
+      @if (allSubjectMaterials().length === 0) {
+      <div class="p-4 rounded-4 bg-light border text-center text-muted small">
+        Nessun materiale ancora caricato per questa materia. Carica i file dalla
+        sezione Materiali.
       </div>
+      } @else {
+      <ul class="list-unstyled d-flex flex-column gap-2 m-0">
+        @for (mat of allSubjectMaterials(); track mat._id) {
+        <li
+          class="d-flex align-items-center gap-2 px-3 py-2 rounded-3 bg-light border"
+        >
+          <span class="text-truncate flex-grow-1 small fw-medium"
+            >{{ mat.name }}</span
+          >
+          @if (mat.isVectorized) {
+          <span class="badge bg-success-subtle text-success rounded-pill small"
+            >Indicizzato</span
+          >
+          } @else {
+          <span class="badge bg-warning-subtle text-warning rounded-pill small"
+            >In elaborazione</span
+          >
+          }
+        </li>
+        }
+      </ul>
+      }
     </div>
 
     <!-- Bottone Avanti -->
@@ -60,12 +95,21 @@
         [disabled]="isSaving() || isLoading() || !agentSettingsForm.valid"
       >
         @if (isSaving()) {
-          <fa-icon [icon]="SpinnerIcon" [animation]="'spin'"></fa-icon>
+        <fa-icon [icon]="SpinnerIcon" [animation]="'spin'"></fa-icon>
         } @else {
-          <span>Avanti</span>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 4L10.59 5.41L16.17 11H4V13H16.17L10.59 18.59L12 20L20 12L12 4Z" fill="white"/>
-          </svg>
+        <span>Avanti</span>
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M12 4L10.59 5.41L16.17 11H4V13H16.17L10.59 18.59L12 20L20 12L12 4Z"
+            fill="white"
+          />
+        </svg>
         }
       </button>
     </div>

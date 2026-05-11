@@ -35,12 +35,17 @@ export const vectorizeMaterialAndUpdateMaterialStatus = async (
     subjectId: material.subjectId,
     teacherId: material.teacherId,
     documentText: textExtracted,
+    documentName: material.name,
   };
   await vectorizeDocumentWithGemini(vectorizeParams);
-  let extractedTextFileUrl = await uploadContentToS3('extracted-text' + material._id.toString() + '.txt', textExtracted, 'text/plain')
+  let extractedTextFileUrl = await uploadContentToS3(
+    "extracted-text" + material._id.toString() + ".txt",
+    textExtracted,
+    "text/plain",
+  );
   material.vectorized = true;
   material.extractedTextFileUrl = extractedTextFileUrl;
-  await material.save()
+  await material.save();
 };
 
 export const vectorizeKnowledgeDocumentAndUpdateStatus = async (
@@ -56,14 +61,18 @@ export const vectorizeKnowledgeDocumentAndUpdateStatus = async (
   const buffer = await fetchBuffer(documentUrl);
   const ext = doc.extension!;
   const textExtracted = await extractTextFromFile(buffer, ext);
-  
+
   await vectorizeKnowledgeManualWithGemini({
     documentId: documentId,
     documentText: textExtracted,
-    role: doc.role as any
+    role: doc.role as any,
   });
 
-  let extractedTextFileUrl = await uploadContentToS3('knowledge-text' + doc._id.toString() + '.txt', textExtracted, 'text/plain')
+  let extractedTextFileUrl = await uploadContentToS3(
+    "knowledge-text" + doc._id.toString() + ".txt",
+    textExtracted,
+    "text/plain",
+  );
   doc.vectorized = true;
   doc.extractedTextFileUrl = extractedTextFileUrl;
   await doc.save();
@@ -75,9 +84,9 @@ export const startIndexingJob = async (id: Types.ObjectId) => {
     await connectDatabase();
     const material = await Material.findById(id);
     if (material) {
-        await vectorizeMaterialAndUpdateMaterialStatus(id);
+      await vectorizeMaterialAndUpdateMaterialStatus(id);
     } else {
-        await vectorizeKnowledgeDocumentAndUpdateStatus(id);
+      await vectorizeKnowledgeDocumentAndUpdateStatus(id);
     }
     return;
   }
@@ -92,13 +101,13 @@ export const startIndexingJob = async (id: Types.ObjectId) => {
 export const handler: SQSHandler = async (event: SQSEvent) => {
   if (event.Records.length == 0) return;
   await connectDatabase();
-  
+
   for (const record of event.Records) {
     const idStr = record.body;
     if (!idStr) continue;
-    
+
     const id = new mongo.ObjectId(idStr);
-    
+
     // Check if it's a Material
     const material = await Material.findById(id);
     if (material) {
@@ -106,7 +115,7 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
       await vectorizeMaterialAndUpdateMaterialStatus(id);
       continue;
     }
-    
+
     // Check if it's a KnowledgeDocument
     const knowledgeDoc = await KnowledgeDocument.findById(id);
     if (knowledgeDoc) {
@@ -114,7 +123,9 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
       await vectorizeKnowledgeDocumentAndUpdateStatus(id);
       continue;
     }
-    
-    console.warn(`ID ${idStr} not found in Material or KnowledgeDocument collections.`);
+
+    console.warn(
+      `ID ${idStr} not found in Material or KnowledgeDocument collections.`,
+    );
   }
 };

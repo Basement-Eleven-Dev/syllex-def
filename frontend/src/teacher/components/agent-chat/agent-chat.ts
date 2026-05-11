@@ -28,12 +28,16 @@ import {
   faGear,
   faPlus,
   faMicrophoneSlash,
+  faChevronLeft,
+  faChevronRight,
 } from '@fortawesome/pro-solid-svg-icons';
 import { faSpinner } from '@fortawesome/pro-regular-svg-icons';
 import { AgentService } from '../../../services/agent.service';
 import { FeedbackService } from '../../../services/feedback-service';
 import { GeminiLiveService } from '../../../services/gemini-live-service';
+import { Materia } from '../../../services/materia';
 import { DatePipe } from '@angular/common';
+import { firstValueFrom } from 'rxjs';
 
 export interface ChatMessage {
   _id?: string;
@@ -66,35 +70,45 @@ export class AgentChat implements OnInit, OnDestroy {
   faGear = faGear;
   faPaperPlane = faPaperPlane;
   faMicrophoneSlash = faMicrophoneSlash;
+  faChevronLeft = faChevronLeft;
+  faChevronRight = faChevronRight;
+
+  // Sidebar collassabile
+  sidebarOpen = signal(true);
 
   // --- Services ---
   private feedbackService = inject(FeedbackService);
   public geminiLiveService = inject(GeminiLiveService);
+  private materiaService = inject(Materia);
   constructor(private agentService: AgentService) {}
 
   // --- Inputs ---
   assistantId = input.required<string>();
+  userRole = input<'teacher' | 'student' | 'admin' | null>(null);
   requestConfig = output<void>(); // Per tornare allo step 1
 
   // --- State ---
   messages = signal<ChatMessage[]>([]);
-  assistantName = signal<string>('Alex'); 
+  assistantName = signal<string>('Alex');
   conversations = signal<any[]>([]);
   currentConversationId = signal<string>('conv_' + Date.now()); // ID di default per evitare blocchi
   inputMessage = '';
   isLoading = signal(false);
-  faPlus = faPlus;    
+  faPlus = faPlus;
 
   // Gestione Modalità UI
-  voiceModeActive = signal(false); 
+  voiceModeActive = signal(false);
 
   // Voice input state (Realtime)
   private mediaStream: MediaStream | null = null;
   private audioContext: AudioContext | null = null;
   private processor: any = null;
-  public recognition: any = null; 
+  public recognition: any = null;
   isRecording = signal(false);
   isMuted = signal(false);
+
+  // Pending voice message saves — tracked to await before mode switch
+  private pendingSaves: Promise<any>[] = [];
   liveTranscript = signal('');
 
   // Audio playback state
@@ -107,13 +121,14 @@ export class AgentChat implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.loadConversationsList();
+    // Pre-fetch del token OAuth per eliminare la latenza al primo click del mic
+    this.geminiLiveService.prefetchToken();
   }
 
   ngOnDestroy() {
     this.stopRealtimeVoice();
     this.pauseAudio();
   }
-
 
   // Effetto: scrolla sempre in fondo quando cambia la lista dei messaggi
   private scrollEffect = effect(() => {
@@ -130,36 +145,85 @@ export class AgentChat implements OnInit, OnDestroy {
     }
   });
 
-  // Effetto: Quando Gemini Live finisce di parlare, salviamo la trascrizione
-  // 1. Effetto per il salvataggio: si attiva SOLO al segnale di fine turno
-  private aiVoiceTranscriptEffect = effect(() => {
-    // Ci iscriviamo in ascolto unicamente a questo evento
-    this.geminiLiveService.turnCompleteEvent();
-    
-    // Usiamo untracked per leggere l'intero testo senza innescare l'effetto ad ogni singola lettera ricevuta
-    const text = untracked(() => this.geminiLiveService.aiTranscript());
-    
+  // Effetto: Quando il turno utente è completo (Gemini ha capito cosa ha detto),
+  // salviamo il messaggio utente usando la trascrizione di Gemini (più affidabile
+  // del SpeechRecognition locale che viene bloccato quando l'AI parla)
+  private userVoiceTranscriptEffect = effect(() => {
+    this.geminiLiveService.userTurnCompleteEvent();
+
+    const text = untracked(() => this.geminiLiveService.userTranscript());
+
     if (text.trim().length > 0) {
-      console.log('💾 [AUTO-SAVE AI MESSAGE]:', text);
-      
+      console.log('💾 [AUTO-SAVE USER VOICE]:', text);
       untracked(() => {
-        this.saveVoiceMessage('agent', text);
-        this.geminiLiveService.aiTranscript.set(''); // Reset pulito in vista del prossimo turno
+        this.saveVoiceMessage('user', text);
       });
     }
   });
 
-  // 2. Effetto puramente visivo: si occupa solo di gestire il lucchetto sul microfono
-  private muteUIEffect = effect(() => {
-    const isSpeaking = this.geminiLiveService.isSpeaking();
-    const voiceActive = this.voiceModeActive();
-    
-    if (isSpeaking && voiceActive) {
-      this.isMuted.set(true);
-    } else if (!isSpeaking && voiceActive) {
-      this.isMuted.set(false);
+  // Effetto: Quando Gemini Live finisce di parlare, salviamo la trascrizione
+  // Si attiva SOLO al segnale di fine turno
+  private lastSavedAiText = '';
+  private aiVoiceTranscriptEffect = effect(() => {
+    // Ci iscriviamo in ascolto unicamente a questo evento
+    this.geminiLiveService.turnCompleteEvent();
+
+    // Usiamo untracked per leggere l'intero testo senza innescare l'effetto ad ogni singola lettera ricevuta
+    const text = untracked(() => this.geminiLiveService.aiTranscript());
+
+    if (text.trim().length > 0 && text !== this.lastSavedAiText) {
+      console.log('💾 [AUTO-SAVE AI MESSAGE]:', text.slice(0, 80));
+      this.lastSavedAiText = text;
+
+      untracked(() => {
+        this.saveVoiceMessage('agent', text);
+        // NON azzeriamo aiTranscript qui — resta visibile nella bolla "in diretta"
+        // finché l'utente non ricomincia a parlare (vedi muteUIEffect)
+      });
     }
-  }, { allowSignalWrites: true });
+  });
+
+  // 2. Effetto: mute mic + stop/start SpeechRecognition durante parlato AI
+  // Quando AI parla: ferma recognition (niente risultati fantasma), muta PCM
+  // Quando AI smette: grace period 300ms, poi riattiva recognition
+  private speakingGraceTimeout: any = null;
+  private muteUIEffect = effect(
+    () => {
+      const isSpeaking = this.geminiLiveService.isSpeaking();
+      const voiceActive = this.voiceModeActive();
+
+      if (!voiceActive) return;
+
+      if (isSpeaking) {
+        // AI sta parlando → blocca tutto
+        if (this.speakingGraceTimeout) {
+          clearTimeout(this.speakingGraceTimeout);
+          this.speakingGraceTimeout = null;
+        }
+        this.isMuted.set(true);
+        if (this.recognition) {
+          try {
+            this.recognition.stop();
+          } catch {}
+        }
+      } else {
+        // AI ha smesso → grace period poi riattiva
+        if (this.speakingGraceTimeout) clearTimeout(this.speakingGraceTimeout);
+        this.speakingGraceTimeout = setTimeout(() => {
+          if (this.voiceModeActive() && !this.geminiLiveService.isSpeaking()) {
+            this.isMuted.set(false);
+            // Riavvia SpeechRecognition (se era stato stoppato)
+            if (this.recognition) {
+              try {
+                this.recognition.start();
+              } catch {}
+            }
+          }
+        }, 300);
+      }
+    },
+    { allowSignalWrites: true },
+  );
 
   private saveVoiceMessage(role: 'user' | 'agent', content: string) {
     const convId = this.currentConversationId();
@@ -170,17 +234,29 @@ export class AgentChat implements OnInit, OnDestroy {
       role,
       content,
       timestamp: new Date(),
-      inputType: 'voice'
+      inputType: 'voice',
     };
-    this.messages.update(prev => [...prev, newMsg]);
+    this.messages.update((prev) => [...prev, newMsg]);
 
     // Se è l'utente, puliamo il transcript AI precedente per far spazio al nuovo turno
     if (role === 'user') {
       this.geminiLiveService.aiTranscript.set('');
+      this.lastSavedAiText = '';
     }
 
-    // Salva nel DB (silenzioso)
-    this.agentService.saveLiveMessage(role, content, convId, 'voice').subscribe();
+    // Salva nel DB e traccia la promise — verrà attesa prima del cambio modalità
+    const savePromise = firstValueFrom(
+      this.agentService.saveLiveMessage(role, content, convId, 'voice'),
+    );
+    this.pendingSaves.push(savePromise);
+    savePromise
+      .then(() => {
+        this.pendingSaves = this.pendingSaves.filter((p) => p !== savePromise);
+      })
+      .catch((err) => {
+        console.error('[Voice] Save failed:', err);
+        this.pendingSaves = this.pendingSaves.filter((p) => p !== savePromise);
+      });
   }
 
   // ==================
@@ -205,7 +281,7 @@ export class AgentChat implements OnInit, OnDestroy {
         if (!this.currentConversationId()) {
           this.startNewChat();
         }
-      }
+      },
     });
   }
 
@@ -230,11 +306,18 @@ export class AgentChat implements OnInit, OnDestroy {
     this.sendMessage('text');
   }
 
-  sendMessage(inputType: 'text' | 'voice' = 'text') {
+  async sendMessage(inputType: 'text' | 'voice' = 'text') {
     const text = this.inputMessage.trim();
     const convId = this.currentConversationId();
 
     if (!text || !convId || this.isLoading()) return;
+
+    // Se ci sono salvataggi vocali ancora in corso, attendiamo prima
+    // di inviare — altrimenti il backend non vedrebbe i messaggi voice nel DB
+    if (this.pendingSaves.length > 0) {
+      await Promise.allSettled(this.pendingSaves);
+      this.pendingSaves = [];
+    }
 
     // Aggiungi localmente il messaggio dell'utente
     this.messages.update((msgs) => [
@@ -271,7 +354,10 @@ export class AgentChat implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('Error generating response:', error);
-        this.feedbackService.showFeedback('Errore nella generazione della risposta', false);
+        this.feedbackService.showFeedback(
+          'Errore nella generazione della risposta',
+          false,
+        );
         this.isLoading.set(false);
       },
     });
@@ -295,11 +381,28 @@ export class AgentChat implements OnInit, OnDestroy {
     );
   }
 
-  toggleVoiceInput() {
+  async toggleVoiceInput() {
     if (this.voiceModeActive()) {
       this.stopRealtimeVoice();
+
+      // Attendi che TUTTI i salvataggi vocali siano completati nel DB
+      if (this.pendingSaves.length > 0) {
+        console.log(
+          `[Voice→Text] Attendo ${this.pendingSaves.length} salvataggi...`,
+        );
+        await Promise.allSettled(this.pendingSaves);
+        this.pendingSaves = [];
+      }
+
       this.voiceModeActive.set(false);
       this.stopPollingMessages();
+
+      // Ricarica lo storico dal DB per garantire che il modello testuale
+      // veda TUTTI i messaggi vocali appena salvati
+      const convId = this.currentConversationId();
+      if (convId) {
+        this.initializeChatHistory(convId);
+      }
     } else {
       this.voiceModeActive.set(true);
       this.startRealtimeVoice();
@@ -318,27 +421,32 @@ export class AgentChat implements OnInit, OnDestroy {
     this.pollingInterval = setInterval(() => {
       const convId = this.currentConversationId();
       if (convId && this.voiceModeActive()) {
-        this.agentService.getConversationHistory(convId).subscribe((response: any[]) => {
-          if (response && response.length > 0) {
-            const history: ChatMessage[] = response.map((msg: any) => ({
-              _id: msg._id,
-              role: msg.role,
-              content: msg.content,
-              timestamp: msg.timestamp,
-              audioUrl: msg.audioUrl || null,
-              inputType: msg.inputType || 'text',
-            }));
-            
-            // Aggiorna i messaggi solo se il DB ha più messaggi di quelli locali
-            // (non sovrascrivere mai con una lista più corta: il messaggio AI potrebbe essere
-            // stato aggiunto localmente ma non ancora persistito)
-            if (history.length > this.messages().length || 
+        this.agentService
+          .getConversationHistory(convId)
+          .subscribe((response: any[]) => {
+            if (response && response.length > 0) {
+              const history: ChatMessage[] = response.map((msg: any) => ({
+                _id: msg._id,
+                role: msg.role,
+                content: msg.content,
+                timestamp: msg.timestamp,
+                audioUrl: msg.audioUrl || null,
+                inputType: msg.inputType || 'text',
+              }));
+
+              // Aggiorna i messaggi solo se il DB ha più messaggi di quelli locali
+              // (non sovrascrivere mai con una lista più corta: il messaggio AI potrebbe essere
+              // stato aggiunto localmente ma non ancora persistito)
+              if (
+                history.length > this.messages().length ||
                 (history.length === this.messages().length &&
-                 history[history.length-1]?.content !== this.messages()[this.messages().length-1]?.content)) {
-              this.messages.set(history);
+                  history[history.length - 1]?.content !==
+                    this.messages()[this.messages().length - 1]?.content)
+              ) {
+                this.messages.set(history);
+              }
             }
-          }
-        });
+          });
       }
     }, 1000); // Controlla ogni secondo
   }
@@ -355,7 +463,31 @@ export class AgentChat implements OnInit, OnDestroy {
       this.isRecording.set(true);
       this.geminiLiveService.userTranscript.set('');
       this.geminiLiveService.aiTranscript.set('');
-      
+
+      // AWAIT assistant config BEFORE connecting (fix: senza questo, tutorConfig
+      // era null al momento del setup WebSocket → il modello vocale partiva
+      // senza storico conversazione)
+      const res = await firstValueFrom(this.agentService.getAssistant());
+
+      // TUTTI i messaggi come contesto (non solo ultimi 10)
+      const recentHistory = this.messages().map((m) => ({
+        role: m.role as 'user' | 'agent',
+        content: m.content,
+      }));
+
+      const { name, tone } = this.getEffectiveAgentConfig(
+        res.exists ? res.assistant : null,
+      );
+
+      this.geminiLiveService.setTutorConfig({
+        name,
+        tone,
+        subjectName:
+          this.materiaService.materiaSelected()?.name ?? 'questa materia',
+        userRole: this.userRole() ?? 'student',
+        recentHistory,
+      });
+
       await this.geminiLiveService.connect();
       this.startUserTranscriptRecognition(); // Avvia transcrito visuale
 
@@ -363,14 +495,18 @@ export class AgentChat implements OnInit, OnDestroy {
         audio: { sampleRate: 16000, channelCount: 1, echoCancellation: true },
       });
 
-      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)({
+      this.audioContext = new (
+        window.AudioContext || (window as any).webkitAudioContext
+      )({
         sampleRate: 16000,
       });
 
       // Carica il processore AudioWorklet
       await this.audioContext.audioWorklet.addModule('/pcm-processor.js');
 
-      const source = this.audioContext.createMediaStreamSource(this.mediaStream);
+      const source = this.audioContext.createMediaStreamSource(
+        this.mediaStream,
+      );
       this.processor = new AudioWorkletNode(this.audioContext, 'pcm-processor');
 
       this.processor.port.onmessage = (event: any) => {
@@ -400,7 +536,10 @@ export class AgentChat implements OnInit, OnDestroy {
       this.processor.connect(this.audioContext.destination);
     } catch (err) {
       console.error('Errore avvio Realtime:', err);
-      this.feedbackService.showFeedback('Impossibile accedere al microfono', false);
+      this.feedbackService.showFeedback(
+        'Impossibile accedere al microfono',
+        false,
+      );
       this.voiceModeActive.set(false);
       this.isRecording.set(false);
     }
@@ -408,7 +547,9 @@ export class AgentChat implements OnInit, OnDestroy {
 
   /** Avvia il riconoscimento locale SOLO per il feedback visivo e il salvataggio testo */
   private startUserTranscriptRecognition() {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition =
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) return;
 
     this.recognition = new SpeechRecognition();
@@ -421,25 +562,64 @@ export class AgentChat implements OnInit, OnDestroy {
         return;
       }
 
+      // SpeechRecognition locale è usato SOLO per il feedback visivo in tempo reale.
+      // Il salvataggio dei messaggi utente avviene via userTurnCompleteEvent
+      // (da inputTranscription di Gemini, che è più affidabile e non viene
+      // bloccato dal mute durante il parlato AI).
       let interimTranscript = '';
-      let finalTranscript = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          finalTranscript += transcript;
-          // Quando una frase è finale, la salviamo nello storico
-          this.saveVoiceMessage('user', transcript);
-        } else {
-          interimTranscript += transcript;
+        if (!event.results[i].isFinal) {
+          interimTranscript += event.results[i][0].transcript;
         }
       }
-      this.geminiLiveService.userTranscript.set(finalTranscript || interimTranscript);
+
+      // Utente ha iniziato a parlare → azzera il transcript AI del turno precedente
+      if (interimTranscript && this.geminiLiveService.aiTranscript()) {
+        this.geminiLiveService.aiTranscript.set('');
+      }
+
+      if (interimTranscript) {
+        this.geminiLiveService.userTranscript.set(interimTranscript);
+      }
+    };
+
+    // Riavvia automaticamente recognition se si chiude da sola (timeout browser)
+    this.recognition.onend = () => {
+      if (
+        this.voiceModeActive() &&
+        !this.isMuted() &&
+        !this.geminiLiveService.isSpeaking()
+      ) {
+        try {
+          this.recognition?.start();
+        } catch {}
+      }
     };
 
     this.recognition.start();
   }
 
   public stopRealtimeVoice() {
+    // Pulisci il grace timeout
+    if (this.speakingGraceTimeout) {
+      clearTimeout(this.speakingGraceTimeout);
+      this.speakingGraceTimeout = null;
+    }
+
+    // Salva eventuale transcript AI in corso prima di disconnettere
+    // (se l'utente esce mentre l'AI sta ancora parlando, il turnComplete
+    // non arriverà e il transcript andrebbe perso)
+    const pendingAiText = this.geminiLiveService.aiTranscript();
+    if (
+      pendingAiText.trim().length > 0 &&
+      pendingAiText !== this.lastSavedAiText
+    ) {
+      this.saveVoiceMessage('agent', pendingAiText);
+    }
+    this.geminiLiveService.aiTranscript.set('');
+    this.geminiLiveService.userTranscript.set('');
+    this.lastSavedAiText = '';
+
     this.geminiLiveService.disconnect();
     this.stopPollingMessages();
     if (this.recognition) {
@@ -457,17 +637,27 @@ export class AgentChat implements OnInit, OnDestroy {
     this.isMuted.set(false);
   }
 
-
-
   // ==================
   // CHAT HISTORY
   // ==================
 
+  /** Ritorna nome/tono con override studente da localStorage se applicabile */
+  private getEffectiveAgentConfig(assistant: any): {
+    name: string;
+    tone: string;
+  } {
+    return {
+      name: assistant?.name ?? 'Tutor',
+      tone: assistant?.tone ?? 'friendly',
+    };
+  }
+
   async initializeChatHistory(conversationId: string) {
     // Carichiamo prima i dettagli dell'assistente per il nome
-    this.agentService.getAssistant().subscribe(res => {
+    this.agentService.getAssistant().subscribe((res) => {
       if (res.exists && res.assistant) {
-        this.assistantName.set(res.assistant.name);
+        const { name } = this.getEffectiveAgentConfig(res.assistant);
+        this.assistantName.set(name);
       }
     });
 
@@ -519,45 +709,48 @@ export class AgentChat implements OnInit, OnDestroy {
 
   /** Auto-play della risposta quando l'input era vocale */
   private autoPlayResponse(messageId: string, text: string) {
-    this.generateAndPlayAudio({ _id: messageId, role: 'agent', content: text, timestamp: new Date() });
+    this.generateAndPlayAudio({
+      _id: messageId,
+      role: 'agent',
+      content: text,
+      timestamp: new Date(),
+    });
   }
 
   private generateAndPlayAudio(message: ChatMessage) {
     const messageId = message._id!;
     this.loadingAudioIds.update((set) => new Set(set).add(messageId));
 
-    this.agentService
-      .listenToMessage(messageId, message.content)
-      .subscribe({
-        next: (res) => {
-          if (res.success && res.audioUrl) {
-            // Aggiorna il messaggio locale con l'URL
-            this.messages.update((msgs) =>
-              msgs.map((m) =>
-                m._id === messageId ? { ...m, audioUrl: res.audioUrl } : m,
-              ),
-            );
-            this.playAudio(messageId, res.audioUrl);
-          }
-          this.loadingAudioIds.update((set) => {
-            const newSet = new Set(set);
-            newSet.delete(messageId);
-            return newSet;
-          });
-        },
-        error: (err) => {
-          console.error('Error generating audio:', err);
-          this.feedbackService.showFeedback(
-            "Errore nella generazione dell'audio",
-            false,
+    this.agentService.listenToMessage(messageId, message.content).subscribe({
+      next: (res) => {
+        if (res.success && res.audioUrl) {
+          // Aggiorna il messaggio locale con l'URL
+          this.messages.update((msgs) =>
+            msgs.map((m) =>
+              m._id === messageId ? { ...m, audioUrl: res.audioUrl } : m,
+            ),
           );
-          this.loadingAudioIds.update((set) => {
-            const newSet = new Set(set);
-            newSet.delete(messageId);
-            return newSet;
-          });
-        },
-      });
+          this.playAudio(messageId, res.audioUrl);
+        }
+        this.loadingAudioIds.update((set) => {
+          const newSet = new Set(set);
+          newSet.delete(messageId);
+          return newSet;
+        });
+      },
+      error: (err) => {
+        console.error('Error generating audio:', err);
+        this.feedbackService.showFeedback(
+          "Errore nella generazione dell'audio",
+          false,
+        );
+        this.loadingAudioIds.update((set) => {
+          const newSet = new Set(set);
+          newSet.delete(messageId);
+          return newSet;
+        });
+      },
+    });
   }
 
   private playAudio(messageId: string, url: string) {
@@ -573,8 +766,8 @@ export class AgentChat implements OnInit, OnDestroy {
     this.activeAudio.onended = () => {
       this.currentPlayingId.set(null);
       this.activeAudio = null;
-      
-      // Conversazionale Realtime: se siamo ancora in modalità voce, Gemini gestisce il silenzio, 
+
+      // Conversazionale Realtime: se siamo ancora in modalità voce, Gemini gestisce il silenzio,
       // ma se per qualche motivo si scollega, possiamo riattivare qui.
       if (this.voiceModeActive()) {
         setTimeout(() => {

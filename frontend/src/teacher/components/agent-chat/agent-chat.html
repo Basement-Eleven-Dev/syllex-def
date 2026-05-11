@@ -1,6 +1,7 @@
 <div class="agent-chat-wrapper d-flex h-100 w-100 overflow-hidden">
   <!-- SIDEBAR: CRONOLOGIA CONVERSAZIONI -->
-  <div class="chat-sidebar d-none d-lg-flex flex-column border-end bg-light">
+  <div class="chat-sidebar d-none d-lg-flex flex-column border-end bg-light" [class.collapsed]="!sidebarOpen()">
+    @if (sidebarOpen()) {
     <div class="p-4">
       <button
         class="btn btn-primary w-100 rounded-pill d-flex align-items-center justify-content-center gap-2 py-2 shadow-sm"
@@ -36,133 +37,40 @@
       </button>
       }
     </div>
+    }
+
+    <!-- Toggle button -->
+    <button
+      class="sidebar-toggle-btn"
+      (click)="sidebarOpen.set(!sidebarOpen())"
+      [title]="sidebarOpen() ? 'Chiudi cronologia' : 'Apri cronologia'"
+    >
+      <fa-icon [icon]="sidebarOpen() ? faChevronLeft : faChevronRight"></fa-icon>
+    </button>
   </div>
 
   <!-- AREA PRINCIPALE -->
   <div
     class="main-content flex-fill d-flex flex-column position-relative h-100 overflow-hidden bg-white"
   >
-    <!-- SCHERMATA VOCALE (OVERLAY NELLA ZONA CHAT) -->
-    @if (voiceModeActive()) {
-    <div class="voice-screen-overlay animate-fade-in">
-      <div
-        class="voice-screen-content d-flex flex-column align-items-center justify-content-between py-5 h-100"
-      >
-        <div class="voice-header text-center">
-          <h2 class="fw-bold mb-1">Analisi Vocale</h2>
-          <p class="text-muted small">Assistente Attivo</p>
-        </div>
-
-        <div
-          class="voice-center-area d-flex flex-column align-items-center justify-content-center"
-        >
-          <div class="orb-container">
-            <div
-              class="designer-orb"
-              [class.pulse]="(isRecording() && !isMuted()) || geminiLiveService.isSpeaking()"
-              [class.muted]="isMuted() && !geminiLiveService.isSpeaking()"
-              [class.user-speaking]="isRecording() && !isMuted()"
-              [class.ai-speaking]="geminiLiveService.isSpeaking()"
-            ></div>
-          </div>
-
-          <div class="transcript-box mt-5 px-4 text-center">
-            <h4 class="text-muted tiny text-uppercase mb-3">In ascolto</h4>
-            <h2 class="user-live-text fw-bold text-dark">
-              {{ geminiLiveService.userTranscript() || '...' }}
-            </h2>
-
-            @if (geminiLiveService.isSearching()) {
-            <div class="thinking-status mt-3 animate-pulse">
-              <fa-icon
-                [icon]="faSpinner"
-                [animation]="'spin'"
-                class="text-primary me-2"
-              ></fa-icon>
-              <span class="text-muted small fw-bold"
-                >Consulto i documenti...</span
-              >
-            </div>
-            } @if (geminiLiveService.isSpeaking() && (messages().length === 0 ||
-            messages()[messages().length - 1].role !== 'agent')) {
-            <div class="speaking-status mt-3 animate-pulse">
-              <span class="text-primary small fw-bold"
-                >L'assistente sta parlando...</span
-              >
-            </div>
-            } @if (geminiLiveService.aiTranscript()) {
-            <div
-              class="ai-live-text mt-3 p-3 rounded-4 bg-white shadow-sm animate-fade-in"
-            >
-              <p class="mb-0 small fw-bold text-primary">
-                {{ assistantName() }} dice:
-              </p>
-              <p class="mb-0 text-dark small text-start">
-                {{ geminiLiveService.aiTranscript() }}
-              </p>
-            </div>
-            } @if (!geminiLiveService.aiTranscript() && messages().length > 0 &&
-            messages()[messages().length - 1].role === 'agent') {
-            <div
-              class="ai-live-text mt-3 p-3 rounded-4 bg-white shadow-sm animate-fade-in"
-            >
-              <p class="mb-0 small fw-bold text-primary">
-                {{ assistantName() }} ha detto:
-              </p>
-              <p class="mb-0 text-dark small text-start">
-                {{ messages()[messages().length - 1].content }}
-              </p>
-            </div>
-            }
-          </div>
-        </div>
-
-        <div class="voice-footer d-flex gap-3">
-          <button
-            class="btn rounded-pill px-4 py-3 shadow-lg d-flex align-items-center gap-3 transition-all"
-            [class.btn-success]="!isMuted()"
-            [class.btn-secondary]="isMuted()"
-            [disabled]="isMuted()"
-            (click)="finishTurn()"
-          >
-            <fa-icon
-              [icon]="isMuted() ? faSpinner : faPaperPlane"
-              [animation]="isMuted() ? 'spin' : undefined"
-            ></fa-icon>
-            <span class="fw-bold"
-              >{{ isMuted() ? 'Gemini sta elaborando...' : 'Ho finito, rispondi'
-              }}</span
-            >
-          </button>
-
-          <button
-            class="btn btn-dark rounded-pill px-4 py-3 shadow-lg d-flex align-items-center gap-3"
-            (click)="stopRealtimeVoice(); voiceModeActive.set(false)"
-          >
-            <fa-icon [icon]="faStop"></fa-icon>
-            <span class="fw-bold">Esci</span>
-          </button>
-        </div>
-      </div>
-    </div>
-    }
-
-    <!-- SCHERMATA TESTUALE -->
-    @if (!voiceModeActive()) {
-    <!-- HEADER -->
+    <!-- HEADER (sempre visibile) -->
     <div
       class="chat-header-bar d-flex justify-content-between align-items-center p-3 border-bottom"
     >
       <div class="d-flex align-items-center gap-3">
         <div class="status-dot online"></div>
         <h6 class="mb-0 fw-bold">{{ assistantName() }}</h6>
+        @if (voiceModeActive()) {
+        <span class="badge bg-primary-subtle text-primary rounded-pill small">
+          <fa-icon [icon]="faMicrophone" class="me-1"></fa-icon>Vocale attivo
+        </span>
+        }
       </div>
-
     </div>
 
-    <!-- MESSAGGI / INTRO -->
+    <!-- MESSAGGI / INTRO (sempre visibile) -->
     <div #scrollContent class="flex-fill overflow-auto d-flex flex-column p-4">
-      @if (messages().length === 0) {
+      @if (messages().length === 0 && !voiceModeActive()) {
       <div
         class="intro-card-blue d-flex flex-column align-items-center justify-content-center text-white p-5 m-auto w-100 shadow-lg"
       >
@@ -226,14 +134,53 @@
           </div>
         </div>
       </div>
-      } @if (isLoading()) {
+      }
+
+      <!-- Indicatore vocale inline: mostra transcript live sotto i messaggi -->
+      @if (voiceModeActive()) { @if (geminiLiveService.userTranscript()) {
+      <div class="d-flex mb-4 justify-content-end">
+        <div class="voice-live-bubble user-live p-3 shadow-sm">
+          <div
+            class="d-flex align-items-center gap-2 mb-1 tiny fw-bold text-uppercase opacity-75"
+          >
+            <fa-icon [icon]="faMicrophone"></fa-icon>
+            <span>Tu (in diretta)</span>
+          </div>
+          <p class="mb-0">{{ geminiLiveService.userTranscript() }}</p>
+        </div>
+      </div>
+      } @if (geminiLiveService.isSearching()) {
+      <div class="d-flex mb-4">
+        <div class="voice-live-bubble ai-thinking p-3 shadow-sm">
+          <fa-icon
+            [icon]="faSpinner"
+            [animation]="'spin'"
+            class="text-primary me-2"
+          ></fa-icon>
+          <span class="small fw-bold text-muted">Consulto i documenti...</span>
+        </div>
+      </div>
+      } @if (geminiLiveService.aiTranscript()) {
+      <div class="d-flex mb-4">
+        <div class="voice-live-bubble ai-live p-3 shadow-sm">
+          <div
+            class="d-flex align-items-center gap-2 mb-1 tiny fw-bold text-uppercase opacity-75"
+          >
+            <fa-icon [icon]="faSparkles"></fa-icon>
+            <span>{{ assistantName() }} (in diretta)</span>
+          </div>
+          <p class="mb-0">{{ geminiLiveService.aiTranscript() }}</p>
+        </div>
+      </div>
+      } } @if (isLoading()) {
       <div class="typing-dots p-3 bg-light rounded-4 align-self-start mb-4">
         <span></span><span></span><span></span>
       </div>
       } }
     </div>
 
-    <!-- INPUT BAR -->
+    <!-- INPUT BAR: modalità testo -->
+    @if (!voiceModeActive()) {
     <div class="input-area-container p-4 bg-white border-top">
       <div
         class="input-pill-mock d-flex align-items-center px-4 py-2 border shadow-sm"
@@ -261,6 +208,53 @@
             <fa-icon [icon]="SendIcon"></fa-icon>
           </button>
         </div>
+      </div>
+    </div>
+    }
+
+    <!-- INPUT BAR: modalità vocale (sostituisce l'input testo) -->
+    @if (voiceModeActive()) {
+    <div class="voice-input-bar p-3 bg-white border-top">
+      <div class="d-flex align-items-center justify-content-center gap-3">
+        <!-- Orb compatto -->
+        <div
+          class="voice-orb-mini"
+          [class.pulse]="(isRecording() && !isMuted()) || geminiLiveService.isSpeaking()"
+          [class.muted]="isMuted() && !geminiLiveService.isSpeaking()"
+          [class.user-speaking]="isRecording() && !isMuted()"
+          [class.ai-speaking]="geminiLiveService.isSpeaking()"
+        ></div>
+
+        <!-- Status -->
+        <span class="voice-status small fw-bold">
+          @if (isMuted()) { Gemini sta elaborando... } @else if
+          (geminiLiveService.isSpeaking()) { L'assistente sta parlando... }
+          @else { In ascolto... }
+        </span>
+
+        <!-- Azioni -->
+        <button
+          class="btn btn-sm rounded-pill px-3 py-2 shadow-sm"
+          [class.btn-success]="!isMuted()"
+          [class.btn-secondary]="isMuted()"
+          [disabled]="isMuted()"
+          (click)="finishTurn()"
+        >
+          <fa-icon
+            [icon]="isMuted() ? faSpinner : faPaperPlane"
+            [animation]="isMuted() ? 'spin' : undefined"
+            class="me-1"
+          ></fa-icon>
+          <span class="fw-bold small">Rispondi</span>
+        </button>
+
+        <button
+          class="btn btn-sm btn-outline-dark rounded-pill px-3 py-2"
+          (click)="stopRealtimeVoice(); voiceModeActive.set(false)"
+        >
+          <fa-icon [icon]="faStop" class="me-1"></fa-icon>
+          <span class="fw-bold small">Esci</span>
+        </button>
       </div>
     </div>
     }

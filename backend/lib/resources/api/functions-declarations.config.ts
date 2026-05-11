@@ -384,6 +384,12 @@ const AI_ROUTES: FunctionIntegration[] = [
     role: "logged",
   },
   {
+    apiRoute: "ai/list-materials",
+    functionPath: "ai/listMaterials.ts",
+    method: "get",
+    role: "logged",
+  },
+  {
     apiRoute: "ai/questions",
     functionPath: "ai/createAiGenQuestion.ts",
     method: "post",
