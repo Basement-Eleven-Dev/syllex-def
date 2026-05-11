@@ -1,9 +1,4 @@
-import {
-  DatePipe,
-  AsyncPipe,
-  TitleCasePipe,
-  UpperCasePipe,
-} from '@angular/common';
+import { DatePipe, TitleCasePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject, ViewChild } from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -37,8 +32,6 @@ import { map, Observable } from 'rxjs';
     NgbDropdownMenu,
     UserContextualMenu,
     TourAnchorNgBootstrapDirective,
-    AsyncPipe,
-    UpperCasePipe,
   ],
   templateUrl: './nav.html',
   styleUrl: './nav.scss',

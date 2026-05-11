@@ -1,10 +1,106 @@
-@media (max-width: 768px) {
+/* Desktop: sidebar fissa 250px */
+:host {
+  display: block;
+  width: 250px;
+  flex-shrink: 0;
+}
+
+/* Non-desktop: in flusso normale slim, fixed solo quando open */
+@media (max-width: 991px) {
   :host {
+    width: 64px;
+    flex-shrink: 0;
+    overflow: hidden;
+    transition: width 0.3s ease;
+    position: relative;
+    z-index: auto;
+  }
+
+  :host(.open) {
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 1050;
     height: 100dvh;
+    width: 250px;
+    z-index: 1050;
+    overflow-x: hidden;
+  }
+
+  :host:not(.open) {
+    .slim-hide {
+      display: none !important;
+    }
+
+    /* Inner content wrapper: remove Bootstrap px-3 so icons center in 64px */
+    > div > div {
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      padding-bottom: 88px !important;
+    }
+
+    #mainRoutes .sidebarRoute {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .slim-subject-btn {
+      display: flex;
+    }
+
+    .ai-sidebar-btn {
+      justify-content: center !important;
+      padding: 0.75rem 0;
+    }
+
+    .ai-deco,
+    .lab-ai-deco,
+    .chat-ai-deco {
+      position: static;
+      font-size: 1.2rem;
+      opacity: 1;
+      transform: none;
+      color: white;
+    }
+  }
+}
+
+.slim-subject-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.75rem 0;
+  font-size: 1.4rem;
+  cursor: pointer;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  transition: background 0.2s;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+}
+
+.sidebar-toggle-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  color: var(--bs-primary);
+  width: 100%;
+  padding: 0.85rem 0;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  @media (max-width: 991px) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.04);
   }
 }
 

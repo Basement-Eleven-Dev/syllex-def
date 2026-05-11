@@ -1,7 +1,7 @@
-<div class="h-100 card" style="width: 250px">
+<div class="h-100 w-100 card">
   <div class="w-100 px-3 py-4 d-flex flex-column h-100">
     <div
-      class="card bg-secondary text-dark p-3 d-flex flex-column justify-content-center fw-bold overflow-hidden position-relative"
+      class="card bg-secondary text-dark p-3 d-flex flex-column justify-content-center fw-bold overflow-hidden position-relative slim-hide"
       tourAnchor="teacher-subject-select"
     >
       <div class="position-relative">
@@ -67,6 +67,14 @@
       </div>
     </div>
 
+    <div
+      class="slim-subject-btn cursor-pointer"
+      (click)="toggleSidebar.emit()"
+      [title]="selectedSubject?.name"
+    >
+      <fa-icon [icon]="SubjectToggleIcon" class="text-success"></fa-icon>
+    </div>
+
     <div id="mainRoutes" class="d-flex flex-column gap-2 flex-fill mt-4">
       @for(route of mainRoutes; track $index){
       <div
@@ -76,7 +84,7 @@
         [tourAnchor]="route.tourAnchor || ''"
       >
         <fa-icon [icon]="route.icon"></fa-icon>
-        <span class="routeLabel">{{route.label}}</span>
+        <span class="routeLabel slim-hide">{{route.label}}</span>
       </div>
       }
     </div>
@@ -86,7 +94,7 @@
       tourAnchor="teacher-ai-lab"
     >
       <fa-icon [icon]="HeadSideBrainIcon" class="ai-deco lab-ai-deco"></fa-icon>
-      <h5 class="mb-0 position-relative lab-ai-label">Lab AI</h5>
+      <h5 class="mb-0 position-relative lab-ai-label slim-hide">Lab AI</h5>
     </div>
     <div
       class="btn text-start ai ai-sidebar-btn d-flex flex-row align-items-center justify-content-between position-relative"
@@ -94,7 +102,9 @@
       tourAnchor="teacher-agent"
     >
       <fa-icon [icon]="SparklesIcon" class="ai-deco chat-ai-deco"></fa-icon>
-      <div class="d-flex align-items-center gap-2 position-relative pe-4">
+      <div
+        class="d-flex align-items-center gap-2 position-relative pe-4 slim-hide"
+      >
         <h5 class="mb-0 chat-ai-label">Chat AI</h5>
         <a
           class="text-white opacity-50 p-0"
