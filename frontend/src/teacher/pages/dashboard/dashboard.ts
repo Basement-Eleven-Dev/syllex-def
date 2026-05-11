@@ -31,6 +31,7 @@ import { Materia } from '../../../services/materia';
 import { TestsService } from '../../../services/tests-service';
 import { SyllexCard } from '../../components/UI/syllex-card/syllex-card';
 import { SyllexBanner } from '../../components/UI/syllex-banner/syllex-banner';
+import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
 
 interface DashboardQuickLink {
   value: number | undefined;
@@ -53,9 +54,9 @@ interface DashboardAction {
   imports: [
     FontAwesomeModule,
     RouterModule,
-    TourAnchorNgBootstrapDirective,
     SyllexCard,
     SyllexBanner,
+    SyllexPageHeader
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
