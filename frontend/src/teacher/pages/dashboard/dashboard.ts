@@ -7,10 +7,15 @@ import {
 import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 import {
   faBallotCheck,
+  faBell,
+  faBullhorn,
   faCheck,
+  faFileArrowUp,
   faPaperclip,
   faPlus,
   faQuestion,
+  faRobot,
+  faSparkles,
   faUsers,
 } from '@fortawesome/pro-solid-svg-icons';
 import { Calendario } from '../../components/calendario/calendario';
@@ -24,6 +29,8 @@ import {
 } from '../../../services/comunicazioni-service';
 import { Materia } from '../../../services/materia';
 import { TestsService } from '../../../services/tests-service';
+import { SyllexCard } from '../../components/UI/syllex-card/syllex-card';
+import { SyllexBanner } from '../../components/UI/syllex-banner/syllex-banner';
 
 interface DashboardQuickLink {
   value: number | undefined;
@@ -45,16 +52,22 @@ interface DashboardAction {
   selector: 'app-dashboard',
   imports: [
     FontAwesomeModule,
-    DatePipe,
-    Calendario,
     RouterModule,
     TourAnchorNgBootstrapDirective,
+    SyllexCard,
+    SyllexBanner,
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
 export class Dashboard {
   UsersIcon = faUsers;
+  UploadIcon = faFileArrowUp;
+  AiIcon = faSparkles;
+  CommIcon = faBullhorn;
+  RobotIcon = faRobot;
+  faBell = faBell;
+  faPlus = faPlus;
 
   constructor(
     public authService: Auth,

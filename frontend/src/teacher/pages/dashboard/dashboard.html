@@ -1,89 +1,72 @@
 <div tourAnchor="dashboard_welcome">
-  <h1 class="text-dark fw-medium mb-3 display-6">
-    Ciao {{ authService.user?.firstName }}
+  <h1 class="text-dark fw-medium mb-1 display-6">
+    Ciao {{ authService.user?.firstName }},
   </h1>
-  <h5 class="text-dark mb-0 fw-normal">
-    Qui puoi gestire i contenuti e i test per la materia {{
-    materiaService.materiaSelected()?.name}}.
-  </h5>
+  <h6 class="fw-normal mb-5">scopri le azioni che puoi fare oggi.</h6>
 </div>
 
-<div class="row mt-5">
-  <div class="col-12 col-lg-6 d-flex flex-column mb-3">
-    <div
-      class="card p-4 flex-fill"
-      id="startWorkingCard"
-      tourAnchor="dashboard_quick_actions"
-    >
-      <div class="card-body d-flex flex-column gap-4">
-        <div>
-          <span class="display-5 fw-medium text-dark" style="line-height: 1"
-            >Mettiti al lavoro</span
-          >
-          <p class="text-dark fw-light w-75 mt-3">
-            Scegli una delle azioni rapide qui sotto per iniziare a creare
-            contenuti e test per i tuoi studenti.
-          </p>
-        </div>
-        <div class="row">
-          @for(action of quickActions; track $index){
-          <div class="col-6 p-2">
-            <button
-              [class]="'btn btn-lg w-100 actionButton d-flex flex-row justify-content-center align-items-center  gap-2 py-4 btn-' + action.class"
-              (click)="action.action()"
-            >
-              <fa-icon [icon]="action.icon"></fa-icon>
-              {{action.label}}
-            </button>
-          </div>
-          }
-        </div>
-      </div>
-    </div>
+<div class="row g-4 mb-4">
+  <div class="col-12 col-md-3">
+    <app-syllex-card
+      title="Carica materiali"
+      description="Upload rapido di PDF, file, immagini e appunti tramite drag & drop."
+      [icon]="UploadIcon"
+      variant="filled"
+      color="primary"
+      link="/t/risorse"
+    ></app-syllex-card>
   </div>
-  <div class="col-12 col-lg-6 d-flex flex-column mb-3">
+  <div class="col-12 col-md-3">
+    <app-syllex-card
+      title="Genera un test con AI"
+      description="Scegli materia, argomento e difficoltà."
+      [icon]="AiIcon"
+      variant="filled"
+      color="purple"
+      link="/t/tests/new"
+    ></app-syllex-card>
+  </div>
+  <div class="col p-4">
     <div
-      class="card overflow-scroll flex-fill p-4"
-      style="height: 300px"
-      tourAnchor="dashboard_communications"
+      class="d-flex justify-content-between align-items-center text-primary fw-bold fs-4"
     >
-      <div class="card-body">
-        <div class="d-flex flex-row justify-content-between text-dark">
-          <h4 class="text-primary fw-semibold mb-3">
-            Comunica con i tuoi studenti
-          </h4>
-          <a routerLink="/t/comunicazioni">Vedi tutte</a>
-        </div>
-        <div class="h-100 overflow-scroll">
-          @for(c of communications; track $index; let last = $last){
-          <div
-            class="bg-syllex-light communicationCard rounded-syllex"
-            [class.mb-3]="!last"
-            [routerLink]="'/t/comunicazioni/edit/' + c._id"
-          >
-            <div class="card-body">
-              <div
-                class="mb-1 d-flex flex-row justify-content-between align-items-center"
-              >
-                <p class="mb-0 text-primary">{{ c.title }}</p>
-                @if(c.materialIds && c.materialIds.length > 0){
-                <!--                <small>
-                  <fa-icon [icon]="AttachmentIcon"></fa-icon>
-                  {{ c.materialIds.length }} Allegato
-                </small> -->
-                }
-              </div>
-              <small class="fw-light ellipsis-1-lines">{{ c.content }}</small>
-              <small> Creato il {{ c.createdAt | date:'short' }} </small>
-            </div>
-          </div>
-          }
-        </div>
-      </div>
+      <p class="m-0">Comunica con i tuoi studenti</p>
+      <fa-icon [icon]="faBell"></fa-icon>
     </div>
+    <p class="m-0 text-muted">
+      I tuoi studenti sono pronti a ricevere le tue comunicazioni.
+    </p>
+
+    <button
+      class="btn btn-outline-primary w-100 mt-4 d-flex justify-content-start"
+      [routerLink]="['/t/comunicazioni/new']"
+    >
+      <fa-icon [icon]="faPlus" class="me-2 ms-2"></fa-icon>
+      Invia comunicazione
+    </button>
   </div>
 </div>
 
-<section class="mt-3 mb-5 card form-section" tourAnchor="dashboard_calendar">
-  <app-calendario></app-calendario>
-</section>
+<div class="row g-4 mb-5">
+  <div class="col-12 col-md-8">
+    <app-syllex-banner
+      title="Scopri Alex, il nuovo assistente vocale."
+      buttonText="Provalo subito"
+      buttonLink="/t/agente"
+      bgImage="/images/sfondo_palle.png"
+      bgSize="cover"
+      bgPosition="right"
+    >
+    </app-syllex-banner>
+  </div>
+  <div class="col-12 col-md-3">
+    <app-syllex-card
+      title="5 test"
+      description="Hai ancora delle verifiche da correggere per Diritto del Mare."
+      [icon]="UsersIcon"
+      variant="outline"
+      color="primary"
+      link="/t/tests"
+    ></app-syllex-card>
+  </div>
+</div>
