@@ -1,3 +1,41 @@
+$blue: #3931ce;
+$accent: #52a0ff;
+
+// ─── Headings & labels ────────────────────────────────────────────────────────
+h3 {
+  color: $blue;
+  font-weight: 400;
+}
+
+.form-label {
+  font-weight: 400;
+  color: $accent;
+}
+
+.form-check-label {
+  font-weight: 700;
+  color: #212529;
+}
+
+a {
+  color: $blue;
+}
+
+// ─── Inputs — blue border #52A0FF ─────────────────────────────────────────────
+.custom-input {
+  border-color: $accent;
+  font-weight: 600;
+  padding: 0.85rem 1rem;
+  font-size: 1rem;
+  min-height: 54px;
+
+  &:focus {
+    border-color: $blue;
+    box-shadow: 0 0 0 3px rgba($accent, 0.2);
+  }
+}
+
+// ─── Password toggle group ────────────────────────────────────────────────────
 .input-group-custom {
   .custom-input {
     &:focus {
@@ -7,13 +45,15 @@
   }
 
   .border-custom {
-    border: 1px solid #ced4da;
+    border: 1px solid $accent;
     background-color: #fff;
     color: #495057;
+    min-height: 54px;
+    padding: 0 1rem;
 
     &:hover {
       background-color: #f8f9fa;
-      color: #0d6efd;
+      color: $blue;
     }
 
     &:focus {
@@ -22,3 +62,23 @@
   }
 }
 
+// ─── Submit button — flat blue, white text ─────────────────────────────────────
+.btn-gradient-primary {
+  background: $blue;
+  background-image: none;
+  color: #fff;
+  font-weight: 700;
+  padding: 0.9rem 1.5rem;
+  font-size: 1.05rem;
+  min-height: 58px;
+
+  &:hover:not(:disabled) {
+    background: darken($blue, 6%);
+    background-image: none;
+    color: #fff;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+  }
+}

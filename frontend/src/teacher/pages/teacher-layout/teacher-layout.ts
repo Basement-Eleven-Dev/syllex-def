@@ -22,6 +22,7 @@ import {
   RouterModule,
   Router,
   NavigationEnd,
+  NavigationStart,
 } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { Subject, takeUntil, filter, take } from 'rxjs';
@@ -129,6 +130,15 @@ export class TeacherLayout implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.hasTourForRoute.set(this.TOUR_ROUTES.has(window.location.pathname));
+
+    this.router.events
+      .pipe(
+        filter((e) => e instanceof NavigationStart),
+        takeUntil(this.destroy$),
+      )
+      .subscribe(() => {
+        this.closeSidebar();
+      });
 
     this.router.events
       .pipe(
