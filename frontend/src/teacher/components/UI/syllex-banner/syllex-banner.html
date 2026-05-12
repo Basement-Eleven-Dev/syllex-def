@@ -10,14 +10,16 @@
     <p [innerHTML]="title" class="fs-1 text-white fw-bold mb-2"></p>
     <p class="fs-5 text-white opacity-75 mb-4">{{ description }}</p>
 
-    @if (buttonLink) {
-    <button
-      class="btn btn-secondary fw-normal fs-6 btn-lg hover-lift"
-      [routerLink]="buttonLink"
-    >
-      {{ buttonText }}
-    </button>
-    }
+    <ng-container *ngIf="buttonLink">
+      <app-syllex-button
+        [props]="{
+          label: 'Provalo subito',
+          variant: 'secondary',
+          size: 'large',
+          link: buttonLink
+        }"
+      ></app-syllex-button>
+    </ng-container>
   </div>
 
   <!-- Decorazione astratta/sfondo -->

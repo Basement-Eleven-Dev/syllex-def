@@ -1,0 +1,8 @@
+<button
+  class="btn btn-{{ props.variant }} btn-{{ props.size }} fw-normal px-5 py-3"
+  [routerLink]="props.link"
+  [disabled]="props.disabled"
+  (click)="props.onClick && props.onClick()"
+>
+  {{ props.label }}
+</button>
