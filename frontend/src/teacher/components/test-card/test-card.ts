@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { DatePipe, TitleCasePipe } from '@angular/common';
 import {
+  faBell,
   faCheckDouble,
   faClock,
   faEllipsisH,
@@ -37,6 +38,7 @@ import { ɵɵDir } from '@angular/cdk/scrolling';
 })
 export class TestCard {
   BackgroundIcon = faCheckDouble;
+  BellIcon = faBell;
   ClockIcon = faClock;
   UsersIcon = faUsers;
   QuestionsIcon = faQuestionCircle;

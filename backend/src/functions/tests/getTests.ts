@@ -33,8 +33,9 @@ const getStudentTests = async (
   if (!studentId) {
     return { tests: [], total: 0 };
   }
-  const studentClasses = await Class
-    .find({ students: new mongo.ObjectId(studentId) })
+  const studentClasses = await Class.find({
+    students: new mongo.ObjectId(studentId),
+  });
   const classIds = studentClasses.map((c) => c._id);
 
   // Include sia i test assegnati alle classi dello studente
@@ -102,7 +103,7 @@ const getStudentTests = async (
     { $limit: currentPageSize },
   ];
 
-  const tests = await Test.aggregate(pipeline)
+  const tests = await Test.aggregate(pipeline);
 
   // Conta totale per paginazione
   const total = await Test.countDocuments(filter);
@@ -113,7 +114,10 @@ const getStudentTests = async (
   };
 };
 
-const getTeacherTests = async (request: APIGatewayProxyEvent, context: Context) => {
+const getTeacherTests = async (
+  request: APIGatewayProxyEvent,
+  context: Context,
+) => {
   await connectDatabase();
 
   // Estrai parametri per paginazione e filtri
@@ -122,11 +126,13 @@ const getTeacherTests = async (request: APIGatewayProxyEvent, context: Context) 
     pageSize = "10",
     status = "",
     searchTerm = "",
+    hasPendingCorrections = "",
   } = request.queryStringParameters || {};
 
   const currentPage = parseInt(page, 10);
   const currentPageSize = parseInt(pageSize, 10);
   const skip = (currentPage - 1) * currentPageSize;
+  const filterByPending = hasPendingCorrections === "true";
 
   // Costruisci il filtro per MongoDB
   const filter: any = {};
@@ -150,15 +156,18 @@ const getTeacherTests = async (request: APIGatewayProxyEvent, context: Context) 
     filter.name = { $regex: escapedSearchTerm, $options: "i" };
   }
 
-  console.log("Filter applicato:", JSON.stringify(filter));
+  console.log(
+    "Filter applicato:",
+    JSON.stringify(filter),
+    "filterByPending:",
+    filterByPending,
+  );
 
-  // Esegui query con aggregazione per contare i compiti da correggere
-  const tests = await Test
-    .aggregate([
+  if (filterByPending) {
+    // Pipeline con lookup prima della paginazione per filtrare su uncorrectedCount
+    const basePipeline: any[] = [
       { $match: filter },
       { $sort: { createdAt: -1 } },
-      { $skip: skip },
-      { $limit: currentPageSize },
       {
         $lookup: {
           from: "attempts",
@@ -181,14 +190,66 @@ const getTeacherTests = async (request: APIGatewayProxyEvent, context: Context) 
           },
         },
       },
-      {
-        $project: {
-          testAttempts: 0,
+      { $match: { uncorrectedCount: { $gt: 0 } } },
+      { $project: { testAttempts: 0 } },
+    ];
+
+    // Conta totale (deve seguire lo stesso pipeline fino al $match pending)
+    const countResult = await Test.aggregate([
+      ...basePipeline,
+      { $count: "total" },
+    ]);
+    const total = countResult[0]?.total ?? 0;
+
+    const tests = await Test.aggregate([
+      ...basePipeline,
+      { $skip: skip },
+      { $limit: currentPageSize },
+    ]);
+
+    console.log(`Trovati ${tests.length} test da correggere`);
+    return { tests, total };
+  }
+
+  // Esegui query con aggregazione per contare i compiti da correggere (fast path)
+  const tests = await Test.aggregate([
+    { $match: filter },
+    { $sort: { createdAt: -1 } },
+    { $skip: skip },
+    { $limit: currentPageSize },
+    {
+      $lookup: {
+        from: "attempts",
+        localField: "_id",
+        foreignField: "testId",
+        as: "testAttempts",
+      },
+    },
+    {
+      $addFields: {
+        _id: { $toString: "$_id" },
+        uncorrectedCount: {
+          $size: {
+            $filter: {
+              input: "$testAttempts",
+              as: "attempt",
+              cond: { $ne: ["$$attempt.status", "reviewed"] },
+            },
+          },
         },
       },
-    ])
+    },
+    {
+      $project: {
+        testAttempts: 0,
+      },
+    },
+  ]);
 
-  console.log(`Trovati ${tests.length} test con aggregazione e filtro:`, filter);
+  console.log(
+    `Trovati ${tests.length} test con aggregazione e filtro:`,
+    filter,
+  );
 
   // Conta totale per paginazione
   const total = await Test.countDocuments(filter);
@@ -200,9 +261,8 @@ const getTeacherTests = async (request: APIGatewayProxyEvent, context: Context) 
 };
 
 const getTests = async (request: APIGatewayProxyEvent, context: Context) => {
-  if (context.user!.role == 'teacher') return getTeacherTests(request, context);
-  return getStudentTests(request, context)
-
-}
+  if (context.user!.role == "teacher") return getTeacherTests(request, context);
+  return getStudentTests(request, context);
+};
 
 export const handler = lambdaRequest(getTests);

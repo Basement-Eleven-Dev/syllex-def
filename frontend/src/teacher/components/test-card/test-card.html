@@ -1,24 +1,18 @@
 <div class="position-relative h-100">
-  <div
-    class="card p-3 h-100"
-    [class.has-pending-corrections]="(test.uncorrectedCount || 0) > 0"
-  >
-    <div
-      class="card-body d-flex flex-column justify-content-between gap-3 align-items-start"
-    >
+  <div class="card p-3 h-100">
+    <div class="card-body d-flex flex-column justify-content-between gap-3">
       <div
         class="d-flex flex-row gap-2 align-items-center w-100 justify-content-between"
       >
-        <div class="d-flex flex-row gap-2 align-items-center">
-          <div [class]="'status-pill ' + test.status"></div>
+        <span [class]="'status-badge status-badge--' + test.status">
           {{ test.status | titlecase }}
-        </div>
+        </span>
         @if((test.uncorrectedCount || 0) > 0) {
-        <div class="d-flex flex-row align-items-center gap-2">
-          <span class="rounded-circle fw-bold bg-warning text-dark  " style="width: 1.5rem; height: 1.5rem; display: flex; align-items: center; justify-content: center; font-size: 0.7rem;">
-            {{ test.uncorrectedCount }}
-          </span>
-          da correggere
+        <div
+          class="d-flex flex-row align-items-center gap-1 text-nowrap corrections-label"
+        >
+          <fa-icon [icon]="BellIcon" class="bell-icon"></fa-icon>
+          <span>da correggere</span>
         </div>
         }
       </div>
@@ -31,10 +25,12 @@
       <section class="d-flex flex-column gap-2">
         <div class="text-dark">
           <fa-icon [icon]="ClockIcon" class="me-1"></fa-icon>
-          @if(test.availableFrom && test.availableTo) { Disponibile dal {{
-          test.availableFrom | date: 'd MMM y' }} al {{ test.availableTo | date:
-          'd MMM y' }} } @else if(test.availableFrom) { Disponibile dal {{
-          test.availableFrom | date: 'd MMM y' }} }
+          @if(test.availableFrom) { Dal {{ test.availableFrom | date: 'dd/MM/yy'
+          }} } @if(test.availableTo) {
+          <br /><span class="ms-3"
+            >Al {{ test.availableTo | date: 'dd/MM/yy' }}</span
+          >
+          }
         </div>
         <div class="text-dark">
           <fa-icon [icon]="QuestionsIcon" class="me-1"></fa-icon>
@@ -60,25 +56,22 @@
       </section>
       <div class="d-flex flex-row align-items-center w-100 gap-2">
         <button
-          class="btn flex-fill"
+          class="btn btn-dark flex-fill"
           [routerLink]="'/t/tests/' + test._id"
-          id="view-test-button"
-          [class.has-pending-corrections]="(test.uncorrectedCount || 0) > 0"
         >
-          Visualizza Test
+          Visualizza
         </button>
         <div
           ngbDropdown
-          class="d-inline-block"
+          class="flex-fill"
           container="body"
           placement="bottom-end"
         >
-          <button class="btn btn-primary circle-btn btn-sm" ngbDropdownToggle>
-            <fa-icon
-              [icon]="ThreeDotsIcon"
-              class="d-inline-flex"
-              style="font-size: 0.9rem"
-            ></fa-icon>
+          <button
+            class="btn btn-outline-dark w-100 actions-btn"
+            ngbDropdownToggle
+          >
+            Azioni
           </button>
           <div ngbDropdownMenu>
             <app-test-contextual-menu
