@@ -20,12 +20,15 @@
 
   &--pubblicato {
     background-color: #52a0ff;
+    color: white;
   }
   &--bozza {
     background-color: #ff9a52;
+    color: white;
   }
   &--archiviato {
     background-color: #dee2e6;
+    color: var(--bs-dark);
   }
 }
 

@@ -1,21 +1,21 @@
 // Status badge (same as test-card)
 .status-badge {
   display: inline-block;
-  padding: 0.15rem 0.55rem;
   border-radius: 6px;
   font-size: 0.7rem;
-  font-weight: 600;
-  color: black;
   white-space: nowrap;
 
   &--pubblicato {
     background-color: #52a0ff;
+    color: white;
   }
   &--bozza {
     background-color: #ff9a52;
+    color: white;
   }
   &--archiviato {
     background-color: #dee2e6;
+    color: var(--bs-dark);
   }
 }
 
@@ -23,13 +23,13 @@
 .corrections-label {
   font-size: 0.7rem;
   font-weight: 500;
-  color: black;
+  color: var(--bs-dark);
   flex-shrink: 0;
 }
 
 .bell-icon {
   font-size: 0.75rem;
-  color: black;
+  color: var(--bs-dark);
 }
 
 ::ng-deep .actions-btn.dropdown-toggle::after {

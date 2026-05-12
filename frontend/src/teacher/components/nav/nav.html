@@ -11,7 +11,6 @@
     <div class="d-flex flex-row gap-3">
       <button
         class="btn calendarBtn bg-transparent d-none d-md-block flex-shrink-0 py-3"
-        (click)="openCalendarioModal()"
       >
         <span class="opacity-75">{{ now | date: 'EEE,' }}</span>
         <span class="fw-bold mx-1">{{ now | date: 'd MMMM' | titlecase }}</span>
@@ -25,7 +24,28 @@
         style="min-width: 300px"
       /> -->
     </div>
-
+    <div
+      class="rounded py-3 px-4 d-flex align-items-center gap-2 px-3 py-2"
+      style="background: #d7eef7; cursor: pointer"
+      (click)="toggleHelpChat(); $event.stopPropagation()"
+    >
+      <img
+        src="/images/logo_primary.png"
+        alt="Logo"
+        height="18"
+        style="flex-shrink: 0"
+      />
+      <span
+        class="slim-hide"
+        style="
+          color: #3931ce;
+          font-weight: 500;
+          font-size: 0.85rem;
+          white-space: nowrap;
+        "
+        >Come posso aiutarti?</span
+      >
+    </div>
     <div ngbDropdown class="d-inline-block" tourAnchor="teacher-profile">
       <div
         id="dropdownBasic1"
@@ -56,4 +76,5 @@
       </div>
     </div>
   </div>
+  <app-help-chat></app-help-chat>
 </nav>

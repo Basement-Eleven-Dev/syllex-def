@@ -19,6 +19,7 @@ import { Auth, User } from '../../../services/auth';
 import { Calendario } from '../calendario/calendario';
 import { UserContextualMenu } from '../user-contextual-menu/user-contextual-menu';
 import { map, Observable } from 'rxjs';
+import { HelpChat } from '../help-chat/help-chat';
 
 @Component({
   selector: 'app-nav',
@@ -32,6 +33,7 @@ import { map, Observable } from 'rxjs';
     NgbDropdownMenu,
     UserContextualMenu,
     TourAnchorNgBootstrapDirective,
+    HelpChat,
   ],
   templateUrl: './nav.html',
   styleUrl: './nav.scss',
@@ -42,6 +44,11 @@ export class Nav {
   now: number = Date.now();
   UserProfileIcon = faUserCircle;
   user: Observable<User | null>;
+  @ViewChild(HelpChat) helpChatRef!: HelpChat;
+
+  toggleHelpChat() {
+    this.helpChatRef?.toggleChat();
+  }
 
   constructor(
     public authService: Auth,

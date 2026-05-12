@@ -1,39 +1,36 @@
-<div tourAnchor="test_header" class="d-flex flex-column mb-4">
-  <div>
-    <h1 class="text-dark fw-semibold mb-2">Benvenuto in Test,</h1>
-    <h5 class="text-dark mb-0 fw-normal mb-3">
-      Qui puoi creare nuovi test e pubblicarli.
-    </h5>
-  </div>
-  <button
-    tourAnchor="test_new_button"
-    class="btn btn-gradient-secondary btn-lg me-auto py-3 icon-btn"
-    routerLink="/t/tests/new"
+<div tourAnchor="test_header" class="d-flex flex-column">
+  <app-syllex-page-header
+    [title]="'Benvenuto in Test,'"
+    [description]="'qui puoi creare nuovi test e pubblicarli per i tuoi studenti, oppure correggere quelli già inviati.'"
   >
-    <fa-icon [icon]="PlusIcon" />
-    Crea Nuovo
-  </button>
+    <app-syllex-button
+      [props]="{
+          label: 'Crea Nuovo Test',
+          variant: 'secondary',
+          size: 'large',
+          link: '/t/tests/new'
+        }"
+    ></app-syllex-button>
+  </app-syllex-page-header>
 </div>
 
 <section
   tourAnchor="test_filters"
   class="d-flex flex-wrap mb-3 gap-3 align-items-center"
 >
-  <div class="flex-grow-1 min-w-0">
-    <input
-      type="text"
-      id="search-term"
-      class="form-control custom-input filter w-100"
-      placeholder="Cerca test..."
-      [value]="SearchTerm()"
-      (input)="onSearchTermChange($any($event.target).value)"
-    />
-  </div>
+  <input
+    type="text"
+    id="search-term"
+    class="form-control custom-input filter py-3 w-25"
+    placeholder="Cerca test..."
+    [value]="SearchTerm()"
+    (input)="onSearchTermChange($any($event.target).value)"
+  />
 
   <div>
     <select
       id="publication-status"
-      class="form-select custom-input filter"
+      class="form-select custom-input filter py-3"
       style="width: 130px"
       [value]="Status()"
       (change)="onStatusChange($any($event.target).value)"
@@ -46,7 +43,7 @@
   </div>
   <button
     type="button"
-    class="btn btn-outline-dark"
+    class="btn btn-primary py-3"
     (click)="clearFilters()"
     title="Pulisci filtri"
   >
@@ -61,10 +58,9 @@
 </section>
 
 <!-- ===== SEZIONE: ULTIMI TEST ===== -->
-<section class="mb-3">
+<section class="mb-3 mt-5">
   <div class="section-header mb-3">
-    <h4 class="section-title mb-0">Ultimi test</h4>
-    <div class="section-divider"></div>
+    <h4 class="section-title mb-0 ms-3">Ultimi test</h4>
   </div>
 
   @if(ViewType === 'table') { @if(RecentTests().length > 0) {
@@ -82,7 +78,7 @@
   <div class="row g-3">
     @for(test of RecentTests(); track test._id; let first = $first) {
     <div
-      class="col-12 col-md-6 col-lg-4 col-xl-3"
+      class="col-12 col-md-6 col-lg-4 col-xl-4"
       [tourAnchor]="first ? 'test_first_card' : ''"
     >
       <app-test-card
@@ -103,7 +99,7 @@
   } @if(CollectionSizeRecent() > PageSizeRecent()) {
   <div
     tourAnchor="test_pagination"
-    class="mt-4 d-flex flex-wrap gap-2 align-items-center"
+    class="mt-4 d-flex justify-content-end gap-2 align-items-center"
   >
     <app-syllex-pagination
       [collectionSize]="CollectionSizeRecent()"
@@ -111,26 +107,14 @@
       [pageSize]="PageSizeRecent()"
       (pageChange)="onNewRecentPageRequested($event)"
     />
-    <select
-      class="form-select form-select-sm custom-input ms-auto"
-      style="width: auto"
-      [value]="PageSizeRecent()"
-      (change)="onRecentPageSizeChange(+$any($event.target).value)"
-    >
-      <option value="4">4 per pagina</option>
-      <option value="8">8 per pagina</option>
-      <option value="12">12 per pagina</option>
-      <option value="20">20 per pagina</option>
-    </select>
   </div>
   }
 </section>
 
 <!-- ===== SEZIONE: DA CORREGGERE ===== -->
-<section class="mb-5">
+<section class="mb-5 mt-5">
   <div class="section-header mb-3">
-    <h4 class="section-title mb-0">Da Correggere</h4>
-    <div class="section-divider"></div>
+    <h4 class="section-title mb-0 ms-3">Da Correggere</h4>
     @if(CollectionSizePending() > 0) {
     <span class="badge rounded-pill bg-warning text-dark ms-2 section-badge">
       {{ CollectionSizePending() }}
@@ -169,24 +153,13 @@
     }
   </div>
   } @if(CollectionSizePending() > PageSizePending()) {
-  <div class="mt-4 d-flex flex-wrap gap-2 align-items-center">
+  <div class="mt-4 d-flex justify-content-end gap-2 align-items-center">
     <app-syllex-pagination
       [collectionSize]="CollectionSizePending()"
       [page]="PagePending()"
       [pageSize]="PageSizePending()"
       (pageChange)="onNewPendingPageRequested($event)"
     />
-    <select
-      class="form-select form-select-sm custom-input ms-auto"
-      style="width: auto"
-      [value]="PageSizePending()"
-      (change)="onPendingPageSizeChange(+$any($event.target).value)"
-    >
-      <option value="4">4 per pagina</option>
-      <option value="8">8 per pagina</option>
-      <option value="12">12 per pagina</option>
-      <option value="20">20 per pagina</option>
-    </select>
   </div>
   }
 </section>

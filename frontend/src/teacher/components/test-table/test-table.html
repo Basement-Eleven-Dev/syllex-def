@@ -14,7 +14,7 @@
       @for(test of tests; track $index){
       <tr>
         <td>
-          <div class="d-flex flex-row align-items-center gap-2">
+          <div class="d-flex fw-bold flex-row align-items-center gap-2">
             {{ test.name }} @if((test.uncorrectedCount || 0) > 0) {
             <div
               class="d-flex flex-row align-items-center gap-1 text-nowrap corrections-label"
@@ -26,7 +26,7 @@
           </div>
         </td>
         <td>
-          <span [class]="'status-badge status-badge--' + test.status">
+          <span [class]="'status-badge py-2 px-4 status-badge--' + test.status">
             {{ test.status | titlecase }}
           </span>
         </td>
@@ -54,7 +54,7 @@
           class="d-flex flex-row justify-content-end align-items-center gap-2"
         >
           <button
-            class="btn btn-dark btn-sm"
+            class="btn btn-primary btn-sm py-2 px-4 py"
             [routerLink]="['/t/tests', test._id]"
           >
             Visualizza
@@ -66,7 +66,7 @@
             placement="bottom-end"
           >
             <button
-              class="btn btn-outline-dark btn-sm actions-btn"
+              class="btn btn-outline-dark bg-white text-dark btn-sm actions-btn py-2 px-4"
               ngbDropdownToggle
             >
               Azioni

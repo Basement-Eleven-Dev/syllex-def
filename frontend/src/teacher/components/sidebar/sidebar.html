@@ -12,10 +12,11 @@
           {{ selectedSubject?.name }}
         </h4>
         <button
-          class="btn argomenti-btn btn-sm mt-2 fw-normal w-100"
+          class="btn argomenti-btn py-3 btn-sm mt-4 fw-normal w-100"
           (click)="onRequestSubjectSettings()"
+          style="min-height: 1.5rem"
         >
-          Argomenti
+          Vedi argomenti
         </button>
         @if (availableSubjects().length > 0) {
         <div
@@ -42,7 +43,7 @@
         <div class="subjects-scroll-container mt-1 d-flex flex-column gap-2">
           @for(subject of availableSubjects(); track subject._id){
           <div
-            class="p-2 fw-normal rounded-2 d-flex align-items-center gap-2 cursor-pointer materiaBtn d-flex flex-row justify-content-between align-items-center"
+            class="p-2 fw-normal py-3 px-4 rounded-2 d-flex align-items-center gap-2 cursor-pointer materiaBtn d-flex flex-row justify-content-between align-items-center"
             [class.active]="selectedSubject?._id === subject._id"
             (click)="selectSubject(subject)"
             role="button"
@@ -77,17 +78,28 @@
 
     <div id="mainRoutes" class="d-flex flex-column gap-2 flex-fill mt-4">
       @for(route of mainRoutes; track $index){
+      <!-- 
+      <app-syllex-button
+        [props]="{
+            label: route.label,
+            variant: 'primary',
+            size: 'medium',
+            link: route.path,
+          }"
+      ></app-syllex-button> -->
       <div
-        class="sidebarRoute w-100 gap-2 d-flex align-items-center"
+        class="sidebarRoute w-100 gap-2 d-flex py-3 px-4 align-items-center"
         [routerLink]="route.path"
         routerLinkActive="active"
         [tourAnchor]="route.tourAnchor || ''"
       >
-        <fa-icon [icon]="route.icon"></fa-icon>
+        <!--    <fa-icon [icon]="route.icon"></fa-icon> -->
         <span class="routeLabel slim-hide">{{route.label}}</span>
       </div>
       }
     </div>
+    <!-- Help chat button -->
+
     <div
       class="btn text-start ai ai-sidebar-btn d-flex flex-row align-items-center justify-content-between position-relative"
       routerLink="/t/laboratorio-ai"
@@ -123,30 +135,6 @@
         >
         </a>
       </div>
-    </div>
-
-    <!-- Help chat button -->
-    <div
-      class="rounded-pill shadow-sm d-flex align-items-center gap-2 px-3 py-2 mt-2"
-      style="background: #d7eef7; cursor: pointer"
-      (click)="toggleHelpChat(); $event.stopPropagation()"
-    >
-      <img
-        src="/images/logo_primary.png"
-        alt="Logo"
-        height="18"
-        style="flex-shrink: 0"
-      />
-      <span
-        class="slim-hide"
-        style="
-          color: #3931ce;
-          font-weight: 500;
-          font-size: 0.85rem;
-          white-space: nowrap;
-        "
-        >Come posso aiutarti?</span
-      >
     </div>
 
     <app-help-chat></app-help-chat>

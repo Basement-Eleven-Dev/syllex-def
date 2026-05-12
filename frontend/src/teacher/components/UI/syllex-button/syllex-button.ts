@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterModule } from '@angular/router';
 interface SyllexButtonProps {
   label: string;
   variant: 'primary' | 'secondary' | 'outline' | 'text';
@@ -10,7 +10,7 @@ interface SyllexButtonProps {
 }
 @Component({
   selector: 'app-syllex-button',
-  imports: [RouterLink],
+  imports: [RouterLink, RouterModule],
   templateUrl: './syllex-button.html',
   styleUrl: './syllex-button.scss',
 })

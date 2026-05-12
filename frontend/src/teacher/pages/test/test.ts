@@ -15,6 +15,8 @@ import {
 import { debounceTime, Subject, takeUntil } from 'rxjs';
 import { FeedbackService } from '../../../services/feedback-service';
 import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
+import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
+import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
 
 type TestStatus = 'bozza' | 'pubblicato' | 'archiviato' | '';
 
@@ -30,6 +32,8 @@ type TestStatus = 'bozza' | 'pubblicato' | 'archiviato' | '';
     FormsModule,
     ViewTypeToggle,
     TourAnchorNgBootstrapDirective,
+    SyllexPageHeader,
+    SyllexButton,
   ],
   templateUrl: './test.html',
   styleUrl: './test.scss',
@@ -53,14 +57,14 @@ export class Test implements OnDestroy {
   LoadingRecent = signal<boolean>(false);
   CollectionSizeRecent = signal<number>(0);
   PageRecent = signal<number>(1);
-  PageSizeRecent = signal<number>(4);
+  PageSizeRecent = signal<number>(8);
 
   // Section: Da Correggere
   PendingTests = signal<TestInterface[]>([]);
   LoadingPending = signal<boolean>(false);
   CollectionSizePending = signal<number>(0);
   PagePending = signal<number>(1);
-  PageSizePending = signal<number>(4);
+  PageSizePending = signal<number>(8);
 
   // Private Properties
   private SearchTermSubject = new Subject<string>();
