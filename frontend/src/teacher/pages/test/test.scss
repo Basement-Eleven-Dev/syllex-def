@@ -20,5 +20,11 @@
 
 .section-badge {
   font-size: 0.75rem;
-  padding: 0.35em 0.65em;
+  height: 35px;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
 }
