@@ -32,7 +32,8 @@
             <input
               type="text"
               formControlName="title"
-              class="form-control form-control-lg border-0 bg-light shadow-none"
+              class="form-control border-0 bg-light shadow-none"
+              style="height: 38px"
               placeholder="Es: Verifica di fine modulo - Elettronica"
             />
           </div>
@@ -40,15 +41,15 @@
             <label class="form-label text-dark fw-semibold small mb-2"
               >Password (Opzionale)</label
             >
-            <div class="input-group">
+            <div class="input-group" style="height: 38px">
               <input
                 type="text"
                 formControlName="password"
-                class="form-control border-0 bg-light shadow-none"
+                class="form-control border-0 bg-light shadow-none py-0"
                 placeholder="Chiave d'accesso"
               />
               <button
-                class="btn btn-light border-0 px-3 shadow-none"
+                class="btn btn-light border-0 px-3 py-0 shadow-none"
                 type="button"
                 (click)="onGeneratePassword()"
               >
@@ -125,110 +126,123 @@
 
     <!-- COLONNA IMPOSTAZIONI (DESTRA) -->
     <div class="col-12 col-lg-4 bg-light border-start">
-      <div class="right-panel p-4 p-md-5">
-        <!-- 1. Disponibilità -->
-        <div class="settings-group mb-5">
-          <label class="d-flex align-items-center text-dark fw-bold small mb-4">
-            <fa-icon [icon]="CalendarIcon" class="me-2"></fa-icon> Disponibilità
-          </label>
-          <div class="mb-3">
-            <label class="text-muted small mb-1 d-block">Data Inizio</label>
-            <input
-              type="date"
-              formControlName="availableFrom"
-              class="form-control border-0 bg-white shadow-sm"
-            />
-          </div>
-          <div>
-            <label class="text-muted small mb-1 d-block">Data Fine</label>
-            <input
-              type="date"
-              formControlName="availableTo"
-              class="form-control border-0 bg-white shadow-sm"
-            />
-          </div>
-        </div>
-
-        <!-- Requisiti -->
-        <div class="settings-group mb-5">
-          <label class="d-flex align-items-center text-dark fw-bold small mb-4">
-            <fa-icon [icon]="ClockIcon" class="me-2"></fa-icon> Requisiti e
-            tempo
-          </label>
-
-          <div class="mb-4">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <label class="text-muted small">Punteggio Idoneità</label>
-              <span class="badge bg-white text-dark border shadow-sm fw-medium"
-                >Max: {{ maxScore }} pt</span
-              >
-            </div>
-            <input
-              type="number"
-              formControlName="requiredScore"
-              class="form-control border-0 bg-white shadow-sm py-2"
-              placeholder="Min. punti"
-            />
-          </div>
-
-          <div>
-            <label class="text-muted small mb-2 d-block"
-              >Tempo Limite (minuti)</label
+      <div style="position: sticky; top: 0">
+        <!-- Impostazioni -->
+        <div class="right-panel p-3">
+          <!-- 1. Disponibilità -->
+          <div class="settings-group mb-4">
+            <label
+              class="d-flex align-items-center text-dark fw-bold small mb-3"
             >
-            <div class="input-group shadow-sm rounded-3 overflow-hidden">
+              <fa-icon [icon]="CalendarIcon" class="me-2"></fa-icon>
+              Disponibilità
+            </label>
+            <div class="mb-3">
+              <label class="text-muted small mb-1 d-block">Data Inizio</label>
+              <input
+                type="date"
+                formControlName="availableFrom"
+                class="form-control border-0 bg-white shadow-sm"
+              />
+            </div>
+            <div>
+              <label class="text-muted small mb-1 d-block">Data Fine</label>
+              <input
+                type="date"
+                formControlName="availableTo"
+                class="form-control border-0 bg-white shadow-sm"
+              />
+            </div>
+          </div>
+
+          <!-- Requisiti -->
+          <div class="settings-group mb-4">
+            <label
+              class="d-flex align-items-center text-dark fw-bold small mb-3"
+            >
+              <fa-icon [icon]="ClockIcon" class="me-2"></fa-icon> Requisiti e
+              tempo
+            </label>
+
+            <div class="mb-3">
+              <div
+                class="d-flex justify-content-between align-items-center mb-2"
+              >
+                <label class="text-muted small">Punteggio Idoneità</label>
+                <span
+                  class="badge bg-white text-dark border shadow-sm fw-medium"
+                  >Max: {{ maxScore }} pt</span
+                >
+              </div>
               <input
                 type="number"
-                formControlName="time"
-                class="form-control border-0 bg-white py-2 shadow-none"
-                [placeholder]="time === null ? 'Tempo illimitato' : 'Minuti'"
+                formControlName="requiredScore"
+                class="form-control border-0 bg-white shadow-sm py-2"
+                placeholder="Min. punti"
               />
-              <button
-                class="btn btn-white border-0 px-3"
-                type="button"
-                [class.text-primary]="time === null"
-                (click)="onToggleUnlimitedTime()"
+            </div>
+
+            <div>
+              <label class="text-muted small mb-2 d-block"
+                >Tempo Limite (minuti)</label
               >
-                <fa-icon [icon]="InfinityIcon"></fa-icon>
-              </button>
+              <div class="input-group shadow-sm rounded-3 overflow-hidden">
+                <input
+                  type="number"
+                  formControlName="time"
+                  class="form-control border-0 bg-white py-2 shadow-none"
+                  [placeholder]="time === null ? 'Tempo illimitato' : 'Minuti'"
+                />
+                <button
+                  class="btn btn-white border-0 px-3"
+                  type="button"
+                  [class.text-primary]="time === null"
+                  (click)="onToggleUnlimitedTime()"
+                >
+                  <fa-icon [icon]="InfinityIcon"></fa-icon>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Comportamento -->
-        <div class="settings-group mb-5">
-          <label class="d-flex align-items-center text-dark fw-bold small mb-4">
-            <fa-icon [icon]="TrophyIcon" class="me-2"></fa-icon> Comportamento
-          </label>
-          <div class="d-flex flex-column gap-3">
-            <div class="form-check form-switch custom-switch">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                role="switch"
-                id="random-sw"
-                formControlName="randomizeQuestions"
-              />
-              <label class="form-check-label text-dark small" for="random-sw"
-                >Randomizza domande</label
-              >
-            </div>
-            <div class="form-check form-switch custom-switch">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                role="switch"
-                id="oneshot-sw"
-                formControlName="oneShotAnswers"
-              />
-              <label class="form-check-label text-dark small" for="oneshot-sw"
-                >Risposta secca (One-shot)</label
-              >
+          <!-- Comportamento -->
+          <div class="settings-group mb-4">
+            <label
+              class="d-flex align-items-center text-dark fw-bold small mb-3"
+            >
+              <fa-icon [icon]="TrophyIcon" class="me-2"></fa-icon> Comportamento
+            </label>
+            <div class="d-flex flex-column gap-3">
+              <div class="form-check form-switch custom-switch">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  role="switch"
+                  id="random-sw"
+                  formControlName="randomizeQuestions"
+                />
+                <label class="form-check-label text-dark small" for="random-sw"
+                  >Randomizza domande</label
+                >
+              </div>
+              <div class="form-check form-switch custom-switch">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  role="switch"
+                  id="oneshot-sw"
+                  formControlName="oneShotAnswers"
+                />
+                <label class="form-check-label text-dark small" for="oneshot-sw"
+                  >Risposta secca (One-shot)</label
+                >
+              </div>
             </div>
           </div>
         </div>
 
         <!-- Azioni Finali -->
-        <div class="mt-auto pt-4 border-top">
+        <div class="p-3 pt-3 border-top bg-light">
           <button
             class="btn btn-primary w-100 py-3 fw-bold shadow-sm rounded-3 mb-3 d-flex align-items-center justify-content-center gap-2"
             type="button"
@@ -272,6 +286,7 @@
           </div>
         </div>
       </div>
+      <!-- /sticky wrapper -->
     </div>
   </div>
 </form>
