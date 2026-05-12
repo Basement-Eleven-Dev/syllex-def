@@ -1,5 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, computed, effect } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import {
   FontAwesomeModule,
   IconDefinition,
@@ -56,7 +57,7 @@ interface DashboardAction {
     RouterModule,
     SyllexCard,
     SyllexBanner,
-    SyllexPageHeader
+    SyllexPageHeader,
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
@@ -71,7 +72,6 @@ export class Dashboard {
   faPlus = faPlus;
   testsToGradeCount = 0;
 
-
   get selectedMateriaName() {
     return this.materiaService.materiaSelected()?.name || '';
   }
@@ -84,7 +84,11 @@ export class Dashboard {
     private testService: TestsService,
     public materiaService: Materia,
     private router: Router,
+    private sanitizer: DomSanitizer,
   ) {
+    this.bannerTitle = this.sanitizer.bypassSecurityTrustHtml(
+      'Scopri Alex, <br/> il nuovo assistente vocale.',
+    );
     // Carica comunicazioni recenti quando viene selezionata una materia
     effect(() => {
       const selectedMateria = this.materiaService.materiaSelected();
@@ -98,6 +102,7 @@ export class Dashboard {
     });
   }
   AttachmentIcon = faPaperclip;
+  bannerTitle: SafeHtml;
 
   quickActions: DashboardAction[] = [
     {

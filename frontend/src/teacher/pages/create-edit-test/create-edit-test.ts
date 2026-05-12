@@ -20,6 +20,7 @@ import {
   faInfinity,
   faKey,
   faPenRuler,
+  faPlus,
   faSave,
   faSparkles,
 } from '@fortawesome/pro-solid-svg-icons';
@@ -38,6 +39,9 @@ import { Materia } from '../../../services/materia';
 import { TestsService, TestInterface } from '../../../services/tests-service';
 import { FeedbackService } from '../../../services/feedback-service';
 import { QuestionsSearchFilters } from '../../components/questions-search-filters/questions-search-filters';
+import { SyllexPageHeader } from "../../components/UI/syllex-page-header/syllex-page-header";
+import { QuestionsGridSelector } from '../../components/questions-grid-selector/questions-grid-selector';
+import { SyllexPagination } from '../../components/syllex-pagination/syllex-pagination';
 
 @Component({
   selector: 'app-create-edit-test',
@@ -47,10 +51,12 @@ import { QuestionsSearchFilters } from '../../components/questions-search-filter
     ReactiveFormsModule,
     FontAwesomeModule,
     SearchQuestions,
-    QuestionsDroppableList,
     ClassSelector,
     BackTo,
     QuestionsSearchFilters,
+    SyllexPageHeader,
+    QuestionsGridSelector,
+    SyllexPagination,
   ],
   templateUrl: './create-edit-test.html',
   styleUrl: './create-edit-test.scss',
@@ -72,6 +78,7 @@ export class CreateEditTest implements OnInit {
   readonly DraftIcon = faPenRuler;
   readonly SaveIcon = faSave;
   readonly SparklesIcon = faSparkles;
+  readonly PlusIcon = faPlus;
 
   @ViewChild(QuestionsDroppableList)
   questionsComponent!: QuestionsDroppableList;
@@ -92,7 +99,7 @@ export class CreateEditTest implements OnInit {
   readonly PageTitle = computed(() =>
     this.IsEditMode()
       ? 'Modifica Test di valutazione'
-      : 'Nuovo Test di valutazione',
+      : 'Crea test',
   );
 
   readonly TestForm: FormGroup = new FormGroup({
@@ -313,6 +320,24 @@ export class CreateEditTest implements OnInit {
     testData.oneShotAnswers = !!formValue.oneShotAnswers;
 
     return testData;
+  }
+
+  onAddQuestion(): void {
+    this.router.navigate(['/t/create-question']);
+  }
+
+  onToggleQuestion(question: any): void {
+    const currentIds = this.SelectedQuestionIds();
+    if (currentIds.includes(question._id)) {
+      this.SelectedQuestionIds.set(currentIds.filter(id => id !== question._id));
+    } else {
+      this.SelectedQuestionIds.set([...currentIds, question._id]);
+    }
+  }
+
+  onPreview(): void {
+    // Logica per mostrare l'anteprima (es. apertura modale o scroll a sezione dedicata)
+    this.feedbackService.showFeedback('Apertura anteprima test...', true);
   }
 
   onRequestAIGeneration(): void {

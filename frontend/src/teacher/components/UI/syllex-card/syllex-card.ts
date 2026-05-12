@@ -13,11 +13,18 @@ import { faArrowRight } from '@fortawesome/pro-solid-svg-icons';
   styleUrl: './syllex-card.scss',
 })
 export class SyllexCard {
+  @Input() titleTextSize: 'small' | 'medium' | 'large' = 'medium';
   @Input() title!: string;
   @Input() description?: string;
   @Input() icon?: IconDefinition;
   @Input() variant: 'filled' | 'outline' | 'ai' = 'filled';
-  @Input() color: 'primary' | 'blue' | 'purple' | 'green' | 'warning' | 'danger' = 'primary';
+  @Input() color:
+    | 'primary'
+    | 'blue'
+    | 'purple'
+    | 'green'
+    | 'warning'
+    | 'danger' = 'primary';
   @Input() link?: string;
   @Input() target: string = '_self';
   @Input() showArrow: boolean = true;
@@ -30,7 +37,16 @@ export class SyllexCard {
       [`variant-${this.variant}`]: true,
       [`color-${this.color}`]: true,
       'is-clickable': !!this.link,
-      [this.class]: !!this.class
+      [this.class]: !!this.class,
     };
+  }
+
+  get titleClass(): string {
+    const map: Record<string, string> = {
+      small: 'fs-4',
+      medium: 'fs-3',
+      large: 'fs-1',
+    };
+    return map[this.titleTextSize] ?? 'fs-3';
   }
 }

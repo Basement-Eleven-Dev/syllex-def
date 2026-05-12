@@ -1,8 +1,8 @@
 <app-syllex-page-header
-  [title]="'Ciao, ' + authService.user?.firstName"  
+  [title]="'Ciao, ' + authService.user?.firstName"
   [description]="'scopri le azioni che puoi fare oggi.'"
-  
->  </app-syllex-page-header>
+>
+</app-syllex-page-header>
 
 <div class="row g-4 mb-4">
   <div class="col-12 col-lg-3">
@@ -17,12 +17,12 @@
   </div>
   <div class="col-12 col-lg-3">
     <app-syllex-card
-      title="Genera un test con AI"
-      description="Scegli materia, argomento e difficoltà."
+      title="Genera un materiale con AI"
+      description="Scegli tra diverse opzioni per creare contenuti personalizzati."
       [icon]="AiIcon"
       variant="filled"
       color="purple"
-      link="/t/tests/new"
+      link="/t/laboratorio-ai"
     ></app-syllex-card>
   </div>
   <div class="col p-4">
@@ -47,9 +47,9 @@
 </div>
 
 <div class="row g-4 mb-5">
-  <div class="col-12 col-lg-8">
+  <div class="col-12 col-lg-6">
     <app-syllex-banner
-      title="Scopri Alex, il nuovo assistente vocale."
+      [title]="bannerTitle"
       buttonText="Provalo subito"
       buttonLink="/t/agente"
       bgImage="/images/sfondo_palle.png"
@@ -62,10 +62,21 @@
     <app-syllex-card
       [title]="testsToGradeCount + ' test'"
       [description]="'Hai ancora delle verifiche da correggere per ' + selectedMateriaName"
+      [titleTextSize]="'large'"
       [icon]="UsersIcon"
       variant="outline"
       color="primary"
       link="/t/tests"
+    ></app-syllex-card>
+  </div>
+  <div class="col-12 col-lg-3">
+    <app-syllex-card
+      title="Genera un test con AI"
+      description="Scegli materia, argomento e difficoltà."
+      [icon]="AiIcon"
+      variant="filled"
+      color="blue"
+      link="/t/tests/new"
     ></app-syllex-card>
   </div>
 </div>

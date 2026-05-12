@@ -67,7 +67,7 @@
       id="privacyAccepted"
       formControlName="privacyAccepted"
     />
-    <label class="form-check-label small fw-bold" for="privacyAccepted">
+    <label class="form-check-label small" for="privacyAccepted">
       Dichiaro di aver preso visione della
       <a
         href="https://www.iubenda.com/privacy-policy/45755357"
@@ -82,13 +82,9 @@
   }
   <button
     type="submit"
-    class="btn btn-gradient-primary btn-lg w-100"
+    class="btn btn-gradient-primary fw-normal btn-lg w-100"
     [disabled]="(isMfaChallenge ? mfaCodeForm.invalid : loginForm.invalid) || loading"
   >
-    <fa-icon
-      [icon]="loading ? SpinnerIcon : LoginIcon"
-      [animation]="loading ? 'spin' : undefined"
-    ></fa-icon>
     {{ isMfaChallenge ? 'Verifica' : (isChallenge ? 'Conferma e Accedi' :
     'Accedi') }}
   </button>

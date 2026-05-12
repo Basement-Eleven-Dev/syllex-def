@@ -33,7 +33,7 @@ export class SearchQuestions implements OnInit, OnDestroy {
   totalQuestions = signal<number>(0);
   isLoading = signal<boolean>(false);
   currentPage = signal<number>(1);
-  readonly pageSize = 3;
+  readonly pageSize = 6;
 
   // Questions visible in the list (excluding already-selected ones)
   readonly visibleQuestions = computed(() =>

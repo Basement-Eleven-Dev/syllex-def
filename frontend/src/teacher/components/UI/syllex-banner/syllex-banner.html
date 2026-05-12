@@ -5,10 +5,9 @@
   [style.backgroundSize]="bgSize"
   [style.backgroundPosition]="bgPosition"
   [style.backgroundRepeat]="'no-repeat'"
-
 >
   <div class="banner-content z-2 position-relative">
-    <h2 class="fs-2 text-white mb-3 w-md-50 w-100">{{ title }}</h2>
+    <p [innerHTML]="title" class="fs-1 text-white fw-bold mb-2"></p>
     <p class="fs-5 text-white opacity-75 mb-4">{{ description }}</p>
 
     @if (buttonLink) {

@@ -93,7 +93,11 @@
       routerLink="/t/laboratorio-ai"
       tourAnchor="teacher-ai-lab"
     >
-      <fa-icon [icon]="HeadSideBrainIcon" class="ai-deco lab-ai-deco"></fa-icon>
+      <fa-icon
+        [icon]="HeadSideBrainIcon"
+        [size]="'xs'"
+        class="ai-deco lab-ai-deco me-2"
+      ></fa-icon>
       <h5 class="mb-0 position-relative lab-ai-label slim-hide">Lab AI</h5>
     </div>
     <div
@@ -101,7 +105,11 @@
       routerLink="/t/agente"
       tourAnchor="teacher-agent"
     >
-      <fa-icon [icon]="SparklesIcon" class="ai-deco chat-ai-deco"></fa-icon>
+      <fa-icon
+        [icon]="SparklesIcon"
+        [size]="'xs'"
+        class="ai-deco chat-ai-deco me-2"
+      ></fa-icon>
       <div
         class="d-flex align-items-center gap-2 position-relative pe-4 slim-hide"
       >
@@ -113,7 +121,6 @@
           [queryParams]="{step: 1}"
           (click)="$event.stopPropagation()"
         >
-          <fa-icon [icon]="GearIcon"></fa-icon>
         </a>
       </div>
     </div>

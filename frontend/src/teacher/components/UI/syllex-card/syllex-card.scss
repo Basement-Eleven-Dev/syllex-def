@@ -5,7 +5,7 @@ $green: #10b981;
 $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
 .syllex-card {
-  min-height: 240px;
+  min-height: 300px;
   transition: $transition;
   border: 1px solid transparent;
   text-decoration: none;
@@ -15,11 +15,15 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     &:hover {
       transform: translateY(-5px);
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-      .arrow-icon { transform: translateX(5px); }
+      .arrow-icon {
+        transform: translateX(5px);
+      }
     }
   }
 
-  h3, .main-icon, .arrow-icon {
+  h3,
+  .main-icon,
+  .arrow-icon {
     transition: $transition;
   }
 
@@ -30,43 +34,80 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   &.variant-filled {
     &.color-primary {
       background-color: #eff6ff;
-      h3, .main-icon, .arrow-icon { color: $primary !important; }
+      h3,
+      .main-icon,
+      .arrow-icon {
+        color: $primary !important;
+      }
     }
     &.color-blue {
       background-color: #f0f9ff;
-      h3, .main-icon, .arrow-icon { color: $blue !important; }
+      h3,
+      .main-icon,
+      .arrow-icon {
+        color: $blue !important;
+      }
     }
     &.color-purple {
       background-color: #f5f3ff;
-      h3, .main-icon, .arrow-icon { color: $purple !important; }
+      h3,
+      .main-icon,
+      .arrow-icon {
+        color: $purple !important;
+      }
     }
   }
 
   &.variant-outline {
     background-color: white;
     border: 1.5px solid #e2e8f0;
-    
+
     &.color-primary {
       border-color: #bfdbfe;
-      h3, .main-icon, .arrow-icon { color: $primary !important; }
-      &:hover { border-color: $primary; }
+      h3,
+      .main-icon,
+      .arrow-icon {
+        color: $primary !important;
+      }
+      &:hover {
+        border-color: $primary;
+      }
     }
     &.color-blue {
       border-color: #bae6fd;
-      h3, .main-icon, .arrow-icon { color: $blue !important; }
-      &:hover { border-color: $blue; }
+      h3,
+      .main-icon,
+      .arrow-icon {
+        color: $blue !important;
+      }
+      &:hover {
+        border-color: $blue;
+      }
     }
     &.color-purple {
       border-color: #ddd6fe;
-      h3, .main-icon, .arrow-icon { color: $purple !important; }
-      &:hover { border-color: $purple; }
+      h3,
+      .main-icon,
+      .arrow-icon {
+        color: $purple !important;
+      }
+      &:hover {
+        border-color: $purple;
+      }
     }
   }
 
   &.variant-ai {
     background: linear-gradient(135deg, #3931ce 0%, #6366f1 100%);
     border: none;
-    h3, p, .main-icon, .arrow-icon { color: white !important; }
-    p { opacity: 0.9 !important; }
+    h3,
+    p,
+    .main-icon,
+    .arrow-icon {
+      color: white !important;
+    }
+    p {
+      opacity: 0.9 !important;
+    }
   }
 }

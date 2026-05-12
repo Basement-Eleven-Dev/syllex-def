@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-syllex-banner',
@@ -10,7 +11,7 @@ import { RouterLink } from '@angular/router';
   styleUrl: './syllex-banner.scss',
 })
 export class SyllexBanner {
-  @Input() title!: string;
+  @Input() title!: SafeHtml;
   @Input() description!: string;
   @Input() buttonText: string = 'Scopri di più';
   @Input() buttonLink!: string;
