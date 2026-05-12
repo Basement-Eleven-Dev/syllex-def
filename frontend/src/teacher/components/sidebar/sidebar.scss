@@ -26,9 +26,17 @@
     overflow-x: hidden;
   }
 
+  :host(.open) .slim-only {
+    display: none !important;
+  }
+
   :host:not(.open) {
     .slim-hide {
       display: none !important;
+    }
+
+    .slim-only {
+      display: flex !important;
     }
 
     /* Inner content wrapper: remove Bootstrap px-3 so icons center in 64px */

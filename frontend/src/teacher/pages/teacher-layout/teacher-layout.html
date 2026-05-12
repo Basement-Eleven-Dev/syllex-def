@@ -8,8 +8,6 @@
 </div>
 } -->
 
-<app-help-chat></app-help-chat>
-
 <div class="w-100 dvh-100 d-flex flex-row overflow-hidden">
   @if (showLoading()) {
   <div id="loadingOverlay" animate.enter="fade-in">
@@ -26,6 +24,7 @@
     (click)="closeSidebar()"
   ></div>
   <app-sidebar
+    #sidebarRef
     [open]="sidebarOpen()"
     (toggleSidebar)="toggleSidebar()"
   ></app-sidebar>

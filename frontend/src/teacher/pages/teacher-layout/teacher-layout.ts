@@ -15,7 +15,6 @@ import {
 } from 'ngx-ui-tour-ng-bootstrap';
 import { Sidebar } from '../../components/sidebar/sidebar';
 import { Nav } from '../../components/nav/nav';
-import { HelpChat } from '../../components/help-chat/help-chat';
 import { UserContextualMenu } from '../../components/user-contextual-menu/user-contextual-menu';
 import {
   RouterOutlet,
@@ -63,7 +62,6 @@ import { crea_domanda_steps } from '../../../tours/tour_crea_domanda';
   imports: [
     Sidebar,
     Nav,
-    HelpChat,
     RouterOutlet,
     RouterModule,
     FontAwesomeModule,
@@ -78,7 +76,7 @@ import { crea_domanda_steps } from '../../../tours/tour_crea_domanda';
   styleUrl: './teacher-layout.scss',
 })
 export class TeacherLayout implements OnInit, OnDestroy {
-  @ViewChild(HelpChat) helpChatRef!: HelpChat;
+  @ViewChild('sidebarRef') sidebarRef!: Sidebar;
 
   showLoading = signal<boolean>(false);
   hasTourForRoute = signal<boolean>(false);
@@ -188,7 +186,7 @@ export class TeacherLayout implements OnInit, OnDestroy {
     this.sidebarOpen.set(false);
   }
   openHelpChat() {
-    this.helpChatRef?.toggleChat();
+    this.sidebarRef?.toggleHelpChat();
   }
   startTour() {
     const currentRoute = window.location.pathname;

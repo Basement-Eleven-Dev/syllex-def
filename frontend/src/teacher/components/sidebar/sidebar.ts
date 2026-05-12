@@ -5,6 +5,7 @@ import {
   Input,
   Output,
   EventEmitter,
+  ViewChild,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import {
@@ -39,6 +40,7 @@ import { Auth } from '../../../services/auth';
 import { FormsModule } from '@angular/forms';
 import { Materia, MateriaObject } from '../../../services/materia';
 import { SubjectSettingsModal } from '../subject-settings-modal/subject-settings-modal';
+import { HelpChat } from '../help-chat/help-chat';
 
 interface SidebarRoute {
   path: string;
@@ -55,6 +57,7 @@ interface SidebarRoute {
     NgbCollapseModule,
     FormsModule,
     TourAnchorNgBootstrapDirective,
+    HelpChat,
   ],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.scss',
@@ -63,6 +66,11 @@ interface SidebarRoute {
 export class Sidebar {
   @Input() open = false;
   @Output() toggleSidebar = new EventEmitter<void>();
+  @ViewChild(HelpChat) helpChatRef!: HelpChat;
+
+  toggleHelpChat() {
+    this.helpChatRef?.toggleChat();
+  }
   onRequestSubjectSettings() {
     const modalRef = this.modalService.open(SubjectSettingsModal, {
       centered: true,

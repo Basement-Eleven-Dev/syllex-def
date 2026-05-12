@@ -1,230 +1,278 @@
-<app-back-to
-  [path]="'/t/tests'"
-  [label]="'Torna alla lista dei test'"
-></app-back-to>
-
-<app-syllex-page-header
-  [title]="PageTitle()"
-  [description]="'Prepara il prossimo test per le tue classi'"
->
-  <button class="btn btn-secondary btn-lg fw-normal" (click)="onRequestAIGeneration()">
-    <fa-icon [icon]="SparklesIcon" class="me-2" />Genera con AI
-  </button>
-</app-syllex-page-header>
-
 @if (IsLoading()) {
-<div class="d-flex justify-content-center align-items-center py-5">
+<div
+  class="d-flex justify-content-center align-items-center"
+  style="height: 400px"
+>
   <div class="spinner-border text-primary" role="status">
     <span class="visually-hidden">Caricamento...</span>
   </div>
 </div>
 } @else {
-<form [formGroup]="TestForm" class="d-flex flex-column gap-4 pb-5">
-  <!-- BLOCCO SUPERIORE: INFO E DISPONIBILITÀ -->
-  <div class="row g-4 mb-4">
-    <!-- Colonna Sinistra (8/12): Titolo, Password, Classi -->
-    <div class="col-12 col-lg-8">
-      <div class="bg-white rounded-4 p-4 shadow-sm h-100">
+<form
+  [formGroup]="TestForm"
+  class="create-test-container bg-white rounded-4 shadow-sm border"
+>
+  <div class="row g-0">
+    <!-- COLONNA PRINCIPALE (SINISTRA) -->
+    <div class="col-12 col-lg-8 border-end">
+      <!-- Sezione 1: Header e Info Base -->
+      <div class="p-4 p-md-5 border-bottom bg-white">
+        <div class="mb-5">
+          <h4 class="fw-bold text-dark mb-1">Configurazione Test</h4>
+          <p class="text-muted small">
+            Definisci i dettagli principali e le classi di destinazione.
+          </p>
+        </div>
+
         <div class="row g-4">
-          <!-- Titolo -->
-          <div class="col-md-6">
-            <label class="form-label text-dark fw-bold small">Titolo</label>
-            <input type="text" class="form-control form-control-lg bg-light border-0" 
-                   formControlName="title" placeholder="Inserisci il titolo del test">
+          <div class="col-12 col-md-8">
+            <label class="form-label text-dark fw-semibold small mb-2"
+              >Titolo del Test</label
+            >
+            <input
+              type="text"
+              formControlName="title"
+              class="form-control form-control-lg border-0 bg-light shadow-none"
+              placeholder="Es: Verifica di fine modulo - Elettronica"
+            />
           </div>
-          <!-- Password -->
-          <div class="col-md-6">
-            <label class="form-label text-dark fw-bold small">Password</label>
-            <div class="d-flex gap-2">
-              <input type="text" class="form-control form-control-lg bg-light border-0" 
-                     formControlName="password" placeholder="Password d'accesso (opzionale)">
-              <button class="btn btn-light border-0 px-3" type="button" (click)="onGeneratePassword()">
+          <div class="col-12 col-md-4">
+            <label class="form-label text-dark fw-semibold small mb-2"
+              >Password (Opzionale)</label
+            >
+            <div class="input-group">
+              <input
+                type="text"
+                formControlName="password"
+                class="form-control border-0 bg-light shadow-none"
+                placeholder="Chiave d'accesso"
+              />
+              <button
+                class="btn btn-light border-0 px-3 shadow-none"
+                type="button"
+                (click)="onGeneratePassword()"
+              >
                 <fa-icon [icon]="GenPasswordIcon"></fa-icon>
               </button>
             </div>
           </div>
-          <!-- Classi -->
           <div class="col-12">
-            <label class="form-label text-dark fw-bold small mb-3">Classi a cui assegnare il test</label>
-            <app-class-selector 
-              [selectedClassIds]="assignedClasses" 
-              (selectedClassIdsChange)="onClassesChange($event)">
+            <label class="form-label text-dark fw-semibold small mb-3"
+              >Assegna alle Classi</label
+            >
+            <app-class-selector
+              [selectedClassIds]="assignedClasses"
+              (selectedClassIdsChange)="onClassesChange($event)"
+            >
             </app-class-selector>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Colonna Destra (4/12): Disponibilità -->
-    <div class="col-12 col-lg-4">
-      <div class="bg-white rounded-4 p-4 shadow-sm h-100 d-flex flex-column">
-        <label class="form-label text-dark fw-bold small mb-4">Disponibilità per gli studenti</label>
-        
-        <div class="mb-4">
-          <label class="text-muted small mb-2 d-block fw-light">Dal giorno</label>
-          <input type="date" formControlName="availableFrom" class="form-control bg-light border-0 py-2">
-        </div>
-
-        <div class="mb-2">
-          <label class="text-muted small mb-2 d-block fw-light">Al giorno</label>
-          <input type="date" formControlName="availableTo" class="form-control bg-light border-0 py-2">
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <!-- BLOCCO RICERCA DOMANDE -->
-  <div class="bg-white rounded-4 p-4 shadow-sm">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
-      <div>
-        <h5 class="fw-bold mb-1">Ricerca domande</h5>
-        <p class="text-muted mb-0 small">Accedi alla banca domande e seleziona le domande da inserire nel test.</p>
-      </div>
-      <button class="btn btn-primary rounded-3 px-4 py-2 fw-semibold shadow-sm" type="button" (click)="onAddQuestion()">
-        <fa-icon [icon]="PlusIcon" class="me-2"></fa-icon>Crea Nuova Domanda
-      </button>
-    </div>
-
-    <app-questions-search-filters
-      (filtersChanged)="questionsSearched.onFiltersChanged($event)"
-    ></app-questions-search-filters>
-
-    <!-- GRIGLIA DI SELEZIONE DOMANDE -->
-    <div class="mt-4">
-      <app-questions-grid-selector
-        [questions]="questionsSearched.filteredQuestions()"
-        [selectedIds]="SelectedQuestionIds()"
-        (toggleSelection)="onToggleQuestion($event)"
-      ></app-questions-grid-selector>
-      
-      <!-- PAGINAZIONE -->
-      <div class="mt-5 d-flex justify-content-center">
-        <app-syllex-pagination
-          [page]="questionsSearched.currentPage()"
-          [collectionSize]="questionsSearched.totalQuestions()"
-          [pageSize]="questionsSearched.pageSize"
-          (pageChange)="questionsSearched.onPageChange($event)"
-        ></app-syllex-pagination>
-      </div>
-
-      <div class="d-none">
-        <!-- Teniamo il componente search solo per la logica di caricamento dati, ma non lo visualizziamo più direttamente -->
-        <app-search-questions #questionsSearched [selectedQuestionIds]="[]"></app-search-questions>
-      </div>
-
-      <div class="d-flex justify-content-end mt-5 pt-3">
-        <button 
-          class="btn btn-success btn-lg rounded-3 px-5 py-3 fw-bold shadow-sm" 
-          type="button" 
-          (click)="onPreview()"
-          [disabled]="SelectedQuestionIds().length === 0"
+      <!-- Sezione 2: Selezione Domande -->
+      <div class="p-4 p-md-5">
+        <div
+          class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3"
         >
-          <fa-icon [icon]="SaveIcon" class="me-2"></fa-icon>Vedi anteprima
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <section class="form-section">
-    <label class="form-label fw-light text-dark"
-      >Requisiti per superare il test e tempo a disposizione</label
-    >
-    <div class="row">
-      <div class="col-4">
-        <label for="required-score" class="form-label text-dark"
-          >Punteggio minimo per idoneità</label
-        >
-        <input
-          type="number"
-          min="1"
-          [max]="maxScore || 100"
-          id="required-score"
-          class="form-control custom-input"
-          formControlName="requiredScore"
-          [placeholder]="maxScore > 0 ? 'Max: ' + maxScore + ' punti' : 'Imposta il punteggio minimo per superare il test'"
-        />
-        @if (maxScore > 0) {
-        <small class="text-muted"
-          >Punteggio massimo del test: {{ maxScore }} punti</small
-        >
-        }
-      </div>
-      <div class="col-4">
-        <label for="max-time" class="form-label text-dark"
-          >Tempo massimo (minuti)</label
-        >
-        <div class="d-flex flex-row gap-3">
-          <input
-            type="number"
-            min="0"
-            max="100"
-            id="max-time"
-            class="form-control custom-input"
-            formControlName="time"
-            [placeholder]="time === null ? 'Tempo illimitato' : 'Imposta il tempo massimo per il test'"
-          />
+          <div>
+            <h5 class="fw-bold mb-1">Banca Domande</h5>
+            <p class="text-muted mb-0 small">
+              Seleziona i contenuti da includere nella prova.
+            </p>
+          </div>
           <button
-            class="btn"
-            id="infiniteButton"
-            [class.selected]="time === null"
-            (click)="onToggleUnlimitedTime()"
+            class="btn btn-outline-primary rounded-3 px-4 py-2 fw-semibold"
+            type="button"
+            (click)="onAddQuestion()"
           >
-            <fa-icon [icon]="InfinityIcon"></fa-icon>
+            <fa-icon [icon]="PlusIcon" class="me-2"></fa-icon>Nuova Domanda
           </button>
         </div>
+
+        <!-- Filtri in linea -->
+        <div class="mb-4">
+          <app-questions-search-filters
+            (filtersChanged)="questionsSearched.onFiltersChanged($event)"
+          >
+          </app-questions-search-filters>
+        </div>
+
+        <!-- GRIGLIA DI SELEZIONE DOMANDE -->
+        <app-questions-grid-selector
+          [questions]="questionsSearched.filteredQuestions()"
+          [selectedIds]="SelectedQuestionIds()"
+          (toggleSelection)="onToggleQuestion($event)"
+        ></app-questions-grid-selector>
+
+        <!-- PAGINAZIONE -->
+        <div class="mt-5 d-flex justify-content-center">
+          <app-syllex-pagination
+            [page]="questionsSearched.currentPage()"
+            [collectionSize]="questionsSearched.totalQuestions()"
+            [pageSize]="questionsSearched.pageSize"
+            (pageChange)="questionsSearched.onPageChange($event)"
+          ></app-syllex-pagination>
+        </div>
+
+        <div class="d-none">
+          <app-search-questions
+            #questionsSearched
+            [selectedQuestionIds]="[]"
+          ></app-search-questions>
+        </div>
       </div>
     </div>
-  </section>
 
-  <section class="form-section">
-    <label class="form-label fw-light text-dark">Opzioni extra</label>
-    <div class="form-check form-switch">
-      <input
-        class="form-check-input"
-        type="checkbox"
-        role="switch"
-        id="randomize-questions"
-        formControlName="randomizeQuestions"
-      />
-      <label class="form-check-label text-dark" for="randomize-questions">
-        Randomizza ordine domande
-        <small class="text-muted d-block fw-light">Se attivo, ogni studente vedrà le domande in un ordine diverso e casuale</small>
-      </label>
-    </div>
-    
-    <div class="form-check form-switch mt-3">
-      <input
-        class="form-check-input"
-        type="checkbox"
-        role="switch"
-        id="one-shot-answers"
-        formControlName="oneShotAnswers"
-      />
-      <label class="form-check-label text-dark" for="one-shot-answers">
-        One-shot (risposta secca)
-        <small class="text-muted d-block fw-light">Se attivo, lo studente non potrà cambiare la sua scelta una volta data (solo domande chiuse)</small>
-      </label>
-    </div>
-  </section>
+    <!-- COLONNA IMPOSTAZIONI (DESTRA) -->
+    <div class="col-12 col-lg-4 bg-light border-start">
+      <div class="right-panel p-4 p-md-5">
+        <!-- 1. Disponibilità -->
+        <div class="settings-group mb-5">
+          <label class="d-flex align-items-center text-dark fw-bold small mb-4">
+            <fa-icon [icon]="CalendarIcon" class="me-2"></fa-icon> Disponibilità
+          </label>
+          <div class="mb-3">
+            <label class="text-muted small mb-1 d-block">Data Inizio</label>
+            <input
+              type="date"
+              formControlName="availableFrom"
+              class="form-control border-0 bg-white shadow-sm"
+            />
+          </div>
+          <div>
+            <label class="text-muted small mb-1 d-block">Data Fine</label>
+            <input
+              type="date"
+              formControlName="availableTo"
+              class="form-control border-0 bg-white shadow-sm"
+            />
+          </div>
+        </div>
 
-  <div class="d-flex flex-row justify-content-end mt-5 gap-3">
-    <button
-      class="btn btn-link btn-lg"
-      type="button"
-      (click)="onSaveTest(true)"
-      [disabled]="IsLoading() || !CanSaveDraft()"
-    >
-      Salva Bozza
-    </button>
-    <button
-      class="btn btn-gradient-primary icon-btn btn-lg"
-      type="button"
-      (click)="onSaveTest()"
-      [disabled]="IsLoading() || !CanPublish()"
-    >
-      Salva
-    </button>
+        <!-- Requisiti -->
+        <div class="settings-group mb-5">
+          <label class="d-flex align-items-center text-dark fw-bold small mb-4">
+            <fa-icon [icon]="ClockIcon" class="me-2"></fa-icon> Requisiti e
+            tempo
+          </label>
+
+          <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <label class="text-muted small">Punteggio Idoneità</label>
+              <span class="badge bg-white text-dark border shadow-sm fw-medium"
+                >Max: {{ maxScore }} pt</span
+              >
+            </div>
+            <input
+              type="number"
+              formControlName="requiredScore"
+              class="form-control border-0 bg-white shadow-sm py-2"
+              placeholder="Min. punti"
+            />
+          </div>
+
+          <div>
+            <label class="text-muted small mb-2 d-block"
+              >Tempo Limite (minuti)</label
+            >
+            <div class="input-group shadow-sm rounded-3 overflow-hidden">
+              <input
+                type="number"
+                formControlName="time"
+                class="form-control border-0 bg-white py-2 shadow-none"
+                [placeholder]="time === null ? 'Tempo illimitato' : 'Minuti'"
+              />
+              <button
+                class="btn btn-white border-0 px-3"
+                type="button"
+                [class.text-primary]="time === null"
+                (click)="onToggleUnlimitedTime()"
+              >
+                <fa-icon [icon]="InfinityIcon"></fa-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comportamento -->
+        <div class="settings-group mb-5">
+          <label class="d-flex align-items-center text-dark fw-bold small mb-4">
+            <fa-icon [icon]="TrophyIcon" class="me-2"></fa-icon> Comportamento
+          </label>
+          <div class="d-flex flex-column gap-3">
+            <div class="form-check form-switch custom-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="random-sw"
+                formControlName="randomizeQuestions"
+              />
+              <label class="form-check-label text-dark small" for="random-sw"
+                >Randomizza domande</label
+              >
+            </div>
+            <div class="form-check form-switch custom-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="oneshot-sw"
+                formControlName="oneShotAnswers"
+              />
+              <label class="form-check-label text-dark small" for="oneshot-sw"
+                >Risposta secca (One-shot)</label
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Azioni Finali -->
+        <div class="mt-auto pt-4 border-top">
+          <button
+            class="btn btn-primary w-100 py-3 fw-bold shadow-sm rounded-3 mb-3 d-flex align-items-center justify-content-center gap-2"
+            type="button"
+            (click)="onPreview()"
+            [disabled]="SelectedQuestionIds().length === 0"
+          >
+            <fa-icon [icon]="SaveIcon"></fa-icon> Vedi Anteprima
+          </button>
+
+          <div class="row g-2">
+            <div class="col-8">
+              <button
+                class="btn btn-dark w-100 py-2 fw-bold shadow-none"
+                type="button"
+                (click)="onSaveTest()"
+                [disabled]="IsLoading() || !CanPublish()"
+                [ngbTooltip]="PublishBlockers().length ? publishTooltip : ''"
+                placement="top"
+                tooltipClass="tooltip-blockers"
+              >
+                Pubblica Test
+              </button>
+              <ng-template #publishTooltip>
+                <div class="text-start">
+                  @for (b of PublishBlockers(); track b) {
+                  <div>· {{ b }}</div>
+                  }
+                </div>
+              </ng-template>
+            </div>
+            <div class="col-4">
+              <button
+                class="btn btn-warning w-100 py-2 small shadow-none border-0 text-white"
+                type="button"
+                (click)="onSaveTest(true)"
+                [disabled]="IsLoading() || !CanSaveDraft()"
+              >
+                Bozza
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </form>
 }

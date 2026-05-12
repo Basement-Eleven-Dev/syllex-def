@@ -1,16 +1,101 @@
-.classBadge,
-#infiniteButton {
-  background-color: transparent;
-  outline: 1px solid var(--bs-primary);
-  color: var(--bs-primary);
+.create-test-container {
+  overflow: clip; // mantiene i bordi arrotondati senza rompere position: sticky
+  min-height: calc(100vh - 200px);
 
-  &:hover {
-    cursor: pointer;
-    background-color: var(--bs-primary);
-    color: white;
+  .right-panel {
+    position: sticky;
+    top: 0;
+    max-height: 100dvh;
+    overflow-y: auto;
+    padding-bottom: 2rem;
   }
-  &.selected {
-    background-color: var(--bs-primary);
-    color: white;
+
+  .form-control-lg {
+    font-size: 1.25rem;
+    font-weight: 600;
+
+    &::placeholder {
+      font-weight: 400;
+      opacity: 0.5;
+    }
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .bg-light {
+    background-color: #f8fafc !important;
+  }
+
+  .btn-white {
+    background-color: white;
+    &:hover {
+      background-color: #f1f5f9;
+    }
+  }
+
+  .settings-group {
+    label {
+      letter-spacing: 0.05em;
+    }
+  }
+
+  .custom-switch {
+    padding-left: 3rem;
+    .form-check-input {
+      width: 2.5rem;
+      height: 1.25rem;
+      margin-left: -3rem;
+      cursor: pointer;
+
+      &:checked {
+        background-color: var(--bs-primary);
+        border-color: var(--bs-primary);
+      }
+    }
+  }
+
+  .sticky-lg-top {
+    @media (min-width: 992px) {
+      position: sticky !important;
+      top: 0 !important;
+      align-self: flex-start; /* Sblocca lo sticky impedendo alla sidebar di allungarsi quanto la colonna sinistra */
+      max-height: 100vh !important;
+      overflow-y: auto;
+      padding-top: 2rem !important;
+      padding-bottom: 3rem !important;
+
+      scrollbar-width: none;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+  }
+
+  .bg-light {
+    background-color: #f1f5f9 !important;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    border: none;
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    }
+  }
+
+  .btn-outline-primary {
+    border-color: #e2e8f0;
+    color: #475569;
+    &:hover {
+      background-color: #f8fafc;
+      border-color: #cbd5e1;
+      color: #1e293b;
+    }
   }
 }

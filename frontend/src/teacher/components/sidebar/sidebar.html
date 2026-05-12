@@ -124,5 +124,31 @@
         </a>
       </div>
     </div>
+
+    <!-- Help chat button -->
+    <div
+      class="rounded-pill shadow-sm d-flex align-items-center gap-2 px-3 py-2 mt-2"
+      style="background: #d7eef7; cursor: pointer"
+      (click)="toggleHelpChat(); $event.stopPropagation()"
+    >
+      <img
+        src="/images/logo_primary.png"
+        alt="Logo"
+        height="18"
+        style="flex-shrink: 0"
+      />
+      <span
+        class="slim-hide"
+        style="
+          color: #3931ce;
+          font-weight: 500;
+          font-size: 0.85rem;
+          white-space: nowrap;
+        "
+        >Come posso aiutarti?</span
+      >
+    </div>
+
+    <app-help-chat></app-help-chat>
   </div>
 </div>
