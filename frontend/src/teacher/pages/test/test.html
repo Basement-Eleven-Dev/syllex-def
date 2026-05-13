@@ -62,7 +62,7 @@
   <div class="row g-3">
     @for(test of RecentTests(); track test._id; let first = $first) {
     <div
-      class="col-12 col-md-6 col-lg-4 col-xl-3"
+      class="col-12 col-md-6 col-lg-4 col-xl-4"
       [tourAnchor]="first ? 'test_first_card' : ''"
     >
       <app-test-card
