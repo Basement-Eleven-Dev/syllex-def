@@ -1,11 +1,15 @@
 .folder-card,
 .materiale-card {
   transition: all 0.2s ease-in-out;
-  border: 1px solid #dee2e6;
+  border: 2px solid transparent;
   &:hover {
     z-index: 10;
     cursor: pointer;
-    background-color: #c2d9ff40;
+    filter: brightness(0.97);
+  }
+
+  &:active {
+    cursor: grabbing;
   }
 
   &.selected {
@@ -14,25 +18,16 @@
   }
 }
 
-.selection-checkbox {
-  display: none !important;
+.materiale-card {
+  background-color: #f3f4f6;
 }
 
-.ai-badge {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  z-index: 5;
-  pointer-events: none;
-  border-radius: 100%;
-  aspect-ratio: 1/1;
-  width: 1.5rem;
-  height: 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 600;
+.folder-card {
+  background-color: #dbeafe;
+}
+
+.selection-checkbox {
+  display: none !important;
 }
 
 .folder-card:hover .selection-checkbox,

@@ -23,6 +23,7 @@ import {
   faRobot,
   faShareNodes,
   faDownload,
+  faSparkles,
 } from '@fortawesome/pro-solid-svg-icons';
 import {
   NgbDropdown,
@@ -69,6 +70,7 @@ export class MaterialeCard implements OnInit, OnDestroy {
 
   readonly ThreeDotsIcon = faEllipsisVertical;
   readonly RobotIcon = faRobot;
+  readonly SparklesIcon = faSparkles;
 
   requestAssignToClass(): void {
     this.contextualMenuRef?.onRequestAssignToClass();
