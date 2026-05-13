@@ -24,6 +24,7 @@ import {
   faRobot,
   faXmark,
   faTrash,
+  faMagnifyingGlass,
 } from '@fortawesome/pro-solid-svg-icons';
 import {
   NgbDropdown,
@@ -117,6 +118,7 @@ export class Materiali implements OnInit {
     robot: faRobot,
     clear: faXmark,
     trash: faTrash,
+    search: faMagnifyingGlass,
   } as const;
 
   // ── State proxied from facade (avoids template changes) ───────────
