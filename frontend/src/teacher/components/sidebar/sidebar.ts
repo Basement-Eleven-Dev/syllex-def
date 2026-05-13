@@ -113,7 +113,7 @@ export class Sidebar {
   mainRoutes: SidebarRoute[] = [
     {
       path: 'dashboard',
-      label: 'Dashboard',
+      label: 'Home',
       icon: faGauge,
     },
     {

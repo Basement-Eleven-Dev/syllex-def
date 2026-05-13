@@ -5,6 +5,23 @@
   flex-shrink: 0;
 }
 
+.sidebar {
+  background-color: #d2e2ff;
+  border-radius: 0 2.4rem 2.4rem 0;
+}
+
+.sidebar-header {
+  img {
+    height: 36px;
+    width: auto;
+    display: block;
+    cursor: pointer;
+  }
+
+  .logo-slim {
+    display: none;
+  }
+}
 /* Non-desktop: in flusso normale slim, fixed solo quando open */
 @media (max-width: 991px) {
   :host {
@@ -31,6 +48,21 @@
   }
 
   :host:not(.open) {
+    .sidebar-header {
+      justify-content: center;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+
+      .logo-extended {
+        display: none;
+      }
+
+      .logo-slim {
+        display: block;
+        height: 28px;
+      }
+    }
+
     .slim-hide {
       display: none !important;
     }
