@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   inject,
   signal,
   ViewChild,
@@ -23,6 +24,7 @@ import {
   faRobot,
   faXmark,
   faTrash,
+  faMagnifyingGlass,
 } from '@fortawesome/pro-solid-svg-icons';
 import {
   NgbDropdown,
@@ -53,10 +55,12 @@ import {
 } from '../../../app/_utils/file-validation.utils';
 import { StorageLimitBar } from '../../components/storage-limit-bar/storage-limit-bar';
 import { AiOverlay } from '../../components/ai-overlay/ai-overlay';
+import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
 import { SuggestedTopicsModal } from '../../components/suggested-topics-modal/suggested-topics-modal';
 import { effect, untracked } from '@angular/core';
 import { FeedbackService } from '../../../services/feedback-service';
 import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
+import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
 
 @Component({
   selector: 'app-materiali',
@@ -72,7 +76,9 @@ import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
     MaterialeContextualMenu,
     StorageLimitBar,
     AiOverlay,
+    SyllexButton,
     TourAnchorNgBootstrapDirective,
+    SyllexPageHeader,
   ],
   templateUrl: './materiali.html',
   styleUrl: './materiali.scss',
@@ -112,6 +118,7 @@ export class Materiali implements OnInit {
     robot: faRobot,
     clear: faXmark,
     trash: faTrash,
+    search: faMagnifyingGlass,
   } as const;
 
   // ── State proxied from facade (avoids template changes) ───────────
@@ -122,6 +129,14 @@ export class Materiali implements OnInit {
   readonly selectedCount = this.facade.selectedCount;
   readonly isStorageFull = this.facade.isStorageFull;
   readonly suggestedTopics = this.facade.suggestedTopics;
+
+  readonly files = computed(() =>
+    (this.rootFolder()?.content ?? []).filter((item) => item.type === 'file'),
+  );
+
+  readonly folders = computed(() =>
+    (this.rootFolder()?.content ?? []).filter((item) => item.type === 'folder'),
+  );
 
   // ── UI-only state ─────────────────────────────────────────────────
   protected readonly viewType = signal<ViewType>('grid');

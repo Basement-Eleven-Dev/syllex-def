@@ -1,51 +1,61 @@
-<h1 class="text-dark fw-medium mb-3 display-6">
-  <span tourAnchor="materiali_header">File e Risorse</span>
-</h1>
-<h5 class="text-dark mb-0 fw-normal">
-  Gestisci e visualizza i tuoi file e le risorse per la materia selezionata.
-</h5>
+<!--       <button
+        tourAnchor="materiali_generate_ai"
+        class="btn ai icon-btn"
+        (click)="onRequestGenerate()"
+        [disabled]="isStorageFull()"
+      >
+        <fa-icon [icon]="icons.sparkles"></fa-icon> Genera con AI
+      </button> -->
 
-<section tourAnchor="materiali_search" class="d-flex flex-row gap-3 my-5">
-  <input
-    #fileInput
-    type="file"
-    class="d-none"
-    (change)="onFileSelected($event)"
-    [accept]="acceptedExtensions"
+<app-syllex-page-header
+  [title]="'File e Risorse'"
+  [description]="'Gestisci e visualizza i tuoi file e le risorse per la materia selezionata.'"
+>
+  <app-syllex-button
+    [props]="{ label: 'Genera materiale con AI', variant: 'secondary', size: 'large' }"
+    (clicked)="onRequestGenerate()"
   />
-  <div>
+</app-syllex-page-header>
+
+<div class="materiali-toolbar my-5">
+  <section tourAnchor="materiali_search" class="d-flex flex-row gap-2 mb-3">
     <input
-      type="text"
-      class="form-control me-3 custom-input filter"
-      id="search-term"
-      placeholder="Cerca file o cartella..."
-      style="min-width: 400px"
-      [(ngModel)]="searchTerm"
+      #fileInput
+      type="file"
+      class="d-none"
+      (change)="onFileSelected($event)"
+      [accept]="acceptedExtensions"
     />
-  </div>
-  <button
-    type="button"
-    class="btn btn-outline-danger"
-    (click)="clearFilters()"
-    title="Pulisci filtri"
-  >
-    <fa-icon [icon]="icons.clear"></fa-icon>
-  </button>
+    <div class="input-group rounded-3 overflow-hidden" style="max-width: 460px">
+      <span class="input-group-text border-0 bg-light text-muted">
+        <fa-icon [icon]="icons.search"></fa-icon>
+      </span>
+      <input
+        type="text"
+        class="form-control border-0 bg-light shadow-none"
+        id="search-term"
+        placeholder="Cerca file o cartella..."
+        [(ngModel)]="searchTerm"
+      />
+    </div>
+    <button
+      type="button"
+      class="btn bg-light text-muted"
+      (click)="clearFilters()"
+      title="Pulisci filtri"
+    >
+      <fa-icon [icon]="icons.clear"></fa-icon>
+    </button>
+  </section>
 
-  <app-view-type-toggle
-    class="ms-auto"
-    [viewType]="viewType()"
-    [pageKey]="'materiali'"
-    (viewTypeChange)="onChangeViewType($event)"
-  />
-</section>
+  <app-storage-limit-bar tourAnchor="materiali_storage_bar" />
+</div>
 
-<app-storage-limit-bar tourAnchor="materiali_storage_bar" />
-
-<section class="form-section">
+<section>
+  <!-- Breadcrumb + selezione -->
   <div
     tourAnchor="materiali_content"
-    class="d-flex flex-row align-items-center justify-content-between mb-4"
+    class="d-flex flex-row align-items-center justify-content-between mb-5"
   >
     <div class="d-flex flex-row align-items-center gap-2">
       @for(dir of currentPathArray(); track $index; let last = $last){
@@ -79,41 +89,29 @@
         selectedCount() }})
       </button>
       }
-      <button
-        tourAnchor="materiali_new_folder"
-        class="btn btn-blue icon-btn"
-        (click)="onCreateNewFolder()"
-      >
-        <fa-icon [icon]="icons.plus"></fa-icon> Nuova cartella
-      </button>
-      <button
-        tourAnchor="materiali_upload"
-        class="btn btn-blue icon-btn"
-        (click)="onRequestUpload()"
-        [disabled]="isStorageFull()"
-      >
-        <fa-icon [icon]="icons.upload"></fa-icon> Carica file
-      </button>
-      <button
-        tourAnchor="materiali_generate_ai"
-        class="btn ai icon-btn"
-        (click)="onRequestGenerate()"
-        [disabled]="isStorageFull()"
-      >
-        <fa-icon [icon]="icons.sparkles"></fa-icon> Genera con AI
-      </button>
+
+      <app-view-type-toggle
+        [viewType]="viewType()"
+        [pageKey]="'materiali'"
+        (viewTypeChange)="onChangeViewType($event)"
+      />
     </div>
   </div>
 
-  <div>
+  <!-- Sezione CARTELLE -->
+  @if (folders().length > 0) {
+  <div class="mb-5">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h5 class="fw-semibold mb-0">Cartelle</h5>
+      <app-syllex-button
+        [props]="{ label: 'Crea nuova cartella', variant: 'primary', size: 'large' }"
+        (clicked)="onCreateNewFolder()"
+      />
+    </div>
     @if(viewType() === 'grid') {
     <div class="row">
-      @for(item of rootFolder().content; track item._id; let first = $first){
-      <div
-        class="col-12 col-md-6 col-lg-4 col-xl-3 mb-3"
-        [tourAnchor]="first ? 'materiali_first_card' : ''"
-      >
-        @if('content' in item) {
+      @for(item of folders(); track item._id){
+      <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-3">
         <div
           (dragover)="onDragOver($event)"
           (drop)="onDrop(item, $event)"
@@ -132,23 +130,10 @@
             (selectItemEvent)="onSelectItem(item, $event)"
           />
         </div>
-        } @else {
-        <app-materiale-card
-          [item]="item"
-          [highlightedItemId]="highlightedItemId()"
-          [isSelected]="isItemSelected(item._id)"
-          [draggable]="true"
-          (openItem)="onRequestOpenItem(item)"
-          (dragstart)="onDragStart(item, $event)"
-          (renameItem)="onRequestRenameItem(item, $event)"
-          (deleteItem)="onRequestDeleteItem(item)"
-          (selectItemEvent)="onSelectItem(item, $event)"
-        />
-        }
       </div>
       } @empty {
-      <div class="col-12 text-center py-5">
-        <p class="text-muted">Nessun elemento presente</p>
+      <div class="col-12 text-center py-4">
+        <p class="text-muted">Nessuna cartella presente</p>
       </div>
       }
     </div>
@@ -174,7 +159,133 @@
           </tr>
         </thead>
         <tbody>
-          @for(item of rootFolder().content; track item._id!){
+          @for(item of folders(); track item._id!){
+          <tr
+            class="cursor-pointer"
+            [class.table-active]="isItemSelected(item._id!)"
+            [class.highlight-row]="highlightedItemId() === item._id!"
+            [draggable]="true"
+            (click)="onSelectItem(item, $event)"
+            (dblclick)="onRequestOpenItem(item); $event.stopPropagation()"
+            (dragstart)="onDragStart(item, $event)"
+            (dragover)="onDragOver($event)"
+            (drop)="onDrop(item, $event)"
+            (dragenter)="onDragEnter($event)"
+            (dragleave)="onDragLeave($event)"
+          >
+            <td>
+              <input
+                type="checkbox"
+                class="form-check-input"
+                [checked]="isItemSelected(item._id!)"
+                (click)="$event.stopPropagation()"
+                (change)="onSelectItem(item, $event)"
+              />
+            </td>
+            <td>
+              <fa-icon
+                [icon]="getItemIcon(item)"
+                size="lg"
+                [style.color]="getItemColor(item)"
+              />
+            </td>
+            <td>{{ item.name }}</td>
+            <td class="text-muted">{{ getItemType(item) }}</td>
+            <td class="text-muted">{{ getItemSize(item) }}</td>
+            <td class="text-muted">
+              {{ item.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+            </td>
+            <td>
+              <div ngbDropdown class="d-inline-block">
+                <button
+                  class="btn btn-sm btn-light circle-btn"
+                  (click)="$event.stopPropagation()"
+                  ngbDropdownToggle
+                >
+                  <fa-icon [icon]="icons.threeDots" />
+                </button>
+                <div ngbDropdownMenu>
+                  <app-materiale-contextual-menu
+                    [item]="item"
+                    (renameItem)="onRequestRenameItem(item, $event)"
+                    (deleteItem)="onRequestDeleteItem(item)"
+                  />
+                </div>
+              </div>
+            </td>
+          </tr>
+          } @empty {
+          <tr>
+            <td colspan="7" class="text-center py-4">
+              <p class="text-muted">Nessuna cartella presente</p>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    }
+  </div>
+  }
+
+  <!-- Sezione FILE -->
+  <div>
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h5 class="fw-semibold mb-0">File</h5>
+      <app-syllex-button
+        tourAnchor="materiali_upload"
+        [props]="{ label: 'Carica nuovo', variant: 'secondary', size: 'large', leftIcon: icons.upload, disabled: isStorageFull() }"
+        (clicked)="onRequestUpload()"
+      />
+    </div>
+    @if(viewType() === 'grid') {
+    <div class="row">
+      @for(item of files(); track item._id; let first = $first){
+      <div
+        class="col-12 col-md-6 col-lg-4 col-xl-3 mb-3"
+        [tourAnchor]="first ? 'materiali_first_card' : ''"
+      >
+        <app-materiale-card
+          [item]="item"
+          [highlightedItemId]="highlightedItemId()"
+          [isSelected]="isItemSelected(item._id)"
+          [draggable]="true"
+          (openItem)="onRequestOpenItem(item)"
+          (dragstart)="onDragStart(item, $event)"
+          (renameItem)="onRequestRenameItem(item, $event)"
+          (deleteItem)="onRequestDeleteItem(item)"
+          (selectItemEvent)="onSelectItem(item, $event)"
+        />
+      </div>
+      } @empty {
+      <div class="col-12 text-center py-4">
+        <p class="text-muted">Nessun file presente</p>
+      </div>
+      }
+    </div>
+    } @else {
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 40px">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                [checked]="isAllSelected()"
+                (change)="toggleSelectAll()"
+              />
+            </th>
+            <th style="width: 40px"></th>
+            <th>Nome</th>
+            <th style="width: 120px">Tipo</th>
+            <th style="width: 120px">Dimensione</th>
+            <th style="width: 180px">Data modifica</th>
+            <th style="width: 50px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(item of files(); track item._id!){
           <tr
             class="cursor-pointer"
             [class.table-active]="isItemSelected(item._id!)"
@@ -213,7 +324,7 @@
               />
               }
             </td>
-            <td class="">{{ item.name }}</td>
+            <td>{{ item.name }}</td>
             <td class="text-muted">{{ getItemType(item) }}</td>
             <td class="text-muted">{{ getItemSize(item) }}</td>
             <td class="text-muted">
@@ -240,8 +351,8 @@
           </tr>
           } @empty {
           <tr>
-            <td colspan="6" class="text-center py-5">
-              <p class="text-muted">Nessun elemento presente</p>
+            <td colspan="7" class="text-center py-4">
+              <p class="text-muted">Nessun file presente</p>
             </td>
           </tr>
           }
