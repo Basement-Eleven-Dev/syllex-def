@@ -26,13 +26,15 @@
   <app-questions-search-filters
     class="flex-grow-1"
     (filtersChanged)="onFiltersChanged($event)"
-  ></app-questions-search-filters>
-  <app-view-type-toggle
-    tourAnchor="banca_toggle"
-    [viewType]="ViewType"
-    [pageKey]="'banca'"
-    (viewTypeChange)="onChangeViewType($event)"
-  />
+  >
+    <app-view-type-toggle
+      class="ms-auto"
+      tourAnchor="banca_toggle"
+      [viewType]="ViewType"
+      [pageKey]="'banca'"
+      (viewTypeChange)="onChangeViewType($event)"
+    />
+  </app-questions-search-filters>
 </section>
 
 @if (ViewType === 'table') {

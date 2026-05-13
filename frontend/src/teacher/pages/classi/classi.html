@@ -4,41 +4,20 @@
 />
 
 <section class="d-flex flex-row my-5 gap-3">
-  <div>
-    <input
-      type="text"
-      class="form-control custom-input filter"
-      id="search-term"
-      placeholder="Cerca classi..."
-      style="min-width: 400px"
-      [value]="SearchTerm()"
-      (input)="onSearchTermChange($any($event.target).value)"
-    />
-  </div>
-  <div>
-    <select
-      id="year-filter"
-      class="form-select custom-input filter"
-      style="min-width: 200px"
-      [value]="SelectedYear()"
-      (change)="onYearChange($any($event.target).value)"
-    >
-      <option value="">Tutti gli anni</option>
-      <option value="2026">2026</option>
-      <option value="2027">2027</option>
-      <option value="2028">2028</option>
-      <option value="2029">2029</option>
-      <option value="2030">2030</option>
-    </select>
-  </div>
-  <button
-    type="button"
-    class="btn btn-outline-danger"
-    (click)="clearFilters()"
-    title="Pulisci filtri"
-  >
-    <fa-icon [icon]="ClearIcon"></fa-icon>
-  </button>
+  <app-syllex-search-input
+    placeholder="Cerca classi..."
+    [value]="SearchTerm()"
+    (valueChange)="onSearchTermChange($event)"
+    style="min-width: 400px"
+  />
+  <app-syllex-select-input
+    [value]="SelectedYear().toString()"
+    (valueChange)="onYearChange($event)"
+    style="min-width: 200px"
+    placeholder="Tutti gli anni"
+    [options]="yearOptions"
+  />
+  <app-syllex-clear-button (clicked)="clearFilters()" />
   <app-view-type-toggle
     class="ms-auto"
     [viewType]="viewType"

@@ -2,72 +2,53 @@
   <!-- Riga 1: Ricerca Testuale -->
   <div class="d-flex gap-2 align-items-center">
     <div style="max-width: 320px; min-width: 180px; flex: 1">
-      <input
-        type="text"
-        class="form-control bg-light border-0 py-2 shadow-none"
+      <app-syllex-search-input
         placeholder="Cerca per testo della domanda..."
         formControlName="searchTerm"
       />
     </div>
-    <button
-      type="button"
-      class="btn btn-red"
-      (click)="resetFilters()"
-      title="Pulisci filtri"
-    >
-      <fa-icon [icon]="ClearIcon"></fa-icon>
-    </button>
+    <app-syllex-clear-button (clicked)="resetFilters()" />
+    <ng-content></ng-content>
   </div>
 
   <!-- Riga 2: Filtri Specifici (Si adattano alla larghezza della colonna) -->
   <div class="d-flex flex-row flex-wrap gap-2">
     <!-- Tipologia -->
     <div class="flex-fill" style="min-width: 130px">
-      <select
-        class="form-select bg-light border-0 py-2 shadow-none small w-100"
+      <app-syllex-select-input
         formControlName="type"
-      >
-        <option value="">Tutte le tipologie</option>
-        @for(type of ['scelta multipla', 'vero falso', 'risposta aperta']; track
-        $index) {
-        <option [value]="type">{{ type | titlecase }}</option>
-        }
-      </select>
+        class="w-100"
+        placeholder="Tutte le tipologie"
+        [options]="typeOptions"
+      />
     </div>
 
     <!-- Argomento -->
     <div class="flex-fill" style="min-width: 130px">
-      <select
-        class="form-select bg-light border-0 py-2 shadow-none small w-100"
+      <app-syllex-select-input
         formControlName="topicId"
-      >
-        <option value="">Argomento</option>
-        @for(topic of materiaService.materiaSelected()?.topics; track $index) {
-        <option [value]="topic._id">{{ topic.name }}</option>
-        }
-      </select>
+        class="w-100"
+        placeholder="Argomento"
+        [options]="topicOptions()"
+      />
     </div>
 
     <!-- Difficoltà -->
     <div class="flex-fill" style="min-width: 100px">
-      <select
-        class="form-select bg-light border-0 py-2 shadow-none small w-100"
+      <app-syllex-select-input
         formControlName="difficulty"
-      >
-        <option value="">Difficoltà</option>
-        @for(opt of DifficultyOptions; track opt.value) {
-        <option [value]="opt.value">{{ opt.label }}</option>
-        }
-      </select>
+        class="w-100"
+        placeholder="Difficoltà"
+        [options]="DifficultyOptions"
+      />
     </div>
 
     <!-- Tag -->
     <div class="flex-fill" style="min-width: 120px">
-      <input
-        type="text"
-        class="form-control bg-light border-0 py-2 shadow-none small w-100"
+      <app-syllex-search-input
         placeholder="Filtra per tag..."
         formControlName="tag"
+        class="w-100"
       />
     </div>
   </div>

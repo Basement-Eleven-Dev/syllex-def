@@ -18,37 +18,21 @@
   tourAnchor="test_filters"
   class="d-flex flex-wrap mb-3 gap-3 align-items-center"
 >
-  <input
-    type="text"
-    id="search-term"
-    class="form-control custom-input filter py-3 w-25"
+  <app-syllex-search-input
     placeholder="Cerca test..."
     [value]="SearchTerm()"
-    (input)="onSearchTermChange($any($event.target).value)"
+    (valueChange)="onSearchTermChange($event)"
+    style="width: 25%; min-width: 220px"
   />
 
-  <div>
-    <select
-      id="publication-status"
-      class="form-select custom-input filter py-3"
-      style="width: 130px"
-      [value]="Status()"
-      (change)="onStatusChange($any($event.target).value)"
-    >
-      <option value="">Stato</option>
-      @for(status of ['bozza', 'pubblicato', 'archiviato']; track $index) {
-      <option [value]="status">{{ status | titlecase }}</option>
-      }
-    </select>
-  </div>
-  <button
-    type="button"
-    class="btn btn-primary py-3"
-    (click)="clearFilters()"
-    title="Pulisci filtri"
-  >
-    <fa-icon [icon]="ClearIcon"></fa-icon>
-  </button>
+  <app-syllex-select-input
+    [value]="Status()"
+    (valueChange)="onStatusChange($event)"
+    style="width: 130px"
+    placeholder="Stato"
+    [options]="statusOptions"
+  />
+  <app-syllex-clear-button (clicked)="clearFilters()" />
   <app-view-type-toggle
     class="ms-auto"
     [viewType]="ViewType"
