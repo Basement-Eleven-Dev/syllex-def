@@ -5,7 +5,10 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faChartLine, faUsers } from '@fortawesome/pro-solid-svg-icons';
 import { forkJoin, of } from 'rxjs';
 import { catchError, filter, map, switchMap } from 'rxjs/operators';
-import { StatCard, StatCardData } from '../../components/stat-card/stat-card';
+import {
+  KpiCardData,
+  SyllexKpiRow,
+} from '../../components/UI/syllex-kpi-row/syllex-kpi-row';
 import { StatisticheClasse } from '../../components/statistiche-classe/statistiche-classe';
 import { StudentiClasseTable } from '../../components/studenti-classe-table/studenti-classe-table';
 import {
@@ -17,7 +20,6 @@ import {
   StudentPerformanceData,
 } from '../../../services/class-statistics.service';
 import { TestsService } from '../../../services/tests-service';
-import { JsonPipe } from '@angular/common';
 import { BackTo } from '../../components/back-to/back-to';
 
 interface ClassDetailSection {
@@ -34,7 +36,7 @@ interface ClassDetailSection {
     StudentiClasseTable,
     FontAwesomeModule,
     StatisticheClasse,
-    StatCard,
+    SyllexKpiRow,
     BackTo,
   ],
   templateUrl: './classe-dettaglio.html',
@@ -78,33 +80,32 @@ export class ClasseDettaglio {
   ];
 
   // Computed stats
-  readonly Stats = computed<StatCardData[]>(() => {
+  readonly Stats = computed<KpiCardData[]>(() => {
     const classData = this.ClassData();
-    console.log('Computing stats with classData:', classData);
     if (!classData) return [];
 
     return [
       {
-        Label: 'Numero Studenti',
-        Value: this.StudentsData().length,
+        label: 'Numero Studenti',
+        value: this.StudentsData().length,
       },
       {
-        Label: 'Performance Media',
-        RequirePercentage: true,
-        Value: this.AveragePerformance(),
+        label: 'Performance Media',
+        requirePercentage: true,
+        value: this.AveragePerformance(),
       },
       {
-        Label: 'Test Assegnati',
-        Value: this.AssignedTestsCount(),
-        Link: '/t/tests/new',
-        QueryParams: { assign: classData._id },
-        LinkLabel: 'Nuovo test',
+        label: 'Test Assegnati',
+        value: this.AssignedTestsCount(),
+        buttonLink: '/t/tests/new',
+        buttonQueryParams: { assign: classData._id },
+        buttonLabel: 'Nuovo test',
       },
       {
-        Label: 'Test Consegnati',
-        Value: this.SubmittedTestsCount(),
-        Link: ['/t/tests'],
-        LinkLabel: 'Vedi tutti',
+        label: 'Test Consegnati',
+        value: this.SubmittedTestsCount(),
+        buttonLink: ['/t/tests'],
+        buttonLabel: 'Vedi tutti',
       },
     ];
   });
