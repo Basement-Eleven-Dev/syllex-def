@@ -29,23 +29,18 @@
   }
 }
 
-.section-link {
-  color: var(--bs-dark);
-  text-align: left;
-  transition: all 0.2s ease;
-  border: none;
-
-  &:hover {
-    background-color: #c2d9ff;
-    transform: translateX(4px);
-  }
-
-  &.active {
-    background-color: #c2d9ff;
-    font-weight: 600;
-  }
+.section-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #9ca3af;
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
 
   fa-icon {
-    margin-right: 0.5rem;
+    font-size: 1rem;
   }
 }

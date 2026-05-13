@@ -1,20 +1,48 @@
-.section-link {
-  color: var(--bs-dark);
-  text-align: left;
-  transition: all 0.2s ease;
-  border: none;
+.class-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.25rem;
+
+  &__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #3931ce;
+    display: flex;
+    align-items: center;
+  }
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: 2px solid #3931ce;
+  background: transparent;
+  color: #3931ce;
+  flex-shrink: 0;
+  transition: opacity 0.2s ease;
 
   &:hover {
-    background-color: #c2d9ff;
-    transform: translateX(4px);
+    opacity: 0.75;
   }
+}
 
-  &.active {
-    background-color: #c2d9ff;
-    font-weight: 600;
-  }
+.section-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #9ca3af;
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
 
   fa-icon {
-    margin-right: 0.5rem;
+    font-size: 1rem;
   }
 }

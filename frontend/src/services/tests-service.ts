@@ -54,7 +54,7 @@ export interface AttemptInterface {
   testId: string;
   subjectId: string;
   status: 'not-reviewed' | 'reviewed';
-  deliverdAt: Date;
+  deliveredAt: Date;
   reviewedAt?: Date;
   score: number;
   maxScore: number;

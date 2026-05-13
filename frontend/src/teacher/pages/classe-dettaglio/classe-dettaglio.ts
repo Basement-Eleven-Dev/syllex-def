@@ -25,13 +25,6 @@ import {
 } from '../../../services/class-statistics.service';
 import { TestsService } from '../../../services/tests-service';
 
-interface ClassDetailSection {
-  Id: number;
-  Title: string;
-  Icon: any;
-  Component: any;
-}
-
 @Component({
   selector: 'app-class-detail',
   imports: [
@@ -65,23 +58,6 @@ export class ClasseDettaglio {
   readonly IsLoading = signal<boolean>(true);
   readonly ErrorMessage = signal<string | null>(null);
 
-  // Section management
-  readonly ActiveSectionId = signal<number>(1);
-  readonly Sections: ClassDetailSection[] = [
-    {
-      Id: 1,
-      Title: 'Assegnazioni',
-      Icon: this.UsersIcon,
-      Component: StudentiClasseTable,
-    },
-    {
-      Id: 2,
-      Title: 'Statistiche',
-      Icon: this.ChartIcon,
-      Component: StatisticheClasse,
-    },
-  ];
-
   // Computed stats
   readonly Stats = computed<KpiCardData[]>(() => {
     const classData = this.ClassData();
@@ -112,12 +88,6 @@ export class ClasseDettaglio {
       },
     ];
   });
-
-  readonly ActiveSectionComponent = computed(
-    () =>
-      this.Sections.find((s) => s.Id === this.ActiveSectionId())?.Component ||
-      null,
-  );
 
   readonly ClassNotFound = computed(
     () => !this.IsLoading() && !this.ClassData(),
@@ -199,9 +169,5 @@ export class ClasseDettaglio {
         return of(null);
       }),
     );
-  }
-
-  onSectionChange(sectionId: number): void {
-    this.ActiveSectionId.set(sectionId);
   }
 }

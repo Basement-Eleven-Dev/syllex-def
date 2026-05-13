@@ -20,6 +20,11 @@ import {
   ViewType,
 } from '../../components/view-type-toggle/view-type-toggle';
 import { BackTo } from '../../components/back-to/back-to';
+import {
+  KpiCardData,
+  SyllexKpiRow,
+} from '../../components/UI/syllex-kpi-row/syllex-kpi-row';
+import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
 
 @Component({
   selector: 'app-classi',
@@ -29,6 +34,8 @@ import { BackTo } from '../../components/back-to/back-to';
     SyllexPagination,
     FormsModule,
     ViewTypeToggle,
+    SyllexKpiRow,
+    SyllexPageHeader,
   ],
   templateUrl: './classi.html',
   styleUrl: './classi.scss',
@@ -75,6 +82,15 @@ export class Classi {
   });
 
   CollectionSize = computed(() => this.FilteredClassi().length);
+
+  KpiClassi = computed<KpiCardData[]>(() =>
+    this.PaginatedClassi().map((classe) => ({
+      value: classe.name,
+      label: `${classe.students.length} student${classe.students.length === 1 ? 'e' : 'i'}`,
+      buttonLabel: 'Visualizza',
+      buttonLink: ['/t/classi', classe._id],
+    })),
+  );
 
   PaginatedClassi = computed<ClassInterface[]>(() => {
     const filtered = this.FilteredClassi();
