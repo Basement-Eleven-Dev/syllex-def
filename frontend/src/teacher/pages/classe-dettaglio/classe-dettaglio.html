@@ -12,8 +12,16 @@
 } @if (ClassNotFound()) {
 <div class="alert alert-warning" role="alert">Classe non trovata</div>
 } @if (ClassData() && !IsLoading()) {
-<app-back-to [path]="'/t/classi'" [label]="'Torna alle classi'" />
-<h1 class="text-dark fw-bold mb-0 display-6">{{ ClassData()!.name }}</h1>
+<div class="class-header">
+  <button
+    class="back-btn"
+    [routerLink]="'/t/classi'"
+    aria-label="Torna alle classi"
+  >
+    <fa-icon [icon]="ArrowLeftIcon" />
+  </button>
+  <span class="class-header__title">Classe: {{ ClassData()!.name }}</span>
+</div>
 
 <!-- Statistics Cards -->
 <div class="mt-5">

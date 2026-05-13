@@ -2,7 +2,11 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faChartLine, faUsers } from '@fortawesome/pro-solid-svg-icons';
+import {
+  faArrowLeft,
+  faChartLine,
+  faUsers,
+} from '@fortawesome/pro-solid-svg-icons';
 import { forkJoin, of } from 'rxjs';
 import { catchError, filter, map, switchMap } from 'rxjs/operators';
 import {
@@ -20,7 +24,6 @@ import {
   StudentPerformanceData,
 } from '../../../services/class-statistics.service';
 import { TestsService } from '../../../services/tests-service';
-import { BackTo } from '../../components/back-to/back-to';
 
 interface ClassDetailSection {
   Id: number;
@@ -37,7 +40,6 @@ interface ClassDetailSection {
     FontAwesomeModule,
     StatisticheClasse,
     SyllexKpiRow,
-    BackTo,
   ],
   templateUrl: './classe-dettaglio.html',
   styleUrl: './classe-dettaglio.scss',
@@ -50,6 +52,7 @@ export class ClasseDettaglio {
   private readonly statisticsService = inject(ClassStatisticsService);
 
   // Icons
+  readonly ArrowLeftIcon = faArrowLeft;
   readonly ChartIcon = faChartLine;
   readonly UsersIcon = faUsers;
 
