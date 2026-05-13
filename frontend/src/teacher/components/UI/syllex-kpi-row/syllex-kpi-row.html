@@ -1,0 +1,28 @@
+<div class="row g-3">
+  @for (kpi of kpis; track $index) {
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="kpi-card">
+      <div class="kpi-card__top">
+        @if (kpi.buttonLabel && kpi.buttonLink) {
+        <a
+          [routerLink]="kpi.buttonLink"
+          [queryParams]="kpi.buttonQueryParams"
+          class="kpi-btn"
+        >
+          {{ kpi.buttonLabel }}
+        </a>
+        }
+      </div>
+      <div class="kpi-card__bottom">
+        <span class="kpi-value">
+          {{ kpi.value }}@if (kpi.requirePercentage) {<small
+            class="kpi-percentage"
+            >%</small
+          >}
+        </span>
+        <span class="kpi-label">{{ kpi.label }}</span>
+      </div>
+    </div>
+  </div>
+  }
+</div>
