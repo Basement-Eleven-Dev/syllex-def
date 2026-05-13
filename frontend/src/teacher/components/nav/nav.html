@@ -77,6 +77,52 @@
       <fa-icon [icon]="SubjectToggleIcon" class="text-success"></fa-icon>
     </div> -->
 
+  <!-- Subject selector -->
+  @if (selectedSubject()) {
+  <div class="subject-selector">
+    <div ngbDropdown class="d-inline-block">
+      <button
+        ngbDropdownToggle
+        class="subject-pill-btn d-flex align-items-center gap-2"
+      >
+        <fa-icon
+          [icon]="ArrowDownIcon"
+          [size]="'lg'"
+          class="subject-pill-chevron"
+        ></fa-icon>
+        <span class="subject-pill-name">{{ selectedSubject()!.name }}</span>
+      </button>
+      <div ngbDropdownMenu class="subject-dropdown-menu shadow">
+        @for (subject of allSubjects(); track subject._id) {
+        <button
+          ngbDropdownItem
+          class="subject-dropdown-item d-flex align-items-center gap-2"
+          [class.active]="selectedSubject()!._id === subject._id"
+          (click)="selectSubject(subject)"
+        >
+          <fa-icon
+            [icon]="CheckIcon"
+            [size]="'xs'"
+            class="check-icon flex-shrink-0"
+            [class.invisible]="selectedSubject()!._id !== subject._id"
+          ></fa-icon>
+          <span class="subject-dropdown-item-label">{{ subject.name }}</span>
+        </button>
+        }
+      </div>
+    </div>
+    <app-syllex-button
+      [props]="{
+          label: 'Argomenti',
+          variant: 'underline',
+          color: 'white',
+          size: 'small'
+        }"
+      (clicked)="onRequestSubjectSettings()"
+    ></app-syllex-button>
+  </div>
+  }
+
   <div class="flex-fill d-flex flex-row justify-content-end gap-4">
     <div class="d-flex flex-row gap-3">
       <button
@@ -95,7 +141,7 @@
       /> -->
     </div>
     <div
-      class="rounded py-3 px-4 d-flex align-items-center gap-2 px-3 py-2"
+      class="rounded-pill py-3 px-4 d-flex align-items-center gap-2 px-3 py-2"
       style="background: #d7eef7; cursor: pointer"
       (click)="toggleHelpChat(); $event.stopPropagation()"
     >

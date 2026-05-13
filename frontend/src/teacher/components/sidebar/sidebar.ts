@@ -41,7 +41,6 @@ import { FormsModule } from '@angular/forms';
 import { Materia, MateriaObject } from '../../../services/materia';
 import { SubjectSettingsModal } from '../subject-settings-modal/subject-settings-modal';
 import { HelpChat } from '../help-chat/help-chat';
-import { SyllexButton } from '../UI/syllex-button/syllex-button';
 
 interface SidebarRoute {
   path: string;
@@ -59,7 +58,6 @@ interface SidebarRoute {
     FormsModule,
     TourAnchorNgBootstrapDirective,
     HelpChat,
-    SyllexButton,
   ],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.scss',

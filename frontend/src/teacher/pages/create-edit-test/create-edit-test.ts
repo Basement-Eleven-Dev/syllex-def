@@ -35,7 +35,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SearchQuestions } from '../../components/search-questions/search-questions';
 import { ClassSelector } from '../../components/class-selector/class-selector';
 import { ClassiService } from '../../../services/classi-service';
-import { BackTo } from '../../components/back-to/back-to';
 import { GenAiContents } from '../../components/gen-ai-contents/gen-ai-contents';
 import {
   NgbModal,
@@ -50,7 +49,6 @@ import {
 } from '../../../services/questions';
 import { FeedbackService } from '../../../services/feedback-service';
 import { QuestionsSearchFilters } from '../../components/questions-search-filters/questions-search-filters';
-import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
 import { QuestionsGridSelector } from '../../components/questions-grid-selector/questions-grid-selector';
 import { SyllexPagination } from '../../components/syllex-pagination/syllex-pagination';
 import { TestPreviewModal } from '../../components/test-preview-modal/test-preview-modal';
@@ -65,9 +63,7 @@ import { forkJoin } from 'rxjs';
     FontAwesomeModule,
     SearchQuestions,
     ClassSelector,
-    BackTo,
     QuestionsSearchFilters,
-    SyllexPageHeader,
     QuestionsGridSelector,
     SyllexPagination,
     NgbTooltipModule,

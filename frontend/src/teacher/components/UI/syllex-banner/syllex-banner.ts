@@ -1,13 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { SafeHtml } from '@angular/platform-browser';
 import { SyllexButton } from '../syllex-button/syllex-button';
 
 @Component({
   selector: 'app-syllex-banner',
   standalone: true,
-  imports: [CommonModule, RouterLink, SyllexButton],
+  imports: [CommonModule, SyllexButton],
   templateUrl: './syllex-banner.html',
   styleUrl: './syllex-banner.scss',
 })

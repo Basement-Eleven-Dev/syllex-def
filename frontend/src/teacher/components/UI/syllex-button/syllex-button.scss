@@ -6,3 +6,57 @@ button {
     border-color: color-mix(in srgb, var(--bs-btn-bg) 70%, black);
   }
 }
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--bs-primary);
+  border: 2px solid var(--bs-primary) !important;
+
+  &:hover:not(:disabled) {
+    background-color: var(--bs-primary);
+    color: white;
+    border-color: var(--bs-primary) !important;
+  }
+}
+
+.btn-outline-white {
+  background-color: transparent;
+  color: white;
+  border: 2px solid white !important;
+
+  &:hover:not(:disabled) {
+    background-color: white;
+    color: var(--bs-primary);
+    border-color: white !important;
+  }
+}
+
+.btn-underline {
+  background: transparent;
+  color: var(--bs-primary);
+  border: none !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+
+  &:hover:not(:disabled) {
+    border-color: transparent !important;
+    opacity: 0.75;
+  }
+}
+
+.btn-underline-white {
+  background: transparent;
+  color: white;
+  border: none !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+
+  &:hover:not(:disabled) {
+    border-color: transparent !important;
+    opacity: 0.75;
+  }
+}

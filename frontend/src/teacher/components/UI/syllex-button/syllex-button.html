@@ -1,9 +1,14 @@
 <button
-  class="btn btn-{{ props.variant }} btn-{{ props.size }} fs-6 fw-medium px-5 py-3 "
+  class="btn fs-6 fw-medium d-inline-flex align-items-center gap-2"
+  [ngClass]="buttonClasses"
   [routerLink]="props.link"
   [disabled]="props.disabled"
-  (click)="props.onClick && props.onClick()"
+  (click)="handleClick()"
   [routerLinkActive]="'active'"
 >
-  {{ props.label }}
+  @if (props.leftIcon) {
+  <fa-icon [icon]="props.leftIcon"></fa-icon>
+  } {{ props.label }} @if (props.rightIcon) {
+  <fa-icon [icon]="props.rightIcon"></fa-icon>
+  }
 </button>
