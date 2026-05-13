@@ -31,6 +31,59 @@ button {
   }
 }
 
+.btn-outline-dark {
+  background-color: white;
+  color: var(--bs-dark);
+  border: 1px solid var(--bs-dark) !important;
+
+  &:hover:not(:disabled) {
+    background-color: var(--bs-dark);
+    color: white;
+    border-color: var(--bs-dark) !important;
+  }
+}
+
+.btn-outline-danger {
+  background-color: transparent;
+  color: var(--bs-danger);
+  border: 1px solid var(--bs-danger) !important;
+
+  &:hover:not(:disabled) {
+    background-color: var(--bs-danger);
+    color: white;
+    border-color: var(--bs-danger) !important;
+  }
+}
+
+.btn-solid-danger {
+  background-color: #ffd4da;
+  color: #9b1c2e;
+  border: 1px solid #ffd4da !important;
+
+  &:hover:not(:disabled) {
+    background-color: #ffbec7;
+    border-color: #ffbec7 !important;
+  }
+}
+
+.icon-only {
+  &.btn-sm {
+    padding: 0.3rem !important;
+    aspect-ratio: 1;
+    justify-content: center;
+  }
+  &.btn-lg {
+    padding: 0.75rem !important;
+    aspect-ratio: 1;
+    justify-content: center;
+  }
+  &:not(.btn-sm):not(.btn-lg) {
+    padding: 0.5rem !important;
+    aspect-ratio: 1;
+    justify-content: center;
+  }
+}
+
 .btn-underline {
   background: transparent;
   color: var(--bs-primary);

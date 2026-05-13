@@ -1,0 +1,37 @@
+.badge-syllex {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.3em 0.65em;
+  border-radius: 6px;
+
+  &.badge-syllex-green {
+    background-color: #d1fae5;
+    color: #065f46;
+  }
+
+  &.badge-syllex-orange {
+    background-color: #ffedd5;
+    color: #9a3412;
+  }
+
+  &.badge-syllex-blue {
+    background-color: #dbeafe;
+    color: #1e40af;
+  }
+
+  &.badge-syllex-purple {
+    background-color: #ede9fe;
+    color: #5b21b6;
+  }
+
+  &.badge-syllex-red {
+    background-color: #fee2e2;
+    color: #991b1b;
+  }
+
+  &.badge-syllex-gray {
+    background-color: #f3f4f6;
+    color: #374151;
+  }
+}
