@@ -24,6 +24,7 @@ import {
   KpiCardData,
   SyllexKpiRow,
 } from '../../components/UI/syllex-kpi-row/syllex-kpi-row';
+import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
 
 @Component({
   selector: 'app-classi',
@@ -34,6 +35,7 @@ import {
     FormsModule,
     ViewTypeToggle,
     SyllexKpiRow,
+    SyllexPageHeader,
   ],
   templateUrl: './classi.html',
   styleUrl: './classi.scss',

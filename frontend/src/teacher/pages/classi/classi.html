@@ -1,9 +1,7 @@
-<h1 class="text-dark fw-medium mb-3 display-6">
-  Le tue classi di {{ materiaService.materiaSelected()!.name }}
-</h1>
-<h5 class="text-dark mb-0 fw-normal">
-  Gestisci e visualizza le tue classi da qui.
-</h5>
+<app-syllex-page-header
+  [title]="'Le tue classi di ' + materiaService.materiaSelected()!.name"
+  [description]="'Gestisci e visualizza le tue classi da qui.'"
+/>
 
 <section class="d-flex flex-row my-5 gap-3">
   <div>
