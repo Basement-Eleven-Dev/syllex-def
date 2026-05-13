@@ -268,8 +268,8 @@ export class GeminiLiveService {
     if (!this.wsSubject) return;
     console.log('🏁 Invio segnale FINE TURNO (User done)');
     this.wsSubject.next({
-      realtimeInput: {
-        endOfTurn: true,
+      clientContent: {
+        turnComplete: true,
       },
     });
   }
