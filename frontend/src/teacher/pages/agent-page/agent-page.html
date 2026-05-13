@@ -83,34 +83,6 @@
         class="col d-flex flex-column h-100 position-relative"
         [class.d-none]="userRole() === 'student' && activeTab() !== 'chat'"
       >
-        <!-- Header di navigazione per Docenti -->
-        @if (userRole() === 'teacher' || userRole() === 'admin') {
-        <div
-          class="chat-header-nav bg-white border-bottom px-4 py-3 d-flex align-items-center justify-content-between shadow-sm"
-          style="z-index: 10"
-        >
-          <div class="d-flex align-items-center gap-3">
-            <div class="bg-primary bg-opacity-10 p-2 rounded-3 text-primary">
-              <fa-icon [icon]="HeadSideBrainIcon"></fa-icon>
-            </div>
-            <div>
-              <h6 class="mb-0 fw-bold">
-                Agente AI — {{ materiaService.materiaSelected()?.name }}
-              </h6>
-              <span class="small text-muted">Modalità Interazione</span>
-            </div>
-          </div>
-
-          <button
-            class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold"
-            (click)="onBackToConfig()"
-          >
-            <fa-icon [icon]="faGear" class="me-2"></fa-icon>
-            Configura
-          </button>
-        </div>
-        }
-
         <!-- Header per Studente (cambio materia su mobile) -->
         @if (userRole() === 'student' && !noAssistantAvailable()) {
         <div

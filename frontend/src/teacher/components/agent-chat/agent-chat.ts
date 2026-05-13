@@ -30,6 +30,8 @@ import {
   faMicrophoneSlash,
   faChevronLeft,
   faChevronRight,
+  faKeyboard,
+  faWaveformLines,
 } from '@fortawesome/pro-solid-svg-icons';
 import { faSpinner } from '@fortawesome/pro-regular-svg-icons';
 import { AgentService } from '../../../services/agent.service';
@@ -72,6 +74,8 @@ export class AgentChat implements OnInit, OnDestroy {
   faMicrophoneSlash = faMicrophoneSlash;
   faChevronLeft = faChevronLeft;
   faChevronRight = faChevronRight;
+  faKeyboard = faKeyboard;
+  faWaveformLines = faWaveformLines;
 
   // Sidebar collassabile
   sidebarOpen = signal(true);
@@ -411,8 +415,27 @@ export class AgentChat implements OnInit, OnDestroy {
   }
 
   finishTurn() {
-    this.geminiLiveService.sendEndOfTurn();
-    this.isMuted.set(true); // Silenzia finché l'AI non inizia a parlare o finisce
+    // Stoppa recognition locale
+    if (this.recognition) {
+      try {
+        this.recognition.stop();
+      } catch {}
+    }
+    // Invia 1s di silenzio per forzare il VAD di Gemini a triggerare la risposta
+    // Identico a quando l'utente smette di parlare naturalmente
+    this.sendSilenceFrames();
+  }
+
+  private sendSilenceFrames() {
+    const sampleRate = 16000;
+    const numSamples = sampleRate; // 1 secondo di silenzio
+    const silence = new Int16Array(numSamples);
+    const bytes = new Uint8Array(silence.buffer);
+    let binary = '';
+    for (let i = 0; i < bytes.byteLength; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    this.geminiLiveService.sendAudioChunk(window.btoa(binary));
   }
 
   private pollingInterval: any;
@@ -597,6 +620,19 @@ export class AgentChat implements OnInit, OnDestroy {
     };
 
     this.recognition.start();
+  }
+
+  public exitVoiceMode() {
+    this.stopRealtimeVoice();
+    this.voiceModeActive.set(false);
+  }
+
+  public toggleInputMode() {
+    if (this.voiceModeActive()) {
+      this.exitVoiceMode();
+    } else {
+      this.toggleVoiceInput();
+    }
   }
 
   public stopRealtimeVoice() {

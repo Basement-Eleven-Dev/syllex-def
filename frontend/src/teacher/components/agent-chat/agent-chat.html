@@ -1,132 +1,57 @@
 <div class="agent-chat-wrapper d-flex h-100 w-100 overflow-hidden">
-  <!-- SIDEBAR: CRONOLOGIA CONVERSAZIONI -->
-  <div class="chat-sidebar d-none d-lg-flex flex-column border-end bg-light" [class.collapsed]="!sidebarOpen()">
-    @if (sidebarOpen()) {
-    <div class="p-4">
-      <button
-        class="btn btn-primary w-100 rounded-pill d-flex align-items-center justify-content-center gap-2 py-2 shadow-sm"
-        (click)="startNewChat()"
-      >
-        <fa-icon [icon]="faPlus"></fa-icon>
-        <span>Nuova Chat</span>
-      </button>
-    </div>
-
-    <div class="flex-fill overflow-auto px-3">
-      <div class="text-muted tiny fw-bold text-uppercase mb-3 px-2">
-        Cronologia Chat
-      </div>
-      @for (conv of conversations(); track conv.id) {
-      <button
-        class="btn btn-history-item w-100 text-start mb-2 p-3 rounded-4 transition-all"
-        [class.active]="currentConversationId() === conv.id"
-        (click)="selectConversation(conv.id)"
-      >
-        <div class="d-flex justify-content-between align-items-center">
-          <span class="fw-bold small text-truncate pe-2"
-            >{{ conv.title || 'Chat ' + (conv.timestamp | date:'dd MMM')
-            }}</span
-          >
-          <span class="text-muted tiny"
-            >{{ conv.timestamp | date:'HH:mm' }}</span
-          >
-        </div>
-        <p class="text-muted tiny text-truncate mb-0 mt-1">
-          {{ conv.preview || 'Nessun messaggio' }}
-        </p>
-      </button>
-      }
-    </div>
-    }
-
-    <!-- Toggle button -->
-    <button
-      class="sidebar-toggle-btn"
-      (click)="sidebarOpen.set(!sidebarOpen())"
-      [title]="sidebarOpen() ? 'Chiudi cronologia' : 'Apri cronologia'"
-    >
-      <fa-icon [icon]="sidebarOpen() ? faChevronLeft : faChevronRight"></fa-icon>
-    </button>
-  </div>
-
   <!-- AREA PRINCIPALE -->
   <div
     class="main-content flex-fill d-flex flex-column position-relative h-100 overflow-hidden bg-white"
   >
-    <!-- HEADER (sempre visibile) -->
-    <div
-      class="chat-header-bar d-flex justify-content-between align-items-center p-3 border-bottom"
-    >
-      <div class="d-flex align-items-center gap-3">
-        <div class="status-dot online"></div>
-        <h6 class="mb-0 fw-bold">{{ assistantName() }}</h6>
-        @if (voiceModeActive()) {
-        <span class="badge bg-primary-subtle text-primary rounded-pill small">
-          <fa-icon [icon]="faMicrophone" class="me-1"></fa-icon>Vocale attivo
-        </span>
-        }
-      </div>
-    </div>
-
     <!-- MESSAGGI / INTRO (sempre visibile) -->
     <div #scrollContent class="flex-fill overflow-auto d-flex flex-column p-4">
       @if (messages().length === 0 && !voiceModeActive()) {
       <div
-        class="intro-card-blue d-flex flex-column align-items-center justify-content-center text-white p-5 m-auto w-100 shadow-lg"
+        class="intro-welcome d-flex flex-column align-items-center justify-content-center m-auto"
       >
-        <div class="sparkle-icon-wrap mb-4">
-          <fa-icon [icon]="faSparkles"></fa-icon>
-        </div>
-        <h1 class="display-5 fw-bold mb-4 text-center">
-          Sono <span>{{ assistantName() }}</span>,<br />il tuo assistente
-          didattico
-        </h1>
+        <h2 class="fw-bold mb-2 text-center intro-welcome__title">
+          Cosa vuoi fare oggi?
+        </h2>
+        <p class="text-muted mb-5 text-center intro-welcome__subtitle">
+          Scegli un'azione rapida, oppure chatta con {{ assistantName() }}
+        </p>
 
-        <div
-          class="quick-pills d-flex flex-column gap-3 w-100 align-items-center"
-        >
+        <!-- Riga superiore: 2 bottoni -->
+        <div class="d-flex gap-3 mb-3 justify-content-center w-100">
           <button
-            class="btn btn-light-pill"
-            (click)="inputMessage = 'Quali sono gli argomenti principali?'; sendMessage('text')"
-          >
-            <fa-icon [icon]="faBookOpen" class="me-3"></fa-icon>Argomenti
-            principali
-          </button>
-          <button
-            class="btn btn-light-pill"
+            class="btn btn-quick-action"
             (click)="inputMessage = 'Fammi un riassunto sintetico'; sendMessage('text')"
           >
-            <fa-icon [icon]="faLightbulb" class="me-3"></fa-icon>Riassunto
+            <fa-icon [icon]="faLightbulb" class="me-2"></fa-icon>Riassunto
             sintetico
           </button>
           <button
-            class="btn btn-light-pill"
+            class="btn btn-quick-action"
+            (click)="inputMessage = 'Quali sono gli argomenti principali?'; sendMessage('text')"
+          >
+            <fa-icon [icon]="faBookOpen" class="me-2"></fa-icon>Argomenti
+            principali
+          </button>
+        </div>
+        <!-- Riga inferiore: 1 bottone centrato -->
+        <div class="d-flex justify-content-center w-100">
+          <button
+            class="btn btn-quick-action"
             (click)="inputMessage = 'Mettimi alla prova con un quiz di tre domande'; sendMessage('text')"
           >
-            <fa-icon [icon]="faSparkles" class="me-3"></fa-icon>Mettimi alla
+            <fa-icon [icon]="faSparkles" class="me-2"></fa-icon>Mettimi alla
             prova con un quiz
           </button>
         </div>
       </div>
       } @else { @for (msg of messages(); track $index) {
       <div
-        class="d-flex mb-4"
+        class="d-flex mb-3"
         [class.justify-content-end]="msg.role === 'user'"
       >
-        <div
-          class="msg-bubble-mock p-3 shadow-sm"
-          [class.user]="msg.role === 'user'"
-        >
-          <div
-            class="d-flex align-items-center gap-2 mb-2 opacity-75 tiny fw-bold text-uppercase"
-          >
-            @if (msg.role !== 'user') {
-            <fa-icon [icon]="faSparkles"></fa-icon>
-            }
-            <span>{{ msg.role === 'user' ? 'Tu' : assistantName() }}</span>
-          </div>
+        <div class="msg-line" [class.msg-line--user]="msg.role === 'user'">
           <markdown [data]="msg.content"></markdown>
-          <div class="tiny mt-2 opacity-50 d-flex align-items-center">
+          <div class="tiny mt-1 opacity-40 d-flex align-items-center">
             <span>{{ msg.timestamp | date:'HH:mm' }}</span>
             @if (msg.inputType === 'voice') {
             <fa-icon [icon]="faMicrophone" class="ms-2"></fa-icon>
@@ -134,128 +59,157 @@
           </div>
         </div>
       </div>
-      }
-
-      <!-- Indicatore vocale inline: mostra transcript live sotto i messaggi -->
-      @if (voiceModeActive()) { @if (geminiLiveService.userTranscript()) {
-      <div class="d-flex mb-4 justify-content-end">
-        <div class="voice-live-bubble user-live p-3 shadow-sm">
-          <div
-            class="d-flex align-items-center gap-2 mb-1 tiny fw-bold text-uppercase opacity-75"
-          >
-            <fa-icon [icon]="faMicrophone"></fa-icon>
-            <span>Tu (in diretta)</span>
-          </div>
-          <p class="mb-0">{{ geminiLiveService.userTranscript() }}</p>
-        </div>
-      </div>
-      } @if (geminiLiveService.isSearching()) {
-      <div class="d-flex mb-4">
-        <div class="voice-live-bubble ai-thinking p-3 shadow-sm">
-          <fa-icon
-            [icon]="faSpinner"
-            [animation]="'spin'"
-            class="text-primary me-2"
-          ></fa-icon>
-          <span class="small fw-bold text-muted">Consulto i documenti...</span>
-        </div>
-      </div>
-      } @if (geminiLiveService.aiTranscript()) {
-      <div class="d-flex mb-4">
-        <div class="voice-live-bubble ai-live p-3 shadow-sm">
-          <div
-            class="d-flex align-items-center gap-2 mb-1 tiny fw-bold text-uppercase opacity-75"
-          >
-            <fa-icon [icon]="faSparkles"></fa-icon>
-            <span>{{ assistantName() }} (in diretta)</span>
-          </div>
-          <p class="mb-0">{{ geminiLiveService.aiTranscript() }}</p>
-        </div>
-      </div>
-      } } @if (isLoading()) {
+      } @if (isLoading()) {
       <div class="typing-dots p-3 bg-light rounded-4 align-self-start mb-4">
         <span></span><span></span><span></span>
       </div>
       } }
     </div>
 
-    <!-- INPUT BAR: modalità testo -->
-    @if (!voiceModeActive()) {
-    <div class="input-area-container p-4 bg-white border-top">
+    <!-- ORB AREA: visibile solo in modalità vocale -->
+    <div class="voice-orb-area" [class.visible]="voiceModeActive()">
       <div
-        class="input-pill-mock d-flex align-items-center px-4 py-2 border shadow-sm"
-      >
-        <textarea
-          class="form-control border-0 shadow-none bg-transparent"
-          [(ngModel)]="inputMessage"
-          (keydown)="onKeydown($event)"
-          placeholder="Chiedi qualsiasi cosa..."
-          rows="1"
-        ></textarea>
-        <div class="d-flex gap-2 ms-3">
-          <button
-            class="btn btn-icon-round"
+        class="voice-orb-mini"
+        [class.pulse]="(isRecording() && !isMuted()) || geminiLiveService.isSpeaking()"
+        [class.muted]="isMuted() && !geminiLiveService.isSpeaking()"
+        [class.user-speaking]="isRecording() && !isMuted()"
+        [class.ai-speaking]="geminiLiveService.isSpeaking()"
+      ></div>
+      <span class="voice-status small fw-bold mt-2">
+        @if (geminiLiveService.isSpeaking()) { {{ assistantName() }} sta
+        rispondendo... } @else if (isMuted()) { {{ assistantName() }} sta
+        pensando... } @else { In ascolto... }
+      </span>
+    </div>
+
+    <!-- INPUT BAR -->
+    <div
+      class="input-area-container p-4 bg-white"
+      [class.is-voice]="voiceModeActive()"
+    >
+      <!-- BARRA INPUT: switcher sempre visibile, pill collassa verso destra -->
+      <div class="input-bar-row">
+        <!-- Switcher -->
+        <div
+          class="mode-switcher"
+          [class.mode-switcher--voice]="voiceModeActive()"
+        >
+          @if (!voiceModeActive()) {
+          <!-- Text mode: tastiera attiva, click waveform entra in vocale -->
+          <span class="mode-switcher__icon mode-switcher__icon--active">
+            <fa-icon [icon]="faKeyboard" />
+          </span>
+          <span
+            class="mode-switcher__icon"
             (click)="toggleVoiceInput()"
-            title="Parla con l'assistente"
+            style="cursor: pointer"
           >
-            <fa-icon [icon]="faMicrophone"></fa-icon>
-          </button>
+            <fa-icon [icon]="faWaveformLines" />
+          </span>
+          } @else {
+          <!-- Voice mode: click tastiera esce, click stop invia turno -->
+          <span
+            class="mode-switcher__icon"
+            (click)="exitVoiceMode()"
+            style="cursor: pointer"
+          >
+            <fa-icon [icon]="faKeyboard" />
+          </span>
+          @if (isRecording() && !isMuted()) {
+          <span
+            class="mode-switcher__icon mode-switcher__icon--stop"
+            (click)="finishTurn()"
+            style="cursor: pointer"
+          >
+            <fa-icon [icon]="faStop" />
+          </span>
+          } @else {
+          <span class="mode-switcher__icon mode-switcher__icon--active">
+            <fa-icon [icon]="faWaveformLines" />
+          </span>
+          } }
+        </div>
+
+        <!-- Input pill (collassa verso destra in voice mode) -->
+        <div
+          class="input-pill-mock d-flex align-items-center px-4 py-2 border shadow-sm"
+        >
+          <textarea
+            class="form-control border-0 shadow-none bg-transparent"
+            [(ngModel)]="inputMessage"
+            (keydown)="onKeydown($event)"
+            placeholder="Scrivi qui..."
+            rows="1"
+          ></textarea>
           <button
-            class="btn btn-send-round"
+            class="btn-send-new ms-3"
             (click)="sendMessage('text')"
             [disabled]="!inputMessage.trim() || isLoading()"
           >
-            <fa-icon [icon]="SendIcon"></fa-icon>
+            <fa-icon [icon]="SendIcon" />
           </button>
         </div>
       </div>
     </div>
-    }
+  </div>
 
-    <!-- INPUT BAR: modalità vocale (sostituisce l'input testo) -->
-    @if (voiceModeActive()) {
-    <div class="voice-input-bar p-3 bg-white border-top">
-      <div class="d-flex align-items-center justify-content-center gap-3">
-        <!-- Orb compatto -->
-        <div
-          class="voice-orb-mini"
-          [class.pulse]="(isRecording() && !isMuted()) || geminiLiveService.isSpeaking()"
-          [class.muted]="isMuted() && !geminiLiveService.isSpeaking()"
-          [class.user-speaking]="isRecording() && !isMuted()"
-          [class.ai-speaking]="geminiLiveService.isSpeaking()"
-        ></div>
+  <!-- SIDEBAR DESTRA: CRONOLOGIA CONVERSAZIONI -->
+  <div
+    class="chat-sidebar d-none d-lg-flex flex-column"
+    [class.collapsed]="!sidebarOpen()"
+  >
+    <!-- Toggle button -->
+    <button
+      class="sidebar-toggle-btn"
+      (click)="sidebarOpen.set(!sidebarOpen())"
+      [title]="sidebarOpen() ? 'Chiudi cronologia' : 'Apri cronologia'"
+    >
+      <fa-icon
+        [icon]="sidebarOpen() ? faChevronRight : faChevronLeft"
+      ></fa-icon>
+    </button>
 
-        <!-- Status -->
-        <span class="voice-status small fw-bold">
-          @if (isMuted()) { Gemini sta elaborando... } @else if
-          (geminiLiveService.isSpeaking()) { L'assistente sta parlando... }
-          @else { In ascolto... }
-        </span>
+    @if (sidebarOpen()) {
+    <div class="p-3 pb-2">
+      <button
+        class="btn btn-primary w-100 rounded-pill d-flex align-items-center justify-content-center gap-2 py-2 shadow-sm mb-2"
+        (click)="startNewChat()"
+      >
+        <fa-icon [icon]="faPlus"></fa-icon>
+        <span>Nuova Chat</span>
+      </button>
+      @if (userRole() === 'teacher' || userRole() === 'admin') {
+      <button
+        class="btn-sidebar-config w-100 d-flex align-items-center justify-content-center gap-2 px-3 py-2 rounded-3"
+        (click)="requestConfig.emit()"
+      >
+        <fa-icon [icon]="faGear"></fa-icon>
+        <span class="small fw-semibold">Configura assistente</span>
+      </button>
+      }
+    </div>
 
-        <!-- Azioni -->
-        <button
-          class="btn btn-sm rounded-pill px-3 py-2 shadow-sm"
-          [class.btn-success]="!isMuted()"
-          [class.btn-secondary]="isMuted()"
-          [disabled]="isMuted()"
-          (click)="finishTurn()"
-        >
-          <fa-icon
-            [icon]="isMuted() ? faSpinner : faPaperPlane"
-            [animation]="isMuted() ? 'spin' : undefined"
-            class="me-1"
-          ></fa-icon>
-          <span class="fw-bold small">Rispondi</span>
-        </button>
+    <div
+      class="tiny fw-bold text-uppercase px-3 pb-1 pt-2 sidebar-section-label"
+    >
+      Cronologia
+    </div>
 
-        <button
-          class="btn btn-sm btn-outline-dark rounded-pill px-3 py-2"
-          (click)="stopRealtimeVoice(); voiceModeActive.set(false)"
-        >
-          <fa-icon [icon]="faStop" class="me-1"></fa-icon>
-          <span class="fw-bold small">Esci</span>
-        </button>
-      </div>
+    <div class="flex-fill overflow-auto px-2 pb-3">
+      @for (conv of conversations(); track conv.id) {
+      <button
+        class="btn-history-item w-100 text-start mb-1 px-3 py-2 rounded-3"
+        [class.active]="currentConversationId() === conv.id"
+        (click)="selectConversation(conv.id)"
+      >
+        <div class="fw-semibold small text-truncate">
+          {{ conv.title || 'Chat ' + (conv.timestamp | date:'dd MMM') }}
+        </div>
+        <div class="tiny text-truncate mt-1 opacity-60">
+          {{ conv.preview || 'Nessun messaggio' }}
+        </div>
+      </button>
+      }
     </div>
     }
   </div>
