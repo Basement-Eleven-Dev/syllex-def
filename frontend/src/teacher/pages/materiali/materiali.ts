@@ -24,7 +24,6 @@ import {
   faRobot,
   faXmark,
   faTrash,
-  faMagnifyingGlass,
 } from '@fortawesome/pro-solid-svg-icons';
 import {
   NgbDropdown,
@@ -61,6 +60,8 @@ import { effect, untracked } from '@angular/core';
 import { FeedbackService } from '../../../services/feedback-service';
 import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
+import { SyllexSearchInput } from '../../components/UI/syllex-search-input/syllex-search-input';
+import { SyllexClearButton } from '../../components/UI/syllex-clear-button/syllex-clear-button';
 
 @Component({
   selector: 'app-materiali',
@@ -77,6 +78,8 @@ import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-
     StorageLimitBar,
     AiOverlay,
     SyllexButton,
+    SyllexSearchInput,
+    SyllexClearButton,
     TourAnchorNgBootstrapDirective,
     SyllexPageHeader,
   ],
@@ -118,7 +121,6 @@ export class Materiali implements OnInit {
     robot: faRobot,
     clear: faXmark,
     trash: faTrash,
-    search: faMagnifyingGlass,
   } as const;
 
   // ── State proxied from facade (avoids template changes) ───────────

@@ -1,5 +1,12 @@
 import { TitleCasePipe } from '@angular/common';
-import { Component, EventEmitter, Output, OnInit, inject } from '@angular/core';
+import {
+  Component,
+  computed,
+  EventEmitter,
+  Output,
+  OnInit,
+  inject,
+} from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -9,6 +16,9 @@ import {
 import { Materia } from '../../../services/materia';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faXmark } from '@fortawesome/pro-solid-svg-icons';
+import { SyllexClearButton } from '../UI/syllex-clear-button/syllex-clear-button';
+import { SyllexSearchInput } from '../UI/syllex-search-input/syllex-search-input';
+import { SyllexSelectInput } from '../UI/syllex-select-input/syllex-select-input';
 import {
   DIFFICULTY_OPTIONS,
   QuestionDifficulty,
@@ -17,7 +27,15 @@ import {
 @Component({
   selector: 'app-questions-search-filters',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, TitleCasePipe, FontAwesomeModule],
+  imports: [
+    FormsModule,
+    ReactiveFormsModule,
+    TitleCasePipe,
+    FontAwesomeModule,
+    SyllexClearButton,
+    SyllexSearchInput,
+    SyllexSelectInput,
+  ],
   templateUrl: './questions-search-filters.html',
   styleUrl: './questions-search-filters.scss',
 })
@@ -37,6 +55,19 @@ export class QuestionsSearchFilters implements OnInit {
 
   // Data
   protected readonly DifficultyOptions = DIFFICULTY_OPTIONS;
+
+  protected readonly typeOptions = [
+    { value: 'scelta multipla', label: 'Scelta multipla' },
+    { value: 'vero falso', label: 'Vero falso' },
+    { value: 'risposta aperta', label: 'Risposta aperta' },
+  ];
+
+  protected readonly topicOptions = computed(() =>
+    (this.materiaService.materiaSelected()?.topics ?? []).map((t) => ({
+      value: t._id ?? '',
+      label: t.name,
+    })),
+  );
 
   // Dependency Injection
   protected readonly materiaService = inject(Materia);

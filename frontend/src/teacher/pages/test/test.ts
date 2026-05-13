@@ -17,6 +17,9 @@ import { FeedbackService } from '../../../services/feedback-service';
 import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
 import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
+import { SyllexSearchInput } from '../../components/UI/syllex-search-input/syllex-search-input';
+import { SyllexClearButton } from '../../components/UI/syllex-clear-button/syllex-clear-button';
+import { SyllexSelectInput } from '../../components/UI/syllex-select-input/syllex-select-input';
 
 type TestStatus = 'bozza' | 'pubblicato' | 'archiviato' | '';
 
@@ -34,6 +37,9 @@ type TestStatus = 'bozza' | 'pubblicato' | 'archiviato' | '';
     TourAnchorNgBootstrapDirective,
     SyllexPageHeader,
     SyllexButton,
+    SyllexSearchInput,
+    SyllexClearButton,
+    SyllexSelectInput,
   ],
   templateUrl: './test.html',
   styleUrl: './test.scss',
@@ -42,6 +48,12 @@ export class Test implements OnDestroy {
   // Icons
   protected readonly PlusIcon = faPlus;
   protected readonly ClearIcon = faXmark;
+
+  protected readonly statusOptions = [
+    { value: 'bozza', label: 'Bozza' },
+    { value: 'pubblicato', label: 'Pubblicato' },
+    { value: 'archiviato', label: 'Archiviato' },
+  ];
 
   // Dependency Injection
   private testsService = inject(TestsService);

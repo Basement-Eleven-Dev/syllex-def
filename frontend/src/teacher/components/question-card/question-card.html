@@ -5,36 +5,21 @@
   [class.dimmed]="dimmed"
 >
   <div class="card-body d-flex flex-column gap-2">
-    <!-- ── Header: policy (banca) | index (test-composition) | topic | type ── -->
-    <div class="d-flex flex-row align-items-center justify-content-between">
-      <div class="d-flex align-items-center gap-2 text-truncate">
-        @if (mode === 'banca') {
-        <div class="d-flex flex-row gap-2 align-items-center me-2">
-          <div [class]="'status-pill ' + question.policy"></div>
-          <span class="text-muted small"
-            >{{ question.policy | titlecase }}</span
-          >
-        </div>
-        } @if (mode === 'test-composition') {
-        <span class="badge bg-dark"># {{ index + 1 }}</span>
-        } @if (mode === 'student' && showIndex) {
-        <span class="badge bg-dark"># {{ index + 1 }}</span>
-        }
-        <span
-          class="text-muted text-truncate"
-          [attr.title]="materiaService.getTopicName(question.topicId)"
-          >{{ materiaService.getTopicName(question.topicId) }}</span
-        >
-        <span class="text-muted">|</span>
-        <span class="text-primary">{{ question.type }}</span>
-      </div>
-      @if(question.aiGenerated) {
+    <!-- ── Header: topic + policy badge ── -->
+    <div
+      class="d-flex flex-row align-items-center justify-content-between gap-2"
+    >
       <span
-        class="ai-badge float-end"
-        style="background-color: #9664c8; font-size: 0.65rem"
-        >IA</span
+        class="text-muted small text-truncate"
+        [attr.title]="materiaService.getTopicName(question.topicId)"
       >
-      }
+        {{ materiaService.getTopicName(question.topicId) }}
+      </span>
+      @if (mode === 'banca') { @if (question.policy === 'private') {
+      <app-syllex-badge label="Uso Test" color="green" />
+      } @else {
+      <app-syllex-badge label="Esercitazione" color="orange" />
+      } }
     </div>
 
     <!-- ── Optional image ── -->
@@ -182,8 +167,8 @@
     </section>
     }
 
-    <!-- ── Correzione (banca / ai-review) ── -->
-    @if (mode === 'banca' || mode === 'ai-review') {
+    <!-- ── Correzione (ai-review only, banca moved to footer) ── -->
+    @if (mode === 'ai-review') {
     <section>
       <p class="mb-0 fw-bold mt-2 text-muted" style="font-size: 0.8rem">
         Correzione
@@ -197,55 +182,56 @@
     <hr class="my-2" />
     <section class="d-flex flex-column gap-2">
       <div class="d-flex align-items-center gap-3">
-        <span
-          class="badge"
-          [class.bg-success]="questionStatus === 'correct'"
-          [class.bg-danger]="questionStatus === 'wrong'"
-          [class.bg-warning]="questionStatus === 'semi-correct'"
-          [class.text-dark]="questionStatus === 'semi-correct'"
-        >
-          @switch (questionStatus) { @case ('correct') { Corretta } @case
-          ('wrong') { Errata } @case ('semi-correct') { Parzialmente corretta }
-          }
-        </span>
+        <app-syllex-badge
+          [label]="questionStatus === 'correct' ? 'Corretta' : questionStatus === 'wrong' ? 'Errata' : 'Parzialmente corretta'"
+          [color]="questionStatus === 'correct' ? 'green' : questionStatus === 'wrong' ? 'red' : 'orange'"
+        />
         @if (score !== null) {
         <span class="fw-semibold">Punteggio: {{ score }}</span>
         }
       </div>
       @if(teacherFeedback){
-      <div >
+      <div>
         <p class="mb-0 fw-light text-muted">{{ feedbackLabel }}</p>
-        <p class="mb-0">
-          {{ teacherFeedback }}
-        </p>
-      </div>}
+        <p class="mb-0">{{ teacherFeedback }}</p>
+      </div>
+      }
     </section>
     }
   </div>
 
-  <!-- ── Banca actions ── -->
+  <!-- ── Banca footer ── -->
   @if (mode === 'banca') {
-  <div class="d-flex flex-row gap-1 justify-content-end w-100">
-    <button
-      type="button"
-      class="btn btn-edit"
-      title="Modifica"
-      [routerLink]="'/t/edit-question/' + question._id"
-    >
-      <fa-icon [icon]="EditIcon"></fa-icon>
-    </button>
-    <button
-      type="button"
-      class="btn btn-delete"
-      title="Elimina"
-      confirmAction
-      [confirmMessage]="'Vuoi eliminare questa domanda? L\'azione non può essere annullata.'"
-      [confirmTitle]="'Elimina domanda'"
-      [confirmButtonText]="'Elimina'"
-      (confirmed)="removeMe.emit(question._id)"
-    >
-      <fa-icon [icon]="TrashIcon"></fa-icon>
-    </button>
+  <div class="card-footer-divider mx-3"></div>
+  <div
+    class="d-flex flex-row align-items-end justify-content-between gap-3 px-3 pb-3 pt-2"
+  >
+    <div class="overflow-hidden" style="max-width: 75%">
+      <p
+        class="mb-1 fw-semibold text-muted"
+        style="
+          font-size: 0.75rem;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        "
+      >
+        Correzione
+      </p>
+      <p class="mb-0 text-muted small">{{ question.explanation || '—' }}</p>
+    </div>
+    <div class="d-flex flex-row gap-1 flex-shrink-0 align-items-stretch">
+      <app-syllex-button
+        [props]="{ label: 'Modifica', variant: 'outline', color: 'dark', size: 'small', link: '/t/edit-question/' + question._id }"
+      />
+      <app-syllex-button
+        [props]="{ label: '', variant: 'primary', color: 'danger', size: 'small', leftIcon: TrashIcon }"
+        confirmAction
+        [confirmMessage]="'Vuoi eliminare questa domanda? L\'azione non può essere annullata.'"
+        [confirmTitle]="'Elimina domanda'"
+        [confirmButtonText]="'Elimina'"
+        (confirmed)="removeMe.emit(question._id)"
+      />
+    </div>
   </div>
   }
 

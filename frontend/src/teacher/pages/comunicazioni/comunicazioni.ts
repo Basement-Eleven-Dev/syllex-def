@@ -13,6 +13,9 @@ import {
 import { ClassiService } from '../../../services/classi-service';
 import { FeedbackService } from '../../../services/feedback-service';
 import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
+import { SyllexSearchInput } from '../../components/UI/syllex-search-input/syllex-search-input';
+import { SyllexClearButton } from '../../components/UI/syllex-clear-button/syllex-clear-button';
+import { SyllexSelectInput } from '../../components/UI/syllex-select-input/syllex-select-input';
 
 @Component({
   selector: 'app-comunicazioni',
@@ -23,6 +26,9 @@ import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
     SyllexPagination,
     FormsModule,
     TourAnchorNgBootstrapDirective,
+    SyllexSearchInput,
+    SyllexClearButton,
+    SyllexSelectInput,
   ],
   templateUrl: './comunicazioni.html',
   styleUrl: './comunicazioni.scss',
@@ -31,6 +37,15 @@ export class Comunicazioni {
   // Icons
   protected readonly PlusIcon = faPlus;
   protected readonly ClearIcon = faXmark;
+
+  protected readonly classiSelectOptions = computed(() =>
+    this.classiService.classi().map((c) => ({ value: c._id!, label: c.name })),
+  );
+
+  protected readonly attachmentOptions = [
+    { value: 'true', label: 'Sì' },
+    { value: 'false', label: 'No' },
+  ];
 
   // Dependency Injection
   protected readonly materiaService = inject(Materia);

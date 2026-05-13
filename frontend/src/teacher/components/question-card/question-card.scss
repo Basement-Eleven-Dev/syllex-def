@@ -1,4 +1,10 @@
+.card-footer-divider {
+  height: 1px;
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
 .question-card {
+  background-color: #e8f1fd;
   transition: all 0.2s ease;
 
   &.moveable {

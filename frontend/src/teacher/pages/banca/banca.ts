@@ -18,6 +18,8 @@ import {
 } from '../../components/view-type-toggle/view-type-toggle';
 import { FeedbackService } from '../../../services/feedback-service';
 import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
+import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
+import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
 
 @Component({
   selector: 'app-banca',
@@ -31,6 +33,8 @@ import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
     FormsModule,
     ViewTypeToggle,
     TourAnchorNgBootstrapDirective,
+    SyllexPageHeader,
+    SyllexButton,
   ],
   templateUrl: './banca.html',
   styleUrl: './banca.scss',

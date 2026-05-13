@@ -1,23 +1,16 @@
-<div class="d-flex flex-row align-items-center mb-5">
-  <div>
-    <h1 class="text-dark fw-medium mb-3 display-6" tourAnchor="banca_header">
-      Banca Domande ({{ CollectionSize() }})
-    </h1>
-    <h5 class="text-dark mb-0 fw-normal">
-      Qui puoi trovare tutte le domande con cui comporre i test di
-      <span class="fw-bold">{{ materiaService.materiaSelected()?.name }}</span
-      >.<br />
-      Puoi cercare, filtrare e modificare le domande a tuo piacimento.
-    </h5>
-  </div>
-  <button
-    class="btn btn-gradient-secondary btn-lg ms-auto py-3 icon-btn"
+<app-syllex-page-header
+  [title]="'Banca Domande'"
+  [description]="'Qui puoi trovare tutte le domande con cui comporre i test di ' + (materiaService.materiaSelected()?.name || '') + '.'"
+>
+  <app-syllex-button
+    [props]="{
+          label: 'Crea Domanda',
+          variant: 'secondary',
+          size: 'large'
+        }"
     routerLink="/t/create-question"
-  >
-    <fa-icon [icon]="PlusIcon"></fa-icon>
-    Nuova domanda
-  </button>
-</div>
+  />
+</app-syllex-page-header>
 
 <section
   class="d-flex flex-row align-items-center gap-3"
@@ -26,13 +19,15 @@
   <app-questions-search-filters
     class="flex-grow-1"
     (filtersChanged)="onFiltersChanged($event)"
-  ></app-questions-search-filters>
-  <app-view-type-toggle
-    tourAnchor="banca_toggle"
-    [viewType]="ViewType"
-    [pageKey]="'banca'"
-    (viewTypeChange)="onChangeViewType($event)"
-  />
+  >
+    <app-view-type-toggle
+      class="ms-auto"
+      tourAnchor="banca_toggle"
+      [viewType]="ViewType"
+      [pageKey]="'banca'"
+      (viewTypeChange)="onChangeViewType($event)"
+    />
+  </app-questions-search-filters>
 </section>
 
 @if (ViewType === 'table') {

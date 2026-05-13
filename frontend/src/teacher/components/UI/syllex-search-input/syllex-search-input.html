@@ -1,0 +1,12 @@
+<div class="input-group rounded-3 overflow-hidden">
+  <span class="input-group-text border-0 bg-light text-muted py-3">
+    <fa-icon [icon]="SearchIcon"></fa-icon>
+  </span>
+  <input
+    type="text"
+    class="form-control border-0 bg-light shadow-none py-3"
+    [placeholder]="placeholder"
+    [value]="value"
+    (input)="handleInput($any($event.target).value)"
+  />
+</div>

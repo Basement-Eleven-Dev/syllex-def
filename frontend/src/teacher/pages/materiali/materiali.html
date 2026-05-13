@@ -26,26 +26,13 @@
       (change)="onFileSelected($event)"
       [accept]="acceptedExtensions"
     />
-    <div class="input-group rounded-3 overflow-hidden" style="max-width: 460px">
-      <span class="input-group-text border-0 bg-light text-muted">
-        <fa-icon [icon]="icons.search"></fa-icon>
-      </span>
-      <input
-        type="text"
-        class="form-control border-0 bg-light shadow-none"
-        id="search-term"
-        placeholder="Cerca file o cartella..."
-        [(ngModel)]="searchTerm"
-      />
-    </div>
-    <button
-      type="button"
-      class="btn bg-light text-muted"
-      (click)="clearFilters()"
-      title="Pulisci filtri"
-    >
-      <fa-icon [icon]="icons.clear"></fa-icon>
-    </button>
+    <app-syllex-search-input
+      placeholder="Cerca file o cartella..."
+      [value]="searchTerm()"
+      (valueChange)="searchTerm.set($event)"
+      style="max-width: 460px"
+    />
+    <app-syllex-clear-button (clicked)="clearFilters()" />
   </section>
 
   <app-storage-limit-bar tourAnchor="materiali_storage_bar" />

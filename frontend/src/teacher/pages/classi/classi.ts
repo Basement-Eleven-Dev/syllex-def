@@ -25,6 +25,9 @@ import {
   SyllexKpiRow,
 } from '../../components/UI/syllex-kpi-row/syllex-kpi-row';
 import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
+import { SyllexSearchInput } from '../../components/UI/syllex-search-input/syllex-search-input';
+import { SyllexClearButton } from '../../components/UI/syllex-clear-button/syllex-clear-button';
+import { SyllexSelectInput } from '../../components/UI/syllex-select-input/syllex-select-input';
 
 @Component({
   selector: 'app-classi',
@@ -36,6 +39,9 @@ import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-
     ViewTypeToggle,
     SyllexKpiRow,
     SyllexPageHeader,
+    SyllexSearchInput,
+    SyllexClearButton,
+    SyllexSelectInput,
   ],
   templateUrl: './classi.html',
   styleUrl: './classi.scss',
@@ -47,6 +53,14 @@ export class Classi {
   protected readonly EyeIcon = faEye;
   protected readonly CalendarIcon = faCalendar;
   protected readonly ClearIcon = faXmark;
+
+  protected readonly yearOptions = [
+    { value: '2026', label: '2026' },
+    { value: '2027', label: '2027' },
+    { value: '2028', label: '2028' },
+    { value: '2029', label: '2029' },
+    { value: '2030', label: '2030' },
+  ];
 
   // Dependency Injection
   protected readonly materiaService = inject(Materia);
