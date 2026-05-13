@@ -182,17 +182,10 @@
     <hr class="my-2" />
     <section class="d-flex flex-column gap-2">
       <div class="d-flex align-items-center gap-3">
-        <span
-          class="badge"
-          [class.bg-success]="questionStatus === 'correct'"
-          [class.bg-danger]="questionStatus === 'wrong'"
-          [class.bg-warning]="questionStatus === 'semi-correct'"
-          [class.text-dark]="questionStatus === 'semi-correct'"
-        >
-          @switch (questionStatus) { @case ('correct') { Corretta } @case
-          ('wrong') { Errata } @case ('semi-correct') { Parzialmente corretta }
-          }
-        </span>
+        <app-syllex-badge
+          [label]="questionStatus === 'correct' ? 'Corretta' : questionStatus === 'wrong' ? 'Errata' : 'Parzialmente corretta'"
+          [color]="questionStatus === 'correct' ? 'green' : questionStatus === 'wrong' ? 'red' : 'orange'"
+        />
         @if (score !== null) {
         <span class="fw-semibold">Punteggio: {{ score }}</span>
         }
@@ -226,7 +219,7 @@
       </p>
       <p class="mb-0 text-muted small">{{ question.explanation || '—' }}</p>
     </div>
-    <div class="d-flex flex-row gap-1 flex-shrink-0">
+    <div class="d-flex flex-row gap-1 flex-shrink-0 align-items-stretch">
       <app-syllex-button
         [props]="{ label: 'Modifica', variant: 'outline', color: 'dark', size: 'small', link: '/t/edit-question/' + question._id }"
       />

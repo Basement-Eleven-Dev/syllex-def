@@ -2,17 +2,16 @@
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.02em;
-  padding: 0.3em 0.65em;
   border-radius: 6px;
 
   &.badge-syllex-green {
-    background-color: #d1fae5;
-    color: #065f46;
+    background-color: var(--syllex-green);
+    color: #3d5c00;
   }
 
   &.badge-syllex-orange {
-    background-color: #ffedd5;
-    color: #9a3412;
+    background-color: var(--syllex-orange);
+    color: #fff;
   }
 
   &.badge-syllex-blue {

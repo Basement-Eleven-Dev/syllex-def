@@ -20,7 +20,7 @@ const COLOR_CLASSES: Record<SyllexBadgeColor, string> = {
 @Component({
   selector: 'app-syllex-badge',
   standalone: true,
-  template: `<span class="badge badge-syllex {{ colorClass }}">{{
+  template: `<span class="badge badge-syllex py-2 px-4 {{ colorClass }}">{{
     label
   }}</span>`,
   styleUrl: './syllex-badge.scss',
