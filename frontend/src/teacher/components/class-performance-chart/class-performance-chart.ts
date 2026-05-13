@@ -1,5 +1,4 @@
 import {
-  afterNextRender,
   Component,
   effect,
   ElementRef,
@@ -9,29 +8,51 @@ import {
 import {
   Chart,
   ChartConfiguration,
-  BarController,
-  BarElement,
+  LineController,
+  LineElement,
+  PointElement,
   CategoryScale,
   LinearScale,
   Tooltip,
   Legend,
   Title,
+  Filler,
 } from 'chart.js';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of, startWith, switchMap } from 'rxjs';
-import { AttemptInterface, TestsService } from '../../../services/tests-service';
+import {
+  AttemptInterface,
+  TestsService,
+} from '../../../services/tests-service';
 import { computed, inject, input } from '@angular/core';
 
 // Register Chart.js components
 Chart.register(
-  BarController,
-  BarElement,
+  LineController,
+  LineElement,
+  PointElement,
   CategoryScale,
   LinearScale,
   Tooltip,
   Legend,
   Title,
+  Filler,
 );
+
+// Sep=8 Oct=9 Nov=10 Dec=11 Jan=0 Feb=1 Mar=2 Apr=3 May=4 Jun=5
+const SCHOOL_MONTH_LABELS = [
+  'Set',
+  'Ott',
+  'Nov',
+  'Dic',
+  'Gen',
+  'Feb',
+  'Mar',
+  'Apr',
+  'Mag',
+  'Giu',
+];
+const SCHOOL_MONTHS = [8, 9, 10, 11, 0, 1, 2, 3, 4, 5];
 
 @Component({
   selector: 'app-class-performance-chart',
@@ -54,36 +75,33 @@ export class ClassPerformanceChart {
     ),
   );
 
-  readonly scores = computed(() => {
+  readonly monthlyData = computed<(number | null)[]>(() => {
     const data = this.attemptsData();
     if (!data) return [];
 
-    // Raggruppa i tentativi per studente e calcola la media
-    const studentScores = new Map<string, { total: number; count: number }>();
+    const buckets = SCHOOL_MONTHS.map(() => ({ total: 0, count: 0 }));
 
     data.attempts.forEach((attempt: AttemptInterface) => {
-      // Consideriamo solo i test corretti (reviewed) per avere dati attendibili
-      if (attempt.status !== 'reviewed') return;
-
-      const current = studentScores.get(attempt.studentId) || {
-        total: 0,
-        count: 0,
-      };
-      const percentage = (attempt.score / attempt.maxScore) * 100;
-
-      studentScores.set(attempt.studentId, {
-        total: current.total + percentage,
-        count: current.count + 1,
-      });
+      if (!attempt.maxScore || attempt.maxScore === 0) return;
+      const dateVal = attempt.deliveredAt ?? attempt.reviewedAt;
+      if (!dateVal) return;
+      const month = new Date(dateVal).getMonth();
+      const idx = SCHOOL_MONTHS.indexOf(month);
+      if (idx === -1) return;
+      const pct = (attempt.score / attempt.maxScore) * 100;
+      buckets[idx].total += pct;
+      buckets[idx].count += 1;
     });
 
-    return Array.from(studentScores.values()).map((s) => s.total / s.count);
+    return buckets.map((b) =>
+      b.count > 0 ? Math.round(b.total / b.count) : null,
+    );
   });
 
   readonly IsLoading = computed(() => this.attemptsData() === null);
   readonly IsEmpty = computed(() => {
-    const scores = this.scores();
-    return this.attemptsData() !== null && scores.length === 0;
+    const data = this.attemptsData();
+    return data !== null && this.monthlyData().every((v) => v === null);
   });
 
   readonly chartRef = viewChild<ElementRef<HTMLCanvasElement>>('chart');
@@ -93,10 +111,10 @@ export class ClassPerformanceChart {
     effect(
       () => {
         const canvasRef = this.chartRef();
-        const scores = this.scores();
+        const monthly = this.monthlyData();
 
-        if (canvasRef && scores.length > 0) {
-          this.createScoreDistributionChart(canvasRef, scores);
+        if (canvasRef && monthly.length > 0) {
+          this.createAreaChart(canvasRef, monthly);
         } else if (this.chart) {
           this.chart.destroy();
           this.chart = undefined;
@@ -106,34 +124,32 @@ export class ClassPerformanceChart {
     );
   }
 
-  private createScoreDistributionChart(
+  private createAreaChart(
     canvasRef: ElementRef<HTMLCanvasElement>,
-    scores: number[],
+    data: (number | null)[],
   ): void {
-    // Destroy existing chart if present
-    if (this.chart) {
-      this.chart.destroy();
-    }
-
-    const { labels, data } = this.calculateDistribution(scores);
+    this.chart?.destroy();
 
     const ctx = canvasRef.nativeElement.getContext('2d');
-    if (!ctx) {
-      console.error('Failed to get 2D context');
-      return;
-    }
+    if (!ctx) return;
 
     const config: ChartConfiguration = {
-      type: 'bar',
+      type: 'line',
       data: {
-        labels: labels,
+        labels: SCHOOL_MONTH_LABELS,
         datasets: [
           {
             label: 'Performance (%)',
-            data: data,
-            backgroundColor: '#375ec985',
-
-            borderRadius: 8,
+            data,
+            borderColor: '#3931CE',
+            borderWidth: 2.5,
+            backgroundColor: '#3931CE',
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#3931CE',
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            spanGaps: true,
           },
         ],
       },
@@ -142,72 +158,50 @@ export class ClassPerformanceChart {
         maintainAspectRatio: false,
         scales: {
           y: {
-            beginAtZero: true,
+            min: 0,
+            max: 100,
             ticks: {
-              stepSize: 1,
-              precision: 0,
+              stepSize: 10,
+              callback: (v) => `${v}%`,
             },
-            title: {
-              display: true,
-              text: 'Numero di studenti',
-              font: {
-                size: 14,
-                weight: 'bold',
-              },
-            },
+            grid: { color: 'rgba(0,0,0,0.06)' },
           },
           x: {
-            title: {
-              display: true,
-              text: 'Range punteggio',
-              font: {
-                size: 14,
-                weight: 'bold',
-              },
-            },
+            grid: { display: false },
           },
         },
         plugins: {
-          legend: {
-            display: false,
-          },
+          legend: { display: false },
           tooltip: {
             callbacks: {
-              label: (context) => {
-                const count = context.parsed.y;
-                return `Studenti: ${count}`;
-              },
+              label: (context) =>
+                context.parsed.y != null
+                  ? `Performance: ${context.parsed.y}%`
+                  : 'Nessun dato',
             },
           },
         },
       },
+      plugins: [
+        {
+          id: 'areaGradient',
+          afterLayout(chart) {
+            const { ctx: c, chartArea } = chart;
+            if (!chartArea) return;
+            const grad = c.createLinearGradient(
+              chartArea.left,
+              0,
+              chartArea.right,
+              0,
+            );
+            grad.addColorStop(0, '#3931CE');
+            grad.addColorStop(1, '#52A0FF');
+            chart.data.datasets[0].backgroundColor = grad;
+          },
+        },
+      ],
     };
 
     this.chart = new Chart(ctx, config);
-    console.log(this.chart);
-  }
-
-  private calculateDistribution(
-    scores: number[],
-  ): { labels: string[]; data: number[] } {
-    const numBins = 5;
-    const binSize = Math.ceil(100 / numBins);
-    const bins: number[] = new Array(numBins).fill(0);
-    const labels: string[] = [];
-
-    // Create labels for each bin
-    for (let i = 0; i < numBins; i++) {
-      const start = i * binSize;
-      const end = Math.min((i + 1) * binSize, 100);
-      labels.push(`${start}-${end}`);
-    }
-
-    // Count scores in each bin
-    scores.forEach((score) => {
-      const binIndex = Math.min(Math.floor(score / binSize), numBins - 1);
-      bins[binIndex]++;
-    });
-
-    return { labels, data: bins };
   }
 }
