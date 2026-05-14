@@ -14,39 +14,38 @@
   </app-syllex-page-header>
 </div>
 
-<section
-  tourAnchor="test_filters"
-  class="d-flex flex-wrap mb-3 gap-3 align-items-center"
->
-  <app-syllex-search-input
-    placeholder="Cerca test..."
-    [value]="SearchTerm()"
-    (valueChange)="onSearchTermChange($event)"
-    style="width: 25%; min-width: 220px"
+<!-- ===== TAB BUTTONS ===== -->
+<div class="d-flex justify-content-between">
+  <app-syllex-tab-filter
+    class="mb-4"
+    [options]="tabOptions"
+    [value]="ActiveTab()"
+    (valueChange)="onTabChange($any($event))"
   />
 
-  <app-syllex-select-input
-    [value]="Status()"
-    (valueChange)="onStatusChange($event)"
-    style="width: 130px"
-    placeholder="Stato"
-    [options]="statusOptions"
-  />
-  <app-syllex-clear-button (clicked)="clearFilters()" />
-  <app-view-type-toggle
-    class="ms-auto"
-    [viewType]="ViewType"
-    [pageKey]="'test'"
-    (viewTypeChange)="onChangeViewType($event)"
-  />
-</section>
+  <section
+    tourAnchor="test_filters"
+    class="d-flex flex-wrap mb-3 gap-3 align-items-center"
+  >
+    <app-syllex-search-input
+      placeholder="Cerca test..."
+      [value]="SearchTerm()"
+      (valueChange)="onSearchTermChange($event)"
+      style="width: 25%; min-width: 220px"
+    />
+    <!--     <app-syllex-clear-button (clicked)="clearFilters()" /> -->
+    <app-view-type-toggle
+      class="ms-auto"
+      [viewType]="ViewType"
+      [pageKey]="'test'"
+      (viewTypeChange)="onChangeViewType($event)"
+    />
+  </section>
+</div>
 
-<!-- ===== SEZIONE: ULTIMI TEST ===== -->
-<section class="mb-3 mt-5">
-  <div class="section-header mb-3">
-    <h4 class="section-title mb-0 ms-3">Ultimi test</h4>
-  </div>
-
+<!-- ===== SEZIONE: TUTTI / BOZZE ===== -->
+@if (ActiveTab() === 'tutti' || ActiveTab() === 'bozze') {
+<section class="mb-3">
   @if(ViewType === 'table') { @if(RecentTests().length > 0) {
   <app-test-table
     [tests]="RecentTests()"
@@ -94,18 +93,11 @@
   </div>
   }
 </section>
+}
 
 <!-- ===== SEZIONE: DA CORREGGERE ===== -->
-<section class="mb-5 mt-5">
-  <div class="section-header mb-3">
-    <h4 class="section-title mb-0 ms-3">Da Correggere</h4>
-    @if(CollectionSizePending() > 0) {
-    <span class="bg-warning text-dark ms-2 section-badge">
-      {{ CollectionSizePending() }}
-    </span>
-    }
-  </div>
-
+@if (ActiveTab() === 'da-correggere') {
+<section class="mb-5">
   @if(ViewType === 'table') { @if(PendingTests().length > 0) {
   <app-test-table
     [tests]="PendingTests()"
@@ -147,3 +139,4 @@
   </div>
   }
 </section>
+}

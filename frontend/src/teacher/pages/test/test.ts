@@ -1,4 +1,3 @@
-import { TitleCasePipe } from '@angular/common';
 import { Component, signal, effect, OnDestroy, inject } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPlus, faXmark } from '@fortawesome/pro-solid-svg-icons';
@@ -19,9 +18,10 @@ import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-
 import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
 import { SyllexSearchInput } from '../../components/UI/syllex-search-input/syllex-search-input';
 import { SyllexClearButton } from '../../components/UI/syllex-clear-button/syllex-clear-button';
-import { SyllexSelectInput } from '../../components/UI/syllex-select-input/syllex-select-input';
+import { SyllexTabFilter } from '../../components/UI/syllex-tab-filter/syllex-tab-filter';
 
 type TestStatus = 'bozza' | 'pubblicato' | 'archiviato' | '';
+type TestTab = 'tutti' | 'da-correggere' | 'bozze';
 
 @Component({
   selector: 'app-test',
@@ -30,7 +30,6 @@ type TestStatus = 'bozza' | 'pubblicato' | 'archiviato' | '';
     TestCard,
     TestTable,
     RouterModule,
-    TitleCasePipe,
     SyllexPagination,
     FormsModule,
     ViewTypeToggle,
@@ -39,7 +38,7 @@ type TestStatus = 'bozza' | 'pubblicato' | 'archiviato' | '';
     SyllexButton,
     SyllexSearchInput,
     SyllexClearButton,
-    SyllexSelectInput,
+    SyllexTabFilter,
   ],
   templateUrl: './test.html',
   styleUrl: './test.scss',
@@ -55,6 +54,11 @@ export class Test implements OnDestroy {
     { value: 'archiviato', label: 'Archiviato' },
   ];
 
+  protected readonly tabOptions = [
+    { value: 'tutti', label: 'Tutti' },
+    { value: 'da-correggere', label: 'Da correggere' },
+    { value: 'bozze', label: 'Bozze' },
+  ];
   // Dependency Injection
   private testsService = inject(TestsService);
   private feedbackService = inject(FeedbackService);
@@ -62,6 +66,7 @@ export class Test implements OnDestroy {
   // Shared filters
   SearchTerm = signal<string>('');
   Status = signal<TestStatus>('');
+  ActiveTab = signal<TestTab>('tutti');
   ViewType: ViewType = this.loadViewTypePreference('test') || 'grid';
 
   // Section: Ultimi test
@@ -90,32 +95,31 @@ export class Test implements OnDestroy {
       this.SearchTerm.set(term);
     });
 
-    // Effect: Ultimi test (triggers independently on its own page/pageSize)
+    // Effect: Ultimi test / Bozze
     effect(() => {
       const searchTerm = this.SearchTerm();
-      const status = this.Status();
+      const tab = this.ActiveTab();
       const page = this.PageRecent();
       const pageSize = this.PageSizeRecent();
-      this.loadRecentTests(
-        page,
-        pageSize,
-        searchTerm || undefined,
-        status || undefined,
-      );
+      if (tab === 'tutti' || tab === 'bozze') {
+        this.loadRecentTests(
+          page,
+          pageSize,
+          searchTerm || undefined,
+          tab === 'bozze' ? 'bozza' : undefined,
+        );
+      }
     });
 
-    // Effect: Da Correggere (triggers independently on its own page/pageSize)
+    // Effect: Da Correggere
     effect(() => {
       const searchTerm = this.SearchTerm();
-      const status = this.Status();
+      const tab = this.ActiveTab();
       const page = this.PagePending();
       const pageSize = this.PageSizePending();
-      this.loadPendingTests(
-        page,
-        pageSize,
-        searchTerm || undefined,
-        status || undefined,
-      );
+      if (tab === 'da-correggere') {
+        this.loadPendingTests(page, pageSize, searchTerm || undefined);
+      }
     });
   }
 
@@ -127,6 +131,12 @@ export class Test implements OnDestroy {
   clearFilters(): void {
     this.SearchTermSubject.next('');
     this.Status.set('');
+    this.PageRecent.set(1);
+    this.PagePending.set(1);
+  }
+
+  onTabChange(tab: TestTab): void {
+    this.ActiveTab.set(tab);
     this.PageRecent.set(1);
     this.PagePending.set(1);
   }
