@@ -42,42 +42,29 @@
     <!-- Help chat button -->
 
     <div
-      class="btn text-start ai ai-sidebar-btn d-flex flex-row align-items-center justify-content-between position-relative"
+      class="btn text-start ai ai-sidebar-btn px-4 py-3 d-flex flex-row align-items-center justify-content-between position-relative"
       routerLink="/t/laboratorio-ai"
       tourAnchor="teacher-ai-lab"
     >
+      <p class="mb-0 position-relative lab-ai-label slim-hide fs-5 fw-bold">
+        Lab AI
+      </p>
       <fa-icon
         [icon]="HeadSideBrainIcon"
-        [size]="'xs'"
-        class="ai-deco lab-ai-deco me-2"
+        class="ai-deco lab-ai-deco me-2 fs-4"
       ></fa-icon>
-      <h5 class="mb-0 position-relative lab-ai-label slim-hide">Lab AI</h5>
     </div>
     <div
-      class="btn text-start ai ai-sidebar-btn d-flex flex-row align-items-center justify-content-between position-relative"
+      class="btn text-start ai ai-sidebar-btn px-4 py-3 d-flex flex-row align-items-center justify-content-between position-relative"
       routerLink="/t/agente"
-      tourAnchor="teacher-agent"
     >
+      <p class="mb-0 position-relative chat-ai-label slim-hide fs-5 fw-bold">
+        Chat AI
+      </p>
       <fa-icon
         [icon]="SparklesIcon"
-        [size]="'xs'"
-        class="ai-deco chat-ai-deco me-2"
+        class="ai-deco chat-ai-deco me-2 fs-4"
       ></fa-icon>
-      <div
-        class="d-flex align-items-center gap-2 position-relative pe-4 slim-hide"
-      >
-        <h5 class="mb-0 chat-ai-label">Chat AI</h5>
-        <a
-          class="text-white opacity-50 p-0"
-          style="font-size: 1.1rem; line-height: 1"
-          [routerLink]="['/t/agente']"
-          [queryParams]="{step: 1}"
-          (click)="$event.stopPropagation()"
-        >
-        </a>
-      </div>
     </div>
-
-    <app-help-chat></app-help-chat>
   </div>
 </div>

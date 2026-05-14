@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { NgClass } from '@angular/common';
+import { NgClass, TitleCasePipe } from '@angular/common';
 import { RouterLink, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
@@ -16,7 +16,13 @@ interface SyllexButtonProps {
 }
 @Component({
   selector: 'app-syllex-button',
-  imports: [NgClass, RouterLink, RouterModule, FontAwesomeModule],
+  imports: [
+    NgClass,
+    RouterLink,
+    RouterModule,
+    FontAwesomeModule,
+    TitleCasePipe,
+  ],
   templateUrl: './syllex-button.html',
   styleUrl: './syllex-button.scss',
 })

@@ -145,17 +145,13 @@
 
 .sidebarRoute {
   width: 100%;
-  border-radius: 8px;
+  border-radius: 30px;
   padding: 0.65rem 1.25rem;
   transition: all 0.3s ease;
   font-size: 1rem;
-  font-weight: 300;
-  routeLabel {
-    color: var(--bs-dark);
-  }
-  fa-icon {
-    color: var(--bs-primary);
-  }
+  font-weight: 600;
+  color: var(--bs-primary);
+
   &:hover,
   &.active {
     cursor: pointer;
@@ -218,8 +214,7 @@
 }
 
 .ai-sidebar-btn {
-  padding: 1rem 1.25rem;
-  border-radius: 8px;
+  border-radius: 30px;
   margin-bottom: 0.5rem;
 }
 
@@ -247,7 +242,7 @@
 }
 
 .chat-ai-label {
-  background: linear-gradient(90deg, #6eafff 0%, #ffffff 100%);
+  background: linear-gradient(90deg, #ffffff 0%, #6eafff 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
