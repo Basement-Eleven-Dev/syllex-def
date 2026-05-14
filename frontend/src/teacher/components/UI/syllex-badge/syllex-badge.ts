@@ -6,7 +6,9 @@ export type SyllexBadgeColor =
   | 'blue'
   | 'purple'
   | 'red'
-  | 'gray';
+  | 'gray'
+  | 'black'
+  | 'celestine';
 
 const COLOR_CLASSES: Record<SyllexBadgeColor, string> = {
   green: 'badge-syllex-green',
@@ -15,14 +17,18 @@ const COLOR_CLASSES: Record<SyllexBadgeColor, string> = {
   purple: 'badge-syllex-purple',
   red: 'badge-syllex-red',
   gray: 'badge-syllex-gray',
+  black: 'badge-syllex-dark',
+  celestine: 'badge-syllex-celestine',
 };
 
 @Component({
   selector: 'app-syllex-badge',
   standalone: true,
-  template: `<span class="badge badge-syllex py-2 px-4 {{ colorClass }}">{{
-    label
-  }}</span>`,
+  template: `<span
+    class="badge badge-syllex rounded-pill px-3 {{ colorClass }} text-uppercase"
+    style="padding-top: 1em; padding-bottom: 1em;"
+    >{{ label }}</span
+  >`,
   styleUrl: './syllex-badge.scss',
   host: { style: 'display: inline-block' },
 })

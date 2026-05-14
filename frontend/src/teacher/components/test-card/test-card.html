@@ -1,82 +1,84 @@
 <div class="position-relative h-100">
   <div class="syllexCard h-100">
-    <div class="d-flex flex-column justify-content-between gap-3">
-      <div
-        class="d-flex flex-row gap-2 align-items-center w-100 justify-content-between"
-      >
-        <span [class]="'px-4 py-2 status-badge status-badge--' + test.status">
-          {{ test.status | titlecase }}
-        </span>
-        @if((test.uncorrectedCount || 0) > 0) {
+    <div class="d-flex flex-column justify-content-between h-100 gap-3">
+      <div class="d-flex justify-content-between align-items-center">
         <div
-          class="d-flex flex-row align-items-center gap-1 text-nowrap corrections-label"
+          class="text-dark d-flex gap-2 justify-content-center align-items-center"
         >
-          <fa-icon [icon]="BellIcon" class="bell-icon"></fa-icon>
-          <span>da correggere</span>
+          <fa-icon [icon]="CalendarIcon"></fa-icon>
+          <p class="m-0" style="font-size: 0.7rem">
+            @if(test.availableFrom) { dal {{ test.availableFrom | date:
+            'dd/MM/yy' }} } @if(test.availableTo) {
+            <span>al {{ test.availableTo | date: 'dd/MM/yy' }}</span>
+            }
+          </p>
         </div>
-        }
+        <div class="d-flex align-items-center gap-2">
+          @if(test.uncorrectedCount && test.uncorrectedCount > 0) {
+          <fa-icon [icon]="BellIcon" class="text-danger fs-4"></fa-icon>
+          }
+
+          <app-syllex-badge
+            [label]="test.status!"
+            [color]="getBadgeColor()"
+          ></app-syllex-badge>
+        </div>
       </div>
+
       <h3
         class="card-title text-dark ellipsis-3-lines mb-0"
         [title]="test.name"
       >
         {{ test.name }}
       </h3>
-      <section class="d-flex flex-column gap-2">
-        <div class="text-dark">
-          @if(test.availableFrom) { Dal {{ test.availableFrom | date: 'dd/MM/yy'
-          }} } @if(test.availableTo) {
-          <span class="ms-1">al {{ test.availableTo | date: 'dd/MM/yy' }}</span>
-          }
-        </div>
-        <div class="text-dark">
-          {{ test.questions?.length || 0 }} Domande - {{ getMaxScore() }} pt.
-        </div>
-        <div class="text-dark">
-          <a
-            (click)="$event.stopPropagation(); contextualMenu.onRequestAssignToClass()"
-            class="text-decoration-underline text-dark"
-          >
-            <fa-icon [icon]="UsersIcon" class="me-1"></fa-icon>
-            @if(test.classIds && test.classIds.length > 0) { @for(class of
-            test.classIds.slice(0, 2); track $index; let last = $last) { {{
-            classiService.getClassNameById(class) }}@if(!last &&
-            test.classIds.length > 1){
-            <span>, </span> } } @if(test.classIds.length > 2) {
-            <span> e altre {{ test.classIds.length - 2 }}</span>
-            } } @else {
-            <span>Nessuna classe assegnata</span>
-            }
-          </a>
-        </div>
-      </section>
-      <div class="d-flex flex-row align-items-center w-100 gap-2">
-        <button
-          class="btn btn-primary flex-fill"
-          [routerLink]="'/t/tests/' + test._id"
-        >
-          Visualizza
-        </button>
-        <div
-          ngbDropdown
-          class="flex-fill"
-          container="body"
-          placement="bottom-end"
-        >
-          <button
-            class="btn btn-outline-dark bg-white text-dark w-100 actions-btn"
-            ngbDropdownToggle
-          >
-            Azioni
-          </button>
-          <div ngbDropdownMenu>
-            <app-test-contextual-menu
-              #contextualMenu
-              [test]="test"
-              (delete)="delete.emit(test._id)"
-              (duplicate)="duplicate.emit(test._id)"
-              (publish)="publish.emit(test._id)"
-            ></app-test-contextual-menu>
+
+      <div class="w-100 gap-2">
+        <section class="d-flex flex-column gap-2">
+          <div class="text-dark">
+            {{ test.questions?.length || 0 }} Domande - {{ getMaxScore() }} pt.
+          </div>
+          <div class="text-dark">
+            <a
+              (click)="$event.stopPropagation(); contextualMenu.onRequestAssignToClass()"
+              class="text-decoration-underline text-dark"
+            >
+              <fa-icon [icon]="UsersIcon" class="me-1"></fa-icon>
+              @if(test.classIds && test.classIds.length > 0) { @for(class of
+              test.classIds.slice(0, 2); track $index; let last = $last) { {{
+              classiService.getClassNameById(class) }}@if(!last &&
+              test.classIds.length > 1){
+              <span>, </span> } } @if(test.classIds.length > 2) {
+              <span> e altre {{ test.classIds.length - 2 }}</span>
+              } } @else {
+              <span>Nessuna classe assegnata</span>
+              }
+            </a>
+          </div>
+        </section>
+        <div class="d-flex flex-row justify-content-end gap-2 mt-5">
+          <app-syllex-button
+            [props]="{
+            label: 'Modifica',
+            variant: 'primary',
+            size: 'medium',
+            link: '/t/tests/edit/' + test._id
+          }"
+          ></app-syllex-button>
+
+          <div ngbDropdown container="body" placement="bottom-end">
+            <app-syllex-button
+              ngbDropdownToggle
+              [props]="{ label: '', variant: 'primary', size: 'medium', leftIcon: ThreeDotsIcon, shape: 'circle' }"
+            />
+            <div ngbDropdownMenu>
+              <app-test-contextual-menu
+                #contextualMenu
+                [test]="test"
+                (delete)="delete.emit(test._id)"
+                (duplicate)="duplicate.emit(test._id)"
+                (publish)="publish.emit(test._id)"
+              ></app-test-contextual-menu>
+            </div>
           </div>
         </div>
       </div>

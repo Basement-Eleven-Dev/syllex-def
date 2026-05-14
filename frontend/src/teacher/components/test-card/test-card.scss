@@ -19,7 +19,7 @@
   white-space: nowrap;
 
   &--pubblicato {
-    background-color: #07c31d;
+    background-color: var(--bs-dark);
     color: white;
   }
   &--bozza {

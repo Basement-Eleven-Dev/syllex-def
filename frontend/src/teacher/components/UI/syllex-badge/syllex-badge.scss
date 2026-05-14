@@ -1,8 +1,6 @@
 .badge-syllex {
-  font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: 0.02em;
-  border-radius: 6px;
 
   &.badge-syllex-green {
     background-color: var(--syllex-green);
@@ -32,5 +30,15 @@
   &.badge-syllex-gray {
     background-color: #f3f4f6;
     color: #374151;
+  }
+
+  &.badge-syllex-dark {
+    background-color: #1f2937;
+    color: #fff;
+  }
+
+  &.badge-syllex-celestine {
+    background-color: #d2e2ff;
+    color: var(--bs-primary);
   }
 }

@@ -8,6 +8,7 @@ interface SyllexButtonProps {
   variant: 'primary' | 'secondary' | 'outline' | 'underline' | 'text';
   size: 'small' | 'medium' | 'large';
   color?: 'primary' | 'white' | 'dark' | 'danger';
+  shape?: 'circle';
   leftIcon?: IconDefinition;
   rightIcon?: IconDefinition;
   disabled?: boolean;
@@ -68,6 +69,7 @@ export class SyllexButton {
       'px-5': this.props.size === 'large',
       'py-3': this.props.size === 'large',
       'icon-only': !this.props.label,
+      'rounded-circle': this.props.shape === 'circle',
     };
   }
 }

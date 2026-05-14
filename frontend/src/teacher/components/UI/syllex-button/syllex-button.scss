@@ -87,6 +87,26 @@ button {
     justify-content: center;
     align-self: stretch;
   }
+
+  &.rounded-circle {
+    border-radius: 50% !important;
+    aspect-ratio: unset !important;
+    padding: 0 !important;
+    align-self: unset !important;
+
+    &.btn-sm {
+      width: 1.875rem;
+      height: 1.875rem;
+    }
+    &.btn-lg {
+      width: 3rem;
+      height: 3rem;
+    }
+    &:not(.btn-sm):not(.btn-lg) {
+      width: 2.5rem;
+      height: 2.5rem;
+    }
+  }
 }
 
 .btn-underline {
