@@ -1,0 +1,43 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.com-wrapper {
+  height: 300px;
+  position: relative;
+  overflow: hidden;
+  padding: 1.2rem 0 0;
+  background-color: #0e3462;
+  border-radius: 30px;
+}
+
+.com-scroll {
+  position: absolute;
+  top: 80px;
+  left: 0;
+  right: 0;
+  bottom: 2rem;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0.75rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  cursor: grab;
+  user-select: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.com-item {
+  flex: 0 0 360px;
+  width: 360px;
+  max-width: 360px;
+  height: 100%;
+  overflow: hidden;
+}

@@ -23,17 +23,22 @@
     }
     <div
       tourAnchor="calendario_nav"
-      class="d-flex flex-row align-items-center gap-0 border border-primary rounded-syllex"
+      class="d-flex flex-row align-items-center gap-2"
     >
       <button
-        class="btn btn-link d-flex flex-column justify-content-center align-items-center"
+        class="btn nav-circle-btn d-flex align-items-center justify-content-center"
         (click)="navigateMonth(-1)"
       >
         <fa-icon [icon]="ArrowLeftIcon"></fa-icon>
       </button>
-      <span class="text-primary">|</span>
+      <span
+        class="fw-semibold text-capitalize"
+        style="min-width: 140px; text-align: center"
+      >
+        {{ CurrentDate() | date: 'MMMM yyyy' : '' : 'it' }}
+      </span>
       <button
-        class="btn btn-link d-flex flex-column justify-content-center align-items-center"
+        class="btn nav-circle-btn d-flex align-items-center justify-content-center"
         (click)="navigateMonth(1)"
       >
         <fa-icon [icon]="ArrowRightIcon"></fa-icon>
@@ -92,11 +97,9 @@
       <div
         class="d-flex flex-row align-items-center justify-content-between mb-3 px-1"
       >
-        <div>
-          <h4 class="fw-semibold text-primary mb-0">
-            Oggi / {{ SelectedDate() | date: 'fullDate' | titlecase }}
-          </h4>
-        </div>
+        <h4 class="fw-semibold text-primary mb-0">
+          {{ SelectedDate() | date: 'fullDate' | titlecase }}
+        </h4>
         @if (!readonly()) {
         <button class="btn btn-blue btn-sm" (click)="openAddEventModal()">
           <fa-icon [icon]="PlusIcon"></fa-icon> Nuovo Evento
@@ -109,16 +112,8 @@
         tourAnchor="calendario_dettaglio_giorno"
         id="calendarDayDetailCard"
       >
-        <!-- Scrollable Content Section -->
         <div class="calendar-events-scrollable flex-fill pe-2">
-          @for (comunicazione of SelectedDateComunicazioni(); track
-          comunicazione._id) {
-          <div
-            app-student-comunicazione-card
-            [comunicazione]="comunicazione"
-            class="mb-3 d-block"
-          ></div>
-          } @for (event of SelectedDateEvents(); track event._id) {
+          @for (event of SelectedDateEvents(); track event._id) {
           <app-calendar-event-card
             [Event]="event"
             [readonly]="readonly()"
@@ -135,7 +130,6 @@
         </div>
       </div>
       } @else {
-      <!-- State when no date is selected -->
       <div
         class="flex-fill p-4 rounded-syllex bg-white no-date-selected"
         id="calendarDayDetailCard"
