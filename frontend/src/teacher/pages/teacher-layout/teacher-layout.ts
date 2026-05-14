@@ -122,7 +122,7 @@ export class TeacherLayout implements OnInit, OnDestroy {
     '/t/risorse',
     '/t/tests',
     '/t/comunicazioni',
-    '/t/eventi',
+    '/t/calendario',
     '/t/create-question',
   ]);
 
@@ -212,7 +212,7 @@ export class TeacherLayout implements OnInit, OnDestroy {
       case '/t/comunicazioni':
         this.tourService.initialize(comunicazioni_steps);
         break;
-      case '/t/eventi':
+      case '/t/calendario':
         this.tourService.initialize(eventi_steps);
         break;
       case '/t/create-question':

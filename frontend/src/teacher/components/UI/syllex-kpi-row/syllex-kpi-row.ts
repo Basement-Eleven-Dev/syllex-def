@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { SyllexButton } from '../syllex-button/syllex-button';
 
 export interface KpiCardData {
   label: string;
@@ -12,7 +13,7 @@ export interface KpiCardData {
 
 @Component({
   selector: 'app-syllex-kpi-row',
-  imports: [RouterLink],
+  imports: [RouterLink, SyllexButton],
   templateUrl: './syllex-kpi-row.html',
   styleUrl: './syllex-kpi-row.scss',
 })

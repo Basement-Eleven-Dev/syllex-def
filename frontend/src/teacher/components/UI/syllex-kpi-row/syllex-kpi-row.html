@@ -4,13 +4,14 @@
     <div class="kpi-card">
       <div class="kpi-card__top">
         @if (kpi.buttonLabel && kpi.buttonLink) {
-        <a
-          [routerLink]="kpi.buttonLink"
-          [queryParams]="kpi.buttonQueryParams"
-          class="kpi-btn"
-        >
-          {{ kpi.buttonLabel }}
-        </a>
+        <app-syllex-button
+          [props]="{
+          label: kpi.buttonLabel,
+          variant: 'primary',
+          size: 'medium',
+          link: $any(kpi.buttonLink)
+        }"
+        ></app-syllex-button>
         }
       </div>
       <div class="kpi-card__bottom">

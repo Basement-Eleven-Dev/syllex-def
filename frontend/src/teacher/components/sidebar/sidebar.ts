@@ -142,8 +142,8 @@ export class Sidebar {
       icon: faFile,
     },
     {
-      path: 'eventi',
-      label: 'Eventi',
+      path: 'calendario',
+      label: 'Calendario',
       icon: faCalendarAlt,
     },
   ];
