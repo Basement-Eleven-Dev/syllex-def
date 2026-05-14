@@ -7,6 +7,17 @@ button {
   }
 }
 
+.btn-celestine {
+  background-color: #d2e2ff;
+  color: var(--bs-primary);
+  border: 1px solid #d2e2ff !important;
+
+  &:hover:not(:disabled) {
+    background-color: #bdd4ff;
+    border-color: #bdd4ff !important;
+  }
+}
+
 .btn-outline {
   background-color: transparent;
   color: var(--bs-primary);
@@ -35,7 +46,6 @@ button {
   background-color: white;
   color: var(--bs-dark);
   border: 1px solid var(--bs-dark) !important;
-  border-radius: 6px !important;
 
   &:hover:not(:disabled) {
     background-color: var(--bs-dark);
@@ -60,7 +70,6 @@ button {
   background-color: #ffd4da;
   color: #9b1c2e;
   border: 1px solid #ffd4da !important;
-  border-radius: 6px !important;
 
   &:hover:not(:disabled) {
     background-color: #ffbec7;

@@ -74,14 +74,14 @@ export class Test implements OnDestroy {
   LoadingRecent = signal<boolean>(false);
   CollectionSizeRecent = signal<number>(0);
   PageRecent = signal<number>(1);
-  PageSizeRecent = signal<number>(6);
+  PageSizeRecent = signal<number>(8);
 
   // Section: Da Correggere
   PendingTests = signal<TestInterface[]>([]);
   LoadingPending = signal<boolean>(false);
   CollectionSizePending = signal<number>(0);
   PagePending = signal<number>(1);
-  PageSizePending = signal<number>(6);
+  PageSizePending = signal<number>(8);
 
   // Private Properties
   private SearchTermSubject = new Subject<string>();

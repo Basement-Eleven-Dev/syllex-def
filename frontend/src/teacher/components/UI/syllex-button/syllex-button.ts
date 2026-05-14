@@ -7,7 +7,7 @@ interface SyllexButtonProps {
   label: string;
   variant: 'primary' | 'secondary' | 'outline' | 'underline' | 'text';
   size: 'small' | 'medium' | 'large';
-  color?: 'primary' | 'white' | 'dark' | 'danger';
+  color?: 'primary' | 'white' | 'dark' | 'danger' | 'celestine';
   shape?: 'circle';
   leftIcon?: IconDefinition;
   rightIcon?: IconDefinition;
@@ -56,6 +56,8 @@ export class SyllexButton {
         this.props.variant === 'outline' && this.props.color === 'danger',
       'btn-solid-danger':
         this.props.variant === 'primary' && this.props.color === 'danger',
+      'btn-celestine':
+        this.props.variant === 'primary' && this.props.color === 'celestine',
       'btn-underline':
         this.props.variant === 'underline' && this.props.color !== 'white',
       'btn-underline-white':

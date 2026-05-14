@@ -8,13 +8,14 @@ import {
 } from '../../../services/materiali/materiali-service';
 import { ClassiService } from '../../../services/classi-service';
 import { FeedbackService } from '../../../services/feedback-service';
+import { SyllexButton } from '../UI/syllex-button/syllex-button';
 
 type ResourceType = 'test' | 'material';
 type Resource = TestInterface | MaterialInterface;
 
 @Component({
   selector: 'app-assign-class',
-  imports: [ClassSelector],
+  imports: [ClassSelector, SyllexButton],
   templateUrl: './assign-class.html',
   styleUrl: './assign-class.scss',
 })

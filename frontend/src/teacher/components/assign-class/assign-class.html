@@ -28,22 +28,28 @@
 </div>
 
 <div class="modal-footer">
-  <button
-    type="button"
-    class="btn btn-blue"
+  <app-syllex-button
+    [props]="{
+          label: 'Annulla',
+          variant: 'primary',
+          color: 'celestine',
+          size: 'medium',
+          disabled: IsSaving()
+        }"
     (click)="cancel()"
-    [disabled]="IsSaving()"
-  >
-    Annulla
-  </button>
-  <button
-    type="button"
-    class="btn btn-primary"
+  />
+
+  <app-syllex-button
+    [props]="{
+          label: 'Salva',
+          variant: 'primary',
+          size: 'medium',
+          disabled: IsSaving()
+        }"
     (click)="saveAssignment()"
-    [disabled]="IsSaving()"
   >
     @if (IsSaving()) {
     <span class="spinner-border spinner-border-sm me-2" role="status"></span>
     } Salva
-  </button>
+  </app-syllex-button>
 </div>
