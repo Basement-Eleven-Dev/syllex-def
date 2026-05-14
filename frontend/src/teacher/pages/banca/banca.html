@@ -12,24 +12,32 @@
   />
 </app-syllex-page-header>
 
+<div class="d-flex justify-content-between">
+  <app-syllex-tab-filter
+    class="mb-4"
+    [options]="tabOptions"
+    [value]="ActiveTab()"
+    (valueChange)="onTabChange($any($event))"
+  />
+</div>
 <section
-  class="d-flex flex-row align-items-center gap-3"
   tourAnchor="banca_filters"
+  class="d-flex gap-3 justify-content-between align-items-center"
 >
-  <app-questions-search-filters
-    class="flex-grow-1"
-    (filtersChanged)="onFiltersChanged($event)"
-  >
-    <app-view-type-toggle
-      class="ms-auto"
-      tourAnchor="banca_toggle"
-      [viewType]="ViewType"
-      [pageKey]="'banca'"
-      (viewTypeChange)="onChangeViewType($event)"
+  <div class="w-75">
+    <app-questions-search-filters
+      class="flex-grow-1"
+      (filtersChanged)="onFiltersChanged($event)"
     />
-  </app-questions-search-filters>
-</section>
+  </div>
 
+  <app-view-type-toggle
+    tourAnchor="banca_toggle"
+    [viewType]="ViewType"
+    [pageKey]="'banca'"
+    (viewTypeChange)="onChangeViewType($event)"
+  />
+</section>
 @if (ViewType === 'table') {
 <div class="mt-4">
   <app-question-table
@@ -51,9 +59,9 @@
   </div>
   }
 </div>
-}
+} @if (CollectionSize() > PageSize()) {
 <div
-  class="mt-5 d-flex flex-row justify-content-between align-items-center mb-5"
+  class="mt-4 d-flex justify-content-end gap-2 align-items-center mb-5"
   tourAnchor="banca_pagination"
 >
   <app-syllex-pagination
@@ -62,15 +70,5 @@
     [pageSize]="PageSize()"
     (pageChange)="Page.set($event)"
   />
-
-  <select
-    class="form-select custom-input"
-    style="width: auto"
-    [ngModel]="PageSize()"
-    (ngModelChange)="PageSize.set($event); Page.set(1)"
-  >
-    <option [ngValue]="5">5 per pagina</option>
-    <option [ngValue]="10">10 per pagina</option>
-    <option [ngValue]="20">20 per pagina</option>
-  </select>
 </div>
+}

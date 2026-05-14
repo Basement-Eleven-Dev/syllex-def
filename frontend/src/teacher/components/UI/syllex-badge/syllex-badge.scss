@@ -41,4 +41,9 @@
     background-color: #d2e2ff;
     color: var(--bs-primary);
   }
+
+  &.badge-syllex-primary {
+    background-color: var(--bs-primary);
+    color: #fff;
+  }
 }

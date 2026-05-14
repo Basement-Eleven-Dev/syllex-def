@@ -8,7 +8,8 @@ export type SyllexBadgeColor =
   | 'red'
   | 'gray'
   | 'black'
-  | 'celestine';
+  | 'celestine'
+  | 'primary';
 
 const COLOR_CLASSES: Record<SyllexBadgeColor, string> = {
   green: 'badge-syllex-green',
@@ -19,6 +20,7 @@ const COLOR_CLASSES: Record<SyllexBadgeColor, string> = {
   gray: 'badge-syllex-gray',
   black: 'badge-syllex-dark',
   celestine: 'badge-syllex-celestine',
+  primary: 'badge-syllex-primary',
 };
 
 @Component({

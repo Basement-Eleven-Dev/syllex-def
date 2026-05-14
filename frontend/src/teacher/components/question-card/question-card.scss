@@ -1,3 +1,38 @@
+.question-text-row {
+  position: relative;
+  padding-right: 1.8rem;
+
+  .expand-btn {
+    position: absolute;
+    top: 0.1rem;
+    right: 0;
+    background: none;
+    border: none;
+    padding: 0.2rem 0.3rem;
+    color: var(--bs-secondary-color);
+    cursor: pointer;
+    line-height: 1;
+    border-radius: 0.4rem;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.06);
+      color: var(--bs-body-color);
+    }
+
+    fa-icon {
+      display: block;
+      transition: transform 0.2s ease;
+    }
+
+    fa-icon.rotated {
+      transform: rotate(180deg);
+    }
+  }
+}
+
 .text-clamp {
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -9,34 +44,6 @@
 .card-footer-divider {
   height: 1px;
   background-color: rgba(0, 0, 0, 0.08);
-}
-
-.expand-btn {
-  flex-shrink: 0;
-  background: none;
-  border: none;
-  padding: 0.2rem 0.3rem;
-  color: var(--bs-secondary-color);
-  cursor: pointer;
-  line-height: 1;
-  border-radius: 0.4rem;
-  transition:
-    background-color 0.15s ease,
-    color 0.15s ease;
-
-  &:hover {
-    background-color: rgba(0, 0, 0, 0.06);
-    color: var(--bs-body-color);
-  }
-
-  fa-icon {
-    display: block;
-    transition: transform 0.2s ease;
-  }
-
-  fa-icon.rotated {
-    transform: rotate(180deg);
-  }
 }
 
 .question-card {

@@ -1,5 +1,5 @@
 <div
-  class="card d-flex gap-2 question-card p-3 h-100"
+  class="syllexCard d-flex gap-2 question-card flex-column h-100"
   [class.moveable]="mode === 'test-composition'"
   [class.locked]="locked"
   [class.dimmed]="dimmed"
@@ -15,11 +15,16 @@
       >
         {{ materiaService.getTopicName(question.topicId) }}
       </span>
-      @if (mode === 'banca') { @if (question.policy === 'private') {
-      <app-syllex-badge label="Uso Test" color="green" />
-      } @else {
-      <app-syllex-badge label="Esercitazione" color="orange" />
-      } }
+
+      <div class="d-flex flex-row align-items-center gap-2">
+        @if (mode === 'banca') { @if (question.policy === 'private') {
+        <app-syllex-badge label="Uso Test" color="green" />
+        } @else {
+        <app-syllex-badge label="Esercitazione" color="celestine" />
+        } }
+
+        <app-syllex-badge [label]="question.type" color="primary" />
+      </div>
     </div>
 
     <!-- ── Optional image ── -->
@@ -36,9 +41,9 @@
     }
 
     <!-- ── Question text ── -->
-    <section class="d-flex align-items-start gap-2">
+    <section class="question-text-row">
       <p
-        class="mb-0 mt-1 flex-grow-1"
+        class="mb-0 mt-1 question-text"
         [class.text-clamp]="mode === 'banca' && Collapsed()"
         style="font-size: 1.05rem"
       >
@@ -218,11 +223,8 @@
 
   <!-- ── Banca footer ── -->
   @if (mode === 'banca' && !Collapsed()) {
-  <div class="card-footer-divider mx-3"></div>
-  <div
-    class="d-flex flex-row align-items-end justify-content-between gap-3 px-3 pb-3 pt-2"
-  >
-    <div class="overflow-hidden" style="max-width: 75%">
+  <div class="d-flex flex-column gap-2">
+    <div class="overflow-hidden">
       <p
         class="mb-1 fw-semibold text-muted"
         style="
@@ -235,12 +237,14 @@
       </p>
       <p class="mb-0 text-muted small">{{ question.explanation || '—' }}</p>
     </div>
-    <div class="d-flex flex-row gap-1 flex-shrink-0 align-items-stretch">
+    <div
+      class="d-flex flex-row gap-1 flex-shrink-0 align-items-center justify-content-end"
+    >
       <app-syllex-button
-        [props]="{ label: 'Modifica', variant: 'outline', color: 'dark', size: 'small', link: '/t/edit-question/' + question._id }"
+        [props]="{ label: 'Modifica', variant: 'primary', color: 'dark', size: 'medium', link: '/t/edit-question/' + question._id }"
       />
       <app-syllex-button
-        [props]="{ label: '', variant: 'primary', color: 'danger', size: 'small', leftIcon: TrashIcon }"
+        [props]="{ label: '', variant: 'primary', color: 'danger',   size: 'medium', shape: 'circle', leftIcon: TrashIcon }"
         confirmAction
         [confirmMessage]="'Vuoi eliminare questa domanda? L\'azione non può essere annullata.'"
         [confirmTitle]="'Elimina domanda'"
