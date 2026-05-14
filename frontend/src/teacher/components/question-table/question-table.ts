@@ -9,6 +9,8 @@ import { Materia } from '../../../services/materia';
 import { QuestionCard } from '../question-card/question-card';
 import { QuestionPreviewModal } from './question-preview-modal';
 import { ConfirmActionDirective } from '../../../directives/confirm-action.directive';
+import { SyllexButton } from '../UI/syllex-button/syllex-button';
+import { SyllexBadge } from '../UI/syllex-badge/syllex-badge';
 
 @Component({
   selector: 'app-question-table',
@@ -18,6 +20,8 @@ import { ConfirmActionDirective } from '../../../directives/confirm-action.direc
     FontAwesomeModule,
     RouterModule,
     ConfirmActionDirective,
+    SyllexButton,
+    SyllexBadge,
   ],
   templateUrl: './question-table.html',
   styleUrl: './question-table.scss',
