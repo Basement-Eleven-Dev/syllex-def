@@ -1,9 +1,17 @@
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  inject,
+  signal,
+} from '@angular/core';
 import { QuestionInterface } from '../../../services/questions';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faCheck,
+  faChevronDown,
   faPencilAlt,
   faTrash,
 } from '@fortawesome/pro-solid-svg-icons';
@@ -42,6 +50,9 @@ export class QuestionCard {
   protected readonly TrashIcon = faTrash;
   protected readonly CheckIcon = faCheck;
   protected readonly EditIcon = faPencilAlt;
+  protected readonly ChevronIcon = faChevronDown;
+
+  Collapsed = signal(true);
 
   private readonly modalServ = inject(NgbModal);
   protected readonly materiaService = inject(Materia);

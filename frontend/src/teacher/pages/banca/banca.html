@@ -38,12 +38,11 @@
   />
 </div>
 } @else {
-<div class="row mt-4">
+<div class="questions-masonry mt-4">
   @for(question of Questions(); track question._id; let last = $last; let i =
   $index) {
-  <div class="col-12 col-lg-6 mb-3">
+  <div class="questions-masonry-item">
     <div
-      class="h-100"
       app-question-card
       [question]="question"
       mode="banca"
