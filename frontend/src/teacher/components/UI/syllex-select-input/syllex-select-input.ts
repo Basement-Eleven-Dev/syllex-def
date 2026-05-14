@@ -22,7 +22,7 @@ export interface SelectOption {
   imports: [FormsModule],
   template: `
     <select
-      class="form-select bg-light border-0 shadow-none py-3"
+      class="form-select bg-light border-0 shadow-none py-2 px-4 rounded-pill "
       [ngModel]="value"
       (ngModelChange)="handleChange($event)"
       (blur)="onTouched()"

@@ -1,10 +1,9 @@
 <div
-  class="wrapper py-1"
-  style="z-index: 99"
+  class="wrapper"
   [ngClass]="viewType() === 'table' ? 'table-view' : 'grid-view'"
 >
   <div id="selector"></div>
-  <div style="z-index: 100">
+  <div class="icons-container">
     <div class="icon-wrapper" (click)="onChangeViewType('table')">
       <fa-icon [icon]="TableIcon" id="table-icon"></fa-icon>
     </div>
@@ -13,3 +12,4 @@
     </div>
   </div>
 </div>
+

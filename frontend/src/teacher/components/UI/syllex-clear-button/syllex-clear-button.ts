@@ -9,11 +9,12 @@ import { faXmark } from '@fortawesome/pro-solid-svg-icons';
   template: `
     <button
       type="button"
-      class="btn btn-red py-3 px-3"
+      class="rounded-circle p-1 btn d-flex justify-content-center align-items-center  bg-primary text-white"
+      style="width: 37.6px; height: 37.6px;"
       (click)="clicked.emit()"
       title="Pulisci filtri"
     >
-      <fa-icon [icon]="XIcon"></fa-icon>
+      <fa-icon [icon]="XIcon" class="p-1"></fa-icon>
     </button>
   `,
 })
