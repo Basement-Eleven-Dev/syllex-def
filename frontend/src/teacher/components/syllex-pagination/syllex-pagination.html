@@ -2,16 +2,6 @@
   <button
     class="nav-button py-4 px-4"
     [disabled]="page() === 1"
-    (click)="onFirst()"
-    type="button"
-    title="Prima pagina"
-  >
-    <fa-icon class="d-inline-flex" [icon]="AnglesLeft"></fa-icon>
-  </button>
-
-  <button
-    class="nav-button py-4 px-4"
-    [disabled]="page() === 1"
     (click)="onPrevious()"
     type="button"
     title="Pagina precedente"
