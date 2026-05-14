@@ -1,7 +1,16 @@
 <div class="row g-3">
   @for (kpi of kpis; track $index) {
   <div class="col-12 col-sm-6 col-xl-3">
-    <div class="kpi-card">
+    <div class="kpi-card d-flex justify-content-between">
+      <div class="d-flex flex-column gap-1">
+        <span class="kpi-value">
+          {{ kpi.value }}@if (kpi.requirePercentage) {<small
+            class="kpi-percentage"
+            >%</small
+          >}
+        </span>
+        <span class="kpi-label">{{ kpi.label }}</span>
+      </div>
       <div class="kpi-card__top">
         @if (kpi.buttonLabel && kpi.buttonLink) {
         <app-syllex-button
@@ -13,15 +22,6 @@
         }"
         ></app-syllex-button>
         }
-      </div>
-      <div class="kpi-card__bottom">
-        <span class="kpi-value">
-          {{ kpi.value }}@if (kpi.requirePercentage) {<small
-            class="kpi-percentage"
-            >%</small
-          >}
-        </span>
-        <span class="kpi-label">{{ kpi.label }}</span>
       </div>
     </div>
   </div>
