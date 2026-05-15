@@ -113,7 +113,6 @@ export async function generateAIResponseGemini(
       contents,
       config: {
         systemInstruction: systemPrompt,
-        tools: toolsConfig,
       },
     });
 
