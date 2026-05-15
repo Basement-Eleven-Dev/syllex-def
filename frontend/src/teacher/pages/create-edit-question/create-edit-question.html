@@ -1,29 +1,13 @@
-<!-- Page Header -->
-<div class="page-header" tourAnchor="crea_domanda_header">
-  <button
-    class="back-btn"
-    [routerLink]="'/t/banca'"
-    aria-label="Torna alla banca"
-    type="button"
-  >
-    <fa-icon [icon]="ArrowLeftIcon" />
-  </button>
-  <div>
-    <h1 class="mb-0 fw-semibold" style="letter-spacing: -0.04em">
-      {{ PageTitle() }}
-    </h1>
-    <p class="text-muted mb-0">{{ PageDescription() }}</p>
-  </div>
-</div>
+<app-syllex-page-header
+  tourAnchor="crea_domanda_header"
+  [title]="PageTitle()"
+  [description]="PageDescription()"
+></app-syllex-page-header>
 
 <!-- Wizard -->
 @if (!SelectedMethod()) {
 <!-- ── PRE-STEP: Scelta del metodo ── -->
 <div class="pre-step">
-  <h2 class="pre-step__title">Come vuoi creare la domanda?</h2>
-  <p class="pre-step__subtitle">
-    Scegli il metodo di creazione. L'AI è il modo più rapido e consigliato!
-  </p>
   <div class="row g-4">
     <div class="col-12 col-md-6">
       <div

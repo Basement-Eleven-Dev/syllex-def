@@ -22,6 +22,7 @@ import { TypeSelector } from '../../components/type-selector/type-selector';
 import { MaterialiSelector } from '../../components/materiali-selector/materiali-selector';
 import { AiOverlay } from '../../components/ai-overlay/ai-overlay';
 import { SyllexCard } from '../../components/UI/syllex-card/syllex-card';
+import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
 import { AiService } from '../../../services/ai-service';
 import { FeedbackService } from '../../../services/feedback-service';
 import {
@@ -44,6 +45,7 @@ interface StepDef {
     MaterialiSelector,
     AiOverlay,
     SyllexCard,
+    SyllexPageHeader,
     TourAnchorNgBootstrapDirective,
   ],
   templateUrl: './laboratorio-ai.html',

@@ -1,32 +1,14 @@
-<!-- Page Header -->
-<div class="page-header" tourAnchor="laboratorio_ai_header">
-  <button
-    class="back-btn"
-    [routerLink]="'/t/dashboard'"
-    aria-label="Torna alla dashboard"
-    type="button"
-  >
-    <fa-icon [icon]="ChevronLeftIcon" />
-  </button>
-  <div>
-    <h1 class="mb-0 fw-semibold" style="letter-spacing: -0.04em">
-      Crea con l'AI di Syllex
-    </h1>
-    <p class="text-muted mb-0">
-      Genera materiali didattici e domande per i test in pochi passi.
-    </p>
-  </div>
-</div>
+<app-syllex-page-header
+  tourAnchor="laboratorio_ai_header"
+  title="Crea con l'AI di Syllex"
+  description="Genera materiali didattici e domande per i test in pochi passi."
+></app-syllex-page-header>
 
 @if (!InitialChoice()) {
 <!-- PRE-STEP: Scelta del tipo -->
 <div class="pre-step" tourAnchor="laboratorio_ai_type_cards">
-  <h2 class="pre-step__title">Cosa vuoi creare?</h2>
-  <p class="pre-step__subtitle">
-    Scegli il tipo di contenuto che vuoi generare con l'AI di Syllex.
-  </p>
-  <div class="row g-4 justify-content-center">
-    <div class="col-12 col-md-5" tourAnchor="laboratorio_ai_card_materials">
+  <div class="row g-4">
+    <div class="col-12 col-md-6" tourAnchor="laboratorio_ai_card_materials">
       <div
         (click)="onSelectInitialType('materials')"
         style="cursor: pointer"
@@ -44,7 +26,7 @@
         ></app-syllex-card>
       </div>
     </div>
-    <div class="col-12 col-md-5" tourAnchor="laboratorio_ai_card_questions">
+    <div class="col-12 col-md-6" tourAnchor="laboratorio_ai_card_questions">
       <div
         (click)="onSelectInitialType('questions')"
         style="cursor: pointer"
