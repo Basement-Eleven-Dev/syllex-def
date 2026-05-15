@@ -31,6 +31,7 @@ import { TypeSelector } from '../../components/type-selector/type-selector';
 import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
 import { SyllexCard } from '../../components/UI/syllex-card/syllex-card';
 import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
+import { SyllexSelectInput } from '../../components/UI/syllex-select-input/syllex-select-input';
 import { Materia } from '../../../services/materia';
 import { QuestionsService } from '../../../services/questions';
 import { FeedbackService } from '../../../services/feedback-service';
@@ -77,6 +78,7 @@ interface StepDef {
     SyllexButton,
     SyllexCard,
     SyllexPageHeader,
+    SyllexSelectInput,
     TourAnchorNgBootstrapDirective,
     MaterialiSelector,
   ],
@@ -127,6 +129,13 @@ export class CreateEditQuestion {
   // Data
   readonly QuestionTypeOptions = QUESTION_TYPE_OPTIONS;
   readonly DifficultyOptions = DIFFICULTY_OPTIONS;
+  readonly LanguageOptions = [
+    { value: 'it', label: 'Italiano' },
+    { value: 'en', label: 'English' },
+    { value: 'es', label: 'Español' },
+    { value: 'fr', label: 'Français' },
+    { value: 'de', label: 'Deutsch' },
+  ];
   private readonly QuestionId = this.activatedRoute.snapshot.paramMap.get('id');
   private CurrentQuestionId = signal<string | null>(null);
 

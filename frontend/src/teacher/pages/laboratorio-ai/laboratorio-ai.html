@@ -94,9 +94,9 @@
         @stepIn
         tourAnchor="gen_ai_type_selector"
       >
-        <h5 class="wizard-step-title">Tipo di materiale</h5>
+        <h5 class="wizard-step-title">Che materiale vuoi creare?</h5>
         <p class="wizard-step-subtitle">
-          Scegli il formato del contenuto che vuoi generare.
+          Scegli il formato e l'AI farà il resto.
         </p>
         <app-type-selector
           [options]="MaterialTypes"
@@ -117,10 +117,10 @@
       >
         <h5 class="wizard-step-title">
           <fa-icon [icon]="SparklesIcon" class="me-2 text-primary"></fa-icon>
-          Genera {{ SelectedMaterialTypeName() }}
+          Come vuoi il tuo {{ SelectedMaterialTypeName() }}?
         </h5>
         <p class="wizard-step-subtitle">
-          Configura i parametri e scegli i materiali di riferimento.
+          Dicci come lo vuoi, l'AI lo creerà su misura per te.
         </p>
 
         <div [formGroup]="genForm">
@@ -131,7 +131,7 @@
               <div tourAnchor="gen_ai_m_params">
                 <div class="row g-2">
                   <div class="col-6">
-                    <label class="wizard-field-label">N° slide</label>
+                    <label class="wizard-field-label">Quante slide?</label>
                     <input
                       type="number"
                       class="form-control custom-input"
@@ -142,46 +142,48 @@
                     />
                   </div>
                   <div class="col-12">
-                    <label class="wizard-field-label">Formato</label>
-                    <div class="d-flex gap-4 pt-1">
-                      <div class="form-check">
+                    <label class="wizard-field-label">In che formato?</label>
+                    <div class="d-flex gap-2 pt-1">
+                      <label
+                        class="rounded-syllex border typeCard p-3 d-flex align-items-center gap-2 flex-fill"
+                        [class.selected]="genForm.get('format')?.value === 'pptx'"
+                        for="formatPPTX"
+                        style="cursor: pointer; max-width: 160px"
+                      >
                         <input
-                          class="form-check-input"
+                          class="form-check-input flex-shrink-0 mt-0"
                           type="radio"
                           value="pptx"
                           id="formatPPTX"
                           formControlName="format"
                         />
-                        <label
-                          class="form-check-label"
-                          for="formatPPTX"
-                          style="cursor: pointer"
-                        >
-                          <span class="fw-bold">PPTX</span>
-                          <span class="text-muted small ms-1"
-                            >(Modificabile)</span
-                          >
-                        </label>
-                      </div>
-                      <div class="form-check">
+                        <div>
+                          <div class="fw-semibold small">PPTX</div>
+                          <div class="text-muted" style="font-size: 0.75rem">
+                            Modificabile
+                          </div>
+                        </div>
+                      </label>
+                      <label
+                        class="rounded-syllex border typeCard p-3 d-flex align-items-center gap-2 flex-fill"
+                        [class.selected]="genForm.get('format')?.value === 'pdf'"
+                        for="formatPDF"
+                        style="cursor: pointer; max-width: 160px"
+                      >
                         <input
-                          class="form-check-input"
+                          class="form-check-input flex-shrink-0 mt-0"
                           type="radio"
                           value="pdf"
                           id="formatPDF"
                           formControlName="format"
                         />
-                        <label
-                          class="form-check-label"
-                          for="formatPDF"
-                          style="cursor: pointer"
-                        >
-                          <span class="fw-bold">PDF</span>
-                          <span class="text-muted small ms-1"
-                            >(Documento statico)</span
-                          >
-                        </label>
-                      </div>
+                        <div>
+                          <div class="fw-semibold small">PDF</div>
+                          <div class="text-muted" style="font-size: 0.75rem">
+                            Documento statico
+                          </div>
+                        </div>
+                      </label>
                     </div>
                   </div>
                 </div>
@@ -189,19 +191,11 @@
               }
 
               <div>
-                <label class="wizard-field-label">Lingua</label>
-                <select
-                  class="form-select custom-input"
+                <label class="wizard-field-label">In che lingua?</label>
+                <app-syllex-select-input
                   formControlName="language"
-                  aria-label="Lingua"
-                  style="max-width: 220px"
-                >
-                  <option value="italiano">Italiano</option>
-                  <option value="inglese">English</option>
-                  <option value="spagnolo">Español</option>
-                  <option value="francese">Français</option>
-                  <option value="tedesco">Deutsch</option>
-                </select>
+                  [options]="LanguageOptions"
+                ></app-syllex-select-input>
               </div>
 
               <div
@@ -209,7 +203,7 @@
                 tourAnchor="gen_ai_instructions"
               >
                 <label class="wizard-field-label">
-                  Istruzioni aggiuntive
+                  Hai istruzioni particolari?
                   <span class="text-muted fw-normal">(opzionale)</span>
                 </label>
                 <textarea
@@ -217,7 +211,7 @@
                   formControlName="instructions"
                   rows="4"
                   style="resize: none"
-                  placeholder="Stile, tono di voce, punti chiave da trattare..."
+                  placeholder="Es. usa un tono formale, includi esempi pratici, fai sintesi concise..."
                 ></textarea>
               </div>
 
@@ -241,9 +235,11 @@
 
             <!-- Right: materiali -->
             <div class="col-12 col-lg-6" tourAnchor="gen_ai_support_files">
-              <label class="wizard-field-label">Materiali di riferimento</label>
+              <label class="wizard-field-label"
+                >Da dove vuoi che l'AI impari?</label
+              >
               <p class="text-muted small mb-2">
-                L'AI userà questi file come fonte per generare il contenuto.
+                Carica dispense, PDF o slide: l'AI li studià per te.
               </p>
               <app-materiali-selector></app-materiali-selector>
             </div>

@@ -91,9 +91,10 @@
       <!-- ── STEP 1: Tipo ── -->
       @if (CurrentStep() === 1) {
       <div class="wizard-step-content" @stepIn tourAnchor="crea_domanda_tipo">
-        <h5 class="wizard-step-title">Tipo di domanda</h5>
+        <h5 class="wizard-step-title">Che tipo di domanda stai creando?</h5>
         <p class="wizard-step-subtitle">
-          Scegli il formato della domanda. Puoi cambiarlo in qualsiasi momento.
+          Scegli il formato più adatto ai tuoi obiettivi. Potrai sempre
+          cambiarlo.
         </p>
         <app-type-selector
           [options]="QuestionTypeOptions"
@@ -116,10 +117,10 @@
         @if (!AiIsReviewing()) {
         <h5 class="wizard-step-title">
           <fa-icon [icon]="SparklesIcon" class="me-2 text-primary"></fa-icon>
-          Genera con AI
+          Quante domande vuoi generare?
         </h5>
         <p class="wizard-step-subtitle">
-          Configura i parametri e lascia lavorare l'AI.
+          Dicci l'argomento e i parametri, l'AI creerà le domande per te.
         </p>
 
         <div [formGroup]="aiForm">
@@ -128,7 +129,7 @@
             <div class="col-12 col-lg-6 d-flex flex-column gap-3">
               <!-- Argomento -->
               <div tourAnchor="crea_domanda_argomento">
-                <label class="wizard-field-label">Argomento *</label>
+                <label class="wizard-field-label">Su quale argomento? *</label>
                 <select
                   class="form-select bg-light border-0 shadow-none py-2 px-3 rounded-pill"
                   formControlName="topicId"
@@ -146,7 +147,7 @@
               <!-- Parametri -->
               <div class="row g-2" tourAnchor="crea_domanda_difficolta">
                 <div class="col-6">
-                  <label class="wizard-field-label">N° domande</label>
+                  <label class="wizard-field-label">Quante domande?</label>
                   <input
                     type="number"
                     class="form-control custom-input"
@@ -158,7 +159,7 @@
                 </div>
                 @if (IsAiFormMultipleChoice()) {
                 <div class="col-6">
-                  <label class="wizard-field-label">Alternative</label>
+                  <label class="wizard-field-label">Opzioni per risposta</label>
                   <input
                     type="number"
                     class="form-control custom-input"
@@ -170,37 +171,28 @@
                 </div>
                 }
                 <div class="col-6">
-                  <label class="wizard-field-label">Lingua</label>
-                  <select
-                    class="form-select custom-input"
+                  <label class="wizard-field-label">In che lingua?</label>
+                  <app-syllex-select-input
                     formControlName="language"
-                    aria-label="Lingua"
-                  >
-                    <option value="it">Italiano</option>
-                    <option value="en">English</option>
-                    <option value="es">Español</option>
-                    <option value="fr">Français</option>
-                    <option value="de">Deutsch</option>
-                  </select>
+                    [options]="LanguageOptions"
+                    placeholder="Scegli lingua"
+                  ></app-syllex-select-input>
                 </div>
                 <div class="col-6">
-                  <label class="wizard-field-label">Difficoltà</label>
-                  <select
-                    class="form-select custom-input"
-                    formControlName="difficulty"
-                    aria-label="Difficoltà"
+                  <label class="wizard-field-label"
+                    >Livello di difficoltà</label
                   >
-                    @for (opt of DifficultyOptions; track opt.value) {
-                    <option [value]="opt.value">{{ opt.label }}</option>
-                    }
-                  </select>
+                  <app-syllex-select-input
+                    formControlName="difficulty"
+                    [options]="DifficultyOptions"
+                  ></app-syllex-select-input>
                 </div>
               </div>
 
               <!-- Istruzioni -->
               <div class="flex-fill d-flex flex-column">
                 <label class="wizard-field-label">
-                  Istruzioni aggiuntive
+                  Hai istruzioni particolari?
                   <span class="text-muted fw-normal">(opzionale)</span>
                 </label>
                 <textarea
@@ -208,7 +200,7 @@
                   formControlName="instructions"
                   rows="4"
                   style="resize: none"
-                  placeholder="Stile, tono, aspetti specifici da coprire..."
+                  placeholder="Es. usa linguaggio semplice, includi esempi pratici, evita domande trabocchetto..."
                 ></textarea>
               </div>
 
@@ -224,7 +216,7 @@
                     [icon]="AiIsLoading() ? SpinnerIcon : SparklesIcon"
                     [animation]="AiIsLoading() ? 'spin' : undefined"
                   ></fa-icon>
-                  {{ AiIsLoading() ? 'Generazione in corso...' : 'Genera
+                  {{ AiIsLoading() ? 'Generazione in corso...' : 'Genera le mie
                   domande' }}
                 </button>
               </div>
@@ -232,9 +224,12 @@
 
             <!-- Right: materiali -->
             <div class="col-12 col-lg-6" tourAnchor="gen_ai_support_files">
-              <label class="wizard-field-label">Materiali di riferimento</label>
+              <label class="wizard-field-label"
+                >Da dove vuoi che l'AI impari?</label
+              >
               <p class="text-muted small mb-2">
-                L'AI userà questi materiali come fonte per generare le domande.
+                Carica dispense, PDF o slide: l'AI li studià per creare domande
+                pertinenti.
               </p>
               <app-materiali-selector></app-materiali-selector>
             </div>
@@ -247,9 +242,12 @@
         <div @stepIn>
           <div class="d-flex align-items-center justify-content-between mb-3">
             <div>
-              <h5 class="wizard-step-title mb-1">Revisiona le domande</h5>
+              <h5 class="wizard-step-title mb-1">
+                Scegli le domande da salvare
+              </h5>
               <p class="wizard-step-subtitle mb-0">
-                Seleziona quelle che vuoi salvare nella banca domande.
+                Controlla le domande generate e tieni solo quelle che ti
+                convincono.
               </p>
             </div>
             <button
@@ -348,15 +346,15 @@
         @stepIn
         tourAnchor="crea_domanda_contenuto"
       >
-        <h5 class="wizard-step-title">Scrivi la domanda</h5>
+        <h5 class="wizard-step-title">Qual è la tua domanda?</h5>
         <p class="wizard-step-subtitle">
-          Inserisci il testo. Puoi anche allegare un'immagine.
+          Scrivi la domanda e, se vuoi, arricchiscila con un'immagine.
         </p>
 
         <div [formGroup]="QuestionForm" class="d-flex flex-column gap-3">
           <div class="row g-3">
             <div class="col-12 col-md-6" tourAnchor="crea_domanda_argomento">
-              <label class="wizard-field-label">Argomento *</label>
+              <label class="wizard-field-label">Su quale argomento? *</label>
               <select
                 class="form-select bg-light border-0 shadow-none py-2 px-3 rounded-pill"
                 formControlName="topicId"
@@ -369,16 +367,11 @@
               </select>
             </div>
             <div class="col-12 col-md-6" tourAnchor="crea_domanda_difficolta">
-              <label class="wizard-field-label">Difficoltà</label>
-              <select
-                class="form-select bg-light border-0 shadow-none py-2 px-3 rounded-pill"
+              <label class="wizard-field-label">Quanto è difficile?</label>
+              <app-syllex-select-input
                 formControlName="difficulty"
-                aria-label="Seleziona difficoltà"
-              >
-                @for (opt of DifficultyOptions; track opt.value) {
-                <option [value]="opt.value">{{ opt.label }}</option>
-                }
-              </select>
+                [options]="DifficultyOptions"
+              ></app-syllex-select-input>
             </div>
           </div>
 
@@ -464,12 +457,12 @@
         @stepIn
         tourAnchor="crea_domanda_opzioni"
       >
-        <h5 class="wizard-step-title">Risposta corretta</h5>
+        <h5 class="wizard-step-title">Qual è la risposta giusta?</h5>
         <p class="wizard-step-subtitle">
           @if (SelectedQuestionType() === 'scelta multipla') { Aggiungi le
           opzioni e segna quella corretta. } @else if (SelectedQuestionType()
-          === 'vero falso') { Seleziona se l'affermazione è vera o falsa. }
-          @else { Le domande aperte non richiedono una risposta predefinita. }
+          === 'vero falso') { L'affermazione che hai scritto è vera o falsa? }
+          @else { Le domande aperte vengono corrette direttamente dal docente. }
         </p>
 
         <div [formGroup]="QuestionForm">
@@ -527,19 +520,20 @@
         @stepIn
         tourAnchor="crea_domanda_spiegazione"
       >
-        <h5 class="wizard-step-title">Dettagli e pubblicazione</h5>
+        <h5 class="wizard-step-title">Quasi fatto! Ultimi dettagli</h5>
         <p class="wizard-step-subtitle">
-          Aggiungi spiegazione, tag e scegli la visibilità, poi salva.
+          Aggiungi contesto e scegli chi può vedere questa domanda.
         </p>
 
         <div [formGroup]="QuestionForm" class="d-flex flex-column gap-4">
           <!-- Spiegazione -->
           <div>
             <label class="wizard-field-label">
-              Spiegazione <span class="text-muted fw-normal">(opzionale)</span>
+              Vuoi aggiungere una spiegazione?
+              <span class="text-muted fw-normal">(opzionale)</span>
             </label>
             <p class="text-muted small mb-2">
-              Verrà mostrata allo studente dopo la correzione.
+              Verrà mostrata allo studente dopo la correzione, come feedback.
             </p>
             <textarea
               class="form-control custom-input"
@@ -580,7 +574,9 @@
 
           <!-- Visibilità -->
           <div tourAnchor="crea_domanda_visibilita">
-            <label class="wizard-field-label">Visibilità</label>
+            <label class="wizard-field-label"
+              >Chi può vedere questa domanda?</label
+            >
             <div class="d-flex gap-3 mt-2">
               <div
                 class="rounded-syllex border typeCard p-3 d-flex align-items-center gap-3"
@@ -594,9 +590,9 @@
                   [checked]="SelectedPolicyType() === 'public'"
                 />
                 <div>
-                  <div class="fw-semibold small">Disponibile</div>
+                  <div class="fw-semibold small">Condivisa</div>
                   <div class="text-muted" style="font-size: 0.75rem">
-                    Visibile a tutti i docenti
+                    Tutti i colleghi possono usarla
                   </div>
                 </div>
               </div>
@@ -612,9 +608,9 @@
                   [checked]="SelectedPolicyType() === 'private'"
                 />
                 <div>
-                  <div class="fw-semibold small">Solo docente</div>
+                  <div class="fw-semibold small">Privata</div>
                   <div class="text-muted" style="font-size: 0.75rem">
-                    Visibile solo a te
+                    Solo tu puoi usarla
                   </div>
                 </div>
               </div>

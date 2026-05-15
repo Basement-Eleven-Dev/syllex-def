@@ -23,6 +23,7 @@ import { MaterialiSelector } from '../../components/materiali-selector/materiali
 import { AiOverlay } from '../../components/ai-overlay/ai-overlay';
 import { SyllexCard } from '../../components/UI/syllex-card/syllex-card';
 import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
+import { SyllexSelectInput } from '../../components/UI/syllex-select-input/syllex-select-input';
 import { AiService } from '../../../services/ai-service';
 import { FeedbackService } from '../../../services/feedback-service';
 import {
@@ -46,6 +47,7 @@ interface StepDef {
     AiOverlay,
     SyllexCard,
     SyllexPageHeader,
+    SyllexSelectInput,
     TourAnchorNgBootstrapDirective,
   ],
   templateUrl: './laboratorio-ai.html',
@@ -86,6 +88,13 @@ export class LaboratorioAi {
 
   // Options
   readonly MaterialTypes = MATERIAL_TYPE_OPTIONS;
+  readonly LanguageOptions = [
+    { value: 'italiano', label: 'Italiano' },
+    { value: 'inglese', label: 'English' },
+    { value: 'spagnolo', label: 'Español' },
+    { value: 'francese', label: 'Français' },
+    { value: 'tedesco', label: 'Deutsch' },
+  ];
 
   // State
   readonly InitialChoice = signal<'materials' | null>(null);
