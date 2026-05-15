@@ -1,0 +1,38 @@
+<div
+  class="syllex-card h-100 d-flex flex-column justify-content-between p-4 rounded-4 position-relative"
+  [ngClass]="cardClasses"
+  [routerLink]="link && !link.startsWith('http') ? link : null"
+>
+  <div>
+    @if (link && link.startsWith('http')) {
+    <a
+      [href]="link"
+      [target]="target"
+      class="card-link-overlay position-absolute h-100 w-100 start-0 top-0 z-1"
+    ></a>
+    }
+
+    <div
+      class="card-top d-flex justify-content-between align-items-center mb-2"
+    >
+      <div class="card-title-section">
+        <h3 class="fw-semibold m-0 w-75" [ngClass]="titleClass">{{ title }}</h3>
+      </div>
+      @if (icon) {
+      <div class="card-icon-section">
+        <fa-icon [icon]="icon" class="main-icon fs-3"></fa-icon>
+      </div>
+      }
+    </div>
+  </div>
+
+  <div class="card-footer d-flex justify-content-between align-items-center">
+    @if (description) {
+    <p class="text-dark opacity-75 w-50 small mb-0">{{ description }}</p>
+    } @if (showArrow) {
+
+    <fa-icon [icon]="faArrowRight" class="arrow-icon"></fa-icon>
+
+    }
+  </div>
+</div>

@@ -1,73 +1,28 @@
-<form [formGroup]="SearchForm" class="d-flex flex-row flex-wrap gap-3">
-  <input
-    type="text"
-    class="form-control custom-input filter"
-    placeholder="Cerca domanda..."
-    id="search-term"
-    formControlName="searchTerm"
-    style="max-width: 300px"
-  />
-  <div>
-    <select class="form-select custom-input filter" formControlName="type">
-      <option value="">Tutte le tipologie</option>
-      @for(type of ['scelta multipla', 'vero falso', 'risposta aperta']; track
-      $index) {
-      <option value="{{ type }}">{{ type | titlecase }}</option>
-      }
-    </select>
+<form [formGroup]="SearchForm" class="d-flex flex-column gap-2 mb-0">
+  <div class="d-flex flex-row flex-wrap gap-2">
+    <div style="max-width: 320px; min-width: 280px; flex: 1">
+      <app-syllex-search-input
+        placeholder="Cerca per testo della domanda..."
+        formControlName="searchTerm"
+      />
+    </div>
+
+    <!-- Argomento -->
+    <div class="flex-fill" style="min-width: 100px">
+      <app-syllex-select-input
+        formControlName="topicId"
+        placeholder="Argomento"
+        [options]="topicOptions()"
+      />
+    </div>
+
+    <!-- Difficoltà -->
+    <div class="flex-fill" style="min-width: 100px">
+      <app-syllex-select-input
+        formControlName="difficulty"
+        placeholder="Difficoltà"
+        [options]="DifficultyOptions"
+      />
+    </div>
   </div>
-  <div>
-    <select class="form-select custom-input filter" formControlName="topicId">
-      <option value="">Argomento</option>
-      @for(topic of materiaService.materiaSelected()?.topics; track $index) {
-      <option value="{{ topic._id }}">{{ topic.name | titlecase }}</option>
-      }
-    </select>
-  </div>
-  <div>
-    <select class="form-select custom-input filter" formControlName="policy">
-      <option value="">Policy</option>
-      @for(type of ['public', 'private']; track $index) {
-      <option value="{{ type }}">
-        {{ type == 'public' ? 'Pubblica' : 'Privata' }}
-      </option>
-      }
-    </select>
-  </div>
-  <div>
-    <select
-      class="form-select custom-input filter"
-      formControlName="difficulty"
-    >
-      <option value="">Difficoltà</option>
-      @for(opt of DifficultyOptions; track opt.value) {
-      <option [value]="opt.value">{{ opt.label }}</option>
-      }
-    </select>
-  </div>
-  <div>
-    <select
-      class="form-select custom-input filter"
-      formControlName="aiGenerated"
-    >
-      <option value="">AI Generata</option>
-      <option [value]="true">Sì</option>
-      <option [value]="false">No</option>
-    </select>
-  </div>
-  <input
-    type="text"
-    class="form-control custom-input filter"
-    placeholder="Cerca per tag..."
-    formControlName="tag"
-    style="max-width: 200px"
-  />
-  <button
-    type="button"
-    class="btn btn-outline-danger"
-    (click)="resetFilters()"
-    title="Pulisci filtri"
-  >
-    <fa-icon [icon]="ClearIcon"></fa-icon>
-  </button>
 </form>

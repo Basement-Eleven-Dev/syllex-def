@@ -2,10 +2,7 @@
   transition: all 0.25s linear;
   position: relative;
   &:hover {
-    background-color: var(--bs-primary);
-    img {
-      filter: brightness(0) invert(1);
-    }
+    background-color: #bdd5ff !important;
   }
 
   .notification-dot {
@@ -204,10 +201,10 @@
 @media (max-width: 576px) {
   #chat {
     top: 1rem !important;
-    right: 1rem !important;
+    left: 1rem !important;
     bottom: 1rem !important;
     width: calc(100vw - 2rem);
     height: calc(100dvh - 2rem);
-    transform-origin: 100% 100%;
+    transform-origin: 0% 100%;
   }
 }

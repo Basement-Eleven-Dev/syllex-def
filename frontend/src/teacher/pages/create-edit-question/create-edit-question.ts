@@ -9,6 +9,7 @@ import {
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
+  faArrowLeft,
   faFaceGrinWink,
   faGraduationCap,
   faImage,
@@ -27,8 +28,9 @@ import {
   DIFFICULTY_OPTIONS,
   QuestionDifficulty,
 } from '../../../types/question.types';
-import { BackTo } from '../../components/back-to/back-to';
 import { TypeSelector } from '../../components/type-selector/type-selector';
+import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
+import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
 import { Materia } from '../../../services/materia';
 import { QuestionsService } from '../../../services/questions';
 import { FeedbackService } from '../../../services/feedback-service';
@@ -50,7 +52,7 @@ export interface AnswerOption {
     TypeSelector,
     FormsModule,
     ReactiveFormsModule,
-    BackTo,
+    SyllexButton,
     TourAnchorNgBootstrapDirective,
   ],
   templateUrl: './create-edit-question.html',
@@ -66,6 +68,7 @@ export class CreateEditQuestion {
   private readonly destroyRef = inject(DestroyRef);
 
   // Icons
+  readonly ArrowLeftIcon = faArrowLeft;
   readonly SparklesIcon = faSparkles;
   readonly ImageIcon = faImage;
   readonly UsersIcon = faUsers;

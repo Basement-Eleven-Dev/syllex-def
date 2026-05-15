@@ -2,10 +2,17 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faChartLine, faUsers } from '@fortawesome/pro-solid-svg-icons';
+import {
+  faArrowLeft,
+  faChartLine,
+  faUsers,
+} from '@fortawesome/pro-solid-svg-icons';
 import { forkJoin, of } from 'rxjs';
 import { catchError, filter, map, switchMap } from 'rxjs/operators';
-import { StatCard, StatCardData } from '../../components/stat-card/stat-card';
+import {
+  KpiCardData,
+  SyllexKpiRow,
+} from '../../components/UI/syllex-kpi-row/syllex-kpi-row';
 import { StatisticheClasse } from '../../components/statistiche-classe/statistiche-classe';
 import { StudentiClasseTable } from '../../components/studenti-classe-table/studenti-classe-table';
 import {
@@ -17,15 +24,6 @@ import {
   StudentPerformanceData,
 } from '../../../services/class-statistics.service';
 import { TestsService } from '../../../services/tests-service';
-import { JsonPipe } from '@angular/common';
-import { BackTo } from '../../components/back-to/back-to';
-
-interface ClassDetailSection {
-  Id: number;
-  Title: string;
-  Icon: any;
-  Component: any;
-}
 
 @Component({
   selector: 'app-class-detail',
@@ -34,8 +32,7 @@ interface ClassDetailSection {
     StudentiClasseTable,
     FontAwesomeModule,
     StatisticheClasse,
-    StatCard,
-    BackTo,
+    SyllexKpiRow,
   ],
   templateUrl: './classe-dettaglio.html',
   styleUrl: './classe-dettaglio.scss',
@@ -48,6 +45,7 @@ export class ClasseDettaglio {
   private readonly statisticsService = inject(ClassStatisticsService);
 
   // Icons
+  readonly ArrowLeftIcon = faArrowLeft;
   readonly ChartIcon = faChartLine;
   readonly UsersIcon = faUsers;
 
@@ -60,60 +58,36 @@ export class ClasseDettaglio {
   readonly IsLoading = signal<boolean>(true);
   readonly ErrorMessage = signal<string | null>(null);
 
-  // Section management
-  readonly ActiveSectionId = signal<number>(1);
-  readonly Sections: ClassDetailSection[] = [
-    {
-      Id: 1,
-      Title: 'Assegnazioni',
-      Icon: this.UsersIcon,
-      Component: StudentiClasseTable,
-    },
-    {
-      Id: 2,
-      Title: 'Statistiche',
-      Icon: this.ChartIcon,
-      Component: StatisticheClasse,
-    },
-  ];
-
   // Computed stats
-  readonly Stats = computed<StatCardData[]>(() => {
+  readonly Stats = computed<KpiCardData[]>(() => {
     const classData = this.ClassData();
-    console.log('Computing stats with classData:', classData);
     if (!classData) return [];
 
     return [
       {
-        Label: 'Numero Studenti',
-        Value: this.StudentsData().length,
+        label: 'Numero Studenti',
+        value: this.StudentsData().length,
       },
       {
-        Label: 'Performance Media',
-        RequirePercentage: true,
-        Value: this.AveragePerformance(),
+        label: 'Performance Media',
+        requirePercentage: true,
+        value: this.AveragePerformance(),
       },
       {
-        Label: 'Test Assegnati',
-        Value: this.AssignedTestsCount(),
-        Link: '/t/tests/new',
-        QueryParams: { assign: classData._id },
-        LinkLabel: 'Nuovo test',
+        label: 'Test Assegnati',
+        value: this.AssignedTestsCount(),
+        buttonLink: '/t/tests/new',
+        buttonQueryParams: { assign: classData._id },
+        buttonLabel: 'Nuovo test',
       },
       {
-        Label: 'Test Consegnati',
-        Value: this.SubmittedTestsCount(),
-        Link: ['/t/tests'],
-        LinkLabel: 'Vedi tutti',
+        label: 'Test Consegnati',
+        value: this.SubmittedTestsCount(),
+        buttonLink: ['/t/tests'],
+        buttonLabel: 'Vedi tutti',
       },
     ];
   });
-
-  readonly ActiveSectionComponent = computed(
-    () =>
-      this.Sections.find((s) => s.Id === this.ActiveSectionId())?.Component ||
-      null,
-  );
 
   readonly ClassNotFound = computed(
     () => !this.IsLoading() && !this.ClassData(),
@@ -195,9 +169,5 @@ export class ClasseDettaglio {
         return of(null);
       }),
     );
-  }
-
-  onSectionChange(sectionId: number): void {
-    this.ActiveSectionId.set(sectionId);
   }
 }

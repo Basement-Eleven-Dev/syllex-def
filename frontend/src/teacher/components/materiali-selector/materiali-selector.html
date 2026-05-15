@@ -22,41 +22,29 @@
     (change)="onFileSelected($event)"
     accept=".pdf,.docx,.xlsx,.pptx,.txt"
   />
-  <!-- Already Processed Materials Section -->
-  @if (embeddingCreationMode && processedMaterials().length > 0) {
-  <div class="mb-3">
-    <label class="small text-muted mb-2">Risorse già elaborate</label>
-    <ul
-      class="list-group list-group-flush border rounded-3 mb-2"
-      style="max-height: 150px; overflow-y: auto"
-    >
+  <!-- Materiali Associati (Bubbles style come Image 1) -->
+  @if (processedMaterials().length > 0) {
+  <div class="mb-4">
+    <label class="fw-bold text-dark small mb-3 text-uppercase ls-wide">Materiali Associati</label>
+    <div class="d-flex flex-wrap gap-2">
       @for (m of processedMaterials(); track m._id) {
-      <li
-        class="list-group-item p-2 d-flex align-items-center opacity-75 bg-light"
-        style="font-size: 0.9rem"
-      >
+      <div class="material-bubble d-flex align-items-center gap-2 px-3 py-2 shadow-sm border border-success border-opacity-25">
         <fa-icon
           [icon]="getFileIcon(m.extension!)"
           [style.color]="getIconColor(m)"
-          class="me-2"
+          class="small"
         ></fa-icon>
-        <span class="flex-grow-1 text-truncate">{{ m.name }}</span>
-        <div class="d-flex align-items-center gap-3">
-          <div class="d-flex align-items-center gap-1 text-primary small">
-            <fa-icon [icon]="CheckIcon"></fa-icon>
-            <span>Associato</span>
-          </div>
-          <button
-            class="btn btn-link text-danger p-0 border-0"
-            (click)="onRemoveMaterial(m._id)"
-            title="Rimuovi associazione"
-          >
-            <fa-icon [icon]="TrashIcon"></fa-icon>
-          </button>
-        </div>
-      </li>
+        <span class="small fw-semibold text-truncate" style="max-width: 150px;">{{ m.name }}</span>
+        <button
+          class="btn btn-link text-danger p-0 border-0 ms-1 d-flex align-items-center"
+          (click)="onRemoveMaterial(m._id)"
+          title="Rimuovi"
+        >
+          <fa-icon [icon]="TrashIcon" [size]="'xs'"></fa-icon>
+        </button>
+      </div>
       }
-    </ul>
+    </div>
   </div>
   }
 

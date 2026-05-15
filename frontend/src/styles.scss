@@ -1,106 +1,105 @@
+@use "sass:color";
 /* Font Family: Figtree */
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-Regular.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-Regular.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-Italic.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-Italic.ttf") format("truetype");
   font-weight: 400;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-Medium.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-Medium.ttf") format("truetype");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-MediumItalic.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-MediumItalic.ttf") format("truetype");
   font-weight: 500;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-SemiBold.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-SemiBold.ttf") format("truetype");
   font-weight: 600;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-SemiBoldItalic.ttf")
-    format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-SemiBoldItalic.ttf") format("truetype");
   font-weight: 600;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-Bold.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-Bold.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-BoldItalic.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-BoldItalic.ttf") format("truetype");
   font-weight: 700;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-Black.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-Black.ttf") format("truetype");
   font-weight: 900;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-BlackItalic.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-BlackItalic.ttf") format("truetype");
   font-weight: 900;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-ExtraBold.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-ExtraBold.ttf") format("truetype");
   font-weight: 800;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-ExtraBoldItalic.ttf")
-    format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-ExtraBoldItalic.ttf") format("truetype");
   font-weight: 800;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-Light.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-Light.ttf") format("truetype");
   font-weight: 300;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-LightItalic.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-LightItalic.ttf") format("truetype");
   font-weight: 300;
   font-style: italic;
   font-display: swap;
 }
 
-$primary: #3931ce;
+$primary: #0b00de;
 $secondary: #c9f321;
 $info: #0dcaf0;
 $success: #16a34a;
@@ -111,7 +110,7 @@ $dark: #262626;
 $min-contrast-ratio: 4.5;
 $font-size-base: 0.9rem;
 $enable-gradients: false;
-$font-family-sans-serif: "Figtree", sans-serif;
+$font-family-sans-serif: "DMSans", sans-serif;
 $border-radius: 0.75rem;
 $border-radius-sm: 0.5rem;
 $border-radius-lg: 0.9rem;
@@ -144,25 +143,30 @@ $border-color: rgba(0, 0, 0, 0.077);
 
 @import "bootstrap/scss/bootstrap";
 
+:root {
+  --syllex-green: #c9f321;
+  --syllex-orange: #ffa052;
+}
+
 .dvh-100 {
   height: 100dvh;
 }
-
+html,
 body {
   background-color: #ffffff;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 // Riduci la spaziatura tra lettere su tutto
-html,
+/* html,
 body,
 input,
 textarea,
 select,
 button {
-  letter-spacing: -0.02em;
+  letter-spacing: 0em;
 }
-
+ */
 #authRightColumn {
   background: url("/images/auth_right.png");
   background-size: cover;
@@ -180,12 +184,10 @@ button {
   border-radius: 8px;
   padding-top: 0.8rem;
   padding-bottom: 0.8rem;
-  &::placeholder {
-    color: rgba(var(--bs-primary-rgb), 0.4);
-  }
+
   &:focus {
-    color: $primary;
-    border-color: darken($primary, 10%);
+    color: $gray-800;
+    border-color: color.adjust($primary, $lightness: -10%);
   }
   &.filter {
     border: rgb(127, 127, 127) 1px solid;
@@ -195,14 +197,12 @@ button {
     }
   }
 }
-.card {
-  border-radius: 8px;
-  border: none;
-  box-shadow: 0px 0px 28px 8px rgba(224, 224, 224, 0.204);
-}
 
-.rounded-syllex {
-  border-radius: 8px;
+.syllexCard {
+  padding: 2.4rem;
+  border-radius: 30px;
+  border: none;
+  background-color: #eef4ff;
 }
 
 a {
@@ -285,8 +285,7 @@ textarea.custom-input {
   background: linear-gradient(
     135deg,
     var(--bs-primary) 0%,
-    color-mix(in srgb, var(--bs-primary) 70%, rgb(242, 242, 242)) 50%,
-    color-mix(in srgb, var(--bs-primary) 90%, rgb(242, 242, 242)) 100%
+    color-mix(in srgb, var(--bs-primary) 75%, black) 100%
   );
   color: white;
   border: none;
@@ -304,8 +303,7 @@ textarea.custom-input {
     background: linear-gradient(
       135deg,
       var(--bs-primary) 0%,
-      color-mix(in srgb, var(--bs-primary) 70%, rgb(242, 242, 242)) 50%,
-      color-mix(in srgb, var(--bs-primary) 90%, rgb(242, 242, 242)) 100%
+      color-mix(in srgb, var(--bs-primary) 75%, black) 100%
     );
     color: white;
     font-weight: bold;
@@ -457,6 +455,10 @@ section {
   justify-content: center;
 }
 
+.rounded-syllex {
+  border-radius: 12px !important;
+}
+
 .typeCard {
   color: var(--bs-dark);
   transition: all 0.3s ease;
@@ -533,7 +535,7 @@ section {
 }
 
 .toast-error {
-  background-color: lighten($danger, 20%);
+  background-color: color.adjust($danger, $lightness: 20%);
   color: rgb(135, 12, 12);
 }
 

@@ -7,6 +7,7 @@ import { Types } from "mongoose";
 interface RelevantDocument {
   text: string;
   score: number;
+  document_name?: string;
 }
 
 export async function retrieveRelevantDocumentsWithGemini(
@@ -46,7 +47,9 @@ export async function retrieveRelevantDocumentsWithGemini(
       if (associatedFileIds && associatedFileIds.length > 0) {
         filter.referenced_file_id = { $in: associatedFileIds };
       } else {
-        console.log("[RAG Gemini] Ricerca testuale senza file associati: ritorno array vuoto.");
+        console.log(
+          "[RAG Gemini] Ricerca testuale senza file associati: ritorno array vuoto.",
+        );
         return [];
       }
     }
@@ -72,6 +75,7 @@ export async function retrieveRelevantDocumentsWithGemini(
           $project: {
             _id: 0,
             text: 1,
+            document_name: 1,
             score: { $meta: "vectorSearchScore" },
           },
         },
@@ -79,7 +83,7 @@ export async function retrieveRelevantDocumentsWithGemini(
     } catch (vectorError: any) {
       console.warn(
         `[RAG Gemini] Pre-filtering fallito per ${type}, provo fallback post-filtering.`,
-        vectorError.message
+        vectorError.message,
       );
 
       // TENTATIVO 2: Fallback Post-filtering
@@ -101,6 +105,7 @@ export async function retrieveRelevantDocumentsWithGemini(
           $project: {
             _id: 0,
             text: 1,
+            document_name: 1,
             score: { $meta: "vectorSearchScore" },
           },
         },
@@ -116,7 +121,9 @@ export async function retrieveRelevantDocumentsWithGemini(
       - Risultati: ${relevantDocs.length}`);
 
     if (relevantDocs.length === 0) {
-      console.warn(`[RAG Gemini] ATTENZIONE: Zero documenti trovati per la query "${query.substring(0, 50)}..." [Tipo: ${type}]`);
+      console.warn(
+        `[RAG Gemini] ATTENZIONE: Zero documenti trovati per la query "${query.substring(0, 50)}..." [Tipo: ${type}]`,
+      );
     }
 
     return relevantDocs as RelevantDocument[];

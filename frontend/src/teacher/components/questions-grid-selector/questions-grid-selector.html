@@ -1,0 +1,57 @@
+<div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+  @for (question of questions; track question._id) {
+  <div class="col">
+    <div
+      class="question-grid-card h-100 p-4 rounded-4 shadow-sm cursor-pointer border border-2 transition-all"
+      [class.bg-white]="!isSelected(question._id)"
+      [class.border-transparent]="!isSelected(question._id)"
+      [class.bg-primary-subtle]="isSelected(question._id)"
+      [class.border-primary]="isSelected(question._id)"
+      (click)="onToggle(question)"
+    >
+      <div class="d-flex justify-content-between align-items-start mb-3">
+        <span
+          class="badge rounded-pill"
+          [class.bg-primary]="!isSelected(question._id)"
+          [class.bg-white]="isSelected(question._id)"
+          [class.text-primary]="isSelected(question._id)"
+        >
+          {{ getQuestionTypeLabel(question.type) }}
+        </span>
+        <fa-icon
+          [icon]="isSelected(question._id) ? CheckIcon : UncheckIcon"
+          class="fs-4 transition-all"
+          [class.text-primary]="isSelected(question._id)"
+          [class.text-muted]="!isSelected(question._id)"
+          [class.opacity-50]="!isSelected(question._id)"
+        ></fa-icon>
+      </div>
+
+      <div class="question-text mb-3">
+        <p
+          class="mb-0 fw-medium line-clamp-3"
+          [class.text-primary]="isSelected(question._id)"
+        >
+          {{ question.text }}
+        </p>
+      </div>
+
+      <div class="mt-auto d-flex align-items-center gap-2 small text-muted">
+        @if (question.difficulty) {
+        <span [class.text-primary]="isSelected(question._id)">
+          Difficoltà: {{ question.difficulty }}
+        </span>
+        } @if (question.tags && question.tags.length > 0) {
+        <span [class.text-primary]="isSelected(question._id)">
+          • {{ question.tags[0] }}
+        </span>
+        }
+      </div>
+    </div>
+  </div>
+  } @empty {
+  <div class="col-12 text-center py-5 opacity-50">
+    <p class="fs-5">Nessuna domanda trovata con questi filtri.</p>
+  </div>
+  }
+</div>

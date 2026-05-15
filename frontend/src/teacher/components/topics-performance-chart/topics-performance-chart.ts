@@ -107,8 +107,10 @@ export class TopicsPerformanceChart implements OnDestroy {
           {
             label: 'Performance media',
             data: data.map((t) => t.percentage),
-            backgroundColor: '#13214985',
-            borderRadius: 8,
+            backgroundColor: '#C9F321',
+            borderRadius: 16,
+            borderSkipped: false,
+            barThickness: 64,
           },
         ],
       },
@@ -119,19 +121,14 @@ export class TopicsPerformanceChart implements OnDestroy {
           y: {
             beginAtZero: true,
             max: 100,
-            ticks: { stepSize: 10 },
-            title: {
-              display: true,
-              text: 'Performance (%)',
-              font: { size: 14, weight: 'bold' },
+            ticks: {
+              stepSize: 10,
+              callback: (v) => `${v}%`,
             },
+            grid: { color: 'rgba(0,0,0,0.06)' },
           },
           x: {
-            title: {
-              display: true,
-              text: 'Argomenti',
-              font: { size: 14, weight: 'bold' },
-            },
+            grid: { display: false },
           },
         },
         plugins: {
@@ -143,6 +140,24 @@ export class TopicsPerformanceChart implements OnDestroy {
           },
         },
       },
+      plugins: [
+        {
+          id: 'barGradient',
+          beforeDatasetsDraw(chart) {
+            const { ctx } = chart;
+            const meta = chart.getDatasetMeta(0);
+            if (!meta?.data?.length) return;
+            meta.data.forEach((bar: any) => {
+              const left = bar.x - bar.width / 2;
+              const right = bar.x + bar.width / 2;
+              const gradient = ctx.createLinearGradient(left, 0, right, 0);
+              gradient.addColorStop(0, '#C9F321');
+              gradient.addColorStop(1, '#EBFF99');
+              bar.options.backgroundColor = gradient;
+            });
+          },
+        },
+      ],
     };
 
     this.chart = new Chart(ctx, config);

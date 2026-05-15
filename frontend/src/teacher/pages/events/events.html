@@ -1,21 +1,70 @@
-<div tourAnchor="eventi_header" class="d-flex flex-row align-items-center mb-5">
-  <div>
-    <h1 class="text-dark fw-medium mb-3 display-6">Eventi</h1>
-    <h5 class="text-dark mb-0 fw-normal">
-      Gestisci gli eventi della tua classe, creando e modificando eventi
-      importanti.
-    </h5>
+<app-syllex-page-header
+  [title]="'Benvenuto in Calendario,'"
+  [description]="'qui puoi trovare tutti gli eventi e le comunicazioni della tua classe.'"
+>
+  <div class="d-flex gap-2">
+    <app-syllex-button
+      [props]="{
+            label: 'Nuovo Evento',
+            variant: 'secondary',
+            size: 'medium',
+            link: '/t/eventi/new'
+          }"
+    />
+    <app-syllex-button
+      [props]="{
+            label: 'Nuova Comunicazione',
+            variant: 'outline',
+            size: 'medium',
+            link: '/t/comunicazioni/new'
+          }"
+    />
   </div>
-
-  <button
-    tourAnchor="eventi_new_button"
-    class="btn btn-gradient-secondary btn-lg ms-auto py-3 icon-btn"
-    routerLink="/t/eventi/new"
+</app-syllex-page-header>
+<div class="com-wrapper mb-5" style="padding-top: 35px">
+  <div class="mb-3 text-white flex-shrink-0 px-4">
+    <h2 class="fs-2 fw-semibold mb-0">Comunicazioni recenti</h2>
+  </div>
+  <div
+    class="com-scroll"
+    (wheel)="onComScroll($event)"
+    (mousedown)="onDragStart($event)"
+    (mousemove)="onDragMove($event)"
+    (mouseup)="onDragEnd()"
+    (mouseleave)="onDragEnd()"
   >
-    <fa-icon [icon]="PlusIcon"></fa-icon>
-    Nuovo evento
-  </button>
+    @for(com of Comunicazioni(); track com._id) {
+    <div class="com-item">
+      <div
+        class="p-4 rounded-5 h-100 bg-white text-dark communication-item-card d-flex flex-column"
+      >
+        <p class="fs-4 m-0">
+          {{ com.title.substring(0, 23) + "..." | titlecase }}
+        </p>
+        <p class="text-muted mb-2 ellipsis-3-lines flex-grow-1">
+          {{ com.content }}
+        </p>
+        <div class="d-flex justify-content-between">
+          <span
+            class="text-primary border-0 px-2 py-1 rounded-pill mb-2 d-inline-block small"
+          >
+            {{ com.createdAt | date:'d MMM yyyy' : '' : 'it' }}
+          </span>
+          <app-syllex-button
+            [props]="{ label: 'Apri', variant: 'primary', size: 'small', link: '/t/comunicazioni/edit/' + com._id }"
+          />
+        </div>
+      </div>
+    </div>
+    } @empty {
+    <div class="text-white opacity-50 py-3">
+      Nessuna comunicazione presente.
+    </div>
+    }
+  </div>
 </div>
-<div tourAnchor="eventi_calendario" class="card form-section p-4">
-  <app-calendario [showHeadings]="false" [readonly]="true"></app-calendario>
-</div>
+
+<!-- SEZIONE CALENDARIO -->
+<section class="calendar-section pb-4">
+  <app-calendario [showHeadings]="false" [readonly]="false"></app-calendario>
+</section>

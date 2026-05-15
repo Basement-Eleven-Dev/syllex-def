@@ -1,16 +1,27 @@
-import { Component, signal, computed } from '@angular/core';
+import {
+  Component,
+  signal,
+  computed,
+  Input,
+  Output,
+  EventEmitter,
+  ViewChild,
+} from '@angular/core';
 import { RouterModule } from '@angular/router';
 import {
   FontAwesomeModule,
   IconDefinition,
 } from '@fortawesome/angular-fontawesome';
 import {
+  faArrowDownBigSmall,
   faBallotCheck,
   faBook,
   faBrainCircuit,
   faCalendarAlt,
   faChartLine,
   faChevronDown,
+  faChevronLeft,
+  faChevronRight,
   faChevronUp,
   faClipboardQuestion,
   faFile,
@@ -29,6 +40,7 @@ import { Auth } from '../../../services/auth';
 import { FormsModule } from '@angular/forms';
 import { Materia, MateriaObject } from '../../../services/materia';
 import { SubjectSettingsModal } from '../subject-settings-modal/subject-settings-modal';
+import { HelpChat } from '../help-chat/help-chat';
 
 interface SidebarRoute {
   path: string;
@@ -45,11 +57,20 @@ interface SidebarRoute {
     NgbCollapseModule,
     FormsModule,
     TourAnchorNgBootstrapDirective,
+    HelpChat,
   ],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.scss',
+  host: { '[class.open]': 'open' },
 })
 export class Sidebar {
+  @Input() open = false;
+  @Output() toggleSidebar = new EventEmitter<void>();
+  @ViewChild(HelpChat) helpChatRef!: HelpChat;
+
+  toggleHelpChat() {
+    this.helpChatRef?.toggleChat();
+  }
   onRequestSubjectSettings() {
     const modalRef = this.modalService.open(SubjectSettingsModal, {
       centered: true,
@@ -59,9 +80,12 @@ export class Sidebar {
   SparklesIcon = faSparkles;
   BookIcon = faBook;
   ChevronDownIcon = faChevronDown;
+  ChevronLeftIcon = faChevronLeft;
+  ChevronRightIcon = faChevronRight;
   ChevronUpIcon = faChevronUp;
   HeadSideBrainIcon = faHeadSideBrain;
   GearIcon = faGear;
+  SubjectToggleIcon = faArrowDownBigSmall;
   faPencil = faPencil;
 
   isSubjectsCollapsed = signal(true);
@@ -87,7 +111,7 @@ export class Sidebar {
   mainRoutes: SidebarRoute[] = [
     {
       path: 'dashboard',
-      label: 'Dashboard',
+      label: 'Home',
       icon: faGauge,
     },
     {
@@ -118,13 +142,8 @@ export class Sidebar {
       icon: faFile,
     },
     {
-      path: 'comunicazioni',
-      label: 'Comunicazioni',
-      icon: faMailboxOpenLetter,
-    },
-    {
-      path: 'eventi',
-      label: 'Eventi',
+      path: 'calendario',
+      label: 'Calendario',
       icon: faCalendarAlt,
     },
   ];

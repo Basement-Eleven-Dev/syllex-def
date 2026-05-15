@@ -1,0 +1,39 @@
+.syllex-banner {
+  min-height: 300px;
+  background-repeat: no-repeat;
+  transition: all 0.3s ease;
+
+  &.bg-primary-gradient {
+    background: linear-gradient(135deg, #3931ce 0%, #6366f1 100%);
+  }
+
+  .banner-content {
+    h2 {
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+  }
+
+  .hover-lift {
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15) !important;
+    }
+    &:active {
+      transform: translateY(-1px);
+    }
+  }
+
+  // Se vogliamo passare l'immagine delle "palle" tramite ng-content
+  ::ng-deep .banner-decoration img {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+    object-position: right center;
+    opacity: 0.8;
+  }
+}
+

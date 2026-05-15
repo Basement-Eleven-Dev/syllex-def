@@ -7,13 +7,17 @@ export async function saveMessage(
   userId: Types.ObjectId,
   role: "user" | "agent",
   content: string,
+  inputType: "text" | "voice" = "text",
+  conversationId: string,
 ) {
   await connectDatabase();
   const message = {
     subjectId: subjectId,
     userId: userId,
+    conversationId,
     role,
     content,
+    inputType,
     timestamp: new Date(),
   };
   const result = await Message.insertOne(message);

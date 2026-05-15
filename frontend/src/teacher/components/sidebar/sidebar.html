@@ -1,98 +1,70 @@
-<div class="h-100 card" style="width: 250px">
+<div class="h-100 w-100 card sidebar">
+  <div
+    class="sidebar-header d-flex align-items-center justify-content-center gap-2 mt-5 px-4"
+  >
+    <img
+      src="/images/logo_primary_extended.png"
+      alt="Syllex Logo"
+      class="logo-extended"
+      routerLink="/t/dashboard"
+    />
+    <img
+      src="/images/logo_primary.png"
+      alt="Syllex Logo"
+      class="logo-slim"
+      routerLink="/t/dashboard"
+    />
+  </div>
+
   <div class="w-100 px-3 py-4 d-flex flex-column h-100">
-    <div
-      class="card bg-secondary text-dark p-3 d-flex flex-column justify-content-center fw-bold overflow-hidden position-relative"
-      tourAnchor="teacher-subject-select"
-    >
-      <h4 class="fw-bold mb-0" [title]="selectedSubject?.name">
-        {{ selectedSubject?.name }}
-      </h4>
-
-      <div class="d-flex align-items-center">
-        @if (availableSubjects().length > 0) {
-        <div
-          class="text-decoration-underline fw-light cursor-pointer d-flex flex-row mt-2 justify-content-between align-items-center w-100 z-index-1 position-relative mb-1 small"
-          style="z-index: 1"
-          (click)="toggleSubjectsCollapse()"
-          [attr.aria-expanded]="!isSubjectsCollapsed()"
-          aria-controls="subjectsCollapse"
-        >
-          Cambia materia
-        </div>
-        }
-        <div class="text-start ms-auto">
-          <a class="text-small opacity-75" (click)="onRequestSubjectSettings()">
-            <fa-icon
-              [icon]="GearIcon"
-              class="text-dark"
-              [size]="'1x'"
-            ></fa-icon>
-          </a>
-        </div>
-      </div>
-
-      <div
-        #collapse="ngbCollapse"
-        [ngbCollapse]="isSubjectsCollapsed()"
-        id="subjectsCollapse"
-      >
-        <hr />
-        <div class="subjects-scroll-container mt-1 d-flex flex-column gap-2">
-          @for(subject of availableSubjects(); track subject._id){
-          <div
-            class="p-2 fw-normal rounded-2 d-flex align-items-center gap-2 cursor-pointer materiaBtn d-flex flex-row justify-content-between align-items-center"
-            [class.active]="selectedSubject?._id === subject._id"
-            (click)="selectSubject(subject)"
-            role="button"
-          >
-            <span
-              class="text-truncate"
-              [title]="subject.name"
-              style="min-width: 0"
-              >{{ subject.name }}</span
-            >
-
-            @if (subject.uncorrectedTest != 0) {
-            <span
-              class="status-pill warning d-flex p-2 align-items-center justify-content-center text-white fw-bold flex-shrink-0"
-            >
-              <span>{{ subject.uncorrectedTest }}</span></span
-            >
-            }
-          </div>
-          }
-        </div>
-      </div>
-    </div>
-
     <div id="mainRoutes" class="d-flex flex-column gap-2 flex-fill mt-4">
       @for(route of mainRoutes; track $index){
+      <!-- 
+      <app-syllex-button
+        [props]="{
+            label: route.label,
+            variant: 'primary',
+            size: 'medium',
+            link: route.path,
+          }"
+      ></app-syllex-button> -->
       <div
-        class="sidebarRoute w-100 gap-2 d-flex align-items-center"
+        class="sidebarRoute w-100 gap-2 d-flex py-3 px-4 align-items-center"
         [routerLink]="route.path"
         routerLinkActive="active"
         [tourAnchor]="route.tourAnchor || ''"
       >
         <fa-icon [icon]="route.icon"></fa-icon>
-        <span class="routeLabel">{{route.label}}</span>
+        <span class="routeLabel slim-hide">{{route.label}}</span>
       </div>
       }
     </div>
+    <!-- Help chat button -->
+
     <div
-      class="btn text-start ai d-flex flex-column justify-content-center position-relative py-4 mb-2"
-      routerLink="/t/agente"
-      tourAnchor="teacher-agent"
-    >
-      <fa-icon [icon]="HeadSideBrainIcon" id="sparkleIcon"></fa-icon>
-      <h5 class="mb-0">Agente AI di {{ selectedSubject?.name }}</h5>
-    </div>
-    <div
-      class="btn text-start ai d-flex flex-column justify-content-center position-relative py-4"
+      class="btn text-start ai ai-sidebar-btn px-4 py-3 d-flex flex-row align-items-center justify-content-between position-relative"
       routerLink="/t/laboratorio-ai"
       tourAnchor="teacher-ai-lab"
     >
-      <fa-icon [icon]="SparklesIcon" id="sparkleIcon"></fa-icon>
-      <h5 class="mb-0">Laboratorio AI</h5>
+      <p class="mb-0 position-relative lab-ai-label slim-hide fs-5 fw-bold">
+        Lab AI
+      </p>
+      <fa-icon
+        [icon]="HeadSideBrainIcon"
+        class="ai-deco lab-ai-deco me-2 fs-4"
+      ></fa-icon>
+    </div>
+    <div
+      class="btn text-start ai ai-sidebar-btn px-4 py-3 d-flex flex-row align-items-center justify-content-between position-relative"
+      routerLink="/t/agente"
+    >
+      <p class="mb-0 position-relative chat-ai-label slim-hide fs-5 fw-bold">
+        Chat AI
+      </p>
+      <fa-icon
+        [icon]="SparklesIcon"
+        class="ai-deco chat-ai-deco me-2 fs-4"
+      ></fa-icon>
     </div>
   </div>
 </div>

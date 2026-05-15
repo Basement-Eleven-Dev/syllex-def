@@ -1,113 +1,142 @@
-<div tourAnchor="test_header" class="d-flex flex-row align-items-center mb-5">
-  <div>
-    <h1 class="text-dark fw-medium mb-3 display-6">Lista dei test</h1>
-    <h5 class="text-dark mb-0 fw-normal">
-      Gestisci i test di valutazione da assegnare alle tue classi
-    </h5>
-  </div>
-  <button
-    tourAnchor="test_new_button"
-    class="btn btn-gradient-secondary btn-lg ms-auto py-3 icon-btn"
-    routerLink="/t/tests/new"
+<div tourAnchor="test_header" class="d-flex flex-column">
+  <app-syllex-page-header
+    [title]="'Benvenuto in Test,'"
+    [description]="'qui puoi creare nuovi test e pubblicarli per i tuoi studenti, oppure correggere quelli già inviati.'"
   >
-    <fa-icon [icon]="PlusIcon" />
-    Nuovo test
-  </button>
+    <app-syllex-button
+      [props]="{
+          label: 'Crea Nuovo Test',
+          variant: 'secondary',
+          size: 'large',
+          link: '/t/tests/new'
+        }"
+    ></app-syllex-button>
+  </app-syllex-page-header>
 </div>
 
-<section tourAnchor="test_filters" class="d-flex flex-row mb-5 gap-3">
-  <div>
-    <input
-      type="text"
-      id="search-term"
-      class="form-control me-3 custom-input filter"
-      placeholder="Cerca test..."
-      style="min-width: 400px"
-      [value]="SearchTerm()"
-      (input)="onSearchTermChange($any($event.target).value)"
-    />
-  </div>
-
-  <div>
-    <select
-      id="publication-status"
-      class="form-select custom-input filter"
-      style="max-width: 200px"
-      [value]="Status()"
-      (change)="onStatusChange($any($event.target).value)"
-    >
-      <option value="">Stato</option>
-      @for(status of ['bozza', 'pubblicato', 'archiviato']; track $index) {
-      <option [value]="status">{{ status | titlecase }}</option>
-      }
-    </select>
-  </div>
-  <button
-    type="button"
-    class="btn btn-outline-danger"
-    (click)="clearFilters()"
-    title="Pulisci filtri"
-  >
-    <fa-icon [icon]="ClearIcon"></fa-icon>
-  </button>
-  <app-view-type-toggle
-    class="ms-auto"
-    [viewType]="ViewType"
-    [pageKey]="'test'"
-    (viewTypeChange)="onChangeViewType($event)"
+<!-- ===== TAB BUTTONS ===== -->
+<div class="d-flex justify-content-between">
+  <app-syllex-tab-filter
+    class="mb-4"
+    [options]="tabOptions"
+    [value]="ActiveTab()"
+    (valueChange)="onTabChange($any($event))"
   />
-</section>
 
-@if(ViewType === 'table') {
-<app-test-table
-  [tests]="Tests()"
-  (delete)="onDeleteTest($event)"
-  (duplicate)="onDuplicateTest($event)"
-  (publish)="onPublishTest($event)"
-/>
-} @else {
-<div class="row">
-  @for(test of Tests(); track test._id; let first = $first) {
-  <div
-    class="col-12 col-lg-6 col-xl-4 mb-3"
-    [tourAnchor]="first ? 'test_first_card' : ''"
+  <section
+    tourAnchor="test_filters"
+    class="d-flex flex-wrap mb-3 gap-3 align-items-center"
   >
-    <app-test-card
-      [test]="test"
-      (delete)="onDeleteTest($event)"
-      (duplicate)="onDuplicateTest($event)"
-      (publish)="onPublishTest($event)"
+    <app-syllex-search-input
+      placeholder="Cerca test..."
+      [value]="SearchTerm()"
+      (valueChange)="onSearchTermChange($event)"
+      style="width: 25%; min-width: 220px"
     />
+    <!--     <app-syllex-clear-button (clicked)="clearFilters()" /> -->
+    <app-view-type-toggle
+      class="ms-auto"
+      [viewType]="ViewType"
+      [pageKey]="'test'"
+      (viewTypeChange)="onChangeViewType($event)"
+    />
+  </section>
+</div>
+
+<!-- ===== SEZIONE: TUTTI / BOZZE ===== -->
+@if (ActiveTab() === 'tutti' || ActiveTab() === 'bozze') {
+<section class="mb-3">
+  @if(ViewType === 'table') { @if(RecentTests().length > 0) {
+  <app-test-table
+    [tests]="RecentTests()"
+    (delete)="onDeleteTest($event)"
+    (duplicate)="onDuplicateTest($event)"
+    (publish)="onPublishTest($event)"
+  />
+  } @else {
+  <div class="alert alert-info text-center">
+    Nessun test trovato. Crea il tuo primo test!
   </div>
-  } @empty {
-  <div class="col-12">
-    <div class="alert alert-info text-center">
-      Nessun test trovato. Crea il tuo primo test!
+  } } @else {
+  <div class="row g-3">
+    @for(test of RecentTests(); track test._id; let first = $first) {
+    <div
+      class="col-12 col-md-6 col-lg-4 col-xl-3"
+      [tourAnchor]="first ? 'test_first_card' : ''"
+    >
+      <app-test-card
+        [test]="test"
+        (delete)="onDeleteTest($event)"
+        (duplicate)="onDuplicateTest($event)"
+        (publish)="onPublishTest($event)"
+      />
     </div>
+    } @empty {
+    <div class="col-12">
+      <div class="alert alert-info text-center">
+        Nessun test trovato. Crea il tuo primo test!
+      </div>
+    </div>
+    }
+  </div>
+  } @if(CollectionSizeRecent() > PageSizeRecent()) {
+  <div
+    tourAnchor="test_pagination"
+    class="mt-4 d-flex justify-content-end gap-2 align-items-center"
+  >
+    <app-syllex-pagination
+      [collectionSize]="CollectionSizeRecent()"
+      [page]="PageRecent()"
+      [pageSize]="PageSizeRecent()"
+      (pageChange)="onNewRecentPageRequested($event)"
+    />
   </div>
   }
-</div>
+</section>
 }
 
-<div
-  tourAnchor="test_pagination"
-  class="mt-5 d-flex flex-row justify-content-between align-items-center"
->
-  <app-syllex-pagination
-    [collectionSize]="CollectionSize()"
-    [page]="Page()"
-    [pageSize]="PageSize()"
-    (pageChange)="onNewPageRequested($event)"
+<!-- ===== SEZIONE: DA CORREGGERE ===== -->
+@if (ActiveTab() === 'da-correggere') {
+<section class="mb-5">
+  @if(ViewType === 'table') { @if(PendingTests().length > 0) {
+  <app-test-table
+    [tests]="PendingTests()"
+    (delete)="onDeleteTest($event)"
+    (duplicate)="onDuplicateTest($event)"
+    (publish)="onPublishTest($event)"
   />
-
-  <select
-    class="form-select form-select-sm custom-input"
-    style="width: auto"
-    [value]="PageSize()"
-    (change)="onPageSizeChange(+$any($event.target).value)"
-  >
-    <option value="5">5 per pagina</option>
-    <option value="10">10 per pagina</option>
-    <option value="20">20 per pagina</option>
-  </select>
-</div>
+  } @else {
+  <div class="alert alert-success text-center">
+    Nessun test da correggere. Ottimo lavoro!
+  </div>
+  } } @else {
+  <div class="row g-3">
+    @for(test of PendingTests(); track test._id) {
+    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+      <app-test-card
+        [test]="test"
+        (delete)="onDeleteTest($event)"
+        (duplicate)="onDuplicateTest($event)"
+        (publish)="onPublishTest($event)"
+      />
+    </div>
+    } @empty {
+    <div class="col-12">
+      <div class="alert alert-success text-center">
+        Nessun test da correggere. Ottimo lavoro!
+      </div>
+    </div>
+    }
+  </div>
+  } @if(CollectionSizePending() > PageSizePending()) {
+  <div class="mt-4 d-flex justify-content-end gap-2 align-items-center">
+    <app-syllex-pagination
+      [collectionSize]="CollectionSizePending()"
+      [page]="PagePending()"
+      [pageSize]="PageSizePending()"
+      (pageChange)="onNewPendingPageRequested($event)"
+    />
+  </div>
+  }
+</section>
+}

@@ -17,11 +17,15 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
+  faCalendar,
+  faClock,
   faInfinity,
   faKey,
   faPenRuler,
+  faPlus,
   faSave,
   faSparkles,
+  faTrophy,
 } from '@fortawesome/pro-solid-svg-icons';
 import {
   QuestionsDroppableList,
@@ -31,13 +35,24 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SearchQuestions } from '../../components/search-questions/search-questions';
 import { ClassSelector } from '../../components/class-selector/class-selector';
 import { ClassiService } from '../../../services/classi-service';
-import { BackTo } from '../../components/back-to/back-to';
 import { GenAiContents } from '../../components/gen-ai-contents/gen-ai-contents';
-import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbModal,
+  NgbOffcanvas,
+  NgbTooltipModule,
+} from '@ng-bootstrap/ng-bootstrap';
 import { Materia } from '../../../services/materia';
 import { TestsService, TestInterface } from '../../../services/tests-service';
+import {
+  QuestionsService,
+  QuestionInterface,
+} from '../../../services/questions';
 import { FeedbackService } from '../../../services/feedback-service';
 import { QuestionsSearchFilters } from '../../components/questions-search-filters/questions-search-filters';
+import { QuestionsGridSelector } from '../../components/questions-grid-selector/questions-grid-selector';
+import { SyllexPagination } from '../../components/syllex-pagination/syllex-pagination';
+import { TestPreviewModal } from '../../components/test-preview-modal/test-preview-modal';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-create-edit-test',
@@ -47,10 +62,11 @@ import { QuestionsSearchFilters } from '../../components/questions-search-filter
     ReactiveFormsModule,
     FontAwesomeModule,
     SearchQuestions,
-    QuestionsDroppableList,
     ClassSelector,
-    BackTo,
     QuestionsSearchFilters,
+    QuestionsGridSelector,
+    SyllexPagination,
+    NgbTooltipModule,
   ],
   templateUrl: './create-edit-test.html',
   styleUrl: './create-edit-test.scss',
@@ -63,8 +79,10 @@ export class CreateEditTest implements OnInit {
   private readonly offcanvasService = inject(NgbOffcanvas);
   readonly materiaService = inject(Materia);
   private readonly testsService = inject(TestsService);
+  readonly questionsService = inject(QuestionsService);
   private readonly feedbackService = inject(FeedbackService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly modalService = inject(NgbModal);
 
   // Icons
   readonly InfinityIcon = faInfinity;
@@ -72,6 +90,13 @@ export class CreateEditTest implements OnInit {
   readonly DraftIcon = faPenRuler;
   readonly SaveIcon = faSave;
   readonly SparklesIcon = faSparkles;
+  readonly PlusIcon = faPlus;
+  readonly TrophyIcon = faTrophy;
+  readonly ClockIcon = faClock;
+  readonly CalendarIcon = faCalendar;
+
+  // Selected questions map for preview
+  selectedQuestionsMap = new Map<string, QuestionInterface>();
 
   @ViewChild(QuestionsDroppableList)
   questionsComponent!: QuestionsDroppableList;
@@ -90,9 +115,7 @@ export class CreateEditTest implements OnInit {
   // Computed
   readonly IsEditMode = computed(() => !!this.TestId());
   readonly PageTitle = computed(() =>
-    this.IsEditMode()
-      ? 'Modifica Test di valutazione'
-      : 'Nuovo Test di valutazione',
+    this.IsEditMode() ? 'Modifica Test di valutazione' : 'Crea test',
   );
 
   readonly TestForm: FormGroup = new FormGroup({
@@ -196,25 +219,28 @@ export class CreateEditTest implements OnInit {
   }
 
   get maxScore(): number {
-    return (
-      this.questionsComponent
-        ?.selectedQuestions()
-        .reduce((sum, q) => sum + q.points, 0) ?? 0
-    );
+    return this.SelectedQuestionIds().length; // 1 punto per domanda (default)
   }
 
-  readonly CanPublish = computed(() => {
-    this.FormChanged(); // Trigger on form changes
+  readonly PublishBlockers = computed(() => {
+    this.FormChanged();
     const form = this.TestForm.value;
-    return !!(
-      form.title &&
-      form.availableFrom &&
-      form.classes?.length > 0 &&
-      this.questionsComponent?.selectedQuestions()?.length > 0 &&
-      form.requiredScore > 0 &&
-      form.requiredScore <= this.maxScore
-    );
+    const blockers: string[] = [];
+    if (!form.title) blockers.push('Inserisci un titolo');
+    if (!form.availableFrom) blockers.push('Imposta la data di inizio');
+    if (!form.classes?.length) blockers.push('Assegna almeno una classe');
+    if (!this.SelectedQuestionIds().length)
+      blockers.push('Seleziona almeno una domanda');
+    if (!form.requiredScore || form.requiredScore <= 0)
+      blockers.push('Imposta un punteggio di idoneità');
+    if (form.requiredScore > this.maxScore)
+      blockers.push(
+        `Punteggio idoneità (${form.requiredScore}) maggiore del massimo (${this.maxScore})`,
+      );
+    return blockers;
   });
+
+  readonly CanPublish = computed(() => this.PublishBlockers().length === 0);
 
   readonly CanSaveDraft = computed(() => {
     this.FormChanged(); // Trigger on form changes
@@ -280,9 +306,11 @@ export class CreateEditTest implements OnInit {
 
   private prepareTestData(asDraft: boolean, subjectId: string): TestInterface {
     const formValue = this.TestForm.value;
-    const questionsWithPoints = this.questionsComponent
-      .selectedQuestions()
-      .map((q) => ({ questionId: q._id, points: q.points }));
+    const selectedIds = this.SelectedQuestionIds();
+    const questionsWithPoints = selectedIds.map((id) => ({
+      questionId: id,
+      points: 1, // Default a 1 punto ora che non c'è più il drag & drop
+    }));
 
     const testData: TestInterface = {
       name: formValue.title,
@@ -313,6 +341,83 @@ export class CreateEditTest implements OnInit {
     testData.oneShotAnswers = !!formValue.oneShotAnswers;
 
     return testData;
+  }
+
+  onAddQuestion(): void {
+    this.router.navigate(['/t/create-question']);
+  }
+
+  onToggleQuestion(question: QuestionInterface): void {
+    const currentIds = this.SelectedQuestionIds();
+    if (currentIds.includes(question._id)) {
+      this.SelectedQuestionIds.set(
+        currentIds.filter((id) => id !== question._id),
+      );
+      this.selectedQuestionsMap.delete(question._id);
+    } else {
+      this.SelectedQuestionIds.set([...currentIds, question._id]);
+      this.selectedQuestionsMap.set(question._id, question);
+    }
+  }
+
+  onPreview(): void {
+    const selectedIds = this.SelectedQuestionIds();
+
+    // Verifichiamo se abbiamo tutti gli oggetti completi nel Map
+    const missingIds = selectedIds.filter(
+      (id) => !this.selectedQuestionsMap.has(id),
+    );
+
+    if (missingIds.length > 0) {
+      this.IsLoading.set(true);
+      // Carichiamo le domande mancanti
+      const loadRequests = missingIds.map((id) =>
+        this.questionsService.loadQuestion(id),
+      );
+
+      forkJoin(loadRequests).subscribe({
+        next: (questions) => {
+          questions.forEach((q) => this.selectedQuestionsMap.set(q._id, q));
+          this.IsLoading.set(false);
+          this.openPreviewModal();
+        },
+        error: () => {
+          this.feedbackService.showFeedback(
+            "Errore nel caricamento dell'anteprima",
+            false,
+          );
+          this.IsLoading.set(false);
+        },
+      });
+    } else {
+      this.openPreviewModal();
+    }
+  }
+
+  private openPreviewModal(): void {
+    const modalRef = this.modalService.open(TestPreviewModal, {
+      size: 'xl',
+      centered: true,
+      scrollable: true,
+      windowClass: 'test-preview-modal',
+    });
+
+    const selectedIds = this.SelectedQuestionIds();
+    const sortedQuestions = selectedIds
+      .map((id) => this.selectedQuestionsMap.get(id)!)
+      .filter((q) => !!q);
+
+    modalRef.componentInstance.testTitle = this.TestForm.get('title')?.value;
+    modalRef.componentInstance.questions = sortedQuestions;
+
+    modalRef.result.then(
+      (result) => {
+        if (result === 'save') {
+          this.onSaveTest(false);
+        }
+      },
+      () => {},
+    );
   }
 
   onRequestAIGeneration(): void {

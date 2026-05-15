@@ -1,0 +1,27 @@
+.tab-filter {
+  .tab-item {
+    background: transparent;
+    border: none;
+    border-radius: 0.9rem;
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: var(--bs-secondary-color);
+    cursor: pointer;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease,
+      font-weight 0.15s ease;
+    white-space: nowrap;
+
+    &:hover:not(.active) {
+      background-color: rgba(210, 226, 255, 0.4);
+      color: var(--bs-body-color);
+    }
+
+    &.active {
+      background-color: #d2e2ff;
+      color: var(--bs-primary);
+      font-weight: 700;
+    }
+  }
+}

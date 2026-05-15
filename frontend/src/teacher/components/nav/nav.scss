@@ -4,6 +4,95 @@ img {
   }
 }
 
+.teacher-nav {
+  border-radius: 30px;
+}
+
+.subject-selector {
+  display: flex;
+  align-items: center;
+  border-radius: 999px;
+
+  > :first-child button {
+    border-radius: 999px 0 0 999px;
+  }
+
+  > :last-child {
+    border-radius: 0 999px 999px 0;
+  }
+}
+
+.subject-pill-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 0.4rem 1rem;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &::after {
+    display: none;
+  }
+}
+
+.subject-pill-tag {
+  display: none;
+}
+
+.subject-pill-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  max-width: 340px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.subject-pill-chevron {
+  opacity: 0.5;
+  flex-shrink: 0;
+  color: white;
+  transition: transform 0.2s;
+}
+
+.subject-dropdown-menu {
+  min-width: 340px;
+  max-height: 300px;
+  overflow-y: auto;
+  border-radius: 12px;
+  padding: 0.4rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.subject-dropdown-item {
+  border-radius: 8px;
+  font-size: 0.9rem;
+
+  .check-icon {
+    color: var(--bs-primary);
+    width: 12px;
+    flex-shrink: 0;
+  }
+
+  .subject-dropdown-item-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+
+  &.active {
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    color: var(--bs-primary);
+    font-weight: 600;
+  }
+
+  &:hover:not(.active) {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+}
+
 ::ng-deep .dropdown-toggle::after {
   display: none;
 }

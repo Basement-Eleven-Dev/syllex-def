@@ -107,7 +107,7 @@ export const teacherRoutes: Routes = [
       import('./pages/correzione/correzione').then((m) => m.Correzione),
   },
   {
-    path: 'eventi',
+    path: 'calendario',
     loadComponent: () => import('./pages/events/events').then((m) => m.Events),
   },
   {

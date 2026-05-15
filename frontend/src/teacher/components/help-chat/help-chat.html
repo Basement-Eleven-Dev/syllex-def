@@ -1,10 +1,15 @@
-<div
-  class="btn rounded rounded-circle shadow p-2 position-fixed bottom-0 end-0 m-3"
-  id="tutorialAgentBtn"
-  style="z-index: 1050"
-  (click)="toggleChat()"
->
-  <img src="/images/logo_primary.png" alt="Logo" height="30" />
+<div class="d-none" id="tutorialAgentBtn">
+  style="z-index: 1050; background: #d2e2ff; cursor: pointer; border: none"
+  (click)="toggleChat()" >
+  <span style="color: #3931ce; font-weight: 500; font-size: 0.95rem"
+    >Come posso aiutarti oggi?</span
+  >
+  <img
+    src="/images/logo_primary.png"
+    alt="Logo"
+    height="22"
+    style="flex-shrink: 0"
+  />
   @if (hasUnread()) {
   <span class="notification-dot"></span>
   }

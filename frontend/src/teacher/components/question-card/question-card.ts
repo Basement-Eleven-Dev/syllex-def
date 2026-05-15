@@ -1,9 +1,17 @@
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  inject,
+  signal,
+} from '@angular/core';
 import { QuestionInterface } from '../../../services/questions';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faCheck,
+  faChevronDown,
   faPencilAlt,
   faTrash,
 } from '@fortawesome/pro-solid-svg-icons';
@@ -11,8 +19,9 @@ import { FormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { RouterModule } from '@angular/router';
 import { Materia } from '../../../services/materia';
-import { TitleCasePipe } from '@angular/common';
 import { ConfirmActionDirective } from '../../../directives/confirm-action.directive';
+import { SyllexBadge } from '../UI/syllex-badge/syllex-badge';
+import { SyllexButton } from '../UI/syllex-button/syllex-button';
 
 /** Controls what the card renders and which actions are visible. */
 export type QuestionCardMode =
@@ -30,8 +39,9 @@ export type QuestionCardMode =
     FontAwesomeModule,
     FormsModule,
     RouterModule,
-    TitleCasePipe,
     ConfirmActionDirective,
+    SyllexBadge,
+    SyllexButton,
   ],
   templateUrl: './question-card.html',
   styleUrl: './question-card.scss',
@@ -40,6 +50,9 @@ export class QuestionCard {
   protected readonly TrashIcon = faTrash;
   protected readonly CheckIcon = faCheck;
   protected readonly EditIcon = faPencilAlt;
+  protected readonly ChevronIcon = faChevronDown;
+
+  Collapsed = signal(true);
 
   private readonly modalServ = inject(NgbModal);
   protected readonly materiaService = inject(Materia);

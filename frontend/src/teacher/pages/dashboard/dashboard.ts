@@ -1,5 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, computed, effect } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import {
   FontAwesomeModule,
   IconDefinition,
@@ -7,10 +8,15 @@ import {
 import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 import {
   faBallotCheck,
+  faBell,
+  faBullhorn,
   faCheck,
+  faFileArrowUp,
   faPaperclip,
   faPlus,
   faQuestion,
+  faRobot,
+  faSparkles,
   faUsers,
 } from '@fortawesome/pro-solid-svg-icons';
 import { Calendario } from '../../components/calendario/calendario';
@@ -24,6 +30,10 @@ import {
 } from '../../../services/comunicazioni-service';
 import { Materia } from '../../../services/materia';
 import { TestsService } from '../../../services/tests-service';
+import { SyllexCard } from '../../components/UI/syllex-card/syllex-card';
+import { SyllexBanner } from '../../components/UI/syllex-banner/syllex-banner';
+import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
+import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
 
 interface DashboardQuickLink {
   value: number | undefined;
@@ -45,16 +55,28 @@ interface DashboardAction {
   selector: 'app-dashboard',
   imports: [
     FontAwesomeModule,
-    DatePipe,
-    Calendario,
     RouterModule,
-    TourAnchorNgBootstrapDirective,
+    SyllexCard,
+    SyllexBanner,
+    SyllexPageHeader,
+    SyllexButton,
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
 export class Dashboard {
   UsersIcon = faUsers;
+  UploadIcon = faFileArrowUp;
+  AiIcon = faSparkles;
+  CommIcon = faBullhorn;
+  RobotIcon = faRobot;
+  faBell = faBell;
+  faPlus = faPlus;
+  testsToGradeCount = 0;
+
+  get selectedMateriaName() {
+    return this.materiaService.materiaSelected()?.name || '';
+  }
 
   constructor(
     public authService: Auth,
@@ -64,19 +86,25 @@ export class Dashboard {
     private testService: TestsService,
     public materiaService: Materia,
     private router: Router,
+    private sanitizer: DomSanitizer,
   ) {
+    this.bannerTitle = this.sanitizer.bypassSecurityTrustHtml(
+      'Scopri Alex, <br/> il nuovo assistente vocale.',
+    );
     // Carica comunicazioni recenti quando viene selezionata una materia
     effect(() => {
       const selectedMateria = this.materiaService.materiaSelected();
       if (selectedMateria) {
         this.loadRecentCommunications();
         this.testService.countAssignmentsToGrade().subscribe((response) => {
-          this.quickActions[3].label += ` (${response.count})`;
+          this.testsToGradeCount = response.count;
+          this.quickActions[3].label = `Da correggere (${response.count})`;
         });
       }
     });
   }
   AttachmentIcon = faPaperclip;
+  bannerTitle: SafeHtml;
 
   quickActions: DashboardAction[] = [
     {

@@ -5,6 +5,8 @@ import {
   effect,
   OnInit,
   OnDestroy,
+  ViewChild,
+  HostListener,
 } from '@angular/core';
 import {
   TourAnchorNgBootstrapDirective,
@@ -13,8 +15,14 @@ import {
 } from 'ngx-ui-tour-ng-bootstrap';
 import { Sidebar } from '../../components/sidebar/sidebar';
 import { Nav } from '../../components/nav/nav';
-import { HelpChat } from '../../components/help-chat/help-chat';
-import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
+import { UserContextualMenu } from '../../components/user-contextual-menu/user-contextual-menu';
+import {
+  RouterOutlet,
+  RouterModule,
+  Router,
+  NavigationEnd,
+  NavigationStart,
+} from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { Subject, takeUntil, filter, take } from 'rxjs';
 import { Auth } from '../../../services/auth';
@@ -26,7 +34,16 @@ import {
   faBookOpen,
   faInfoCircle,
   faQuestionCircle,
+  faGauge,
+  faBallotCheck,
+  faUsers,
+  faFile,
 } from '@fortawesome/pro-solid-svg-icons';
+import {
+  NgbDropdown,
+  NgbDropdownToggle,
+  NgbDropdownMenu,
+} from '@ng-bootstrap/ng-bootstrap';
 import { Materia } from '../../../services/materia';
 import { CommonModule } from '@angular/common';
 import { FeedbackService } from '../../../services/feedback-service';
@@ -45,18 +62,35 @@ import { crea_domanda_steps } from '../../../tours/tour_crea_domanda';
   imports: [
     Sidebar,
     Nav,
-    HelpChat,
     RouterOutlet,
+    RouterModule,
     FontAwesomeModule,
     TourStepTemplateComponent,
     CommonModule,
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    UserContextualMenu,
   ],
   templateUrl: './teacher-layout.html',
   styleUrl: './teacher-layout.scss',
 })
 export class TeacherLayout implements OnInit, OnDestroy {
+  @ViewChild('sidebarRef') sidebarRef!: Sidebar;
+
   showLoading = signal<boolean>(false);
   hasTourForRoute = signal<boolean>(false);
+  sidebarOpen = signal<boolean>(false);
+  navHidden = signal<boolean>(false);
+  private lastScrollY = 0;
+
+  GaugeIcon = faGauge;
+  BallotCheckIcon = faBallotCheck;
+  UsersIcon = faUsers;
+  FileIcon = faFile;
+  UserProfileIcon = faUserCircle;
+  HelpIcon = faQuestionCircle;
+
   public materia = inject(Materia);
   private feedbackService = inject(FeedbackService);
   public tourService: TourService = inject(TourService) as TourService;
@@ -65,9 +99,7 @@ export class TeacherLayout implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   SpinnerIcon = faSpinnerThird;
-  UserProfileIcon = faUserCircle;
   InfoIcon = faInfoCircle;
-  questionMarkIcon = faQuestionCircle;
 
   constructor() {
     effect(() => {
@@ -90,12 +122,21 @@ export class TeacherLayout implements OnInit, OnDestroy {
     '/t/risorse',
     '/t/tests',
     '/t/comunicazioni',
-    '/t/eventi',
+    '/t/calendario',
     '/t/create-question',
   ]);
 
   ngOnInit() {
     this.hasTourForRoute.set(this.TOUR_ROUTES.has(window.location.pathname));
+
+    this.router.events
+      .pipe(
+        filter((e) => e instanceof NavigationStart),
+        takeUntil(this.destroy$),
+      )
+      .subscribe(() => {
+        this.closeSidebar();
+      });
 
     this.router.events
       .pipe(
@@ -119,6 +160,34 @@ export class TeacherLayout implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  @HostListener('window:scroll', [])
+  onWindowScroll() {
+    const currentY = window.scrollY;
+    const diff = currentY - this.lastScrollY;
+    if (Math.abs(diff) < 5) return;
+    this.navHidden.set(diff > 0 && currentY > 60);
+    this.lastScrollY = currentY;
+  }
+
+  onContentScroll(event: Event) {
+    const el = event.target as HTMLElement;
+    const currentY = el.scrollTop;
+    const diff = currentY - this.lastScrollY;
+    if (Math.abs(diff) < 5) return;
+    this.navHidden.set(diff > 0 && currentY > 60);
+    this.lastScrollY = currentY;
+  }
+
+  toggleSidebar() {
+    this.sidebarOpen.update((v) => !v);
+  }
+
+  closeSidebar() {
+    this.sidebarOpen.set(false);
+  }
+  openHelpChat() {
+    this.sidebarRef?.toggleHelpChat();
+  }
   startTour() {
     const currentRoute = window.location.pathname;
     switch (currentRoute) {
@@ -143,7 +212,7 @@ export class TeacherLayout implements OnInit, OnDestroy {
       case '/t/comunicazioni':
         this.tourService.initialize(comunicazioni_steps);
         break;
-      case '/t/eventi':
+      case '/t/calendario':
         this.tourService.initialize(eventi_steps);
         break;
       case '/t/create-question':

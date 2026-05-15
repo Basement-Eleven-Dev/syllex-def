@@ -1,3 +1,20 @@
+.nav-circle-btn {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background-color: var(--bs-dark);
+  color: white;
+  padding: 0;
+  border: none;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: #333;
+    color: white;
+  }
+}
+
 #dayBoxesContainer {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -7,7 +24,7 @@
   aspect-ratio: 1 / 1;
   overflow: hidden;
   position: relative;
-  background-color: #c2d9ff;
+  background-color: #a9d0ff;
   border-radius: var(--bs-border-radius-lg);
   transition: background-color 0.2s ease;
   padding: 4%;
@@ -33,11 +50,11 @@
     .event-count {
       display: flex;
       font-size: 0.6rem;
- width:1.2rem;
- flex-shrink: 0; /* IMPEDISCE LA DEFORMAZIONE */
-aspect-ratio: 1/1;
-line-height: 0;
- justify-content: center;
+      width: 1.2rem;
+      flex-shrink: 0; /* IMPEDISCE LA DEFORMAZIONE */
+      aspect-ratio: 1/1;
+      line-height: 0;
+      justify-content: center;
       align-items: center;
       border-radius: 50%;
     }

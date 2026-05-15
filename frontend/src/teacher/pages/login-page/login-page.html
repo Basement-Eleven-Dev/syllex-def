@@ -1,27 +1,28 @@
-<div
-  class="w-100 dvh-100 wrap d-flex flex-column justify-content-center container-fluid"
->
-  <video autoplay muted loop playsinline class="video-background">
-    <source src="/bgsyllex.mp4" type="video/mp4" />
-  </video>
-  <div class="row d-flex flex-row justify-content-center">
-    <div
-      class="col-10 col-md-6 col-lg-3 mb-4 mb-md-0"
-      animate.enter="enter-animation"
-    >
-      <div class="text-center mb-5">
-        <img
-          src="/images/logo_primary_extended.png"
-          alt="Logo"
-          height="65"
-          style="filter: brightness(0) invert(1)"
-        />
+<div class="login-page">
+  <!-- LEFT PANEL — blue card, large desktop only -->
+  <div class="login-left d-none d-lg-flex">
+    <div class="login-left__logo">
+      <img src="/images/logotipo.svg" alt="Syllex" height="52" />
+    </div>
+    <div class="login-left__spacer"></div>
+    <div class="login-left__footer">
+      <h2 class="login-left__title">Benvenuto su Syllex</h2>
+      <p class="login-left__subtitle">Entra nella piattaforma.</p>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="login-right">
+    <div class="login-form-container">
+      <!-- Logo + tagline (tagline hidden on large desktop where left panel is visible) -->
+      <div class="mb-4">
+        <img src="/images/logo_primary.png" alt="Syllex" height="52" />
+        <p class="login-tagline d-block d-lg-none">Benvenuto su Syllex</p>
+        <p class="login-tagline-sub d-block d-lg-none">
+          Entra nella piattaforma.
+        </p>
       </div>
-      <div class="card p-4" style="min-height: 500px">
-        <div class="card-body d-flex flex-column justify-content-center">
-          <app-login-form></app-login-form>
-        </div>
-      </div>
+      <app-login-form></app-login-form>
     </div>
   </div>
 </div>

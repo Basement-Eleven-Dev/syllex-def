@@ -2,7 +2,11 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule, DatePipe, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faEllipsisVertical, faEye } from '@fortawesome/pro-solid-svg-icons';
+import {
+  faEllipsisVertical,
+  faEye,
+  faBell,
+} from '@fortawesome/pro-solid-svg-icons';
 import {
   NgbPagination,
   NgbDropdown,
@@ -34,6 +38,7 @@ import { ClassiService } from '../../../services/classi-service';
 })
 export class TestTable {
   EyeIcon = faEye;
+  BellIcon = faBell;
   ThreeDotsIcon = faEllipsisVertical;
 
   @Input() tests: TestInterface[] = [];

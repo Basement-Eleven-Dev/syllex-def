@@ -1,4 +1,3 @@
-import { TitleCasePipe } from '@angular/common';
 import { Component, signal, effect, OnDestroy, inject } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPlus, faXmark } from '@fortawesome/pro-solid-svg-icons';
@@ -15,8 +14,14 @@ import {
 import { debounceTime, Subject, takeUntil } from 'rxjs';
 import { FeedbackService } from '../../../services/feedback-service';
 import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
+import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
+import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
+import { SyllexSearchInput } from '../../components/UI/syllex-search-input/syllex-search-input';
+import { SyllexClearButton } from '../../components/UI/syllex-clear-button/syllex-clear-button';
+import { SyllexTabFilter } from '../../components/UI/syllex-tab-filter/syllex-tab-filter';
 
 type TestStatus = 'bozza' | 'pubblicato' | 'archiviato' | '';
+type TestTab = 'tutti' | 'da-correggere' | 'bozze';
 
 @Component({
   selector: 'app-test',
@@ -25,11 +30,15 @@ type TestStatus = 'bozza' | 'pubblicato' | 'archiviato' | '';
     TestCard,
     TestTable,
     RouterModule,
-    TitleCasePipe,
     SyllexPagination,
     FormsModule,
     ViewTypeToggle,
     TourAnchorNgBootstrapDirective,
+    SyllexPageHeader,
+    SyllexButton,
+    SyllexSearchInput,
+    SyllexClearButton,
+    SyllexTabFilter,
   ],
   templateUrl: './test.html',
   styleUrl: './test.scss',
@@ -39,19 +48,40 @@ export class Test implements OnDestroy {
   protected readonly PlusIcon = faPlus;
   protected readonly ClearIcon = faXmark;
 
+  protected readonly statusOptions = [
+    { value: 'bozza', label: 'Bozza' },
+    { value: 'pubblicato', label: 'Pubblicato' },
+    { value: 'archiviato', label: 'Archiviato' },
+  ];
+
+  protected readonly tabOptions = [
+    { value: 'tutti', label: 'Tutti' },
+    { value: 'da-correggere', label: 'Da correggere' },
+    { value: 'bozze', label: 'Bozze' },
+  ];
   // Dependency Injection
   private testsService = inject(TestsService);
   private feedbackService = inject(FeedbackService);
 
-  // Signals
-  Tests = signal<TestInterface[]>([]);
-  Loading = signal<boolean>(false);
-  CollectionSize = signal<number>(0);
-  Page = signal<number>(1);
-  PageSize = signal<number>(5);
+  // Shared filters
   SearchTerm = signal<string>('');
   Status = signal<TestStatus>('');
+  ActiveTab = signal<TestTab>('tutti');
   ViewType: ViewType = this.loadViewTypePreference('test') || 'grid';
+
+  // Section: Ultimi test
+  RecentTests = signal<TestInterface[]>([]);
+  LoadingRecent = signal<boolean>(false);
+  CollectionSizeRecent = signal<number>(0);
+  PageRecent = signal<number>(1);
+  PageSizeRecent = signal<number>(8);
+
+  // Section: Da Correggere
+  PendingTests = signal<TestInterface[]>([]);
+  LoadingPending = signal<boolean>(false);
+  CollectionSizePending = signal<number>(0);
+  PagePending = signal<number>(1);
+  PageSizePending = signal<number>(8);
 
   // Private Properties
   private SearchTermSubject = new Subject<string>();
@@ -65,18 +95,31 @@ export class Test implements OnDestroy {
       this.SearchTerm.set(term);
     });
 
+    // Effect: Ultimi test / Bozze
     effect(() => {
-      const currentSearchTerm = this.SearchTerm();
-      const currentStatus = this.Status();
-      const currentPage = this.Page();
-      const currentPageSize = this.PageSize();
+      const searchTerm = this.SearchTerm();
+      const tab = this.ActiveTab();
+      const page = this.PageRecent();
+      const pageSize = this.PageSizeRecent();
+      if (tab === 'tutti' || tab === 'bozze') {
+        this.loadRecentTests(
+          page,
+          pageSize,
+          searchTerm || undefined,
+          tab === 'bozze' ? 'bozza' : undefined,
+        );
+      }
+    });
 
-      this.loadTests(
-        currentPage,
-        currentPageSize,
-        currentSearchTerm || undefined,
-        currentStatus || undefined,
-      );
+    // Effect: Da Correggere
+    effect(() => {
+      const searchTerm = this.SearchTerm();
+      const tab = this.ActiveTab();
+      const page = this.PagePending();
+      const pageSize = this.PageSizePending();
+      if (tab === 'da-correggere') {
+        this.loadPendingTests(page, pageSize, searchTerm || undefined);
+      }
     });
   }
 
@@ -88,25 +131,44 @@ export class Test implements OnDestroy {
   clearFilters(): void {
     this.SearchTermSubject.next('');
     this.Status.set('');
-    this.Page.set(1);
+    this.PageRecent.set(1);
+    this.PagePending.set(1);
   }
+
+  onTabChange(tab: TestTab): void {
+    this.ActiveTab.set(tab);
+    this.PageRecent.set(1);
+    this.PagePending.set(1);
+  }
+
   onSearchTermChange(value: string): void {
     this.SearchTermSubject.next(value);
-    this.Page.set(1);
+    this.PageRecent.set(1);
+    this.PagePending.set(1);
   }
 
   onStatusChange(value: string): void {
     this.Status.set(value as TestStatus);
-    this.Page.set(1);
+    this.PageRecent.set(1);
+    this.PagePending.set(1);
   }
 
-  onNewPageRequested(newPage: number): void {
-    this.Page.set(newPage);
+  onNewRecentPageRequested(newPage: number): void {
+    this.PageRecent.set(newPage);
   }
 
-  onPageSizeChange(newPageSize: number): void {
-    this.PageSize.set(newPageSize);
-    this.Page.set(1);
+  onRecentPageSizeChange(newPageSize: number): void {
+    this.PageSizeRecent.set(newPageSize);
+    this.PageRecent.set(1);
+  }
+
+  onNewPendingPageRequested(newPage: number): void {
+    this.PagePending.set(newPage);
+  }
+
+  onPendingPageSizeChange(newPageSize: number): void {
+    this.PageSizePending.set(newPageSize);
+    this.PagePending.set(1);
   }
 
   onChangeViewType(type: ViewType): void {
@@ -122,10 +184,64 @@ export class Test implements OnDestroy {
     }
   }
 
+  private loadRecentTests(
+    page: number,
+    pageSize: number,
+    searchTerm?: string,
+    status?: TestStatus,
+  ): void {
+    this.LoadingRecent.set(true);
+    this.testsService
+      .getPaginatedTests(page, pageSize, searchTerm, status || undefined)
+      .pipe(takeUntil(this.Destroy$))
+      .subscribe({
+        next: (response) => {
+          this.RecentTests.set(response.tests);
+          this.CollectionSizeRecent.set(response.total);
+          this.LoadingRecent.set(false);
+        },
+        error: () => {
+          this.LoadingRecent.set(false);
+        },
+      });
+  }
+
+  private loadPendingTests(
+    page: number,
+    pageSize: number,
+    searchTerm?: string,
+    status?: TestStatus,
+  ): void {
+    this.LoadingPending.set(true);
+    this.testsService
+      .getPaginatedTests(page, pageSize, searchTerm, status || undefined, true)
+      .pipe(takeUntil(this.Destroy$))
+      .subscribe({
+        next: (response) => {
+          this.PendingTests.set(response.tests);
+          this.CollectionSizePending.set(response.total);
+          this.LoadingPending.set(false);
+        },
+        error: () => {
+          this.LoadingPending.set(false);
+        },
+      });
+  }
+
   onDeleteTest(testId: string): void {
     this.testsService.deleteTest(testId).subscribe({
       next: () => {
-        this.removeTestFromList(testId);
+        this.RecentTests.update((tests) =>
+          tests.filter((t) => t._id !== testId),
+        );
+        this.CollectionSizeRecent.update((size) => size - 1);
+        const wasInPending = this.PendingTests().some((t) => t._id === testId);
+        if (wasInPending) {
+          this.PendingTests.update((tests) =>
+            tests.filter((t) => t._id !== testId),
+          );
+          this.CollectionSizePending.update((size) => size - 1);
+        }
         this.feedbackService.showFeedback('Test eliminato con successo', true);
       },
       error: (err: Error) => {
@@ -138,44 +254,11 @@ export class Test implements OnDestroy {
     });
   }
 
-  // Metodi privati
-  private loadTests(
-    page: number,
-    pageSize: number,
-    searchTerm?: string,
-    status?: TestStatus,
-  ): void {
-    this.Loading.set(true);
-    this.testsService
-      .getPaginatedTests(
-        page,
-        pageSize,
-        searchTerm || undefined,
-        status || undefined,
-      )
-      .pipe(takeUntil(this.Destroy$))
-      .subscribe({
-        next: (response) => {
-          this.Tests.set(response.tests);
-          this.CollectionSize.set(response.total);
-          this.Loading.set(false);
-        },
-        error: () => {
-          this.Loading.set(false);
-        },
-      });
-  }
-
-  private removeTestFromList(testId: string): void {
-    this.Tests.update((tests) => tests.filter((t) => t._id !== testId));
-    this.CollectionSize.update((size) => size - 1);
-  }
-
   onDuplicateTest(testId: string): void {
     this.testsService.duplicateTest(testId).subscribe({
       next: (response) => {
-        this.Tests.update((tests) => [response.test, ...tests]);
-        this.CollectionSize.update((size) => size + 1);
+        this.RecentTests.update((tests) => [response.test, ...tests]);
+        this.CollectionSizeRecent.update((size) => size + 1);
         this.feedbackService.showFeedback('Test duplicato con successo', true);
       },
       error: (err: Error) => {
@@ -191,11 +274,12 @@ export class Test implements OnDestroy {
   onPublishTest(testId: string): void {
     this.testsService.publishTest(testId).subscribe({
       next: () => {
-        this.Tests.update((tests) =>
+        const updater = (tests: TestInterface[]) =>
           tests.map((t) =>
-            t._id === testId ? { ...t, status: 'pubblicato' } : t,
-          ),
-        );
+            t._id === testId ? { ...t, status: 'pubblicato' as const } : t,
+          );
+        this.RecentTests.update(updater);
+        this.PendingTests.update(updater);
         this.feedbackService.showFeedback('Test pubblicato con successo', true);
       },
       error: (err: Error) => {
