@@ -363,6 +363,7 @@ export class GenAiContents implements OnInit {
       explanation: q.explanation,
       difficulty,
       options: q.options,
+      correctAnswer: q.correctAnswer,
       policy: 'private',
       topicId,
       subjectId,
