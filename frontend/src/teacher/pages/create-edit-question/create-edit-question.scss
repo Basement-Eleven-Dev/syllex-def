@@ -133,10 +133,6 @@
 
 .wizard-panel {
   flex: 1;
-  background: white;
-  border: 1px solid var(--bs-border-color);
-  border-radius: 1rem;
-  overflow: hidden;
   min-height: 380px;
 }
 
@@ -176,18 +172,17 @@
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
-  border: 2px solid var(--bs-border-color);
-  background: white;
-  color: var(--bs-body-color);
+  border: none;
+  background: var(--bs-light);
+  color: var(--bs-secondary-color);
   flex-shrink: 0;
   margin-top: 1.5rem;
   transition: all 0.2s ease;
   cursor: pointer;
 
   &:hover:not(:disabled) {
-    border-color: var(--bs-primary);
+    background: rgba(var(--bs-primary-rgb), 0.08);
     color: var(--bs-primary);
-    background: rgba(var(--bs-primary-rgb), 0.05);
   }
 
   &:disabled {
@@ -259,10 +254,9 @@
 }
 
 .review-card {
-  border: 1px solid var(--bs-border-color);
   border-radius: 0.75rem;
   padding: 1rem 1.25rem;
-  background: white;
+  background: var(--bs-light);
   transition: opacity 0.2s ease;
 
   &--deselected {
@@ -373,12 +367,19 @@
 // ─── Type Cards (vero/falso, visibilità) ─────────────
 
 .typeCard {
+  background: var(--bs-light);
+  transition: background 0.15s ease;
+
   &.selected {
-    background-color: var(--bs-secondary);
-    color: var(--bs-dark);
+    background: rgba(var(--bs-primary-rgb), 0.1);
+
+    .form-check-input {
+      background-color: var(--bs-primary);
+      border-color: var(--bs-primary);
+    }
 
     .typeIconWrapper {
-      background-color: var(--bs-dark);
+      background-color: var(--bs-primary);
       color: white;
     }
   }
@@ -391,7 +392,6 @@
   align-items: center;
   font-size: 0.9rem;
   padding: 0.75rem 1rem;
-  background: rgba(var(--bs-info-rgb), 0.08);
-  border: 1px solid rgba(var(--bs-info-rgb), 0.2);
-  border-radius: 0.6rem;
+  background: rgba(var(--bs-primary-rgb), 0.06);
+  border-radius: 0.75rem;
 }

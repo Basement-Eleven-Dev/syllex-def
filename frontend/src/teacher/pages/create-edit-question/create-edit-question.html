@@ -205,7 +205,7 @@
               </div>
 
               <!-- CTA -->
-              <div class="pt-1">
+              <div class="d-flex justify-content-end pt-1">
                 <button
                   type="button"
                   class="btn btn-primary ai btn-lg icon-btn rounded-pill fw-bold"
@@ -250,14 +250,10 @@
                 convincono.
               </p>
             </div>
-            <button
-              type="button"
-              class="btn icon-btn btn-blue btn-sm"
-              (click)="toggleAll()"
-            >
-              <fa-icon [icon]="CheckIcon" class="me-1"></fa-icon>
-              {{ AllSelected() ? 'Deseleziona tutte' : 'Seleziona tutte' }}
-            </button>
+            <app-syllex-button
+              [props]="{ label: AllSelected() ? 'Deseleziona tutte' : 'Seleziona tutte', variant: 'outline', size: 'small' }"
+              (clicked)="toggleAll()"
+            ></app-syllex-button>
           </div>
 
           @if (PartialWarningCount() > 0) {
@@ -476,7 +472,7 @@
           } @if (SelectedQuestionType() === 'vero falso') {
           <div class="d-flex gap-3" tourAnchor="crea_domanda_verofalso">
             <div
-              class="rounded-syllex border typeCard p-3 flex-fill d-flex align-items-center gap-3"
+              class="rounded-syllex typeCard p-3 flex-fill d-flex align-items-center gap-3"
               (click)="onSelectCorrectAnswer(true)"
               [class.selected]="QuestionForm.get('correctAnswer')?.value === true"
               style="cursor: pointer; max-width: 200px"
@@ -489,7 +485,7 @@
               <span class="fw-semibold">Vero</span>
             </div>
             <div
-              class="rounded-syllex border typeCard p-3 flex-fill d-flex align-items-center gap-3"
+              class="rounded-syllex typeCard p-3 flex-fill d-flex align-items-center gap-3"
               (click)="onSelectCorrectAnswer(false)"
               [class.selected]="QuestionForm.get('correctAnswer')?.value === false"
               style="cursor: pointer; max-width: 200px"
@@ -579,7 +575,7 @@
             >
             <div class="d-flex gap-3 mt-2">
               <div
-                class="rounded-syllex border typeCard p-3 d-flex align-items-center gap-3"
+                class="rounded-syllex typeCard p-3 d-flex align-items-center gap-3"
                 (click)="onSelectPolicyType('public')"
                 [class.selected]="SelectedPolicyType() === 'public'"
                 style="cursor: pointer; max-width: 240px"
@@ -597,7 +593,7 @@
                 </div>
               </div>
               <div
-                class="rounded-syllex border typeCard p-3 d-flex align-items-center gap-3"
+                class="rounded-syllex typeCard p-3 d-flex align-items-center gap-3"
                 (click)="onSelectPolicyType('private')"
                 [class.selected]="SelectedPolicyType() === 'private'"
                 style="cursor: pointer; max-width: 240px"
@@ -619,12 +615,15 @@
 
           <!-- Azioni -->
           <div
-            class="d-flex gap-3 align-items-center pt-2"
+            class="d-flex gap-2 align-items-center justify-content-end pt-2"
             tourAnchor="crea_domanda_salva"
           >
+            <app-syllex-button
+              [props]="{ label: 'Annulla', variant: 'outline', size: 'medium', link: '/t/banca' }"
+            ></app-syllex-button>
             <button
               type="button"
-              class="btn btn-primary icon-btn btn-lg rounded-pill fw-bold px-5"
+              class="btn btn-primary icon-btn btn-lg rounded-pill fw-bold"
               [disabled]="IsLoading() || QuestionForm.invalid"
               (click)="onSaveQuestion()"
             >
@@ -635,9 +634,6 @@
               ></fa-icon>
               {{ SaveButtonLabel() }}
             </button>
-            <app-syllex-button
-              [props]="{ label: 'Annulla', variant: 'outline', size: 'medium', link: '/t/banca' }"
-            ></app-syllex-button>
           </div>
         </div>
       </div>
