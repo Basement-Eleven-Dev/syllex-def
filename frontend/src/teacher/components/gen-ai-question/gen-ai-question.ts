@@ -12,7 +12,7 @@ import {
   faSparkles,
   faSpinnerThird,
 } from '@fortawesome/pro-solid-svg-icons';
-import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveOffcanvas, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import {
   QUESTION_TYPE_OPTIONS,
   QuestionDifficulty,
@@ -54,6 +54,7 @@ export class GenAiQuestion {
   @ViewChild(MaterialiSelector) materialiSelector!: MaterialiSelector;
 
   readonly offcanvas = inject(NgbOffcanvas);
+  private readonly activeOffcanvas = inject(NgbActiveOffcanvas);
   readonly aiService = inject(AiService);
   readonly materiaService = inject(Materia);
 
@@ -81,6 +82,10 @@ export class GenAiQuestion {
   onSelectQuestionType(value: string): void {
     this.selectedType.set(value);
     this.genAiQuestionForm.patchValue({ type: value });
+  }
+
+  onDismiss(): void {
+    this.activeOffcanvas.dismiss();
   }
 
   async onGenerate(): Promise<void> {

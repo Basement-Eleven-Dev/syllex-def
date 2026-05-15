@@ -1,42 +1,44 @@
-<div class="d-flex flex-column gap-3">
-  <div class="d-flex justify-content-between align-items-center">
-    <span class="fw-semibold">Opzioni di Risposta</span>
-    <button
-      type="button"
-      class="btn btn-blue icon-btn"
-      (click)="onAddOption()"
-    >
-      <fa-icon [icon]="AddIcon"></fa-icon> Aggiungi Opzione
-    </button>
-  </div>
+<div class="d-flex flex-column gap-2">
   @for(option of options; track $index){
-  <div class="d-flex flex-row gap-3">
-    <span class="optionLabel">{{ getOptionLabel($index + 1) }}</span>
+  <div class="d-flex flex-row align-items-center gap-2">
+    <span class="optionLabel flex-shrink-0"
+      >{{ getOptionLabel($index + 1) }}</span
+    >
     <input
       type="text"
-      class="form-control custom-input"
+      class="form-control bg-light border-0 shadow-none rounded-pill py-2 px-3 flex-fill"
       [(ngModel)]="option.label"
       (ngModelChange)="onOptionsChange()"
       placeholder="Testo dell'opzione"
     />
     <button
-      class="btn d-flex flex-row align-items-center gap-1"
+      class="btn btn-sm rounded-pill px-3 flex-shrink-0"
       [class.btn-success]="option.isCorrect"
-      [class.btn-outline-success]="!option.isCorrect"
+      [class.btn-outline-secondary]="!option.isCorrect"
       (click)="onSetCorrectOption($index)"
+      type="button"
+      [title]="option.isCorrect ? 'Risposta corretta' : 'Segna come corretta'"
     >
       <fa-icon [icon]="CheckIcon"></fa-icon>
     </button>
     @if(options.length > 2) {
     <button
       type="button"
-      class="btn btn-outline-danger"
+      class="btn btn-sm btn-outline-danger rounded-pill px-3 flex-shrink-0"
       (click)="onRemoveOption($index)"
-      [disabled]="options.length <= 2"
     >
       <fa-icon [icon]="RemoveIcon"></fa-icon>
     </button>
     }
   </div>
   }
+  <div class="mt-1">
+    <button
+      type="button"
+      class="btn btn-outline-primary btn-sm rounded-pill px-3"
+      (click)="onAddOption()"
+    >
+      <fa-icon [icon]="AddIcon" class="me-1"></fa-icon> Aggiungi opzione
+    </button>
+  </div>
 </div>

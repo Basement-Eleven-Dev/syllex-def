@@ -1,100 +1,169 @@
 <form [formGroup]="genAiQuestionForm" (ngSubmit)="onGenerate()">
-  <div class="offcanvas-body dvh-100 overflow-scroll py-4">
-    <div class="h-100 d-flex flex-column gap-3 justify-content-between">
-      <section class="form-section">
-        <app-type-selector
-          [options]="questionTypeOptions"
-          [(selectedValue)]="selectedType"
-          (typeSelected)="onSelectQuestionType($event)"
-          [direction]="'column'"
-        ></app-type-selector>
-      </section>
-
-      <section class="form-section">
-        <label class="form-label text-dark">Argomento</label>
-        <select
-          class="form-select mb-4 custom-input w-auto"
-          formControlName="topicId"
-          aria-label="Seleziona argomento"
-        >
-          <option value="" disabled selected>Seleziona argomento</option>
-          @for(topic of materiaService.materiaSelected()?.topics; track
-          topic._id) {
-          <option [value]="topic._id">{{ topic.name }}</option>
-          }
-        </select>
-
-        <div class="row g-3 mb-4">
-          <div class="col-6">
-            <label class="form-label text-dark">Lingua</label>
-            <select
-              class="form-select custom-input"
-              formControlName="language"
-              aria-label="Seleziona lingua"
-            >
-              <option value="it">Italiano</option>
-              <option value="en">English</option>
-              <option value="es">Español</option>
-              <option value="fr">Français</option>
-              <option value="de">Deutsch</option>
-            </select>
-          </div>
-          <div class="col-6">
-            <label class="form-label text-dark">Difficoltà</label>
-            <select
-              class="form-select custom-input"
-              formControlName="difficulty"
-              aria-label="Seleziona difficoltà"
-            >
-              <option value="elementary">Elementare</option>
-              <option value="easy">Facile</option>
-              <option value="medium">Media</option>
-              <option value="hard">Difficile</option>
-              <option value="very_hard">Molto difficile</option>
-            </select>
-          </div>
-        </div>
-
-        @if (IsMultipleChoice()) {
-        <label class="form-label text-dark">Numero di alternative</label>
-        <input
-          type="number"
-          class="form-control mb-4 custom-input"
-          formControlName="numberOfAlternatives"
-          min="2"
-          max="8"
-          aria-label="Numero di alternative"
-        />
-        }
-
-        <label class="form-label text-dark">Istruzioni aggiuntive</label>
-        <textarea
-          class="form-control mb-4 custom-input"
-          formControlName="instructions"
-          rows="5"
-          style="resize: none"
-          placeholder="Fornisci dettagli aggiuntivi per la domanda in merito allo stile, al contesto o ad altri aspetti rilevanti."
-        ></textarea>
-      </section>
-
-      <section class="form-section">
-        <app-materiali-selector></app-materiali-selector>
-      </section>
-
-      <section class="flex-fill d-flex flex-column">
-        <button
-          class="btn btn-lg w-100 ai mb-4 py-3"
-          [disabled]="IsLoading() || genAiQuestionForm.invalid"
-          type="submit"
-        >
-          <fa-icon
-            [icon]="IsLoading() ? SpinnerIcon : SparklesIcon"
-            class="me-2"
-            [animation]="IsLoading() ? 'spin' : undefined"
-          ></fa-icon>
-          Genera Domanda
-        </button>
-      </section>
+  <!-- Header -->
+  <div class="offcanvas-header border-bottom px-4 py-3">
+    <div>
+      <h5
+        class="offcanvas-title fw-semibold mb-0"
+        style="letter-spacing: -0.02em"
+      >
+        <fa-icon [icon]="SparklesIcon" class="me-2 text-primary"></fa-icon>
+        Genera con AI
+      </h5>
+      <p class="text-muted small mb-0 mt-1">
+        L'AI creerà una domanda basandosi sui materiali selezionati.
+      </p>
     </div>
+    <button
+      type="button"
+      class="btn-close ms-3"
+      aria-label="Chiudi"
+      (click)="onDismiss()"
+    ></button>
+  </div>
+
+  <div class="offcanvas-body overflow-auto py-3 d-flex flex-column gap-3">
+    <!-- Tipo -->
+    <div>
+      <p
+        class="text-muted small fw-semibold text-uppercase mb-2"
+        style="letter-spacing: 0.05em"
+      >
+        Tipo di domanda
+      </p>
+      <app-type-selector
+        [options]="questionTypeOptions"
+        [(selectedValue)]="selectedType"
+        (typeSelected)="onSelectQuestionType($event)"
+        [direction]="'column'"
+      ></app-type-selector>
+    </div>
+
+    <hr class="my-1" />
+
+    <!-- Argomento -->
+    <div>
+      <p
+        class="text-muted small fw-semibold text-uppercase mb-2"
+        style="letter-spacing: 0.05em"
+      >
+        Argomento
+      </p>
+      <select
+        class="form-select bg-light border-0 shadow-none py-2 px-3 rounded-pill"
+        formControlName="topicId"
+        aria-label="Seleziona argomento"
+      >
+        <option value="" disabled selected>Seleziona argomento</option>
+        @for(topic of materiaService.materiaSelected()?.topics; track topic._id)
+        {
+        <option [value]="topic._id">{{ topic.name }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Lingua + Difficoltà -->
+    <div class="row g-2">
+      <div class="col-6">
+        <p
+          class="text-muted small fw-semibold text-uppercase mb-2"
+          style="letter-spacing: 0.05em"
+        >
+          Lingua
+        </p>
+        <select
+          class="form-select bg-light border-0 shadow-none py-2 px-3 rounded-pill"
+          formControlName="language"
+          aria-label="Seleziona lingua"
+        >
+          <option value="it">Italiano</option>
+          <option value="en">English</option>
+          <option value="es">Español</option>
+          <option value="fr">Français</option>
+          <option value="de">Deutsch</option>
+        </select>
+      </div>
+      <div class="col-6">
+        <p
+          class="text-muted small fw-semibold text-uppercase mb-2"
+          style="letter-spacing: 0.05em"
+        >
+          Difficoltà
+        </p>
+        <select
+          class="form-select bg-light border-0 shadow-none py-2 px-3 rounded-pill"
+          formControlName="difficulty"
+          aria-label="Seleziona difficoltà"
+        >
+          <option value="elementary">Elementare</option>
+          <option value="easy">Facile</option>
+          <option value="medium">Media</option>
+          <option value="hard">Difficile</option>
+          <option value="very_hard">Molto difficile</option>
+        </select>
+      </div>
+    </div>
+
+    @if (IsMultipleChoice()) {
+    <div>
+      <p
+        class="text-muted small fw-semibold text-uppercase mb-2"
+        style="letter-spacing: 0.05em"
+      >
+        N. alternative
+      </p>
+      <input
+        type="number"
+        class="form-control bg-light border-0 shadow-none py-2 px-3 rounded-pill"
+        formControlName="numberOfAlternatives"
+        min="2"
+        max="8"
+        aria-label="Numero di alternative"
+      />
+    </div>
+    }
+
+    <!-- Istruzioni -->
+    <div>
+      <p
+        class="text-muted small fw-semibold text-uppercase mb-2"
+        style="letter-spacing: 0.05em"
+      >
+        Istruzioni aggiuntive
+      </p>
+      <textarea
+        class="form-control custom-input"
+        formControlName="instructions"
+        rows="3"
+        style="resize: none"
+        placeholder="Dettagli sullo stile, contesto o aspetti rilevanti..."
+      ></textarea>
+    </div>
+
+    <hr class="my-1" />
+
+    <!-- Materiali -->
+    <div>
+      <p
+        class="text-muted small fw-semibold text-uppercase mb-2"
+        style="letter-spacing: 0.05em"
+      >
+        Materiali di riferimento
+      </p>
+      <app-materiali-selector></app-materiali-selector>
+    </div>
+
+    <!-- Genera -->
+    <button
+      class="btn btn-lg w-100 text-white ai py-3 rounded-pill mt-2"
+      [disabled]="IsLoading() || genAiQuestionForm.invalid"
+      type="submit"
+    >
+      <fa-icon
+        [icon]="IsLoading() ? SpinnerIcon : SparklesIcon"
+        class="me-2"
+        [animation]="IsLoading() ? 'spin' : undefined"
+      ></fa-icon>
+      {{ IsLoading() ? 'Generazione in corso...' : 'Genera Domanda' }}
+    </button>
   </div>
 </form>
