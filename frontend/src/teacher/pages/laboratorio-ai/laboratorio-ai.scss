@@ -1,11 +1,236 @@
-.card {
-  overflow: hidden;
-  min-width: 400px;
+// ─── Page Header ──────────────────────────────────────
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+
+  h1 {
+    font-size: 1.75rem;
+  }
 }
-#sparkleIcon {
-  position: absolute;
-  font-size: 300px;
-  opacity: 0.2;
-  top: -10px;
-  right: -10px;
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: 2px solid #3931ce;
+  background: transparent;
+  color: #3931ce;
+  flex-shrink: 0;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.75;
+  }
+}
+
+// ─── Wizard Container ─────────────────────────────────
+
+.wizard-container {
+  width: 100%;
+}
+
+// ─── Step Indicator ───────────────────────────────────
+
+.wizard-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 1.75rem;
+}
+
+.wizard-dot-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.wizard-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 2px solid var(--bs-border-color);
+  color: var(--bs-secondary-color);
+  background: white;
+  transition: all 0.25s ease;
+  z-index: 1;
+
+  &--active {
+    border-color: var(--bs-primary);
+    color: var(--bs-primary);
+    background: rgba(var(--bs-primary-rgb), 0.06);
+    transform: scale(1.15);
+  }
+
+  &--completed {
+    border-color: var(--bs-success);
+    color: white;
+    background: var(--bs-success);
+  }
+}
+
+.wizard-dot-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--bs-secondary-color);
+  white-space: nowrap;
+}
+
+.wizard-connector {
+  flex: 1;
+  height: 2px;
+  background: var(--bs-border-color);
+  margin: 0 0.25rem;
+  margin-bottom: 1.1rem;
+  transition: background 0.3s ease;
+  max-width: 80px;
+
+  &--done {
+    background: var(--bs-success);
+  }
+}
+
+// ─── Wizard Main ──────────────────────────────────────
+
+.wizard-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.wizard-panel {
+  flex: 1;
+  background: white;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 1rem;
+  overflow: hidden;
+  min-height: 380px;
+}
+
+.wizard-step-content {
+  padding: 2rem;
+}
+
+.wizard-step-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+  letter-spacing: -0.02em;
+}
+
+.wizard-step-subtitle {
+  color: var(--bs-secondary-color);
+  font-size: 0.875rem;
+  margin-bottom: 1.5rem;
+}
+
+.wizard-field-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--bs-secondary-color);
+  margin-bottom: 0.5rem;
+}
+
+// ─── Nav Buttons ──────────────────────────────────────
+
+.wizard-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: 2px solid var(--bs-border-color);
+  background: white;
+  color: var(--bs-body-color);
+  flex-shrink: 0;
+  margin-top: 1.5rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    border-color: var(--bs-primary);
+    color: var(--bs-primary);
+    background: rgba(var(--bs-primary-rgb), 0.05);
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+}
+
+.wizard-nav-spacer {
+  width: 2.5rem;
+  flex-shrink: 0;
+}
+
+// ─── Method Cards ─────────────────────────────────────
+
+.method-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: 0.875rem;
+  border: 2px solid var(--bs-border-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 90px;
+  background: white;
+  height: 100%;
+
+  &:hover {
+    border-color: var(--bs-primary);
+    background: rgba(var(--bs-primary-rgb), 0.04);
+
+    .method-card-icon {
+      color: var(--bs-primary);
+    }
+  }
+
+  &.selected {
+    border-color: var(--bs-primary);
+    background: rgba(var(--bs-primary-rgb), 0.06);
+
+    .method-card-icon {
+      color: var(--bs-primary);
+    }
+  }
+
+  &--ai:hover .method-card-icon,
+  &--ai.selected .method-card-icon {
+    background: linear-gradient(
+      135deg,
+      var(--bs-primary) 0%,
+      color-mix(in srgb, var(--bs-primary) 75%, black) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+.method-card-icon {
+  font-size: 1.75rem;
+  color: var(--bs-secondary-color);
+  flex-shrink: 0;
+  transition: color 0.2s ease;
 }
