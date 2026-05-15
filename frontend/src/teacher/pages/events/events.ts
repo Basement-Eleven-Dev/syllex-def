@@ -1,5 +1,5 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
-import { RouterModule, RouterLink } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { Calendario } from '../../components/calendario/calendario';
 import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
 import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
@@ -8,33 +8,29 @@ import {
   ComunicazioniService,
 } from '../../../services/comunicazioni-service';
 import { Materia } from '../../../services/materia';
-import { DatePipe } from '@angular/common';
+import { DatePipe, TitleCasePipe } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
-  faArrowRight,
   faCalendarAlt,
   faBullhorn,
   faPlus,
 } from '@fortawesome/pro-solid-svg-icons';
-import { ComunicazioneCard } from '../../components/comunicazione-card/comunicazione-card';
 
 @Component({
   selector: 'app-events',
   imports: [
     RouterModule,
-    RouterLink,
     Calendario,
     SyllexPageHeader,
     SyllexButton,
     DatePipe,
     FontAwesomeModule,
-    ComunicazioneCard,
+    TitleCasePipe,
   ],
   templateUrl: './events.html',
   styleUrl: './events.scss',
 })
 export class Events {
-  faArrowRight = faArrowRight;
   faCalendarAlt = faCalendarAlt;
   faBullhorn = faBullhorn;
   faPlus = faPlus;

@@ -21,12 +21,9 @@
     />
   </div>
 </app-syllex-page-header>
-<div class="com-wrapper mb-5">
+<div class="com-wrapper mb-5" style="padding-top: 35px">
   <div class="mb-3 text-white flex-shrink-0 px-4">
-    <h2 class="h5 fw-bold mb-0">Comunicazioni</h2>
-    <p class="opacity-75 small mb-0">
-      Resta aggiornato sugli avvisi importanti della classe.
-    </p>
+    <h2 class="fs-2 fw-semibold mb-0">Comunicazioni recenti</h2>
   </div>
   <div
     class="com-scroll"
@@ -39,22 +36,24 @@
     @for(com of Comunicazioni(); track com._id) {
     <div class="com-item">
       <div
-        class="syllexCard bg-white text-dark p-3 h-100 communication-item-card d-flex flex-column"
+        class="p-4 rounded-5 h-100 bg-white text-dark communication-item-card d-flex flex-column"
       >
-        <span
-          class="badge bg-primary-subtle text-primary border-0 px-2 py-1 rounded-pill mb-2 d-inline-block small"
-        >
-          {{ com.createdAt | date:'d MMM yyyy' : '' : 'it' }}
-        </span>
-        <h5 class="fw-bold mb-2 ellipsis-2-lines" style="font-size: 1rem">
-          {{ com.title }}
-        </h5>
-        <p class="text-muted small mb-2 ellipsis-3-lines flex-grow-1">
+        <p class="fs-4 m-0">
+          {{ com.title.substring(0, 23) + "..." | titlecase }}
+        </p>
+        <p class="text-muted mb-2 ellipsis-3-lines flex-grow-1">
           {{ com.content }}
         </p>
-        <app-syllex-button
-          [props]="{ label: 'Apri', variant: 'primary', size: 'small', link: '/t/comunicazioni/edit/' + com._id }"
-        />
+        <div class="d-flex justify-content-between">
+          <span
+            class="text-primary border-0 px-2 py-1 rounded-pill mb-2 d-inline-block small"
+          >
+            {{ com.createdAt | date:'d MMM yyyy' : '' : 'it' }}
+          </span>
+          <app-syllex-button
+            [props]="{ label: 'Apri', variant: 'primary', size: 'small', link: '/t/comunicazioni/edit/' + com._id }"
+          />
+        </div>
       </div>
     </div>
     } @empty {
@@ -67,22 +66,5 @@
 
 <!-- SEZIONE CALENDARIO -->
 <section class="calendar-section pb-4">
-  <div class="d-flex align-items-center mb-3 px-1">
-    <div
-      class="p-2 bg-primary rounded-3 text-white me-3 d-flex align-items-center justify-content-center"
-      style="width: 36px; height: 36px"
-    >
-      <fa-icon [icon]="faCalendarAlt" style="font-size: 14px"></fa-icon>
-    </div>
-    <div>
-      <h3 class="fw-bold text-dark mb-0 fs-5">Agenda Didattica</h3>
-      <p class="text-muted small mb-0">
-        Visualizza e gestisci le scadenze e gli appuntamenti
-      </p>
-    </div>
-  </div>
-
-  <div class="bg-white rounded-4 shadow-sm border p-3">
-    <app-calendario [showHeadings]="false" [readonly]="false"></app-calendario>
-  </div>
+  <app-calendario [showHeadings]="false" [readonly]="false"></app-calendario>
 </section>

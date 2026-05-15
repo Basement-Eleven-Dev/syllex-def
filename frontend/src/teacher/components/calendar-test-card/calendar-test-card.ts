@@ -14,13 +14,17 @@ import { Materia } from '../../../services/materia';
       [routerLink]="readonly() ? null : '/t/tests/' + Test()._id"
       [class.cursor-default]="readonly()"
     >
-      <div class="d-flex flex-row align-items-center justify-content-between mb-1">
+      <div
+        class="d-flex flex-row align-items-center justify-content-between mb-1"
+      >
         <div class="d-flex flex-row align-items-center gap-2">
           <fa-icon [icon]="TestIcon" class="text-danger"></fa-icon>
           <h6 class="mb-0">{{ Test().name }}</h6>
         </div>
         @if (Test().subjectId) {
-          <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-medium px-2 py-1 small">
+          <span
+            class="badge bg-danger-subtle text-danger border border-danger-subtle fw-medium px-2 py-1 small"
+          >
             {{ materiaService.getSubjectName(Test().subjectId!) }}
           </span>
         }
