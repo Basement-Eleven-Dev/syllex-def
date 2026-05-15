@@ -6,12 +6,8 @@
     aria-label="Close"
     (click)="ActiveModal!.dismiss()"
   ></button>
-  }
-
-  <div
-    [class]="'mb-4 d-flex flex-row' + (showHeadings() ? ' justify-content-between align-items-center' : '')"
-  >
-    @if(showHeadings()){
+  } @if(showHeadings()){
+  <div class="mb-4 d-flex flex-row justify-content-between align-items-center">
     <div class="flex-fill">
       <h4 class="text-dark mb-0">
         Calendario di {{ materiaService.materiaSelected()?.name }}
@@ -20,35 +16,38 @@
         Tieni traccia dei test che hai fissato per i tuoi studenti
       </p>
     </div>
-    }
-    <div
-      tourAnchor="calendario_nav"
-      class="d-flex flex-row align-items-center gap-2"
-    >
-      <button
-        class="btn nav-circle-btn d-flex align-items-center justify-content-center"
-        (click)="navigateMonth(-1)"
-      >
-        <fa-icon [icon]="ArrowLeftIcon"></fa-icon>
-      </button>
-      <span
-        class="fw-semibold text-capitalize"
-        style="min-width: 140px; text-align: center"
-      >
-        {{ CurrentDate() | date: 'MMMM yyyy' : '' : 'it' }}
-      </span>
-      <button
-        class="btn nav-circle-btn d-flex align-items-center justify-content-center"
-        (click)="navigateMonth(1)"
-      >
-        <fa-icon [icon]="ArrowRightIcon"></fa-icon>
-      </button>
-    </div>
   </div>
+  }
 
   <div class="row">
     <!-- Calendar grid -->
     <div tourAnchor="calendario_griglia" class="col-12 col-lg-6 mb-3">
+      <div class="d-flex justify-content-center mb-3">
+        <div
+          tourAnchor="calendario_nav"
+          class="d-flex flex-row align-items-center gap-2 rounded-pill px-3 py-1"
+          style="background-color: #d2e2ff"
+        >
+          <button
+            class="btn text-primary border-0 p-1 lh-1"
+            (click)="navigateMonth(-1)"
+          >
+            <fa-icon [icon]="ArrowLeftIcon"></fa-icon>
+          </button>
+          <span
+            class="fw-semibold text-capitalize text-primary"
+            style="min-width: 140px; text-align: center"
+          >
+            {{ CurrentDate() | date: 'MMMM yyyy' : '' : 'it' }}
+          </span>
+          <button
+            class="btn text-primary border-0 p-1 lh-1"
+            (click)="navigateMonth(1)"
+          >
+            <fa-icon [icon]="ArrowRightIcon"></fa-icon>
+          </button>
+        </div>
+      </div>
       <div class="d-flex flex-row mb-3">
         @for (day of ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom']; track
         $index) {
@@ -76,13 +75,6 @@
             <span class="event-count badge bg-primary" title="Eventi e Test">
               {{ getEventCount(dayBox) }}
             </span>
-            } @if (getComunicazioniCount(dayBox) > 0) {
-            <span
-              class="event-count badge bg-info text-dark"
-              title="Comunicazioni"
-            >
-              {{ getComunicazioniCount(dayBox) }}
-            </span>
             }
           </div>
           }
@@ -108,7 +100,7 @@
       </div>
 
       <div
-        class="flex-fill p-3 rounded-syllex bg-white"
+        class="flex-fill p-3 border-0"
         tourAnchor="calendario_dettaglio_giorno"
         id="calendarDayDetailCard"
       >
