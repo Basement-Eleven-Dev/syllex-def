@@ -17,6 +17,54 @@
 </div>
 
 <!-- Wizard -->
+@if (!SelectedMethod()) {
+<!-- ── PRE-STEP: Scelta del metodo ── -->
+<div class="pre-step">
+  <h2 class="pre-step__title">Come vuoi creare la domanda?</h2>
+  <p class="pre-step__subtitle">
+    Scegli il metodo di creazione. L'AI è il modo più rapido e consigliato!
+  </p>
+  <div class="row g-4">
+    <div class="col-12 col-md-6">
+      <div
+        class="h-100"
+        style="cursor: pointer"
+        (click)="onSelectMethod('ai')"
+        role="button"
+        aria-label="Genera con AI"
+      >
+        <app-syllex-card
+          title="Genera con AI"
+          description="L'AI creerà le domande dai tuoi materiali in pochi secondi"
+          [icon]="SparklesIcon"
+          variant="ai"
+          [showArrow]="true"
+          class="h-100"
+        ></app-syllex-card>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <div
+        class="h-100"
+        style="cursor: pointer"
+        (click)="onSelectMethod('manual')"
+        role="button"
+        aria-label="Crea manualmente"
+      >
+        <app-syllex-card
+          title="Crea manualmente"
+          description="Scrivi il testo della domanda e configura le risposte passo dopo passo"
+          [icon]="PencilIcon"
+          variant="filled"
+          color="purple"
+          [showArrow]="true"
+          class="h-100"
+        ></app-syllex-card>
+      </div>
+    </div>
+  </div>
+</div>
+} @if (SelectedMethod()) {
 <div class="wizard-container">
   <!-- Step indicator -->
   <div class="wizard-indicator">
@@ -48,7 +96,7 @@
       class="wizard-nav-btn"
       type="button"
       (click)="goPrev()"
-      [disabled]="CurrentStep() === 1 && !AiIsReviewing()"
+      [disabled]="false"
       aria-label="Passo precedente"
     >
       <fa-icon [icon]="ChevronLeftIcon" />
@@ -56,50 +104,8 @@
 
     <!-- Panel -->
     <div class="wizard-panel">
-      <!-- ── STEP 1: Metodo ── -->
+      <!-- ── STEP 1: Tipo ── -->
       @if (CurrentStep() === 1) {
-      <div class="wizard-step-content" @stepIn>
-        <h5 class="wizard-step-title">Come vuoi creare la domanda?</h5>
-        <p class="wizard-step-subtitle">
-          Scegli il metodo di creazione. L'AI è il modo più rapido!
-        </p>
-        <div class="row g-3">
-          <div class="col-12 col-md-6">
-            <div
-              class="method-card method-card--ai"
-              [class.selected]="SelectedMethod() === 'ai'"
-              (click)="onSelectMethod('ai')"
-            >
-              <fa-icon [icon]="SparklesIcon" class="method-card-icon"></fa-icon>
-              <div>
-                <h5 class="mb-1 fw-semibold">Genera con AI</h5>
-                <p class="small mb-0 opacity-75">
-                  L'AI creerà le domande dai tuoi materiali in pochi secondi
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="col-12 col-md-6">
-            <div
-              class="method-card method-card--manual"
-              [class.selected]="SelectedMethod() === 'manual'"
-              (click)="onSelectMethod('manual')"
-            >
-              <fa-icon [icon]="PencilIcon" class="method-card-icon"></fa-icon>
-              <div>
-                <h5 class="mb-1 fw-semibold">Crea manualmente</h5>
-                <p class="small mb-0 opacity-75">
-                  Scrivi tu il testo della domanda e configura le risposte
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      }
-
-      <!-- ── STEP 2: Tipo ── -->
-      @if (CurrentStep() === 2) {
       <div class="wizard-step-content" @stepIn tourAnchor="crea_domanda_tipo">
         <h5 class="wizard-step-title">Tipo di domanda</h5>
         <p class="wizard-step-subtitle">
@@ -115,8 +121,8 @@
       </div>
       }
 
-      <!-- ── STEP 3 AI: Genera ── -->
-      @if (CurrentStep() === 3 && SelectedMethod() === 'ai') {
+      <!-- ── STEP 2 AI: Genera ── -->
+      @if (CurrentStep() === 2 && SelectedMethod() === 'ai') {
       <div
         class="wizard-step-content"
         @stepIn
@@ -351,8 +357,8 @@
       </div>
       }
 
-      <!-- ── STEP 3 Manual: Contenuto ── -->
-      @if (CurrentStep() === 3 && SelectedMethod() === 'manual') {
+      <!-- ── STEP 2 Manual: Contenuto ── -->
+      @if (CurrentStep() === 2 && SelectedMethod() === 'manual') {
       <div
         class="wizard-step-content"
         @stepIn
@@ -467,8 +473,8 @@
       </div>
       }
 
-      <!-- ── STEP 4 Manual: Risposta ── -->
-      @if (CurrentStep() === 4 && SelectedMethod() === 'manual') {
+      <!-- ── STEP 3 Manual: Risposta ── -->
+      @if (CurrentStep() === 3 && SelectedMethod() === 'manual') {
       <div
         class="wizard-step-content"
         @stepIn
@@ -530,8 +536,8 @@
       </div>
       }
 
-      <!-- ── STEP 5 Manual: Pubblica ── -->
-      @if (CurrentStep() === 5 && SelectedMethod() === 'manual') {
+      <!-- ── STEP 4 Manual: Pubblica ── -->
+      @if (CurrentStep() === 4 && SelectedMethod() === 'manual') {
       <div
         class="wizard-step-content"
         @stepIn
@@ -674,3 +680,4 @@
     }
   </div>
 </div>
+}

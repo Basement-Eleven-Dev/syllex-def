@@ -18,6 +18,54 @@
   </div>
 </div>
 
+@if (!InitialChoice()) {
+<!-- PRE-STEP: Scelta del tipo -->
+<div class="pre-step" tourAnchor="laboratorio_ai_type_cards">
+  <h2 class="pre-step__title">Cosa vuoi creare?</h2>
+  <p class="pre-step__subtitle">
+    Scegli il tipo di contenuto che vuoi generare con l'AI di Syllex.
+  </p>
+  <div class="row g-4 justify-content-center">
+    <div class="col-12 col-md-5" tourAnchor="laboratorio_ai_card_materials">
+      <div
+        (click)="onSelectInitialType('materials')"
+        style="cursor: pointer"
+        role="button"
+        tabindex="0"
+        (keydown.enter)="onSelectInitialType('materials')"
+      >
+        <app-syllex-card
+          title="Materiale di studio"
+          description="Genera slides, riassunti, glossari e mappe concettuali dai tuoi file"
+          [icon]="MaterialsIcon"
+          variant="ai"
+          [showArrow]="true"
+          class="h-100"
+        ></app-syllex-card>
+      </div>
+    </div>
+    <div class="col-12 col-md-5" tourAnchor="laboratorio_ai_card_questions">
+      <div
+        (click)="onSelectInitialType('questions')"
+        style="cursor: pointer"
+        role="button"
+        tabindex="0"
+        (keydown.enter)="onSelectInitialType('questions')"
+      >
+        <app-syllex-card
+          title="Domande dei Test"
+          description="Crea domande per la banca domande in modalità guidata"
+          [icon]="QuestionsIcon"
+          variant="filled"
+          color="purple"
+          [showArrow]="true"
+          class="h-100"
+        ></app-syllex-card>
+      </div>
+    </div>
+  </div>
+</div>
+} @if (InitialChoice() === 'materials') {
 <!-- Wizard -->
 <div class="wizard-container">
   <!-- Step indicator -->
@@ -50,7 +98,6 @@
       class="wizard-nav-btn"
       type="button"
       (click)="goPrev()"
-      [disabled]="CurrentStep() === 1"
       aria-label="Passo precedente"
     >
       <fa-icon [icon]="ChevronLeftIcon" />
@@ -58,61 +105,8 @@
 
     <!-- Panel -->
     <div class="wizard-panel">
-      <!-- ── STEP 1: Scelta ── -->
+      <!-- ── STEP 1: Tipo materiale ── -->
       @if (CurrentStep() === 1) {
-      <div
-        class="wizard-step-content"
-        @stepIn
-        tourAnchor="laboratorio_ai_type_cards"
-      >
-        <h5 class="wizard-step-title">Cosa vuoi creare?</h5>
-        <p class="wizard-step-subtitle">
-          Scegli il tipo di contenuto che vuoi generare con l'AI di Syllex.
-        </p>
-        <div class="row g-3">
-          <div class="col-12 col-md-6">
-            <div
-              tourAnchor="laboratorio_ai_card_materials"
-              class="method-card method-card--ai"
-              (click)="onSelectInitialType('materials')"
-            >
-              <fa-icon
-                [icon]="MaterialsIcon"
-                class="method-card-icon"
-              ></fa-icon>
-              <div>
-                <h5 class="mb-1 fw-semibold">Materiale di studio</h5>
-                <p class="small mb-0 opacity-75">
-                  Genera slides, riassunti, glossari e mappe concettuali dai
-                  tuoi file
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="col-12 col-md-6">
-            <div
-              tourAnchor="laboratorio_ai_card_questions"
-              class="method-card"
-              (click)="onSelectInitialType('questions')"
-            >
-              <fa-icon
-                [icon]="QuestionsIcon"
-                class="method-card-icon"
-              ></fa-icon>
-              <div>
-                <h5 class="mb-1 fw-semibold">Domande dei Test</h5>
-                <p class="small mb-0 opacity-75">
-                  Crea domande per la banca domande in modalità guidata
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      }
-
-      <!-- ── STEP 2: Tipo materiale ── -->
-      @if (CurrentStep() === 2) {
       <div
         class="wizard-step-content"
         @stepIn
@@ -132,8 +126,8 @@
       </div>
       }
 
-      <!-- ── STEP 3: Configura e Genera ── -->
-      @if (CurrentStep() === 3) {
+      <!-- ── STEP 2: Configura e Genera ── -->
+      @if (CurrentStep() === 2) {
       <div
         class="wizard-step-content"
         @stepIn
@@ -293,6 +287,7 @@
     }
   </div>
 </div>
+}
 
 <!-- AI Overlay -->
 <app-ai-overlay

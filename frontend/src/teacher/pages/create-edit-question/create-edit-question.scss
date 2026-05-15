@@ -1,3 +1,22 @@
+// ─── Pre-step Card Selection ──────────────────────────
+
+.pre-step {
+  margin-bottom: 2rem;
+
+  &__title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    margin-bottom: 0.35rem;
+  }
+
+  &__subtitle {
+    color: var(--bs-secondary-color);
+    font-size: 0.9rem;
+    margin-bottom: 1.75rem;
+  }
+}
+
 // ─── Page Header ──────────────────────────────────────
 
 .page-header {

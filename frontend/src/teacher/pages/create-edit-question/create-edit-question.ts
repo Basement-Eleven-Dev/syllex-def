@@ -29,6 +29,7 @@ import {
 } from '../../../types/question.types';
 import { TypeSelector } from '../../components/type-selector/type-selector';
 import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
+import { SyllexCard } from '../../components/UI/syllex-card/syllex-card';
 import { Materia } from '../../../services/materia';
 import { QuestionsService } from '../../../services/questions';
 import { FeedbackService } from '../../../services/feedback-service';
@@ -73,6 +74,7 @@ interface StepDef {
     FormsModule,
     ReactiveFormsModule,
     SyllexButton,
+    SyllexCard,
     TourAnchorNgBootstrapDirective,
     MaterialiSelector,
   ],
@@ -146,25 +148,23 @@ export class CreateEditQuestion {
   // Computed — steps
   readonly IsEditMode = computed(() => !!this.QuestionId);
   readonly TotalSteps = computed(() =>
-    this.SelectedMethod() === 'ai' ? 3 : 5,
+    this.SelectedMethod() === 'ai' ? 2 : 4,
   );
   readonly StepDefs = computed<StepDef[]>(() =>
     this.SelectedMethod() === 'ai'
       ? [
-          { n: 1, label: 'Metodo' },
-          { n: 2, label: 'Tipo' },
-          { n: 3, label: 'Genera' },
+          { n: 1, label: 'Tipo' },
+          { n: 2, label: 'Genera' },
         ]
       : [
-          { n: 1, label: 'Metodo' },
-          { n: 2, label: 'Tipo' },
-          { n: 3, label: 'Contenuto' },
-          { n: 4, label: 'Risposta' },
-          { n: 5, label: 'Pubblica' },
+          { n: 1, label: 'Tipo' },
+          { n: 2, label: 'Contenuto' },
+          { n: 3, label: 'Risposta' },
+          { n: 4, label: 'Pubblica' },
         ],
   );
-  // Manual step 4 valid — needs options check
-  readonly Step4Valid = computed(() => {
+  // Manual step 3 valid — needs options check (was step 4)
+  readonly Step3Valid = computed(() => {
     const vals = this.ManualFormValues();
     const type = this.SelectedQuestionType();
     if (type === 'risposta aperta') return true;
@@ -207,17 +207,17 @@ export class CreateEditQuestion {
   readonly CanGoNext = computed(() => {
     const step = this.CurrentStep();
     const method = this.SelectedMethod();
-    if (step === 1) return !!method;
-    if (step === 2) return !!this.SelectedQuestionType();
-    if (step === 3 && method === 'manual') {
+    if (step === 1) return !!this.SelectedQuestionType();
+    if (step === 2 && method === 'manual') {
       const vals = this.ManualFormValues();
       return !!(vals['topicId'] && (vals['text'] as string)?.trim());
     }
-    if (step === 4 && method === 'manual') return this.Step4Valid();
+    if (step === 3 && method === 'manual') return this.Step3Valid();
     return false;
   });
   readonly ShowNextArrow = computed(() => {
-    if (this.SelectedMethod() === 'ai' && this.CurrentStep() === 3)
+    if (!this.SelectedMethod()) return false;
+    if (this.SelectedMethod() === 'ai' && this.CurrentStep() === 2)
       return false;
     if (
       this.SelectedMethod() === 'manual' &&
@@ -292,6 +292,12 @@ export class CreateEditQuestion {
       this.AiIsReviewing.set(false);
       return;
     }
+    if (this.CurrentStep() === 1) {
+      // Back to pre-step card selection
+      this.SelectedMethod.set(null);
+      this.CurrentStep.set(1);
+      return;
+    }
     if (this.CurrentStep() > 1) {
       this.CurrentStep.update((s) => s - 1);
     }
@@ -304,10 +310,7 @@ export class CreateEditQuestion {
     this.AiIsReviewing.set(false);
     this.AiReviewQuestions.set([]);
     this.PartialWarningCount.set(0);
-    // Auto-advance to step 2
-    if (this.CurrentStep() === 1) {
-      setTimeout(() => this.goNext(), 220);
-    }
+    this.CurrentStep.set(1);
   }
 
   onSelectQuestionType(type: string): void {
@@ -317,8 +320,8 @@ export class CreateEditQuestion {
     this.AiIsReviewing.set(false);
     this.AiReviewQuestions.set([]);
     this.PartialWarningCount.set(0);
-    // Auto-advance from step 2
-    if (this.CurrentStep() === 2) {
+    // Auto-advance from step 1 (type selection)
+    if (this.CurrentStep() === 1) {
       setTimeout(() => this.goNext(), 280);
     }
   }
@@ -616,7 +619,7 @@ export class CreateEditQuestion {
 
   private populateFormWithQuestion(question: any): void {
     this.SelectedMethod.set('manual');
-    this.CurrentStep.set(3); // start at content step in edit mode
+    this.CurrentStep.set(2); // start at content step in edit mode
     this.QuestionForm.patchValue({
       type: question.type,
       text: question.text,

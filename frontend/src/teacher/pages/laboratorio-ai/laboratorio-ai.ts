@@ -21,6 +21,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
 import { TypeSelector } from '../../components/type-selector/type-selector';
 import { MaterialiSelector } from '../../components/materiali-selector/materiali-selector';
 import { AiOverlay } from '../../components/ai-overlay/ai-overlay';
+import { SyllexCard } from '../../components/UI/syllex-card/syllex-card';
 import { AiService } from '../../../services/ai-service';
 import { FeedbackService } from '../../../services/feedback-service';
 import {
@@ -42,6 +43,7 @@ interface StepDef {
     TypeSelector,
     MaterialiSelector,
     AiOverlay,
+    SyllexCard,
     TourAnchorNgBootstrapDirective,
   ],
   templateUrl: './laboratorio-ai.html',
@@ -84,15 +86,15 @@ export class LaboratorioAi {
   readonly MaterialTypes = MATERIAL_TYPE_OPTIONS;
 
   // State
+  readonly InitialChoice = signal<'materials' | null>(null);
   readonly CurrentStep = signal<number>(1);
   readonly SelectedMaterialType = signal<string>('');
   readonly IsGenerating = signal<boolean>(false);
   readonly GenerationSuccess = signal<boolean>(false);
 
   readonly StepDefs: StepDef[] = [
-    { n: 1, label: 'Scelta' },
-    { n: 2, label: 'Tipo' },
-    { n: 3, label: 'Genera' },
+    { n: 1, label: 'Tipo' },
+    { n: 2, label: 'Genera' },
   ];
 
   // Computed
@@ -105,10 +107,10 @@ export class LaboratorioAi {
   );
 
   readonly CanGoNext = computed(
-    () => this.CurrentStep() === 2 && !!this.SelectedMaterialType(),
+    () => this.CurrentStep() === 1 && !!this.SelectedMaterialType(),
   );
 
-  readonly ShowNextArrow = computed(() => this.CurrentStep() === 2);
+  readonly ShowNextArrow = computed(() => this.CurrentStep() === 1);
 
   // Form (step 3)
   readonly genForm = new FormGroup({
@@ -126,11 +128,18 @@ export class LaboratorioAi {
 
   goNext(): void {
     if (!this.CanGoNext()) return;
-    if (this.CurrentStep() < 3) this.CurrentStep.update((s) => s + 1);
+    if (this.CurrentStep() < 2) this.CurrentStep.update((s) => s + 1);
   }
 
   goPrev(): void {
-    if (this.CurrentStep() <= 1) return;
+    if (this.CurrentStep() === 1) {
+      // Back to pre-step card selection
+      this.InitialChoice.set(null);
+      this.SelectedMaterialType.set('');
+      this.genForm.controls['selectedType'].setValue('');
+      this.CurrentStep.set(1);
+      return;
+    }
     if (this.CurrentStep() === 2) {
       this.SelectedMaterialType.set('');
       this.genForm.controls['selectedType'].setValue('');
@@ -138,23 +147,24 @@ export class LaboratorioAi {
     this.CurrentStep.update((s) => s - 1);
   }
 
-  // ─── Step 1: initial choice ───────────────────────────
+  // ─── Pre-step: initial choice ────────────────────────
 
   onSelectInitialType(type: 'questions' | 'materials'): void {
     if (type === 'questions') {
       this.router.navigate(['/t/create-question']);
     } else {
-      setTimeout(() => this.CurrentStep.set(2), 220);
+      this.InitialChoice.set('materials');
+      this.CurrentStep.set(1);
     }
   }
 
-  // ─── Step 2: material type ─────────────────────────────
+  // ─── Step 1: material type ────────────────────────────
 
   onSelectMaterialType(type: string): void {
     this.SelectedMaterialType.set(type);
     this.genForm.controls['selectedType'].setValue(type);
-    if (this.CurrentStep() === 2) {
-      setTimeout(() => this.CurrentStep.set(3), 280);
+    if (this.CurrentStep() === 1) {
+      setTimeout(() => this.CurrentStep.set(2), 280);
     }
   }
 
