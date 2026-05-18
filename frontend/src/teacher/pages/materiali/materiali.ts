@@ -24,6 +24,7 @@ import {
   faRobot,
   faXmark,
   faTrash,
+  faArrowLeft,
 } from '@fortawesome/pro-solid-svg-icons';
 import {
   NgbDropdown,
@@ -123,6 +124,7 @@ export class Materiali implements OnInit {
     robot: faRobot,
     clear: faXmark,
     trash: faTrash,
+    arrowLeft: faArrowLeft,
   } as const;
 
   // ── State proxied from facade (avoids template changes) ───────────
@@ -141,6 +143,15 @@ export class Materiali implements OnInit {
   readonly folders = computed(() =>
     (this.rootFolder()?.content ?? []).filter((item) => item.type === 'folder'),
   );
+
+  readonly allItems = computed(() => {
+    const content = this.rootFolder()?.content ?? [];
+    return [...content].sort((a, b) => {
+      if (a.type === 'folder' && b.type !== 'folder') return -1;
+      if (a.type !== 'folder' && b.type === 'folder') return 1;
+      return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+    });
+  });
 
   // ── UI-only state ─────────────────────────────────────────────────
   protected readonly viewType = signal<ViewType>('grid');
@@ -342,12 +353,17 @@ export class Materiali implements OnInit {
   // ── GenAI ─────────────────────────────────────────────────────────
 
   protected onRequestGenerate(): void {
-    this.offcanvasService.open(GenAiContents, {
+    const offcanvasRef = this.offcanvasService.open(GenAiContents, {
       position: 'end',
       panelClass: 'offcanvas-large',
       scroll: true,
       backdrop: true,
     });
+
+    offcanvasRef.result.then(
+      () => this.facade.reload(),
+      () => this.facade.reload()
+    );
   }
 
   // ── Topic Suggestions ─────────────────────────────────────────────

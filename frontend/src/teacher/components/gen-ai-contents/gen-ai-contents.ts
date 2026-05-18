@@ -51,6 +51,7 @@ import { QuestionCard } from '../question-card/question-card';
 import { AiOverlay } from '../ai-overlay/ai-overlay';
 import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 import { SyllexButton } from '../UI/syllex-button/syllex-button';
+import { MaterialiFacadeService } from '../../../services/materiali/materiali-facade.service';
 
 interface ReviewQuestion {
   readonly TempId: string;
@@ -90,6 +91,7 @@ export class GenAiContents implements OnInit {
   readonly feedbackService = inject(FeedbackService);
   readonly modalService = inject(NgbModal);
   readonly router = inject(Router);
+  readonly materialiFacade = inject(MaterialiFacadeService);
   @Optional() readonly activeOffcanvas = inject(NgbActiveOffcanvas, {
     optional: true,
   });
@@ -194,7 +196,7 @@ export class GenAiContents implements OnInit {
   }
 
   async onSubmit(): Promise<void> {
-    if (this.genForm.invalid) {
+    if (this.IsGenerating() || this.genForm.invalid) {
       this.genForm.markAllAsTouched();
       return;
     }
@@ -279,6 +281,10 @@ export class GenAiContents implements OnInit {
   }
 
   onReturnToMaterials(): void {
+    const generated = this.GeneratedMaterial();
+    if (generated?._id) {
+      this.materialiFacade.highlightedItemId.set(generated._id);
+    }
     this.IsGenerating.set(false);
     this.GenerationSuccess.set(false);
     this.GeneratedMaterial.set(null);
