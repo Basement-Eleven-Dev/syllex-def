@@ -1,4 +1,4 @@
-<div class="bg-light p-4 rounded-5 d-flex flex-column gap-3 shadow-sm">
+<div class="p-4 rounded-4 d-flex flex-column gap-3" style="background: #d2e2ff;">
   <label class="form-label text-dark fw-bold fs-4">
     Domanda {{ index }}
     <span class="badge" [class]="data.answer.result">
@@ -47,7 +47,7 @@
         style="cursor: help;"
         [ngClass]="{
           'bg-danger': data.answer.aiProbability > 50,
-          'bg-success': data.answer.aiProbability <= 50
+          'bg-primary': data.answer.aiProbability <= 50
         }"
         ngbTooltip="Indica quanto è probabile che questo testo sia stato scritto da un'intelligenza artificiale (es: ChatGPT)"
       >
@@ -64,7 +64,7 @@
         >Feedback per lo studente</label
       >
       <textarea
-        class="form-control custom-input"
+        class="form-control border-0 bg-white rounded-3 shadow-none"
         rows="4"
         [(ngModel)]="data.answer.feedback"
         placeholder="Inserisci un commento..."
@@ -79,7 +79,7 @@
 
       <input
         type="number"
-        class="form-control custom-input fs-4"
+        class="form-control border-0 bg-white rounded-3 shadow-none fs-4 text-center"
         [(ngModel)]="data.answer.score"
         [max]="data.answer.maxScore"
         min="0"

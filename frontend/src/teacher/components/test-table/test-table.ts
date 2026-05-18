@@ -17,6 +17,7 @@ import { TestInterface, TestsService } from '../../../services/tests-service';
 import { TestContextualMenu } from '../test-contextual-menu/test-contextual-menu';
 import { RouterModule } from '@angular/router';
 import { ClassiService } from '../../../services/classi-service';
+import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
 
 @Component({
   selector: 'app-test-table',
@@ -31,6 +32,7 @@ import { ClassiService } from '../../../services/classi-service';
     NgbDropdownMenu,
     TestContextualMenu,
     RouterModule,
+    SyllexButton,
   ],
   standalone: true,
   templateUrl: './test-table.html',
