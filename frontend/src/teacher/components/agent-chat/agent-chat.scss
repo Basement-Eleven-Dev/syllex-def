@@ -83,6 +83,14 @@
       color: white;
       font-weight: 600;
     }
+
+    .conversation-date {
+      opacity: 0.75;
+    }
+
+    &.active .conversation-date {
+      opacity: 0.95;
+    }
   }
 }
 

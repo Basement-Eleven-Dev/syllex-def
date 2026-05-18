@@ -805,4 +805,34 @@ export class AgentChat implements OnInit, OnDestroy {
       if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
     });
   }
+
+  formatConversationDate(timestamp: string | Date | null | undefined): string {
+    if (!timestamp) return '';
+
+    const date = new Date(timestamp);
+    if (Number.isNaN(date.getTime())) return '';
+
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const targetDay = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+    );
+
+    const dayMs = 24 * 60 * 60 * 1000;
+    const diffDays = Math.round(
+      (today.getTime() - targetDay.getTime()) / dayMs,
+    );
+
+    if (diffDays === 0) return 'Oggi';
+    if (diffDays === 1) return 'Ieri';
+
+    const sameYear = now.getFullYear() === date.getFullYear();
+    return date.toLocaleDateString('it-IT', {
+      day: '2-digit',
+      month: 'short',
+      ...(sameYear ? {} : { year: 'numeric' }),
+    });
+  }
 }
