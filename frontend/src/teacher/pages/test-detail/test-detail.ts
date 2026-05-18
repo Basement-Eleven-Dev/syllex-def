@@ -31,6 +31,7 @@ import { TestsService } from '../../../services/tests-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { TestAiSummaryComponent } from '../../components/test-ai-summary/test-ai-summary';
+import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
 
 // Mappatura icone: associa le stringhe del backend agli oggetti FontAwesome
 const IconMap: Record<string, any> = {
@@ -52,6 +53,7 @@ const IconMap: Record<string, any> = {
     TestStats,
     SyllexKpiRow,
     TestAiSummaryComponent,
+    SyllexButton,
   ],
   templateUrl: './test-detail.html',
   styleUrl: './test-detail.scss',

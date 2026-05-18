@@ -1,28 +1,25 @@
-<select
-  class="form-select mb-4 custom-input filter"
-  [(ngModel)]="classSelected"
-  style="max-width: 200px"
->
-  <option [ngValue]="''">Tutte le classi</option>
-</select>
+<app-syllex-select-input
+  class="mb-4"
+  [value]="classSelected"
+  (valueChange)="classSelected = $event"
+  style="max-width: 220px"
+  placeholder="Tutte le classi"
+  [options]="[]"
+/>
 
 <div class="row">
-
   <div class="col-12 d-flex flex-column">
     <div class="card p-3 mb-4 flex-fill">
       <div class="card-body h-100">
         <h5 class="text-dark fw-semibold mb-3">Performance per argomento</h5>
         <div class="mb-3">
-          <select
-            class="form-select custom-input filter"
-            [(ngModel)]="selectedTopic"
-            (change)="onTopicChange()"
-          >
-            <option value="">Tutti gli argomenti</option>
-            @for (topic of availableTopics; track topic) {
-            <option [value]="topic">{{ topic }}</option>
-            }
-          </select>
+          <app-syllex-select-input
+            [value]="selectedTopic"
+            (valueChange)="selectedTopic = $event; onTopicChange()"
+            style="max-width: 260px"
+            placeholder="Tutti gli argomenti"
+            [options]="topicOptions"
+          />
         </div>
         <div style="position: relative; height: 400px; width: 100%">
           <canvas #topicChart></canvas>
@@ -52,8 +49,9 @@
           pageSize; track $index) {
           <tr>
             <td>
-              <span class="bg-dark  p-2 text-white rounded-circle"
-              style="font-size: x-small; aspect-ratio: 1/1;"
+              <span
+                class="bg-dark p-2 text-white rounded-circle"
+                style="font-size: x-small; aspect-ratio: 1/1"
                 ># {{ ((page-1) * pageSize) + $index + 1 }}</span
               >
             </td>

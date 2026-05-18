@@ -16,6 +16,10 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SyllexPagination } from '../syllex-pagination/syllex-pagination';
 import { SlicePipe } from '@angular/common';
+import {
+  SyllexSelectInput,
+  SelectOption,
+} from '../UI/syllex-select-input/syllex-select-input';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TestsService } from '../../../services/tests-service';
 import { FeedbackService } from '../../../services/feedback-service';
@@ -31,6 +35,7 @@ Chart.register(...registerables);
     SyllexPagination,
     ReactiveFormsModule,
     SlicePipe,
+    SyllexSelectInput,
   ],
   templateUrl: './test-stats.html',
   styleUrl: './test-stats.scss',
@@ -72,6 +77,10 @@ export class TestStats implements OnInit, AfterViewInit, OnChanges {
 
   get collectionSize(): number {
     return this.processedQuestions.length;
+  }
+
+  get topicOptions(): SelectOption[] {
+    return this.availableTopics.map((t) => ({ value: t, label: t }));
   }
 
   ngOnChanges(changes: SimpleChanges): void {
