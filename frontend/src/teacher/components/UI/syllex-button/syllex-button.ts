@@ -11,6 +11,7 @@ interface SyllexButtonProps {
   shape?: 'circle';
   leftIcon?: IconDefinition;
   rightIcon?: IconDefinition;
+  animation?: 'spin';
   disabled?: boolean;
   onClick?: () => void;
   link?: string;

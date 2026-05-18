@@ -138,6 +138,10 @@ export class CreateEditQuestion {
     { value: 'fr', label: 'Français' },
     { value: 'de', label: 'Deutsch' },
   ];
+  readonly PolicyOptions = [
+    { value: 'public', label: 'Esercitazione' },
+    { value: 'private', label: 'Uso Test' },
+  ];
   private readonly QuestionId = this.activatedRoute.snapshot.paramMap.get('id');
   private CurrentQuestionId = signal<string | null>(null);
 
@@ -265,6 +269,7 @@ export class CreateEditQuestion {
       'medium',
       Validators.required,
     ),
+    policy: new FormControl('public', Validators.required),
     numberOfQuestions: new FormControl(3, [
       Validators.required,
       Validators.min(1),
@@ -426,6 +431,7 @@ export class CreateEditQuestion {
     const subjectId = this.materiaService.materiaSelected()?._id;
     const topicId = this.aiForm.get('topicId')?.value;
     const difficulty = this.aiForm.get('difficulty')?.value;
+    const policy = this.aiForm.get('policy')?.value || 'public';
     let savedCount = 0;
 
     for (const item of selected) {
@@ -437,7 +443,7 @@ export class CreateEditQuestion {
           topicId,
           difficulty,
           subjectId,
-          policy: 'public',
+          policy,
           tags: [],
         };
         if (item.data.type === 'scelta multipla')

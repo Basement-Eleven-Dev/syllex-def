@@ -1,4 +1,6 @@
-<div class="modal-header border-0 pb-0">
+
+<div class="p-3">
+<div class="modal-header border-0">
   <h5 class="modal-title fw-bold">
     Argomenti di <span class="text-primary">{{ Subject()?.name }}</span>
   </h5>
@@ -27,7 +29,7 @@
     @for (topic of Topics(); track topic._id; let i = $index) {
     <div
       class="d-flex align-items-center gap-2 px-3 py-1 rounded-3"
-      [style.background]="i % 2 === 0 ? '#d2e2ff' : '#ffffff'"
+      [style.background]="i % 2 === 0 ? '#f2f7ff' : '#ffffff'"
     >
       @if (EditingTopicId() === topic._id) {
       <input
@@ -38,12 +40,12 @@
         autofocus
       />
       <app-syllex-button
-        [props]="{ label: '', variant: 'primary', size: 'small', leftIcon: CheckIcon, disabled: IsSaving() || !EditValue().trim() }"
+        [props]="{ label: '', variant: 'primary', size: 'small', leftIcon: CheckIcon, disabled: IsSaving() || !EditValue().trim(), shape: 'circle' }"
         (clicked)="confirmRename(topic._id)"
       />
       <div class="topic-actions d-flex gap-1">
         <app-syllex-button
-          [props]="{ label: '', variant: 'outline', size: 'small', leftIcon: XmarkIcon }"
+          [props]="{ label: '', variant: 'primary', color: 'danger', size: 'small', leftIcon: XmarkIcon, shape: 'circle' }"
           (clicked)="cancelEdit()"
         />
       </div>
@@ -51,13 +53,14 @@
       <span class="flex-fill text-dark fw-medium">{{ topic.name }}</span>
       <div class="topic-actions d-flex gap-1">
         <app-syllex-button
-          [props]="{ label: '', variant: 'outline', size: 'small', leftIcon: PencilIcon }"
+          [props]="{ label: '', variant: 'primary', color: 'celestine', size: 'small', leftIcon: PencilIcon, shape: 'circle' }"
           (clicked)="startEdit(topic)"
         />
         <app-syllex-button
-          [props]="{ label: '', variant: 'outline', size: 'small', color: 'danger', leftIcon: TrashIcon }"
+          [props]="{ label: '', variant: 'primary', color: 'danger', size: 'small', leftIcon: TrashIcon, shape: 'circle' }"
           (clicked)="deleteTopic(topic._id)"
         />
+   
       </div>
       }
     </div>
@@ -84,9 +87,4 @@
   </div>
 </div>
 
-<div class="modal-footer border-0 pt-0">
-  <app-syllex-button
-    [props]="{ label: 'Chiudi', variant: 'outline', size: 'small' }"
-    (clicked)="ActiveModal.close()"
-  />
 </div>

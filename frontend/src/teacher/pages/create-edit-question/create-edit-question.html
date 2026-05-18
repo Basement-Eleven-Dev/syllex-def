@@ -170,6 +170,13 @@
                       [options]="DifficultyOptions"
                     ></app-syllex-select-input>
                   </div>
+                  <div class="col-6">
+                    <label class="wizard-field-label">Tipo di utilizzo</label>
+                    <app-syllex-select-input
+                      formControlName="policy"
+                      [options]="PolicyOptions"
+                    ></app-syllex-select-input>
+                  </div>
                 </div>
 
                 <!-- Istruzioni -->
@@ -186,20 +193,6 @@
                     placeholder="Es. usa linguaggio semplice, includi esempi pratici, evita domande trabocchetto..."
                   ></textarea>
                 </div>
-
-                <!-- CTA -->
-                <div class="d-flex justify-content-end pt-3">
-                  <app-syllex-button
-                    [props]="{
-                      label: AiIsLoading() ? 'Generazione in corso...' : 'Genera le mie domande',
-                      variant: 'primary',
-                      size: 'large',
-                      leftIcon: AiIsLoading() ? SpinnerIcon : SparklesIcon,
-                      disabled: aiForm.invalid || AiIsLoading()
-                    }"
-                    (clicked)="onGenerateAI()"
-                  />
-                </div>
               </div>
             </div>
 
@@ -213,8 +206,22 @@
                   Carica dispense, PDF o slide: l'AI li studierà per creare domande
                   pertinenti.
                 </p>
-                <div class="flex-grow-1">
+                <div class="flex-grow-1 mb-3">
                   <app-materiali-selector></app-materiali-selector>
+                </div>
+                <!-- CTA -->
+                <div class="d-flex justify-content-end pt-3">
+                  <app-syllex-button
+                    [props]="{
+                      label: AiIsLoading() ? 'Generazione in corso...' : 'Genera le mie domande',
+                      variant: 'primary',
+                      size: 'large',
+                      leftIcon: AiIsLoading() ? SpinnerIcon : SparklesIcon,
+                      animation: AiIsLoading() ? 'spin' : undefined,
+                      disabled: aiForm.invalid || AiIsLoading()
+                    }"
+                    (clicked)="onGenerateAI()"
+                  />
                 </div>
               </div>
             </div>
