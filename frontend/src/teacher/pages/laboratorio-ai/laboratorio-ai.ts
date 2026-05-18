@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, ViewChild, computed, inject, signal } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -88,22 +88,26 @@ const STYLE_PREFILL_MAP: Record<SlideStyle, string> = {
   animations: [
     trigger('stepIn', [
       transition(':enter', [
-        style({ opacity: 0, transform: 'translateX(20px)' }),
+        style({ opacity: 0, transform: 'translateX(16px)' }),
         animate(
-          '250ms ease-out',
+          '220ms 80ms ease-out',
           style({ opacity: 1, transform: 'translateX(0)' }),
         ),
       ]),
       transition(':leave', [
+        style({ position: 'absolute', top: 0, left: 0, right: 0, opacity: 1 }),
         animate(
-          '180ms ease-in',
-          style({ opacity: 0, transform: 'translateX(-20px)' }),
+          '150ms ease-in',
+          style({ opacity: 0, transform: 'translateX(-12px)' }),
         ),
       ]),
     ]),
   ],
 })
 export class LaboratorioAi {
+  @ViewChild(MaterialiSelector)
+  private materialiSelectorRef?: MaterialiSelector;
+
   private readonly router = inject(Router);
   private readonly aiService = inject(AiService);
   private readonly feedbackService = inject(FeedbackService);
@@ -160,7 +164,7 @@ export class LaboratorioAi {
 
   // Computed
   readonly IsSlides = computed(() => this.SelectedMaterialType() === 'slides');
-  readonly MaxStep = computed(() => (this.IsSlides() ? 4 : 2));
+  readonly MaxStep = computed(() => (this.IsSlides() ? 4 : 3));
 
   readonly StepDefs = computed<StepDef[]>(() => {
     if (this.IsSlides()) {
@@ -173,7 +177,8 @@ export class LaboratorioAi {
     }
     return [
       { n: 1, label: 'Tipo' },
-      { n: 2, label: 'Genera' },
+      { n: 2, label: 'File' },
+      { n: 3, label: 'Genera' },
     ];
   });
 
@@ -187,8 +192,7 @@ export class LaboratorioAi {
     const step = this.CurrentStep();
     if (step >= this.MaxStep()) return false;
     if (step === 1) return !!this.SelectedMaterialType();
-    if (step === 2 && this.IsSlides())
-      return this.SelectedMaterialIds().length > 0;
+    if (step === 2) return this.SelectedMaterialIds().length > 0;
     return true;
   });
 
@@ -203,7 +207,7 @@ export class LaboratorioAi {
     ]),
     format: new FormControl<'pptx' | 'pdf'>('pdf'),
     language: new FormControl('italiano', Validators.required),
-    instructions: new FormControl(''),
+    instructions: new FormControl(STYLE_PREFILL_MAP['bilanciata']),
     slideStyle: new FormControl<SlideStyle>('bilanciata'),
     topicId: new FormControl<string>(''),
   });
@@ -212,8 +216,19 @@ export class LaboratorioAi {
 
   goNext(): void {
     if (!this.CanGoNext()) return;
-    if (this.CurrentStep() < this.MaxStep())
-      this.CurrentStep.update((s) => s + 1);
+    if (this.CurrentStep() < this.MaxStep()) {
+      const nextStep = this.CurrentStep() + 1;
+      this.CurrentStep.set(nextStep);
+      // When entering slide style step, ensure prefill matches current selection
+      if (this.IsSlides() && nextStep === 3) {
+        const style = this.genForm.controls['slideStyle'].value as SlideStyle;
+        if (style && !this.genForm.controls['instructions'].value) {
+          this.genForm.controls['instructions'].setValue(
+            STYLE_PREFILL_MAP[style],
+          );
+        }
+      }
+    }
   }
 
   goPrev(): void {
@@ -251,6 +266,10 @@ export class LaboratorioAi {
 
   onMaterialSelectionChange(materials: MaterialInterface[]): void {
     this.SelectedMaterialIds.set(materials.map((m) => m._id));
+  }
+
+  onDeselectAllMaterials(): void {
+    this.materialiSelectorRef?.deselectAll();
   }
 
   // ─── Style preset ─────────────────────────────────────

@@ -58,17 +58,6 @@
 
   <!-- Main area: prev arrow | panel | next arrow/spacer -->
   <div class="wizard-main">
-    <!-- Prev arrow -->
-    <button
-      class="wizard-nav-btn"
-      type="button"
-      (click)="goPrev()"
-      aria-label="Passo precedente"
-    >
-      <fa-icon [icon]="ChevronLeftIcon" />
-    </button>
-
-    <!-- Panel -->
     <div class="wizard-panel">
       <!-- ── STEP 1: Tipo materiale ── -->
       @if (CurrentStep() === 1) {
@@ -105,25 +94,54 @@
       </div>
       }
 
-      <!-- ── STEP 2 slides: File ── -->
-      @if (CurrentStep() === 2 && IsSlides()) {
+      <!-- ── STEP 2: File + Argomento (tutti i tipi) ── -->
+      @if (CurrentStep() === 2) {
       <div
         class="wizard-step-content"
         @stepIn
         tourAnchor="gen_ai_support_files"
       >
-        <h5 class="wizard-step-title">Da dove impara l'AI?</h5>
-        <p class="wizard-step-subtitle">
-          Seleziona i materiali di riferimento e, se vuoi, restringi a un
-          argomento specifico.
-        </p>
+        <div
+          class="d-flex align-items-center justify-content-between gap-2 mb-3"
+        >
+          <h5 class="wizard-step-title mb-0">
+            Seleziona i materiali di riferimento
+          </h5>
+          @if (SelectedMaterialIds().length > 0) {
+          <div class="d-flex align-items-center gap-2 flex-shrink-0">
+            <span
+              class="badge rounded-pill bg-primary"
+              style="font-size: 0.72rem"
+            >
+              {{ SelectedMaterialIds().length }} selezionati
+            </span>
+            <button
+              type="button"
+              class="btn btn-link btn-sm p-0 text-muted text-nowrap"
+              style="font-size: 0.78rem"
+              (click)="onDeselectAllMaterials()"
+            >
+              Deseleziona tutti
+            </button>
+          </div>
+          }
+        </div>
+        <app-materiali-selector
+          [compact]="true"
+          [initialMaterialIds]="SelectedMaterialIds()"
+          (selectionChange)="onMaterialSelectionChange($event)"
+        ></app-materiali-selector>
         @if (materiaService.materiaSelected()?.topics?.length) {
-        <div [formGroup]="genForm" class="mb-3">
+        <div [formGroup]="genForm" class="mt-3">
           <label class="wizard-field-label"
             >Argomento
             <span class="text-muted fw-normal">(opzionale)</span></label
           >
-          <select class="form-select custom-input" formControlName="topicId">
+          <select
+            class="form-select bg-light border-0 shadow-none py-2 px-3 rounded-pill"
+            style="font-size: 0.875rem"
+            formControlName="topicId"
+          >
             <option value="">Tutti gli argomenti</option>
             @for (topic of materiaService.materiaSelected()!.topics; track
             topic._id) {
@@ -131,78 +149,11 @@
             }
           </select>
         </div>
-        }
-        <app-materiali-selector
-          [initialMaterialIds]="SelectedMaterialIds()"
-          (selectionChange)="onMaterialSelectionChange($event)"
-        ></app-materiali-selector>
-        @if (SelectedMaterialIds().length === 0) {
+        } @if (SelectedMaterialIds().length === 0) {
         <p class="text-muted small mt-2">
           Seleziona almeno un file per continuare.
         </p>
         }
-      </div>
-      }
-
-      <!-- ── STEP 2 altri tipi: Configura e Genera ── -->
-      @if (CurrentStep() === 2 && !IsSlides()) {
-      <div
-        class="wizard-step-content"
-        @stepIn
-        tourAnchor="laboratorio_ai_content"
-      >
-        <h5 class="wizard-step-title">
-          <fa-icon [icon]="SparklesIcon" class="me-2 text-primary"></fa-icon>
-          Crea il tuo {{ SelectedMaterialTypeName() }}
-        </h5>
-        <p class="wizard-step-subtitle">
-          Seleziona i file di riferimento e personalizza l'output.
-        </p>
-        <div [formGroup]="genForm" class="d-flex flex-column gap-3">
-          <div>
-            <label class="wizard-field-label">File di riferimento</label>
-            <app-materiali-selector
-              [initialMaterialIds]="SelectedMaterialIds()"
-              (selectionChange)="onMaterialSelectionChange($event)"
-            ></app-materiali-selector>
-          </div>
-          <div>
-            <label class="wizard-field-label">In che lingua?</label>
-            <app-syllex-select-input
-              formControlName="language"
-              [options]="LanguageOptions"
-            ></app-syllex-select-input>
-          </div>
-          <div>
-            <label class="wizard-field-label">
-              Istruzioni particolari
-              <span class="text-muted fw-normal">(opzionale)</span>
-            </label>
-            <textarea
-              class="form-control custom-input"
-              formControlName="instructions"
-              rows="3"
-              style="resize: none"
-              placeholder="Es. usa un tono formale, includi esempi pratici..."
-            ></textarea>
-          </div>
-          <div class="d-flex justify-content-end">
-            <button
-              tourAnchor="gen_ai_submit"
-              type="button"
-              class="btn btn-primary ai btn-lg icon-btn rounded-pill fw-bold"
-              [disabled]="genForm.invalid || IsGenerating() || SelectedMaterialIds().length === 0"
-              (click)="onGenerate()"
-            >
-              <fa-icon
-                [icon]="IsGenerating() ? SpinnerIcon : SparklesIcon"
-                [animation]="IsGenerating() ? 'spin' : undefined"
-              ></fa-icon>
-              {{ IsGenerating() ? 'Generazione in corso...' : 'Genera ' +
-              SelectedMaterialTypeName() }}
-            </button>
-          </div>
-        </div>
       </div>
       }
 
@@ -250,6 +201,44 @@
               rows="3"
               style="resize: none"
               placeholder="Es. includi esempi pratici, usa un tono formale, evidenzia le definizioni..."
+            ></textarea>
+          </div>
+        </div>
+      </div>
+      }
+
+      <!-- ── STEP 3 altri tipi: Personalizza ── -->
+      @if (CurrentStep() === 3 && !IsSlides()) {
+      <div
+        class="wizard-step-content"
+        @stepIn
+        tourAnchor="laboratorio_ai_content"
+      >
+        <h5 class="wizard-step-title">
+          Personalizza il {{ SelectedMaterialTypeName() }}
+        </h5>
+        <p class="wizard-step-subtitle">
+          Indica la lingua e aggiungi istruzioni specifiche per l'AI.
+        </p>
+        <div [formGroup]="genForm" class="d-flex flex-column gap-3">
+          <div>
+            <label class="wizard-field-label">In che lingua?</label>
+            <app-syllex-select-input
+              formControlName="language"
+              [options]="LanguageOptions"
+            ></app-syllex-select-input>
+          </div>
+          <div>
+            <label class="wizard-field-label">
+              Istruzioni particolari
+              <span class="text-muted fw-normal">(opzionale)</span>
+            </label>
+            <textarea
+              class="form-control custom-input"
+              formControlName="instructions"
+              rows="4"
+              style="resize: none"
+              placeholder="Es. usa un tono formale, includi esempi pratici, evidenzia le definizioni..."
             ></textarea>
           </div>
         </div>
@@ -332,40 +321,83 @@
               </label>
             </div>
           </div>
-          <div class="d-flex justify-content-end pt-1">
-            <button
-              tourAnchor="gen_ai_submit"
-              type="button"
-              class="btn btn-primary ai btn-lg icon-btn rounded-pill fw-bold"
-              [disabled]="genForm.invalid || IsGenerating()"
-              (click)="onGenerate()"
-            >
-              <fa-icon
-                [icon]="IsGenerating() ? SpinnerIcon : SparklesIcon"
-                [animation]="IsGenerating() ? 'spin' : undefined"
-              ></fa-icon>
-              {{ IsGenerating() ? 'Generazione in corso...' : 'Genera Slides' }}
-            </button>
-          </div>
         </div>
       </div>
       }
     </div>
 
-    <!-- Next arrow / spacer -->
-    @if (ShowNextArrow()) {
-    <button
-      class="wizard-nav-btn"
-      type="button"
-      (click)="goNext()"
-      [disabled]="!CanGoNext()"
-      aria-label="Passo successivo"
-    >
-      <fa-icon [icon]="ChevronRightIcon" />
-    </button>
-    } @else {
-    <div class="wizard-nav-spacer"></div>
-    }
+    <!-- Footer navigation -->
+    <div class="wizard-footer">
+      <!-- Left: Indietro -->
+      <div>
+        <button
+          type="button"
+          class="btn btn-outline-secondary rounded-pill px-4"
+          (click)="goPrev()"
+          [disabled]="IsGenerating()"
+        >
+          <fa-icon [icon]="ChevronLeftIcon" class="me-1"></fa-icon>
+          Indietro
+        </button>
+      </div>
+
+      <!-- Center: step dots with labels -->
+      <div class="wizard-footer-center">
+        <div class="wizard-footer-divider"></div>
+        <div class="wizard-indicator wizard-indicator--footer">
+          @for (s of StepDefs(); track s.n) {
+          <div class="wizard-dot-wrap">
+            <div
+              class="wizard-dot"
+              [class.wizard-dot--active]="s.n === CurrentStep()"
+              [class.wizard-dot--completed]="s.n < CurrentStep()"
+            >
+              @if (s.n < CurrentStep()) {
+              <fa-icon [icon]="CheckIcon" />
+              } @else { {{ s.n }} }
+            </div>
+            <span class="wizard-dot-label">{{ s.label }}</span>
+          </div>
+          @if (!$last) {
+          <div
+            class="wizard-connector"
+            [class.wizard-connector--done]="s.n < CurrentStep()"
+          ></div>
+          } }
+        </div>
+        <div class="wizard-footer-divider"></div>
+      </div>
+
+      <!-- Right: Avanti / Genera -->
+      <div class="wizard-footer__right">
+        @if (ShowNextArrow()) {
+        <button
+          type="button"
+          class="btn btn-primary rounded-pill px-4 fw-semibold"
+          (click)="goNext()"
+          [disabled]="!CanGoNext()"
+        >
+          Avanti
+          <fa-icon [icon]="ChevronRightIcon" class="ms-1"></fa-icon>
+        </button>
+        } @else {
+        <button
+          tourAnchor="gen_ai_submit"
+          type="button"
+          class="btn btn-primary ai icon-btn rounded-pill px-4 fw-bold"
+          [disabled]="genForm.invalid || IsGenerating()"
+          (click)="onGenerate()"
+        >
+          <fa-icon
+            [icon]="IsGenerating() ? SpinnerIcon : SparklesIcon"
+            [animation]="IsGenerating() ? 'spin' : undefined"
+          ></fa-icon>
+          {{ IsGenerating() ? 'Generazione in corso...' : 'Genera ' +
+          SelectedMaterialTypeName() }}
+        </button>
+        }
+      </div>
+    </div>
   </div>
 </div>
 }

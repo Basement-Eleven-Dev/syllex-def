@@ -1,5 +1,13 @@
 // ─── Pre-step Card Selection ──────────────────────────
 
+// Make this component fill its flex parent (teacher layout scroll area)
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
 .pre-step {
   margin-bottom: 2rem;
 
@@ -52,6 +60,10 @@
 
 .wizard-container {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 // ─── Step Indicator ───────────────────────────────────
@@ -61,7 +73,46 @@
   align-items: center;
   justify-content: center;
   gap: 0;
-  margin-bottom: 1.75rem;
+}
+
+// Variant inside footer — occupies 50% of the center wrapper
+.wizard-indicator--footer {
+  width: 50%;
+  flex-shrink: 0;
+
+  .wizard-dot {
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0.65rem;
+  }
+
+  .wizard-dot-label {
+    font-size: 0.58rem;
+    letter-spacing: 0.02em;
+  }
+
+  .wizard-connector {
+    flex: 1;
+    margin-bottom: 1rem;
+  }
+}
+
+// Center wrapper: full 1fr column, hairline dividers flank the dots
+.wizard-footer-center {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  // keep dots vertically aligned with the dot circles, not the labels
+  padding-bottom: 1rem; // matches connector margin-bottom so dividers align to circle mid
+}
+
+.wizard-footer-divider {
+  flex: 1;
+  height: 1px;
+  background: var(--bs-border-color);
+  align-self: flex-start;
+  margin-top: 0.75rem; // align with dot circle center
 }
 
 .wizard-dot-wrap {
@@ -127,17 +178,29 @@
 
 .wizard-main {
   display: flex;
-  align-items: flex-start;
-  gap: 1rem;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 .wizard-panel {
   flex: 1;
-  min-height: 380px;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative; // anchor for absolute-positioned leaving step
 }
 
 .wizard-step-content {
-  padding: 2rem;
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem 2rem;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .wizard-step-title {
@@ -163,37 +226,20 @@
   margin-bottom: 0.5rem;
 }
 
-// ─── Nav Buttons ──────────────────────────────────────
+// ─── Wizard Footer ────────────────────────────────────
 
-.wizard-nav-btn {
-  display: flex;
+.wizard-footer {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
-  border: none;
-  background: var(--bs-light);
-  color: var(--bs-secondary-color);
+  gap: 1rem;
+  padding: 0.45rem 1.5rem;
   flex-shrink: 0;
-  margin-top: 1.5rem;
-  transition: all 0.2s ease;
-  cursor: pointer;
 
-  &:hover:not(:disabled) {
-    background: rgba(var(--bs-primary-rgb), 0.08);
-    color: var(--bs-primary);
+  .wizard-footer__right {
+    display: flex;
+    justify-content: flex-end;
   }
-
-  &:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-  }
-}
-
-.wizard-nav-spacer {
-  width: 2.5rem;
-  flex-shrink: 0;
 }
 
 // ─── Method Cards ─────────────────────────────────────
