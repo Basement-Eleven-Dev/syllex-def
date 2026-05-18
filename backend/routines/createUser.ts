@@ -263,6 +263,8 @@ const start = async () => {
   await clientMongo.close();
 };
 
-start()
-  .catch(console.error)
-  .then(() => process.exit(0));
+if (require.main === module) {
+  start()
+    .catch(console.error)
+    .then(() => process.exit(0));
+}

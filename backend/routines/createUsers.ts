@@ -81,8 +81,10 @@ const start = async () => {
         })
         userIds.push(creation._id)
     }
-    //@ts-ignore
-    await db.collection("classes").updateOne({ _id: new ObjectId(classId as string) }, { $push: { students: { $each: userIds } } })
+    await db.collection("classes").updateOne(
+        { _id: new mongo.ObjectId(classId as string) },
+        { $push: { students: { $each: userIds } } } as any,
+    )
 
     await clientMongo.close();
 };
