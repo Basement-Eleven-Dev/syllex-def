@@ -76,7 +76,7 @@
               />
             </div>
             <div class="col-12 col-md-6">
-              <label class="text-muted small mb-1 d-block"
+              <label class="form-label text-dark fw-semibold small mb-2"
                 >Data Fine
                 <span class="text-muted fw-normal">(opzionale)</span></label
               >
@@ -129,25 +129,26 @@
       </div>
       } @if (CurrentStep() === 3) {
       <div class="syllexCard wizard-step-shell">
-        <div class="row g-3 g-md-4">
+        <div class="row g-3 g-md-4 step3-grid">
           <div class="col-12 col-md-4">
             <div class="d-flex justify-content-between align-items-center mb-2">
               <label class="form-label text-dark fw-semibold small mb-0"
                 >Punteggio Idoneità *</label
               >
-              <span class="badge bg-white text-dark border fw-medium"
-                >{{ TestForm.get('requiredScore')?.value || 0 }} / {{ maxScore
-                }} pt</span
-              >
             </div>
             <input
               type="number"
               formControlName="requiredScore"
-              class="form-control form-control-flat"
-              style="height: 42px"
+              class="form-control form-control-flat step3-control"
               placeholder="Min. punti"
               [attr.max]="maxScore"
             />
+            <div class="d-flex justify-content-end">
+              <small class="text-muted fw-medium"
+                >{{ TestForm.get('requiredScore')?.value || 0 }} / {{ maxScore
+                }} pt</small
+              >
+            </div>
           </div>
 
           <div class="col-12 col-md-4">
@@ -155,39 +156,32 @@
               >Password
               <span class="text-muted fw-normal">(opzionale)</span></label
             >
-            <div class="input-group" style="height: 42px">
+            <div class="syllex-input-group">
               <input
                 type="text"
                 formControlName="password"
-                class="form-control form-control-flat py-0"
+                class="form-control"
                 placeholder="Chiave d'accesso"
               />
-              <button
-                class="btn btn-light border-0 px-3 py-0"
-                type="button"
-                (click)="onGeneratePassword()"
-              >
+              <button class="btn" type="button" (click)="onGeneratePassword()">
                 <fa-icon [icon]="GenPasswordIcon"></fa-icon>
               </button>
             </div>
           </div>
 
           <div class="col-12 col-md-4">
-            <label class="text-muted small mb-2 d-block"
+            <label class="form-label text-dark fw-semibold small mb-2"
               >Tempo Limite (minuti)</label
             >
-            <div
-              class="input-group rounded-3 overflow-hidden"
-              style="height: 42px"
-            >
+            <div class="syllex-input-group">
               <input
                 type="number"
                 formControlName="time"
-                class="form-control form-control-flat py-2"
+                class="form-control"
                 [placeholder]="time === null ? 'Tempo illimitato' : 'Minuti'"
               />
               <button
-                class="btn btn-white border-0 px-3"
+                class="btn"
                 type="button"
                 [class.text-primary]="time === null"
                 (click)="onToggleUnlimitedTime()"
@@ -295,13 +289,21 @@
 
     <!-- COLONNA PREVIEW/AZIONI -->
     <div class="col-12 col-lg-4 ps-lg-4 mt-4 mt-lg-0 syllexCard">
-      <div class="preview-sticky">
+      <div
+        class="preview-sticky h-100 d-flex flex-column justify-content-between"
+      >
         <div class="py-1 py-md-2">
-          <div class="preview-head mb-3">
-            <h6 class="fw-bold mb-1">Anteprima rapida</h6>
-            <p class="text-muted small mb-0">
-              Stato corrente del test, senza uscire dalla pagina.
-            </p>
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+              <h6 class="fw-bold mb-1">Anteprima rapida</h6>
+              <p class="text-muted small mb-0">
+                Stato corrente del test, senza uscire dalla pagina.
+              </p>
+            </div>
+
+            @if (CanPublish()) {
+            <app-syllex-badge label="Pronto" color="green"></app-syllex-badge>
+            } @else { }
           </div>
 
           <div class="preview-meta d-flex flex-column gap-2 small">
@@ -338,12 +340,6 @@
                 }}</span
               >
             </div>
-          </div>
-
-          <div class="mt-3">
-            @if (CanPublish()) {
-            <app-syllex-badge label="Pronto" color="green"></app-syllex-badge>
-            } @else { }
           </div>
         </div>
 
