@@ -55,8 +55,13 @@
       }
     </label>
     <div class="d-flex flex-row align-items-start gap-3">
-      <p class="mb-0 fs-5 flex-fill">{{ data?.answer?.answer || 'Nessuna risposta' }}</p>
-      <div class="d-flex flex-column align-items-center flex-shrink-0" style="min-width: 90px">
+      <p class="mb-0 fs-5 flex-fill">
+        {{ data?.answer?.answer || 'Nessuna risposta' }}
+      </p>
+      <div
+        class="d-flex flex-column align-items-center flex-shrink-0"
+        style="min-width: 90px"
+      >
         <label class="form-label text-dark fw-bold small mb-1">
           Punteggio (max {{ data.answer.maxScore }})
         </label>
