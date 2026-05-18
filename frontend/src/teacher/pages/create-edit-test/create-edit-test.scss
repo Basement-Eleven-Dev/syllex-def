@@ -72,6 +72,85 @@
   .flat-settings {
   }
 
+  .wizard-step-shell {
+    max-height: calc(100vh - 320px);
+    overflow-y: auto;
+  }
+
+  .wizard-step-shell--questions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: calc(100vh - 340px);
+  }
+
+  .step3-grid {
+    .step3-control {
+      height: 42px;
+      border-radius: 0.75rem !important;
+    }
+
+    .syllex-input-group {
+      display: flex;
+      align-items: center;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.75rem;
+      background-color: #fff;
+      height: 42px;
+      overflow: hidden;
+      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+      &:focus-within {
+        border-color: var(--bs-primary) !important;
+      }
+
+      .form-control {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        height: 100%;
+        padding: 0.5rem 0.75rem;
+      }
+
+      .btn {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        height: 100%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 1rem;
+        color: #6b7280;
+        transition: background-color 0.15s ease, color 0.15s ease;
+
+        &:hover {
+          background-color: #f1f5f9 !important;
+          color: var(--bs-primary) !important;
+        }
+      }
+    }
+  }
+
+  .wizard-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .wizard-footer app-syllex-stepper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+
+  .wizard-footer__right {
+    min-width: 96px;
+    display: flex;
+    justify-content: flex-end;
+  }
+
   .advanced-toggle {
     text-decoration: none;
   }
@@ -89,11 +168,6 @@
       border-color: var(--bs-primary) !important;
       box-shadow: none !important;
     }
-  }
-
-  .switch-stack {
-    border: 1px solid #e2e8f0;
-    background: #fff;
   }
 
   .preview-col {
@@ -170,6 +244,25 @@
   }
 
   @media (max-width: 991.98px) {
+    .wizard-step-shell {
+      max-height: none;
+      overflow-y: visible;
+    }
+
+    .wizard-footer {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .wizard-footer app-syllex-stepper {
+      order: -1;
+      margin-bottom: 0.25rem;
+    }
+
+    .wizard-footer__right {
+      min-width: 0;
+    }
+
     .preview-col {
       border-left: 0;
       border-top: 1px solid #e2e8f0;

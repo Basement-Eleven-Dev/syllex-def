@@ -2,22 +2,28 @@ import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faTimes, faFileLines, faCircleCheck, faCircle } from '@fortawesome/pro-solid-svg-icons';
+import {
+  faTimes,
+  faFileLines,
+  faCircleCheck,
+  faCircle,
+} from '@fortawesome/pro-solid-svg-icons';
 import { QuestionInterface } from '../../../services/questions';
+import { SyllexButton } from '../UI/syllex-button/syllex-button';
 
 @Component({
   selector: 'app-test-preview-modal',
   standalone: true,
-  imports: [CommonModule, FontAwesomeModule],
+  imports: [CommonModule, FontAwesomeModule, SyllexButton],
   templateUrl: './test-preview-modal.html',
-  styleUrl: './test-preview-modal.scss'
+  styleUrl: './test-preview-modal.scss',
 })
 export class TestPreviewModal {
   activeModal = inject(NgbActiveModal);
-  
+
   @Input() testTitle: string = '';
   @Input() questions: QuestionInterface[] = [];
-  
+
   CloseIcon = faTimes;
   FileIcon = faFileLines;
   CheckIcon = faCircleCheck;
@@ -25,10 +31,14 @@ export class TestPreviewModal {
 
   getQuestionTypeLabel(type: string): string {
     switch (type) {
-      case 'scelta multipla': return 'Scelta Multipla';
-      case 'vero falso': return 'Vero/Falso';
-      case 'risposta aperta': return 'Risposta Aperta';
-      default: return type;
+      case 'scelta multipla':
+        return 'Scelta Multipla';
+      case 'vero falso':
+        return 'Vero/Falso';
+      case 'risposta aperta':
+        return 'Risposta Aperta';
+      default:
+        return type;
     }
   }
 }
