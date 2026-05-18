@@ -1,4 +1,4 @@
-<div class="p-4 rounded-4 d-flex flex-column gap-3" style="background: #d2e2ff">
+<div class="p-4 rounded-4 d-flex flex-column gap-2" style="background: #d2e2ff">
   <label class="form-label text-dark fw-bold fs-4">
     Domanda {{ index }}
     <span class="badge" [class]="data.answer.result">
@@ -35,10 +35,7 @@
   </div>
   }
 
-  <section
-    class="p-3 rounded-3 border-start border-4"
-    [ngClass]="{'border-success bg-success-subtle': data.answer.isCorrect, 'border-danger bg-danger-subtle': !data.answer.isCorrect && data.answer.result !== 'dubious', 'border-warning bg-warning-subtle': data.answer.result === 'dubious'}"
-  >
+  <section class="px-0 pb-0">
     <label
       class="form-label text-dark fw-bold d-flex align-items-center gap-2 mb-2"
     >
@@ -57,38 +54,34 @@
       </span>
       }
     </label>
-    <p class="mb-0 fs-5">{{ data?.answer?.answer || 'Nessuna risposta' }}</p>
+    <div class="d-flex flex-row align-items-start gap-3">
+      <p class="mb-0 fs-5 flex-fill">{{ data?.answer?.answer || 'Nessuna risposta' }}</p>
+      <div class="d-flex flex-column align-items-center flex-shrink-0" style="min-width: 90px">
+        <label class="form-label text-dark fw-bold small mb-1">
+          Punteggio (max {{ data.answer.maxScore }})
+        </label>
+        <input
+          type="number"
+          class="form-control border-0 bg-white rounded-3 shadow-none fs-4 text-center"
+          [(ngModel)]="data.answer.score"
+          [max]="data.answer.maxScore"
+          min="0"
+          step="0.5"
+          [disabled]="isReviewed === true"
+          (ngModelChange)="isOpenTypeQuestion ? onScoreChange($event) : null"
+        />
+      </div>
+    </div>
   </section>
 
-  <div class="row mt-3 g-3">
-    <div class="col-12 col-md-8">
-      <label class="form-label text-dark fw-bold"
-        >Feedback per lo studente</label
-      >
-      <textarea
-        class="form-control border-0 bg-white rounded-3 shadow-none"
-        rows="4"
-        [(ngModel)]="data.answer.feedback"
-        placeholder="Inserisci un commento..."
-        [disabled]="isReviewed === true"
-      ></textarea>
-    </div>
-
-    <div class="col-12 col-md-4">
-      <label class="form-label text-dark fw-bold">
-        Punteggio (max {{ data.answer.maxScore }})
-      </label>
-
-      <input
-        type="number"
-        class="form-control border-0 bg-white rounded-3 shadow-none fs-4 text-center"
-        [(ngModel)]="data.answer.score"
-        [max]="data.answer.maxScore"
-        min="0"
-        step="0.5"
-        [disabled]="isReviewed === true"
-        (ngModelChange)="isOpenTypeQuestion ? onScoreChange($event) : null"
-      />
-    </div>
+  <div>
+    <label class="form-label text-dark fw-bold">Feedback per lo studente</label>
+    <textarea
+      class="form-control border-0 bg-white rounded-3 shadow-none"
+      rows="4"
+      [(ngModel)]="data.answer.feedback"
+      placeholder="Inserisci un commento..."
+      [disabled]="isReviewed === true"
+    ></textarea>
   </div>
 </div>
