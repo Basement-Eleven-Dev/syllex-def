@@ -1,5 +1,4 @@
 import { connectDatabase } from "../getDatabase";
-import { Assistant } from "../../models/schemas/assistant.schema";
 import { Subject } from "../../models/schemas/subject.schema";
 import { Types } from "mongoose";
 
@@ -9,18 +8,16 @@ export async function buildAgent(
   hasMaterials: boolean = false,
 ) {
   await connectDatabase();
-  const assistant = await Assistant.findOne({ subjectId: subjectId });
-  if (!assistant) {
-    throw new Error("Assistant not found");
-  }
-  const { tone, name } = assistant;
+  // Flusso senza collection assistants: identita fissa
+  const name = "Alex";
+  const tone = "friendly";
   const subject = await Subject.findById(subjectId);
 
   const isTeacher = userRole === "teacher" || userRole === "admin";
 
   return isTeacher
-    ? buildTeacherPrompt(name, subject!.name, tone ?? "friendly", hasMaterials)
-    : buildStudentPrompt(name, subject!.name, tone ?? "friendly", hasMaterials);
+    ? buildTeacherPrompt(name, subject!.name, tone, hasMaterials)
+    : buildStudentPrompt(name, subject!.name, tone, hasMaterials);
 }
 
 function buildTeacherPrompt(

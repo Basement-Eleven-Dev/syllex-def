@@ -9,7 +9,6 @@ import {
   OnDestroy,
   effect,
   untracked,
-  output,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -25,7 +24,6 @@ import {
   faQuestionCircle,
   faMicrophone,
   faStop,
-  faGear,
   faPlus,
   faMicrophoneSlash,
   faChevronLeft,
@@ -69,7 +67,6 @@ export class AgentChat implements OnInit, OnDestroy {
   faQuestionCircle = faQuestionCircle;
   faMicrophone = faMicrophone;
   faStop = faStop;
-  faGear = faGear;
   faPaperPlane = faPaperPlane;
   faMicrophoneSlash = faMicrophoneSlash;
   faChevronLeft = faChevronLeft;
@@ -89,7 +86,6 @@ export class AgentChat implements OnInit, OnDestroy {
   // --- Inputs ---
   assistantId = input.required<string>();
   userRole = input<'teacher' | 'student' | 'admin' | null>(null);
-  requestConfig = output<void>(); // Per tornare allo step 1
 
   // --- State ---
   messages = signal<ChatMessage[]>([]);
@@ -487,20 +483,14 @@ export class AgentChat implements OnInit, OnDestroy {
       this.geminiLiveService.userTranscript.set('');
       this.geminiLiveService.aiTranscript.set('');
 
-      // AWAIT assistant config BEFORE connecting (fix: senza questo, tutorConfig
-      // era null al momento del setup WebSocket → il modello vocale partiva
-      // senza storico conversazione)
-      const res = await firstValueFrom(this.agentService.getAssistant());
-
       // TUTTI i messaggi come contesto (non solo ultimi 10)
       const recentHistory = this.messages().map((m) => ({
         role: m.role as 'user' | 'agent',
         content: m.content,
       }));
 
-      const { name, tone } = this.getEffectiveAgentConfig(
-        res.exists ? res.assistant : null,
-      );
+      const name = 'Alex';
+      const tone = 'friendly';
 
       this.geminiLiveService.setTutorConfig({
         name,
@@ -677,25 +667,8 @@ export class AgentChat implements OnInit, OnDestroy {
   // CHAT HISTORY
   // ==================
 
-  /** Ritorna nome/tono con override studente da localStorage se applicabile */
-  private getEffectiveAgentConfig(assistant: any): {
-    name: string;
-    tone: string;
-  } {
-    return {
-      name: assistant?.name ?? 'Tutor',
-      tone: assistant?.tone ?? 'friendly',
-    };
-  }
-
   async initializeChatHistory(conversationId: string) {
-    // Carichiamo prima i dettagli dell'assistente per il nome
-    this.agentService.getAssistant().subscribe((res) => {
-      if (res.exists && res.assistant) {
-        const { name } = this.getEffectiveAgentConfig(res.assistant);
-        this.assistantName.set(name);
-      }
-    });
+    this.assistantName.set('Alex');
 
     this.agentService.getConversationHistory(conversationId).subscribe({
       next: (response) => {
@@ -830,6 +803,36 @@ export class AgentChat implements OnInit, OnDestroy {
     setTimeout(() => {
       const el = this.scrollContent?.nativeElement;
       if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+    });
+  }
+
+  formatConversationDate(timestamp: string | Date | null | undefined): string {
+    if (!timestamp) return '';
+
+    const date = new Date(timestamp);
+    if (Number.isNaN(date.getTime())) return '';
+
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const targetDay = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+    );
+
+    const dayMs = 24 * 60 * 60 * 1000;
+    const diffDays = Math.round(
+      (today.getTime() - targetDay.getTime()) / dayMs,
+    );
+
+    if (diffDays === 0) return 'Oggi';
+    if (diffDays === 1) return 'Ieri';
+
+    const sameYear = now.getFullYear() === date.getFullYear();
+    return date.toLocaleDateString('it-IT', {
+      day: '2-digit',
+      month: 'short',
+      ...(sameYear ? {} : { year: 'numeric' }),
     });
   }
 }
