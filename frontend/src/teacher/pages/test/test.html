@@ -46,39 +46,42 @@
 <!-- ===== SEZIONE: TUTTI / BOZZE ===== -->
 @if (ActiveTab() === 'tutti' || ActiveTab() === 'bozze') {
 <section class="mb-3">
-  @if(ViewType === 'table') { @if(RecentTests().length > 0) {
-  <app-test-table
-    [tests]="RecentTests()"
-    (delete)="onDeleteTest($event)"
-    (duplicate)="onDuplicateTest($event)"
-    (publish)="onPublishTest($event)"
-  />
+  @if (RecentTests().length === 0) {
+    <div class="mt-5 mb-5">
+      <app-syllex-empty-state
+        title="Nessun test trovato"
+        description="Inizia a creare verifiche e test per i tuoi studenti. Puoi comporre test attingendo dalla banca domande o generarne di nuovi a partire dai tuoi materiali."
+        [icon]="ClipboardListIcon"
+        actionLabel="Crea il tuo primo Test"
+        actionLink="/t/tests/new"
+        [actionIcon]="PlusIcon"
+      ></app-syllex-empty-state>
+    </div>
   } @else {
-  <div class="alert alert-info text-center">
-    Nessun test trovato. Crea il tuo primo test!
-  </div>
-  } } @else {
-  <div class="row g-3">
-    @for(test of RecentTests(); track test._id; let first = $first) {
-    <div
-      class="col-12 col-md-6 col-lg-4 col-xl-3"
-      [tourAnchor]="first ? 'test_first_card' : ''"
-    >
-      <app-test-card
-        [test]="test"
+    @if(ViewType === 'table') {
+      <app-test-table
+        [tests]="RecentTests()"
         (delete)="onDeleteTest($event)"
         (duplicate)="onDuplicateTest($event)"
         (publish)="onPublishTest($event)"
       />
-    </div>
-    } @empty {
-    <div class="col-12">
-      <div class="alert alert-info text-center">
-        Nessun test trovato. Crea il tuo primo test!
+    } @else {
+      <div class="row g-3">
+        @for(test of RecentTests(); track test._id; let first = $first) {
+        <div
+          class="col-12 col-md-6 col-lg-4 col-xl-3"
+          [tourAnchor]="first ? 'test_first_card' : ''"
+        >
+          <app-test-card
+            [test]="test"
+            (delete)="onDeleteTest($event)"
+            (duplicate)="onDuplicateTest($event)"
+            (publish)="onPublishTest($event)"
+          />
+        </div>
+        }
       </div>
-    </div>
     }
-  </div>
   } @if(CollectionSizeRecent() > PageSizeRecent()) {
   <div
     tourAnchor="test_pagination"
@@ -98,36 +101,39 @@
 <!-- ===== SEZIONE: DA CORREGGERE ===== -->
 @if (ActiveTab() === 'da-correggere') {
 <section class="mb-5">
-  @if(ViewType === 'table') { @if(PendingTests().length > 0) {
-  <app-test-table
-    [tests]="PendingTests()"
-    (delete)="onDeleteTest($event)"
-    (duplicate)="onDuplicateTest($event)"
-    (publish)="onPublishTest($event)"
-  />
+  @if (PendingTests().length === 0) {
+    <div class="mt-5 mb-5">
+      <app-syllex-empty-state
+        title="Tutti i test sono corretti!"
+        description="Ottimo lavoro! Al momento non ci sono verifiche o consegne inviate dai tuoi studenti in attesa di essere valutate."
+        [icon]="CircleCheckIcon"
+        actionLabel="Torna alla Dashboard"
+        actionLink="/t/dashboard"
+        actionColor="celestine"
+      ></app-syllex-empty-state>
+    </div>
   } @else {
-  <div class="alert alert-success text-center">
-    Nessun test da correggere. Ottimo lavoro!
-  </div>
-  } } @else {
-  <div class="row g-3">
-    @for(test of PendingTests(); track test._id) {
-    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-      <app-test-card
-        [test]="test"
+    @if(ViewType === 'table') {
+      <app-test-table
+        [tests]="PendingTests()"
         (delete)="onDeleteTest($event)"
         (duplicate)="onDuplicateTest($event)"
         (publish)="onPublishTest($event)"
       />
-    </div>
-    } @empty {
-    <div class="col-12">
-      <div class="alert alert-success text-center">
-        Nessun test da correggere. Ottimo lavoro!
+    } @else {
+      <div class="row g-3">
+        @for(test of PendingTests(); track test._id) {
+        <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+          <app-test-card
+            [test]="test"
+            (delete)="onDeleteTest($event)"
+            (duplicate)="onDuplicateTest($event)"
+            (publish)="onPublishTest($event)"
+          />
+        </div>
+        }
       </div>
-    </div>
     }
-  </div>
   } @if(CollectionSizePending() > PageSizePending()) {
   <div class="mt-4 d-flex justify-content-end gap-2 align-items-center">
     <app-syllex-pagination

@@ -1,1 +1,5 @@
 ops
+
+# MCP Configuration files (contains sensitive database connection strings, credentials, and API keys)
+.vscode/mcp.json
+.mcp.json

@@ -62,6 +62,7 @@ import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
 import { SyllexSearchInput } from '../../components/UI/syllex-search-input/syllex-search-input';
 import { SyllexClearButton } from '../../components/UI/syllex-clear-button/syllex-clear-button';
+import { SyllexEmptyState } from '../../components/UI/syllex-empty-state/syllex-empty-state';
 
 @Component({
   selector: 'app-materiali',
@@ -82,6 +83,7 @@ import { SyllexClearButton } from '../../components/UI/syllex-clear-button/sylle
     SyllexClearButton,
     TourAnchorNgBootstrapDirective,
     SyllexPageHeader,
+    SyllexEmptyState,
   ],
   templateUrl: './materiali.html',
   styleUrl: './materiali.scss',

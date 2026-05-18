@@ -15,6 +15,7 @@ import {
   faBullhorn,
   faPlus,
 } from '@fortawesome/pro-solid-svg-icons';
+import { SyllexEmptyState } from '../../components/UI/syllex-empty-state/syllex-empty-state';
 
 @Component({
   selector: 'app-events',
@@ -26,6 +27,7 @@ import {
     DatePipe,
     FontAwesomeModule,
     TitleCasePipe,
+    SyllexEmptyState,
   ],
   templateUrl: './events.html',
   styleUrl: './events.scss',
@@ -34,6 +36,8 @@ export class Events {
   faCalendarAlt = faCalendarAlt;
   faBullhorn = faBullhorn;
   faPlus = faPlus;
+  protected readonly MessageIcon = faBullhorn;
+  protected readonly PlusIcon = faPlus;
 
   private readonly comunicazioniService = inject(ComunicazioniService);
 

@@ -26,24 +26,36 @@
   />
 </section>
 
-<app-syllex-kpi-row [kpis]="KpiClassi()" />
+@if (FilteredClassi().length === 0) {
+  <div class="mt-5 mb-5">
+    <app-syllex-empty-state
+      title="Nessuna classe assegnata"
+      description="Non ci sono ancora classi associate al tuo account per questa materia. Contatta l'amministratore del tuo istituto per richiedere l'assegnazione delle tue classi."
+      [icon]="UsersIcon"
+      actionLabel="Torna alla Dashboard"
+      actionLink="/t/dashboard"
+    ></app-syllex-empty-state>
+  </div>
+} @else {
+  <app-syllex-kpi-row [kpis]="KpiClassi()" />
 
-<div class="d-flex flex-row justify-content-between align-items-center mt-4">
-  <app-syllex-pagination
-    [collectionSize]="CollectionSize()"
-    [page]="Page()"
-    [pageSize]="PageSize()"
-    (pageChange)="onNewPageRequested($event)"
-  />
+  <div class="d-flex flex-row justify-content-between align-items-center mt-4">
+    <app-syllex-pagination
+      [collectionSize]="CollectionSize()"
+      [page]="Page()"
+      [pageSize]="PageSize()"
+      (pageChange)="onNewPageRequested($event)"
+    />
 
-  <select
-    class="form-select custom-input"
-    style="width: auto"
-    [ngModel]="PageSize()"
-    (ngModelChange)="onPageSizeChange($event)"
-  >
-    <option [ngValue]="5">5 per pagina</option>
-    <option [ngValue]="10">10 per pagina</option>
-    <option [ngValue]="20">20 per pagina</option>
-  </select>
-</div>
+    <select
+      class="form-select custom-input"
+      style="width: auto"
+      [ngModel]="PageSize()"
+      (ngModelChange)="onPageSizeChange($event)"
+    >
+      <option [ngValue]="5">5 per pagina</option>
+      <option [ngValue]="10">10 per pagina</option>
+      <option [ngValue]="20">20 per pagina</option>
+    </select>
+  </div>
+}
