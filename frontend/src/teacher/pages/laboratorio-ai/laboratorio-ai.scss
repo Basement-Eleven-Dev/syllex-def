@@ -94,9 +94,9 @@
   }
 
   &--completed {
-    border-color: var(--bs-success);
+    border-color: var(--bs-primary);
     color: white;
-    background: var(--bs-success);
+    background: var(--bs-primary);
   }
 }
 
@@ -119,7 +119,7 @@
   max-width: 80px;
 
   &--done {
-    background: var(--bs-success);
+    background: var(--bs-primary);
   }
 }
 
@@ -261,6 +261,57 @@
     .form-check-input {
       background-color: var(--bs-primary);
       border-color: var(--bs-primary);
+    }
+  }
+}
+
+// ─── Style Preset Cards ─────────────────────────────────
+
+.style-preset-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.4rem;
+  padding: 1.5rem 1rem 1.25rem;
+  border-radius: 0.875rem;
+  border: 2px solid var(--bs-border-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: white;
+  position: relative;
+
+  .preset-icon {
+    font-size: 1.6rem;
+    color: var(--bs-secondary-color);
+    transition: color 0.2s ease;
+    margin-top: 0.25rem;
+  }
+
+  .preset-badge {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.65rem;
+    white-space: nowrap;
+  }
+
+  &:hover {
+    border-color: var(--bs-primary);
+    background: rgba(var(--bs-primary-rgb), 0.04);
+
+    .preset-icon {
+      color: var(--bs-primary);
+    }
+  }
+
+  &.selected {
+    border-color: var(--bs-primary);
+    background: rgba(var(--bs-primary-rgb), 0.06);
+
+    .preset-icon {
+      color: var(--bs-primary);
     }
   }
 }

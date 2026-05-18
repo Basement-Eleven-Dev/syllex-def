@@ -52,7 +52,7 @@
 <div class="wizard-container">
   <!-- Step indicator -->
   <div class="wizard-indicator">
-    @for (s of StepDefs; track s.n) {
+    @for (s of StepDefs(); track s.n) {
     <div class="wizard-dot-wrap">
       <div
         class="wizard-dot"
@@ -98,18 +98,71 @@
         <p class="wizard-step-subtitle">
           Scegli il formato e l'AI farà il resto.
         </p>
-        <app-type-selector
-          [options]="MaterialTypes"
-          [(selectedValue)]="SelectedMaterialType"
-          (typeSelected)="onSelectMaterialType($event)"
-          [direction]="'row'"
-          [showDescription]="true"
-        ></app-type-selector>
+        <div class="row g-3 mt-1">
+          @for (type of MaterialTypes; track type.value) {
+          <div class="col-12 col-sm-6">
+            <div
+              class="method-card"
+              [class.selected]="SelectedMaterialType() === type.value"
+              (click)="onSelectMaterialType(type.value)"
+              role="button"
+              [attr.aria-label]="type.label"
+            >
+              <span class="method-card-icon"
+                ><fa-icon [icon]="type.icon"
+              /></span>
+              <div>
+                <h6 class="mb-0 fw-semibold">{{ type.label }}</h6>
+                <p class="mb-0 text-muted small">{{ type.description }}</p>
+              </div>
+            </div>
+          </div>
+          }
+        </div>
       </div>
       }
 
-      <!-- ── STEP 2: Configura e Genera ── -->
-      @if (CurrentStep() === 2) {
+      <!-- ── STEP 2 slides: File ── -->
+      @if (CurrentStep() === 2 && IsSlides()) {
+      <div
+        class="wizard-step-content"
+        @stepIn
+        tourAnchor="gen_ai_support_files"
+      >
+        <h5 class="wizard-step-title">Da dove impara l'AI?</h5>
+        <p class="wizard-step-subtitle">
+          Seleziona i materiali di riferimento e, se vuoi, restringi a un
+          argomento specifico.
+        </p>
+        @if (materiaService.materiaSelected()?.topics?.length) {
+        <div [formGroup]="genForm" class="mb-3">
+          <label class="wizard-field-label"
+            >Argomento
+            <span class="text-muted fw-normal">(opzionale)</span></label
+          >
+          <select class="form-select custom-input" formControlName="topicId">
+            <option value="">Tutti gli argomenti</option>
+            @for (topic of materiaService.materiaSelected()!.topics; track
+            topic._id) {
+            <option [value]="topic._id">{{ topic.name }}</option>
+            }
+          </select>
+        </div>
+        }
+        <app-materiali-selector
+          [initialMaterialIds]="SelectedMaterialIds()"
+          (selectionChange)="onMaterialSelectionChange($event)"
+        ></app-materiali-selector>
+        @if (SelectedMaterialIds().length === 0) {
+        <p class="text-muted small mt-2">
+          Seleziona almeno un file per continuare.
+        </p>
+        }
+      </div>
+      }
+
+      <!-- ── STEP 2 altri tipi: Configura e Genera ── -->
+      @if (CurrentStep() === 2 && !IsSlides()) {
       <div
         class="wizard-step-content"
         @stepIn
@@ -117,132 +170,199 @@
       >
         <h5 class="wizard-step-title">
           <fa-icon [icon]="SparklesIcon" class="me-2 text-primary"></fa-icon>
-          Come vuoi il tuo {{ SelectedMaterialTypeName() }}?
+          Crea il tuo {{ SelectedMaterialTypeName() }}
         </h5>
         <p class="wizard-step-subtitle">
-          Dicci come lo vuoi, l'AI lo creerà su misura per te.
+          Seleziona i file di riferimento e personalizza l'output.
         </p>
+        <div [formGroup]="genForm" class="d-flex flex-column gap-3">
+          <div>
+            <label class="wizard-field-label">File di riferimento</label>
+            <app-materiali-selector
+              [initialMaterialIds]="SelectedMaterialIds()"
+              (selectionChange)="onMaterialSelectionChange($event)"
+            ></app-materiali-selector>
+          </div>
+          <div>
+            <label class="wizard-field-label">In che lingua?</label>
+            <app-syllex-select-input
+              formControlName="language"
+              [options]="LanguageOptions"
+            ></app-syllex-select-input>
+          </div>
+          <div>
+            <label class="wizard-field-label">
+              Istruzioni particolari
+              <span class="text-muted fw-normal">(opzionale)</span>
+            </label>
+            <textarea
+              class="form-control custom-input"
+              formControlName="instructions"
+              rows="3"
+              style="resize: none"
+              placeholder="Es. usa un tono formale, includi esempi pratici..."
+            ></textarea>
+          </div>
+          <div class="d-flex justify-content-end">
+            <button
+              tourAnchor="gen_ai_submit"
+              type="button"
+              class="btn btn-primary ai btn-lg icon-btn rounded-pill fw-bold"
+              [disabled]="genForm.invalid || IsGenerating() || SelectedMaterialIds().length === 0"
+              (click)="onGenerate()"
+            >
+              <fa-icon
+                [icon]="IsGenerating() ? SpinnerIcon : SparklesIcon"
+                [animation]="IsGenerating() ? 'spin' : undefined"
+              ></fa-icon>
+              {{ IsGenerating() ? 'Generazione in corso...' : 'Genera ' +
+              SelectedMaterialTypeName() }}
+            </button>
+          </div>
+        </div>
+      </div>
+      }
 
-        <div [formGroup]="genForm">
-          <div class="row g-4">
-            <!-- Left: params + CTA -->
-            <div class="col-12 col-lg-6 d-flex flex-column gap-3">
-              @if (IsSlides()) {
-              <div tourAnchor="gen_ai_m_params">
-                <div class="row g-2">
-                  <div class="col-6">
-                    <label class="wizard-field-label">Quante slide?</label>
-                    <input
-                      type="number"
-                      class="form-control custom-input"
-                      formControlName="numberOfSlides"
-                      min="3"
-                      max="30"
-                      aria-label="Numero di slide"
-                    />
-                  </div>
-                  <div class="col-12">
-                    <label class="wizard-field-label">In che formato?</label>
-                    <div class="d-flex gap-2 pt-1">
-                      <label
-                        class="rounded-syllex typeCard p-3 d-flex align-items-center gap-2 flex-fill"
-                        [class.selected]="genForm.get('format')?.value === 'pptx'"
-                        for="formatPPTX"
-                        style="cursor: pointer; max-width: 160px"
-                      >
-                        <input
-                          class="form-check-input flex-shrink-0 mt-0"
-                          type="radio"
-                          value="pptx"
-                          id="formatPPTX"
-                          formControlName="format"
-                        />
-                        <div>
-                          <div class="fw-semibold small">PPTX</div>
-                          <div class="text-muted" style="font-size: 0.75rem">
-                            Modificabile
-                          </div>
-                        </div>
-                      </label>
-                      <label
-                        class="rounded-syllex typeCard p-3 d-flex align-items-center gap-2 flex-fill"
-                        [class.selected]="genForm.get('format')?.value === 'pdf'"
-                        for="formatPDF"
-                        style="cursor: pointer; max-width: 160px"
-                      >
-                        <input
-                          class="form-check-input flex-shrink-0 mt-0"
-                          type="radio"
-                          value="pdf"
-                          id="formatPDF"
-                          formControlName="format"
-                        />
-                        <div>
-                          <div class="fw-semibold small">PDF</div>
-                          <div class="text-muted" style="font-size: 0.75rem">
-                            Documento statico
-                          </div>
-                        </div>
-                      </label>
-                    </div>
-                  </div>
+      <!-- ── STEP 3 slides: Stile ── -->
+      @if (CurrentStep() === 3 && IsSlides()) {
+      <div class="wizard-step-content" @stepIn tourAnchor="gen_ai_instructions">
+        <h5 class="wizard-step-title">Come vuoi le tue slide?</h5>
+        <p class="wizard-step-subtitle">
+          Scegli lo stile e l'AI adatterà la densità e il tono del testo.
+        </p>
+        <div [formGroup]="genForm" class="d-flex flex-column gap-3">
+          <div class="row g-3">
+            @for (opt of StyleOptions; track opt.value) {
+            <div class="col-12 col-sm-4">
+              <div
+                class="style-preset-card h-100"
+                [class.selected]="genForm.get('slideStyle')?.value === opt.value"
+                (click)="onStyleSelect(opt.value)"
+                role="button"
+              >
+                @if (opt.recommended) {
+                <span class="badge bg-primary preset-badge">Consigliata</span>
+                }
+                <span class="preset-icon">
+                  <fa-icon [icon]="opt.icon" />
+                </span>
+                <div class="fw-semibold" style="font-size: 0.9rem">
+                  {{ opt.label }}
+                </div>
+                <div class="text-muted" style="font-size: 0.78rem">
+                  {{ opt.description }}
                 </div>
               </div>
-              }
-
-              <div>
-                <label class="wizard-field-label">In che lingua?</label>
-                <app-syllex-select-input
-                  formControlName="language"
-                  [options]="LanguageOptions"
-                ></app-syllex-select-input>
-              </div>
-
-              <div
-                class="flex-fill d-flex flex-column"
-                tourAnchor="gen_ai_instructions"
-              >
-                <label class="wizard-field-label">
-                  Hai istruzioni particolari?
-                  <span class="text-muted fw-normal">(opzionale)</span>
-                </label>
-                <textarea
-                  class="form-control custom-input flex-fill"
-                  formControlName="instructions"
-                  rows="4"
-                  style="resize: none"
-                  placeholder="Es. usa un tono formale, includi esempi pratici, fai sintesi concise..."
-                ></textarea>
-              </div>
-
-              <div class="d-flex justify-content-end pt-1">
-                <button
-                  tourAnchor="gen_ai_submit"
-                  type="button"
-                  class="btn btn-primary ai btn-lg icon-btn rounded-pill fw-bold"
-                  [disabled]="genForm.invalid || IsGenerating()"
-                  (click)="onGenerate()"
-                >
-                  <fa-icon
-                    [icon]="IsGenerating() ? SpinnerIcon : SparklesIcon"
-                    [animation]="IsGenerating() ? 'spin' : undefined"
-                  ></fa-icon>
-                  {{ IsGenerating() ? 'Generazione in corso...' : 'Genera ' +
-                  SelectedMaterialTypeName() }}
-                </button>
-              </div>
             </div>
+            }
+          </div>
+          <div>
+            <label class="wizard-field-label">
+              Vuoi aggiungere qualcosa?
+              <span class="text-muted fw-normal">(opzionale)</span>
+            </label>
+            <textarea
+              class="form-control custom-input"
+              formControlName="instructions"
+              rows="3"
+              style="resize: none"
+              placeholder="Es. includi esempi pratici, usa un tono formale, evidenzia le definizioni..."
+            ></textarea>
+          </div>
+        </div>
+      </div>
+      }
 
-            <!-- Right: materiali -->
-            <div class="col-12 col-lg-6" tourAnchor="gen_ai_support_files">
-              <label class="wizard-field-label"
-                >Da dove vuoi che l'AI impari?</label
-              >
-              <p class="text-muted small mb-2">
-                Carica dispense, PDF o slide: l'AI li studià per te.
-              </p>
-              <app-materiali-selector></app-materiali-selector>
+      <!-- ── STEP 4 slides: Dettagli ── -->
+      @if (CurrentStep() === 4 && IsSlides()) {
+      <div class="wizard-step-content" @stepIn tourAnchor="gen_ai_m_params">
+        <h5 class="wizard-step-title">
+          <fa-icon [icon]="SparklesIcon" class="me-2 text-primary"></fa-icon>
+          Ultimi dettagli
+        </h5>
+        <p class="wizard-step-subtitle">
+          Quante slide, in che lingua e il formato di output.
+        </p>
+        <div [formGroup]="genForm" class="d-flex flex-column gap-3">
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="wizard-field-label">Quante slide?</label>
+              <input
+                type="number"
+                class="form-control custom-input"
+                formControlName="numberOfSlides"
+                min="3"
+                max="30"
+                aria-label="Numero di slide"
+              />
             </div>
+            <div class="col-6">
+              <label class="wizard-field-label">In che lingua?</label>
+              <app-syllex-select-input
+                formControlName="language"
+                [options]="LanguageOptions"
+              ></app-syllex-select-input>
+            </div>
+          </div>
+          <div>
+            <label class="wizard-field-label">Formato di output</label>
+            <div class="d-flex gap-2">
+              <label
+                class="rounded-syllex typeCard p-3 d-flex align-items-center gap-2 flex-fill"
+                [class.selected]="genForm.get('format')?.value === 'pdf'"
+                for="formatPDF"
+                style="cursor: pointer; max-width: 160px"
+              >
+                <input
+                  class="form-check-input flex-shrink-0 mt-0"
+                  type="radio"
+                  value="pdf"
+                  id="formatPDF"
+                  formControlName="format"
+                />
+                <div>
+                  <div class="fw-semibold small">PDF</div>
+                  <div class="text-muted" style="font-size: 0.75rem">
+                    Documento statico
+                  </div>
+                </div>
+              </label>
+              <label
+                class="rounded-syllex typeCard p-3 d-flex align-items-center gap-2 flex-fill"
+                [class.selected]="genForm.get('format')?.value === 'pptx'"
+                for="formatPPTX"
+                style="cursor: pointer; max-width: 160px"
+              >
+                <input
+                  class="form-check-input flex-shrink-0 mt-0"
+                  type="radio"
+                  value="pptx"
+                  id="formatPPTX"
+                  formControlName="format"
+                />
+                <div>
+                  <div class="fw-semibold small">PPTX</div>
+                  <div class="text-muted" style="font-size: 0.75rem">
+                    Modificabile
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
+          <div class="d-flex justify-content-end pt-1">
+            <button
+              tourAnchor="gen_ai_submit"
+              type="button"
+              class="btn btn-primary ai btn-lg icon-btn rounded-pill fw-bold"
+              [disabled]="genForm.invalid || IsGenerating()"
+              (click)="onGenerate()"
+            >
+              <fa-icon
+                [icon]="IsGenerating() ? SpinnerIcon : SparklesIcon"
+                [animation]="IsGenerating() ? 'spin' : undefined"
+              ></fa-icon>
+              {{ IsGenerating() ? 'Generazione in corso...' : 'Genera Slides' }}
+            </button>
           </div>
         </div>
       </div>

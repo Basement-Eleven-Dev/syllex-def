@@ -42,7 +42,24 @@ const getPrompt = (
     `;
 
   const prompts: Record<DocumentType, string> = {
-    slides: `Scrivimi ${numberOfSlides || 10} diapositive basate sui documenti forniti. In 'content' inserisci tutto il testo che dovrebbe essere presente compreso di titoli delle slide e specifiche su come presentare le informazioni, senza alcuna spiegazione o testo aggiuntivo. Mantieni il testo conciso e adatto a una presentazione visiva in ambito educativo. Se necessario, organizza le informazioni in punti ed elenchi.`,
+    slides: `Crea esattamente ${numberOfSlides || 10} diapositive basate ESCLUSIVAMENTE sui documenti forniti, seguendo questa struttura rigida:
+
+REGOLE OBBLIGATORIE:
+- La PRIMA diapositiva è sempre la diapositiva di titolo: titolo della presentazione (max 8 parole) e un sottotitolo che elenca i principali argomenti trattati.
+- Ogni diapositiva successiva segue ESATTAMENTE questo formato:
+  ## [TITOLO SLIDE] (max 8 parole, descrittivo del contenuto)
+  - [punto 1: concetto chiave con spiegazione sintetica]
+  - [punto 2: concetto chiave con spiegazione sintetica]
+  - [punto 3: concetto chiave con spiegazione sintetica]
+  (aggiungi un 4° o 5° punto solo se strettamente necessario)
+- L'ultima diapositiva è un riepilogo dei concetti chiave.
+
+REGOLE TASSATIVE SUL CONTENUTO:
+- Ogni punto elenco deve contenere informazioni dense e precise, non frasi generiche.
+- NON inserire mai descrizioni di immagini, placeholder visivi, riferimenti a grafici o elementi grafici di alcun tipo.
+- NON scrivere frasi come "qui va un'immagine", "inserire grafico", "vedi figura" o simili.
+- Il testo è la priorità assoluta: le slide devono essere comprensibili e complete di per sé.
+- In 'content' inserisci SOLO il testo delle slide nel formato indicato, senza spiegazioni o testo aggiuntivo esterno alle slide.`,
     map: `
 Write a valid mermaid.js diagram based on these documents.
 
@@ -182,13 +199,23 @@ const createAIGenMaterial = async (
   }
 
   if (type == "slides") {
+    const GAMMA_INSTRUCTIONS_BASE =
+      "Text and information are the absolute priority. Use images ONLY when strictly necessary to visually explain a specific concept — never for decoration. Prefer simple pictographic icons. Aim for at most 1 image every 3-4 slides.";
+    const gammaAdditionalInstructions = additionalInstructions
+      ? `${GAMMA_INSTRUCTIONS_BASE} | ${additionalInstructions}`.slice(0, 1000)
+      : GAMMA_INSTRUCTIONS_BASE;
+
     let res = await startSlidedeckGeneration({
       inputText: content,
       numCards: numberOfSlides || 10,
       textMode: "preserve",
       exportAs: format || "pptx",
+      additionalInstructions: gammaAdditionalInstructions,
       imageOptions: {
-        source: "aiGenerated",
+        source: "pictographic",
+      },
+      textOptions: {
+        amount: "medium",
       },
       cardOptions: {
         headerFooter: {
