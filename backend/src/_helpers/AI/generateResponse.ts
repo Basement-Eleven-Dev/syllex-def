@@ -107,88 +107,105 @@ export async function generateAIResponseGemini(
     // 4. Tools config (include nomi documenti per aiutare Gemini a filtrare)
     const toolsConfig = hasMaterials ? [buildTools(materialNames)] : undefined;
 
-    // 4. Prima chiamata: Gemini decide se ha bisogno del tool o può rispondere dalla conversazione
-    const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents,
-      config: {
-        systemInstruction: systemPrompt,
-        tools: toolsConfig as any,
-      },
-    });
+    // 4. Agentic loop: Gemini può concatenare più tool call prima di rispondere con testo
+    const MAX_ITERATIONS = 10;
+    let currentContents = contents;
 
-    // 5. Se Gemini ha richiesto un tool → eseguiamo e richiamiamo
-    const candidate = response.candidates?.[0];
-    const functionCall = candidate?.content?.parts?.find(
-      (p: any) => p.functionCall,
-    )?.functionCall;
+    for (let iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: currentContents,
+        config: {
+          systemInstruction: systemPrompt,
+          tools: toolsConfig as any,
+        },
+      });
 
-    if (functionCall) {
-      const modelTurnContent = candidate!.content!;
-      let toolResult: string;
+      const candidate = response.candidates?.[0];
+      const functionCall = candidate?.content?.parts?.find(
+        (p: any) => p.functionCall,
+      )?.functionCall;
 
-      if (functionCall.name === "list_available_materials") {
-        console.log("[Tool] list_available_materials chiamato");
-        const materialList = realMaterials
-          .map((m, i) => `${i + 1}. ${m.name}`)
-          .join("\n");
-        toolResult = `Documenti disponibili per questa materia (${realMaterials.length} totali):\n${materialList}`;
-      } else if (functionCall.name === "search_materials") {
-        const searchQuery = (functionCall.args as any)?.query || query;
-        const docNameFilter = (functionCall.args as any)?.documentName || "";
-        console.log(
-          `[Tool] search_materials query: "${searchQuery.slice(0, 100)}" | doc: "${docNameFilter}"`,
-        );
-
-        // Se è specificato un documentName, filtra i material IDs
-        let filteredIds = realMaterialIds;
-        if (docNameFilter) {
-          const normalizedFilter = docNameFilter.toLowerCase();
-          const matchingMaterials = realMaterials.filter((m) =>
-            m.name.toLowerCase().includes(normalizedFilter),
+      // Se Gemini ha risposto con testo → restituiamo
+      const responseText = extractText(response);
+      if (responseText) {
+        if (iteration > 0) {
+          console.log(
+            `[Tool] Risposta testuale dopo ${iteration} tool call(s)`,
           );
-          if (matchingMaterials.length > 0) {
-            filteredIds = matchingMaterials.map((m) => m._id as Types.ObjectId);
-            console.log(
-              `[Tool] Filtro documento: ${matchingMaterials.length} match su "${docNameFilter}"`,
-            );
-          } else {
-            console.log(
-              `[Tool] Nessun documento matcha "${docNameFilter}", cerco in tutti`,
-            );
-          }
-        }
-
-        const docs = await retrieveRelevantDocumentsWithGemini(
-          searchQuery,
-          subjectId,
-          filteredIds,
-        );
-
-        if (docs.length > 0) {
-          // Formatta con il nome del documento sorgente per ogni chunk
-          toolResult = docs
-            .map((d) => {
-              const source = d.document_name
-                ? `[📄 ${d.document_name}]`
-                : "[📄 Documento]";
-              return `${source}\n${d.text}`;
-            })
-            .join("\n\n---\n\n");
         } else {
-          toolResult =
-            "Nessuna informazione trovata nei materiali didattici per questa query.";
+          console.log(
+            `[Tool] Nessuna function call — risposta diretta (${responseText.length} chars)`,
+          );
         }
-        console.log(`[Tool] RAG risultato: ${toolResult.length} chars`);
-      } else {
-        toolResult = "Strumento non riconosciuto.";
+        return responseText;
       }
 
-      // Seconda chiamata con il risultato del tool — SENZA tools per forzare risposta testuale
-      const responseWithTool = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: [
-          ...contents,
+      // Se Gemini ha richiesto un tool → eseguiamo e continuiamo il loop
+      if (functionCall) {
+        const modelTurnContent = candidate!.content!;
+        let toolResult: string;
+
+        if (functionCall.name === "list_available_materials") {
+          console.log("[Tool] list_available_materials chiamato");
+          const materialList = realMaterials
+            .map((m, i) => `${i + 1}. ${m.name}`)
+            .join("\n");
+          toolResult = `Documenti disponibili per questa materia (${realMaterials.length} totali):\n${materialList}`;
+        } else if (functionCall.name === "search_materials") {
+          const searchQuery = (functionCall.args as any)?.query || query;
+          const docNameFilter = (functionCall.args as any)?.documentName || "";
+          console.log(
+            `[Tool] search_materials query: "${searchQuery.slice(0, 100)}" | doc: "${docNameFilter}"`,
+          );
+
+          let filteredIds = realMaterialIds;
+          if (docNameFilter) {
+            const normalizedFilter = docNameFilter.toLowerCase();
+            const matchingMaterials = realMaterials.filter((m) =>
+              m.name.toLowerCase().includes(normalizedFilter),
+            );
+            if (matchingMaterials.length > 0) {
+              filteredIds = matchingMaterials.map(
+                (m) => m._id as Types.ObjectId,
+              );
+              console.log(
+                `[Tool] Filtro documento: ${matchingMaterials.length} match su "${docNameFilter}"`,
+              );
+            } else {
+              console.log(
+                `[Tool] Nessun documento matcha "${docNameFilter}", cerco in tutti`,
+              );
+            }
+          }
+
+          const docs = await retrieveRelevantDocumentsWithGemini(
+            searchQuery,
+            subjectId,
+            filteredIds,
+          );
+
+          if (docs.length > 0) {
+            toolResult = docs
+              .map((d) => {
+                const source = d.document_name
+                  ? `[📄 ${d.document_name}]`
+                  : "[📄 Documento]";
+                return `${source}\n${d.text}`;
+              })
+              .join("\n\n---\n\n");
+          } else {
+            toolResult =
+              "Nessuna informazione trovata nei materiali didattici per questa query.";
+          }
+          console.log(`[Tool] RAG risultato: ${toolResult.length} chars`);
+        } else {
+          toolResult = "Strumento non riconosciuto.";
+        }
+
+        // Aggiunge il turno del modello + la risposta del tool ai contents per il prossimo giro
+        currentContents = [
+          ...currentContents,
           modelTurnContent,
           {
             role: "user" as const,
@@ -201,38 +218,21 @@ export async function generateAIResponseGemini(
               },
             ],
           },
-        ],
-        config: {
-          systemInstruction: systemPrompt,
-        },
-      });
-
-      const toolResponseText = extractText(responseWithTool);
-      if (!toolResponseText) {
-        console.error(
-          "[Tool] Seconda chiamata senza testo! Parts:",
-          JSON.stringify(
-            responseWithTool.candidates?.[0]?.content?.parts?.map((p: any) =>
-              Object.keys(p),
-            ),
-          ),
-        );
+        ];
+        continue;
       }
-      return (
-        toolResponseText ||
-        "Mi dispiace, non sono riuscito a generare una risposta."
+
+      // Né testo né function call (es. solo thought parts senza output)
+      console.error(
+        `[Tool] Iterazione ${iteration + 1}: né testo né function call. Parts:`,
+        JSON.stringify(
+          candidate?.content?.parts?.map((p: any) => Object.keys(p)),
+        ),
       );
+      break;
     }
 
-    // 6. Nessun tool call — Gemini ha risposto direttamente (follow-up conversazionale)
-    const directText = extractText(response);
-    console.log(
-      `[Tool] Nessuna function call — risposta diretta (${directText?.length || 0} chars)`,
-    );
-
-    return (
-      directText || "Mi dispiace, non sono riuscito a generare una risposta."
-    );
+    return "Mi dispiace, non sono riuscito a generare una risposta.";
   } catch (error) {
     console.error("Errore nella generazione risposta Gemini:", error);
     throw error;
