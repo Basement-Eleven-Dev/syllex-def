@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faCheck,
-  faPencil,
+  faPencilAlt,
   faPlus,
   faXmark,
   faTrash,
@@ -12,10 +12,11 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Materia, TopicObject } from '../../../services/materia';
 import { FeedbackService } from '../../../services/feedback-service';
 import { QuestionsService } from '../../../services/questions';
+import { SyllexButton } from '../UI/syllex-button/syllex-button';
 
 @Component({
   selector: 'app-subject-settings-modal',
-  imports: [FormsModule, FontAwesomeModule],
+  imports: [FormsModule, FontAwesomeModule, SyllexButton],
   templateUrl: './subject-settings-modal.html',
   styleUrl: './subject-settings-modal.scss',
 })
@@ -25,7 +26,7 @@ export class SubjectSettingsModal {
   private readonly feedbackService = inject(FeedbackService);
   private readonly questionService = inject(QuestionsService);
 
-  readonly PencilIcon = faPencil;
+  readonly PencilIcon = faPencilAlt;
   readonly CheckIcon = faCheck;
   readonly XmarkIcon = faXmark;
   readonly PlusIcon = faPlus;
@@ -81,37 +82,47 @@ export class SubjectSettingsModal {
     });
   }
 
-deleteTopic(topicId: string): void {
-  const subjectId = this.Subject()?._id;
-  if (!subjectId) return;
+  deleteTopic(topicId: string): void {
+    const subjectId = this.Subject()?._id;
+    if (!subjectId) return;
 
-  // 1. Controlliamo se ci sono domande associate
-  this.questionService.hasQuestions(topicId).subscribe({
-    next: (hasQuestions) => {
-      if (hasQuestions) {
-        // 2. Se ci sono domande, mostriamo l'alert e interrompiamo
-        alert("Non è possibile eliminare l'argomento perché ci sono domande associate.");
-        return;
-      }
-
-      // 3. Se non ci sono domande, chiediamo conferma per l'eliminazione dell'argomento
-      if (!confirm(`Sei sicuro di voler eliminare questo argomento?`)) return;
-
-      this.MateriaService.deleteTopic(subjectId, topicId).subscribe({
-        next: () => {
-          this.feedbackService.showFeedback('Argomento eliminato con successo!', true);
-         
-        },
-        error: () => {
-          this.feedbackService.showFeedback("Errore nell'eliminare l'argomento.", false);
+    // 1. Controlliamo se ci sono domande associate
+    this.questionService.hasQuestions(topicId).subscribe({
+      next: (hasQuestions) => {
+        if (hasQuestions) {
+          // 2. Se ci sono domande, mostriamo l'alert e interrompiamo
+          alert(
+            "Non è possibile eliminare l'argomento perché ci sono domande associate.",
+          );
+          return;
         }
-      });
-    },
-    error: () => {
-      this.feedbackService.showFeedback("Errore nel controllo delle domande associate.", false);
-    }
-  });
-}
+
+        // 3. Se non ci sono domande, chiediamo conferma per l'eliminazione dell'argomento
+        if (!confirm(`Sei sicuro di voler eliminare questo argomento?`)) return;
+
+        this.MateriaService.deleteTopic(subjectId, topicId).subscribe({
+          next: () => {
+            this.feedbackService.showFeedback(
+              'Argomento eliminato con successo!',
+              true,
+            );
+          },
+          error: () => {
+            this.feedbackService.showFeedback(
+              "Errore nell'eliminare l'argomento.",
+              false,
+            );
+          },
+        });
+      },
+      error: () => {
+        this.feedbackService.showFeedback(
+          'Errore nel controllo delle domande associate.',
+          false,
+        );
+      },
+    });
+  }
 
   addTopic(): void {
     const name = this.NewTopicName().trim();
