@@ -50,12 +50,6 @@
 } @if (InitialChoice() === 'materials') {
 <!-- Wizard -->
 <div class="wizard-container">
-  <!-- Step indicator -->
-  <app-syllex-stepper
-    [steps]="StepDefs()"
-    [currentStep]="CurrentStep()"
-  ></app-syllex-stepper>
-
   <!-- Main area: prev arrow | panel | next arrow/spacer -->
   <div class="wizard-main">
     <div class="wizard-panel">
@@ -330,61 +324,41 @@
     <div class="wizard-footer">
       <!-- Left: Indietro -->
       <div>
-        <button
-          type="button"
-          class="btn btn-outline-secondary rounded-pill px-4"
-          (click)="goPrev()"
-          [disabled]="IsGenerating()"
-        >
-          <fa-icon [icon]="ChevronLeftIcon" class="me-1"></fa-icon>
-          Indietro
-        </button>
+        <app-syllex-button
+          [props]="{
+            label: 'Indietro',
+            variant: 'primary',
+            size: 'medium',
+            disabled: IsGenerating()
+          }"
+          (clicked)="goPrev()"
+        ></app-syllex-button>
       </div>
 
-      <!-- Center: step dots with labels -->
-      <div class="wizard-footer-center">
-        <div class="wizard-footer-divider"></div>
-        <div class="wizard-indicator wizard-indicator--footer">
-          @for (s of StepDefs(); track s.n) {
-          <div class="wizard-dot-wrap">
-            <div
-              class="wizard-dot"
-              [class.wizard-dot--active]="s.n === CurrentStep()"
-              [class.wizard-dot--completed]="s.n < CurrentStep()"
-            >
-              @if (s.n < CurrentStep()) {
-              <fa-icon [icon]="CheckIcon" />
-              } @else { {{ s.n }} }
-            </div>
-            <span class="wizard-dot-label">{{ s.label }}</span>
-          </div>
-          @if (!$last) {
-          <div
-            class="wizard-connector"
-            [class.wizard-connector--done]="s.n < CurrentStep()"
-          ></div>
-          } }
-        </div>
-        <div class="wizard-footer-divider"></div>
-      </div>
+      <app-syllex-stepper
+        [steps]="StepDefs()"
+        [currentStep]="CurrentStep()"
+      ></app-syllex-stepper>
 
       <!-- Right: Avanti / Genera -->
       <div class="wizard-footer__right">
         @if (ShowNextArrow()) {
-        <button
-          type="button"
-          class="btn btn-primary rounded-pill px-4 fw-semibold"
-          (click)="goNext()"
-          [disabled]="!CanGoNext()"
-        >
-          Avanti
-          <fa-icon [icon]="ChevronRightIcon" class="ms-1"></fa-icon>
-        </button>
+
+        <app-syllex-button
+          [props]="{
+            label: 'Avanti',
+            variant: 'primary',
+            size: 'medium',
+            disabled: !CanGoNext()
+          }"
+          (clicked)="goNext()"
+        ></app-syllex-button>
         } @else {
+
         <button
           tourAnchor="gen_ai_submit"
           type="button"
-          class="btn btn-primary ai icon-btn rounded-pill px-4 fw-bold"
+          class="btn btn-primary ms-2 ai icon-btn rounded-pill px-4 py-3 fw-bold"
           [disabled]="genForm.invalid || IsGenerating()"
           (click)="onGenerate()"
         >

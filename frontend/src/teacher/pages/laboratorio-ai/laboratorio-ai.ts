@@ -36,6 +36,7 @@ import {
   MATERIAL_TYPE_OPTIONS,
   MaterialType,
 } from '../../../types/question.types';
+import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
 
 interface StepDef {
   n: number;
@@ -82,6 +83,7 @@ const STYLE_PREFILL_MAP: Record<SlideStyle, string> = {
     SyllexSelectInput,
     SyllexStepper,
     TourAnchorNgBootstrapDirective,
+    SyllexButton,
   ],
   templateUrl: './laboratorio-ai.html',
   styleUrl: './laboratorio-ai.scss',
