@@ -50,6 +50,7 @@ import { forkJoin } from 'rxjs';
 import { QuestionCard } from '../question-card/question-card';
 import { AiOverlay } from '../ai-overlay/ai-overlay';
 import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
+import { SyllexButton } from '../UI/syllex-button/syllex-button';
 
 interface ReviewQuestion {
   readonly TempId: string;
@@ -68,6 +69,7 @@ interface ReviewQuestion {
     QuestionCard,
     AiOverlay,
     TourAnchorNgBootstrapDirective,
+    SyllexButton,
   ],
   templateUrl: './gen-ai-contents.html',
   styleUrl: './gen-ai-contents.scss',
@@ -119,6 +121,13 @@ export class GenAiContents implements OnInit {
   readonly IsSlides = computed(
     () => this.TypeMode() === 'materials' && this.SelectedType() === 'slides',
   );
+  readonly submitButtonProps = computed(() => ({
+    label: this.IsGenerating() ? 'Generazione in corso...' : 'Genera ' + this.getSelectedTypeName(),
+    variant: 'primary' as const,
+    size: 'large' as const,
+    disabled: this.genForm.invalid || this.IsGenerating(),
+    leftIcon: this.IsGenerating() ? this.SpinnerIcon : this.SparklesIcon,
+  }));
   readonly SelectedCount = computed(
     () => this.ReviewQuestions().filter((q) => q.Selected).length,
   );

@@ -583,7 +583,20 @@ export class CreateEditTest implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((questions: QuestionWithPoints[]) => {
         if (questions?.length) {
-          this.questionsComponent.addQuestions(questions);
+          const newIds = questions.map((q) => q._id);
+          this.SelectedQuestionIds.update((ids) => [
+            ...ids,
+            ...newIds.filter((id) => !ids.includes(id)),
+          ]);
+          this.SelectedQuestionPoints.update((pts) => {
+            const updated = { ...pts };
+            for (const q of questions) {
+              if (!(q._id in updated)) {
+                updated[q._id] = q.points ?? 1;
+              }
+            }
+            return updated;
+          });
         }
       });
   }
