@@ -43,6 +43,7 @@ Chart.register(...registerables);
 export class TestStats implements OnInit, AfterViewInit, OnChanges {
   @Input() attempts: any[] = [];
   @Input() maxScore: number = 0;
+  @Input() classes: any[] = [];
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly testsService = inject(TestsService);
@@ -83,20 +84,36 @@ export class TestStats implements OnInit, AfterViewInit, OnChanges {
     return this.availableTopics.map((t) => ({ value: t, label: t }));
   }
 
+  get classOptions(): SelectOption[] {
+    return (this.classes || []).map((c) => ({ value: c._id || c.id || '', label: c.name }));
+  }
+
+  onClassChange(newClass: string) {
+    this.classSelected = newClass;
+    this.processData();
+    this.updateCharts();
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['attempts'] && this.attempts.length > 0) {
+    if ((changes['attempts'] && this.attempts.length > 0) || changes['classes']) {
       this.processData();
       this.updateCharts();
     }
   }
 
   private processData() {
+    // Filtra gli attempts in base alla classe selezionata
+    let filteredAttempts = [...this.attempts];
+    if (this.classSelected) {
+      filteredAttempts = filteredAttempts.filter((a) => a.classId === this.classSelected);
+    }
+
     // 1. Estraiamo i punteggi per il grafico della distribuzione
-    this.scores = this.attempts.map((a) => a.score || 0);
+    this.scores = filteredAttempts.map((a) => a.score || 0);
 
     const questionMap = new Map<string, any>();
 
-    this.attempts.forEach((attempt) => {
+    filteredAttempts.forEach((attempt) => {
       attempt.questions?.forEach((q: any) => {
         // Accediamo ai dati nidificati nell'oggetto 'question'
         const questionData = q.question;

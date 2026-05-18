@@ -1,10 +1,10 @@
 <app-syllex-select-input
   class="mb-4"
   [value]="classSelected"
-  (valueChange)="classSelected = $event"
+  (valueChange)="onClassChange($event)"
   style="max-width: 220px"
   placeholder="Tutte le classi"
-  [options]="[]"
+  [options]="classOptions"
 />
 
 <div class="row">
@@ -58,7 +58,7 @@
             <td class="text-wrap" style="max-width: 300px">{{ stat.text }}</td>
             <td class="text-center text-success">{{ stat.correctCount }}</td>
             <td class="text-center text-danger">{{ stat.errorCount }}</td>
-            <td class="text-center text-secondary">{{ stat.blankCount }}</td>
+            <td class="text-center text-muted">{{ stat.blankCount }}</td>
             <td class="text-center fw-bold">
               @if (stat.totalResponses > 0) { {{ ((stat.correctCount /
               stat.totalResponses) * 100).toFixed(1) }}% } @else { N/A }

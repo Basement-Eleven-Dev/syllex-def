@@ -92,6 +92,7 @@ export class TestDetail {
   readonly TestData = signal<any | null>(null);
   readonly BackendStats = signal<any[]>([]);
   readonly Attempts = signal<any[]>([]);
+  readonly Classes = signal<any[]>([]);
   readonly IsLoading = signal<boolean>(true);
 
   // Computed
@@ -129,6 +130,7 @@ export class TestDetail {
           this.TestData.set(response.test);
           this.BackendStats.set(response.stats);
           this.Attempts.set(response.attempts);
+          this.Classes.set(response.classes || []);
           console.log(this.Attempts);
           this.IsLoading.set(false);
         },
