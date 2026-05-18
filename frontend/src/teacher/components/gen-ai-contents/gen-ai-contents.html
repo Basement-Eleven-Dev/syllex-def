@@ -12,14 +12,18 @@
     <section tourAnchor="gen_ai_type_selector" class="form-section">
 
       @if (TypeMode() === 'questions') {
-        <div class="d-flex align-items-start gap-2">
+        <div class="d-flex align-items-start justify-content-between w-100">
           <h3 class="m-0">Genera nuove domande con AI da inserire nel test</h3>
-          <fa-icon [icon]="SparklesIcon" style="color: #84cc16; font-size: 1.1rem; margin-top: 2px;"></fa-icon>
+          <fa-icon [icon]="SparklesIcon" style="color: #84cc16; font-size: 1.5rem; margin-top: 2px;"></fa-icon>
+        </div>
+      } @else {
+        <div class="d-flex align-items-start justify-content-between w-100">
+          <h3 class="m-0">Genera nuovi materiali con AI</h3>
+          <fa-icon [icon]="SparklesIcon" style="color: #84cc16; font-size: 1.5rem; margin-top: 2px;"></fa-icon>
         </div>
       }
-      <label class="form-label text-dark mb-3 mt-4">
-        Che tipo di {{ TypeMode() === 'questions' ? 'domande' : 'materiale' }}
-        vuoi creare?
+      <label class="form-label text-dark mb-3 mt-4 fw-normal">
+        Scegli la tipologia di {{ TypeMode() === 'questions' ? 'contenuto da generare' : 'materiale di studio da produrre' }}
       </label>
       <app-type-selector
         [options]="Types()"
@@ -55,7 +59,7 @@
       <div class="row g-3">
         @if (IsMultipleChoice()) {
         <div class="col-4">
-          <label class="form-label text-dark mb-2 fw-normal">Alternative</label>
+          <label class="form-label text-dark mb-2 fw-normal">Opzioni di risposta</label>
           <input
             type="number"
             class="form-control custom-input"
@@ -67,7 +71,7 @@
         </div>
         }
         <div class="col">
-          <label class="form-label text-dark mb-2 fw-normal">Lingua</label>
+          <label class="form-label text-dark mb-2 fw-normal">In quale lingua?</label>
           <select
             class="form-select custom-input"
             formControlName="language"
@@ -81,7 +85,7 @@
           </select>
         </div>
         <div class="col">
-          <label class="form-label text-dark mb-2 fw-normal">Difficoltà</label>
+          <label class="form-label text-dark mb-2 fw-normal">Livello di difficoltà</label>
           <select
             class="form-select custom-input"
             formControlName="difficulty"
@@ -121,13 +125,10 @@
 
     <!-- ─── MATERIALS specific parameters ─────────────────────────────── -->
     <section tourAnchor="gen_ai_m_params" class="form-section">
-      <label class="form-label text-dark mb-2 fw-normal"
-        >Parametri di generazione</label
-      >
       <div class="row g-3">
         @if (IsSlides()) {
-        <div class="col-6 col-md-3">
-          <label class="form-label text-dark fw-normal">N° slide</label>
+        <div class="col-6">
+          <label class="form-label text-dark fw-normal d-flex align-items-end mb-2" style="min-height: 42px;">Quante slide vuoi creare?</label>
           <input
             type="number"
             class="form-control custom-input"
@@ -138,8 +139,8 @@
           />
         </div>
         }
-        <div class="col-6 col-md-3">
-          <label class="form-label text-dark fw-normal">Lingua</label>
+        <div [class.col-6]="IsSlides()" [class.col-12]="!IsSlides()">
+          <label class="form-label text-dark fw-normal d-flex align-items-end mb-2" style="min-height: 42px;">In quale lingua?</label>
           <select
             class="form-select custom-input"
             formControlName="language"
@@ -155,7 +156,7 @@
 
         @if (IsSlides()) {
         <div class="col-12">
-          <label class="form-label text-dark fw-normal">Formato slide</label>
+          <label class="form-label text-dark fw-normal">Formato di esportazione</label>
           <div class="d-flex gap-4 pt-1">
             <div class="form-check">
               <input
@@ -170,7 +171,7 @@
                 for="formatPPTX"
                 style="cursor: pointer"
               >
-                <span class="fw-bold">PPTX</span>
+                <span class="fw-bold">Power Point</span>
                 <span class="text-muted small ms-1">(Modificabile)</span>
               </label>
             </div>
@@ -209,7 +210,7 @@
     </section>
 
     <section tourAnchor="gen_ai_instructions" class="form-section">
-      <label class="form-label text-dark mb-2 fw-normal">Istruzioni aggiuntive</label>
+      <label class="form-label text-dark mb-2 fw-normal">Desideri dare indicazioni specifiche all'AI?</label>
       <textarea
         class="form-control custom-input"
         style="border-radius: 2rem !important; padding: 1.25rem 1.75rem;"

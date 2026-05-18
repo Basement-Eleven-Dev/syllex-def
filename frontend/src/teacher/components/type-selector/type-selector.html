@@ -1,4 +1,4 @@
-<div class="type-selector-grid">
+<div class="type-selector-grid" [class.two-columns]="options().length === 4">
   @for (option of options(); track option.value) {
   <div
     class="rounded-lg syllexCard"
