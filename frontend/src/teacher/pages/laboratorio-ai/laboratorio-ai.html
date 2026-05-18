@@ -51,27 +51,10 @@
 <!-- Wizard -->
 <div class="wizard-container">
   <!-- Step indicator -->
-  <div class="wizard-indicator">
-    @for (s of StepDefs(); track s.n) {
-    <div class="wizard-dot-wrap">
-      <div
-        class="wizard-dot"
-        [class.wizard-dot--active]="s.n === CurrentStep()"
-        [class.wizard-dot--completed]="s.n < CurrentStep()"
-      >
-        @if (s.n < CurrentStep()) {
-        <fa-icon [icon]="CheckIcon" />
-        } @else { {{ s.n }} }
-      </div>
-      <span class="wizard-dot-label">{{ s.label }}</span>
-    </div>
-    @if (!$last) {
-    <div
-      class="wizard-connector"
-      [class.wizard-connector--done]="s.n < CurrentStep()"
-    ></div>
-    } }
-  </div>
+  <app-syllex-stepper
+    [steps]="StepDefs()"
+    [currentStep]="CurrentStep()"
+  ></app-syllex-stepper>
 
   <!-- Main area: prev arrow | panel | next arrow/spacer -->
   <div class="wizard-main">

@@ -7,7 +7,7 @@ interface SyllexButtonProps {
   label: string;
   variant: 'primary' | 'secondary' | 'outline' | 'underline' | 'text';
   size: 'small' | 'medium' | 'large';
-  color?: 'primary' | 'white' | 'dark' | 'danger' | 'celestine';
+  color?: 'primary' | 'white' | 'dark' | 'danger' | 'celestine' | 'black';
   shape?: 'circle';
   leftIcon?: IconDefinition;
   rightIcon?: IconDefinition;
@@ -41,13 +41,18 @@ export class SyllexButton {
   get buttonClasses() {
     return {
       'btn-primary':
-        this.props.variant === 'primary' && this.props.color !== 'danger',
+        this.props.variant === 'primary' &&
+        this.props.color !== 'danger' &&
+        this.props.color !== 'black',
       'btn-secondary': this.props.variant === 'secondary',
+      'btn-black':
+        this.props.variant === 'primary' && this.props.color === 'black',
       'btn-outline':
         this.props.variant === 'outline' &&
         this.props.color !== 'white' &&
         this.props.color !== 'dark' &&
-        this.props.color !== 'danger',
+        this.props.color !== 'danger' &&
+        this.props.color !== 'black',
       'btn-outline-white':
         this.props.variant === 'outline' && this.props.color === 'white',
       'btn-outline-dark':
@@ -64,6 +69,7 @@ export class SyllexButton {
         this.props.variant === 'underline' && this.props.color === 'white',
       'btn-text': this.props.variant === 'text',
       'btn-sm': this.props.size === 'small',
+      'btn-md fw-medium': this.props.size === 'medium',
       'btn-lg': this.props.size === 'large',
       'px-4': this.props.size === 'small' || this.props.size === 'medium',
       'py-1': this.props.size === 'small',

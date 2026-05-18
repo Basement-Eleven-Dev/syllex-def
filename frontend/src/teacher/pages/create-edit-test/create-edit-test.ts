@@ -16,17 +16,7 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import {
-  faCalendar,
-  faClock,
-  faInfinity,
-  faKey,
-  faPenRuler,
-  faPlus,
-  faSave,
-  faSparkles,
-  faTrophy,
-} from '@fortawesome/pro-solid-svg-icons';
+import { faInfinity, faKey, faPlus } from '@fortawesome/pro-solid-svg-icons';
 import {
   QuestionsDroppableList,
   QuestionWithPoints,
@@ -36,11 +26,7 @@ import { SearchQuestions } from '../../components/search-questions/search-questi
 import { ClassSelector } from '../../components/class-selector/class-selector';
 import { ClassiService } from '../../../services/classi-service';
 import { GenAiContents } from '../../components/gen-ai-contents/gen-ai-contents';
-import {
-  NgbModal,
-  NgbOffcanvas,
-  NgbTooltipModule,
-} from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { Materia } from '../../../services/materia';
 import { TestsService, TestInterface } from '../../../services/tests-service';
 import {
@@ -53,6 +39,10 @@ import { QuestionsGridSelector } from '../../components/questions-grid-selector/
 import { SyllexPagination } from '../../components/syllex-pagination/syllex-pagination';
 import { TestPreviewModal } from '../../components/test-preview-modal/test-preview-modal';
 import { forkJoin } from 'rxjs';
+import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
+import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
+import { SyllexBadge } from '../../components/UI/syllex-badge/syllex-badge';
+import { SyllexStepper } from '../../components/UI/syllex-stepper/syllex-stepper';
 
 @Component({
   selector: 'app-create-edit-test',
@@ -66,7 +56,10 @@ import { forkJoin } from 'rxjs';
     QuestionsSearchFilters,
     QuestionsGridSelector,
     SyllexPagination,
-    NgbTooltipModule,
+    SyllexPageHeader,
+    SyllexButton,
+    SyllexBadge,
+    SyllexStepper,
   ],
   templateUrl: './create-edit-test.html',
   styleUrl: './create-edit-test.scss',
@@ -87,13 +80,7 @@ export class CreateEditTest implements OnInit {
   // Icons
   readonly InfinityIcon = faInfinity;
   readonly GenPasswordIcon = faKey;
-  readonly DraftIcon = faPenRuler;
-  readonly SaveIcon = faSave;
-  readonly SparklesIcon = faSparkles;
   readonly PlusIcon = faPlus;
-  readonly TrophyIcon = faTrophy;
-  readonly ClockIcon = faClock;
-  readonly CalendarIcon = faCalendar;
 
   // Selected questions map for preview
   selectedQuestionsMap = new Map<string, QuestionInterface>();
@@ -106,11 +93,17 @@ export class CreateEditTest implements OnInit {
 
   // UI State
   readonly IsLoading = signal<boolean>(false);
+  readonly CurrentStep = signal<1 | 2 | 3>(1);
   readonly SelectedQuestionIds = signal<string[]>([]);
   readonly QuestionsToLoad = signal<
     { questionId: string; points: number }[] | undefined
   >(undefined);
   private readonly FormChanged = signal<number>(0);
+  readonly StepDefs = [
+    { n: 1, label: 'Configura' },
+    { n: 2, label: 'Domande' },
+    { n: 3, label: 'Finalizza' },
+  ] as const;
 
   // Computed
   readonly IsEditMode = computed(() => !!this.TestId());
@@ -247,6 +240,56 @@ export class CreateEditTest implements OnInit {
     return !!this.TestForm.value.title;
   });
 
+  readonly Step1Blockers = computed(() => {
+    this.FormChanged();
+    const form = this.TestForm.value;
+    const blockers: string[] = [];
+
+    if (!form.title) blockers.push('Inserisci un titolo');
+    if (!form.availableFrom) blockers.push('Imposta la data di inizio');
+    if (!form.classes?.length) blockers.push('Assegna almeno una classe');
+
+    return blockers;
+  });
+
+  readonly CanGoNextToQuestions = computed(
+    () => this.Step1Blockers().length === 0,
+  );
+
+  readonly CanGoNextToFinalize = computed(
+    () => this.SelectedQuestionIds().length > 0,
+  );
+
+  goNextStep(): void {
+    const step = this.CurrentStep();
+    if (step === 1 && !this.CanGoNextToQuestions()) return;
+    if (step === 2 && !this.CanGoNextToFinalize()) return;
+    if (step < 3) this.CurrentStep.set((step + 1) as 1 | 2 | 3);
+  }
+
+  goPrevStep(): void {
+    const step = this.CurrentStep();
+    if (step > 1) this.CurrentStep.set((step - 1) as 1 | 2 | 3);
+  }
+
+  goToStep(step: number): void {
+    if (step === 1) {
+      this.CurrentStep.set(1);
+      return;
+    }
+    if (step === 2 && this.CanGoNextToQuestions()) {
+      this.CurrentStep.set(2);
+      return;
+    }
+    if (
+      step === 3 &&
+      this.CanGoNextToQuestions() &&
+      this.CanGoNextToFinalize()
+    ) {
+      this.CurrentStep.set(3);
+    }
+  }
+
   onQuestionsChanged(questions: QuestionWithPoints[]): void {
     this.SelectedQuestionIds.set(questions.map((q) => q._id));
   }
@@ -270,6 +313,51 @@ export class CreateEditTest implements OnInit {
       timeControl?.setValue(0);
       timeControl?.enable();
     }
+  }
+
+  getAvailabilitySummary(): string {
+    const start = this.TestForm.get('availableFrom')?.value;
+    const end = this.TestForm.get('availableTo')?.value;
+
+    if (!start && !end) return 'Non impostata';
+    if (start && end) {
+      return `${this.formatDateLabel(start)} - ${this.formatDateLabel(end)}`;
+    }
+    if (start) return `Da ${this.formatDateLabel(start)}`;
+    return `Fino a ${this.formatDateLabel(end)}`;
+  }
+
+  getTimeSummary(): string {
+    const value = this.TestForm.get('time')?.value;
+    if (value === null || value === undefined || value === '' || value <= 0) {
+      return 'Illimitato';
+    }
+    return `${value} min`;
+  }
+
+  private formatDateLabel(value: string): string {
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return value;
+    return d.toLocaleDateString('it-IT', {
+      day: '2-digit',
+      month: 'short',
+    });
+  }
+
+  onResetForm(): void {
+    this.TestForm.reset({
+      title: '',
+      availableFrom: '',
+      availableTo: '',
+      classes: [],
+      password: '',
+      requiredScore: 0,
+      time: 0,
+      randomizeQuestions: false,
+      oneShotAnswers: false,
+    });
+    this.SelectedQuestionIds.set([]);
+    this.CurrentStep.set(1);
   }
 
   onSaveTest(asDraft: boolean = false): void {

@@ -32,6 +32,7 @@ import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
 import { SyllexCard } from '../../components/UI/syllex-card/syllex-card';
 import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
 import { SyllexSelectInput } from '../../components/UI/syllex-select-input/syllex-select-input';
+import { SyllexStepper } from '../../components/UI/syllex-stepper/syllex-stepper';
 import { Materia } from '../../../services/materia';
 import { QuestionsService } from '../../../services/questions';
 import { FeedbackService } from '../../../services/feedback-service';
@@ -79,6 +80,7 @@ interface StepDef {
     SyllexCard,
     SyllexPageHeader,
     SyllexSelectInput,
+    SyllexStepper,
     TourAnchorNgBootstrapDirective,
     MaterialiSelector,
   ],

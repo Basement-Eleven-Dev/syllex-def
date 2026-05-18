@@ -1,0 +1,27 @@
+<div class="w-100 d-flex justify-content-center mb-4">
+  <div class="wizard-indicator" style="max-width: 400px">
+    @for (s of steps; track s.n) {
+    <button
+      type="button"
+      class="wizard-dot-wrap-btn"
+      [disabled]="!isStepClickable(s.n)"
+      (click)="onStepClick(s.n)"
+    >
+      <div
+        class="wizard-dot"
+        [class.wizard-dot--active]="s.n === currentStep"
+        [class.wizard-dot--completed]="s.n < currentStep"
+      >
+        @if (s.n < currentStep) { ✓ } @else { {{ s.n }} }
+      </div>
+      <span class="wizard-dot-label">{{ s.label }}</span>
+    </button>
+
+    @if (!$last) {
+    <div
+      class="wizard-connector"
+      [class.wizard-connector--done]="s.n < currentStep"
+    ></div>
+    } }
+  </div>
+</div>
