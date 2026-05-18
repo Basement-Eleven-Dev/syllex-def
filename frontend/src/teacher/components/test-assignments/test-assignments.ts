@@ -21,7 +21,8 @@ import {
   faXmark,
 } from '@fortawesome/pro-solid-svg-icons';
 import { SyllexPagination } from '../syllex-pagination/syllex-pagination';
-import { RouterLink } from '@angular/router';
+import { SyllexButton } from '../UI/syllex-button/syllex-button';
+import { SyllexSearchInput } from '../UI/syllex-search-input/syllex-search-input';
 
 @Component({
   selector: 'app-test-assignments',
@@ -33,7 +34,8 @@ import { RouterLink } from '@angular/router';
     FormsModule,
     ReactiveFormsModule,
     SyllexPagination,
-    RouterLink,
+    SyllexButton,
+    SyllexSearchInput,
   ],
   templateUrl: './test-assignments.html',
   styleUrl: './test-assignments.scss',

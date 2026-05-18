@@ -7,4 +7,34 @@
   display: grid;
   gap: 0.75rem;
   grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+
+  &.two-columns {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.syllexCard {
+  border: 2px solid color-mix(in srgb, var(--bs-secondary) 30%, white);
+  background-color: #ffffff !important;
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  fa-icon {
+    color: color-mix(in srgb, var(--bs-secondary) 60%, black);
+    transition: color 0.25s ease;
+  }
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--bs-secondary) 60%, white);
+    background-color: color-mix(in srgb, var(--bs-secondary) 12%, white) !important;
+  }
+
+  &.selected {
+    border-color: color-mix(in srgb, var(--bs-secondary) 70%, black) !important;
+    background-color: color-mix(in srgb, var(--bs-secondary) 35%, white) !important;
+
+    fa-icon {
+      color: color-mix(in srgb, var(--bs-secondary) 85%, black);
+    }
+  }
 }

@@ -1,59 +1,389 @@
-<h1
+<app-syllex-page-header
   tourAnchor="laboratorio_ai_header"
-  class="text-dark fw-medium mb-3 display-6"
->
-  Crea utilizzando l'AI di Syllex
-</h1>
-<h5 class="text-dark mb-0 fw-normal">
-  Crea e sperimenta con l'intelligenza artificiale di Syllex da qui.
-</h5>
+  title="Crea con l'AI di Syllex"
+  description="Genera materiali didattici e domande per i test in pochi passi."
+></app-syllex-page-header>
 
-<label class="fw-semibold fs-4 text-dark mt-5 mb-3">Cosa vuoi creare?</label>
-<div
-  tourAnchor="laboratorio_ai_type_cards"
-  class="d-flex flex-row align-items-stretch gap-4"
->
-  <div
-    tourAnchor="laboratorio_ai_card_materials"
-    class="card py-3 ai syllex-shadow"
-    [class.not-selected]="!isMaterialsHovered()"
-    [class.selected]="selectedCreationType === 'materials'"
-    (mouseenter)="isMaterialsHovered.set(true)"
-    (mouseleave)="isMaterialsHovered.set(false)"
-    (click)="selectedCreationType = 'materials'"
-  >
-    <fa-icon [icon]="SparklesIcon" id="sparkleIcon"></fa-icon>
-    <div
-      class="card-body d-flex flex-column align-items-center justify-content-center"
-    >
-      <fa-icon [icon]="MaterialsIcon" class="mb-3" size="4x"></fa-icon>
-      <h5 class="card-title fw-bold mb-0">Materiale di studio</h5>
+@if (!InitialChoice()) {
+<!-- PRE-STEP: Scelta del tipo -->
+<div class="pre-step" tourAnchor="laboratorio_ai_type_cards">
+  <div class="row g-4">
+    <div class="col-12 col-md-6" tourAnchor="laboratorio_ai_card_materials">
+      <div
+        (click)="onSelectInitialType('materials')"
+        style="cursor: pointer"
+        role="button"
+        tabindex="0"
+        (keydown.enter)="onSelectInitialType('materials')"
+      >
+        <app-syllex-card
+          title="Materiale di studio"
+          description="Genera slides, riassunti, glossari e mappe concettuali dai tuoi file"
+          [icon]="MaterialsIcon"
+          variant="ai"
+          [showArrow]="true"
+          class="h-100"
+        ></app-syllex-card>
+      </div>
     </div>
-  </div>
-  <div
-    tourAnchor="laboratorio_ai_card_questions"
-    class="card py-3 ai"
-    [class.not-selected]="!isQuestionsHovered()"
-    [class.selected]="selectedCreationType === 'questions'"
-    (mouseenter)="isQuestionsHovered.set(true)"
-    (mouseleave)="isQuestionsHovered.set(false)"
-    (click)="selectedCreationType = 'questions'"
-  >
-    <fa-icon [icon]="SparklesIcon" id="sparkleIcon"></fa-icon>
-
-    <div
-      class="card-body d-flex flex-column align-items-center justify-content-center"
-    >
-      <fa-icon [icon]="QuestionsIcon" class="mb-3" size="4x"></fa-icon>
-      <h5 class="card-title fw-bold mb-0">Domande dei Test</h5>
+    <div class="col-12 col-md-6" tourAnchor="laboratorio_ai_card_questions">
+      <div
+        (click)="onSelectInitialType('questions')"
+        style="cursor: pointer"
+        role="button"
+        tabindex="0"
+        (keydown.enter)="onSelectInitialType('questions')"
+      >
+        <app-syllex-card
+          title="Domande dei Test"
+          description="Crea domande per la banca domande in modalità guidata"
+          [icon]="QuestionsIcon"
+          variant="filled"
+          color="purple"
+          [showArrow]="true"
+          class="h-100"
+        ></app-syllex-card>
+      </div>
     </div>
   </div>
 </div>
+} @if (InitialChoice() === 'materials') {
+<!-- Wizard -->
+<div class="wizard-container">
+  <!-- Main area: prev arrow | panel | next arrow/spacer -->
+  <div class="wizard-main">
+    <div class="wizard-panel">
+      <!-- ── STEP 1: Tipo materiale ── -->
+      @if (CurrentStep() === 1) {
+      <div
+        class="wizard-step-content"
+        @stepIn
+        tourAnchor="gen_ai_type_selector"
+      >
+        <h5 class="wizard-step-title">Che materiale vuoi creare?</h5>
+        <p class="wizard-step-subtitle">
+          Scegli il formato e l'AI farà il resto.
+        </p>
+        <div class="row g-3 mt-1">
+          @for (type of MaterialTypes; track type.value) {
+          <div class="col-12 col-sm-6">
+            <div
+              class="method-card"
+              [class.selected]="SelectedMaterialType() === type.value"
+              (click)="onSelectMaterialType(type.value)"
+              role="button"
+              [attr.aria-label]="type.label"
+            >
+              <span class="method-card-icon"
+                ><fa-icon [icon]="type.icon"
+              /></span>
+              <div>
+                <h6 class="mb-0 fw-semibold">{{ type.label }}</h6>
+                <p class="mb-0 text-muted small">{{ type.description }}</p>
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+      }
 
-<section tourAnchor="laboratorio_ai_content" class="mt-5">
-  @if(selectedCreationType == 'questions'){
-  <app-gen-ai-contents [type]="'questions'"></app-gen-ai-contents>
-  } @else {
-  <app-gen-ai-contents [type]="'materials'"></app-gen-ai-contents>
-  }
-</section>
+      <!-- ── STEP 2: File + Argomento (tutti i tipi) ── -->
+      @if (CurrentStep() === 2) {
+      <div
+        class="wizard-step-content"
+        @stepIn
+        tourAnchor="gen_ai_support_files"
+      >
+        <div
+          class="d-flex align-items-center justify-content-between gap-2 mb-3"
+        >
+          <h5 class="wizard-step-title mb-0">
+            Seleziona i materiali di riferimento
+          </h5>
+          @if (SelectedMaterialIds().length > 0) {
+          <div class="d-flex align-items-center gap-2 flex-shrink-0">
+            <span
+              class="badge rounded-pill bg-primary"
+              style="font-size: 0.72rem"
+            >
+              {{ SelectedMaterialIds().length }} selezionati
+            </span>
+            <button
+              type="button"
+              class="btn btn-link btn-sm p-0 text-muted text-nowrap"
+              style="font-size: 0.78rem"
+              (click)="onDeselectAllMaterials()"
+            >
+              Deseleziona tutti
+            </button>
+          </div>
+          }
+        </div>
+        <app-materiali-selector
+          [compact]="true"
+          [initialMaterialIds]="SelectedMaterialIds()"
+          (selectionChange)="onMaterialSelectionChange($event)"
+        ></app-materiali-selector>
+        @if (materiaService.materiaSelected()?.topics?.length) {
+        <div [formGroup]="genForm" class="mt-3">
+          <label class="wizard-field-label"
+            >Argomento
+            <span class="text-muted fw-normal">(opzionale)</span></label
+          >
+          <select
+            class="form-select bg-light border-0 shadow-none py-2 px-3 rounded-pill"
+            style="font-size: 0.875rem"
+            formControlName="topicId"
+          >
+            <option value="">Tutti gli argomenti</option>
+            @for (topic of materiaService.materiaSelected()!.topics; track
+            topic._id) {
+            <option [value]="topic._id">{{ topic.name }}</option>
+            }
+          </select>
+        </div>
+        } @if (SelectedMaterialIds().length === 0) {
+        <p class="text-muted small mt-2">
+          Seleziona almeno un file per continuare.
+        </p>
+        }
+      </div>
+      }
+
+      <!-- ── STEP 3 slides: Stile ── -->
+      @if (CurrentStep() === 3 && IsSlides()) {
+      <div class="wizard-step-content" @stepIn tourAnchor="gen_ai_instructions">
+        <h5 class="wizard-step-title">Come vuoi le tue slide?</h5>
+        <p class="wizard-step-subtitle">
+          Scegli lo stile e l'AI adatterà la densità e il tono del testo.
+        </p>
+        <div [formGroup]="genForm" class="d-flex flex-column gap-3">
+          <div class="row g-3">
+            @for (opt of StyleOptions; track opt.value) {
+            <div class="col-12 col-sm-4">
+              <div
+                class="style-preset-card h-100"
+                [class.selected]="genForm.get('slideStyle')?.value === opt.value"
+                (click)="onStyleSelect(opt.value)"
+                role="button"
+              >
+                @if (opt.recommended) {
+                <span class="badge bg-primary preset-badge">Consigliata</span>
+                }
+                <span class="preset-icon">
+                  <fa-icon [icon]="opt.icon" />
+                </span>
+                <div class="fw-semibold" style="font-size: 0.9rem">
+                  {{ opt.label }}
+                </div>
+                <div class="text-muted" style="font-size: 0.78rem">
+                  {{ opt.description }}
+                </div>
+              </div>
+            </div>
+            }
+          </div>
+          <div>
+            <label class="wizard-field-label">
+              Vuoi aggiungere qualcosa?
+              <span class="text-muted fw-normal">(opzionale)</span>
+            </label>
+            <textarea
+              class="form-control custom-input"
+              formControlName="instructions"
+              rows="3"
+              style="resize: none"
+              placeholder="Es. includi esempi pratici, usa un tono formale, evidenzia le definizioni..."
+            ></textarea>
+          </div>
+        </div>
+      </div>
+      }
+
+      <!-- ── STEP 3 altri tipi: Personalizza ── -->
+      @if (CurrentStep() === 3 && !IsSlides()) {
+      <div
+        class="wizard-step-content"
+        @stepIn
+        tourAnchor="laboratorio_ai_content"
+      >
+        <h5 class="wizard-step-title">
+          Personalizza il {{ SelectedMaterialTypeName() }}
+        </h5>
+        <p class="wizard-step-subtitle">
+          Indica la lingua e aggiungi istruzioni specifiche per l'AI.
+        </p>
+        <div [formGroup]="genForm" class="d-flex flex-column gap-3">
+          <div>
+            <label class="wizard-field-label">In che lingua?</label>
+            <app-syllex-select-input
+              formControlName="language"
+              [options]="LanguageOptions"
+            ></app-syllex-select-input>
+          </div>
+          <div>
+            <label class="wizard-field-label">
+              Istruzioni particolari
+              <span class="text-muted fw-normal">(opzionale)</span>
+            </label>
+            <textarea
+              class="form-control custom-input"
+              formControlName="instructions"
+              rows="4"
+              style="resize: none"
+              placeholder="Es. usa un tono formale, includi esempi pratici, evidenzia le definizioni..."
+            ></textarea>
+          </div>
+        </div>
+      </div>
+      }
+
+      <!-- ── STEP 4 slides: Dettagli ── -->
+      @if (CurrentStep() === 4 && IsSlides()) {
+      <div class="wizard-step-content" @stepIn tourAnchor="gen_ai_m_params">
+        <h5 class="wizard-step-title">
+          <fa-icon [icon]="SparklesIcon" class="me-2 text-primary"></fa-icon>
+          Ultimi dettagli
+        </h5>
+        <p class="wizard-step-subtitle">
+          Quante slide, in che lingua e il formato di output.
+        </p>
+        <div [formGroup]="genForm" class="d-flex flex-column gap-3">
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="wizard-field-label">Quante slide?</label>
+              <input
+                type="number"
+                class="form-control custom-input"
+                formControlName="numberOfSlides"
+                min="3"
+                max="30"
+                aria-label="Numero di slide"
+              />
+            </div>
+            <div class="col-6">
+              <label class="wizard-field-label">In che lingua?</label>
+              <app-syllex-select-input
+                formControlName="language"
+                [options]="LanguageOptions"
+              ></app-syllex-select-input>
+            </div>
+          </div>
+          <div>
+            <label class="wizard-field-label">Formato di output</label>
+            <div class="d-flex gap-2">
+              <label
+                class="rounded-syllex typeCard p-3 d-flex align-items-center gap-2 flex-fill"
+                [class.selected]="genForm.get('format')?.value === 'pdf'"
+                for="formatPDF"
+                style="cursor: pointer; max-width: 160px"
+              >
+                <input
+                  class="form-check-input flex-shrink-0 mt-0"
+                  type="radio"
+                  value="pdf"
+                  id="formatPDF"
+                  formControlName="format"
+                />
+                <div>
+                  <div class="fw-semibold small">PDF</div>
+                  <div class="text-muted" style="font-size: 0.75rem">
+                    Documento statico
+                  </div>
+                </div>
+              </label>
+              <label
+                class="rounded-syllex typeCard p-3 d-flex align-items-center gap-2 flex-fill"
+                [class.selected]="genForm.get('format')?.value === 'pptx'"
+                for="formatPPTX"
+                style="cursor: pointer; max-width: 160px"
+              >
+                <input
+                  class="form-check-input flex-shrink-0 mt-0"
+                  type="radio"
+                  value="pptx"
+                  id="formatPPTX"
+                  formControlName="format"
+                />
+                <div>
+                  <div class="fw-semibold small">PPTX</div>
+                  <div class="text-muted" style="font-size: 0.75rem">
+                    Modificabile
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+
+    <!-- Footer navigation -->
+    <div class="wizard-footer">
+      <!-- Left: Indietro -->
+      <div>
+        <app-syllex-button
+          [props]="{
+            label: 'Indietro',
+            variant: 'primary',
+            size: 'medium',
+            disabled: IsGenerating()
+          }"
+          (clicked)="goPrev()"
+        ></app-syllex-button>
+      </div>
+
+      <app-syllex-stepper
+        [steps]="StepDefs()"
+        [currentStep]="CurrentStep()"
+      ></app-syllex-stepper>
+
+      <!-- Right: Avanti / Genera -->
+      <div class="wizard-footer__right">
+        @if (ShowNextArrow()) {
+
+        <app-syllex-button
+          [props]="{
+            label: 'Avanti',
+            variant: 'primary',
+            size: 'medium',
+            disabled: !CanGoNext()
+          }"
+          (clicked)="goNext()"
+        ></app-syllex-button>
+        } @else {
+
+        <button
+          tourAnchor="gen_ai_submit"
+          type="button"
+          class="btn btn-primary ms-2 ai icon-btn rounded-pill px-4 py-3 fw-bold"
+          [disabled]="genForm.invalid || IsGenerating()"
+          (click)="onGenerate()"
+        >
+          <fa-icon
+            [icon]="IsGenerating() ? SpinnerIcon : SparklesIcon"
+            [animation]="IsGenerating() ? 'spin' : undefined"
+          ></fa-icon>
+          {{ IsGenerating() ? 'Generazione in corso...' : 'Genera ' +
+          SelectedMaterialTypeName() }}
+        </button>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+<!-- AI Overlay -->
+<app-ai-overlay
+  [visible]="IsGenerating()"
+  [success]="GenerationSuccess()"
+  loadingTitle="Generazione in corso..."
+  loadingSubtitle="Non tornare indietro e non chiudere la pagina,&#10;altrimenti la generazione andrà perduta."
+  successTitle="Materiale generato!"
+  successMessage="Il tuo materiale è pronto e disponibile in File e Risorse."
+  ctaLabel="Vai ai materiali"
+  (ctaClick)="onReturnToResources()"
+></app-ai-overlay>

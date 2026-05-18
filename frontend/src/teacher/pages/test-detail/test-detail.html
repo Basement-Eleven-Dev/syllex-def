@@ -16,30 +16,22 @@
   </button>
   <span class="class-header__title">{{ TestData()!.name }}</span>
   <div class="ms-auto d-flex flex-row gap-2 align-items-center">
-    <button
-      class="btn btn-sm btn-outline-secondary icon-btn"
-      (click)="onPrintTest()"
-    >
-      <fa-icon [icon]="PrintIcon"></fa-icon> Stampa / PDF
-    </button>
-    <button
-      class="btn btn-sm btn-outline-secondary icon-btn"
-      (click)="onPrintResults()"
-    >
-      <fa-icon [icon]="PrintIcon"></fa-icon> Stampa risultati
-    </button>
-    <button
-      class="btn btn-sm btn-outline-primary icon-btn"
-      (click)="onEditTest()"
-    >
-      <fa-icon [icon]="EditIcon"></fa-icon> Modifica
-    </button>
-    <button
-      class="btn btn-sm btn-outline-danger icon-btn"
-      (click)="onDeleteTest()"
-    >
-      <fa-icon [icon]="TrashIcon"></fa-icon> Elimina
-    </button>
+    <app-syllex-button
+      [props]="{ label: 'Stampa / PDF', variant: 'outline', size: 'small', leftIcon: PrintIcon }"
+      (clicked)="onPrintTest()"
+    />
+    <app-syllex-button
+      [props]="{ label: 'Stampa Risultati', variant: 'outline', size: 'small', leftIcon: PrintIcon }"
+      (clicked)="onPrintResults()"
+    />
+    <app-syllex-button
+      [props]="{ label: 'Modifica', variant: 'outline', size: 'small', leftIcon: EditIcon }"
+      (clicked)="onEditTest()"
+    />
+    <app-syllex-button
+      [props]="{ label: 'Elimina', variant: 'outline', size: 'small', color: 'danger', leftIcon: TrashIcon }"
+      (clicked)="onDeleteTest()"
+    />
   </div>
 </div>
 

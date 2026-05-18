@@ -41,6 +41,7 @@ const askStrucuredGemini = async <T>(
     try {
       const response = await client.models.generateContent({
         model: model,
+
         contents: [
           {
             role: "user",

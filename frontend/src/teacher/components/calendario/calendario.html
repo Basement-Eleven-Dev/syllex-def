@@ -155,7 +155,7 @@
               <p class="mb-0">{{ test.availableFrom | date: 'short' }}</p>
               <div class="d-flex gap-2">
                 <app-syllex-button
-                  [props]="{ label: 'Modifica', variant: 'primary', color: 'celestine', size: 'small', link: '/t/edit-test/' + test._id }"
+                  [props]="{ label: 'Modifica', variant: 'primary', color: 'celestine', size: 'small', link: '/t/tests/edit/' + test._id }"
                 />
                 <app-syllex-button
                   [props]="{ label: 'Elimina', variant: 'primary', color: 'danger', size: 'small' }"

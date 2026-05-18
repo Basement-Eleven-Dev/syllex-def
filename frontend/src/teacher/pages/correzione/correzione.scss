@@ -1,3 +1,52 @@
+.class-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.25rem;
+
+  &__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #3931ce;
+    display: flex;
+    align-items: center;
+  }
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: 2px solid #3931ce;
+  background: transparent;
+  color: #3931ce;
+  flex-shrink: 0;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.75;
+  }
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #9ca3af;
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+
+  fa-icon {
+    font-size: 1rem;
+  }
+}
+
 #statusBadge {
   &.da-correggere {
     background-color: #ffa72c;
@@ -38,6 +87,63 @@
   transform: scale(1.2);
   background-color: var(--bs-primary);
   color: white;
+}
+
+.ai-feedback-card {
+  background: #d2e2ff;
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+}
+
+.ai-feedback-text {
+  font-style: italic;
+  color: #1e1b6e;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.correzione-box {
+  background: #ffffff;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+}
+
+.btn-question {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: none;
+  background: #e4e4e4;
+  color: #363636;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease;
+
+  &.q-correct {
+    background: #4bb543;
+    color: #fff;
+  }
+  &.q-wrong {
+    background: #ff4c4c;
+    color: #fff;
+  }
+  &.q-dubious {
+    background: #ffa72c;
+    color: #fff;
+  }
+  &.q-empty {
+    background: #e4e4e4;
+    color: #363636;
+  }
+  &.q-selected {
+    transform: scale(1.2);
+  }
 }
 
 .btnSelectQuestion {

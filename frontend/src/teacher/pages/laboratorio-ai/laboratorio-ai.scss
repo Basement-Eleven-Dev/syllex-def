@@ -1,11 +1,363 @@
-.card {
-  overflow: hidden;
-  min-width: 400px;
+// ─── Pre-step Card Selection ──────────────────────────
+
+// Make this component fill its flex parent (teacher layout scroll area)
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
-#sparkleIcon {
-  position: absolute;
-  font-size: 300px;
-  opacity: 0.2;
-  top: -10px;
-  right: -10px;
+
+.pre-step {
+  margin-bottom: 2rem;
+
+  &__title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    margin-bottom: 0.35rem;
+  }
+
+  &__subtitle {
+    color: var(--bs-secondary-color);
+    font-size: 0.9rem;
+    margin-bottom: 1.75rem;
+  }
+}
+
+// ─── Page Header ──────────────────────────────────────
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+
+  h1 {
+    font-size: 1.75rem;
+  }
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: 2px solid #3931ce;
+  background: transparent;
+  color: #3931ce;
+  flex-shrink: 0;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.75;
+  }
+}
+
+// ─── Wizard Container ─────────────────────────────────
+
+.wizard-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+// ─── Step Indicator ───────────────────────────────────
+
+.wizard-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+}
+
+// Variant inside footer — occupies 50% of the center wrapper
+.wizard-indicator--footer {
+  width: 50%;
+  flex-shrink: 0;
+
+  .wizard-dot {
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0.65rem;
+  }
+
+  .wizard-dot-label {
+    font-size: 0.58rem;
+    letter-spacing: 0.02em;
+  }
+
+  .wizard-connector {
+    flex: 1;
+    margin-bottom: 1rem;
+  }
+}
+
+// Center wrapper: full 1fr column, hairline dividers flank the dots
+.wizard-footer-center {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  // keep dots vertically aligned with the dot circles, not the labels
+  padding-bottom: 1rem; // matches connector margin-bottom so dividers align to circle mid
+}
+
+.wizard-footer-divider {
+  flex: 1;
+  height: 1px;
+  background: var(--bs-border-color);
+  align-self: flex-start;
+  margin-top: 0.75rem; // align with dot circle center
+}
+
+.wizard-dot-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.wizard-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 2px solid var(--bs-border-color);
+  color: var(--bs-secondary-color);
+  background: white;
+  transition: all 0.25s ease;
+  z-index: 1;
+
+  &--active {
+    border-color: var(--bs-primary);
+    color: var(--bs-primary);
+    background: rgba(var(--bs-primary-rgb), 0.06);
+    transform: scale(1.15);
+  }
+
+  &--completed {
+    border-color: var(--bs-primary);
+    color: white;
+    background: var(--bs-primary);
+  }
+}
+
+.wizard-dot-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--bs-secondary-color);
+  white-space: nowrap;
+}
+
+.wizard-connector {
+  flex: 1;
+  height: 2px;
+  background: var(--bs-border-color);
+  margin: 0 0.25rem;
+  margin-bottom: 1.1rem;
+  transition: background 0.3s ease;
+  max-width: 80px;
+
+  &--done {
+    background: var(--bs-primary);
+  }
+}
+
+// ─── Wizard Main ──────────────────────────────────────
+
+.wizard-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.wizard-panel {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative; // anchor for absolute-positioned leaving step
+}
+
+.wizard-step-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem 2rem;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.wizard-step-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+  letter-spacing: -0.02em;
+}
+
+.wizard-step-subtitle {
+  color: var(--bs-secondary-color);
+  font-size: 0.875rem;
+  margin-bottom: 1.5rem;
+}
+
+.wizard-field-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--bs-secondary-color);
+  margin-bottom: 0.5rem;
+}
+
+// ─── Wizard Footer ────────────────────────────────────
+
+.wizard-footer {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.45rem 1.5rem;
+  flex-shrink: 0;
+
+  .wizard-footer__right {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+// ─── Method Cards ─────────────────────────────────────
+
+.method-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: 0.875rem;
+  border: 2px solid var(--bs-border-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 90px;
+  background: white;
+  height: 100%;
+
+  &:hover {
+    border-color: var(--bs-primary);
+    background: rgba(var(--bs-primary-rgb), 0.04);
+
+    .method-card-icon {
+      color: var(--bs-primary);
+    }
+  }
+
+  &.selected {
+    border-color: var(--bs-primary);
+    background: rgba(var(--bs-primary-rgb), 0.06);
+
+    .method-card-icon {
+      color: var(--bs-primary);
+    }
+  }
+
+  &--ai:hover .method-card-icon,
+  &--ai.selected .method-card-icon {
+    background: linear-gradient(
+      135deg,
+      var(--bs-primary) 0%,
+      color-mix(in srgb, var(--bs-primary) 75%, black) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+.method-card-icon {
+  font-size: 1.75rem;
+  color: var(--bs-secondary-color);
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+
+// ─── Type Cards (formato output) ───────────────────────
+
+.typeCard {
+  background: var(--bs-light);
+  transition: background 0.15s ease;
+
+  &.selected {
+    background: rgba(var(--bs-primary-rgb), 0.1);
+
+    .form-check-input {
+      background-color: var(--bs-primary);
+      border-color: var(--bs-primary);
+    }
+  }
+}
+
+// ─── Style Preset Cards ─────────────────────────────────
+
+.style-preset-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.4rem;
+  padding: 1.5rem 1rem 1.25rem;
+  border-radius: 0.875rem;
+  border: 2px solid var(--bs-border-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: white;
+  position: relative;
+
+  .preset-icon {
+    font-size: 1.6rem;
+    color: var(--bs-secondary-color);
+    transition: color 0.2s ease;
+    margin-top: 0.25rem;
+  }
+
+  .preset-badge {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.65rem;
+    white-space: nowrap;
+  }
+
+  &:hover {
+    border-color: var(--bs-primary);
+    background: rgba(var(--bs-primary-rgb), 0.04);
+
+    .preset-icon {
+      color: var(--bs-primary);
+    }
+  }
+
+  &.selected {
+    border-color: var(--bs-primary);
+    background: rgba(var(--bs-primary-rgb), 0.06);
+
+    .preset-icon {
+      color: var(--bs-primary);
+    }
+  }
 }

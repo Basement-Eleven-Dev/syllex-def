@@ -16,17 +16,7 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import {
-  faCalendar,
-  faClock,
-  faInfinity,
-  faKey,
-  faPenRuler,
-  faPlus,
-  faSave,
-  faSparkles,
-  faTrophy,
-} from '@fortawesome/pro-solid-svg-icons';
+import { faInfinity, faKey, faPlus } from '@fortawesome/pro-solid-svg-icons';
 import {
   QuestionsDroppableList,
   QuestionWithPoints,
@@ -36,11 +26,7 @@ import { SearchQuestions } from '../../components/search-questions/search-questi
 import { ClassSelector } from '../../components/class-selector/class-selector';
 import { ClassiService } from '../../../services/classi-service';
 import { GenAiContents } from '../../components/gen-ai-contents/gen-ai-contents';
-import {
-  NgbModal,
-  NgbOffcanvas,
-  NgbTooltipModule,
-} from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { Materia } from '../../../services/materia';
 import { TestsService, TestInterface } from '../../../services/tests-service';
 import {
@@ -50,9 +36,12 @@ import {
 import { FeedbackService } from '../../../services/feedback-service';
 import { QuestionsSearchFilters } from '../../components/questions-search-filters/questions-search-filters';
 import { QuestionsGridSelector } from '../../components/questions-grid-selector/questions-grid-selector';
-import { SyllexPagination } from '../../components/syllex-pagination/syllex-pagination';
 import { TestPreviewModal } from '../../components/test-preview-modal/test-preview-modal';
 import { forkJoin } from 'rxjs';
+import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
+import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
+import { SyllexBadge } from '../../components/UI/syllex-badge/syllex-badge';
+import { SyllexStepper } from '../../components/UI/syllex-stepper/syllex-stepper';
 
 @Component({
   selector: 'app-create-edit-test',
@@ -65,8 +54,10 @@ import { forkJoin } from 'rxjs';
     ClassSelector,
     QuestionsSearchFilters,
     QuestionsGridSelector,
-    SyllexPagination,
-    NgbTooltipModule,
+    SyllexPageHeader,
+    SyllexButton,
+    SyllexBadge,
+    SyllexStepper,
   ],
   templateUrl: './create-edit-test.html',
   styleUrl: './create-edit-test.scss',
@@ -87,13 +78,7 @@ export class CreateEditTest implements OnInit {
   // Icons
   readonly InfinityIcon = faInfinity;
   readonly GenPasswordIcon = faKey;
-  readonly DraftIcon = faPenRuler;
-  readonly SaveIcon = faSave;
-  readonly SparklesIcon = faSparkles;
   readonly PlusIcon = faPlus;
-  readonly TrophyIcon = faTrophy;
-  readonly ClockIcon = faClock;
-  readonly CalendarIcon = faCalendar;
 
   // Selected questions map for preview
   selectedQuestionsMap = new Map<string, QuestionInterface>();
@@ -106,17 +91,34 @@ export class CreateEditTest implements OnInit {
 
   // UI State
   readonly IsLoading = signal<boolean>(false);
+  readonly CurrentStep = signal<1 | 2 | 3>(1);
   readonly SelectedQuestionIds = signal<string[]>([]);
+  readonly SelectedQuestionPoints = signal<Record<string, number>>({});
   readonly QuestionsToLoad = signal<
     { questionId: string; points: number }[] | undefined
   >(undefined);
   private readonly FormChanged = signal<number>(0);
+  readonly StepDefs = [
+    { n: 1, label: 'Configura' },
+    { n: 2, label: 'Domande' },
+    { n: 3, label: 'Finalizza' },
+  ] as const;
 
   // Computed
   readonly IsEditMode = computed(() => !!this.TestId());
   readonly PageTitle = computed(() =>
     this.IsEditMode() ? 'Modifica Test di valutazione' : 'Crea test',
   );
+  readonly HeaderDescription = computed(() => {
+    const step = this.CurrentStep();
+    if (step === 1) {
+      return 'Step 1 di 3 - Imposta titolo, date e classi del test.';
+    }
+    if (step === 2) {
+      return 'Step 2 di 3 - Seleziona le domande dalla banca.';
+    }
+    return 'Step 3 di 3 - Finalizza regole e pubblicazione.';
+  });
 
   readonly TestForm: FormGroup = new FormGroup({
     title: new FormControl('', [Validators.required]),
@@ -199,6 +201,21 @@ export class CreateEditTest implements OnInit {
 
     if (test.questions && test.questions.length > 0) {
       this.QuestionsToLoad.set(test.questions);
+      this.SelectedQuestionIds.set(
+        test.questions.map((q: { questionId: string }) => q.questionId),
+      );
+      this.SelectedQuestionPoints.set(
+        test.questions.reduce(
+          (
+            acc: Record<string, number>,
+            q: { questionId: string; points?: number },
+          ) => {
+            acc[q.questionId] = q.points && q.points > 0 ? q.points : 1;
+            return acc;
+          },
+          {},
+        ),
+      );
     }
   }
 
@@ -219,7 +236,11 @@ export class CreateEditTest implements OnInit {
   }
 
   get maxScore(): number {
-    return this.SelectedQuestionIds().length; // 1 punto per domanda (default)
+    const points = this.SelectedQuestionPoints();
+    return this.SelectedQuestionIds().reduce(
+      (sum, id) => sum + (points[id] ?? 1),
+      0,
+    );
   }
 
   readonly PublishBlockers = computed(() => {
@@ -247,8 +268,83 @@ export class CreateEditTest implements OnInit {
     return !!this.TestForm.value.title;
   });
 
+  readonly Step1Blockers = computed(() => {
+    this.FormChanged();
+    const form = this.TestForm.value;
+    const blockers: string[] = [];
+
+    if (!form.title) blockers.push('Inserisci un titolo');
+    if (!form.availableFrom) blockers.push('Imposta la data di inizio');
+    if (!form.classes?.length) blockers.push('Assegna almeno una classe');
+
+    return blockers;
+  });
+
+  readonly CanGoNextToQuestions = computed(
+    () => this.Step1Blockers().length === 0,
+  );
+
+  readonly CanGoNextToFinalize = computed(
+    () => this.SelectedQuestionIds().length > 0,
+  );
+
+  readonly ShowFooterNext = computed(() => this.CurrentStep() < 3);
+
+  readonly CanGoNext = computed(() => {
+    const step = this.CurrentStep();
+    if (step === 1) return this.CanGoNextToQuestions();
+    if (step === 2) return this.CanGoNextToFinalize();
+    return false;
+  });
+
+  goNextStep(): void {
+    const step = this.CurrentStep();
+    if (step === 1 && !this.CanGoNextToQuestions()) return;
+    if (step === 2 && !this.CanGoNextToFinalize()) return;
+    if (step < 3) this.CurrentStep.set((step + 1) as 1 | 2 | 3);
+  }
+
+  goPrevStep(): void {
+    const step = this.CurrentStep();
+    if (step > 1) this.CurrentStep.set((step - 1) as 1 | 2 | 3);
+  }
+
+  goToStep(step: number): void {
+    if (step === 1) {
+      this.CurrentStep.set(1);
+      return;
+    }
+    if (step === 2 && this.CanGoNextToQuestions()) {
+      this.CurrentStep.set(2);
+      return;
+    }
+    if (
+      step === 3 &&
+      this.CanGoNextToQuestions() &&
+      this.CanGoNextToFinalize()
+    ) {
+      this.CurrentStep.set(3);
+    }
+  }
+
   onQuestionsChanged(questions: QuestionWithPoints[]): void {
     this.SelectedQuestionIds.set(questions.map((q) => q._id));
+    this.SelectedQuestionPoints.set(
+      questions.reduce<Record<string, number>>((acc, q) => {
+        acc[q._id] = q.points && q.points > 0 ? q.points : 1;
+        return acc;
+      }, {}),
+    );
+  }
+
+  onQuestionPointsChanged(payload: {
+    questionId: string;
+    points: number;
+  }): void {
+    this.SelectedQuestionPoints.update((prev) => ({
+      ...prev,
+      [payload.questionId]: payload.points,
+    }));
   }
 
   onClassesChange(classIds: string[]): void {
@@ -270,6 +366,52 @@ export class CreateEditTest implements OnInit {
       timeControl?.setValue(0);
       timeControl?.enable();
     }
+  }
+
+  getAvailabilitySummary(): string {
+    const start = this.TestForm.get('availableFrom')?.value;
+    const end = this.TestForm.get('availableTo')?.value;
+
+    if (!start && !end) return 'Non impostata';
+    if (start && end) {
+      return `${this.formatDateLabel(start)} - ${this.formatDateLabel(end)}`;
+    }
+    if (start) return `Da ${this.formatDateLabel(start)}`;
+    return `Fino a ${this.formatDateLabel(end)}`;
+  }
+
+  getTimeSummary(): string {
+    const value = this.TestForm.get('time')?.value;
+    if (value === null || value === undefined || value === '' || value <= 0) {
+      return 'Illimitato';
+    }
+    return `${value} min`;
+  }
+
+  private formatDateLabel(value: string): string {
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return value;
+    return d.toLocaleDateString('it-IT', {
+      day: '2-digit',
+      month: 'short',
+    });
+  }
+
+  onResetForm(): void {
+    this.TestForm.reset({
+      title: '',
+      availableFrom: '',
+      availableTo: '',
+      classes: [],
+      password: '',
+      requiredScore: 0,
+      time: 0,
+      randomizeQuestions: false,
+      oneShotAnswers: false,
+    });
+    this.SelectedQuestionIds.set([]);
+    this.SelectedQuestionPoints.set({});
+    this.CurrentStep.set(1);
   }
 
   onSaveTest(asDraft: boolean = false): void {
@@ -307,9 +449,10 @@ export class CreateEditTest implements OnInit {
   private prepareTestData(asDraft: boolean, subjectId: string): TestInterface {
     const formValue = this.TestForm.value;
     const selectedIds = this.SelectedQuestionIds();
+    const questionPoints = this.SelectedQuestionPoints();
     const questionsWithPoints = selectedIds.map((id) => ({
       questionId: id,
-      points: 1, // Default a 1 punto ora che non c'è più il drag & drop
+      points: questionPoints[id] ?? 1,
     }));
 
     const testData: TestInterface = {
@@ -353,9 +496,18 @@ export class CreateEditTest implements OnInit {
       this.SelectedQuestionIds.set(
         currentIds.filter((id) => id !== question._id),
       );
+      this.SelectedQuestionPoints.update((prev) => {
+        const next = { ...prev };
+        delete next[question._id];
+        return next;
+      });
       this.selectedQuestionsMap.delete(question._id);
     } else {
       this.SelectedQuestionIds.set([...currentIds, question._id]);
+      this.SelectedQuestionPoints.update((prev) => ({
+        ...prev,
+        [question._id]: prev[question._id] ?? 1,
+      }));
       this.selectedQuestionsMap.set(question._id, question);
     }
   }
@@ -431,7 +583,20 @@ export class CreateEditTest implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((questions: QuestionWithPoints[]) => {
         if (questions?.length) {
-          this.questionsComponent.addQuestions(questions);
+          const newIds = questions.map((q) => q._id);
+          this.SelectedQuestionIds.update((ids) => [
+            ...ids,
+            ...newIds.filter((id) => !ids.includes(id)),
+          ]);
+          this.SelectedQuestionPoints.update((pts) => {
+            const updated = { ...pts };
+            for (const q of questions) {
+              if (!(q._id in updated)) {
+                updated[q._id] = q.points ?? 1;
+              }
+            }
+            return updated;
+          });
         }
       });
   }

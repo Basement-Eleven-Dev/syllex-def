@@ -1,3 +1,90 @@
+// ─── Pre-step Card Selection ──────────────────────────
+
+.pre-step {
+  margin-bottom: 2rem;
+
+  &__title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    margin-bottom: 0.35rem;
+  }
+
+  &__subtitle {
+    color: var(--bs-secondary-color);
+    font-size: 0.9rem;
+    margin-bottom: 1.75rem;
+  }
+
+  ::ng-deep .syllex-card {
+    min-height: 160px !important;
+    padding: 1.5rem !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .main-icon {
+      font-size: 1.75rem !important;
+    }
+
+    .card-footer {
+      margin-top: 1rem;
+      
+      p {
+        width: 85% !important;
+      }
+    }
+
+    // Custom Celeste Variant (soft solid sky blue background)
+    &.card-celeste {
+      border: none !important;
+      background-color: #e0f2fe !important;
+      
+      h3,
+      .main-icon,
+      .arrow-icon {
+        color: #0369a1 !important;
+      }
+
+      p {
+        color: #0c4a6e !important;
+        opacity: 0.85 !important;
+      }
+      
+      &:hover {
+        background-color: #bae6fd !important;
+        transform: translateY(-4px);
+        box-shadow: 0 10px 20px rgba(2, 132, 199, 0.08);
+      }
+    }
+
+    // Custom Lime Variant (soft solid lime background)
+    &.card-lime {
+      border: none !important;
+      background-color: #ecfccb !important;
+      
+      h3,
+      .main-icon,
+      .arrow-icon {
+        color: #3f6212 !important;
+      }
+
+      p {
+        color: #1a2e05 !important;
+        opacity: 0.85 !important;
+      }
+      
+      &:hover {
+        background-color: #d9f99d !important;
+        transform: translateY(-4px);
+        box-shadow: 0 10px 20px rgba(77, 124, 15, 0.08);
+      }
+    }
+  }
+}
+
+// ─── Page Header ──────────────────────────────────────
+
 .page-header {
   display: flex;
   align-items: center;
@@ -27,6 +114,268 @@
   }
 }
 
+// ─── Wizard Container ─────────────────────────────────
+
+.wizard-container {
+  width: 100%;
+}
+
+// ─── Step Indicator ───────────────────────────────────
+
+.wizard-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 1.75rem;
+}
+
+.wizard-dot-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.wizard-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 2px solid var(--bs-border-color);
+  color: var(--bs-secondary-color);
+  background: white;
+  transition: all 0.25s ease;
+  z-index: 1;
+
+  &--active {
+    border-color: var(--bs-primary);
+    color: var(--bs-primary);
+    background: rgba(var(--bs-primary-rgb), 0.06);
+    transform: scale(1.15);
+  }
+
+  &--completed {
+    border-color: var(--bs-success);
+    color: white;
+    background: var(--bs-success);
+  }
+}
+
+.wizard-dot-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--bs-secondary-color);
+  white-space: nowrap;
+}
+
+.wizard-connector {
+  flex: 1;
+  height: 2px;
+  background: var(--bs-border-color);
+  margin: 0 0.25rem;
+  margin-bottom: 1.1rem; // align with dot center
+  transition: background 0.3s ease;
+  max-width: 80px;
+
+  &--done {
+    background: var(--bs-success);
+  }
+}
+
+// ─── Wizard Main (arrows + panel) ─────────────────────
+
+.wizard-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.wizard-panel {
+  flex: 1;
+  min-height: 380px;
+}
+
+.wizard-step-content {
+  padding: 2rem;
+}
+
+.wizard-step-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+  letter-spacing: -0.02em;
+}
+
+.wizard-step-subtitle {
+  color: var(--bs-secondary-color);
+  font-size: 0.875rem;
+  margin-bottom: 1.5rem;
+}
+
+.wizard-field-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--bs-secondary-color);
+  margin-bottom: 0.5rem;
+}
+
+// ─── Nav Buttons ──────────────────────────────────────
+
+.wizard-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: none;
+  background: var(--bs-light);
+  color: var(--bs-secondary-color);
+  flex-shrink: 0;
+  margin-top: 1.5rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: rgba(var(--bs-primary-rgb), 0.08);
+    color: var(--bs-primary);
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+}
+
+.wizard-nav-spacer {
+  width: 2.5rem;
+  flex-shrink: 0;
+}
+
+// ─── Method Cards ─────────────────────────────────────
+
+.method-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: 0.875rem;
+  border: 2px solid var(--bs-border-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 90px;
+  background: white;
+  height: 100%;
+
+  &:hover {
+    border-color: var(--bs-primary);
+    background: rgba(var(--bs-primary-rgb), 0.04);
+  }
+
+  &.selected {
+    border-color: var(--bs-primary);
+    background: rgba(var(--bs-primary-rgb), 0.06);
+
+    .method-card-icon {
+      color: var(--bs-primary);
+    }
+  }
+
+  &--ai.selected {
+    .method-card-icon {
+      background: linear-gradient(
+        135deg,
+        var(--bs-primary) 0%,
+        color-mix(in srgb, var(--bs-primary) 75%, black) 100%
+      );
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  }
+}
+
+.method-card-icon {
+  font-size: 1.75rem;
+  color: var(--bs-secondary-color);
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+
+// ─── AI Review ────────────────────────────────────────
+
+.review-list {
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+.review-card {
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: var(--bs-light);
+  transition: opacity 0.2s ease;
+
+  &--deselected {
+    opacity: 0.45;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.6rem;
+  }
+
+  &__type {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  &__text {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  &__options {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0.4rem;
+    font-size: 0.875rem;
+
+    li {
+      padding: 0.2rem 0;
+      color: var(--bs-secondary-color);
+
+      &.correct {
+        color: var(--bs-success);
+        font-weight: 600;
+
+        &::before {
+          content: "✓ ";
+        }
+      }
+    }
+  }
+
+  &__vf,
+  &__explanation {
+    font-size: 0.83rem;
+  }
+}
+
+// ─── Image Drop Area ──────────────────────────────────
+
 #imageDropArea {
   border: 1px dashed var(--bs-primary);
   color: var(--bs-primary);
@@ -38,7 +387,6 @@
   min-height: 140px;
 
   &:hover {
-    border-color: var(--bs-dark);
     background-color: rgba(var(--bs-primary-rgb), 0.05);
   }
 
@@ -59,17 +407,13 @@
     img {
       width: 100%;
       height: auto;
-      max-height: 300px;
+      max-height: 260px;
       object-fit: contain;
-    }
-
-    .image-actions {
-      button {
-        font-size: 0.875rem;
-      }
     }
   }
 }
+
+// ─── Tag Badge ────────────────────────────────────────
 
 .tag-badge {
   background-color: var(--bs-primary);
@@ -86,19 +430,34 @@
   }
 }
 
-.typeCard {
-  &.selected {
-    background-color: var(--bs-secondary);
-    color: var(--bs-dark);
+// ─── Type Cards (vero/falso, visibilità) ─────────────
 
-    .typeIconWrapper {
-      background-color: var(--bs-dark);
-      color: white;
+.typeCard {
+  background: var(--bs-light);
+  transition: background 0.15s ease;
+
+  &.selected {
+    background: rgba(var(--bs-primary-rgb), 0.1);
+
+    .form-check-input {
+      background-color: var(--bs-primary);
+      border-color: var(--bs-primary);
     }
 
-    .materialTypeIcon {
-      background-color: var(--bs-dark);
+    .typeIconWrapper {
+      background-color: var(--bs-primary);
       color: white;
     }
   }
+}
+
+// ─── Open answer info ─────────────────────────────────
+
+.open-answer-info {
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+  padding: 0.75rem 1rem;
+  background: rgba(var(--bs-primary-rgb), 0.06);
+  border-radius: 0.75rem;
 }

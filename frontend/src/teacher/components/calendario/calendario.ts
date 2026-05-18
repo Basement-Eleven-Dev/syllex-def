@@ -245,6 +245,8 @@ export class Calendario implements OnInit {
     const modalRef = this.modalService.open(AddEventModal, { centered: true });
     modalRef.componentInstance.SelectedDate = this.SelectedDate();
     modalRef.componentInstance.EventToEdit = eventToEdit;
+    modalRef.componentInstance.SubjectId =
+      this.materiaService.materiaSelected()?._id;
 
     modalRef.result.then(
       (updated: CalendarEvent) => {
