@@ -33,7 +33,10 @@ export class SearchQuestions implements OnInit, OnDestroy {
   totalQuestions = signal<number>(0);
   isLoading = signal<boolean>(false);
   currentPage = signal<number>(1);
-  readonly pageSize = 6;
+  readonly pageSize = 12;
+  readonly canLoadMore = computed(
+    () => this.filteredQuestions().length < this.totalQuestions(),
+  );
 
   // Questions visible in the list (excluding already-selected ones)
   readonly visibleQuestions = computed(() =>
@@ -69,7 +72,7 @@ export class SearchQuestions implements OnInit, OnDestroy {
       .subscribe((filters) => {
         this.currentFilters = filters;
         this.currentPage.set(1);
-        this.loadQuestions();
+        this.loadQuestions(true);
       });
 
     // Initial load
@@ -91,7 +94,7 @@ export class SearchQuestions implements OnInit, OnDestroy {
     this.filtersChanged$.next(filters);
   }
 
-  private loadQuestions(): void {
+  private loadQuestions(reset: boolean = false): void {
     this.isLoading.set(true);
 
     this.questionsService
@@ -107,7 +110,14 @@ export class SearchQuestions implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          this.filteredQuestions.set(response.questions);
+          if (reset || this.currentPage() === 1) {
+            this.filteredQuestions.set(response.questions);
+          } else {
+            const existing = this.filteredQuestions();
+            const seen = new Set(existing.map((q) => q._id));
+            const next = response.questions.filter((q) => !seen.has(q._id));
+            this.filteredQuestions.set([...existing, ...next]);
+          }
           this.totalQuestions.set(response.total);
           this.isLoading.set(false);
         },
@@ -124,6 +134,12 @@ export class SearchQuestions implements OnInit, OnDestroy {
 
   onPageChange(page: number): void {
     this.currentPage.set(page);
+    this.loadQuestions(page === 1);
+  }
+
+  loadNextPageAppend(): void {
+    if (this.isLoading() || !this.canLoadMore()) return;
+    this.currentPage.update((p) => p + 1);
     this.loadQuestions();
   }
 }

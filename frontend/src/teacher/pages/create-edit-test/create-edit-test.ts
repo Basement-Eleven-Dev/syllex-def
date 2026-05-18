@@ -36,7 +36,6 @@ import {
 import { FeedbackService } from '../../../services/feedback-service';
 import { QuestionsSearchFilters } from '../../components/questions-search-filters/questions-search-filters';
 import { QuestionsGridSelector } from '../../components/questions-grid-selector/questions-grid-selector';
-import { SyllexPagination } from '../../components/syllex-pagination/syllex-pagination';
 import { TestPreviewModal } from '../../components/test-preview-modal/test-preview-modal';
 import { forkJoin } from 'rxjs';
 import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
@@ -55,7 +54,6 @@ import { SyllexStepper } from '../../components/UI/syllex-stepper/syllex-stepper
     ClassSelector,
     QuestionsSearchFilters,
     QuestionsGridSelector,
-    SyllexPagination,
     SyllexPageHeader,
     SyllexButton,
     SyllexBadge,
@@ -259,6 +257,15 @@ export class CreateEditTest implements OnInit {
   readonly CanGoNextToFinalize = computed(
     () => this.SelectedQuestionIds().length > 0,
   );
+
+  readonly ShowFooterNext = computed(() => this.CurrentStep() < 3);
+
+  readonly CanGoNext = computed(() => {
+    const step = this.CurrentStep();
+    if (step === 1) return this.CanGoNextToQuestions();
+    if (step === 2) return this.CanGoNextToFinalize();
+    return false;
+  });
 
   goNextStep(): void {
     const step = this.CurrentStep();
