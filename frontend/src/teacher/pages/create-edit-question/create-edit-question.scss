@@ -15,6 +15,72 @@
     font-size: 0.9rem;
     margin-bottom: 1.75rem;
   }
+
+  ::ng-deep .syllex-card {
+    min-height: 160px !important;
+    padding: 1.5rem !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .main-icon {
+      font-size: 1.75rem !important;
+    }
+
+    .card-footer {
+      margin-top: 1rem;
+      
+      p {
+        width: 85% !important;
+      }
+    }
+
+    // Custom Celeste Variant (soft solid sky blue background)
+    &.card-celeste {
+      border: none !important;
+      background-color: #e0f2fe !important;
+      
+      h3,
+      .main-icon,
+      .arrow-icon {
+        color: #0369a1 !important;
+      }
+
+      p {
+        color: #0c4a6e !important;
+        opacity: 0.85 !important;
+      }
+      
+      &:hover {
+        background-color: #bae6fd !important;
+        transform: translateY(-4px);
+        box-shadow: 0 10px 20px rgba(2, 132, 199, 0.08);
+      }
+    }
+
+    // Custom Lime Variant (soft solid lime background)
+    &.card-lime {
+      border: none !important;
+      background-color: #ecfccb !important;
+      
+      h3,
+      .main-icon,
+      .arrow-icon {
+        color: #3f6212 !important;
+      }
+
+      p {
+        color: #1a2e05 !important;
+        opacity: 0.85 !important;
+      }
+      
+      &:hover {
+        background-color: #d9f99d !important;
+        transform: translateY(-4px);
+        box-shadow: 0 10px 20px rgba(77, 124, 15, 0.08);
+      }
+    }
+  }
 }
 
 // ─── Page Header ──────────────────────────────────────
