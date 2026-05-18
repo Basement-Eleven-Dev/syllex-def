@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal, Input, OnInit } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -21,6 +21,8 @@ import {
 import { MaterialInterface } from '../../../services/materiali/materiali-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FeedbackService } from '../../../services/feedback-service';
+import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-create-edit-comunicazione',
@@ -34,11 +36,12 @@ import { FeedbackService } from '../../../services/feedback-service';
     BackTo,
     MaterialiSelector,
     ConfirmActionDirective,
+    SyllexButton,
   ],
   templateUrl: './create-edit-comunicazione.html',
   styleUrl: './create-edit-comunicazione.scss',
 })
-export class CreateEditComunicazione {
+export class CreateEditComunicazione implements OnInit {
   // Services
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -46,21 +49,21 @@ export class CreateEditComunicazione {
   private readonly comunicazioniService = inject(ComunicazioniService);
   private readonly feedbackService = inject(FeedbackService);
   private readonly destroyRef = inject(DestroyRef);
+  readonly activeModal = inject(NgbActiveModal, { optional: true });
 
   // Icons
   readonly SaveIcon = faSave;
   readonly TrashIcon = faTrash;
 
-  // Data
-  private readonly ComunicazioneId: string | null =
-    this.route.snapshot.paramMap.get('comunicazioneId');
+  // Input
+  @Input() comunicazioneId: string | null = null;
 
   // UI State
   readonly IsLoading = signal<boolean>(false);
   readonly MaterialIds = signal<string[]>([]);
 
   // Computed
-  readonly IsEditMode = computed(() => !!this.ComunicazioneId);
+  readonly IsEditMode = computed(() => !!this.comunicazioneId);
   readonly PageTitle = computed(() =>
     this.IsEditMode() ? 'Modifica' : 'Nuova',
   );
@@ -85,9 +88,12 @@ export class CreateEditComunicazione {
     return this.ComunicazioneForm.get('materials')?.value || [];
   }
 
-  constructor() {
-    if (this.ComunicazioneId) {
-      this.loadComunicazione(this.ComunicazioneId);
+  ngOnInit(): void {
+    if (!this.comunicazioneId) {
+      this.comunicazioneId = this.route.snapshot.paramMap.get('comunicazioneId');
+    }
+    if (this.comunicazioneId) {
+      this.loadComunicazione(this.comunicazioneId);
     }
   }
 
@@ -130,11 +136,11 @@ export class CreateEditComunicazione {
   }
 
   onDelete(): void {
-    if (!this.ComunicazioneId) return;
+    if (!this.comunicazioneId) return;
 
     this.IsLoading.set(true);
     this.comunicazioniService
-      .deleteComunicazione(this.ComunicazioneId)
+      .deleteComunicazione(this.comunicazioneId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
@@ -142,7 +148,11 @@ export class CreateEditComunicazione {
             'Comunicazione eliminata con successo',
             true,
           );
-          this.router.navigate(['/t/comunicazioni']);
+          if (this.activeModal) {
+            this.activeModal.close(true);
+          } else {
+            this.router.navigate(['/t/calendario']);
+          }
         },
         error: (error) => {
           console.error('Error deleting communication:', error);
@@ -165,7 +175,7 @@ export class CreateEditComunicazione {
     const comunicazioneData = this.prepareComunicazioneData();
     const serviceCall = this.IsEditMode()
       ? this.comunicazioniService.editComunicazione(
-          this.ComunicazioneId!,
+          this.comunicazioneId!,
           comunicazioneData,
         )
       : this.comunicazioniService.createComunicazione(comunicazioneData);
@@ -178,7 +188,11 @@ export class CreateEditComunicazione {
             : 'Comunicazione creata con successo',
           true,
         );
-        this.router.navigate(['/t/comunicazioni']);
+        if (this.activeModal) {
+          this.activeModal.close(true);
+        } else {
+          this.router.navigate(['/t/calendario']);
+        }
       },
       error: (error) => {
         console.error('Error saving communication:', error);

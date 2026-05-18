@@ -15,9 +15,9 @@
       [props]="{
             label: 'Nuova Comunicazione',
             variant: 'outline',
-            size: 'medium',
-            link: '/t/comunicazioni/new'
+            size: 'medium'
           }"
+      (clicked)="openComunicazioneModal()"
     />
   </div>
 </app-syllex-page-header>
@@ -31,8 +31,8 @@
       description="Condividi novità, compiti o notizie importanti con i tuoi studenti per tenerli sempre aggiornati in tempo reale."
       [icon]="MessageIcon"
       actionLabel="Invia la tua prima Comunicazione"
-      actionLink="/t/comunicazioni/new"
       [actionIcon]="PlusIcon"
+      (actionClicked)="openComunicazioneModal()"
     ></app-syllex-empty-state>
   </div>
 } @else {
@@ -66,7 +66,8 @@
               {{ com.createdAt | date:'d MMM yyyy' : '' : 'it' }}
             </span>
             <app-syllex-button
-              [props]="{ label: 'Apri', variant: 'primary', size: 'small', link: '/t/comunicazioni/edit/' + com._id }"
+              [props]="{ label: 'Apri', variant: 'primary', size: 'small' }"
+              (clicked)="openComunicazioneModal(com._id)"
             />
           </div>
         </div>

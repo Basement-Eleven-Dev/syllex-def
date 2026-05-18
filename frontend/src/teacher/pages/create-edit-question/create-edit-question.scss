@@ -221,11 +221,9 @@
 
 .wizard-field-label {
   display: block;
-  font-size: 0.78rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--bs-secondary-color);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #0e3462 !important;
   margin-bottom: 0.5rem;
 }
 
@@ -460,4 +458,37 @@
   padding: 0.75rem 1rem;
   background: rgba(var(--bs-primary-rgb), 0.06);
   border-radius: 0.75rem;
+}
+
+// ─── Premium Form Styles ──────────────────────────────
+
+.form-section {
+  background-color: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #eef2f6;
+  padding: 1.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+  height: 100%;
+}
+
+.custom-input,
+.form-select {
+  border-radius: 12px !important;
+  border: 1.5px solid #d2e2ff !important;
+  padding: 0.75rem 1rem !important;
+  font-size: 0.95rem !important;
+  transition: all 0.25s ease-in-out !important;
+  background-color: #f8faff !important;
+  color: #0e3462 !important;
+
+  &:focus {
+    background-color: #ffffff !important;
+    border-color: #0b3c7b !important;
+    box-shadow: 0 0 0 3px rgba(11, 60, 123, 0.15) !important;
+    outline: none !important;
+  }
+
+  &::placeholder {
+    color: #a0aec0 !important;
+  }
 }
