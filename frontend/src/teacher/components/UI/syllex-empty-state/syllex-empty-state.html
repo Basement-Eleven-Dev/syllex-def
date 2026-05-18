@@ -1,0 +1,42 @@
+<div class="syllex-empty-state d-flex flex-column align-items-center text-center p-5 rounded-4 border border-1 border-light shadow-sm">
+  <div class="empty-state-icon-container mb-4 d-flex align-items-center justify-content-center position-relative">
+    <div class="icon-glow-bg position-absolute rounded-circle"></div>
+    @if (icon) {
+      <fa-icon [icon]="icon" class="empty-state-icon fs-1 text-primary position-relative z-1"></fa-icon>
+    }
+  </div>
+
+  <h3 class="empty-state-title fw-bold text-dark mb-2">{{ title }}</h3>
+  <p class="empty-state-description text-muted small mx-auto mb-4 w-75" style="max-width: 500px;">
+    {{ description }}
+  </p>
+
+  <div class="d-flex flex-row justify-content-center gap-3 align-items-center">
+    @if (actionLabel) {
+      <app-syllex-button
+        [props]="{
+          label: actionLabel,
+          variant: 'primary',
+          size: 'medium',
+          color: actionColor,
+          leftIcon: actionIcon,
+          link: actionLink
+        }"
+        (clicked)="onActionClick()"
+      ></app-syllex-button>
+    }
+
+    @if (secondaryActionLabel) {
+      <app-syllex-button
+        [props]="{
+          label: secondaryActionLabel,
+          variant: 'outline',
+          size: 'medium',
+          leftIcon: secondaryActionIcon,
+          link: secondaryActionLink
+        }"
+        (clicked)="onSecondaryActionClick()"
+      ></app-syllex-button>
+    }
+  </div>
+</div>

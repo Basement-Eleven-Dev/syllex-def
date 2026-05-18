@@ -40,9 +40,10 @@ import { MaterialInterface } from '../../../services/materiali/materiali-service
     @if (shouldShow()) {
       @if (isFolder(item())) {
         <!-- Folder -->
-        <li class="list-group-item p-2 mb-2" style="border-radius: 8px;">
+        <li class="list-group-item p-0 mb-3 border-0 bg-transparent">
           <div
-            class="folder-item d-flex align-items-center p-2 cursor-pointer text-dark"
+            class="folder-item d-flex align-items-center px-4 py-2 cursor-pointer text-dark border"
+            style="border-radius: 50rem; background-color: #ffffff; min-height: 48px; border: 1px solid #cbd5e1; transition: all 0.2s ease;"
             (click)="folderToggle.emit(item()._id!)"
             role="button"
             [attr.aria-expanded]="isExpanded()"
@@ -65,8 +66,8 @@ import { MaterialInterface } from '../../../services/materiali/materiali-service
           <!-- Folder Content (Recursive) -->
           <div [id]="'collapse-' + item()._id" [ngbCollapse]="!isExpanded()">
             <ul
-              class="list-group list-group-flush ms-4 text-dark"
-              style="border-radius: 8px;"
+              class="list-group list-group-flush ms-4 mt-2 text-dark"
+              style="border: none; background: transparent;"
             >
               @for (childItem of getFilteredContent(); track childItem._id) {
                 <app-materiali-item
@@ -87,8 +88,8 @@ import { MaterialInterface } from '../../../services/materiali/materiali-service
       } @else {
         <!-- File -->
         <li
-          class="list-group-item p-2 d-flex align-items-center cursor-pointer text-dark mb-2"
-          style="border-radius: 8px;"
+          class="list-group-item px-4 py-2 d-flex align-items-center cursor-pointer text-dark mb-2 border"
+          style="border-radius: 50rem; background-color: #ffffff; min-height: 48px; border: 1px solid #cbd5e1; transition: all 0.2s ease;"
           [class.bg-secondary]="isSelected()"
           (click)="materialSelect.emit(item())"
           role="button"

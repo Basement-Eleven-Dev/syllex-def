@@ -1,6 +1,6 @@
 import { Component, signal, effect, OnDestroy, inject } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faPlus, faXmark } from '@fortawesome/pro-solid-svg-icons';
+import { faPlus, faXmark, faClipboardList, faCircleCheck } from '@fortawesome/pro-solid-svg-icons';
 import { TestCard } from '../../components/test-card/test-card';
 import { TestTable } from '../../components/test-table/test-table';
 import { RouterModule } from '@angular/router';
@@ -19,6 +19,7 @@ import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
 import { SyllexSearchInput } from '../../components/UI/syllex-search-input/syllex-search-input';
 import { SyllexClearButton } from '../../components/UI/syllex-clear-button/syllex-clear-button';
 import { SyllexTabFilter } from '../../components/UI/syllex-tab-filter/syllex-tab-filter';
+import { SyllexEmptyState } from '../../components/UI/syllex-empty-state/syllex-empty-state';
 
 type TestStatus = 'bozza' | 'pubblicato' | 'archiviato' | '';
 type TestTab = 'tutti' | 'da-correggere' | 'bozze';
@@ -39,6 +40,7 @@ type TestTab = 'tutti' | 'da-correggere' | 'bozze';
     SyllexSearchInput,
     SyllexClearButton,
     SyllexTabFilter,
+    SyllexEmptyState,
   ],
   templateUrl: './test.html',
   styleUrl: './test.scss',
@@ -47,6 +49,8 @@ export class Test implements OnDestroy {
   // Icons
   protected readonly PlusIcon = faPlus;
   protected readonly ClearIcon = faXmark;
+  protected readonly ClipboardListIcon = faClipboardList;
+  protected readonly CircleCheckIcon = faCircleCheck;
 
   protected readonly statusOptions = [
     { value: 'bozza', label: 'Bozza' },

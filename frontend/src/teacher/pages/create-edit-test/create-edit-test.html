@@ -25,11 +25,11 @@
   } @if (CurrentStep() === 2) {
   <app-syllex-button
     [props]="{
-      label: 'Nuova domanda',
+      label: 'Genera Domande',
       variant: 'primary',
       size: 'medium'
     }"
-    (clicked)="onAddQuestion()"
+    (clicked)="onRequestAIGeneration()"
   ></app-syllex-button>
   } @if (CurrentStep() === 3) {
   <app-syllex-button
@@ -67,7 +67,9 @@
             </div>
 
             <div class="col-12 col-md-6">
-              <label class="text-muted small mb-1 d-block">Data Inizio</label>
+              <label class="form-label text-dark fw-semibold small mb-2"
+                >Data Inizio</label
+              >
               <input
                 type="date"
                 formControlName="availableFrom"

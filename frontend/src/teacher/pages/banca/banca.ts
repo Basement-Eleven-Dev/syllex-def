@@ -21,6 +21,8 @@ import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
 import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
 import { SyllexTabFilter } from '../../components/UI/syllex-tab-filter/syllex-tab-filter';
+import { SyllexEmptyState } from '../../components/UI/syllex-empty-state/syllex-empty-state';
+import { faClipboardQuestion } from '@fortawesome/pro-solid-svg-icons';
 
 type QuestionTab = 'tutti' | 'vero falso' | 'aperta' | 'scelta multipla';
 @Component({
@@ -38,6 +40,7 @@ type QuestionTab = 'tutti' | 'vero falso' | 'aperta' | 'scelta multipla';
     SyllexPageHeader,
     SyllexButton,
     SyllexTabFilter,
+    SyllexEmptyState,
   ],
   templateUrl: './banca.html',
   styleUrl: './banca.scss',
@@ -52,6 +55,7 @@ export class Banca {
     { value: 'scelta multipla', label: 'Scelta Multipla' },
   ];
   protected readonly PlusIcon = faPlus;
+  protected readonly QuestionIcon = faClipboardQuestion;
 
   // Dependency Injection
   private readonly questionsService = inject(QuestionsService);

@@ -1,5 +1,5 @@
 <div
-  [class]="IsOffcanvasMode() ? 'offcanvas-body dvh-100 overflow-scroll p-4' : 'pb-5'"
+  [class]="IsOffcanvasMode() ? 'offcanvas-body syllexCard dvh-100 overflow-scroll p-4' : 'pb-5'"
 >
   @if (!ReviewMode()) {
 
@@ -7,61 +7,59 @@
   <form
     [formGroup]="genForm"
     (ngSubmit)="onSubmit()"
-    class="d-flex flex-column gap-4"
+    class="d-flex flex-column gap-5"
   >
     <section tourAnchor="gen_ai_type_selector" class="form-section">
-      <label class="form-label text-dark mb-3">
-        Che tipo di {{ TypeMode() === 'questions' ? 'domande' : 'materiale' }}
-        vuoi creare?
+
+      @if (TypeMode() === 'questions') {
+        <div class="d-flex align-items-start justify-content-between w-100">
+          <h3 class="m-0">Genera nuove domande con AI da inserire nel test</h3>
+          <fa-icon [icon]="SparklesIcon" style="color: #84cc16; font-size: 1.5rem; margin-top: 2px;"></fa-icon>
+        </div>
+      } @else {
+        <div class="d-flex align-items-start justify-content-between w-100">
+          <h3 class="m-0">Genera nuovi materiali con AI</h3>
+          <fa-icon [icon]="SparklesIcon" style="color: #84cc16; font-size: 1.5rem; margin-top: 2px;"></fa-icon>
+        </div>
+      }
+      <label class="form-label text-dark mb-3 mt-4 fw-normal">
+        Scegli la tipologia di {{ TypeMode() === 'questions' ? 'contenuto da generare' : 'materiale di studio da produrre' }}
       </label>
       <app-type-selector
         [options]="Types()"
         [(selectedValue)]="SelectedType"
         (typeSelected)="onTypeSelected($event)"
         [direction]="'row'"
-        [showDescription]="true"
+        [showDescription]="false"
       ></app-type-selector>
     </section>
 
     @if (TypeMode() === 'questions') {
 
-    <section tourAnchor="gen_ai_q_topic" class="form-section">
-      <label class="form-label text-dark mb-2">
-        Su che argomento di {{ materiaService.materiaSelected()?.name }} vuoi
-        che si concentri l'AI?
-      </label>
-      <select
-        class="form-select custom-input w-auto"
-        formControlName="topicId"
-        aria-label="Seleziona argomento"
-      >
-        <option value="" disabled selected>Seleziona argomento</option>
-        @for (topic of materiaService.materiaSelected()?.topics; track
-        topic._id) {
-        <option [value]="topic._id">{{ topic.name }}</option>
-        }
-      </select>
+    <!-- 2. PARAMETRI DI QUANTITÀ (Domande) -->
+    <section tourAnchor="gen_ai_q_params" class="form-section">
+      <!-- QUANTE DOMANDE -->
+      <div class="d-flex align-items-center justify-content-between px-4 py-3" 
+           style="border-radius: 50rem; border: 1px solid #cbd5e1; background-color: #ffffff; min-height: 48px; transition: all 0.2s ease;">
+        <span class="text-dark fw-normal small" style="pointer-events: none;">Quante domande vuoi generare?</span>
+        <input
+          type="number"
+          class="border-0 bg-transparent text-end p-0"
+          style="width: 55px; outline: none; box-shadow: none; color: #212529;"
+          formControlName="numberOfQuestions"
+          min="1"
+          max="20"
+          aria-label="Numero di domande"
+        />
+      </div>
     </section>
 
-    <section tourAnchor="gen_ai_q_params" class="form-section">
-      <label class="form-label text-dark mb-2 fw-light"
-        >Parametri di generazione</label
-      >
+    <!-- 3. CONFIGURAZIONI DETTAGLIATE (Alternative, Lingua, Difficoltà) -->
+    <section class="form-section">
       <div class="row g-3">
-        <div class="col-6 col-md-3">
-          <label class="form-label text-dark">N° domande</label>
-          <input
-            type="number"
-            class="form-control custom-input"
-            formControlName="numberOfQuestions"
-            min="1"
-            max="20"
-            aria-label="Numero di domande"
-          />
-        </div>
         @if (IsMultipleChoice()) {
-        <div class="col-6 col-md-3">
-          <label class="form-label text-dark">Alternative</label>
+        <div class="col-4">
+          <label class="form-label text-dark mb-2 fw-normal">Opzioni di risposta</label>
           <input
             type="number"
             class="form-control custom-input"
@@ -72,8 +70,8 @@
           />
         </div>
         }
-        <div class="col-6 col-md-3">
-          <label class="form-label text-dark">Lingua</label>
+        <div class="col">
+          <label class="form-label text-dark mb-2 fw-normal">In quale lingua?</label>
           <select
             class="form-select custom-input"
             formControlName="language"
@@ -86,8 +84,8 @@
             <option value="tedesco">Deutsch</option>
           </select>
         </div>
-        <div class="col-6 col-md-3">
-          <label class="form-label text-dark">Difficoltà</label>
+        <div class="col">
+          <label class="form-label text-dark mb-2 fw-normal">Livello di difficoltà</label>
           <select
             class="form-select custom-input"
             formControlName="difficulty"
@@ -103,17 +101,34 @@
       </div>
     </section>
 
+    <!-- 4. ARGOMENTO (Subito prima della selezione dei file di supporto) -->
+    <section tourAnchor="gen_ai_q_topic" class="form-section">
+      <div class="d-flex align-items-center justify-content-between px-4 py-3" 
+           style="border-radius: 50rem; border: 1px solid #cbd5e1; background-color: #ffffff; min-height: 48px; transition: all 0.2s ease;">
+        <span class="text-dark fw-normal small" style="pointer-events: none;">Su quale argomento vuoi che ci concentriamo?</span>
+        <select
+          class="border-0 bg-transparent text-end p-0 fw-semibold"
+          [class.text-muted]="!genForm.get('topicId')?.value"
+          style="outline: none; box-shadow: none; max-width: 180px; cursor: pointer; color: #212529;"
+          formControlName="topicId"
+          aria-label="Seleziona argomento"
+        >
+          <option value="" disabled selected class="text-muted">Seleziona</option>
+          @for (topic of materiaService.materiaSelected()?.topics; track topic._id) {
+          <option [value]="topic._id">{{ topic.name }}</option>
+          }
+        </select>
+      </div>
+    </section>
+
     } @else {
 
     <!-- ─── MATERIALS specific parameters ─────────────────────────────── -->
     <section tourAnchor="gen_ai_m_params" class="form-section">
-      <label class="form-label text-dark mb-2 fw-light"
-        >Parametri di generazione</label
-      >
       <div class="row g-3">
         @if (IsSlides()) {
-        <div class="col-6 col-md-3">
-          <label class="form-label text-dark">N° slide</label>
+        <div class="col-6">
+          <label class="form-label text-dark fw-normal d-flex align-items-end mb-2" style="min-height: 42px;">Quante slide vuoi creare?</label>
           <input
             type="number"
             class="form-control custom-input"
@@ -124,8 +139,8 @@
           />
         </div>
         }
-        <div class="col-6 col-md-3">
-          <label class="form-label text-dark">Lingua</label>
+        <div [class.col-6]="IsSlides()" [class.col-12]="!IsSlides()">
+          <label class="form-label text-dark fw-normal d-flex align-items-end mb-2" style="min-height: 42px;">In quale lingua?</label>
           <select
             class="form-select custom-input"
             formControlName="language"
@@ -141,7 +156,7 @@
 
         @if (IsSlides()) {
         <div class="col-12">
-          <label class="form-label text-dark">Formato slide</label>
+          <label class="form-label text-dark fw-normal">Formato di esportazione</label>
           <div class="d-flex gap-4 pt-1">
             <div class="form-check">
               <input
@@ -152,11 +167,11 @@
                 formControlName="format"
               />
               <label
-                class="form-check-label text-dark"
+                class="form-check-label text-dark fw-normal"
                 for="formatPPTX"
                 style="cursor: pointer"
               >
-                <span class="fw-bold">PPTX</span>
+                <span class="fw-bold">Power Point</span>
                 <span class="text-muted small ms-1">(Modificabile)</span>
               </label>
             </div>
@@ -169,7 +184,7 @@
                 formControlName="format"
               />
               <label
-                class="form-check-label text-dark"
+                class="form-check-label text-dark fw-normal"
                 for="formatPDF"
                 style="cursor: pointer"
               >
@@ -188,16 +203,17 @@
     }
 
     <section tourAnchor="gen_ai_support_files" class="form-section">
-      <label class="form-label text-dark mb-2 fw-light">
-        File e risorse di supporto per la generazione
+      <label class="form-label text-dark mb-2 fw-normal">
+        Seleziona risorse di riferimento per la generazione
       </label>
       <app-materiali-selector></app-materiali-selector>
     </section>
 
     <section tourAnchor="gen_ai_instructions" class="form-section">
-      <label class="form-label text-dark mb-2">Istruzioni aggiuntive</label>
+      <label class="form-label text-dark mb-2 fw-normal">Desideri dare indicazioni specifiche all'AI?</label>
       <textarea
         class="form-control custom-input"
+        style="border-radius: 2rem !important; padding: 1.25rem 1.75rem;"
         formControlName="instructions"
         rows="3"
         [placeholder]="TypeMode() === 'questions'
@@ -206,20 +222,11 @@
       ></textarea>
     </section>
 
-    <div class="text-end">
-      <button
-        tourAnchor="gen_ai_submit"
-        type="submit"
-        class="btn btn-primary ai btn-lg icon-btn"
-        [disabled]="genForm.invalid || IsGenerating()"
-      >
-        <fa-icon
-          [icon]="IsGenerating() ? SpinnerIcon : SparklesIcon"
-          [animation]="IsGenerating() ? 'spin' : undefined"
-        ></fa-icon>
-        {{ IsGenerating() ? 'Generazione in corso...' : 'Genera ' +
-        getSelectedTypeName() }}
-      </button>
+    <div class="text-end" tourAnchor="gen_ai_submit">
+      <app-syllex-button
+        [props]="submitButtonProps()"
+        (clicked)="onSubmit()"
+      ></app-syllex-button>
     </div>
   </form>
 
