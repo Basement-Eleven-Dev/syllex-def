@@ -1,33 +1,41 @@
 <div class="questions-scroll-list" (scroll)="onListScroll($event)">
   @for (question of questions; track question._id) {
-  <button
-    type="button"
+  <div
     class="question-row"
     [class.question-row--selected]="isSelected(question._id)"
     (click)="onToggle(question)"
+    role="button"
+    tabindex="0"
+    (keydown.enter)="onToggle(question)"
   >
     <div class="question-row__content">
-      <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
-        <span
-          class="badge rounded-pill"
-          [class.bg-primary]="!isSelected(question._id)"
-          [class.bg-white]="isSelected(question._id)"
-          [class.text-primary]="isSelected(question._id)"
-        >
-          {{ getQuestionTypeLabel(question.type) }}
-        </span>
-        @if (question.difficulty) {
-        <span class="question-row__meta"
-          >Difficoltà: {{ question.difficulty }}</span
-        >
-        } @if (question.tags && question.tags.length > 0) {
-        <span class="question-row__meta">• {{ question.tags[0] }}</span>
-        }
-      </div>
-
       <p class="question-row__text mb-0">{{ question.text }}</p>
     </div>
-  </button>
+
+    <div class="question-row__right" (click)="$event.stopPropagation()">
+      <span
+        class="badge rounded-pill"
+        [class.bg-primary]="!isSelected(question._id)"
+        [class.bg-white]="isSelected(question._id)"
+        [class.text-primary]="isSelected(question._id)"
+      >
+        {{ getQuestionTypeLabel(question.type) }}
+      </span>
+
+      <div class="question-row__points">
+        <label class="question-row__points-label">Punti</label>
+        <input
+          type="number"
+          min="1"
+          step="1"
+          class="form-control form-control-sm"
+          [value]="getPoints(question._id)"
+          [disabled]="!isSelected(question._id)"
+          (input)="onPointsInput(question._id, $event)"
+        />
+      </div>
+    </div>
+  </div>
   } @empty {
   <div class="text-center py-5 opacity-50">
     <p class="fs-5">Nessuna domanda trovata con questi filtri.</p>

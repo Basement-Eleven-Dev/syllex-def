@@ -12,9 +12,14 @@ import { QuestionInterface } from '../../../services/questions';
 export class QuestionsGridSelector {
   @Input() questions: QuestionInterface[] = [];
   @Input() selectedIds: string[] = [];
+  @Input() pointsByQuestion: Record<string, number> = {};
   @Input() canLoadMore = false;
   @Input() isLoadingMore = false;
   @Output() toggleSelection = new EventEmitter<QuestionInterface>();
+  @Output() pointChanged = new EventEmitter<{
+    questionId: string;
+    points: number;
+  }>();
   @Output() reachBottom = new EventEmitter<void>();
 
   isSelected(id: string): boolean {
@@ -23,6 +28,16 @@ export class QuestionsGridSelector {
 
   onToggle(question: QuestionInterface): void {
     this.toggleSelection.emit(question);
+  }
+
+  getPoints(questionId: string): number {
+    return this.pointsByQuestion[questionId] ?? 1;
+  }
+
+  onPointsInput(questionId: string, event: Event): void {
+    const value = Number((event.target as HTMLInputElement).value);
+    const points = Number.isFinite(value) && value > 0 ? Math.floor(value) : 1;
+    this.pointChanged.emit({ questionId, points });
   }
 
   onListScroll(event: Event): void {

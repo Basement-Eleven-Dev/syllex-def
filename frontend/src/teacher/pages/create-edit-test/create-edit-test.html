@@ -10,8 +10,39 @@
 } @else {
 <app-syllex-page-header
   [title]="PageTitle()"
-  [description]="'Configura il test in modo rapido: parametri in alto, selezione domande al centro e riepilogo a destra.'"
+  [description]="HeaderDescription()"
 >
+  @if (CurrentStep() === 1) {
+  <app-syllex-button
+    [props]="{
+      label: 'Ripristina',
+      variant: 'outline',
+      color: 'dark',
+      size: 'medium'
+    }"
+    (clicked)="onResetForm()"
+  ></app-syllex-button>
+  } @if (CurrentStep() === 2) {
+  <app-syllex-button
+    [props]="{
+      label: 'Nuova domanda',
+      variant: 'primary',
+      size: 'medium'
+    }"
+    (clicked)="onAddQuestion()"
+  ></app-syllex-button>
+  } @if (CurrentStep() === 3) {
+  <app-syllex-button
+    [props]="{
+      label: 'Anteprima',
+      variant: 'primary',
+      color: 'black',
+      size: 'medium',
+      disabled: SelectedQuestionIds().length === 0
+    }"
+    (clicked)="onPreview()"
+  ></app-syllex-button>
+  }
 </app-syllex-page-header>
 
 <form [formGroup]="TestForm" class="create-test-container bg-white">
@@ -20,22 +51,6 @@
     <div class="col-12 col-lg-8 pe-lg-4">
       @if (CurrentStep() === 1) {
       <div class="syllexCard wizard-step-shell">
-        <div class="mb-3 d-flex justify-content-between align-items-start">
-          <div>
-            <h5 class="fw-bold text-dark mb-1">Step 1 - Configura parametri</h5>
-            <p class="text-muted small mb-0">
-              Inserisci i dati del test e imposta regole e disponibilita.
-            </p>
-          </div>
-          <button
-            type="button"
-            class="btn btn-link text-muted small px-0 ms-3 flex-shrink-0"
-            (click)="onResetForm()"
-          >
-            Ripristina valori iniziali
-          </button>
-        </div>
-
         <div class="flat-settings py-1">
           <div class="row g-3 g-md-4">
             <div class="col-12">
@@ -87,27 +102,6 @@
       </div>
       } @if (CurrentStep() === 2) {
       <div class="syllexCard wizard-step-shell wizard-step-shell--questions">
-        <div
-          class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3"
-        >
-          <div>
-            <h5 class="fw-bold mb-1">Step 2 - Seleziona domande</h5>
-            <p class="text-muted mb-0 small">
-              Componi il test scegliendo le domande dalla banca.
-            </p>
-          </div>
-          <div class="d-flex gap-2 align-items-center">
-            <app-syllex-button
-              [props]="{
-                label: 'Nuova domanda',
-                variant: 'primary',
-                size: 'medium'
-              }"
-              (click)="onAddQuestion()"
-            ></app-syllex-button>
-          </div>
-        </div>
-
         <div class="mb-4">
           <app-questions-search-filters
             (filtersChanged)="questionsSearched.onFiltersChanged($event)"
@@ -118,9 +112,11 @@
         <app-questions-grid-selector
           [questions]="questionsSearched.filteredQuestions()"
           [selectedIds]="SelectedQuestionIds()"
+          [pointsByQuestion]="SelectedQuestionPoints()"
           [canLoadMore]="questionsSearched.canLoadMore()"
           [isLoadingMore]="questionsSearched.isLoading()"
           (reachBottom)="questionsSearched.loadNextPageAppend()"
+          (pointChanged)="onQuestionPointsChanged($event)"
           (toggleSelection)="onToggleQuestion($event)"
         ></app-questions-grid-selector>
 
@@ -133,13 +129,6 @@
       </div>
       } @if (CurrentStep() === 3) {
       <div class="syllexCard wizard-step-shell">
-        <div class="mb-3">
-          <h5 class="fw-bold text-dark mb-1">Step 3 - Finalizza il test</h5>
-          <p class="text-muted small mb-0">
-            Imposta il punteggio di idoneità e le regole di svolgimento.
-          </p>
-        </div>
-
         <div class="row g-3 g-md-4">
           <div class="col-12 col-md-4">
             <div class="d-flex justify-content-between align-items-center mb-2">
@@ -159,10 +148,6 @@
               placeholder="Min. punti"
               [attr.max]="maxScore"
             />
-            <div class="text-muted small mt-1">
-              Il test ha {{ maxScore }} {{ maxScore === 1 ? 'domanda' :
-              'domande' }}
-            </div>
           </div>
 
           <div class="col-12 col-md-4">
@@ -213,10 +198,7 @@
           </div>
 
           <div class="col-12 col-md-4">
-            <label class="text-muted small mb-2 d-block"
-              >Comportamento test</label
-            >
-            <div class="d-flex flex-column gap-2 switch-stack rounded-3 p-3">
+            <div class="d-flex flex-column gap-2 rounded-3 p-3">
               <div class="form-check form-switch custom-switch mb-0">
                 <input
                   class="form-check-input"
@@ -244,23 +226,10 @@
             </div>
           </div>
 
-          @if (PublishBlockers().length > 0) {
-          <div class="col-12">
-            <div class="small text-muted">Per pubblicare:</div>
-            @for (b of PublishBlockers(); track b) {
-            <div class="small text-muted">• {{ b }}</div>
-            }
-          </div>
-          }
-
           <div
             class="col-12 d-flex justify-content-between align-items-center gap-2 mt-1"
           >
-            <app-syllex-button
-              [props]="{ label: 'Modifica Domande', variant: 'outline', color: 'dark', size: 'medium' }"
-              (clicked)="goPrevStep()"
-            ></app-syllex-button>
-            <div class="d-flex gap-2">
+            <div class="d-flex gap-2 w-100 justify-content-end">
               <app-syllex-button
                 [props]="{
                   label: 'Salva Bozza',

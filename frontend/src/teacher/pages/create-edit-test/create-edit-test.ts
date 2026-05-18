@@ -93,6 +93,7 @@ export class CreateEditTest implements OnInit {
   readonly IsLoading = signal<boolean>(false);
   readonly CurrentStep = signal<1 | 2 | 3>(1);
   readonly SelectedQuestionIds = signal<string[]>([]);
+  readonly SelectedQuestionPoints = signal<Record<string, number>>({});
   readonly QuestionsToLoad = signal<
     { questionId: string; points: number }[] | undefined
   >(undefined);
@@ -108,6 +109,16 @@ export class CreateEditTest implements OnInit {
   readonly PageTitle = computed(() =>
     this.IsEditMode() ? 'Modifica Test di valutazione' : 'Crea test',
   );
+  readonly HeaderDescription = computed(() => {
+    const step = this.CurrentStep();
+    if (step === 1) {
+      return 'Step 1 di 3 - Imposta titolo, date e classi del test.';
+    }
+    if (step === 2) {
+      return 'Step 2 di 3 - Seleziona le domande dalla banca.';
+    }
+    return 'Step 3 di 3 - Finalizza regole e pubblicazione.';
+  });
 
   readonly TestForm: FormGroup = new FormGroup({
     title: new FormControl('', [Validators.required]),
@@ -190,6 +201,21 @@ export class CreateEditTest implements OnInit {
 
     if (test.questions && test.questions.length > 0) {
       this.QuestionsToLoad.set(test.questions);
+      this.SelectedQuestionIds.set(
+        test.questions.map((q: { questionId: string }) => q.questionId),
+      );
+      this.SelectedQuestionPoints.set(
+        test.questions.reduce(
+          (
+            acc: Record<string, number>,
+            q: { questionId: string; points?: number },
+          ) => {
+            acc[q.questionId] = q.points && q.points > 0 ? q.points : 1;
+            return acc;
+          },
+          {},
+        ),
+      );
     }
   }
 
@@ -210,7 +236,11 @@ export class CreateEditTest implements OnInit {
   }
 
   get maxScore(): number {
-    return this.SelectedQuestionIds().length; // 1 punto per domanda (default)
+    const points = this.SelectedQuestionPoints();
+    return this.SelectedQuestionIds().reduce(
+      (sum, id) => sum + (points[id] ?? 1),
+      0,
+    );
   }
 
   readonly PublishBlockers = computed(() => {
@@ -299,6 +329,22 @@ export class CreateEditTest implements OnInit {
 
   onQuestionsChanged(questions: QuestionWithPoints[]): void {
     this.SelectedQuestionIds.set(questions.map((q) => q._id));
+    this.SelectedQuestionPoints.set(
+      questions.reduce<Record<string, number>>((acc, q) => {
+        acc[q._id] = q.points && q.points > 0 ? q.points : 1;
+        return acc;
+      }, {}),
+    );
+  }
+
+  onQuestionPointsChanged(payload: {
+    questionId: string;
+    points: number;
+  }): void {
+    this.SelectedQuestionPoints.update((prev) => ({
+      ...prev,
+      [payload.questionId]: payload.points,
+    }));
   }
 
   onClassesChange(classIds: string[]): void {
@@ -364,6 +410,7 @@ export class CreateEditTest implements OnInit {
       oneShotAnswers: false,
     });
     this.SelectedQuestionIds.set([]);
+    this.SelectedQuestionPoints.set({});
     this.CurrentStep.set(1);
   }
 
@@ -402,9 +449,10 @@ export class CreateEditTest implements OnInit {
   private prepareTestData(asDraft: boolean, subjectId: string): TestInterface {
     const formValue = this.TestForm.value;
     const selectedIds = this.SelectedQuestionIds();
+    const questionPoints = this.SelectedQuestionPoints();
     const questionsWithPoints = selectedIds.map((id) => ({
       questionId: id,
-      points: 1, // Default a 1 punto ora che non c'è più il drag & drop
+      points: questionPoints[id] ?? 1,
     }));
 
     const testData: TestInterface = {
@@ -448,9 +496,18 @@ export class CreateEditTest implements OnInit {
       this.SelectedQuestionIds.set(
         currentIds.filter((id) => id !== question._id),
       );
+      this.SelectedQuestionPoints.update((prev) => {
+        const next = { ...prev };
+        delete next[question._id];
+        return next;
+      });
       this.selectedQuestionsMap.delete(question._id);
     } else {
       this.SelectedQuestionIds.set([...currentIds, question._id]);
+      this.SelectedQuestionPoints.update((prev) => ({
+        ...prev,
+        [question._id]: prev[question._id] ?? 1,
+      }));
       this.selectedQuestionsMap.set(question._id, question);
     }
   }
