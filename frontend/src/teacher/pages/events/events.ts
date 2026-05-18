@@ -16,6 +16,8 @@ import {
   faPlus,
 } from '@fortawesome/pro-solid-svg-icons';
 import { SyllexEmptyState } from '../../components/UI/syllex-empty-state/syllex-empty-state';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { CreateEditComunicazione } from '../create-edit-comunicazione/create-edit-comunicazione';
 
 @Component({
   selector: 'app-events',
@@ -40,6 +42,7 @@ export class Events {
   protected readonly PlusIcon = faPlus;
 
   private readonly comunicazioniService = inject(ComunicazioniService);
+  private readonly modalService = inject(NgbModal);
 
   protected readonly materiaService = inject(Materia);
 
@@ -53,14 +56,36 @@ export class Events {
     }),
   );
 
+  loadComunicazioni() {
+    const materia = this.materiaService.materiaSelected();
+    if (materia) {
+      this.comunicazioniService
+        .getPagedComunicazioni('', '', '', 1, 50)
+        .subscribe((res) => this.RawComunicazioni.set(res.communications));
+    }
+  }
+
+  openComunicazioneModal(comunicazioneId?: string) {
+    const modalRef = this.modalService.open(CreateEditComunicazione, {
+      centered: true,
+      size: 'lg',
+    });
+    if (comunicazioneId) {
+      modalRef.componentInstance.comunicazioneId = comunicazioneId;
+    }
+    modalRef.result.then(
+      (result) => {
+        if (result === true) {
+          this.loadComunicazioni();
+        }
+      },
+      () => {},
+    );
+  }
+
   constructor() {
     effect(() => {
-      const materia = this.materiaService.materiaSelected();
-      if (materia) {
-        this.comunicazioniService
-          .getPagedComunicazioni('', '', '', 1, 50)
-          .subscribe((res) => this.RawComunicazioni.set(res.communications));
-      }
+      this.loadComunicazioni();
     });
   }
 
