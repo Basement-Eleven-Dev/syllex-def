@@ -1,4 +1,5 @@
 <section class="materiali-selector">
+  @if (!compact) {
   <div class="d-flex justify-content-between align-items-center mb-2">
     <label for="search-term" class="form-label text-dark mb-0"> Associa </label>
     <div class="d-flex gap-2">
@@ -14,6 +15,7 @@
       }
     </div>
   </div>
+  }
   <!-- Hidden file input -->
   <input
     #fileInput
@@ -23,18 +25,24 @@
     accept=".pdf,.docx,.xlsx,.pptx,.txt"
   />
   <!-- Materiali Associati (Bubbles style come Image 1) -->
-  @if (processedMaterials().length > 0) {
+  @if (!compact && processedMaterials().length > 0) {
   <div class="mb-4">
-    <label class="fw-bold text-dark small mb-3 text-uppercase ls-wide">Materiali Associati</label>
+    <label class="fw-bold text-dark small mb-3 text-uppercase ls-wide"
+      >Materiali Associati</label
+    >
     <div class="d-flex flex-wrap gap-2">
       @for (m of processedMaterials(); track m._id) {
-      <div class="material-bubble d-flex align-items-center gap-2 px-3 py-2 shadow-sm border border-success border-opacity-25">
+      <div
+        class="material-bubble d-flex align-items-center gap-2 px-3 py-2 shadow-sm border border-success border-opacity-25"
+      >
         <fa-icon
           [icon]="getFileIcon(m.extension!)"
           [style.color]="getIconColor(m)"
           class="small"
         ></fa-icon>
-        <span class="small fw-semibold text-truncate" style="max-width: 150px;">{{ m.name }}</span>
+        <span class="small fw-semibold text-truncate" style="max-width: 150px"
+          >{{ m.name }}</span
+        >
         <button
           class="btn btn-link text-danger p-0 border-0 ms-1 d-flex align-items-center"
           (click)="onRemoveMaterial(m._id)"
@@ -49,6 +57,7 @@
   }
 
   <!-- Search input -->
+  @if (!compact) {
   <div class="mb-3">
     <input
       type="text"
@@ -58,8 +67,7 @@
       (ngModelChange)="updateSearch($event)"
     />
   </div>
-
-  @if (isSearching()) {
+  } @if (isSearching()) {
   <!-- Search results (flat list) -->
   <ul class="list-group list-group-flush rounded-3">
     @for (material of searchResults(); track material._id) {
@@ -100,11 +108,50 @@
   </ul>
   } @else {
   <!-- Tree list -->
+  @if (compact) {
+  <!-- Compact AI browser: cartelle sopra, file sciolti sotto -->
+  <div class="ai-browser">
+    <!-- Cartelle (con accordion) -->
+    <ul class="list-group list-group-flush">
+      @for (item of materialiService.root(); track item._id) { @if (item.type
+      === 'folder') {
+      <app-materiali-item
+        [item]="item"
+        [embeddingCreationMode]="embeddingCreationMode"
+        [showAiGenerated]="showAiGenerated"
+        [expandedFolders]="expandedFolders()"
+        [selectedMaterialIds]="selectedMaterialIds()"
+        [associatedMaterialIds]="associatedMaterialIds()"
+        [searchQuery]="searchQuery()"
+        (folderToggle)="toggleFolder($event)"
+        (materialSelect)="selectMaterial($event)"
+      />
+      } }
+    </ul>
+    <!-- File sciolti (grid) -->
+    <div class="ai-file-grid">
+      @for (item of materialiService.root(); track item._id) { @if (item.type
+      !== 'folder' && (showAiGenerated || !item.aiGenerated)) {
+      <div
+        class="ai-file-card"
+        [class.selected]="selectedMaterialIds().has(item._id)"
+        (click)="selectMaterial(item)"
+        role="button"
+      >
+        <fa-icon
+          [icon]="getItemFileIcon(item)"
+          [style.color]="getIconColor(item)"
+        ></fa-icon>
+        <span class="ai-file-name">{{ item.name }}</span>
+      </div>
+      } }
+    </div>
+  </div>
+  } @else {
   <div style="max-height: 300px; overflow-y: auto">
     <ul class="list-group list-group-flush">
       @for (item of materialiService.root(); track item._id) { @if
       (showAiGenerated || !item.aiGenerated) {
-
       <app-materiali-item
         [item]="item"
         [embeddingCreationMode]="embeddingCreationMode"
@@ -119,5 +166,5 @@
       } }
     </ul>
   </div>
-  }
+  } }
 </section>
