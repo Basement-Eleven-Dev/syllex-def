@@ -150,7 +150,19 @@
                 [label]="test.subjectId ? materiaService.getSubjectName(test.subjectId) : ''"
               />
             </div>
-            <p class="m-0">{{ test.maxScore }}</p>
+            <p class="m-0 text-muted small">
+              @if (test.questions && test.questions.length) {
+                <span>{{ test.questions.length }} {{ test.questions.length === 1 ? 'domanda' : 'domande' }}</span>
+              }
+              @if (test.maxScore) {
+                <span [class.ms-2]="test.questions && test.questions.length">
+                  {{ (test.questions && test.questions.length) ? '• ' : '' }}Punteggio max: {{ test.maxScore }} pt
+                </span>
+              }
+              @if (test.timeLimit) {
+                <span class="ms-2">• {{ test.timeLimit }} min</span>
+              }
+            </p>
             <div class="d-flex justify-content-between align-items-center mt-2">
               <p class="mb-0">{{ test.availableFrom | date: 'short' }}</p>
               <div class="d-flex gap-2">

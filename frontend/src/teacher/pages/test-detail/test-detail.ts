@@ -42,6 +42,9 @@ const IconMap: Record<string, any> = {
   'pen-nib': faPenNib,
 };
 
+import { BackTo } from '../../components/back-to/back-to';
+import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
+
 @Component({
   selector: 'app-test-detail',
   standalone: true,
@@ -54,6 +57,8 @@ const IconMap: Record<string, any> = {
     SyllexKpiRow,
     TestAiSummaryComponent,
     SyllexButton,
+    BackTo,
+    SyllexPageHeader,
   ],
   templateUrl: './test-detail.html',
   styleUrl: './test-detail.scss',

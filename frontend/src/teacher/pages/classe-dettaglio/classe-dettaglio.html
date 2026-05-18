@@ -12,16 +12,12 @@
 } @if (ClassNotFound()) {
 <div class="alert alert-warning" role="alert">Classe non trovata</div>
 } @if (ClassData() && !IsLoading()) {
-<div class="class-header">
-  <button
-    class="back-btn"
-    [routerLink]="'/t/classi'"
-    aria-label="Torna alle classi"
-  >
-    <fa-icon [icon]="ArrowLeftIcon" />
-  </button>
-  <span class="class-header__title">Classe: {{ ClassData()!.name }}</span>
-</div>
+<app-back-to [path]="'/t/classi'" label="Torna alle classi" />
+
+<app-syllex-page-header
+  [title]="'Classe: ' + ClassData()!.name"
+  [description]="'Visualizza i dettagli, l\'elenco degli studenti iscritti e le performance complessive della classe.'"
+/>
 
 <!-- Statistics Cards -->
 <div class="mt-4">

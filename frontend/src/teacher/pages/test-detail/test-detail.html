@@ -10,36 +10,29 @@
 } @else if (TestData()) {
 
 <!-- Header -->
-<div class="class-header">
-  <button class="back-btn" [routerLink]="'/t/tests'" aria-label="Torna ai test">
-    <fa-icon [icon]="ArrowLeftIcon" />
-  </button>
-  <span class="class-header__title">{{ TestData()!.name }}</span>
-  <div class="ms-auto d-flex flex-row gap-2 align-items-center">
-    <app-syllex-button
-      [props]="{ label: 'Stampa / PDF', variant: 'outline', size: 'small', leftIcon: PrintIcon }"
-      (clicked)="onPrintTest()"
-    />
-    <app-syllex-button
-      [props]="{ label: 'Stampa Risultati', variant: 'outline', size: 'small', leftIcon: PrintIcon }"
-      (clicked)="onPrintResults()"
-    />
-    <app-syllex-button
-      [props]="{ label: 'Modifica', variant: 'outline', size: 'small', leftIcon: EditIcon }"
-      (clicked)="onEditTest()"
-    />
-    <app-syllex-button
-      [props]="{ label: 'Elimina', variant: 'outline', size: 'small', color: 'danger', leftIcon: TrashIcon }"
-      (clicked)="onDeleteTest()"
-    />
-  </div>
-</div>
+<app-back-to [path]="'/t/tests'" label="Torna ai test" />
 
-@if (TestData()!.availableFrom) {
-<p class="text-muted mb-0 mt-1">
-  Creato il {{ TestData()!.availableFrom | date: 'd MMM y' }}
-</p>
-}
+<app-syllex-page-header
+  [title]="TestData()!.name"
+  [description]="TestData()!.availableFrom ? 'Creato il ' + (TestData()!.availableFrom | date: 'd MMM y') : ''"
+>
+  <app-syllex-button
+    [props]="{ label: 'Stampa / PDF', variant: 'primary', color: 'celestine', size: 'large', leftIcon: PrintIcon }"
+    (clicked)="onPrintTest()"
+  />
+  <app-syllex-button
+    [props]="{ label: 'Stampa Risultati', variant: 'primary', color: 'celestine', size: 'large', leftIcon: PrintIcon }"
+    (clicked)="onPrintResults()"
+  />
+  <app-syllex-button
+    [props]="{ label: 'Modifica', variant: 'secondary', size: 'large', leftIcon: EditIcon }"
+    (clicked)="onEditTest()"
+  />
+  <app-syllex-button
+    [props]="{ label: 'Elimina', variant: 'primary', color: 'danger', size: 'large', leftIcon: TrashIcon }"
+    (clicked)="onDeleteTest()"
+  />
+</app-syllex-page-header>
 
 <!-- KPI -->
 <div class="mt-4">
