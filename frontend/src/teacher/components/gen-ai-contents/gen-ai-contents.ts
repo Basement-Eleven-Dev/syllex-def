@@ -18,6 +18,7 @@ import {
   faTimes,
   faSparkles,
   faSpinnerThird,
+  faCircleQuestion,
 } from '@fortawesome/pro-solid-svg-icons';
 import { Materia } from '../../../services/materia';
 import { MaterialiSelector } from '../materiali-selector/materiali-selector';
@@ -107,6 +108,16 @@ export class GenAiContents implements OnInit {
   readonly SpinnerIcon = faSpinnerThird;
   readonly TimesIcon = faTimes;
   readonly CheckAllIcon = faCheckDouble;
+  readonly QuestionIcon = faCircleQuestion;
+
+  @ViewChild('whyMaterialsModal') whyMaterialsModal!: TemplateRef<any>;
+
+  openWhyMaterialsModal(): void {
+    this.modalService.open(this.whyMaterialsModal, {
+      centered: true,
+      size: 'md',
+    });
+  }
 
   // State
   readonly TypeMode = signal<'questions' | 'materials'>('materials');

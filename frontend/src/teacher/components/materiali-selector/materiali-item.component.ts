@@ -156,32 +156,41 @@ export class MaterialiItemComponent {
 
   shouldShow(): boolean {
     const item = this.item();
+    
     // Sempre nascosto se aiGenerated e showAiGenerated è false
     if (!this.showAiGenerated() && item.aiGenerated === true) return false;
-    if (!this.embeddingCreationMode()) return true;
-
-    const associatedIds = new Set(this.associatedMaterialIds());
-
+    
     if (this.isFolder(item)) {
-      return this.hasTextFileInFolder(item, associatedIds);
+      return this.hasSelectableContent(item);
     }
-    // Mostra se è un file di testo e NON è già associato a questo assistente
-    return isTextFile(item.extension || '') && !associatedIds.has(item._id!);
+    
+    // Se è un file e siamo in embeddingCreationMode, applica filtri speciali
+    if (this.embeddingCreationMode()) {
+      const associatedIds = new Set(this.associatedMaterialIds());
+      return isTextFile(item.extension || '') && !associatedIds.has(item._id!);
+    }
+    
+    return true;
   }
 
-  private hasTextFileInFolder(
-    folder: MaterialInterface,
-    associatedIds: Set<string>,
-  ): boolean {
-    if (!folder.content) return false;
+  private hasSelectableContent(folder: MaterialInterface): boolean {
+    if (!folder.content || folder.content.length === 0) return false;
+    const associatedIds = new Set(this.associatedMaterialIds());
+    
     return folder.content.some((child) => {
+      // Escludi materiali AI se showAiGenerated è false
       if (!this.showAiGenerated() && child.aiGenerated === true) return false;
+      
       if (this.isFolder(child)) {
-        return this.hasTextFileInFolder(child, associatedIds);
+        return this.hasSelectableContent(child);
       }
-      return (
-        isTextFile(child.extension || '') && !associatedIds.has(child._id!)
-      );
+      
+      // Se siamo in embeddingCreationMode, applica filtri speciali
+      if (this.embeddingCreationMode()) {
+        return isTextFile(child.extension || '') && !associatedIds.has(child._id!);
+      }
+      
+      return true;
     });
   }
 
@@ -201,7 +210,7 @@ export class MaterialiItemComponent {
       const associatedIds = new Set(this.associatedMaterialIds());
       content = content.filter((child) => {
         if (this.isFolder(child)) {
-          return this.hasTextFileInFolder(child, associatedIds);
+          return this.hasSelectableContent(child);
         }
         return (
           isTextFile(child.extension || '') && !associatedIds.has(child._id!)
