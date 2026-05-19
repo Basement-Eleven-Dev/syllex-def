@@ -11,14 +11,28 @@
   [title]="'File e Risorse'"
   [description]="'Gestisci e visualizza i tuoi file e le risorse per la materia selezionata.'"
 >
-  <app-syllex-button
-    [props]="{ label: 'Genera materiale con AI', variant: 'secondary', size: 'large' }"
-    (clicked)="onRequestGenerate()"
-  />
+  <div class="d-flex gap-2">
+    <app-syllex-button
+      [props]="{ label: 'Crea cartella', variant: 'primary', color: 'celestine', size: 'large', leftIcon: icons.plus }"
+      (clicked)="onCreateNewFolder()"
+    />
+    <app-syllex-button
+      [props]="{ label: 'Carica file', variant: 'primary', color: 'celestine', size: 'large', leftIcon: icons.upload }"
+      (clicked)="onRequestUpload()"
+    />
+    <app-syllex-button
+      [props]="{ label: 'Genera con AI', variant: 'secondary', size: 'large', leftIcon: icons.sparkles }"
+      (clicked)="onRequestGenerate()"
+    />
+  </div>
 </app-syllex-page-header>
 
 <div class="materiali-toolbar my-5">
-  <section tourAnchor="materiali_search" class="d-flex flex-row gap-2 mb-3">
+  <div class="mb-4">
+    <app-storage-limit-bar tourAnchor="materiali_storage_bar" />
+  </div>
+
+  <section tourAnchor="materiali_search" class="d-flex flex-row gap-2">
     <input
       #fileInput
       type="file"
@@ -34,8 +48,6 @@
     />
     <app-syllex-clear-button (clicked)="clearFilters()" />
   </section>
-
-  <app-storage-limit-bar tourAnchor="materiali_storage_bar" />
 </div>
 
 <section>
@@ -44,37 +56,58 @@
     tourAnchor="materiali_content"
     class="d-flex flex-row align-items-center justify-content-between mb-5"
   >
-    <div class="d-flex flex-row align-items-center gap-2">
-      @for(dir of currentPathArray(); track $index; let last = $last){
-      <a
-        (click)="onRequestOpenItem(dir)"
-        class="breadcrumb-link"
-        (dragover)="onDragOver($event)"
-        (drop)="onDrop(dir, $event)"
-        (dragenter)="onDragEnter($event)"
-        (dragleave)="onDragLeave($event)"
-      >
-        <span [class.fw-bold]="last">{{ dir }}</span>
-      </a>
-      @if(!last){
-      <fa-icon [icon]="icons.chevronRight" class="text-muted"></fa-icon>
-      } }
+    <div class="d-flex flex-row align-items-center gap-3">
+      @if (currentPathArray().length > 1) {
+      <app-syllex-button
+        [props]="{
+          label: 'Indietro',
+          variant: 'primary',
+          color: 'celestine',
+          size: 'small',
+          leftIcon: icons.arrowLeft
+        }"
+        (clicked)="onRequestOpenItem(currentPathArray()[currentPathArray().length - 2])"
+      />
+      }
+      <div class="d-flex flex-row align-items-center gap-2">
+        @for(dir of currentPathArray(); track $index; let last = $last){
+        <a
+          (click)="onRequestOpenItem(dir)"
+          class="breadcrumb-link"
+          (dragover)="onDragOver($event)"
+          (drop)="onDrop(dir, $event)"
+          (dragenter)="onDragEnter($event)"
+          (dragleave)="onDragLeave($event)"
+          [style.pointer-events]="last ? 'none' : 'auto'"
+          [style.opacity]="last ? '0.7' : '1'"
+        >
+          <span [class.fw-bold]="last">{{ dir }}</span>
+        </a>
+        @if(!last){
+        <fa-icon [icon]="icons.chevronRight" class="text-muted" style="font-size: 0.85rem;"></fa-icon>
+        } }
+      </div>
     </div>
     <div class="d-flex flex-row align-items-center gap-3">
       @if(selectedCount() > 0) {
-      <button
-        class="btn btn-outline-secondary icon-btn"
-        (click)="onDeselectAll()"
-      >
-        Deseleziona tutte
-      </button>
-      <button
-        class="btn btn-outline-danger icon-btn"
-        (click)="onDeleteSelection()"
-      >
-        <fa-icon [icon]="icons.trash"></fa-icon> Elimina selezionati ({{
-        selectedCount() }})
-      </button>
+      <app-syllex-button
+        [props]="{
+          label: 'Deseleziona',
+          variant: 'outline',
+          size: 'small'
+        }"
+        (clicked)="onDeselectAll()"
+      />
+      <app-syllex-button
+        [props]="{
+          label: 'Elimina selezionati (' + selectedCount() + ')',
+          variant: 'primary',
+          color: 'danger',
+          size: 'small',
+          leftIcon: icons.trash
+        }"
+        (clicked)="onDeleteSelection()"
+      />
       }
 
       <app-view-type-toggle
@@ -85,269 +118,145 @@
     </div>
   </div>
 
-  <!-- Sezione CARTELLE -->
-  @if (folders().length > 0) {
-  <div class="mb-5">
-    <div class="d-flex align-items-center justify-content-between mb-3">
-      <h5 class="fw-semibold mb-0">Cartelle</h5>
-      <app-syllex-button
-        [props]="{ label: 'Crea nuova cartella', variant: 'primary', size: 'large' }"
-        (clicked)="onCreateNewFolder()"
-      />
+  @if (folders().length === 0 && files().length === 0) {
+    <div class="mt-5 mb-5">
+      <app-syllex-empty-state
+        title="Nessun file o risorsa presente"
+        description="Carica dispense, PDF o slide per questa materia. I tuoi materiali saranno analizzati in modo sicuro dall'AI di Syllex per generare test e domande all'istante."
+        [icon]="icons.upload"
+        actionLabel="Carica il tuo primo File"
+        [actionIcon]="icons.upload"
+        (actionClicked)="onRequestUpload()"
+        secondaryActionLabel="Genera con AI"
+        [secondaryActionIcon]="icons.sparkles"
+        (secondaryActionClicked)="onRequestGenerate()"
+      ></app-syllex-empty-state>
     </div>
-    @if(viewType() === 'grid') {
-    <div class="row">
-      @for(item of folders(); track item._id){
-      <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-3">
+  } @else {
+    <!-- Unico Esplora File Coesivo -->
+    <div class="mb-5">
+      @if(viewType() === 'grid') {
+      <div class="row">
+        @for(item of allItems(); track item._id; let first = $first){
         <div
-          (dragover)="onDragOver($event)"
-          (drop)="onDrop(item, $event)"
-          (dragenter)="onDragEnter($event)"
-          (dragleave)="onDragLeave($event)"
+          class="col-12 col-md-6 col-lg-4 col-xl-3 mb-3"
+          [tourAnchor]="first ? 'materiali_first_card' : ''"
         >
-          <app-materiale-card
-            [item]="item"
-            [highlightedItemId]="highlightedItemId()"
-            [isSelected]="isItemSelected(item._id)"
-            [draggable]="true"
-            (openItem)="onRequestOpenItem(item)"
-            (dragstart)="onDragStart(item, $event)"
-            (renameItem)="onRequestRenameItem(item, $event)"
-            (deleteItem)="onRequestDeleteItem(item)"
-            (selectItemEvent)="onSelectItem(item, $event)"
-          />
+          <div
+            (dragover)="onDragOver($event)"
+            (drop)="onDrop(item, $event)"
+            (dragenter)="onDragEnter($event)"
+            (dragleave)="onDragLeave($event)"
+          >
+            <app-materiale-card
+              [item]="item"
+              [highlightedItemId]="highlightedItemId()"
+              [isSelected]="isItemSelected(item._id)"
+              [draggable]="true"
+              (openItem)="onRequestOpenItem(item)"
+              (dragstart)="onDragStart(item, $event)"
+              (renameItem)="onRequestRenameItem(item, $event)"
+              (deleteItem)="onRequestDeleteItem(item)"
+              (selectItemEvent)="onSelectItem(item, $event)"
+            />
+          </div>
         </div>
+        }
       </div>
-      } @empty {
-      <div class="col-12 text-center py-4">
-        <p class="text-muted">Nessuna cartella presente</p>
+      } @else {
+      <div class="table-responsive bg-white rounded-4 shadow-sm p-3">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th style="width: 40px">
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  [checked]="isAllSelected()"
+                  (change)="toggleSelectAll()"
+                />
+              </th>
+              <th style="width: 40px"></th>
+              <th>Nome</th>
+              <th style="width: 120px">Tipo</th>
+              <th style="width: 120px">Dimensione</th>
+              <th style="width: 180px">Data modifica</th>
+              <th style="width: 50px"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for(item of allItems(); track item._id!){
+            <tr
+              class="cursor-pointer"
+              [class.table-active]="isItemSelected(item._id!)"
+              [class.highlight-row]="highlightedItemId() === item._id!"
+              [draggable]="true"
+              (click)="onSelectItem(item, $event)"
+              (dblclick)="onRequestOpenItem(item); $event.stopPropagation()"
+              (dragstart)="onDragStart(item, $event)"
+              (dragover)="onDragOver($event)"
+              (drop)="onDrop(item, $event)"
+              (dragenter)="onDragEnter($event)"
+              (dragleave)="onDragLeave($event)"
+            >
+              <td>
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  [checked]="isItemSelected(item._id!)"
+                  (click)="$event.stopPropagation()"
+                  (change)="onSelectItem(item, $event)"
+                />
+              </td>
+              <td>
+                @if (isAIGenerated(item)) {
+                <fa-icon
+                  [icon]="icons.robot"
+                  style="color: #9664c8"
+                  size="lg"
+                />
+                } @else {
+                <fa-icon
+                  [icon]="getItemIcon(item)"
+                  size="lg"
+                  [style.color]="getItemColor(item)"
+                />
+                }
+              </td>
+              <td class="fw-semibold">
+                {{ item.name }}
+              </td>
+              <td class="text-muted">{{ getItemType(item) }}</td>
+              <td class="text-muted">{{ getItemSize(item) }}</td>
+              <td class="text-muted">
+                {{ item.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+              </td>
+              <td>
+                <div ngbDropdown class="d-inline-block">
+                  <button
+                    class="btn btn-sm btn-light circle-btn"
+                    (click)="$event.stopPropagation()"
+                    ngbDropdownToggle
+                  >
+                    <fa-icon [icon]="icons.threeDots" />
+                  </button>
+                  <div ngbDropdownMenu>
+                    <app-materiale-contextual-menu
+                      [item]="item"
+                      (renameItem)="onRequestRenameItem(item, $event)"
+                      (deleteItem)="onRequestDeleteItem(item)"
+                    />
+                  </div>
+                </div>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
       </div>
       }
     </div>
-    } @else {
-    <div class="table-responsive">
-      <table class="table table-hover align-middle">
-        <thead class="table-light">
-          <tr>
-            <th style="width: 40px">
-              <input
-                type="checkbox"
-                class="form-check-input"
-                [checked]="isAllSelected()"
-                (change)="toggleSelectAll()"
-              />
-            </th>
-            <th style="width: 40px"></th>
-            <th>Nome</th>
-            <th style="width: 120px">Tipo</th>
-            <th style="width: 120px">Dimensione</th>
-            <th style="width: 180px">Data modifica</th>
-            <th style="width: 50px"></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for(item of folders(); track item._id!){
-          <tr
-            class="cursor-pointer"
-            [class.table-active]="isItemSelected(item._id!)"
-            [class.highlight-row]="highlightedItemId() === item._id!"
-            [draggable]="true"
-            (click)="onSelectItem(item, $event)"
-            (dblclick)="onRequestOpenItem(item); $event.stopPropagation()"
-            (dragstart)="onDragStart(item, $event)"
-            (dragover)="onDragOver($event)"
-            (drop)="onDrop(item, $event)"
-            (dragenter)="onDragEnter($event)"
-            (dragleave)="onDragLeave($event)"
-          >
-            <td>
-              <input
-                type="checkbox"
-                class="form-check-input"
-                [checked]="isItemSelected(item._id!)"
-                (click)="$event.stopPropagation()"
-                (change)="onSelectItem(item, $event)"
-              />
-            </td>
-            <td>
-              <fa-icon
-                [icon]="getItemIcon(item)"
-                size="lg"
-                [style.color]="getItemColor(item)"
-              />
-            </td>
-            <td>{{ item.name }}</td>
-            <td class="text-muted">{{ getItemType(item) }}</td>
-            <td class="text-muted">{{ getItemSize(item) }}</td>
-            <td class="text-muted">
-              {{ item.createdAt | date: 'dd/MM/yyyy HH:mm' }}
-            </td>
-            <td>
-              <div ngbDropdown class="d-inline-block">
-                <button
-                  class="btn btn-sm btn-light circle-btn"
-                  (click)="$event.stopPropagation()"
-                  ngbDropdownToggle
-                >
-                  <fa-icon [icon]="icons.threeDots" />
-                </button>
-                <div ngbDropdownMenu>
-                  <app-materiale-contextual-menu
-                    [item]="item"
-                    (renameItem)="onRequestRenameItem(item, $event)"
-                    (deleteItem)="onRequestDeleteItem(item)"
-                  />
-                </div>
-              </div>
-            </td>
-          </tr>
-          } @empty {
-          <tr>
-            <td colspan="7" class="text-center py-4">
-              <p class="text-muted">Nessuna cartella presente</p>
-            </td>
-          </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-    }
-  </div>
   }
-
-  <!-- Sezione FILE -->
-  <div>
-    <div class="d-flex align-items-center justify-content-between mb-3">
-      <h5 class="fw-semibold mb-0">File</h5>
-      <app-syllex-button
-        tourAnchor="materiali_upload"
-        [props]="{ label: 'Carica nuovo', variant: 'secondary', size: 'large', leftIcon: icons.upload, disabled: isStorageFull() }"
-        (clicked)="onRequestUpload()"
-      />
-    </div>
-    @if(viewType() === 'grid') {
-    <div class="row">
-      @for(item of files(); track item._id; let first = $first){
-      <div
-        class="col-12 col-md-6 col-lg-4 col-xl-3 mb-3"
-        [tourAnchor]="first ? 'materiali_first_card' : ''"
-      >
-        <app-materiale-card
-          [item]="item"
-          [highlightedItemId]="highlightedItemId()"
-          [isSelected]="isItemSelected(item._id)"
-          [draggable]="true"
-          (openItem)="onRequestOpenItem(item)"
-          (dragstart)="onDragStart(item, $event)"
-          (renameItem)="onRequestRenameItem(item, $event)"
-          (deleteItem)="onRequestDeleteItem(item)"
-          (selectItemEvent)="onSelectItem(item, $event)"
-        />
-      </div>
-      } @empty {
-      <div class="col-12 text-center py-4">
-        <p class="text-muted">Nessun file presente</p>
-      </div>
-      }
-    </div>
-    } @else {
-    <div class="table-responsive">
-      <table class="table table-hover align-middle">
-        <thead class="table-light">
-          <tr>
-            <th style="width: 40px">
-              <input
-                type="checkbox"
-                class="form-check-input"
-                [checked]="isAllSelected()"
-                (change)="toggleSelectAll()"
-              />
-            </th>
-            <th style="width: 40px"></th>
-            <th>Nome</th>
-            <th style="width: 120px">Tipo</th>
-            <th style="width: 120px">Dimensione</th>
-            <th style="width: 180px">Data modifica</th>
-            <th style="width: 50px"></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for(item of files(); track item._id!){
-          <tr
-            class="cursor-pointer"
-            [class.table-active]="isItemSelected(item._id!)"
-            [class.highlight-row]="highlightedItemId() === item._id!"
-            [draggable]="true"
-            (click)="onSelectItem(item, $event)"
-            (dblclick)="onRequestOpenItem(item); $event.stopPropagation()"
-            (dragstart)="onDragStart(item, $event)"
-            (dragover)="onDragOver($event)"
-            (drop)="onDrop(item, $event)"
-            (dragenter)="onDragEnter($event)"
-            (dragleave)="onDragLeave($event)"
-          >
-            <td>
-              <input
-                type="checkbox"
-                class="form-check-input"
-                [checked]="isItemSelected(item._id!)"
-                (click)="$event.stopPropagation()"
-                (change)="onSelectItem(item, $event)"
-              />
-            </td>
-            <td>
-              @if (isAIGenerated(item)) {
-              <fa-icon
-                [icon]="icons.robot"
-                class="me-3"
-                style="color: #9664c8"
-                size="lg"
-              />
-              } @else {
-              <fa-icon
-                [icon]="getItemIcon(item)"
-                size="lg"
-                [style.color]="getItemColor(item)"
-              />
-              }
-            </td>
-            <td>{{ item.name }}</td>
-            <td class="text-muted">{{ getItemType(item) }}</td>
-            <td class="text-muted">{{ getItemSize(item) }}</td>
-            <td class="text-muted">
-              {{ item.createdAt | date: 'dd/MM/yyyy HH:mm' }}
-            </td>
-            <td>
-              <div ngbDropdown class="d-inline-block">
-                <button
-                  class="btn btn-sm btn-light circle-btn"
-                  (click)="$event.stopPropagation()"
-                  ngbDropdownToggle
-                >
-                  <fa-icon [icon]="icons.threeDots" />
-                </button>
-                <div ngbDropdownMenu>
-                  <app-materiale-contextual-menu
-                    [item]="item"
-                    (renameItem)="onRequestRenameItem(item, $event)"
-                    (deleteItem)="onRequestDeleteItem(item)"
-                  />
-                </div>
-              </div>
-            </td>
-          </tr>
-          } @empty {
-          <tr>
-            <td colspan="7" class="text-center py-4">
-              <p class="text-muted">Nessun file presente</p>
-            </td>
-          </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-    }
-  </div>
 </section>
 
 <app-ai-overlay

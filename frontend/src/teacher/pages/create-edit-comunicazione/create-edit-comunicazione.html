@@ -1,101 +1,131 @@
-<app-back-to
-  [path]="'/t/comunicazioni'"
-  [label]="'Torna alla lista delle comunicazioni'"
-></app-back-to>
-<div class="d-flex flex-row align-items-center justify-content-between mb-4">
-  <div>
-    <h1 class="text-dark fw-medium mb-3 display-6">
-      {{ PageTitle() }} comunicazione
-    </h1>
-    <h5 class="text-dark mb-0 fw-normal">{{ PageDescription() }}</h5>
-  </div>
-  @if(IsEditMode()) {
-  <div>
+<div [class.p-4]="activeModal" [class.p-md-5]="activeModal">
+  @if (!activeModal) {
+  <app-back-to
+    [path]="'/t/calendario'"
+    [label]="'Torna al calendario'"
+  ></app-back-to>
+  } @else {
+  <div class="d-flex justify-content-end mb-2">
     <button
-      class="btn btn-delete py-3"
-      confirmAction
-      (confirmed)="onDelete()"
-      [disabled]="IsLoading()"
-    >
-      <fa-icon [icon]="TrashIcon"></fa-icon>
-      Elimina
-    </button>
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="activeModal.dismiss()"
+    ></button>
   </div>
   }
-</div>
-<form [formGroup]="ComunicazioneForm" (ngSubmit)="onSave()" class="pb-5">
-  <section class="form-section">
-    <div class="mb-3">
-      <label for="titolo" class="form-label text-dark">Titolo</label>
-      <input
-        type="text"
-        id="titolo"
-        class="form-control custom-input"
-        formControlName="title"
-        placeholder="Inserisci il titolo della comunicazione"
-        [class.is-invalid]="
-          ComunicazioneForm.get('title')?.invalid &&
-          ComunicazioneForm.get('title')?.touched
-        "
+  
+  <div class="d-flex flex-row align-items-center justify-content-between mb-4">
+    <div>
+      <h2 class="text-dark fw-semibold mb-1 fs-3">
+        {{ PageTitle() }} comunicazione
+      </h2>
+      <p class="text-muted mb-0 small">{{ PageDescription() }}</p>
+    </div>
+    @if(IsEditMode()) {
+    <div>
+      <app-syllex-button
+        [props]="{
+          label: 'Elimina',
+          variant: 'primary',
+          color: 'danger',
+          size: 'medium',
+          leftIcon: TrashIcon,
+          disabled: IsLoading()
+        }"
+        confirmAction
+        (confirmed)="onDelete()"
       />
-      @if(ComunicazioneForm.get('title')?.invalid &&
-      ComunicazioneForm.get('title')?.touched) {
-      <div class="invalid-feedback">Il titolo è obbligatorio</div>
-      }
     </div>
-    <div class="mb-3">
-      <label for="contenuto" class="form-label text-dark">Contenuto</label>
-      <textarea
-        id="contenuto"
-        class="form-control custom-input"
-        formControlName="content"
-        rows="6"
-        placeholder="Inserisci il contenuto della comunicazione"
-        [class.is-invalid]="
-          ComunicazioneForm.get('content')?.invalid &&
-          ComunicazioneForm.get('content')?.touched
-        "
-      ></textarea>
-      @if(ComunicazioneForm.get('content')?.invalid &&
-      ComunicazioneForm.get('content')?.touched) {
-      <div class="invalid-feedback">Il contenuto è obbligatorio</div>
-      }
-    </div>
-  </section>
-  <section class="form-section mt-4 w-100">
-    <div class="row">
-      <div class="col-4">
-        <label class="form-label text-dark mb-3">Classi destinatarie</label>
-        <app-class-selector
-          [selectedClassIds]="assignedClasses"
-          (selectedClassIdsChange)="onClassesChange($event)"
-        ></app-class-selector>
-        @if(ComunicazioneForm.get('classes')?.invalid &&
-        ComunicazioneForm.get('classes')?.touched) {
-        <div class="text-danger small mt-2">Seleziona almeno una classe</div>
+    }
+  </div>
+
+  <form [formGroup]="ComunicazioneForm" (ngSubmit)="onSave()" class="pb-5">
+    <section class="form-section">
+      <div class="mb-3">
+        <label for="titolo" class="form-label text-dark">Titolo</label>
+        <input
+          type="text"
+          id="titolo"
+          class="form-control custom-input"
+          formControlName="title"
+          placeholder="Inserisci il titolo della comunicazione"
+          [class.is-invalid]="
+            ComunicazioneForm.get('title')?.invalid &&
+            ComunicazioneForm.get('title')?.touched
+          "
+        />
+        @if(ComunicazioneForm.get('title')?.invalid &&
+        ComunicazioneForm.get('title')?.touched) {
+        <div class="invalid-feedback">Il titolo è obbligatorio</div>
         }
       </div>
-      <div class="col-8">
-        <label class="form-label text-dark fw-bold mb-3"
-          >Materiali allegati (opzionale)</label
-        >
-        <app-materiali-selector
-          [initialMaterialIds]="MaterialIds()"
-          (selectionChange)="onMaterialsChange($event)"
-        ></app-materiali-selector>
+      <div class="mb-3">
+        <label for="contenuto" class="form-label text-dark">Contenuto</label>
+        <textarea
+          id="contenuto"
+          class="form-control custom-input"
+          formControlName="content"
+          rows="6"
+          placeholder="Inserisci il contenuto della comunicazione"
+          [class.is-invalid]="
+            ComunicazioneForm.get('content')?.invalid &&
+            ComunicazioneForm.get('content')?.touched
+          "
+        ></textarea>
+        @if(ComunicazioneForm.get('content')?.invalid &&
+        ComunicazioneForm.get('content')?.touched) {
+        <div class="invalid-feedback">Il contenuto è obbligatorio</div>
+        }
       </div>
-    </div>
-  </section>
+    </section>
+    
+    <section class="form-section mt-4 w-100">
+      <div class="row g-4">
+        <div class="col-md-5 col-12">
+          <label class="form-label text-dark mb-3">Classi destinatarie</label>
+          <app-class-selector
+            [selectedClassIds]="assignedClasses"
+            (selectedClassIdsChange)="onClassesChange($event)"
+          ></app-class-selector>
+          @if(ComunicazioneForm.get('classes')?.invalid &&
+          ComunicazioneForm.get('classes')?.touched) {
+          <div class="text-danger small mt-2">Seleziona almeno una classe</div>
+          }
+        </div>
+        <div class="col-md-7 col-12">
+          <label class="form-label text-dark fw-bold mb-3"
+            >Materiali allegati (opzionale)</label
+          >
+          <app-materiali-selector
+            [initialMaterialIds]="MaterialIds()"
+            (selectionChange)="onMaterialsChange($event)"
+          ></app-materiali-selector>
+        </div>
+      </div>
+    </section>
 
-  <div class="d-flex flex-row justify-content-end mt-5 gap-3">
-    <button
-      type="submit"
-      class="btn btn-gradient-primary text-white btn-lg icon-btn"
-      [disabled]="IsLoading()"
-    >
-      @if(IsLoading()) {
-      <span class="spinner-border spinner-border-sm me-2"></span>
-      } @else { } {{ IsLoading() ? 'Salvataggio...' : 'Salva' }}
-    </button>
-  </div>
-</form>
+    <div class="d-flex flex-row justify-content-end mt-5 gap-3">
+      @if (activeModal) {
+      <app-syllex-button
+        [props]="{
+          label: 'Annulla',
+          variant: 'outline',
+          size: 'large',
+          disabled: IsLoading()
+        }"
+        (clicked)="activeModal.dismiss()"
+      />
+      }
+      <app-syllex-button
+        [props]="{
+          label: IsLoading() ? 'Salvataggio...' : 'Salva',
+          variant: 'primary',
+          size: 'large',
+          disabled: IsLoading()
+        }"
+        (clicked)="onSave()"
+      />
+    </div>
+  </form>
+</div>

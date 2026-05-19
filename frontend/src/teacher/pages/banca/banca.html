@@ -38,27 +38,40 @@
     (viewTypeChange)="onChangeViewType($event)"
   />
 </section>
-@if (ViewType === 'table') {
-<div class="mt-4">
-  <app-question-table
-    [questions]="Questions()"
-    (removeMe)="onDeleteQuestion($event)"
-  />
-</div>
+@if (Questions().length === 0) {
+  <div class="mt-5 mb-5">
+    <app-syllex-empty-state
+      title="La tua banca domande è vuota"
+      description="Inizia a creare domande personalizzate per i tuoi test o lascia che l'AI di Syllex ne generi una serie a partire dai tuoi materiali in pochi secondi."
+      [icon]="QuestionIcon"
+      actionLabel="Crea o Genera Domanda"
+      actionLink="/t/create-question"
+      [actionIcon]="PlusIcon"
+    ></app-syllex-empty-state>
+  </div>
 } @else {
-<div class="questions-masonry mt-4">
-  @for(question of Questions(); track question._id; let last = $last; let i =
-  $index) {
-  <div class="questions-masonry-item">
-    <div
-      app-question-card
-      [question]="question"
-      mode="banca"
+  @if (ViewType === 'table') {
+  <div class="mt-4">
+    <app-question-table
+      [questions]="Questions()"
       (removeMe)="onDeleteQuestion($event)"
-    ></div>
+    />
+  </div>
+  } @else {
+  <div class="questions-masonry mt-4">
+    @for(question of Questions(); track question._id; let last = $last; let i =
+    $index) {
+    <div class="questions-masonry-item">
+      <div
+        app-question-card
+        [question]="question"
+        mode="banca"
+        (removeMe)="onDeleteQuestion($event)"
+      ></div>
+    </div>
+    }
   </div>
   }
-</div>
 } @if (CollectionSize() > PageSize()) {
 <div
   class="mt-4 d-flex justify-content-end gap-2 align-items-center mb-5"

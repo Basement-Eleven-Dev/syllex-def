@@ -25,6 +25,9 @@ import {
 } from '../../../services/class-statistics.service';
 import { TestsService } from '../../../services/tests-service';
 
+import { BackTo } from '../../components/back-to/back-to';
+import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
+
 @Component({
   selector: 'app-class-detail',
   imports: [
@@ -33,6 +36,8 @@ import { TestsService } from '../../../services/tests-service';
     FontAwesomeModule,
     StatisticheClasse,
     SyllexKpiRow,
+    BackTo,
+    SyllexPageHeader,
   ],
   templateUrl: './classe-dettaglio.html',
   styleUrl: './classe-dettaglio.scss',

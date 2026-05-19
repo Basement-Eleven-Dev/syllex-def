@@ -39,6 +39,7 @@ interface TestDetailsResponse {
     icon: string;
   }[];
   attempts: any[]; // Qui puoi usare la tua AttemptInterface
+  classes?: any[];
 }
 
 export interface TopicPerformance {

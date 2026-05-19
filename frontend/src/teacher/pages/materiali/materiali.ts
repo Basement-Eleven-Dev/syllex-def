@@ -24,6 +24,7 @@ import {
   faRobot,
   faXmark,
   faTrash,
+  faArrowLeft,
 } from '@fortawesome/pro-solid-svg-icons';
 import {
   NgbDropdown,
@@ -62,6 +63,7 @@ import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
 import { SyllexSearchInput } from '../../components/UI/syllex-search-input/syllex-search-input';
 import { SyllexClearButton } from '../../components/UI/syllex-clear-button/syllex-clear-button';
+import { SyllexEmptyState } from '../../components/UI/syllex-empty-state/syllex-empty-state';
 
 @Component({
   selector: 'app-materiali',
@@ -82,6 +84,7 @@ import { SyllexClearButton } from '../../components/UI/syllex-clear-button/sylle
     SyllexClearButton,
     TourAnchorNgBootstrapDirective,
     SyllexPageHeader,
+    SyllexEmptyState,
   ],
   templateUrl: './materiali.html',
   styleUrl: './materiali.scss',
@@ -121,6 +124,7 @@ export class Materiali implements OnInit {
     robot: faRobot,
     clear: faXmark,
     trash: faTrash,
+    arrowLeft: faArrowLeft,
   } as const;
 
   // ── State proxied from facade (avoids template changes) ───────────
@@ -139,6 +143,15 @@ export class Materiali implements OnInit {
   readonly folders = computed(() =>
     (this.rootFolder()?.content ?? []).filter((item) => item.type === 'folder'),
   );
+
+  readonly allItems = computed(() => {
+    const content = this.rootFolder()?.content ?? [];
+    return [...content].sort((a, b) => {
+      if (a.type === 'folder' && b.type !== 'folder') return -1;
+      if (a.type !== 'folder' && b.type === 'folder') return 1;
+      return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+    });
+  });
 
   // ── UI-only state ─────────────────────────────────────────────────
   protected readonly viewType = signal<ViewType>('grid');
@@ -340,12 +353,17 @@ export class Materiali implements OnInit {
   // ── GenAI ─────────────────────────────────────────────────────────
 
   protected onRequestGenerate(): void {
-    this.offcanvasService.open(GenAiContents, {
+    const offcanvasRef = this.offcanvasService.open(GenAiContents, {
       position: 'end',
       panelClass: 'offcanvas-large',
       scroll: true,
       backdrop: true,
     });
+
+    offcanvasRef.result.then(
+      () => this.facade.reload(),
+      () => this.facade.reload()
+    );
   }
 
   // ── Topic Suggestions ─────────────────────────────────────────────

@@ -63,7 +63,12 @@ export const createAndLinkUser = async (
   const addToGroupCommand = new AdminAddUserToGroupCommand({
     UserPoolId: cognitoPoolId,
     Username: email.trim(),
-    GroupName: role == "teacher" ? "teachers" : (role == 'student' ? "students" : 'admins'),
+    GroupName:
+      role == "teacher"
+        ? "teachers"
+        : role == "student"
+          ? "students"
+          : "admins",
   });
 
   await client.send(addToGroupCommand);
@@ -263,6 +268,8 @@ const start = async () => {
   await clientMongo.close();
 };
 
-start()
-  .catch(console.error)
-  .then(() => process.exit(0));
+if (require.main === module) {
+  start()
+    .catch(console.error)
+    .then(() => process.exit(0));
+}

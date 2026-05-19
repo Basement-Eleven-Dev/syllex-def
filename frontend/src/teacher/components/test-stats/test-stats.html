@@ -1,15 +1,15 @@
 <app-syllex-select-input
   class="mb-4"
   [value]="classSelected"
-  (valueChange)="classSelected = $event"
+  (valueChange)="onClassChange($event)"
   style="max-width: 220px"
   placeholder="Tutte le classi"
-  [options]="[]"
+  [options]="classOptions"
 />
 
 <div class="row">
   <div class="col-12 d-flex flex-column">
-    <div class="card p-3 mb-4 flex-fill">
+    <div class="card card-celeste-light p-3 mb-4 flex-fill">
       <div class="card-body h-100">
         <h5 class="text-dark fw-semibold mb-3">Performance per argomento</h5>
         <div class="mb-3">
@@ -29,7 +29,7 @@
   </div>
 </div>
 
-<div class="card p-3">
+<div class="card card-lime-light p-3">
   <div class="card-body">
     <h5 class="text-dark fw-semibold mb-3">Performance singole domande</h5>
     <div class="table-responsive">
@@ -58,7 +58,7 @@
             <td class="text-wrap" style="max-width: 300px">{{ stat.text }}</td>
             <td class="text-center text-success">{{ stat.correctCount }}</td>
             <td class="text-center text-danger">{{ stat.errorCount }}</td>
-            <td class="text-center text-secondary">{{ stat.blankCount }}</td>
+            <td class="text-center text-muted">{{ stat.blankCount }}</td>
             <td class="text-center fw-bold">
               @if (stat.totalResponses > 0) { {{ ((stat.correctCount /
               stat.totalResponses) * 100).toFixed(1) }}% } @else { N/A }

@@ -37,11 +37,25 @@
   opacity: 1;
 }
 
-.highlight {
-  background-color: #ffeb3b;
-  padding: 0.125rem 0.25rem;
-  border-radius: 0.25rem;
-  font-weight: 600;
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(57, 49, 206, 0.4);
+    border-color: #3931ce;
+  }
+  50% {
+    box-shadow: 0 0 16px 4px rgba(57, 49, 206, 0.2);
+    border-color: #5d54df;
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(57, 49, 206, 0);
+    border-color: #3931ce;
+  }
+}
+
+.highlight-pulse {
+  animation: pulseGlow 2.5s infinite ease-in-out;
+  background-color: #f7fee7 !important;
+  border: 2px solid #3931ce !important;
 }
 
 ::ng-deep .circle-btn.dropdown-toggle::after {

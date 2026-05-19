@@ -15,10 +15,10 @@ import { FeedbackService } from '../../../services/feedback-service';
   standalone: true,
   imports: [CommonModule, FontAwesomeModule],
   template: `
-    <div class="card border-0 shadow-sm rounded-4 bg-primary bg-opacity-10">
+    <div class="card border-0 shadow-sm rounded-4" style="background-color: #f7fee7 !important;">
       <div class="card-body p-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-          <h5 class="fw-bold mb-0 text-primary">
+          <h5 class="fw-bold mb-0" style="color: #3f6212 !important;">
             <fa-icon [icon]="icons.faLightbulb" class="me-2"></fa-icon>
             {{ mode() === 'test' ? 'Analisi IA della Classe' : 'Feedback IA' }}
           </h5>

@@ -4,9 +4,12 @@ import {
   Input,
   OnDestroy,
   OnInit,
+  OnChanges,
+  SimpleChanges,
   Output,
   ViewChild,
   inject,
+  ElementRef,
 } from '@angular/core';
 import {
   FaIconComponent,
@@ -34,6 +37,7 @@ import {
 import { MaterialeContextualMenu } from '../materiale-contextual-menu/materiale-contextual-menu';
 import { MaterialInterface } from '../../../services/materiali/materiali-service';
 import { FileViewer } from '../file-viewer/file-viewer';
+import { SyllexBadge } from '../UI/syllex-badge/syllex-badge';
 
 @Component({
   selector: 'app-materiale-card',
@@ -44,11 +48,12 @@ import { FileViewer } from '../file-viewer/file-viewer';
     NgbDropdown,
     NgbDropdownToggle,
     NgbDropdownMenu,
+    SyllexBadge,
   ],
   templateUrl: './materiale-card.html',
   styleUrl: './materiale-card.scss',
 })
-export class MaterialeCard implements OnInit, OnDestroy {
+export class MaterialeCard implements OnInit, OnDestroy, OnChanges {
   ShareNodesIcon = faShareNodes;
   DownloadIcon = faDownload;
   @Input() item!: MaterialInterface;
@@ -67,10 +72,19 @@ export class MaterialeCard implements OnInit, OnDestroy {
   @ViewChild('contextualMenu') contextualMenuRef?: MaterialeContextualMenu;
 
   modalService = inject(NgbModal);
+  elementRef = inject(ElementRef);
 
   readonly ThreeDotsIcon = faEllipsisVertical;
   readonly RobotIcon = faRobot;
   readonly SparklesIcon = faSparkles;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['highlightedItemId'] && this.highlightedItemId === this.item._id) {
+      setTimeout(() => {
+        this.elementRef.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 500);
+    }
+  }
 
   requestAssignToClass(): void {
     this.contextualMenuRef?.onRequestAssignToClass();

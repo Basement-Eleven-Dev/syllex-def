@@ -209,7 +209,7 @@ export class LaboratorioAi {
     ]),
     format: new FormControl<'pptx' | 'pdf'>('pdf'),
     language: new FormControl('italiano', Validators.required),
-    instructions: new FormControl(STYLE_PREFILL_MAP['bilanciata']),
+    instructions: new FormControl(''),
     slideStyle: new FormControl<SlideStyle>('bilanciata'),
     topicId: new FormControl<string>(''),
   });
@@ -221,10 +221,10 @@ export class LaboratorioAi {
     if (this.CurrentStep() < this.MaxStep()) {
       const nextStep = this.CurrentStep() + 1;
       this.CurrentStep.set(nextStep);
-      // When entering slide style step, ensure prefill matches current selection
+      // When entering slide style step, always sync prefill to current style selection
       if (this.IsSlides() && nextStep === 3) {
         const style = this.genForm.controls['slideStyle'].value as SlideStyle;
-        if (style && !this.genForm.controls['instructions'].value) {
+        if (style) {
           this.genForm.controls['instructions'].setValue(
             STYLE_PREFILL_MAP[style],
           );
@@ -259,6 +259,14 @@ export class LaboratorioAi {
   onSelectMaterialType(type: string): void {
     this.SelectedMaterialType.set(type);
     this.genForm.controls['selectedType'].setValue(type);
+    // Reset instructions to type-appropriate default
+    if (type === 'slides') {
+      this.genForm.controls['instructions'].setValue(
+        STYLE_PREFILL_MAP['bilanciata'],
+      );
+    } else {
+      this.genForm.controls['instructions'].setValue('');
+    }
     if (this.CurrentStep() === 1) {
       setTimeout(() => this.CurrentStep.set(2), 280);
     }

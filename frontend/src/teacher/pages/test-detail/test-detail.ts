@@ -42,6 +42,9 @@ const IconMap: Record<string, any> = {
   'pen-nib': faPenNib,
 };
 
+import { BackTo } from '../../components/back-to/back-to';
+import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
+
 @Component({
   selector: 'app-test-detail',
   standalone: true,
@@ -54,6 +57,8 @@ const IconMap: Record<string, any> = {
     SyllexKpiRow,
     TestAiSummaryComponent,
     SyllexButton,
+    BackTo,
+    SyllexPageHeader,
   ],
   templateUrl: './test-detail.html',
   styleUrl: './test-detail.scss',
@@ -92,6 +97,7 @@ export class TestDetail {
   readonly TestData = signal<any | null>(null);
   readonly BackendStats = signal<any[]>([]);
   readonly Attempts = signal<any[]>([]);
+  readonly Classes = signal<any[]>([]);
   readonly IsLoading = signal<boolean>(true);
 
   // Computed
@@ -129,6 +135,7 @@ export class TestDetail {
           this.TestData.set(response.test);
           this.BackendStats.set(response.stats);
           this.Attempts.set(response.attempts);
+          this.Classes.set(response.classes || []);
           console.log(this.Attempts);
           this.IsLoading.set(false);
         },

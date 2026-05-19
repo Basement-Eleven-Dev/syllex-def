@@ -28,6 +28,7 @@ import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-
 import { SyllexSearchInput } from '../../components/UI/syllex-search-input/syllex-search-input';
 import { SyllexClearButton } from '../../components/UI/syllex-clear-button/syllex-clear-button';
 import { SyllexSelectInput } from '../../components/UI/syllex-select-input/syllex-select-input';
+import { SyllexEmptyState } from '../../components/UI/syllex-empty-state/syllex-empty-state';
 
 @Component({
   selector: 'app-classi',
@@ -42,6 +43,7 @@ import { SyllexSelectInput } from '../../components/UI/syllex-select-input/sylle
     SyllexSearchInput,
     SyllexClearButton,
     SyllexSelectInput,
+    SyllexEmptyState,
   ],
   templateUrl: './classi.html',
   styleUrl: './classi.scss',

@@ -1,3 +1,49 @@
-tbody > tr > td {
-  color: var(--bs-dark);
+.card {
+  border: none !important;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
+}
+
+.card-celeste-light {
+  background-color: #f6f9fe !important;
+  
+  .table {
+    --bs-table-bg: transparent !important;
+    --bs-table-striped-bg: rgba(57, 49, 206, 0.02) !important;
+    --bs-table-hover-bg: rgba(57, 49, 206, 0.04) !important;
+    background-color: transparent !important;
+  }
+  
+  tbody > tr > td {
+    color: var(--bs-dark);
+    background-color: transparent !important;
+    border-bottom: 1px solid rgba(57, 49, 206, 0.06) !important;
+  }
+  
+  thead > tr > th {
+    background-color: transparent !important;
+    border-bottom: 2px solid rgba(57, 49, 206, 0.1) !important;
+  }
+}
+
+.card-lime-light {
+  background-color: #f7fee7 !important;
+  
+  .table {
+    --bs-table-bg: transparent !important;
+    --bs-table-striped-bg: rgba(77, 124, 15, 0.02) !important;
+    --bs-table-hover-bg: rgba(77, 124, 15, 0.04) !important;
+    background-color: transparent !important;
+  }
+  
+  tbody > tr > td {
+    color: var(--bs-dark);
+    background-color: transparent !important;
+    border-bottom: 1px solid rgba(77, 124, 15, 0.06) !important;
+  }
+  
+  thead > tr > th {
+    background-color: transparent !important;
+    border-bottom: 2px solid rgba(77, 124, 15, 0.1) !important;
+  }
 }

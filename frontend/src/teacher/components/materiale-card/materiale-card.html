@@ -4,6 +4,7 @@
   [class.selected]="isSelected"
   [class.opacity-50]="isReady === false"
   [class.pe-none]="isReady === false"
+  [class.highlight-pulse]="highlightedItemId === item._id"
   (dblclick)="requestOpenItem()"
   (click)="selectItem($event)"
 >
@@ -56,12 +57,14 @@
         }
 
         <div class="overflow-hidden">
-          <p
-            class="card-title mb-0 text-truncate"
-            [class.highlight]="highlightedItemId === item._id"
-          >
-            {{ item.name }}
-          </p>
+          <div class="d-flex flex-row align-items-center gap-2 overflow-hidden">
+            <p class="card-title mb-0 text-truncate flex-grow-1">
+              {{ item.name }}
+            </p>
+            @if (highlightedItemId === item._id) {
+              <app-syllex-badge label="Nuovo" color="green" />
+            }
+          </div>
         </div>
       </div>
     </div>

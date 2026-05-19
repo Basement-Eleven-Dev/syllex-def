@@ -83,7 +83,7 @@
           [(selectedValue)]="SelectedQuestionType"
           (typeSelected)="onSelectQuestionType($event)"
           [direction]="'row'"
-          [size]="'small'"
+          [showDescription]="true"
         ></app-type-selector>
       </div>
       }
@@ -106,114 +106,124 @@
         </p>
 
         <div [formGroup]="aiForm">
-          <div class="row g-4">
+          <div class="row g-4 align-items-stretch">
             <!-- Left: params -->
-            <div class="col-12 col-lg-6 d-flex flex-column gap-3">
-              <!-- Argomento -->
-              <div tourAnchor="crea_domanda_argomento">
-                <label class="wizard-field-label">Su quale argomento? *</label>
-                <select
-                  class="form-select bg-light border-0 shadow-none py-2 px-3 rounded-pill"
-                  formControlName="topicId"
-                  aria-label="Seleziona argomento"
-                >
-                  <option value="" disabled selected>
-                    Seleziona argomento
-                  </option>
-                  @for (topic of materiaService.topics; track topic._id) {
-                  <option [value]="topic._id">{{ topic.name }}</option>
-                  }
-                </select>
-              </div>
-
-              <!-- Parametri -->
-              <div class="row g-2" tourAnchor="crea_domanda_difficolta">
-                <div class="col-6">
-                  <label class="wizard-field-label">Quante domande?</label>
-                  <input
-                    type="number"
-                    class="form-control custom-input"
-                    formControlName="numberOfQuestions"
-                    min="1"
-                    max="20"
-                    aria-label="Numero di domande"
-                  />
-                </div>
-                @if (IsAiFormMultipleChoice()) {
-                <div class="col-6">
-                  <label class="wizard-field-label">Opzioni per risposta</label>
-                  <input
-                    type="number"
-                    class="form-control custom-input"
-                    formControlName="numberOfAlternatives"
-                    min="2"
-                    max="8"
-                    aria-label="Numero di alternative"
-                  />
-                </div>
-                }
-                <div class="col-6">
-                  <label class="wizard-field-label">In che lingua?</label>
-                  <app-syllex-select-input
-                    formControlName="language"
-                    [options]="LanguageOptions"
-                    placeholder="Scegli lingua"
-                  ></app-syllex-select-input>
-                </div>
-                <div class="col-6">
-                  <label class="wizard-field-label"
-                    >Livello di difficoltà</label
+            <div class="col-12 col-lg-6 d-flex flex-column">
+              <div class="form-section d-flex flex-column gap-3 h-100">
+                <!-- Argomento -->
+                <div tourAnchor="crea_domanda_argomento">
+                  <label class="wizard-field-label">Su quale argomento? *</label>
+                  <select
+                    class="form-select custom-input"
+                    formControlName="topicId"
+                    aria-label="Seleziona argomento"
                   >
-                  <app-syllex-select-input
-                    formControlName="difficulty"
-                    [options]="DifficultyOptions"
-                  ></app-syllex-select-input>
+                    <option value="" disabled selected>
+                      Seleziona argomento
+                    </option>
+                    @for (topic of materiaService.topics; track topic._id) {
+                    <option [value]="topic._id">{{ topic.name }}</option>
+                    }
+                  </select>
                 </div>
-              </div>
 
-              <!-- Istruzioni -->
-              <div class="flex-fill d-flex flex-column">
-                <label class="wizard-field-label">
-                  Hai istruzioni particolari?
-                  <span class="text-muted fw-normal">(opzionale)</span>
-                </label>
-                <textarea
-                  class="form-control custom-input flex-fill"
-                  formControlName="instructions"
-                  rows="4"
-                  style="resize: none"
-                  placeholder="Es. usa linguaggio semplice, includi esempi pratici, evita domande trabocchetto..."
-                ></textarea>
-              </div>
+                <!-- Parametri -->
+                <div class="row g-3" tourAnchor="crea_domanda_difficolta">
+                  <div class="col-6">
+                    <label class="wizard-field-label">Quante domande?</label>
+                    <input
+                      type="number"
+                      class="form-control custom-input"
+                      formControlName="numberOfQuestions"
+                      min="1"
+                      max="20"
+                      aria-label="Numero di domande"
+                    />
+                  </div>
+                  @if (IsAiFormMultipleChoice()) {
+                  <div class="col-6">
+                    <label class="wizard-field-label">Opzioni per risposta</label>
+                    <input
+                      type="number"
+                      class="form-control custom-input"
+                      formControlName="numberOfAlternatives"
+                      min="2"
+                      max="8"
+                      aria-label="Numero di alternative"
+                    />
+                  </div>
+                  }
+                  <div class="col-6">
+                    <label class="wizard-field-label">In che lingua?</label>
+                    <app-syllex-select-input
+                      formControlName="language"
+                      [options]="LanguageOptions"
+                      placeholder="Scegli lingua"
+                    ></app-syllex-select-input>
+                  </div>
+                  <div class="col-6">
+                    <label class="wizard-field-label"
+                      >Livello di difficoltà</label
+                    >
+                    <app-syllex-select-input
+                      formControlName="difficulty"
+                      [options]="DifficultyOptions"
+                    ></app-syllex-select-input>
+                  </div>
+                  <div class="col-6">
+                    <label class="wizard-field-label">Tipo di utilizzo</label>
+                    <app-syllex-select-input
+                      formControlName="policy"
+                      [options]="PolicyOptions"
+                    ></app-syllex-select-input>
+                  </div>
+                </div>
 
-              <!-- CTA -->
-              <div class="d-flex justify-content-end pt-1">
-                <button
-                  type="button"
-                  class="btn btn-primary ai btn-lg icon-btn rounded-pill fw-bold"
-                  [disabled]="aiForm.invalid || AiIsLoading()"
-                  (click)="onGenerateAI()"
-                >
-                  <fa-icon
-                    [icon]="AiIsLoading() ? SpinnerIcon : SparklesIcon"
-                    [animation]="AiIsLoading() ? 'spin' : undefined"
-                  ></fa-icon>
-                  {{ AiIsLoading() ? 'Generazione in corso...' : 'Genera le mie
-                  domande' }}
-                </button>
+                <!-- Istruzioni -->
+                <div class="flex-fill d-flex flex-column">
+                  <label class="wizard-field-label">
+                    Hai istruzioni particolari?
+                    <span class="text-muted fw-normal">(opzionale)</span>
+                  </label>
+                  <textarea
+                    class="form-control custom-input flex-fill"
+                    formControlName="instructions"
+                    rows="4"
+                    style="resize: none"
+                    placeholder="Es. usa linguaggio semplice, includi esempi pratici, evita domande trabocchetto..."
+                  ></textarea>
+                </div>
               </div>
             </div>
 
             <!-- Right: materiali -->
-            <div class="col-12 col-lg-6" tourAnchor="gen_ai_support_files">
-              <label class="wizard-field-label"
-                >Da dove vuoi che l'AI impari?</label
-              >
-              <p class="text-muted small mb-2">
-                Carica dispense, PDF o slide: l'AI li studià per creare domande
-                pertinenti.
-              </p>
-              <app-materiali-selector></app-materiali-selector>
+            <div class="col-12 col-lg-6 d-flex flex-column" tourAnchor="gen_ai_support_files">
+              <div class="form-section d-flex flex-column h-100">
+                <label class="wizard-field-label"
+                  >Da dove vuoi che l'AI impari?</label
+                >
+                <p class="text-muted small mb-3">
+                  Carica dispense, PDF o slide: l'AI li studierà per creare domande
+                  pertinenti.
+                </p>
+                <div class="flex-grow-1 mb-3">
+                  <app-materiali-selector></app-materiali-selector>
+                </div>
+                <!-- CTA -->
+                <div class="d-flex justify-content-end pt-3">
+                  <app-syllex-button
+                    [props]="{
+                      label: AiIsLoading() ? 'Generazione in corso...' : 'Genera le mie domande',
+                      variant: 'primary',
+                      size: 'large',
+                      leftIcon: AiIsLoading() ? SpinnerIcon : SparklesIcon,
+                      animation: AiIsLoading() ? 'spin' : undefined,
+                      disabled: aiForm.invalid || AiIsLoading()
+                    }"
+                    (clicked)="onGenerateAI()"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
