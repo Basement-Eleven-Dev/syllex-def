@@ -54,6 +54,7 @@ import { AiOverlay } from '../ai-overlay/ai-overlay';
 import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 import { SyllexButton } from '../UI/syllex-button/syllex-button';
 import { MaterialiFacadeService } from '../../../services/materiali/materiali-facade.service';
+import { MaterialInterface } from '../../../services/materiali/materiali-service';
 
 interface ReviewQuestion {
   readonly TempId: string;
@@ -120,6 +121,7 @@ export class GenAiContents implements OnInit {
   readonly GeneratedMaterial = signal<GeneratedMaterial | null>(null);
   /** Number of questions that failed to generate in the last bulk request. */
   readonly PartialGenerationWarning = signal<number>(0);
+  readonly selectedMaterials = signal<MaterialInterface[]>([]);
 
   // Computed
   readonly IsMultipleChoice = computed(
@@ -128,11 +130,31 @@ export class GenAiContents implements OnInit {
   readonly IsSlides = computed(
     () => this.TypeMode() === 'materials' && this.SelectedType() === 'slides',
   );
+  readonly disableReason = computed(() => {
+    const reasons: string[] = [];
+    
+    if (this.selectedMaterials().length === 0) {
+      reasons.push('Seleziona almeno una risorsa o materiale di riferimento.');
+    }
+    
+    if (this.TypeMode() === 'questions' && !this.genForm.get('topicId')?.value) {
+      reasons.push('Seleziona un argomento per le domande.');
+    }
+    
+    if (this.formInvalid()) {
+      const topicInvalid = this.TypeMode() === 'questions' && !this.genForm.get('topicId')?.value;
+      if (!topicInvalid) {
+        reasons.push('Compila correttamente tutti i parametri richiesti.');
+      }
+    }
+    
+    return reasons;
+  });
   readonly submitButtonProps = computed(() => ({
     label: this.IsGenerating() ? 'Generazione in corso...' : 'Genera ' + this.getSelectedTypeName(),
     variant: 'primary' as const,
     size: 'large' as const,
-    disabled: this.formInvalid() || this.IsGenerating(),
+    disabled: this.formInvalid() || this.selectedMaterials().length === 0 || this.IsGenerating(),
     leftIcon: this.IsGenerating() ? this.SpinnerIcon : this.SparklesIcon,
   }));
   readonly SelectedCount = computed(
@@ -207,6 +229,10 @@ export class GenAiContents implements OnInit {
   onTypeSelected(value: string): void {
     this.SelectedType.set(value);
     this.genForm.controls['selectedType'].setValue(value);
+  }
+
+  onMaterialsSelectionChange(materials: MaterialInterface[]): void {
+    this.selectedMaterials.set(materials || []);
   }
 
   async onSubmit(): Promise<void> {

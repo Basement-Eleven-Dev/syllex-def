@@ -206,7 +206,7 @@
       <label class="form-label text-dark mb-2 fw-normal">
         Seleziona risorse di riferimento per la generazione
       </label>
-      <app-materiali-selector></app-materiali-selector>
+      <app-materiali-selector (selectionChange)="onMaterialsSelectionChange($event)"></app-materiali-selector>
     </section>
 
     <section tourAnchor="gen_ai_instructions" class="form-section">
@@ -227,6 +227,20 @@
         [props]="submitButtonProps()"
         (clicked)="onSubmit()"
       ></app-syllex-button>
+
+      @if (disableReason().length > 0 && !IsGenerating()) {
+        <div class="mt-3 p-3 text-start" style="background-color: #fef2f2; border: 1px solid #fca5a5; border-radius: 14px;">
+          <div class="fw-semibold text-danger d-flex align-items-center gap-2 mb-1" style="font-size: 0.85rem;">
+            <fa-icon [icon]="TimesIcon"></fa-icon>
+            <span>Requisiti mancanti per la generazione:</span>
+          </div>
+          <ul class="mb-0 ps-3 text-muted" style="font-size: 0.8rem; line-height: 1.4;">
+            @for (reason of disableReason(); track reason) {
+              <li>{{ reason }}</li>
+            }
+          </ul>
+        </div>
+      }
     </div>
   </form>
 
