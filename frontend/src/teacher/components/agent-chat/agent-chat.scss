@@ -2,18 +2,23 @@
   height: 100%;
   display: block;
   overflow: hidden;
-  background-color: #f8f9fa;
+  background-color: transparent;
 }
 
 .agent-chat-wrapper {
   height: 100%;
+  width: 100%;
+  border-radius: 1.5rem;
+  overflow: hidden;
 }
 
 // --- SIDEBAR ---
 .chat-sidebar {
   width: 280px;
   flex-shrink: 0;
-  background-color: #d2e2ff;
+  background-color: rgba(210, 226, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 1.5rem 0 0 1.5rem;
   transition: width 0.25s ease;
   position: relative;
@@ -96,22 +101,56 @@
 
 // --- MAIN AREA ---
 .main-content {
-  background-color: white;
+  background-color: transparent;
   display: flex;
   flex-direction: column;
+  position: relative;
+
+  // Scrollable message list: add padding so messages scroll past the floating bottom bar
+  > .overflow-auto {
+    padding-bottom: 110px !important; // Calibrated so the last message sits completely outside the fade zone
+
+    // Premium feather-fade mask: dissolves text smoothly into thin air before reaching the input bar!
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 1) 82%,
+      rgba(0, 0, 0, 0) 95%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 1) 82%,
+      rgba(0, 0, 0, 0) 95%
+    );
+  }
 }
 
-// --- MESSAGES (no bubbles) ---
+// --- MESSAGES (Premium Glassmorphic Bubbles) ---
 .msg-line {
   max-width: 72%;
-  color: #1a1a1a;
-  font-size: 0.95rem;
-  line-height: 1.6;
+  color: #1f2937;
+  font-size: 1.1rem;
+  backdrop-filter: blur(10px);
+
+  display: inline-block;
+  text-align: left;
 
   &--user {
-    color: #3931ce;
+    background-color: rgba(210, 226, 255, 0.5);
+    color: #1a1a2e;
     font-weight: 500;
-    text-align: right;
+    text-align: left;
+  }
+
+  ::ng-deep {
+    p {
+      margin-bottom: 0 !important;
+    }
+    // Also strip default margins from lists or headings if rendered
+    ul, ol, h1, h2, h3, h4, h5, h6 {
+      margin-bottom: 0 !important;
+    }
   }
 }
 
@@ -266,16 +305,23 @@
   }
 
   &.visible {
-    max-height: 120px;
+    max-height: 220px !important;
     opacity: 1;
-    padding: 1rem 0;
+    padding: 1rem 0 84px 0 !important; // Push orb and status text up, away from the floating absolute buttons!
   }
 }
 
 // --- INPUT AREA (FIXED BOTTOM) ---
 .input-area-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
   flex-shrink: 0;
-  background: white;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 
   // ---- BARRA INPUT: row sempre centrata, pill si espande/collassa ----
   .input-bar-row {
@@ -342,7 +388,9 @@
   // ---- INPUT PILL: max-width per collasso fluido ----
   .input-pill-mock {
     border-radius: 30px;
-    background: #f7f7fd;
+    background: #ffffff !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02) !important;
     overflow: hidden;
     flex: 1;
     max-width: 480px;
@@ -459,4 +507,32 @@
 }
 .letter-spacing-1 {
   letter-spacing: 1px;
+}
+
+// Premium SyllexCard-aligned Quick Action buttons matching the Banca Domande visual system
+.btn-quick-action {
+  background-color: #f8faff !important; // Premium soft off-white background
+  color: #0b3c7b !important; // Deep navy/blue text & icons for absolute brand cohesion
+  border: 1.5px solid #d2e2ff !important; // Delicate light blue border
+  font-weight: 600 !important;
+  border-radius: 12px !important;
+  padding: 10px 22px !important;
+  box-shadow: 0 4px 10px rgba(11, 60, 123, 0.03) !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+
+  fa-icon {
+    color: #0b3c7b !important;
+  }
+
+  &:hover {
+    background-color: #f0f4ff !important; // Deeper soft blue background
+    border-color: #0b3c7b !important; // Deep blue border highlight
+    color: #0b3c7b !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 16px rgba(11, 60, 123, 0.08) !important;
+
+    fa-icon {
+      color: #0b3c7b !important;
+    }
+  }
 }

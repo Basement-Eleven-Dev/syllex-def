@@ -1,7 +1,7 @@
 <div class="agent-chat-wrapper d-flex h-100 w-100 overflow-hidden">
   <!-- AREA PRINCIPALE -->
   <div
-    class="main-content flex-fill d-flex flex-column position-relative h-100 overflow-hidden bg-white"
+    class="main-content flex-fill d-flex flex-column position-relative h-100 overflow-hidden"
   >
     <!-- MESSAGGI / INTRO (sempre visibile) -->
     <div #scrollContent class="flex-fill overflow-auto d-flex flex-column p-4">
@@ -10,11 +10,22 @@
         class="intro-welcome d-flex flex-column align-items-center justify-content-center m-auto"
       >
         <h2 class="fw-bold mb-2 text-center intro-welcome__title">
-          Cosa vuoi fare oggi?
+          Ciao, sono Alex!
         </h2>
-        <p class="text-muted mb-5 text-center intro-welcome__subtitle">
-          Scegli un'azione rapida, oppure chatta con {{ assistantName() }}
+        <p
+          class="text-muted mb-3 text-center intro-welcome__subtitle"
+          style="max-width: 580px; line-height: 1.6"
+        >
+          Sono il tuo Assistente Didattico Personale in Syllex. Sono pronto ad
+          aiutarti a <strong>riassumere i tuoi materiali</strong>, trovare le
+          <strong>risposte chiave</strong> o metterti alla prova con
+          <strong>quiz personalizzati</strong>.
         </p>
+        <h4
+          class="fw-semibold text-primary mb-5 text-center intro-welcome__prompt"
+        >
+          Come posso aiutarti oggi?
+        </h4>
 
         <!-- Riga superiore: 2 bottoni -->
         <div class="d-flex gap-3 mb-3 justify-content-center w-100">
@@ -49,14 +60,11 @@
         class="d-flex mb-3"
         [class.justify-content-end]="msg.role === 'user'"
       >
-        <div class="msg-line" [class.msg-line--user]="msg.role === 'user'">
+        <div
+          class="msg-line rounded-pill px-4 py-3"
+          [class.msg-line--user]="msg.role === 'user'"
+        >
           <markdown [data]="msg.content"></markdown>
-          <div class="tiny mt-1 opacity-40 d-flex align-items-center">
-            <span>{{ msg.timestamp | date:'HH:mm' }}</span>
-            @if (msg.inputType === 'voice') {
-            <fa-icon [icon]="faMicrophone" class="ms-2"></fa-icon>
-            }
-          </div>
         </div>
       </div>
       } @if (isLoading()) {
@@ -84,7 +92,7 @@
 
     <!-- INPUT BAR -->
     <div
-      class="input-area-container p-4 bg-white"
+      class="input-area-container px-4 pb-3 pt-2 bg-transparent"
       [class.is-voice]="voiceModeActive()"
     >
       <!-- BARRA INPUT: switcher sempre visibile, pill collassa verso destra -->

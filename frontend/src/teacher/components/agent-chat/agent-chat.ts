@@ -22,10 +22,8 @@ import {
   faLightbulb,
   faBookOpen,
   faQuestionCircle,
-  faMicrophone,
   faStop,
   faPlus,
-  faMicrophoneSlash,
   faChevronLeft,
   faChevronRight,
   faKeyboard,
@@ -36,7 +34,6 @@ import { AgentService } from '../../../services/agent.service';
 import { FeedbackService } from '../../../services/feedback-service';
 import { GeminiLiveService } from '../../../services/gemini-live-service';
 import { Materia } from '../../../services/materia';
-import { DatePipe } from '@angular/common';
 import { firstValueFrom } from 'rxjs';
 
 export interface ChatMessage {
@@ -50,7 +47,7 @@ export interface ChatMessage {
 
 @Component({
   selector: 'app-agent-chat',
-  imports: [FormsModule, FontAwesomeModule, MarkdownComponent, DatePipe],
+  imports: [FormsModule, FontAwesomeModule, MarkdownComponent],
   templateUrl: './agent-chat.html',
   styleUrl: './agent-chat.scss',
 })
@@ -65,10 +62,8 @@ export class AgentChat implements OnInit, OnDestroy {
   faLightbulb = faLightbulb;
   faBookOpen = faBookOpen;
   faQuestionCircle = faQuestionCircle;
-  faMicrophone = faMicrophone;
   faStop = faStop;
   faPaperPlane = faPaperPlane;
-  faMicrophoneSlash = faMicrophoneSlash;
   faChevronLeft = faChevronLeft;
   faChevronRight = faChevronRight;
   faKeyboard = faKeyboard;
