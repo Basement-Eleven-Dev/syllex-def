@@ -275,6 +275,10 @@ export class Calendario implements OnInit {
     });
   }
 
+  refresh(): void {
+    this.loadMonthData(this.CurrentDate());
+  }
+
   private loadMonthData(date: Date): void {
     this.calendarService
       .getEvents(date.getMonth(), date.getFullYear())

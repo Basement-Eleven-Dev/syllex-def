@@ -86,6 +86,8 @@ export class CreateEditTest implements OnInit {
   @ViewChild(QuestionsDroppableList)
   questionsComponent!: QuestionsDroppableList;
 
+  @ViewChild('questionsSearched') questionsSearched?: SearchQuestions;
+
   // Data
   private readonly TestId = signal<string | null>(null);
 
@@ -597,6 +599,15 @@ export class CreateEditTest implements OnInit {
             }
             return updated;
           });
+
+          // Prepend newly generated questions to the filteredQuestions list in SearchQuestions component
+          if (this.questionsSearched) {
+            this.questionsSearched.filteredQuestions.update((list) => [
+              ...questions,
+              ...list.filter((existing) => !newIds.includes(existing._id)),
+            ]);
+            this.questionsSearched.totalQuestions.update((tot) => tot + questions.length);
+          }
         }
       });
   }

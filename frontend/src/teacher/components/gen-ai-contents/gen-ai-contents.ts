@@ -8,7 +8,9 @@ import {
   signal,
   TemplateRef,
   ViewChild,
+  DestroyRef,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
@@ -96,6 +98,9 @@ export class GenAiContents implements OnInit {
     optional: true,
   });
 
+  private readonly destroyRef = inject(DestroyRef);
+  readonly formInvalid = signal<boolean>(true);
+
   // Icons
   readonly SparklesIcon = faSparkles;
   readonly SpinnerIcon = faSpinnerThird;
@@ -127,7 +132,7 @@ export class GenAiContents implements OnInit {
     label: this.IsGenerating() ? 'Generazione in corso...' : 'Genera ' + this.getSelectedTypeName(),
     variant: 'primary' as const,
     size: 'large' as const,
-    disabled: this.genForm.invalid || this.IsGenerating(),
+    disabled: this.formInvalid() || this.IsGenerating(),
     leftIcon: this.IsGenerating() ? this.SpinnerIcon : this.SparklesIcon,
   }));
   readonly SelectedCount = computed(
@@ -172,6 +177,15 @@ export class GenAiContents implements OnInit {
     this.SelectedType.set(firstType);
     this.genForm.controls['selectedType'].setValue(firstType);
     this.updateValidatorsForMode(this.TypeMode());
+
+    // Sync validity with formInvalid signal to reactively update computed CTA props
+    this.genForm.statusChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.formInvalid.set(this.genForm.invalid);
+      });
+    // Set initial state
+    this.formInvalid.set(this.genForm.invalid);
   }
 
   private updateValidatorsForMode(mode: 'questions' | 'materials'): void {

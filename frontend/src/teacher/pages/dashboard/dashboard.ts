@@ -1,6 +1,8 @@
 import { DatePipe } from '@angular/common';
-import { Component, computed, effect } from '@angular/core';
+import { Component, computed, effect, inject } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { CreateEditComunicazione } from '../create-edit-comunicazione/create-edit-comunicazione';
 import {
   FontAwesomeModule,
   IconDefinition,
@@ -65,6 +67,7 @@ interface DashboardAction {
   styleUrl: './dashboard.scss',
 })
 export class Dashboard {
+  private readonly modalService = inject(NgbModal);
   UsersIcon = faUsers;
   UploadIcon = faFileArrowUp;
   AiIcon = faSparkles;
@@ -149,5 +152,20 @@ export class Dashboard {
       .subscribe((response) => {
         this.communications = response.communications;
       });
+  }
+
+  protected openNuovaComunicazioneModal(): void {
+    const modalRef = this.modalService.open(CreateEditComunicazione, {
+      centered: true,
+      size: 'lg',
+    });
+    modalRef.result.then(
+      (result) => {
+        if (result === true) {
+          this.loadRecentCommunications();
+        }
+      },
+      () => {},
+    );
   }
 }

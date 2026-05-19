@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewChild, ElementRef } from '@angular/core';
 import { QuestionInterface } from '../../../services/questions';
 
 @Component({
@@ -10,7 +10,26 @@ import { QuestionInterface } from '../../../services/questions';
   styleUrl: './questions-grid-selector.scss',
 })
 export class QuestionsGridSelector {
-  @Input() questions: QuestionInterface[] = [];
+  @ViewChild('scrollContainer') scrollContainer?: ElementRef<HTMLElement>;
+
+  private _questions: QuestionInterface[] = [];
+
+  @Input()
+  set questions(val: QuestionInterface[]) {
+    const prevLength = this._questions.length;
+    this._questions = val || [];
+    if (val && val.length !== prevLength && this.scrollContainer) {
+      setTimeout(() => {
+        if (this.scrollContainer) {
+          this.scrollContainer.nativeElement.scrollTop = 0;
+        }
+      }, 50);
+    }
+  }
+  get questions(): QuestionInterface[] {
+    return this._questions;
+  }
+
   @Input() selectedIds: string[] = [];
   @Input() pointsByQuestion: Record<string, number> = {};
   @Input() canLoadMore = false;
@@ -21,6 +40,16 @@ export class QuestionsGridSelector {
     points: number;
   }>();
   @Output() reachBottom = new EventEmitter<void>();
+
+  get sortedQuestions(): QuestionInterface[] {
+    return [...this._questions].sort((a, b) => {
+      const aSel = this.isSelected(a._id!);
+      const bSel = this.isSelected(b._id!);
+      if (aSel && !bSel) return -1;
+      if (!aSel && bSel) return 1;
+      return 0;
+    });
+  }
 
   isSelected(id: string): boolean {
     return this.selectedIds.includes(id);

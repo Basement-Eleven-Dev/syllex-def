@@ -172,7 +172,7 @@
                 style="cursor: pointer"
               >
                 <span class="fw-bold">Power Point</span>
-                <span class="text-muted small ms-1">(Modificabile)</span>
+                <span class="text-muted small ms-1">(PPTX modificabile)</span>
               </label>
             </div>
             <div class="form-check">
@@ -210,15 +210,15 @@
     </section>
 
     <section tourAnchor="gen_ai_instructions" class="form-section">
-      <label class="form-label text-dark mb-2 fw-normal">Desideri dare indicazioni specifiche all'AI?</label>
+      <label class="form-label text-dark mb-2 fw-normal">Scrivi maggiori informazioni da fornire all’ai per generare un contenuto su misura per le tue esigenze</label>
       <textarea
         class="form-control custom-input"
         style="border-radius: 2rem !important; padding: 1.25rem 1.75rem;"
         formControlName="instructions"
         rows="3"
         [placeholder]="TypeMode() === 'questions'
-          ? 'Stile, tono, aspetti specifici da coprire...'
-          : 'Stile, tono di voce, punti chiave da trattare...'"
+          ? 'Es. Genera domande a risposta multipla basate sul manuale di bordo, con focus sulle procedure di emergenza ed opzioni altamente plausibili.'
+          : 'Es. Concentrati sui protocolli di sicurezza marittima, usa una terminologia tecnica chiara e aggiungi una sezione di sintesi finale con le procedure chiave.'"
       ></textarea>
     </section>
 

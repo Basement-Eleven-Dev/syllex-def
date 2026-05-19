@@ -1,5 +1,5 @@
-<div class="questions-scroll-list" (scroll)="onListScroll($event)">
-  @for (question of questions; track question._id) {
+<div #scrollContainer class="questions-scroll-list" (scroll)="onListScroll($event)">
+  @for (question of sortedQuestions; track question._id) {
   <div
     class="question-row"
     [class.question-row--selected]="isSelected(question._id)"
@@ -14,10 +14,8 @@
 
     <div class="question-row__right" (click)="$event.stopPropagation()">
       <span
-        class="badge rounded-pill"
-        [class.bg-primary]="!isSelected(question._id)"
-        [class.bg-white]="isSelected(question._id)"
-        [class.text-primary]="isSelected(question._id)"
+        class="badge rounded-pill question-badge"
+        [class.question-badge--selected]="isSelected(question._id)"
       >
         {{ getQuestionTypeLabel(question.type) }}
       </span>

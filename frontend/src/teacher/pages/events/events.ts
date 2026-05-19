@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal, ViewChild } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Calendario } from '../../components/calendario/calendario';
 import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
@@ -18,6 +18,7 @@ import {
 import { SyllexEmptyState } from '../../components/UI/syllex-empty-state/syllex-empty-state';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CreateEditComunicazione } from '../create-edit-comunicazione/create-edit-comunicazione';
+import { AddEventModal } from '../../components/add-event-modal/add-event-modal';
 
 @Component({
   selector: 'app-events',
@@ -35,6 +36,8 @@ import { CreateEditComunicazione } from '../create-edit-comunicazione/create-edi
   styleUrl: './events.scss',
 })
 export class Events {
+  @ViewChild(Calendario) calendarioComponent!: Calendario;
+
   faCalendarAlt = faCalendarAlt;
   faBullhorn = faBullhorn;
   faPlus = faPlus;
@@ -77,6 +80,28 @@ export class Events {
       (result) => {
         if (result === true) {
           this.loadComunicazioni();
+          if (this.calendarioComponent) {
+            this.calendarioComponent.refresh();
+          }
+        }
+      },
+      () => {},
+    );
+  }
+
+  openAddEventModal(): void {
+    const modalRef = this.modalService.open(AddEventModal, {
+      centered: true,
+    });
+    modalRef.componentInstance.SelectedDate = new Date();
+    modalRef.componentInstance.SubjectId = this.materiaService.materiaSelected()?._id;
+
+    modalRef.result.then(
+      (created) => {
+        if (created) {
+          if (this.calendarioComponent) {
+            this.calendarioComponent.refresh();
+          }
         }
       },
       () => {},
