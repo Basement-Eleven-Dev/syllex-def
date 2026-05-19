@@ -159,6 +159,12 @@ export class Calendario implements OnInit {
     this.loadMonthData(this.CurrentDate());
   }
 
+  setActiveDetailTab(tab: string): void {
+    if (tab === 'eventi' || tab === 'comunicazioni') {
+      this.ActiveDetailTab.set(tab);
+    }
+  }
+
   navigateMonth(delta: number): void {
     const current = this.CurrentDate();
     this.CurrentDate.set(
