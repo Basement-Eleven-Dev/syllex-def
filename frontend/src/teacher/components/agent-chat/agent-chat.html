@@ -194,23 +194,31 @@
 
     <div class="flex-fill overflow-auto px-2 pb-3">
       @for (conv of conversations(); track conv.id) {
-      <button
-        class="btn-history-item w-100 text-start mb-1 px-3 py-2 rounded-3"
+      <div
+        class="history-item-container mb-1"
         [class.active]="currentConversationId() === conv.id"
         (click)="selectConversation(conv.id)"
       >
-        <div class="d-flex align-items-center gap-2 mb-1">
-          <div class="fw-semibold small text-truncate flex-grow-1">
-            {{ conv.title || 'Chat' }}
-          </div>
-          <div class="tiny conversation-date flex-shrink-0">
+        <div class="history-item-left">
+          <fa-icon [icon]="faComment" class="history-item-icon"></fa-icon>
+          <span class="history-item-title text-truncate">
+            {{ conv.title || 'Conversazione' }}
+          </span>
+        </div>
+
+        <div class="history-item-right" (click)="$event.stopPropagation()">
+          <span class="tiny conversation-date">
             {{ formatConversationDate(conv.timestamp) }}
-          </div>
+          </span>
+          <button
+            class="btn-delete-conv"
+            (click)="deleteConversation(conv.id, $event)"
+            title="Elimina conversazione"
+          >
+            <fa-icon [icon]="faTrash"></fa-icon>
+          </button>
         </div>
-        <div class="tiny text-truncate opacity-60">
-          {{ conv.preview || 'Nessun messaggio' }}
-        </div>
-      </button>
+      </div>
       }
     </div>
     }

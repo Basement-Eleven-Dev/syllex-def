@@ -52,6 +52,12 @@ export class AgentService {
     return this.http.get<any[]>('messages/list-conversations');
   }
 
+  deleteConversation(conversationId: string) {
+    return this.http.delete<{ success: boolean; deletedCount?: number }>(
+      'messages/' + conversationId
+    );
+  }
+
   saveLiveMessage(role: string, content: string, conversationId: string, inputType: string = 'voice') {
     return this.http.post<{ success: boolean; _id: string }>(
       'messages/save',

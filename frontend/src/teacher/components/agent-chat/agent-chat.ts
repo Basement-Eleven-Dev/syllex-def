@@ -28,6 +28,8 @@ import {
   faChevronRight,
   faKeyboard,
   faWaveformLines,
+  faTrash,
+  faComment,
 } from '@fortawesome/pro-solid-svg-icons';
 import { faSpinner } from '@fortawesome/pro-regular-svg-icons';
 import { AgentService } from '../../../services/agent.service';
@@ -68,6 +70,8 @@ export class AgentChat implements OnInit, OnDestroy {
   faChevronRight = faChevronRight;
   faKeyboard = faKeyboard;
   faWaveformLines = faWaveformLines;
+  faTrash = faTrash;
+  faComment = faComment;
 
   // Sidebar collassabile
   sidebarOpen = signal(true);
@@ -290,6 +294,32 @@ export class AgentChat implements OnInit, OnDestroy {
   selectConversation(id: string) {
     this.currentConversationId.set(id);
     this.initializeChatHistory(id);
+  }
+
+  deleteConversation(id: string, event: Event) {
+    event.stopPropagation(); // Prevent choosing the chat when clicking delete
+    if (confirm('Sei sicuro di voler cancellare questa conversazione?')) {
+      this.agentService.deleteConversation(id).subscribe({
+        next: () => {
+          this.feedbackService.showFeedback('Conversazione cancellata con successo', true);
+          this.agentService.listConversations().subscribe((res) => {
+            this.conversations.set(res);
+            // If we deleted the currently active conversation, switch or start a new one
+            if (this.currentConversationId() === id) {
+              if (res.length > 0) {
+                this.selectConversation(res[0].id);
+              } else {
+                this.startNewChat();
+              }
+            }
+          });
+        },
+        error: (err) => {
+          console.error('Error deleting conversation:', err);
+          this.feedbackService.showFeedback('Errore nella cancellazione della conversazione', false);
+        }
+      });
+    }
   }
 
   // ==================
