@@ -1,36 +1,24 @@
-<div class="d-none" id="tutorialAgentBtn">
-  style="z-index: 1050; background: #d2e2ff; cursor: pointer; border: none"
-  (click)="toggleChat()" >
-  <span style="color: #3931ce; font-weight: 500; font-size: 0.95rem"
-    >Come posso aiutarti oggi?</span
-  >
-  <img
-    src="/images/logo_primary.png"
-    alt="Logo"
-    height="22"
-    style="flex-shrink: 0"
-  />
-  @if (hasUnread()) {
-  <span class="notification-dot"></span>
-  }
-</div>
-
 <div
   id="chat"
   role="dialog"
-  aria-label="Assistant chat"
+  aria-label="Assistente Syllex"
   [class.open]="chatVisible()"
   [attr.aria-hidden]="!chatVisible()"
-  class="d-flex flex-column rounded-syllex"
+  class="d-flex flex-column"
 >
-  <div
-    class="chat-header d-flex align-items-center justify-content-between px-4 pt-3 pb-2 border-bottom"
-  >
-    <div class="d-flex align-items-center gap-2">
-      <span class="fw-semibold small">Assistente Syllex</span>
+  <!-- Header -->
+  <div class="chat-header d-flex align-items-center justify-content-between px-4 py-3">
+    <div class="d-flex align-items-center gap-3">
+      <div class="chat-header__avatar">
+        <img src="/images/logotipo.svg" alt="Syllex" height="18" />
+      </div>
+      <div>
+        <p class="chat-header__name mb-0">Assistente Syllex</p>
+        <p class="chat-header__sub mb-0">Supporto alla piattaforma</p>
+      </div>
     </div>
     <a
-      class="text-dark chat-close-btn"
+      class="chat-close-btn"
       (click)="closeChat()"
       aria-label="Chiudi chat"
       title="Chiudi"
@@ -40,57 +28,59 @@
     </a>
   </div>
 
+  <!-- Body -->
   <div class="flex-fill position-relative overflow-hidden">
     <div class="chat-body px-4 py-3">
       @if (messages().length === 0) {
-      <div class="empty-state">
-        <img
-          src="/images/logo_primary.png"
-          alt=""
-          height="52"
-          class="mb-3 opacity-50"
-        />
-        <p class="fw-semibold mb-1">Ciao {{ userName }},</p>
-        <p class="text-muted small mb-0">come posso aiutarti?</p>
-      </div>
-      } @else { @for (msg of messages(); track $index) {
-      <div
-        class="message mb-2"
-        [class.user]="msg.role === 'user'"
-        [class.assistant]="msg.role === 'assistant'"
-      >
-        <span
-          class="message-bubble py-2 px-3 rounded-3"
-          [innerHTML]="msg.content"
-        ></span>
-        @if (msg.role === 'assistant' && msg.suggestedAction) {
-        <div class="mt-2 text-start">
-          <button
-            class="suggested-action-btn d-inline-flex align-items-center gap-2"
-            (click)="navigateToAction(msg.suggestedAction.path)"
-          >
-            <fa-icon [icon]="actionIcon"></fa-icon>
-            <span>{{ msg.suggestedAction.label }}</span>
-          </button>
+        <div class="empty-state">
+          <div class="empty-state__orb mb-4">
+            <img src="/images/logo_primary.png" alt="" height="28" />
+          </div>
+          <p class="empty-state__greeting mb-1">Ciao {{ userName }}!</p>
+          <p class="empty-state__sub">In questa sezione posso aiutarti ad usare Syllex. Di cosa hai bisogno?</p>
         </div>
+      } @else {
+        @for (msg of messages(); track $index) {
+          <div
+            class="message mb-3"
+            [class.user]="msg.role === 'user'"
+            [class.assistant]="msg.role === 'assistant'"
+          >
+            <span
+              class="message-bubble py-2 px-3"
+              [innerHTML]="msg.content"
+            ></span>
+            @if (msg.role === 'assistant' && msg.suggestedAction) {
+              <div class="mt-2 text-start">
+                <button
+                  class="suggested-action-btn d-inline-flex align-items-center gap-2"
+                  (click)="navigateToAction(msg.suggestedAction.path)"
+                >
+                  <fa-icon [icon]="actionIcon"></fa-icon>
+                  <span>{{ msg.suggestedAction.label }}</span>
+                </button>
+              </div>
+            }
+          </div>
         }
-      </div>
-      } } @if (isSending()) {
-      <div class="message assistant mb-2">
-        <span class="message-bubble typing-indicator py-2 px-3 rounded-3">
-          <span></span><span></span><span></span>
-        </span>
-      </div>
+      }
+      @if (isSending()) {
+        <div class="message assistant mb-3">
+          <span class="message-bubble typing-indicator py-2 px-3">
+            <span></span><span></span><span></span>
+          </span>
+        </div>
       }
       <div #chatBottom></div>
     </div>
   </div>
 
-  <div class="chat-input px-3 py-3 border-top">
-    <div class="input-group">
+  <!-- Input area -->
+  <div class="chat-input px-3 py-3">
+    <div class="chat-input__row d-flex align-items-center gap-2">
       <input
         type="text"
-        class="form-control"
+        class="chat-input__field form-control"
         placeholder="Scrivi un messaggio…"
         [(ngModel)]="currentMessage"
         (keydown.enter)="sendMessage()"
@@ -98,7 +88,7 @@
         aria-label="Messaggio"
       />
       <button
-        class="btn btn-primary"
+        class="chat-input__send"
         type="button"
         (click)="sendMessage()"
         [disabled]="!currentMessage.trim() || isSending()"

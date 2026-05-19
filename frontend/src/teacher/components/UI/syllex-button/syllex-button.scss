@@ -124,14 +124,17 @@ button {
     &.btn-sm {
       width: 1.875rem;
       height: 1.875rem;
+      font-size: 0.75rem !important;
     }
     &.btn-lg {
       width: 3rem;
       height: 3rem;
+      font-size: 1.25rem !important;
     }
     &:not(.btn-sm):not(.btn-lg) {
       width: 2.5rem;
       height: 2.5rem;
+      font-size: 1rem !important;
     }
   }
 }
