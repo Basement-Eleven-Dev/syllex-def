@@ -436,15 +436,19 @@ export class AgentChat implements OnInit, OnDestroy {
   }
 
   finishTurn() {
-    // Stoppa recognition locale
+    console.log('🏁 Manual finish turn requested. Passing the ball natively!');
+    // 1. Muta immediatamente il microfono per bloccare ulteriore invio audio e mostrare "Pensando..."
+    this.isMuted.set(true);
+
+    // 2. Stoppa la trascrizione SpeechRecognition locale
     if (this.recognition) {
       try {
         this.recognition.stop();
       } catch {}
     }
-    // Invia 1s di silenzio per forzare il VAD di Gemini a triggerare la risposta
-    // Identico a quando l'utente smette di parlare naturalmente
-    this.sendSilenceFrames();
+
+    // 3. Invia il segnale nativo di fine turno al WebSocket (latenza zero)
+    this.geminiLiveService.sendEndOfTurn();
   }
 
   private sendSilenceFrames() {
