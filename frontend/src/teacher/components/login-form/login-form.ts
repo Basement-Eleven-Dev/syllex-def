@@ -14,12 +14,19 @@ import {
   faEye,
   faEyeSlash,
 } from '@fortawesome/pro-solid-svg-icons';
+import { SyllexButton } from '../UI/syllex-button/syllex-button';
 import { Auth } from '../../../services/auth';
 import { isStaging } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login-form',
-  imports: [FormsModule, ReactiveFormsModule, FontAwesomeModule, RouterModule],
+  imports: [
+    FormsModule,
+    ReactiveFormsModule,
+    FontAwesomeModule,
+    RouterModule,
+    SyllexButton,
+  ],
   templateUrl: './login-form.html',
   styleUrl: './login-form.scss',
 })
@@ -58,7 +65,20 @@ export class LoginForm {
   constructor(
     private router: Router,
     private authService: Auth,
-  ) { }
+  ) {}
+
+  submitAuthFlow() {
+    if (this.loading) return;
+    if (this.isMfaChallenge) {
+      this.onConfirmMfa();
+      return;
+    }
+    if (this.isChallenge) {
+      this.onConfirmChallenge();
+      return;
+    }
+    this.onSingIn();
+  }
 
   onSingIn() {
     this.loading = true;

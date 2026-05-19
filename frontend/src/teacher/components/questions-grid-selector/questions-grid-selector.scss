@@ -27,8 +27,42 @@
 }
 
 .question-row--selected {
-  border-color: var(--bs-primary);
-  background: rgba(var(--bs-primary-rgb), 0.06);
+  border-color: #84cc16 !important;
+  background: #f7fee7 !important;
+  box-shadow: 0 4px 14px rgba(132, 204, 22, 0.08);
+
+  .question-row__text {
+    color: #1a2e05 !important;
+    font-weight: 500;
+  }
+
+  .question-row__points-label {
+    color: #3f6212 !important;
+  }
+
+  .form-control {
+    border-color: #d9f99d !important;
+    background-color: #ffffff !important;
+    color: #3f6212 !important;
+    font-weight: 600;
+
+    &:focus {
+      border-color: #84cc16 !important;
+      box-shadow: 0 0 0 0.25rem rgba(132, 204, 22, 0.2) !important;
+    }
+  }
+}
+
+.question-badge {
+  background-color: #f1f5f9;
+  color: #475569;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.question-badge--selected {
+  background-color: #84cc16 !important;
+  color: #ffffff !important;
 }
 
 .question-row__content {

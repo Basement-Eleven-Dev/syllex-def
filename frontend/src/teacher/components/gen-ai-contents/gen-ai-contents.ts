@@ -8,7 +8,9 @@ import {
   signal,
   TemplateRef,
   ViewChild,
+  DestroyRef,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
@@ -16,6 +18,7 @@ import {
   faTimes,
   faSparkles,
   faSpinnerThird,
+  faCircleQuestion,
 } from '@fortawesome/pro-solid-svg-icons';
 import { Materia } from '../../../services/materia';
 import { MaterialiSelector } from '../materiali-selector/materiali-selector';
@@ -52,6 +55,7 @@ import { AiOverlay } from '../ai-overlay/ai-overlay';
 import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 import { SyllexButton } from '../UI/syllex-button/syllex-button';
 import { MaterialiFacadeService } from '../../../services/materiali/materiali-facade.service';
+import { MaterialInterface } from '../../../services/materiali/materiali-service';
 
 interface ReviewQuestion {
   readonly TempId: string;
@@ -96,11 +100,24 @@ export class GenAiContents implements OnInit {
     optional: true,
   });
 
+  private readonly destroyRef = inject(DestroyRef);
+  readonly formInvalid = signal<boolean>(true);
+
   // Icons
   readonly SparklesIcon = faSparkles;
   readonly SpinnerIcon = faSpinnerThird;
   readonly TimesIcon = faTimes;
   readonly CheckAllIcon = faCheckDouble;
+  readonly QuestionIcon = faCircleQuestion;
+
+  @ViewChild('whyMaterialsModal') whyMaterialsModal!: TemplateRef<any>;
+
+  openWhyMaterialsModal(): void {
+    this.modalService.open(this.whyMaterialsModal, {
+      centered: true,
+      size: 'md',
+    });
+  }
 
   // State
   readonly TypeMode = signal<'questions' | 'materials'>('materials');
@@ -115,6 +132,7 @@ export class GenAiContents implements OnInit {
   readonly GeneratedMaterial = signal<GeneratedMaterial | null>(null);
   /** Number of questions that failed to generate in the last bulk request. */
   readonly PartialGenerationWarning = signal<number>(0);
+  readonly selectedMaterials = signal<MaterialInterface[]>([]);
 
   // Computed
   readonly IsMultipleChoice = computed(
@@ -123,11 +141,31 @@ export class GenAiContents implements OnInit {
   readonly IsSlides = computed(
     () => this.TypeMode() === 'materials' && this.SelectedType() === 'slides',
   );
+  readonly disableReason = computed(() => {
+    const reasons: string[] = [];
+    
+    if (this.selectedMaterials().length === 0) {
+      reasons.push('Seleziona almeno una risorsa o materiale di riferimento.');
+    }
+    
+    if (this.TypeMode() === 'questions' && !this.genForm.get('topicId')?.value) {
+      reasons.push('Seleziona un argomento per le domande.');
+    }
+    
+    if (this.formInvalid()) {
+      const topicInvalid = this.TypeMode() === 'questions' && !this.genForm.get('topicId')?.value;
+      if (!topicInvalid) {
+        reasons.push('Compila correttamente tutti i parametri richiesti.');
+      }
+    }
+    
+    return reasons;
+  });
   readonly submitButtonProps = computed(() => ({
     label: this.IsGenerating() ? 'Generazione in corso...' : 'Genera ' + this.getSelectedTypeName(),
     variant: 'primary' as const,
     size: 'large' as const,
-    disabled: this.genForm.invalid || this.IsGenerating(),
+    disabled: this.formInvalid() || this.selectedMaterials().length === 0 || this.IsGenerating(),
     leftIcon: this.IsGenerating() ? this.SpinnerIcon : this.SparklesIcon,
   }));
   readonly SelectedCount = computed(
@@ -172,6 +210,15 @@ export class GenAiContents implements OnInit {
     this.SelectedType.set(firstType);
     this.genForm.controls['selectedType'].setValue(firstType);
     this.updateValidatorsForMode(this.TypeMode());
+
+    // Sync validity with formInvalid signal to reactively update computed CTA props
+    this.genForm.statusChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.formInvalid.set(this.genForm.invalid);
+      });
+    // Set initial state
+    this.formInvalid.set(this.genForm.invalid);
   }
 
   private updateValidatorsForMode(mode: 'questions' | 'materials'): void {
@@ -193,6 +240,10 @@ export class GenAiContents implements OnInit {
   onTypeSelected(value: string): void {
     this.SelectedType.set(value);
     this.genForm.controls['selectedType'].setValue(value);
+  }
+
+  onMaterialsSelectionChange(materials: MaterialInterface[]): void {
+    this.selectedMaterials.set(materials || []);
   }
 
   async onSubmit(): Promise<void> {

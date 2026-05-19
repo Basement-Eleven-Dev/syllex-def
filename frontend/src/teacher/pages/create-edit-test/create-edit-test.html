@@ -22,15 +22,6 @@
     }"
     (clicked)="onResetForm()"
   ></app-syllex-button>
-  } @if (CurrentStep() === 2) {
-  <app-syllex-button
-    [props]="{
-      label: 'Genera Domande',
-      variant: 'primary',
-      size: 'medium'
-    }"
-    (clicked)="onRequestAIGeneration()"
-  ></app-syllex-button>
   } @if (CurrentStep() === 3) {
   <app-syllex-button
     [props]="{
@@ -104,11 +95,24 @@
       </div>
       } @if (CurrentStep() === 2) {
       <div class="syllexCard wizard-step-shell wizard-step-shell--questions">
-        <div class="mb-4">
-          <app-questions-search-filters
-            (filtersChanged)="questionsSearched.onFiltersChanged($event)"
-          >
-          </app-questions-search-filters>
+        <div class="d-flex flex-row flex-wrap align-items-center justify-content-between gap-3 mb-4">
+          <div class="flex-grow-1">
+            <app-questions-search-filters
+              (filtersChanged)="questionsSearched.onFiltersChanged($event)"
+            >
+            </app-questions-search-filters>
+          </div>
+          <div class="flex-shrink-0">
+            <app-syllex-button
+              [props]="{
+                label: 'Genera con AI',
+                variant: 'secondary',
+                leftIcon: SparklesIcon,
+                size: 'medium'
+              }"
+              (clicked)="onRequestAIGeneration()"
+            ></app-syllex-button>
+          </div>
         </div>
 
         <app-questions-grid-selector

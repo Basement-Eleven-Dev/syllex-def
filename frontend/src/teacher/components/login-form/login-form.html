@@ -3,7 +3,7 @@
 }
 <form
   [formGroup]="isMfaChallenge ? mfaCodeForm : loginForm"
-  (ngSubmit)="isMfaChallenge ? onConfirmMfa() : (isChallenge ? onConfirmChallenge() : onSingIn())"
+  (ngSubmit)="submitAuthFlow()"
   class="d-flex flex-column gap-3"
 >
   <h3 class="login-heading">
@@ -25,11 +25,11 @@
       <input
         formControlName="password"
         [type]="showPassword ? 'text' : 'password'"
-        class="form-control custom-input border-end-0"
+        class="form-control custom-input"
         placeholder="Minimo 8 caratteri"
       />
       <button
-        class="btn btn-outline-secondary border-start-0 border-custom"
+        class="btn border-custom"
         type="button"
         (click)="showPassword = !showPassword"
       >
@@ -80,14 +80,16 @@
     </label>
   </div>
   }
-  <button
-    type="submit"
-    class="btn btn-gradient-primary fw-normal btn-lg w-100"
-    [disabled]="(isMfaChallenge ? mfaCodeForm.invalid : loginForm.invalid) || loading"
-  >
-    {{ isMfaChallenge ? 'Verifica' : (isChallenge ? 'Conferma e Accedi' :
-    'Accedi') }}
-  </button>
+  <app-syllex-button
+    [props]="{
+      label: isMfaChallenge ? 'Verifica' : (isChallenge ? 'Conferma e accedi' : 'Accedi'),
+      variant: 'primary',
+      size: 'large',
+      disabled: (isMfaChallenge ? mfaCodeForm.invalid : loginForm.invalid) || loading,
+      leftIcon: loading ? SpinnerIcon : LoginIcon,
+      animation: loading ? 'spin' : undefined
+    }"
+  ></app-syllex-button>
   @if(hasResult){
   <div
     class="alert text-center mt-4"

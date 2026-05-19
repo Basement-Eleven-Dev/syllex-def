@@ -17,6 +17,7 @@
             <th></th>
             <th class="text-muted fw-light">Nome</th>
             <th class="text-muted fw-light">Cognome</th>
+            <th class="text-muted fw-light">Classe</th>
             <th class="text-muted fw-light">Punteggio</th>
             <th class="text-muted fw-light">Consegnato il</th>
             <th></th>
@@ -37,6 +38,11 @@
             </td>
             <td>{{ assignment.studentName }}</td>
             <td>{{ assignment.studentLastName }}</td>
+            <td>
+              <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-medium px-2 py-1 small">
+                {{ assignment.className || 'Nessuna classe' }}
+              </span>
+            </td>
             <td>
               @if(assignment.status === 'not-started') {
               <span class="text-muted">Non iniziato</span>

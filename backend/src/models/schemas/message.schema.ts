@@ -8,7 +8,8 @@ const messageSchema = new Schema({
     audioUrl: { type: String },
     role: { type: String, enum: ['user', 'agent'], required: true },
     inputType: { type: String, enum: ['text', 'voice'], default: 'text' },
-    timestamp: { type: Date, required: true }
+    timestamp: { type: Date, required: true },
+    conversationTitle: { type: String }
 });
 
 type Message = InferSchemaType<typeof messageSchema>;

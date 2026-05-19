@@ -109,7 +109,7 @@ export async function generateAIResponseGemini(
 
     // 4. Agentic loop: Gemini può concatenare più tool call prima di rispondere con testo
     const MAX_ITERATIONS = 10;
-    let currentContents = contents;
+    let currentContents: any[] = contents;
 
     for (let iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
       const response = await ai.models.generateContent({
@@ -236,5 +236,21 @@ export async function generateAIResponseGemini(
   } catch (error) {
     console.error("Errore nella generazione risposta Gemini:", error);
     throw error;
+  }
+}
+
+export async function generateConversationTitleGemini(query: string): Promise<string> {
+  try {
+    const ai = await getGeminiClient();
+    const prompt = `Genera un titolo riassuntivo estremamente sintetico (massimo 4 parole) in italiano per descrivere l'argomento principale di questa domanda: "${query}". Rispondi SOLO con il titolo, senza virgolette, senza punteggiatura, e capitalizza la prima lettera.`;
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+    });
+    const text = extractText(response);
+    return text ? text.trim().replace(/["']/g, "") : "";
+  } catch (error) {
+    console.error("Errore generazione titolo:", error);
+    return "";
   }
 }

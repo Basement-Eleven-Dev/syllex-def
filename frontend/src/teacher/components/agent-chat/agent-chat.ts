@@ -22,21 +22,20 @@ import {
   faLightbulb,
   faBookOpen,
   faQuestionCircle,
-  faMicrophone,
   faStop,
   faPlus,
-  faMicrophoneSlash,
   faChevronLeft,
   faChevronRight,
   faKeyboard,
   faWaveformLines,
+  faTrash,
+  faComment,
 } from '@fortawesome/pro-solid-svg-icons';
 import { faSpinner } from '@fortawesome/pro-regular-svg-icons';
 import { AgentService } from '../../../services/agent.service';
 import { FeedbackService } from '../../../services/feedback-service';
 import { GeminiLiveService } from '../../../services/gemini-live-service';
 import { Materia } from '../../../services/materia';
-import { DatePipe } from '@angular/common';
 import { firstValueFrom } from 'rxjs';
 
 export interface ChatMessage {
@@ -50,7 +49,7 @@ export interface ChatMessage {
 
 @Component({
   selector: 'app-agent-chat',
-  imports: [FormsModule, FontAwesomeModule, MarkdownComponent, DatePipe],
+  imports: [FormsModule, FontAwesomeModule, MarkdownComponent],
   templateUrl: './agent-chat.html',
   styleUrl: './agent-chat.scss',
 })
@@ -65,14 +64,14 @@ export class AgentChat implements OnInit, OnDestroy {
   faLightbulb = faLightbulb;
   faBookOpen = faBookOpen;
   faQuestionCircle = faQuestionCircle;
-  faMicrophone = faMicrophone;
   faStop = faStop;
   faPaperPlane = faPaperPlane;
-  faMicrophoneSlash = faMicrophoneSlash;
   faChevronLeft = faChevronLeft;
   faChevronRight = faChevronRight;
   faKeyboard = faKeyboard;
   faWaveformLines = faWaveformLines;
+  faTrash = faTrash;
+  faComment = faComment;
 
   // Sidebar collassabile
   sidebarOpen = signal(true);
@@ -297,6 +296,32 @@ export class AgentChat implements OnInit, OnDestroy {
     this.initializeChatHistory(id);
   }
 
+  deleteConversation(id: string, event: Event) {
+    event.stopPropagation(); // Prevent choosing the chat when clicking delete
+    if (confirm('Sei sicuro di voler cancellare questa conversazione?')) {
+      this.agentService.deleteConversation(id).subscribe({
+        next: () => {
+          this.feedbackService.showFeedback('Conversazione cancellata con successo', true);
+          this.agentService.listConversations().subscribe((res) => {
+            this.conversations.set(res);
+            // If we deleted the currently active conversation, switch or start a new one
+            if (this.currentConversationId() === id) {
+              if (res.length > 0) {
+                this.selectConversation(res[0].id);
+              } else {
+                this.startNewChat();
+              }
+            }
+          });
+        },
+        error: (err) => {
+          console.error('Error deleting conversation:', err);
+          this.feedbackService.showFeedback('Errore nella cancellazione della conversazione', false);
+        }
+      });
+    }
+  }
+
   // ==================
   // MESSAGE SENDING
   // ==================
@@ -411,15 +436,19 @@ export class AgentChat implements OnInit, OnDestroy {
   }
 
   finishTurn() {
-    // Stoppa recognition locale
+    console.log('🏁 Manual finish turn requested. Passing the ball natively!');
+    // 1. Muta immediatamente il microfono per bloccare ulteriore invio audio e mostrare "Pensando..."
+    this.isMuted.set(true);
+
+    // 2. Stoppa la trascrizione SpeechRecognition locale
     if (this.recognition) {
       try {
         this.recognition.stop();
       } catch {}
     }
-    // Invia 1s di silenzio per forzare il VAD di Gemini a triggerare la risposta
-    // Identico a quando l'utente smette di parlare naturalmente
-    this.sendSilenceFrames();
+
+    // 3. Invia il segnale nativo di fine turno al WebSocket (latenza zero)
+    this.geminiLiveService.sendEndOfTurn();
   }
 
   private sendSilenceFrames() {

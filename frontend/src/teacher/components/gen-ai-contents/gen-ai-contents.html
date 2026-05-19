@@ -172,7 +172,7 @@
                 style="cursor: pointer"
               >
                 <span class="fw-bold">Power Point</span>
-                <span class="text-muted small ms-1">(Modificabile)</span>
+                <span class="text-muted small ms-1">(PPTX modificabile)</span>
               </label>
             </div>
             <div class="form-check">
@@ -203,22 +203,33 @@
     }
 
     <section tourAnchor="gen_ai_support_files" class="form-section">
-      <label class="form-label text-dark mb-2 fw-normal">
+      <label class="form-label text-dark mb-1 fw-normal">
         Seleziona risorse di riferimento per la generazione
       </label>
-      <app-materiali-selector></app-materiali-selector>
+      <div class="mb-3 text-start">
+        <button
+          type="button"
+          class="btn btn-link p-0 text-decoration-none d-inline-flex align-items-center gap-2 fw-semibold"
+          style="font-size: 0.825rem; color: #0284c7 !important; border: none; box-shadow: none;"
+          (click)="openWhyMaterialsModal()"
+        >
+          <fa-icon [icon]="QuestionIcon" style="font-size: 0.95rem;"></fa-icon>
+          <span>Perché non vedo tutti i miei materiali qui? Scopri di più</span>
+        </button>
+      </div>
+      <app-materiali-selector (selectionChange)="onMaterialsSelectionChange($event)"></app-materiali-selector>
     </section>
 
     <section tourAnchor="gen_ai_instructions" class="form-section">
-      <label class="form-label text-dark mb-2 fw-normal">Desideri dare indicazioni specifiche all'AI?</label>
+      <label class="form-label text-dark mb-2 fw-normal">Scrivi maggiori informazioni da fornire all’ai per generare un contenuto su misura per le tue esigenze</label>
       <textarea
         class="form-control custom-input"
         style="border-radius: 2rem !important; padding: 1.25rem 1.75rem;"
         formControlName="instructions"
         rows="3"
         [placeholder]="TypeMode() === 'questions'
-          ? 'Stile, tono, aspetti specifici da coprire...'
-          : 'Stile, tono di voce, punti chiave da trattare...'"
+          ? 'Es. Genera domande a risposta multipla basate sul manuale di bordo, con focus sulle procedure di emergenza ed opzioni altamente plausibili.'
+          : 'Es. Concentrati sui protocolli di sicurezza marittima, usa una terminologia tecnica chiara e aggiungi una sezione di sintesi finale con le procedure chiave.'"
       ></textarea>
     </section>
 
@@ -227,6 +238,20 @@
         [props]="submitButtonProps()"
         (clicked)="onSubmit()"
       ></app-syllex-button>
+
+      @if (disableReason().length > 0 && !IsGenerating()) {
+        <div class="mt-3 p-3 text-start" style="background-color: #fef2f2; border: 1px solid #fca5a5; border-radius: 14px;">
+          <div class="fw-semibold text-danger d-flex align-items-center gap-2 mb-1" style="font-size: 0.85rem;">
+            <fa-icon [icon]="TimesIcon"></fa-icon>
+            <span>Requisiti mancanti per la generazione:</span>
+          </div>
+          <ul class="mb-0 ps-3 text-muted" style="font-size: 0.8rem; line-height: 1.4;">
+            @for (reason of disableReason(); track reason) {
+              <li>{{ reason }}</li>
+            }
+          </ul>
+        </div>
+      }
     </div>
   </form>
 
@@ -354,5 +379,47 @@
     >
       Vai a file e risorse
     </button>
+  </div>
+</ng-template>
+
+<!-- ─── WHY MATERIALS EXCLUSION MODAL ──────────────────────────────────────────── -->
+<ng-template #whyMaterialsModal let-modal>
+  <div class="modal-header border-0 pb-0">
+    <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2">
+      <fa-icon [icon]="QuestionIcon" style="color: #0284c7;"></fa-icon>
+      <span>Materiali di Riferimento</span>
+    </h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body py-4">
+    <div class="d-flex flex-column gap-3">
+      <div class="p-3 rounded bg-light border-start border-4" style="border-color: #0284c7 !important;">
+        <p class="mb-0 text-dark small fw-semibold">
+          Perché non tutti i file sono selezionabili per la generazione AI?
+        </p>
+      </div>
+      
+      <p class="text-muted small mb-0" style="line-height: 1.6;">
+        Per garantire l'<strong>integrità didattica</strong> e l'<strong>accuratezza tecnica</strong> dei contenuti generati, la piattaforma applica una regola di progettazione fondamentale:
+      </p>
+
+      <div class="p-3 border rounded-syllex bg-light">
+        <ul class="mb-0 ps-3 text-muted small d-flex flex-column gap-2" style="list-style-type: disc;">
+          <li>
+            <strong>Fonti Originali Certificate:</strong> La generazione di domande e dispense deve basarsi esclusivamente su documentazione ufficiale, manualistica di bordo o testi caricati direttamente dai docenti.
+          </li>
+          <li>
+            <strong>Prevenzione del Degrado Didattico:</strong> I materiali già contrassegnati come <em>generati dall'Intelligenza Artificiale</em> vengono intenzionalmente esclusi. Questo evita il fenomeno della degradazione ricorsiva e riduce a zero il rischio di allucinazioni AI a cascata.
+          </li>
+        </ul>
+      </div>
+
+      <p class="text-muted small mb-0 mt-1">
+        Trovi tutti i tuoi file originali accessibili ed organizzati per cartelle, pronti per essere utilizzati come solide fondamenta per i tuoi test.
+      </p>
+    </div>
+  </div>
+  <div class="modal-footer border-0 pt-0">
+    <button type="button" class="btn btn-dark w-100" (click)="modal.close()" style="border-radius: 12px;">Ho capito</button>
   </div>
 </ng-template>
