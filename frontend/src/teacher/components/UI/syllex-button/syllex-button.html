@@ -1,5 +1,5 @@
 <button
-  class="btn rounded-pill fw-normal d-inline-flex align-items-center gap-2"
+  class="btn rounded-pill fw-normal d-inline-flex align-items-center justify-content-center gap-2"
   [ngClass]="buttonClasses"
   [routerLink]="props.link"
   [disabled]="props.disabled"
@@ -7,7 +7,11 @@
   [routerLinkActive]="'active'"
 >
   @if (props.leftIcon) {
-  <fa-icon [icon]="props.leftIcon" [animation]="props.animation"></fa-icon>
+  <fa-icon
+    [icon]="props.leftIcon"
+    [animation]="props.animation"
+    [class.fa-spin]="props.animation === 'spin'"
+  ></fa-icon>
   } {{ props.label | titlecase }} @if (props.rightIcon) {
   <fa-icon [icon]="props.rightIcon"></fa-icon>
   }
