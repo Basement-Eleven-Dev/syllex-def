@@ -24,6 +24,7 @@ export type AIGenQuestionInput = {
   type: QuestionType;
   language?: string;
   difficulty?: QuestionDifficulty;
+  count?: number;
 };
 export type QuestionDifficulty =
   | "elementary"
@@ -77,79 +78,151 @@ CRITICAL RULES:
 
 // 0.8-2 for high randomness
 const QUESTION_GENERATION_MODEL_TEMPERATURE = 1.4;
-export const generateTrueFalseQuestion = async (
+
+export const generateTrueFalseQuestions = async (
   context: Context,
   difficulty: string,
   materialObjects: Material[],
   topic: Topic,
   language: string = "it",
   instructions: string = "",
-): Promise<Partial<Question>> => {
-  const PROMPT = `${getSystemPrompt(language)}
+  count: number = 1,
+): Promise<Partial<Question>[]> => {
+  if (count <= 1) {
+    const PROMPT = `${getSystemPrompt(language)}
 
 Create a true/false quiz question about the topic "${topic.name}" with ${difficulty} difficulty.
 The question must be a clear declarative statement that is either true or false.
 In the "explanation" field, state concisely (2-3 sentences max) why the statement is true or false. Go straight to the factual explanation, no preambles.
 ${instructions ? `\nAdditional instructions from the teacher: ${instructions}` : ""}`;
+    const result = await askStructuredLLM(
+      PROMPT,
+      materialObjects,
+      TrueFalseQuestionStructure,
+      QUESTION_GENERATION_MODEL_TEMPERATURE,
+      0.95,
+      64,
+    );
+    const question: Partial<Question> = {
+      type: "vero falso",
+      text: result.text,
+      explanation: result.explanation,
+      policy: "private",
+      correctAnswer: result.correctAnswer,
+      aiGenerated: true,
+      difficulty: difficulty as Question["difficulty"],
+      topicId: topic._id!,
+      teacherId: context.user!._id,
+      subjectId: context.subjectId!,
+    };
+    return [question];
+  }
+
+  const PROMPT = `${getSystemPrompt(language)}
+
+Create exactly ${count} distinct and diverse true/false quiz questions about the topic "${topic.name}" with ${difficulty} difficulty.
+Each question must focus on a completely different aspect, subtopic, or concept of the material to ensure high variety.
+Requirements:
+- Each question must be a clear declarative statement that is either true or false.
+- In the "explanation" field, state concisely (2-3 sentences max) why the statement is true or false. Go straight to the factual explanation, no preambles.
+- VARIETY IS CRITICAL: Each question must test a different concept, subtopic, or aspect of the material. Do not repeat concepts, structures, or terms.
+${instructions ? `\nAdditional instructions from the teacher: ${instructions}` : ""}`;
+
   const result = await askStructuredLLM(
     PROMPT,
     materialObjects,
-    TrueFalseQuestionStructure,
+    z.object({ questions: z.array(TrueFalseQuestionStructure) }),
     QUESTION_GENERATION_MODEL_TEMPERATURE,
     0.95,
     64,
   );
-  const question: Partial<Question> = {
+
+  return result.questions.map((q) => ({
     type: "vero falso",
-    text: result.text,
-    explanation: result.explanation,
+    text: q.text,
+    explanation: q.explanation,
     policy: "private",
-    correctAnswer: result.correctAnswer,
+    correctAnswer: q.correctAnswer,
     aiGenerated: true,
     difficulty: difficulty as Question["difficulty"],
     topicId: topic._id!,
     teacherId: context.user!._id,
     subjectId: context.subjectId!,
-  };
-  return question;
+  }));
 };
-export const generateOpenQuestion = async (
+
+export const generateOpenQuestions = async (
   context: Context,
   difficulty: string,
   materialObjects: Material[],
   topic: Topic,
   language: string = "it",
   instructions: string = "",
-): Promise<Partial<Question>> => {
-  const PROMPT = `${getSystemPrompt(language)}
+  count: number = 1,
+): Promise<Partial<Question>[]> => {
+  if (count <= 1) {
+    const PROMPT = `${getSystemPrompt(language)}
 
 Create an open-answer quiz question about the topic "${topic.name}" with ${difficulty} difficulty.
 The question must NOT include any answer choices — the student must formulate the answer independently.
 In the "correctAnswer" field, provide a concise but complete model answer. Go straight to the content, no preambles or rhetorical phrases.
 ${instructions ? `\nAdditional instructions from the teacher: ${instructions}` : ""}`;
 
+    const result = await askStructuredLLM(
+      PROMPT,
+      materialObjects,
+      OpenQuestionStructure,
+      QUESTION_GENERATION_MODEL_TEMPERATURE,
+      0.95,
+      64,
+    );
+    const question: Partial<Question> = {
+      type: "risposta aperta",
+      text: result.text,
+      explanation: result.correctAnswer,
+      policy: "private",
+      aiGenerated: true,
+      difficulty: difficulty as Question["difficulty"],
+      topicId: topic._id!,
+      teacherId: context.user!._id,
+      subjectId: context.subjectId!,
+    };
+    return [question];
+  }
+
+  const PROMPT = `${getSystemPrompt(language)}
+
+Create exactly ${count} distinct and diverse open-answer quiz questions about the topic "${topic.name}" with ${difficulty} difficulty.
+Each question must focus on a completely different aspect, fact, or concept of the material to ensure variety.
+Requirements:
+- The questions must NOT include any answer choices — the student must formulate the answer independently.
+- In the "correctAnswer" field, provide a concise but complete model answer. Go straight to the content, no preambles or rhetorical phrases.
+- VARIETY IS CRITICAL: Each question must focus on a completely different aspect, fact, or concept from the material. Ensure diverse framing and syntax.
+${instructions ? `\nAdditional instructions from the teacher: ${instructions}` : ""}`;
+
   const result = await askStructuredLLM(
     PROMPT,
     materialObjects,
-    OpenQuestionStructure,
+    z.object({ questions: z.array(OpenQuestionStructure) }),
     QUESTION_GENERATION_MODEL_TEMPERATURE,
     0.95,
     64,
   );
-  const question: Partial<Question> = {
+
+  return result.questions.map((q) => ({
     type: "risposta aperta",
-    text: result.text,
-    explanation: result.correctAnswer,
+    text: q.text,
+    explanation: q.correctAnswer,
     policy: "private",
     aiGenerated: true,
     difficulty: difficulty as Question["difficulty"],
     topicId: topic._id!,
     teacherId: context.user!._id,
     subjectId: context.subjectId!,
-  };
-  return question;
+  }));
 };
-export const generateMultipleChoiceQuestion = async (
+
+export const generateMultipleChoiceQuestions = async (
   context: Context,
   difficulty: string,
   materialObjects: Material[],
@@ -157,8 +230,10 @@ export const generateMultipleChoiceQuestion = async (
   language: string = "it",
   numberOfAlternatives: number = 5,
   instructions: string = "",
-): Promise<Partial<Question>> => {
-  const PROMPT = `${getSystemPrompt(language)}
+  count: number = 1,
+): Promise<Partial<Question>[]> => {
+  if (count <= 1) {
+    const PROMPT = `${getSystemPrompt(language)}
 
 Create a multiple-choice quiz question about the topic "${topic.name}" with ${difficulty} difficulty.
 Requirements:
@@ -167,27 +242,62 @@ Requirements:
 - Wrong options must be plausible but clearly incorrect based on the content.
 - In the "explanation" field, state concisely (2-3 sentences max) why the correct answer is right. Go straight to the factual explanation, no preambles.
 ${instructions ? `\nAdditional instructions from the teacher: ${instructions}` : ""}`;
+    const result = await askStructuredLLM(
+      PROMPT,
+      materialObjects,
+      MultipleChoiceQuestionStructure,
+      QUESTION_GENERATION_MODEL_TEMPERATURE,
+      0.95,
+      64,
+    );
+    const question: Partial<Question> = {
+      type: "scelta multipla",
+      text: result.text,
+      explanation: result.explanation,
+      options: result.options as Question["options"],
+      policy: "private",
+      aiGenerated: true,
+      difficulty: difficulty as Question["difficulty"],
+      topicId: topic._id!,
+      teacherId: context.user!._id,
+      subjectId: context.subjectId!,
+    };
+    return [question];
+  }
+
+  const PROMPT = `${getSystemPrompt(language)}
+
+Create exactly ${count} distinct and diverse multiple-choice quiz questions about the topic "${topic.name}" with ${difficulty} difficulty.
+Each question must test a different concept, subtopic, or factual detail from the material to ensure that none of the questions or their distractors overlap in content or style.
+Requirements:
+- For each question: exactly ${numberOfAlternatives} answer options, with exactly ONE correct.
+- Do NOT prefix options with labels like A/B/C/D/E.
+- Wrong options must be plausible but clearly incorrect based on the content.
+- In the "explanation" field, state concisely (2-3 sentences max) why the correct answer is right. Go straight to the factual explanation, no preambles.
+- VARIETY IS CRITICAL: Each question must test a different concept, subtopic, or factual detail from the material. Ensure that none of the questions or their distractors overlap in content or style.
+${instructions ? `\nAdditional instructions from the teacher: ${instructions}` : ""}`;
+
   const result = await askStructuredLLM(
     PROMPT,
     materialObjects,
-    MultipleChoiceQuestionStructure,
+    z.object({ questions: z.array(MultipleChoiceQuestionStructure) }),
     QUESTION_GENERATION_MODEL_TEMPERATURE,
     0.95,
     64,
   );
-  const question: Partial<Question> = {
+
+  return result.questions.map((q) => ({
     type: "scelta multipla",
-    text: result.text,
-    explanation: result.explanation,
-    options: result.options as Question["options"],
+    text: q.text,
+    explanation: q.explanation,
+    options: q.options as Question["options"],
     policy: "private",
     aiGenerated: true,
     difficulty: difficulty as Question["difficulty"],
     topicId: topic._id!,
     teacherId: context.user!._id,
     subjectId: context.subjectId!,
-  };
-  return question;
+  }));
 };
 
 const createAIGenQuestion = async (
@@ -202,6 +312,7 @@ const createAIGenQuestion = async (
     language,
     difficulty,
     instructions,
+    count,
   } = JSON.parse(request.body || "{}") as AIGenQuestionInput;
 
   //error handling
@@ -228,26 +339,30 @@ const createAIGenQuestion = async (
 
   //create question
   const difficultyPrompt = DIFFICULTY_PROMPT_MAP[difficulty || "medium"];
-  const question =
+  const requestedCount = count && count > 0 ? count : 1;
+
+  const questions =
     type == "open"
-      ? await generateOpenQuestion(
+      ? await generateOpenQuestions(
           context,
           difficultyPrompt,
           materialObjects,
           topic,
           language,
           instructions,
+          requestedCount,
         )
       : type == "true-false"
-        ? await generateTrueFalseQuestion(
+        ? await generateTrueFalseQuestions(
             context,
             difficultyPrompt,
             materialObjects,
             topic,
             language,
             instructions,
+            requestedCount,
           )
-        : await generateMultipleChoiceQuestion(
+        : await generateMultipleChoiceQuestions(
             context,
             difficultyPrompt,
             materialObjects,
@@ -255,9 +370,13 @@ const createAIGenQuestion = async (
             language,
             numberOfAlternatives || 5,
             instructions,
+            requestedCount,
           );
 
-  return { question };
+  return {
+    question: questions[0],
+    questions,
+  };
 };
 
 export const handler = lambdaRequest(createAIGenQuestion);

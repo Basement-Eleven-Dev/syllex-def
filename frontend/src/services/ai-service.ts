@@ -29,6 +29,7 @@ export interface GenerateQuestionRequest {
   language?: string;
   difficulty?: QuestionDifficulty;
   numberOfAlternatives?: number;
+  count?: number;
 }
 
 export interface GeneratedQuestionOption {
@@ -93,24 +94,33 @@ export class AiService {
     return response.question;
   }
 
-  /** Generates N questions sequentially to avoid Gemini rate limits.
-   * Returns the fulfilled questions plus the number of failed requests.
+  /** Generates N questions in a single backend call to ensure variety,
+   * prevent duplicates, and optimize performance.
+   * Returns the generated questions plus the number of failed requests.
    */
   async generateQuestions(
     data: Parameters<AiService['generateQuestion']>[0],
     count: number,
   ): Promise<{ questions: GeneratedQuestion[]; failedCount: number }> {
-    const results = await Promise.allSettled(
-      Array.from({ length: count }, () => this.generateQuestion(data)),
-    );
-    const questions = results
-      .filter(
-        (r): r is PromiseFulfilledResult<GeneratedQuestion> =>
-          r.status === 'fulfilled',
-      )
-      .map((r) => r.value);
-    const failedCount = results.filter((r) => r.status === 'rejected').length;
-    return { questions, failedCount };
+    const payload: GenerateQuestionRequest = {
+      topicId: data.topicId,
+      materialIds: data.materialIds,
+      type: QUESTION_TYPE_MAP[data.type],
+      instructions: data.instructions,
+      language: data.language,
+      difficulty: data.difficulty,
+      numberOfAlternatives: data.numberOfAlternatives,
+      count,
+    };
+    try {
+      const response = await firstValueFrom(
+        this.http.post<{ questions: GeneratedQuestion[] }>('ai/questions', payload),
+      );
+      return { questions: response.questions || [], failedCount: 0 };
+    } catch (error) {
+      console.error('Failed to generate questions in batch', error);
+      return { questions: [], failedCount: count };
+    }
   }
 
   async generateMaterial(data: {
