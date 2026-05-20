@@ -38,6 +38,9 @@ import {
 } from '../../../types/question.types';
 import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
 
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { SyllexErrorModalComponent } from '../../../directives/syllex-error-modal.component';
+
 interface StepDef {
   n: number;
   label: string;
@@ -72,6 +75,7 @@ const STYLE_PREFILL_MAP: Record<SlideStyle, string> = {
 
 @Component({
   selector: 'app-laboratorio-ai',
+  standalone: true,
   imports: [
     FontAwesomeModule,
     RouterModule,
@@ -114,6 +118,7 @@ export class LaboratorioAi {
   private readonly aiService = inject(AiService);
   private readonly feedbackService = inject(FeedbackService);
   readonly materiaService = inject(Materia);
+  private readonly modalService = inject(NgbModal);
 
   // Icons
   readonly QuestionsIcon = faCheckDouble;
@@ -338,11 +343,20 @@ export class LaboratorioAi {
       });
 
       this.GenerationSuccess.set(true);
-    } catch {
-      this.feedbackService.showFeedback(
-        'Errore durante la generazione. Riprova.',
-        false,
-      );
+    } catch (error) {
+      const errMsg = this.aiService.extractErrorMessage(error);
+      if (errMsg.toLowerCase().includes('non contiene testo sufficiente')) {
+        const modalRef = this.modalService.open(SyllexErrorModalComponent, {
+          centered: true,
+          backdrop: 'static',
+          keyboard: false,
+        });
+        modalRef.componentInstance.title = 'Generazione Impedita';
+        modalRef.componentInstance.message = errMsg;
+        modalRef.componentInstance.buttonText = 'Ho capito, riprovo';
+      } else {
+        this.feedbackService.showFeedback(errMsg, false);
+      }
       this.IsGenerating.set(false);
     }
   }

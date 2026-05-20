@@ -38,6 +38,8 @@ import { QuestionsService } from '../../../services/questions';
 import { FeedbackService } from '../../../services/feedback-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DestroyRef } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { SyllexErrorModalComponent } from '../../../directives/syllex-error-modal.component';
 import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 import { AiService, GeneratedQuestion } from '../../../services/ai-service';
 import { MaterialiSelector } from '../../components/materiali-selector/materiali-selector';
@@ -69,13 +71,14 @@ interface StepDef {
 
 @Component({
   selector: 'app-create-edit-question',
+  standalone: true,
   imports: [
-    RouterModule,
     FontAwesomeModule,
+    RouterModule,
+    ReactiveFormsModule,
+    FormsModule,
     MultipleChoiceOptions,
     TypeSelector,
-    FormsModule,
-    ReactiveFormsModule,
     SyllexButton,
     SyllexCard,
     SyllexPageHeader,
@@ -91,11 +94,12 @@ interface StepDef {
       transition(':enter', [
         style({ opacity: 0, transform: 'translateX(20px)' }),
         animate(
-          '250ms ease-out',
+          '260ms 100ms ease-out',
           style({ opacity: 1, transform: 'translateX(0)' }),
         ),
       ]),
       transition(':leave', [
+        style({ position: 'absolute', top: 0, left: 0, right: 0, opacity: 1 }),
         animate(
           '180ms ease-in',
           style({ opacity: 0, transform: 'translateX(-20px)' }),
@@ -112,6 +116,7 @@ export class CreateEditQuestion {
   private readonly feedbackService = inject(FeedbackService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly aiService = inject(AiService);
+  private readonly modalService = inject(NgbModal);
 
   @ViewChild(MaterialiSelector) private materialiSelector!: MaterialiSelector;
 
@@ -400,11 +405,20 @@ export class CreateEditQuestion {
         })),
       );
       this.AiIsReviewing.set(true);
-    } catch {
-      this.feedbackService.showFeedback(
-        'Errore durante la generazione AI',
-        false,
-      );
+    } catch (error) {
+      const errMsg = this.aiService.extractErrorMessage(error);
+      if (errMsg.toLowerCase().includes('non contiene testo sufficiente')) {
+        const modalRef = this.modalService.open(SyllexErrorModalComponent, {
+          centered: true,
+          backdrop: 'static',
+          keyboard: false,
+        });
+        modalRef.componentInstance.title = 'Generazione Impedita';
+        modalRef.componentInstance.message = errMsg;
+        modalRef.componentInstance.buttonText = 'Ho capito, riprovo';
+      } else {
+        this.feedbackService.showFeedback(errMsg, false);
+      }
     } finally {
       this.AiIsLoading.set(false);
     }
@@ -436,11 +450,12 @@ export class CreateEditQuestion {
 
     for (const item of selected) {
       try {
+        const resolvedTopicId = item.data.topicId || topicId;
         const questionData: any = {
           type: item.data.type,
           text: item.data.text,
           explanation: item.data.explanation,
-          topicId,
+          topicId: resolvedTopicId,
           difficulty,
           subjectId,
           policy,

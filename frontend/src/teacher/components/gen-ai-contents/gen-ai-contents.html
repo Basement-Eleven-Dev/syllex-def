@@ -114,6 +114,7 @@
           aria-label="Seleziona argomento"
         >
           <option value="" disabled selected class="text-muted">Seleziona</option>
+          <option value="auto">Tutti gli argomenti (Intero documento)</option>
           @for (topic of materiaService.materiaSelected()?.topics; track topic._id) {
           <option [value]="topic._id">{{ topic.name }}</option>
           }

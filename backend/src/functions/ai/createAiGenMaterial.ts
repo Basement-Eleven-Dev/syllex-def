@@ -8,6 +8,7 @@ import { startSlidedeckGeneration } from "../../_helpers/gammaApi";
 import { uploadContentToS3 } from "../../_helpers/uploadFileToS3";
 import { getConvertedDocument } from "../../_helpers/documents/documentConversion";
 import { askStructuredLLM } from "../../_helpers/AI/simpleCompletion";
+import { fetchBuffer } from "../../_helpers/fetchBuffer";
 import { z } from "zod";
 import { Organization } from "../../models/schemas/organization.schema";
 
@@ -134,6 +135,26 @@ const createAIGenMaterial = async (
     subjectId: context.subjectId as any,
     aiGenerated: { $ne: true },
   });
+
+  // Fetch all text buffers and validate combined content length
+  let totalTextLength = 0;
+  for (const m of materialObjects) {
+    if (m.extractedTextFileUrl) {
+      try {
+        const buffer = await fetchBuffer(m.extractedTextFileUrl);
+        totalTextLength += buffer.toString("utf-8").trim().length;
+      } catch (e) {
+        console.error(`Failed to fetch buffer for material ${m._id}:`, e);
+      }
+    }
+  }
+
+  // If there are materials selected but they have less than 150 characters, reject
+  if (materialObjects.length > 0 && totalTextLength < 150) {
+    throw createHttpError.BadRequest(
+      `Non è possibile avviare la generazione automatica perché il documento selezionato non contiene testo sufficiente (rilevati solo ${totalTextLength} caratteri). Per garantire l'accuratezza didattica dei materiali ed evitare che l'Intelligenza Artificiale inventi di sana pianta concetti non presenti (fenomeno delle allucinazioni), è necessario che il file di riferimento contenga del testo concreto (come dispense, capitoli di libri o appunti). Ti invitiamo a caricare un documento completo di testo e riprovare!`
+    );
+  }
 
   const prompt = getPrompt(
     type,

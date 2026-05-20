@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { MaterialType, QuestionType } from '../types/question.types';
 
@@ -43,6 +43,7 @@ export interface GeneratedQuestion {
   explanation: string;
   correctAnswer?: boolean;
   options?: GeneratedQuestionOption[];
+  topicId?: string;
 }
 
 export interface GenerateMaterialRequest {
@@ -69,6 +70,25 @@ export interface GeneratedMaterial {
 })
 export class AiService {
   private http = inject(HttpClient);
+
+  extractErrorMessage(error: unknown): string {
+    if (error instanceof HttpErrorResponse) {
+      const payloadMessage = error.error?.message;
+      if (typeof payloadMessage === 'string' && payloadMessage.trim()) {
+        return payloadMessage;
+      }
+      if (typeof error.error === 'string' && error.error.trim()) {
+        return error.error;
+      }
+      if (typeof error.message === 'string' && error.message.trim()) {
+        return error.message;
+      }
+    }
+    if (error instanceof Error && error.message.trim()) {
+      return error.message;
+    }
+    return 'Errore durante la generazione. Riprova.';
+  }
 
   async generateQuestion(data: {
     topicId: string;
@@ -118,8 +138,7 @@ export class AiService {
       );
       return { questions: response.questions || [], failedCount: 0 };
     } catch (error) {
-      console.error('Failed to generate questions in batch', error);
-      return { questions: [], failedCount: count };
+      throw new Error(this.extractErrorMessage(error));
     }
   }
 
@@ -139,9 +158,13 @@ export class AiService {
       additionalInstructions: data.additionalInstructions || undefined,
       language: data.language,
     };
-    const response = await firstValueFrom(
-      this.http.post<{ material: GeneratedMaterial }>('ai/materials', payload),
-    );
-    return response.material;
+    try {
+      const response = await firstValueFrom(
+        this.http.post<{ material: GeneratedMaterial }>('ai/materials', payload),
+      );
+      return response.material;
+    } catch (error) {
+      throw new Error(this.extractErrorMessage(error));
+    }
   }
 }
