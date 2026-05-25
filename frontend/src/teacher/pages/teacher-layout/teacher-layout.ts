@@ -83,6 +83,7 @@ export class TeacherLayout implements OnInit, OnDestroy {
   sidebarOpen = signal<boolean>(false);
   navHidden = signal<boolean>(false);
   isAgentRoute = signal<boolean>(false);
+  hideBottomNavRoute = signal<boolean>(false);
   private lastScrollY = 0;
 
   GaugeIcon = faGauge;
@@ -129,7 +130,9 @@ export class TeacherLayout implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.hasTourForRoute.set(this.TOUR_ROUTES.has(window.location.pathname));
-    this.isAgentRoute.set(window.location.pathname === '/t/agente');
+    const isAgent = window.location.pathname === '/t/agente';
+    this.isAgentRoute.set(isAgent);
+    this.hideBottomNavRoute.set(isAgent || window.location.pathname === '/t/laboratorio-ai' || window.location.pathname === '/t/create-question');
 
     this.router.events
       .pipe(
@@ -148,7 +151,9 @@ export class TeacherLayout implements OnInit, OnDestroy {
       .subscribe((e) => {
         const url = (e as NavigationEnd).urlAfterRedirects.split('?')[0];
         this.hasTourForRoute.set(this.TOUR_ROUTES.has(url));
-        this.isAgentRoute.set(url === '/t/agente');
+        const isAgent = url === '/t/agente';
+        this.isAgentRoute.set(isAgent);
+        this.hideBottomNavRoute.set(isAgent || url === '/t/laboratorio-ai' || url === '/t/create-question');
       });
     this.tourService.start$.pipe(takeUntil(this.destroy$)).subscribe(() => {
       document.body.classList.add('tour-active');

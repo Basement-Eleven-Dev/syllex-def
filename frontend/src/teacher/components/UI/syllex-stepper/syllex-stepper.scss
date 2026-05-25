@@ -1,7 +1,7 @@
 .wizard-indicator {
   display: flex;
   align-items: center;
-  width: 50%;
+  width: 100%;
   gap: 0;
 }
 
@@ -53,6 +53,10 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
   white-space: nowrap;
+
+  @media (max-width: 991px) {
+    display: none;
+  }
 }
 
 .wizard-connector {

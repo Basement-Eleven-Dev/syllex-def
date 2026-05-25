@@ -195,15 +195,31 @@
   display: flex;
   align-items: flex-start;
   gap: 1rem;
+
+  @media (max-width: 991px) {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0;
+  }
 }
 
 .wizard-panel {
   flex: 1;
   min-height: 380px;
+
+  @media (max-width: 991px) {
+    order: 1;
+    width: 100%;
+    min-height: auto;
+  }
 }
 
 .wizard-step-content {
   padding: 2rem;
+  
+  @media (max-width: 991px) {
+    padding: 0.5rem;
+  }
 }
 
 .wizard-step-title {
@@ -253,11 +269,28 @@
     opacity: 0.3;
     cursor: not-allowed;
   }
+
+  @media (max-width: 991px) {
+    width: 2.25rem;
+    height: 2.25rem;
+    margin-top: 1rem;
+    order: 2;
+
+    &:last-of-type {
+      order: 3;
+    }
+  }
 }
 
 .wizard-nav-spacer {
   width: 2.5rem;
   flex-shrink: 0;
+  
+  @media (max-width: 991px) {
+    width: 2.25rem;
+    margin-top: 1rem;
+    order: 3;
+  }
 }
 
 // ─── Method Cards ─────────────────────────────────────
@@ -469,10 +502,23 @@
   padding: 1.75rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
   height: 100%;
+
+  @media (max-width: 991px) {
+    padding: 1rem;
+    border-radius: 12px;
+  }
 }
 
-.custom-input,
-.form-select {
+.mobile-full-width-btn {
+  @media (max-width: 991px) {
+    button, app-syllex-button, ::ng-deep button {
+      width: 100% !important;
+    }
+  }
+}
+
+::ng-deep .custom-input,
+::ng-deep .form-select {
   border-radius: 12px !important;
   border: 1.5px solid #d2e2ff !important;
   padding: 0.75rem 1rem !important;

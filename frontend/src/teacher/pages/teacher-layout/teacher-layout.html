@@ -50,7 +50,7 @@
   }
 </div>
 
-<nav class="bottom-nav d-lg-none" [class.hidden]="navHidden() || isAgentRoute()">
+<nav class="bottom-nav d-lg-none" [class.hidden]="navHidden() || hideBottomNavRoute()">
   <button
     class="bottom-nav-item"
     (click)="$event.stopPropagation(); openHelpChat()"
