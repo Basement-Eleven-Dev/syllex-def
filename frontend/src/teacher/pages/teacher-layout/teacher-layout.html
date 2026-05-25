@@ -38,7 +38,9 @@
       (scroll)="onContentScroll($event)"
     >
       <div
-        class="px-3 px-md-5 py-4 flex-grow-1 d-flex flex-column"
+        class="px-md-5 flex-grow-1 d-flex flex-column"
+        [class.px-3]="!isAgentRoute()"
+        [class.py-4]="!isAgentRoute()"
         style="min-height: 0; min-width: 0; view-transition-name: teacher-content"
       >
         <router-outlet></router-outlet>
@@ -48,7 +50,7 @@
   }
 </div>
 
-<nav class="bottom-nav d-lg-none" [class.hidden]="navHidden()">
+<nav class="bottom-nav d-lg-none" [class.hidden]="navHidden() || isAgentRoute()">
   <button
     class="bottom-nav-item"
     (click)="$event.stopPropagation(); openHelpChat()"

@@ -30,6 +30,8 @@ import {
   faWaveformLines,
   faTrash,
   faComment,
+  faBars,
+  faTimes,
 } from '@fortawesome/pro-solid-svg-icons';
 import { faSpinner } from '@fortawesome/pro-regular-svg-icons';
 import { AgentService } from '../../../services/agent.service';
@@ -72,9 +74,12 @@ export class AgentChat implements OnInit, OnDestroy {
   faWaveformLines = faWaveformLines;
   faTrash = faTrash;
   faComment = faComment;
+  faBars = faBars;
+  faTimes = faTimes;
 
   // Sidebar collassabile
   sidebarOpen = signal(true);
+  mobileHistoryOpen = signal(false);
 
   // --- Services ---
   private feedbackService = inject(FeedbackService);
@@ -294,6 +299,7 @@ export class AgentChat implements OnInit, OnDestroy {
   selectConversation(id: string) {
     this.currentConversationId.set(id);
     this.initializeChatHistory(id);
+    this.mobileHistoryOpen.set(false);
   }
 
   deleteConversation(id: string, event: Event) {

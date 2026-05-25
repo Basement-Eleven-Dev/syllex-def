@@ -1,13 +1,23 @@
-<div class="agent-chat-wrapper d-flex h-100 w-100 overflow-hidden">
+<div class="agent-chat-wrapper d-flex h-100 w-100 overflow-hidden position-relative">
   <!-- AREA PRINCIPALE -->
   <div
     class="main-content flex-fill d-flex flex-column position-relative h-100 overflow-hidden"
   >
+    <!-- MOBILE HEADER -->
+    <div class="d-flex d-lg-none align-items-center justify-content-between px-3 py-3 bg-white shadow-sm" style="z-index: 20;">
+      <h6 class="mb-0 fw-bold text-primary d-flex align-items-center gap-2">
+        <fa-icon [icon]="faSparkles" class="text-warning"></fa-icon> Alex
+      </h6>
+      <button class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" (click)="mobileHistoryOpen.set(true)">
+        <fa-icon [icon]="faBars"></fa-icon>
+      </button>
+    </div>
+
     <!-- MESSAGGI / INTRO (sempre visibile) -->
-    <div #scrollContent class="flex-fill overflow-auto d-flex flex-column p-4">
+    <div #scrollContent class="flex-fill overflow-auto d-flex flex-column p-2 p-md-4">
       @if (messages().length === 0 && !voiceModeActive()) {
       <div
-        class="intro-welcome d-flex flex-column align-items-center justify-content-center m-auto"
+        class="intro-welcome d-flex flex-column align-items-center justify-content-center mx-auto"
       >
         <h2 class="fw-bold mb-2 text-center intro-welcome__title">
           Ciao, sono Alex!
@@ -28,16 +38,16 @@
         </h4>
 
         <!-- Riga superiore: 2 bottoni -->
-        <div class="d-flex gap-3 mb-3 justify-content-center w-100">
+        <div class="d-flex flex-column flex-md-row gap-2 gap-md-3 mb-3 justify-content-center w-100">
           <button
-            class="btn btn-quick-action"
+            class="btn btn-quick-action quick-btn-responsive"
             (click)="inputMessage = 'Fammi un riassunto sintetico'; sendMessage('text')"
           >
             <fa-icon [icon]="faLightbulb" class="me-2"></fa-icon>Riassunto
             sintetico
           </button>
           <button
-            class="btn btn-quick-action"
+            class="btn btn-quick-action quick-btn-responsive"
             (click)="inputMessage = 'Quali sono gli argomenti principali?'; sendMessage('text')"
           >
             <fa-icon [icon]="faBookOpen" class="me-2"></fa-icon>Argomenti
@@ -47,7 +57,7 @@
         <!-- Riga inferiore: 1 bottone centrato -->
         <div class="d-flex justify-content-center w-100">
           <button
-            class="btn btn-quick-action"
+            class="btn btn-quick-action quick-btn-responsive"
             (click)="inputMessage = 'Mettimi alla prova con un quiz di tre domande'; sendMessage('text')"
           >
             <fa-icon [icon]="faSparkles" class="me-2"></fa-icon>Mettimi alla
@@ -61,7 +71,7 @@
         [class.justify-content-end]="msg.role === 'user'"
       >
         <div
-          class="msg-line rounded-pill px-4 py-3"
+          class="msg-line rounded-4 px-3 px-md-4 py-2 py-md-3"
           [class.msg-line--user]="msg.role === 'user'"
         >
           <markdown [data]="msg.content"></markdown>
@@ -87,7 +97,7 @@
 
     <!-- INPUT BAR -->
     <div
-      class="input-area-container px-4 pb-3 pt-2 bg-transparent"
+      class="input-area-container px-2 px-md-4 pb-3 pt-2 bg-transparent"
       [class.is-voice]="voiceModeActive()"
     >
       <div class="input-bar-row">
@@ -124,7 +134,7 @@
         <!-- Input pill (collassa verso destra in voice mode) o pulsanti Voice Mode -->
         @if (!voiceModeActive()) {
           <div
-            class="input-pill-mock d-flex align-items-center px-4 py-2 border shadow-sm"
+            class="input-pill-mock d-flex align-items-center px-3 px-md-4 py-2 border shadow-sm"
           >
             <textarea
               class="form-control border-0 shadow-none bg-transparent"
@@ -181,12 +191,24 @@
 
   <!-- SIDEBAR DESTRA: CRONOLOGIA CONVERSAZIONI -->
   <div
-    class="chat-sidebar d-none d-lg-flex flex-column"
+    class="chat-sidebar flex-column d-flex"
+    [class.mobile-hidden]="!mobileHistoryOpen()"
     [class.collapsed]="!sidebarOpen()"
+    [class.mobile-open]="mobileHistoryOpen()"
   >
-    <!-- Toggle button -->
+    <!-- Mobile header for sidebar -->
+    @if (mobileHistoryOpen()) {
+    <div class="d-flex d-lg-none justify-content-between align-items-center p-3 border-bottom bg-white">
+      <h6 class="mb-0 fw-bold text-primary">Le tue Chat</h6>
+      <button class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" (click)="mobileHistoryOpen.set(false)">
+        <fa-icon [icon]="faTimes"></fa-icon>
+      </button>
+    </div>
+    }
+
+    <!-- Toggle button (Desktop only) -->
     <button
-      class="sidebar-toggle-btn"
+      class="sidebar-toggle-btn d-none d-lg-flex"
       (click)="sidebarOpen.set(!sidebarOpen())"
       [title]="sidebarOpen() ? 'Chiudi cronologia' : 'Apri cronologia'"
     >
@@ -195,7 +217,7 @@
       ></fa-icon>
     </button>
 
-    @if (sidebarOpen()) {
+    @if (sidebarOpen() || mobileHistoryOpen()) {
     <div class="p-3 pb-2">
       <button
         class="btn btn-primary w-100 rounded-pill d-flex align-items-center justify-content-center gap-2 py-2 shadow-sm mb-2"
