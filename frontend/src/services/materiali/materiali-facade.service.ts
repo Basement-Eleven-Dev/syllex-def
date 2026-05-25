@@ -40,6 +40,8 @@ export class MaterialiFacadeService {
 
   readonly searchTerm = signal('');
   readonly highlightedItemId = signal<string | null>(null);
+  /** ID da evidenziare non appena compare nella lista (dopo reload) */
+  private readonly pendingHighlightId = signal<string | null>(null);
   readonly isLoading = this.materialiService.isLoading;
   readonly isStorageFull = this.materialiService.isStorageFull;
   readonly selectedCount = computed(
@@ -68,6 +70,22 @@ export class MaterialiFacadeService {
   private isSearchActive = false;
 
   constructor() {
+    // Quando i materiali vengono (ri)caricati, controlla se c'è un ID
+    // in attesa di essere evidenziato e attivalo.
+    effect(() => {
+      const pending = this.pendingHighlightId();
+      if (!pending) return;
+      const items = this.materialiService.root();
+      const found = items.some((i) => i._id === pending);
+      if (found) {
+        untracked(() => {
+          this.highlightedItemId.set(pending);
+          this.pendingHighlightId.set(null);
+          setTimeout(() => this.highlightedItemId.set(null), 10000);
+        });
+      }
+    });
+
     effect(() => {
       const term = this.searchTerm().trim();
 
@@ -167,11 +185,11 @@ export class MaterialiFacadeService {
 
   /**
    * Evidenzia un materiale appena creato/generato.
-   * L'highlight si azzera automaticamente dopo 8 secondi.
+   * L'ID viene messo in "attesa" e viene attivato non appena
+   * compare nella lista dopo il prossimo reload.
    */
   setNewlyCreatedHighlight(itemId: string): void {
-    this.highlightedItemId.set(itemId);
-    setTimeout(() => this.highlightedItemId.set(null), 8000);
+    this.pendingHighlightId.set(itemId);
   }
 
   // ── CRUD ──────────────────────────────────────────────────────────
