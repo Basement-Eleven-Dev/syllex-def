@@ -81,6 +81,10 @@ export class AgentChat implements OnInit, OnDestroy {
   sidebarOpen = signal(true);
   mobileHistoryOpen = signal(false);
 
+  // Inline delete confirmation
+  pendingDeleteId = signal<string | null>(null);
+  private deleteResetTimeout: any = null;
+
   // --- Services ---
   private feedbackService = inject(FeedbackService);
   public geminiLiveService = inject(GeminiLiveService);
@@ -131,6 +135,7 @@ export class AgentChat implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.stopRealtimeVoice();
     this.pauseAudio();
+    if (this.deleteResetTimeout) clearTimeout(this.deleteResetTimeout);
   }
 
   // Effetto: scrolla sempre in fondo quando cambia la lista dei messaggi
@@ -300,9 +305,24 @@ export class AgentChat implements OnInit, OnDestroy {
     this.mobileHistoryOpen.set(false);
   }
 
+  requestDeleteConversation(id: string, event: Event) {
+    event.stopPropagation();
+    if (this.deleteResetTimeout) clearTimeout(this.deleteResetTimeout);
+    this.pendingDeleteId.set(id);
+    // Auto-reset dopo 3 secondi senza conferma
+    this.deleteResetTimeout = setTimeout(() => this.pendingDeleteId.set(null), 3000);
+  }
+
+  cancelDelete(event: Event) {
+    event.stopPropagation();
+    if (this.deleteResetTimeout) clearTimeout(this.deleteResetTimeout);
+    this.pendingDeleteId.set(null);
+  }
+
   deleteConversation(id: string, event: Event) {
-    event.stopPropagation(); // Prevent choosing the chat when clicking delete
-    if (confirm('Sei sicuro di voler cancellare questa conversazione?')) {
+    event.stopPropagation();
+    if (this.deleteResetTimeout) clearTimeout(this.deleteResetTimeout);
+    this.pendingDeleteId.set(null);
       this.agentService.deleteConversation(id).subscribe({
         next: () => {
           this.feedbackService.showFeedback(
@@ -329,7 +349,6 @@ export class AgentChat implements OnInit, OnDestroy {
           );
         },
       });
-    }
   }
 
   // ==================

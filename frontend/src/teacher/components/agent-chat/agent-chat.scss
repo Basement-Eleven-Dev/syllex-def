@@ -23,7 +23,9 @@
   backdrop-filter: blur(10px);
   border-left: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 1.5rem 0 0 1.5rem;
-  transition: width 0.25s ease, transform 0.3s ease;
+  transition:
+    width 0.25s ease,
+    transform 0.3s ease;
   position: relative;
 
   @media (max-width: 991px) {
@@ -138,11 +140,57 @@
       height: 20px;
       flex-shrink: 0;
 
+      &.is-confirming {
+        width: auto;
+        gap: 5px;
+
+        .delete-confirm-label {
+          font-size: 0.72rem;
+          font-weight: 600;
+          color: #dc3545;
+          white-space: nowrap;
+        }
+
+        .btn-confirm-yes {
+          font-size: 0.72rem;
+          font-weight: 700;
+          color: #fff;
+          background: #dc3545;
+          border: none;
+          border-radius: 4px;
+          padding: 2px 7px;
+          cursor: pointer;
+          transition: background 0.15s;
+          line-height: 1.4;
+
+          &:hover {
+            background: #bb2d3b;
+          }
+        }
+
+        .btn-confirm-no {
+          font-size: 0.72rem;
+          font-weight: 500;
+          color: rgba(11, 60, 123, 0.5);
+          background: transparent;
+          border: none;
+          padding: 2px 4px;
+          cursor: pointer;
+          transition: color 0.15s;
+
+          &:hover {
+            color: #0b3c7b;
+          }
+        }
+      }
+
       .conversation-date {
         font-size: 0.725rem;
         color: #0b3c7b;
         opacity: 0.55;
-        transition: opacity 0.2s ease, transform 0.2s ease;
+        transition:
+          opacity 0.2s ease,
+          transform 0.2s ease;
         pointer-events: none;
         white-space: nowrap;
       }
@@ -152,7 +200,10 @@
         opacity: 0;
         visibility: hidden;
         color: rgba(11, 60, 123, 0.4);
-        transition: opacity 0.2s ease, transform 0.2s ease, color 0.15s ease;
+        transition:
+          opacity 0.2s ease,
+          transform 0.2s ease,
+          color 0.15s ease;
         padding: 0;
         border: none;
         background: transparent;
@@ -226,7 +277,7 @@
             opacity: 0.8;
             visibility: visible;
             transform: scale(1);
-            
+
             &:hover {
               opacity: 1;
             }
@@ -289,7 +340,14 @@
       margin-bottom: 0 !important;
     }
     // Also strip default margins from lists or headings if rendered
-    ul, ol, h1, h2, h3, h4, h5, h6 {
+    ul,
+    ol,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
       margin-bottom: 0 !important;
     }
   }
@@ -341,7 +399,7 @@
 
 .quick-btn-responsive {
   width: 100%;
-  
+
   @media (min-width: 768px) {
     width: auto;
     white-space: nowrap;
@@ -663,7 +721,8 @@
 }
 
 @keyframes pulse-dot {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(0.8);
     opacity: 0.5;
   }
@@ -822,7 +881,8 @@
 }
 
 @keyframes pulse-green {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(0.9);
     opacity: 0.6;
   }
