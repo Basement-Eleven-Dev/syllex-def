@@ -3,29 +3,26 @@
   [description]="'Gestisci e visualizza le tue classi da qui.'"
 />
 
-<section class="d-flex flex-column flex-xl-row my-4 gap-3 align-items-start align-items-xl-center">
-  <div class="search-wrapper w-100" style="max-width: 100%;">
-    <app-syllex-search-input
-      placeholder="Cerca classi..."
-      [value]="SearchTerm()"
-      (valueChange)="onSearchTermChange($event)"
-    />
-  </div>
-  
-  <div class="d-flex flex-row gap-2 w-100 flex-xl-grow-0" style="max-width: 100%;">
-    <div class="select-wrapper flex-grow-1">
-      <app-syllex-select-input
-        [value]="SelectedYear().toString()"
-        (valueChange)="onYearChange($event)"
-        placeholder="Tutti gli anni"
-        [options]="yearOptions"
-      />
-    </div>
-    <app-syllex-clear-button (clicked)="clearFilters()" />
-  </div>
+<section class="classi-filter-bar my-4">
+  <app-syllex-search-input
+    placeholder="Cerca classi..."
+    [value]="SearchTerm()"
+    (valueChange)="onSearchTermChange($event)"
+    class="classi-filter-bar__search"
+  />
+
+  <app-syllex-select-input
+    [value]="SelectedYear().toString()"
+    (valueChange)="onYearChange($event)"
+    placeholder="Tutti gli anni"
+    [options]="yearOptions"
+    class="classi-filter-bar__select"
+  />
+
+  <app-syllex-clear-button (clicked)="clearFilters()" />
 
   <app-view-type-toggle
-    class="ms-xl-auto align-self-end align-self-xl-center"
+    class="ms-auto"
     [viewType]="viewType"
     [pageKey]="'classi'"
     (viewTypeChange)="onChangeViewType($event)"

@@ -179,8 +179,7 @@ button {
   }
 }
 
-.custom-input,
-.form-select {
+.custom-input {
   border-radius: 12px !important;
   border: 1.5px solid #d2e2ff !important;
   padding: 0.75rem 1rem !important;
@@ -209,6 +208,42 @@ button {
     }
   }
 }
+
+// ─── Stile unificato per tutti i filtri di pagina (search + select) ───
+.filter-input-pill {
+  background-color: #f5f8ff !important;
+  border: 1.5px solid #d5e4ff !important;
+  border-radius: 999px !important;
+  color: #1a2540 !important;
+  box-shadow: none !important;
+  transition: border-color 0.15s ease !important;
+  font-size: 0.875rem !important;
+
+  &:focus,
+  &:focus-within {
+    background-color: #f5f8ff !important;
+    border-color: var(--bs-primary) !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+
+  &::placeholder {
+    color: #7a90b8 !important;
+  }
+
+  // Icona search: sfondo trasparente per non mostrare il grigio Bootstrap
+  .input-group-text {
+    background-color: transparent !important;
+    border: none !important;
+  }
+
+  // Per il form-select: freccia in tonalità scura coerente
+  &.form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%231a2540' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+    padding-right: 2.5rem !important;
+  }
+}
+
 
 .syllexCard {
   padding: 2.4rem;
