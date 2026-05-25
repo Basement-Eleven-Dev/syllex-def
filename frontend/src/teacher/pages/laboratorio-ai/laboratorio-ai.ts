@@ -42,6 +42,7 @@ import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SyllexErrorModalComponent } from '../../../directives/syllex-error-modal.component';
+import { MaterialiFacadeService } from '../../../services/materiali/materiali-facade.service';
 
 interface StepDef {
   n: number;
@@ -121,6 +122,7 @@ export class LaboratorioAi {
   private readonly feedbackService = inject(FeedbackService);
   readonly materiaService = inject(Materia);
   private readonly modalService = inject(NgbModal);
+  private readonly materialiFacade = inject(MaterialiFacadeService);
 
   // Icons
   readonly QuestionsIcon = faCheckDouble;
@@ -335,7 +337,7 @@ export class LaboratorioAi {
         additionalInstructions = parts.join(' | ') || undefined;
       }
 
-      await this.aiService.generateMaterial({
+      const result = await this.aiService.generateMaterial({
         type: selectedType as MaterialType,
         materialIds: this.SelectedMaterialIds(),
         numberOfSlides: this.IsSlides()
@@ -347,6 +349,10 @@ export class LaboratorioAi {
       });
 
       this.GenerationSuccess.set(true);
+      // Memorizza l'ID nel facade per evidenziarlo nella pagina Risorse
+      if (result?._id) {
+        this.materialiFacade.setNewlyCreatedHighlight(result._id);
+      }
     } catch (error) {
       const errMsg = this.aiService.extractErrorMessage(error);
       if (errMsg.toLowerCase().includes('non contiene testo sufficiente')) {

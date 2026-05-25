@@ -165,6 +165,15 @@ export class MaterialiFacadeService {
     this.materialiService.loadMaterials();
   }
 
+  /**
+   * Evidenzia un materiale appena creato/generato.
+   * L'highlight si azzera automaticamente dopo 8 secondi.
+   */
+  setNewlyCreatedHighlight(itemId: string): void {
+    this.highlightedItemId.set(itemId);
+    setTimeout(() => this.highlightedItemId.set(null), 8000);
+  }
+
   // ── CRUD ──────────────────────────────────────────────────────────
 
   createFolder(): Observable<MaterialInterface> {
