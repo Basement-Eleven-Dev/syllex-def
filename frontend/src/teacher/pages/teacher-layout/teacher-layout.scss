@@ -9,7 +9,7 @@
 .bottom-nav {
   position: fixed;
   bottom: 1rem;
-  left: 1rem;
+  left: calc(64px + 1rem);
   right: 1rem;
   height: 56px;
   background: var(--bs-primary);

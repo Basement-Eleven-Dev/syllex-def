@@ -203,6 +203,11 @@ button {
   border-radius: 30px;
   border: none;
   background-color: #eef4ff;
+
+  @media (max-width: 991px) {
+    padding: 1.25rem;
+    border-radius: 20px;
+  }
 }
 
 a {

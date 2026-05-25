@@ -1,10 +1,11 @@
 <div
-  class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-5 ms-4"
+  class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-4 mb-md-5 ms-3 ms-md-4 w-100"
+  style="max-width: 100%; overflow: hidden;"
 >
-  <div class="col-12 col-md-auto flex-grow-1">
+  <div class="col-12 col-md-auto flex-grow-1" style="min-width: 0;">
     <h1
-      class="mb-1 fs-1 text-nowrap fw-semibold"
-      style="letter-spacing: -0.04em"
+      class="mb-1 fs-1 fw-semibold"
+      style="letter-spacing: -0.04em; word-wrap: break-word;"
     >
       {{ title }}
     </h1>
@@ -12,7 +13,7 @@
   </div>
 
   <div
-    class="header-actions d-flex gap-2 justify-content-start justify-content-md-end pt-2"
+    class="header-actions w-100 w-md-auto pt-2"
   >
     <ng-content></ng-content>
   </div>

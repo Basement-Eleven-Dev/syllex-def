@@ -2,25 +2,23 @@
   [title]="'Benvenuto in Calendario,'"
   [description]="'qui puoi trovare tutti gli eventi e le comunicazioni della tua classe.'"
 >
-  <div class="d-flex gap-2">
-    <app-syllex-button
-      [props]="{
-            label: 'Nuovo Evento',
-            variant: 'secondary',
-            size: 'large'
-          }"
-      (clicked)="openAddEventModal()"
-    />
-    <app-syllex-button
-      [props]="{
-            label: 'Nuova Comunicazione',
-            variant: 'primary',
-            color: 'celestine',
-            size: 'large'
-          }"
-      (clicked)="openComunicazioneModal()"
-    />
-  </div>
+  <app-syllex-button
+    [props]="{
+          label: 'Nuovo Evento',
+          variant: 'secondary',
+          size: 'medium'
+        }"
+    (clicked)="openAddEventModal()"
+  />
+  <app-syllex-button
+    [props]="{
+          label: 'Nuova Comunicazione',
+          variant: 'primary',
+          color: 'celestine',
+          size: 'medium'
+        }"
+    (clicked)="openComunicazioneModal()"
+  />
 </app-syllex-page-header>
 @if (Comunicazioni().length === 0) {
   <div class="mb-5">
@@ -38,7 +36,7 @@
   </div>
 } @else {
   <div class="com-wrapper mb-5" style="padding-top: 35px">
-    <div class="mb-3 text-white flex-shrink-0 px-4">
+    <div class="mb-3 flex-shrink-0 px-3 px-lg-4 text-white com-title">
       <h2 class="fs-2 fw-semibold mb-0">Comunicazioni recenti</h2>
     </div>
     <div
@@ -52,17 +50,17 @@
       @for(com of Comunicazioni(); track com._id) {
       <div class="com-item">
         <div
-          class="p-4 rounded-5 h-100 bg-white text-dark communication-item-card d-flex flex-column"
+          class="p-4 rounded-5 h-100 communication-item-card bg-white com-card d-flex flex-column shadow-sm"
         >
-          <p class="fs-4 m-0">
-            {{ com.title.substring(0, 23) + "..." | titlecase }}
+          <p class="fs-4 m-0 com-item-title">
+            {{ com.title.substring(0, 18) + "..." | titlecase }}
           </p>
-          <p class="text-muted mb-2 ellipsis-3-lines flex-grow-1">
+          <p class="mb-2 ellipsis-3-lines flex-grow-1 text-muted com-desc">
             {{ com.content }}
           </p>
-          <div class="d-flex justify-content-between">
+          <div class="d-flex justify-content-between align-items-center mt-2">
             <span
-              class="text-primary border-0 px-2 py-1 rounded-pill mb-2 d-inline-block small"
+              class="border-0 px-2 py-1 rounded-pill d-inline-block small text-primary com-date"
             >
               {{ com.createdAt | date:'d MMM yyyy' : '' : 'it' }}
             </span>

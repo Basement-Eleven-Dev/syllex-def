@@ -1,3 +1,20 @@
+.search-wrapper {
+  flex: 1;
+  min-width: 400px;
+
+  @media (max-width: 991px) {
+    min-width: 100%;
+  }
+}
+
+.select-wrapper {
+  min-width: 200px;
+  
+  @media (max-width: 991px) {
+    min-width: 0;
+  }
+}
+
 tbody > tr > td {
   color: var(--bs-dark);
   border: none;

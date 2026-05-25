@@ -52,7 +52,7 @@
       <div class="d-flex flex-row mb-3">
         @for (day of ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom']; track
         $index) {
-        <div class="flex-fill text-center fw-bold text-muted">
+        <div class="flex-fill text-center fw-bold text-muted" style="font-size: 0.85rem">
           {{ day | uppercase }}
         </div>
         }
@@ -71,14 +71,9 @@
           >
             {{ dayBox.day }}
           </div>
-          <div class="event-badges">
-            @if (getEventCount(dayBox) > 0) {
-            <fa-icon [icon]="BellIcon" class="text-danger"></fa-icon>
-            <!--        <span class="event-count badge " title="Eventi e Test">
-              {{ getEventCount(dayBox) }}
-            </span> -->
-            }
-          </div>
+          @if (getEventCount(dayBox) > 0) {
+            <div class="event-dot"></div>
+          }
           }
         </div>
         }
@@ -86,10 +81,10 @@
     </div>
 
     <!-- Day detail panel -->
-    <div class="d-flex w-lg-50 w-100 flex-column mb-3 syllexCard">
+    <div class="d-flex w-lg-50 w-100 flex-column mb-3 syllexCard day-detail-panel">
       @if (SelectedDate()) {
       <div
-        class="d-flex flex-row align-items-center justify-content-between mb-3 px-1"
+        class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between mb-3 px-1 gap-3"
       >
         <div class="d-flex flex-column gap-2 text-primary">
           <p class="m-0">Eventi della giornata</p>
@@ -100,10 +95,11 @@
 
         @if (!readonly()) {
         <app-syllex-button
+          class="calendar-add-btn"
           [props]="{
-            label: 'Crea nuovo evento',
+            label: 'Nuovo evento',
             variant: 'primary',
-            size: 'large',
+            size: 'medium',
             leftIcon: CalendarIcon
           }"
           (click)="openAddEventModal()"
@@ -111,22 +107,23 @@
         }
       </div>
 
-      <div class="flex-fill p-3 border-0" id="calendarDayDetailCard">
+      <div class="flex-fill p-3 p-lg-3 border-0" id="calendarDayDetailCard">
         <div class="calendar-events-scrollable flex-fill pe-">
           @for (event of SelectedDateEvents(); track event._id) {
-          <div class="syllexCard border-primary bg-white mb-4">
-            <div class="d-flex justify-content-between">
-              <p class="fs-5 fw-semibold">{{ event.title }}</p>
+          <div class="syllexCard border-primary bg-white mb-4 event-inner-card">
+            <div class="d-flex justify-content-between align-items-start gap-2">
+              <p class="fs-5 fw-semibold mb-2">{{ event.title }}</p>
               <app-syllex-badge
+                class="flex-shrink-0"
                 color="green"
                 [label]="event.subjectId ? materiaService.getSubjectName(event.subjectId) : ''"
               />
             </div>
             <p class="m-0">{{ event.description }}</p>
-            <div class="d-flex justify-content-between align-items-center mt-2">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mt-2 gap-2">
               <p class="mb-0">{{ event.date | date: 'short' }}</p>
               @if (!readonly()) {
-              <div class="d-flex gap-2">
+              <div class="d-flex flex-wrap gap-2">
                 <app-syllex-button
                   [props]="{ label: 'Modifica', variant: 'primary', color: 'celestine', size: 'small' }"
                   (clicked)="editEvent(event._id!)"
@@ -142,10 +139,11 @@
             </div>
           </div>
           } @for (test of SelectedDateTests(); track test._id) {
-          <div class="syllexCard border-primary bg-white mb-4">
-            <div class="d-flex justify-content-between">
-              <p class="fs-5 fw-semibold">{{ test.name }}</p>
+          <div class="syllexCard border-primary bg-white mb-4 event-inner-card">
+            <div class="d-flex justify-content-between align-items-start gap-2">
+              <p class="fs-5 fw-semibold mb-2">{{ test.name }}</p>
               <app-syllex-badge
+                class="flex-shrink-0"
                 color="green"
                 [label]="test.subjectId ? materiaService.getSubjectName(test.subjectId) : ''"
               />
@@ -163,10 +161,10 @@
                 <span class="ms-2">• {{ test.timeLimit }} min</span>
               }
             </p>
-            <div class="d-flex justify-content-between align-items-center mt-2">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mt-2 gap-2">
               <p class="mb-0">{{ test.availableFrom | date: 'short' }}</p>
               @if (!readonly()) {
-              <div class="d-flex gap-2">
+              <div class="d-flex flex-wrap gap-2">
                 <app-syllex-button
                   [props]="{ label: 'Modifica', variant: 'primary', color: 'celestine', size: 'small', link: '/t/tests/edit/' + test._id }"
                 />

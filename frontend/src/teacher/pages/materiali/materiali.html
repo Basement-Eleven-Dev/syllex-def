@@ -11,20 +11,18 @@
   [title]="'File e Risorse'"
   [description]="'Gestisci e visualizza i tuoi file e le risorse per la materia selezionata.'"
 >
-  <div class="d-flex gap-2">
-    <app-syllex-button
-      [props]="{ label: 'Crea cartella', variant: 'primary', color: 'celestine', size: 'large', leftIcon: icons.plus }"
-      (clicked)="onCreateNewFolder()"
-    />
-    <app-syllex-button
-      [props]="{ label: 'Carica file', variant: 'primary', color: 'celestine', size: 'large', leftIcon: icons.upload }"
-      (clicked)="onRequestUpload()"
-    />
-    <app-syllex-button
-      [props]="{ label: 'Genera con AI', variant: 'secondary', size: 'large', leftIcon: icons.sparkles }"
-      (clicked)="onRequestGenerate()"
-    />
-  </div>
+  <app-syllex-button
+    [props]="{ label: 'Crea cartella', variant: 'primary', color: 'celestine', size: 'medium', leftIcon: icons.plus }"
+    (clicked)="onCreateNewFolder()"
+  />
+  <app-syllex-button
+    [props]="{ label: 'Carica file', variant: 'primary', color: 'celestine', size: 'medium', leftIcon: icons.upload }"
+    (clicked)="onRequestUpload()"
+  />
+  <app-syllex-button
+    [props]="{ label: 'Genera con AI', variant: 'secondary', size: 'medium', leftIcon: icons.sparkles }"
+    (clicked)="onRequestGenerate()"
+  />
 </app-syllex-page-header>
 
 <div class="materiali-toolbar my-5">
@@ -32,7 +30,7 @@
     <app-storage-limit-bar tourAnchor="materiali_storage_bar" />
   </div>
 
-  <section tourAnchor="materiali_search" class="d-flex flex-row gap-2">
+  <section tourAnchor="materiali_search" class="d-flex flex-row gap-2 w-100">
     <input
       #fileInput
       type="file"
@@ -41,10 +39,11 @@
       [accept]="acceptedExtensions"
     />
     <app-syllex-search-input
+      class="flex-grow-1 w-100"
       placeholder="Cerca file o cartella..."
       [value]="searchTerm()"
       (valueChange)="searchTerm.set($event)"
-      style="max-width: 460px"
+      style="max-width: 100%"
     />
     <app-syllex-clear-button (clicked)="clearFilters()" />
   </section>
@@ -54,9 +53,9 @@
   <!-- Breadcrumb + selezione -->
   <div
     tourAnchor="materiali_content"
-    class="d-flex flex-row align-items-center justify-content-between mb-5"
+    class="d-flex flex-column flex-xl-row align-items-start align-items-xl-center justify-content-between gap-3 mb-5 w-100"
   >
-    <div class="d-flex flex-row align-items-center gap-3">
+    <div class="d-flex flex-row flex-wrap align-items-center gap-3">
       @if (currentPathArray().length > 1) {
       <app-syllex-button
         [props]="{
@@ -69,7 +68,7 @@
         (clicked)="onRequestOpenItem(currentPathArray()[currentPathArray().length - 2])"
       />
       }
-      <div class="d-flex flex-row align-items-center gap-2">
+      <div class="d-flex flex-row flex-wrap align-items-center gap-2">
         @for(dir of currentPathArray(); track $index; let last = $last){
         <a
           (click)="onRequestOpenItem(dir)"
@@ -88,7 +87,7 @@
         } }
       </div>
     </div>
-    <div class="d-flex flex-row align-items-center gap-3">
+    <div class="d-flex flex-row flex-wrap align-items-center gap-3 w-100 w-xl-auto mt-2 mt-xl-0 justify-content-start justify-content-xl-end">
       @if(selectedCount() > 0) {
       <app-syllex-button
         [props]="{
@@ -100,7 +99,7 @@
       />
       <app-syllex-button
         [props]="{
-          label: 'Elimina selezionati (' + selectedCount() + ')',
+          label: 'Elimina (' + selectedCount() + ')',
           variant: 'primary',
           color: 'danger',
           size: 'small',
@@ -111,6 +110,7 @@
       }
 
       <app-view-type-toggle
+        class="ms-auto ms-xl-0"
         [viewType]="viewType()"
         [pageKey]="'materiali'"
         (viewTypeChange)="onChangeViewType($event)"
