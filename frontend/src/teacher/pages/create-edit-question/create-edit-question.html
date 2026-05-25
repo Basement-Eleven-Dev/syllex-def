@@ -49,25 +49,8 @@
 </div>
 } @if (SelectedMethod()) {
 <div class="wizard-container">
-  <!-- Step indicator -->
-  <app-syllex-stepper
-    [steps]="StepDefs()"
-    [currentStep]="CurrentStep()"
-  ></app-syllex-stepper>
-
-  <!-- Main area: prev arrow | panel | next arrow -->
+  <!-- Main area: panel -->
   <div class="wizard-main">
-    <!-- Prev arrow -->
-    <button
-      class="wizard-nav-btn"
-      type="button"
-      (click)="goPrev()"
-      [disabled]="false"
-      aria-label="Passo precedente"
-    >
-      <fa-icon [icon]="ChevronLeftIcon" />
-    </button>
-
     <!-- Panel -->
     <div class="wizard-panel">
       <!-- ── STEP 1: Tipo ── -->
@@ -97,14 +80,6 @@
       >
         <!-- Phase A: form -->
         @if (!AiIsReviewing()) {
-        <h5 class="wizard-step-title">
-          <fa-icon [icon]="SparklesIcon" class="me-2 text-primary"></fa-icon>
-          Quante domande vuoi generare?
-        </h5>
-        <p class="wizard-step-subtitle">
-          Dicci l'argomento e i parametri, l'AI creerà le domande per te.
-        </p>
-
         <div [formGroup]="aiForm">
           <div class="row g-4 align-items-stretch">
             <!-- Left: params -->
@@ -335,12 +310,7 @@
         @stepIn
         tourAnchor="crea_domanda_contenuto"
       >
-        <h5 class="wizard-step-title">Qual è la tua domanda?</h5>
-        <p class="wizard-step-subtitle">
-          Scrivi la domanda e, se vuoi, arricchiscila con un'immagine.
-        </p>
-
-        <div [formGroup]="QuestionForm" class="d-flex flex-column gap-3">
+        <div [formGroup]="QuestionForm" class="form-section d-flex flex-column gap-3">
           <div class="row g-3">
             <div class="col-12 col-md-6" tourAnchor="crea_domanda_argomento">
               <label class="wizard-field-label">Su quale argomento? *</label>
@@ -446,15 +416,7 @@
         @stepIn
         tourAnchor="crea_domanda_opzioni"
       >
-        <h5 class="wizard-step-title">Qual è la risposta giusta?</h5>
-        <p class="wizard-step-subtitle">
-          @if (SelectedQuestionType() === 'scelta multipla') { Aggiungi le
-          opzioni e segna quella corretta. } @else if (SelectedQuestionType()
-          === 'vero falso') { L'affermazione che hai scritto è vera o falsa? }
-          @else { Le domande aperte vengono corrette direttamente dal docente. }
-        </p>
-
-        <div [formGroup]="QuestionForm">
+        <div [formGroup]="QuestionForm" class="form-section">
           @if (SelectedQuestionType() === 'scelta multipla') {
           <div class="col-12 col-md-10">
             <app-multiple-choice-options
@@ -509,12 +471,7 @@
         @stepIn
         tourAnchor="crea_domanda_spiegazione"
       >
-        <h5 class="wizard-step-title">Quasi fatto! Ultimi dettagli</h5>
-        <p class="wizard-step-subtitle">
-          Aggiungi contesto e scegli chi può vedere questa domanda.
-        </p>
-
-        <div [formGroup]="QuestionForm" class="d-flex flex-column gap-4">
+        <div [formGroup]="QuestionForm" class="form-section d-flex flex-column gap-4">
           <!-- Spiegazione -->
           <div>
             <label class="wizard-field-label">
@@ -633,20 +590,32 @@
       }
     </div>
 
-    <!-- Next arrow -->
-    @if (ShowNextArrow()) {
-    <button
-      class="wizard-nav-btn"
-      type="button"
-      (click)="goNext()"
-      [disabled]="!CanGoNext()"
-      aria-label="Passo successivo"
-    >
-      <fa-icon [icon]="ChevronRightIcon" />
-    </button>
-    } @else {
-    <div class="wizard-nav-spacer"></div>
-    }
+  </div>
+
+  <!-- Footer navigation -->
+  <div class="wizard-footer mt-4">
+    <!-- Left: Indietro -->
+    <div>
+      <app-syllex-button
+        [props]="{ label: 'Indietro', variant: 'outline', size: 'medium', leftIcon: ChevronLeftIcon }"
+        (clicked)="goPrev()"
+      ></app-syllex-button>
+    </div>
+
+    <app-syllex-stepper
+      [steps]="StepDefs()"
+      [currentStep]="CurrentStep()"
+    ></app-syllex-stepper>
+
+    <!-- Right: Avanti -->
+    <div class="wizard-footer__right">
+      @if (ShowNextArrow()) {
+      <app-syllex-button
+        [props]="{ label: 'Avanti', variant: 'primary', size: 'medium', rightIcon: ChevronRightIcon, disabled: !CanGoNext() }"
+        (clicked)="goNext()"
+      ></app-syllex-button>
+      }
+    </div>
   </div>
 </div>
 }

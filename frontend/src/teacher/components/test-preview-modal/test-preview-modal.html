@@ -106,23 +106,27 @@
   </div>
 </div>
 
-<div class="modal-footer border-0 p-4 bg-light">
-  <app-syllex-button
-    [props]="{
-          label: 'Chiudi anteprima',
-          variant: 'primary',
-          size: 'medium',
-        
-        }"
-    (click)="activeModal.dismiss()"
-  />
-  <app-syllex-button
-    [props]="{
-          label: 'Conferma e Salva',
-          variant: 'secondary',
-          size: 'medium',
-        
-        }"
-    (click)="activeModal.close('save')"
-  />
+<div class="modal-footer border-0 p-3 p-md-4 bg-light d-flex flex-nowrap gap-2 mobile-split-footer">
+  <div class="w-50">
+    <app-syllex-button
+      class="w-100 d-block"
+      [props]="{
+            label: 'Chiudi',
+            variant: 'primary',
+            size: 'medium',
+          }"
+      (click)="activeModal.dismiss()"
+    />
+  </div>
+  <div class="w-50">
+    <app-syllex-button
+      class="w-100 d-block"
+      [props]="{
+            label: 'Conferma',
+            variant: 'secondary',
+            size: 'medium',
+          }"
+      (click)="activeModal.close('save')"
+    />
+  </div>
 </div>

@@ -19,6 +19,8 @@ import {
   faListCheck,
   faSparkles,
   faSpinnerThird,
+  faArrowLeft,
+  faArrowRight,
 } from '@fortawesome/pro-solid-svg-icons';
 import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 import { trigger, transition, style, animate } from '@angular/animations';
@@ -128,6 +130,8 @@ export class LaboratorioAi {
   readonly ChevronLeftIcon = faChevronLeft;
   readonly ChevronRightIcon = faChevronRight;
   readonly CheckIcon = faCheck;
+  readonly ArrowLeftIcon = faArrowLeft;
+  readonly ArrowRightIcon = faArrowRight;
 
   // Options
   readonly MaterialTypes = MATERIAL_TYPE_OPTIONS;

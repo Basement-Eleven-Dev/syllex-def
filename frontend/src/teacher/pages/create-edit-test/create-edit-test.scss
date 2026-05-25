@@ -249,18 +249,14 @@
       overflow-y: visible;
     }
 
-    .wizard-footer {
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    .wizard-footer app-syllex-stepper {
-      order: -1;
-      margin-bottom: 0.25rem;
-    }
-
-    .wizard-footer__right {
-      min-width: 0;
+    .mobile-full-width-btn {
+      flex-direction: column !important;
+      width: 100%;
+      
+      app-syllex-button, button {
+        width: 100%;
+        display: block;
+      }
     }
 
     .preview-col {

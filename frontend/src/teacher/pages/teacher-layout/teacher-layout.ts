@@ -132,7 +132,7 @@ export class TeacherLayout implements OnInit, OnDestroy {
     this.hasTourForRoute.set(this.TOUR_ROUTES.has(window.location.pathname));
     const isAgent = window.location.pathname === '/t/agente';
     this.isAgentRoute.set(isAgent);
-    this.hideBottomNavRoute.set(isAgent || window.location.pathname === '/t/laboratorio-ai' || window.location.pathname === '/t/create-question');
+    this.hideBottomNavRoute.set(isAgent || window.location.pathname === '/t/laboratorio-ai' || window.location.pathname === '/t/create-question' || window.location.pathname.startsWith('/t/tests/new') || window.location.pathname.startsWith('/t/tests/edit'));
 
     this.router.events
       .pipe(
@@ -153,7 +153,7 @@ export class TeacherLayout implements OnInit, OnDestroy {
         this.hasTourForRoute.set(this.TOUR_ROUTES.has(url));
         const isAgent = url === '/t/agente';
         this.isAgentRoute.set(isAgent);
-        this.hideBottomNavRoute.set(isAgent || url === '/t/laboratorio-ai' || url === '/t/create-question');
+        this.hideBottomNavRoute.set(isAgent || url === '/t/laboratorio-ai' || url === '/t/create-question' || url.startsWith('/t/tests/new') || url.startsWith('/t/tests/edit'));
       });
     this.tourService.start$.pipe(takeUntil(this.destroy$)).subscribe(() => {
       document.body.classList.add('tour-active');

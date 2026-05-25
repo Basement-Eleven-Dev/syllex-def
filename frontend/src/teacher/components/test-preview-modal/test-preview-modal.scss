@@ -45,3 +45,10 @@
     background-color: #f8fafc;
   }
 }
+
+.mobile-split-footer {
+  app-syllex-button, button {
+    width: 100%;
+    display: block;
+  }
+}

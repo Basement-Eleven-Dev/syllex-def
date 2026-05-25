@@ -14,7 +14,7 @@
 
   &.two-columns {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    @media (max-width: 991px) {
+    @media (max-width: 991px) { 
       grid-template-columns: 1fr;
     }
   }

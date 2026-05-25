@@ -36,29 +36,43 @@
 
     @if (TypeMode() === 'questions') {
 
-    <!-- 2. PARAMETRI DI QUANTITÀ (Domande) -->
-    <section tourAnchor="gen_ai_q_params" class="form-section">
-      <!-- QUANTE DOMANDE -->
-      <div class="d-flex align-items-center justify-content-between px-4 py-3" 
-           style="border-radius: 50rem; border: 1px solid #cbd5e1; background-color: #ffffff; min-height: 48px; transition: all 0.2s ease;">
-        <span class="text-dark fw-normal small" style="pointer-events: none;">Quante domande vuoi generare?</span>
-        <input
-          type="number"
-          class="border-0 bg-transparent text-end p-0"
-          style="width: 55px; outline: none; box-shadow: none; color: #212529;"
-          formControlName="numberOfQuestions"
-          min="1"
-          max="20"
-          aria-label="Numero di domande"
-        />
-      </div>
-    </section>
-
-    <!-- 3. CONFIGURAZIONI DETTAGLIATE (Alternative, Lingua, Difficoltà) -->
+    <!-- 2 & 3. PARAMETRI DI GENERAZIONE E ARGOMENTO -->
     <section class="form-section">
-      <div class="row g-3">
+      <div class="row g-4">
+        
+        <!-- Quante Domande -->
+        <div class="col-12 col-md-6" tourAnchor="gen_ai_q_params">
+          <label class="form-label text-dark mb-2 fw-normal">Quante domande vuoi generare?</label>
+          <input
+            type="number"
+            class="form-control custom-input"
+            formControlName="numberOfQuestions"
+            min="1"
+            max="20"
+            aria-label="Numero di domande"
+          />
+        </div>
+
+        <!-- Argomento -->
+        <div class="col-12 col-md-6" tourAnchor="gen_ai_q_topic">
+          <label class="form-label text-dark mb-2 fw-normal">Su quale argomento?</label>
+          <select
+            class="form-select custom-input"
+            [class.text-muted]="!genForm.get('topicId')?.value"
+            formControlName="topicId"
+            aria-label="Seleziona argomento"
+          >
+            <option value="" disabled selected class="text-muted">Seleziona...</option>
+            <option value="auto">Tutti (Intero documento)</option>
+            @for (topic of materiaService.materiaSelected()?.topics; track topic._id) {
+            <option [value]="topic._id">{{ topic.name }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Opzioni (se Scelta Multipla) -->
         @if (IsMultipleChoice()) {
-        <div class="col-4">
+        <div class="col-12 col-md-4">
           <label class="form-label text-dark mb-2 fw-normal">Opzioni di risposta</label>
           <input
             type="number"
@@ -70,13 +84,11 @@
           />
         </div>
         }
-        <div class="col">
+
+        <!-- Lingua -->
+        <div class="col-12 col-md-4">
           <label class="form-label text-dark mb-2 fw-normal">In quale lingua?</label>
-          <select
-            class="form-select custom-input"
-            formControlName="language"
-            aria-label="Lingua"
-          >
+          <select class="form-select custom-input" formControlName="language" aria-label="Lingua">
             <option value="italiano">Italiano</option>
             <option value="inglese">English</option>
             <option value="spagnolo">Español</option>
@@ -84,13 +96,11 @@
             <option value="tedesco">Deutsch</option>
           </select>
         </div>
-        <div class="col">
+
+        <!-- Difficoltà -->
+        <div class="col-12 col-md-4">
           <label class="form-label text-dark mb-2 fw-normal">Livello di difficoltà</label>
-          <select
-            class="form-select custom-input"
-            formControlName="difficulty"
-            aria-label="Difficoltà"
-          >
+          <select class="form-select custom-input" formControlName="difficulty" aria-label="Difficoltà">
             <option value="elementary">Elementare</option>
             <option value="easy">Facile</option>
             <option value="medium">Media</option>
@@ -101,35 +111,14 @@
       </div>
     </section>
 
-    <!-- 4. ARGOMENTO (Subito prima della selezione dei file di supporto) -->
-    <section tourAnchor="gen_ai_q_topic" class="form-section">
-      <div class="d-flex align-items-center justify-content-between px-4 py-3" 
-           style="border-radius: 50rem; border: 1px solid #cbd5e1; background-color: #ffffff; min-height: 48px; transition: all 0.2s ease;">
-        <span class="text-dark fw-normal small" style="pointer-events: none;">Su quale argomento vuoi che ci concentriamo?</span>
-        <select
-          class="border-0 bg-transparent text-end p-0 fw-semibold"
-          [class.text-muted]="!genForm.get('topicId')?.value"
-          style="outline: none; box-shadow: none; max-width: 180px; cursor: pointer; color: #212529;"
-          formControlName="topicId"
-          aria-label="Seleziona argomento"
-        >
-          <option value="" disabled selected class="text-muted">Seleziona</option>
-          <option value="auto">Tutti gli argomenti (Intero documento)</option>
-          @for (topic of materiaService.materiaSelected()?.topics; track topic._id) {
-          <option [value]="topic._id">{{ topic.name }}</option>
-          }
-        </select>
-      </div>
-    </section>
-
     } @else {
 
     <!-- ─── MATERIALS specific parameters ─────────────────────────────── -->
     <section tourAnchor="gen_ai_m_params" class="form-section">
-      <div class="row g-3">
+      <div class="row g-4">
         @if (IsSlides()) {
-        <div class="col-6">
-          <label class="form-label text-dark fw-normal d-flex align-items-end mb-2" style="min-height: 42px;">Quante slide vuoi creare?</label>
+        <div class="col-12 col-md-6">
+          <label class="form-label text-dark mb-2 fw-normal">Quante slide vuoi creare?</label>
           <input
             type="number"
             class="form-control custom-input"
@@ -140,8 +129,8 @@
           />
         </div>
         }
-        <div [class.col-6]="IsSlides()" [class.col-12]="!IsSlides()">
-          <label class="form-label text-dark fw-normal d-flex align-items-end mb-2" style="min-height: 42px;">In quale lingua?</label>
+        <div class="col-12 col-md-6">
+          <label class="form-label text-dark mb-2 fw-normal">In quale lingua?</label>
           <select
             class="form-select custom-input"
             formControlName="language"
@@ -157,8 +146,8 @@
 
         @if (IsSlides()) {
         <div class="col-12">
-          <label class="form-label text-dark fw-normal">Formato di esportazione</label>
-          <div class="d-flex gap-4 pt-1">
+          <label class="form-label text-dark mb-3 fw-normal">Formato di esportazione</label>
+          <div class="d-flex flex-wrap gap-4">
             <div class="form-check">
               <input
                 class="form-check-input"
@@ -190,9 +179,7 @@
                 style="cursor: pointer"
               >
                 <span class="fw-bold">PDF</span>
-                <span class="text-muted small ms-1"
-                  >(Genera documento statico)</span
-                >
+                <span class="text-muted small ms-1">(Genera documento statico)</span>
               </label>
             </div>
           </div>
@@ -225,7 +212,6 @@
       <label class="form-label text-dark mb-2 fw-normal">Scrivi maggiori informazioni da fornire all’ai per generare un contenuto su misura per le tue esigenze</label>
       <textarea
         class="form-control custom-input"
-        style="border-radius: 2rem !important; padding: 1.25rem 1.75rem;"
         formControlName="instructions"
         rows="3"
         [placeholder]="TypeMode() === 'questions'

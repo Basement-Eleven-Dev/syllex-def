@@ -132,8 +132,7 @@
             <span class="text-muted fw-normal">(opzionale)</span></label
           >
           <select
-            class="form-select bg-light border-0 shadow-none py-2 px-3 rounded-pill"
-            style="font-size: 0.875rem"
+            class="form-select custom-input"
             formControlName="topicId"
           >
             <option value="">Tutti gli argomenti</option>
@@ -321,55 +320,113 @@
     </div>
 
     <!-- Footer navigation -->
-    <div class="wizard-footer">
-      <!-- Left: Indietro -->
-      <div>
-        <app-syllex-button
-          [props]="{
-            label: 'Indietro',
-            variant: 'primary',
-            size: 'medium',
-            disabled: IsGenerating()
-          }"
-          (clicked)="goPrev()"
-        ></app-syllex-button>
+    <div class="wizard-footer p-3 mt-3 w-100">
+      <!-- MOBILE LAYOUT -->
+      <div class="d-flex flex-column w-100 d-lg-none gap-3">
+        <!-- Top row: <, Stepper, > -->
+        <div class="d-flex justify-content-between align-items-center w-100 px-3 gap-3">
+          <app-syllex-button
+            [props]="{
+              leftIcon: ArrowLeftIcon,
+              variant: 'outline',
+              color: 'dark',
+              size: 'medium',
+              shape: 'circle',
+              disabled: IsGenerating() || CurrentStep() === 1
+            }"
+            (clicked)="goPrev()"
+          ></app-syllex-button>
+
+          <app-syllex-stepper
+            [steps]="StepDefs()"
+            [currentStep]="CurrentStep()"
+            class="flex-grow-1"
+          ></app-syllex-stepper>
+
+          <div [class.invisible]="!ShowNextArrow()">
+            <app-syllex-button
+              [props]="{
+                rightIcon: ArrowRightIcon,
+                variant: 'primary',
+                size: 'medium',
+                shape: 'circle',
+                disabled: !CanGoNext()
+              }"
+              (clicked)="goNext()"
+            ></app-syllex-button>
+          </div>
+        </div>
+
+        <!-- Bottom row: Genera -->
+        @if (!ShowNextArrow()) {
+        <div class="w-100 d-flex justify-content-center px-2 mt-2">
+          <button
+            tourAnchor="gen_ai_submit"
+            type="button"
+            class="btn btn-primary ms-2 ai icon-btn rounded-pill px-4 py-3 fw-bold w-100"
+            [disabled]="genForm.invalid || IsGenerating()"
+            (click)="onGenerate()"
+          >
+            <fa-icon
+              [icon]="IsGenerating() ? SpinnerIcon : SparklesIcon"
+              [animation]="IsGenerating() ? 'spin' : undefined"
+            ></fa-icon>
+            {{ IsGenerating() ? 'Generazione...' : 'Genera ' + SelectedMaterialTypeName() }}
+          </button>
+        </div>
+        }
       </div>
 
-      <app-syllex-stepper
-        [steps]="StepDefs()"
-        [currentStep]="CurrentStep()"
-      ></app-syllex-stepper>
+      <!-- DESKTOP LAYOUT -->
+      <div class="d-none d-lg-flex w-100 align-items-center justify-content-between">
+        <div>
+          <app-syllex-button
+            [props]="{
+              label: 'Indietro',
+              leftIcon: ArrowLeftIcon,
+              variant: 'outline',
+              color: 'dark',
+              size: 'medium',
+              disabled: IsGenerating() || CurrentStep() === 1
+            }"
+            (clicked)="goPrev()"
+          ></app-syllex-button>
+        </div>
 
-      <!-- Right: Avanti / Genera -->
-      <div class="wizard-footer__right">
-        @if (ShowNextArrow()) {
+        <app-syllex-stepper
+          [steps]="StepDefs()"
+          [currentStep]="CurrentStep()"
+          class="flex-grow-1 d-flex justify-content-center"
+        ></app-syllex-stepper>
 
-        <app-syllex-button
-          [props]="{
-            label: 'Avanti',
-            variant: 'primary',
-            size: 'medium',
-            disabled: !CanGoNext()
-          }"
-          (clicked)="goNext()"
-        ></app-syllex-button>
-        } @else {
-
-        <button
-          tourAnchor="gen_ai_submit"
-          type="button"
-          class="btn btn-primary ms-2 ai icon-btn rounded-pill px-4 py-3 fw-bold"
-          [disabled]="genForm.invalid || IsGenerating()"
-          (click)="onGenerate()"
-        >
-          <fa-icon
-            [icon]="IsGenerating() ? SpinnerIcon : SparklesIcon"
-            [animation]="IsGenerating() ? 'spin' : undefined"
-          ></fa-icon>
-          {{ IsGenerating() ? 'Generazione in corso...' : 'Genera ' +
-          SelectedMaterialTypeName() }}
-        </button>
-        }
+        <div class="wizard-footer__right d-flex gap-2 justify-content-end" style="min-width: 120px;">
+          @if (ShowNextArrow()) {
+          <app-syllex-button
+            [props]="{
+              label: 'Avanti',
+              rightIcon: ArrowRightIcon,
+              variant: 'primary',
+              size: 'medium',
+              disabled: !CanGoNext()
+            }"
+            (clicked)="goNext()"
+          ></app-syllex-button>
+          } @else {
+          <button
+            tourAnchor="gen_ai_submit"
+            type="button"
+            class="btn btn-primary ai icon-btn rounded-pill px-4 py-3 fw-bold"
+            [disabled]="genForm.invalid || IsGenerating()"
+            (click)="onGenerate()"
+          >
+            <fa-icon
+              [icon]="IsGenerating() ? SpinnerIcon : SparklesIcon"
+              [animation]="IsGenerating() ? 'spin' : undefined"
+            ></fa-icon>
+            {{ IsGenerating() ? 'Generazione in corso...' : 'Genera ' + SelectedMaterialTypeName() }}
+          </button>
+          }
+        </div>
       </div>
     </div>
   </div>
