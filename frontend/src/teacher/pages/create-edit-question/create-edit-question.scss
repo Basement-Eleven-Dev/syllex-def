@@ -153,18 +153,6 @@
   }
 }
 
-.wizard-step-title {
-  font-size: 1.15rem;
-  font-weight: 700;
-  margin-bottom: 0.2rem;
-  letter-spacing: -0.02em;
-}
-
-.wizard-step-subtitle {
-  color: var(--bs-secondary-color);
-  font-size: 0.875rem;
-  margin-bottom: 1.5rem;
-}
 
 .wizard-field-label {
   display: block;
@@ -405,17 +393,7 @@
 // ─── Premium Form Styles ──────────────────────────────
 
 .form-section {
-  background-color: #f8faff;
-  border-radius: 20px;
-  border: none;
-  padding: 1.75rem;
-  box-shadow: none;
   height: 100%;
-
-  @media (max-width: 991px) {
-    padding: 1rem;
-    border-radius: 12px;
-  }
 }
 
 .mobile-full-width-btn {

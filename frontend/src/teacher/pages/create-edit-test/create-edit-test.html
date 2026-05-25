@@ -313,7 +313,7 @@
 
         <!-- DESKTOP LAYOUT -->
         <div class="d-none d-lg-flex w-100 align-items-center justify-content-between">
-          <div>
+          <div class="wizard-footer__left d-flex justify-content-start" style="flex: 1;">
             <app-syllex-button
               [props]="{
                 label: 'Indietro',
@@ -327,16 +327,17 @@
             ></app-syllex-button>
           </div>
 
-          <app-syllex-stepper
-            [steps]="StepDefs"
-            [currentStep]="CurrentStep()"
-            [clickable]="true"
-            [maxClickableStep]="CanGoNextToFinalize() ? 3 : CanGoNextToQuestions() ? 2 : 1"
-            (stepSelected)="goToStep($event)"
-            class="flex-grow-1 d-flex justify-content-center"
-          ></app-syllex-stepper>
+          <div style="flex: 0 1 400px;" class="d-flex justify-content-center mx-4">
+            <app-syllex-stepper
+              [steps]="StepDefs"
+              [currentStep]="CurrentStep()"
+              [clickable]="true"
+              [maxClickableStep]="CanGoNextToFinalize() ? 3 : CanGoNextToQuestions() ? 2 : 1"
+              (stepSelected)="goToStep($event)"
+            ></app-syllex-stepper>
+          </div>
 
-          <div class="wizard-footer__right d-flex gap-2 justify-content-end" style="min-width: 120px;">
+          <div class="wizard-footer__right d-flex gap-2 justify-content-end" style="flex: 1;">
             @if (ShowFooterNext()) {
             <app-syllex-button
               [props]="{

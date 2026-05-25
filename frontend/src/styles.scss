@@ -308,7 +308,7 @@ textarea.custom-input {
   border: none;
   position: relative;
   cursor: pointer;
-  transition: all 0.8s ease;
+  transition: background 0.8s ease, box-shadow 0.8s ease, transform 0.2s ease, opacity 0.2s ease;
   box-shadow: 0px 0px 28px 8px rgba(224, 224, 224, 0.204);
 
   &.not-selected {
@@ -396,14 +396,30 @@ textarea.custom-input {
   inherits: false;
 }
 
-section {
-  &.form-section {
-    background-color: #f8faff;
-    padding: 2rem;
-    border-radius: 20px;
-    box-shadow: none;
-    border: none;
+.form-section {
+  background-color: #f8faff;
+  border-radius: 20px;
+  border: none;
+  padding: 1.75rem;
+  box-shadow: none;
+
+  @media (max-width: 991px) {
+    padding: 1rem;
+    border-radius: 12px;
   }
+}
+
+.wizard-step-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+  letter-spacing: -0.02em;
+}
+
+.wizard-step-subtitle {
+  color: var(--bs-secondary-color);
+  font-size: 0.875rem;
+  margin-bottom: 1.5rem;
 }
 
 .background-icon {

@@ -253,7 +253,7 @@
                 <button
                   tourAnchor="gen_ai_submit"
                   type="button"
-                  class="btn btn-primary ai btn-lg icon-btn rounded-pill fw-bold"
+                  class="btn btn-primary ai btn-lg rounded-pill fw-bold d-flex align-items-center justify-content-center gap-2 text-nowrap"
                   [disabled]="genForm.invalid || IsGenerating()"
                   (click)="onGenerate()"
                 >
@@ -261,8 +261,8 @@
                     [icon]="IsGenerating() ? SpinnerIcon : SparklesIcon"
                     [animation]="IsGenerating() ? 'spin' : undefined"
                   ></fa-icon>
-                  {{ IsGenerating() ? 'Generazione in corso...' : 'Genera ' +
-                  SelectedMaterialTypeName() }}
+                  <span>{{ IsGenerating() ? 'Generazione in corso...' : 'Genera ' +
+                  SelectedMaterialTypeName() }}</span>
                 </button>
               </div>
             </div>
