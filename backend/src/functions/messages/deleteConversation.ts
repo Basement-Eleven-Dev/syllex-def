@@ -7,7 +7,7 @@ const deleteConversation = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
-  const conversationId = request.pathParameters?.conversationId;
+  const conversationId = request.pathParameters?.messageId || request.pathParameters?.conversationId;
   const userId = context.user?._id;
 
   if (!conversationId || !userId) {
