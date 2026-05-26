@@ -1,18 +1,103 @@
-.wrap {
-  position: relative;
-  height: 100vh;
-  overflow: hidden;
+$blue: #3931ce;
+$accent: #52a0ff;
+
+// ─── Page shell ──────────────────────────────────────────────────────────────
+.login-page {
+  display: flex;
+  min-height: 100dvh;
+  background: #fff;
+  padding: 3.5rem;
+  gap: 3rem;
 }
 
-.video-background {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  min-width: 100%;
-  min-height: 100%;
-  width: auto;
-  height: auto;
-  transform: translate(-50%, -50%);
-  z-index: -1;
-  object-fit: cover;
+// ─── Left blue panel ─────────────────────────────────────────────────────────
+.login-left {
+  flex: 0 0 50%;
+  align-self: stretch;
+  background: $blue;
+  display: flex;
+  flex-direction: column;
+  padding: 2.5rem;
+  margin: 0;
+  border-radius: 20px;
+  box-shadow: 0 8px 48px rgba($blue, 0.3);
+  position: relative;
+  z-index: 1;
+
+  &__logo {
+    // top-left logo
+  }
+
+  &__spacer {
+    flex: 1;
+  }
+
+  &__footer {
+    padding-bottom: 1rem;
+  }
+
+  &__title {
+    color: #fff;
+    font-size: clamp(2.75rem, 4vw, 4rem);
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+  }
+
+  &__subtitle {
+    color: rgba(#fff, 0.75);
+    font-size: 1.05rem;
+    margin-bottom: 0;
+  }
+}
+
+// ─── Right white panel ────────────────────────────────────────────────────────
+.login-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  background: #fff;
+}
+
+.login-form-container {
+  width: 100%;
+  max-width: 420px;
+}
+
+// ─── Mobile/tablet: single column, white bg (< lg = 992px) ──────────────────
+@media (max-width: 991.98px) {
+  .login-page {
+    flex-direction: column;
+    justify-content: center;
+    padding: 2rem 1.5rem;
+    gap: 0;
+  }
+
+  .login-right {
+    width: 100%;
+    padding: 0;
+  }
+
+  .login-form-container {
+    max-width: 480px;
+  }
+}
+
+// ─── Tagline below logo (small/tablet only) ───────────────────────────────────
+.login-tagline {
+  color: $blue;
+  font-size: clamp(1.55rem, 5vw, 2rem);
+  font-weight: 700;
+  margin-top: 1rem;
+  margin-bottom: 0.15rem;
+}
+
+.login-tagline-sub {
+  color: rgba($blue, 0.65);
+  font-size: 0.95rem;
+  margin-bottom: 0;
 }

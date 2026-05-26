@@ -50,10 +50,14 @@ export class ComunicazioneCard {
   ) {
     effect(() => {
       const root = this.materialiService.root();
-      if (root.length > 0 && this.comunicazione?.materialIds) {
-        this.attachments = this.comunicazione.materialIds
-          .map((id) => this.materialiService.getMaterialById(id))
-          .filter((m): m is MaterialInterface => m !== undefined);
+      if (this.comunicazione?.materialIds?.length > 0) {
+        if (root.length === 0) {
+          this.materialiService.loadMaterials();
+        } else {
+          this.attachments = this.comunicazione.materialIds
+            .map((id) => this.materialiService.getMaterialById(id))
+            .filter((m): m is MaterialInterface => m !== undefined);
+        }
       }
     });
   }

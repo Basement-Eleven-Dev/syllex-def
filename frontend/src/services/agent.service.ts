@@ -33,18 +33,35 @@ export class AgentService {
     );
   }
 
-  generateResponse(query: string) {
+  generateResponse(query: string, conversationId: string, inputType: 'text' | 'voice' = 'text') {
     return this.http.post<{
       success: boolean;
       aiResponse: any;
       _id: string;
       audioUrl?: string | null;
-    }>('assistant/response', { query });
+    }>('assistant/response', { query, inputType, conversationId });
   }
 
-  getConversationHistory() {
+  getConversationHistory(conversationId: string) {
     return this.http.get<any[]>(
-      'messages'
+      'messages', { params: { conversationId } }
+    );
+  }
+
+  listConversations() {
+    return this.http.get<any[]>('messages/list-conversations');
+  }
+
+  deleteConversation(conversationId: string) {
+    return this.http.delete<{ success: boolean; deletedCount?: number }>(
+      'messages/' + conversationId
+    );
+  }
+
+  saveLiveMessage(role: string, content: string, conversationId: string, inputType: string = 'voice') {
+    return this.http.post<{ success: boolean; _id: string }>(
+      'messages/save',
+      { role, content, conversationId, inputType }
     );
   }
 

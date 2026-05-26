@@ -8,29 +8,34 @@ const countAssignmentsToGrade = async (
   context: Context,
 ) => {
   await connectDatabase();
-  const { onlyCount = 'true', excludeStatus = 'reviewed' } = request.queryStringParameters || {};
   const subjectId = context.subjectId;
 
-  // Costruisci il filtro
-  const filter: any = {
-    status: { $ne: excludeStatus },
+  const matchStage: any = {
+    status: "delivered",
     subjectId: subjectId,
   };
 
-  // Solo attempt del teacher loggato
   if (context.user?._id) {
-    filter.teacherId = context.user._id;
+    matchStage.teacherId = context.user._id;
   }
-  if (JSON.parse(onlyCount)) {
 
-    // Conta i documenti
-    const count = await Attempt.countDocuments(filter);
+  const result = await Attempt.aggregate([
+    { $match: matchStage },
+    {
+      $lookup: {
+        from: "tests",
+        localField: "testId",
+        foreignField: "_id",
+        as: "test",
+      },
+    },
+    { $match: { "test.0": { $exists: true } } },
+    { $count: "count" },
+  ]);
 
-    return {
-      count: count,
-    };
-  }
-  else return await Attempt.find(filter);
+  return {
+    count: result[0]?.count ?? 0,
+  };
 };
 
 export const handler = lambdaRequest(countAssignmentsToGrade);

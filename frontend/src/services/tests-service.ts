@@ -39,6 +39,7 @@ interface TestDetailsResponse {
     icon: string;
   }[];
   attempts: any[]; // Qui puoi usare la tua AttemptInterface
+  classes?: any[];
 }
 
 export interface TopicPerformance {
@@ -54,7 +55,7 @@ export interface AttemptInterface {
   testId: string;
   subjectId: string;
   status: 'not-reviewed' | 'reviewed';
-  deliverdAt: Date;
+  deliveredAt: Date;
   reviewedAt?: Date;
   score: number;
   maxScore: number;
@@ -65,18 +66,23 @@ export interface AttemptInterface {
   providedIn: 'root',
 })
 export class TestsService {
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getPaginatedTests(
     page: number,
     pageSize: number,
     searchTerm?: string,
     status?: 'bozza' | 'pubblicato' | 'archiviato',
+    hasPendingCorrections?: boolean,
   ) {
     let url = `tests?page=${page}&pageSize=${pageSize}`;
 
     if (searchTerm) {
       url += `&searchTerm=${encodeURIComponent(searchTerm)}`;
+    }
+
+    if (hasPendingCorrections) {
+      url += `&hasPendingCorrections=true`;
     }
 
     if (status) {
@@ -121,7 +127,6 @@ export class TestsService {
     return this.http.get<{ count: number }>('attempts');
   }
 
-
   updateClassIds(testId: string, classIds: string[]) {
     return this.http.put<{ success: boolean; test: TestInterface }>(
       `tests/${testId}/classes`,
@@ -162,10 +167,11 @@ export class TestsService {
   }
 
   correctAttemptWithAI(attemptId: string, questionId: string) {
-    return this.http.post<{ score: number; explanation: string, aiProbability: string }>(
-      `attempts/${attemptId}/questions/${questionId}/ai-correction`,
-      {},
-    );
+    return this.http.post<{
+      score: number;
+      explanation: string;
+      aiProbability: string;
+    }>(`attempts/${attemptId}/questions/${questionId}/ai-correction`, {});
   }
 
   getClassTopicsPerformance(classId: string) {
@@ -179,8 +185,6 @@ export class TestsService {
   }
 
   getAttemptInsight(attemptId: string) {
-    return this.http.get<{ insight: string }>(
-      `attempts/${attemptId}/insight`
-    );
+    return this.http.get<{ insight: string }>(`attempts/${attemptId}/insight`);
   }
 }

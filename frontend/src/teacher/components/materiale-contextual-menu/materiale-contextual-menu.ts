@@ -27,11 +27,26 @@ export class MaterialeContextualMenu {
       centered: true,
       size: 'md',
     });
-    modalRef.componentInstance.currentName = this.item.name;
+
+    const fullName = this.item.name;
+    const ext = this.item.extension;
+
+    // Strip extension from input display if present
+    let baseName = fullName;
+    if (ext && fullName.toLowerCase().endsWith('.' + ext.toLowerCase())) {
+      baseName = fullName.substring(0, fullName.length - ext.length - 1);
+    }
+
+    modalRef.componentInstance.currentName = baseName;
 
     modalRef.result.then(
       (newName: string) => {
-        this.renameItem.emit(newName);
+        // Re-append extension if original had one and it's not already typed
+        let finalName = newName.trim();
+        if (ext && !finalName.toLowerCase().endsWith('.' + ext.toLowerCase())) {
+          finalName = `${finalName}.${ext}`;
+        }
+        this.renameItem.emit(finalName);
       },
       () => {
         // Modal dismissed

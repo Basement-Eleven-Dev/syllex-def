@@ -72,7 +72,7 @@ const submitStudentAttempt = async (
           index: i,
           score,
           teacherComment,
-          status: score > 0 ? "correct" : "wrong",
+          status: score > 0 ? "correct" : "incorrect",
         };
       }),
     );
@@ -107,11 +107,17 @@ const submitStudentAttempt = async (
   }
 
   // ── Flusso normale: correzione chiuse se tutte determinabili ──
-  const questionsForCorrection = attempt.questions.map((q) => ({
-    answer: q.answer,
-    correct: q.question?.options?.find((o) => o.isCorrect)?.label ?? null,
-    type: q.question?.type,
-  }));
+  const questionsForCorrection = attempt.questions.map((q) => {
+    let correct: string | null = null;
+    if (q.question?.type === "vero falso") {
+      const ca = (q.question as any).correctAnswer;
+      if (ca === true) correct = "Vero";
+      else if (ca === false) correct = "Falso";
+    } else {
+      correct = q.question?.options?.find((o) => o.isCorrect)?.label ?? null;
+    }
+    return { answer: q.answer, correct, type: q.question?.type };
+  });
 
   const correctable = questionsForCorrection.every(
     (q) => q.type !== "risposta aperta",

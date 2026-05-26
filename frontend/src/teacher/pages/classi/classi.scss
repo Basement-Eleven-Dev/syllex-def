@@ -1,3 +1,40 @@
+// ─── Filter bar ───────────────────────────────────────
+
+// Altezza comune per tutti gli input della toolbar
+$filter-height: 44px;
+
+.classi-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+
+  &__search {
+    flex: 1 1 260px;
+    min-width: 0;
+  }
+
+  &__select {
+    flex: 0 1 220px;
+    min-width: 0;
+  }
+
+  // Forza stessa altezza su tutti i controlli figli
+  ::ng-deep .input-group,
+  ::ng-deep select.form-select {
+    height: $filter-height;
+    min-height: $filter-height;
+  }
+
+  @media (max-width: 575px) {
+    &__search,
+    &__select {
+      flex: 1 1 100%;
+    }
+  }
+}
+
+
 tbody > tr > td {
   color: var(--bs-dark);
   border: none;

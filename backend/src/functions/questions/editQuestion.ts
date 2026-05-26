@@ -38,6 +38,14 @@ const editQuestion = async (
     updateData.imageUrl = questionData.imageUrl;
   }
 
+  // Gestione risposta corretta per domande vero/falso
+  if (
+    questionData.type === "vero falso" &&
+    questionData.correctAnswer !== undefined
+  ) {
+    updateData.correctAnswer = questionData.correctAnswer;
+  }
+
   // Gestione opzioni per domande a scelta multipla
   if (questionData.type === "scelta multipla" && questionData.options) {
     updateData.options = questionData.options;
@@ -47,7 +55,7 @@ const editQuestion = async (
   const updatedQuestion = await Question.findOneAndUpdate(
     { _id: questionId, teacherId: context.user?._id } as any,
     { $set: updateData },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   ).lean();
 
   if (!updatedQuestion) {

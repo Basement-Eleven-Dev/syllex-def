@@ -15,7 +15,9 @@ import { inject } from '@angular/core';
         <h6 class="mb-0 flex-fill">{{ Event().title }}</h6>
         <div class="d-flex align-items-center gap-2">
           @if (Event().subjectId) {
-            <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-medium px-2 py-1 small me-2">
+            <span
+              class="badge bg-primary-subtle text-primary border border-primary-subtle fw-medium px-2 py-1 small me-2"
+            >
               {{ materiaService.getSubjectName(Event().subjectId!) }}
             </span>
           }

@@ -1,8 +1,9 @@
 import { DatePipe } from '@angular/common';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
+  faArrowLeft,
   faChartLine,
   faPencilAlt,
   faSpinnerThird,
@@ -19,8 +20,10 @@ import { TestPrintModal } from '../../components/test-print-modal/test-print-mod
 import { TestResultsPrintModal } from '../../components/test-results-print-modal/test-results-print-modal';
 import { QuestionsService } from '../../../services/questions';
 import { forkJoin, switchMap, of, tap } from 'rxjs';
-import { BackTo } from '../../components/back-to/back-to';
-import { StatCard, StatCardData } from '../../components/stat-card/stat-card';
+import {
+  KpiCardData,
+  SyllexKpiRow,
+} from '../../components/UI/syllex-kpi-row/syllex-kpi-row';
 import { TestAssignments } from '../../components/test-assignments/test-assignments';
 import { TestStats } from '../../components/test-stats/test-stats';
 import { FeedbackService } from '../../../services/feedback-service';
@@ -28,6 +31,7 @@ import { TestsService } from '../../../services/tests-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { TestAiSummaryComponent } from '../../components/test-ai-summary/test-ai-summary';
+import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
 
 // Mappatura icone: associa le stringhe del backend agli oggetti FontAwesome
 const IconMap: Record<string, any> = {
@@ -38,17 +42,23 @@ const IconMap: Record<string, any> = {
   'pen-nib': faPenNib,
 };
 
+import { BackTo } from '../../components/back-to/back-to';
+import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
+
 @Component({
   selector: 'app-test-detail',
   standalone: true,
   imports: [
     DatePipe,
+    RouterModule,
     FontAwesomeModule,
     TestAssignments,
     TestStats,
-    BackTo,
-    StatCard,
+    SyllexKpiRow,
     TestAiSummaryComponent,
+    SyllexButton,
+    BackTo,
+    SyllexPageHeader,
   ],
   templateUrl: './test-detail.html',
   styleUrl: './test-detail.scss',
@@ -75,6 +85,7 @@ export class TestDetail {
   private readonly questionsService = inject(QuestionsService);
 
   // Icone UI statiche
+  readonly ArrowLeftIcon = faArrowLeft;
   readonly UsersIcon = faUsers;
   readonly ChartIcon = faChartLine;
   readonly TrashIcon = faTrash;
@@ -86,26 +97,21 @@ export class TestDetail {
   readonly TestData = signal<any | null>(null);
   readonly BackendStats = signal<any[]>([]);
   readonly Attempts = signal<any[]>([]);
+  readonly Classes = signal<any[]>([]);
   readonly IsLoading = signal<boolean>(true);
-  readonly ActiveSection = signal<number>(1);
 
   // Computed
   readonly TestId = computed(() => this.route.snapshot.paramMap.get('testId'));
 
-  // Trasforma i dati del backend nel formato richiesto dalle StatCard
-  readonly TestStats = computed<StatCardData[]>(() => {
-    return this.BackendStats().map((stat) => ({
-      Label: stat.title,
-      Value: stat.value,
-      Icon: IconMap[stat.icon] || this.ChartIcon,
-    }));
+  // Trasforma i dati del backend nel formato richiesto dalle KPI card
+  readonly TestStats = computed<KpiCardData[]>(() => {
+    return this.BackendStats()
+      .filter((stat) => stat.title !== 'Assegnazioni')
+      .map((stat) => ({
+        label: stat.title,
+        value: stat.value,
+      }));
   });
-
-  // Lista sezioni (rimossa la proprietà 'component' perché usiamo @if nell'HTML)
-  readonly Sections = [
-    { id: 1, title: 'Assegnazioni', icon: this.UsersIcon },
-    { id: 2, title: 'Statistiche', icon: this.ChartIcon },
-  ];
 
   constructor() {
     this.loadTestData();
@@ -129,6 +135,7 @@ export class TestDetail {
           this.TestData.set(response.test);
           this.BackendStats.set(response.stats);
           this.Attempts.set(response.attempts);
+          this.Classes.set(response.classes || []);
           console.log(this.Attempts);
           this.IsLoading.set(false);
         },
@@ -167,10 +174,6 @@ export class TestDetail {
         error: () =>
           this.feedbackService.showFeedback('Errore eliminazione', false),
       });
-  }
-
-  onChangeSection(sectionId: number): void {
-    this.ActiveSection.set(sectionId);
   }
 
   onPrintTest(): void {

@@ -2,7 +2,11 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule, DatePipe, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faEllipsisVertical, faEye } from '@fortawesome/pro-solid-svg-icons';
+import {
+  faEllipsisVertical,
+  faEye,
+  faBell,
+} from '@fortawesome/pro-solid-svg-icons';
 import {
   NgbPagination,
   NgbDropdown,
@@ -13,6 +17,7 @@ import { TestInterface, TestsService } from '../../../services/tests-service';
 import { TestContextualMenu } from '../test-contextual-menu/test-contextual-menu';
 import { RouterModule } from '@angular/router';
 import { ClassiService } from '../../../services/classi-service';
+import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
 
 @Component({
   selector: 'app-test-table',
@@ -27,6 +32,7 @@ import { ClassiService } from '../../../services/classi-service';
     NgbDropdownMenu,
     TestContextualMenu,
     RouterModule,
+    SyllexButton,
   ],
   standalone: true,
   templateUrl: './test-table.html',
@@ -34,6 +40,7 @@ import { ClassiService } from '../../../services/classi-service';
 })
 export class TestTable {
   EyeIcon = faEye;
+  BellIcon = faBell;
   ThreeDotsIcon = faEllipsisVertical;
 
   @Input() tests: TestInterface[] = [];

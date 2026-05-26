@@ -1,0 +1,13 @@
+.questions-masonry {
+  columns: 2;
+  column-gap: 1.5rem;
+
+  @media (max-width: 991px) {
+    columns: 1;
+  }
+}
+
+.questions-masonry-item {
+  break-inside: avoid;
+  margin-bottom: 1rem;
+}

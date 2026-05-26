@@ -33,6 +33,10 @@ export const questionSchema = new Schema(
     teacherId: { type: Schema.Types.ObjectId, required: true },
     correctAnswer: { type: Boolean },
     aiGenerated: { type: Boolean },
+    difficulty: {
+      type: String,
+      enum: ["elementary", "easy", "medium", "hard", "very_hard"],
+    },
     options: { type: [optionSchema], default: [] },
     tags: { type: [String], default: [] },
   },

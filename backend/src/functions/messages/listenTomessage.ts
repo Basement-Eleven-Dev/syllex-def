@@ -11,7 +11,7 @@ const listenToMessage = async (
   context: Context,
 ) => {
   const { text } = JSON.parse(request.body || "{}");
-  const messageId = request.pathParameters!.messageId! as string;
+  const messageId = (request.pathParameters?.conversationId || request.pathParameters?.messageId)! as string;
   const voice = await getAssistantVoice(context.subjectId!);
 
   let audioUrl;

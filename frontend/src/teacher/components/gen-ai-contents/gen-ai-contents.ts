@@ -8,7 +8,9 @@ import {
   signal,
   TemplateRef,
   ViewChild,
+  DestroyRef,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
@@ -16,6 +18,7 @@ import {
   faTimes,
   faSparkles,
   faSpinnerThird,
+  faCircleQuestion,
 } from '@fortawesome/pro-solid-svg-icons';
 import { Materia } from '../../../services/materia';
 import { MaterialiSelector } from '../materiali-selector/materiali-selector';
@@ -50,6 +53,10 @@ import { forkJoin } from 'rxjs';
 import { QuestionCard } from '../question-card/question-card';
 import { AiOverlay } from '../ai-overlay/ai-overlay';
 import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
+import { SyllexButton } from '../UI/syllex-button/syllex-button';
+import { MaterialiFacadeService } from '../../../services/materiali/materiali-facade.service';
+import { MaterialInterface } from '../../../services/materiali/materiali-service';
+import { SyllexErrorModalComponent } from '../../../directives/syllex-error-modal.component';
 
 interface ReviewQuestion {
   readonly TempId: string;
@@ -68,6 +75,7 @@ interface ReviewQuestion {
     QuestionCard,
     AiOverlay,
     TourAnchorNgBootstrapDirective,
+    SyllexButton,
   ],
   templateUrl: './gen-ai-contents.html',
   styleUrl: './gen-ai-contents.scss',
@@ -88,15 +96,29 @@ export class GenAiContents implements OnInit {
   readonly feedbackService = inject(FeedbackService);
   readonly modalService = inject(NgbModal);
   readonly router = inject(Router);
+  readonly materialiFacade = inject(MaterialiFacadeService);
   @Optional() readonly activeOffcanvas = inject(NgbActiveOffcanvas, {
     optional: true,
   });
+
+  private readonly destroyRef = inject(DestroyRef);
+  readonly formInvalid = signal<boolean>(true);
 
   // Icons
   readonly SparklesIcon = faSparkles;
   readonly SpinnerIcon = faSpinnerThird;
   readonly TimesIcon = faTimes;
   readonly CheckAllIcon = faCheckDouble;
+  readonly QuestionIcon = faCircleQuestion;
+
+  @ViewChild('whyMaterialsModal') whyMaterialsModal!: TemplateRef<any>;
+
+  openWhyMaterialsModal(): void {
+    this.modalService.open(this.whyMaterialsModal, {
+      centered: true,
+      size: 'md',
+    });
+  }
 
   // State
   readonly TypeMode = signal<'questions' | 'materials'>('materials');
@@ -111,6 +133,7 @@ export class GenAiContents implements OnInit {
   readonly GeneratedMaterial = signal<GeneratedMaterial | null>(null);
   /** Number of questions that failed to generate in the last bulk request. */
   readonly PartialGenerationWarning = signal<number>(0);
+  readonly selectedMaterials = signal<MaterialInterface[]>([]);
 
   // Computed
   readonly IsMultipleChoice = computed(
@@ -119,6 +142,33 @@ export class GenAiContents implements OnInit {
   readonly IsSlides = computed(
     () => this.TypeMode() === 'materials' && this.SelectedType() === 'slides',
   );
+  readonly disableReason = computed(() => {
+    const reasons: string[] = [];
+    
+    if (this.selectedMaterials().length === 0) {
+      reasons.push('Seleziona almeno una risorsa o materiale di riferimento.');
+    }
+    
+    if (this.TypeMode() === 'questions' && !this.genForm.get('topicId')?.value) {
+      reasons.push('Seleziona un argomento per le domande.');
+    }
+    
+    if (this.formInvalid()) {
+      const topicInvalid = this.TypeMode() === 'questions' && !this.genForm.get('topicId')?.value;
+      if (!topicInvalid) {
+        reasons.push('Compila correttamente tutti i parametri richiesti.');
+      }
+    }
+    
+    return reasons;
+  });
+  readonly submitButtonProps = computed(() => ({
+    label: this.IsGenerating() ? 'Generazione in corso...' : 'Genera ' + this.getSelectedTypeName(),
+    variant: 'primary' as const,
+    size: 'large' as const,
+    disabled: this.formInvalid() || this.selectedMaterials().length === 0 || this.IsGenerating(),
+    leftIcon: this.IsGenerating() ? this.SpinnerIcon : this.SparklesIcon,
+  }));
   readonly SelectedCount = computed(
     () => this.ReviewQuestions().filter((q) => q.Selected).length,
   );
@@ -161,6 +211,15 @@ export class GenAiContents implements OnInit {
     this.SelectedType.set(firstType);
     this.genForm.controls['selectedType'].setValue(firstType);
     this.updateValidatorsForMode(this.TypeMode());
+
+    // Sync validity with formInvalid signal to reactively update computed CTA props
+    this.genForm.statusChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.formInvalid.set(this.genForm.invalid);
+      });
+    // Set initial state
+    this.formInvalid.set(this.genForm.invalid);
   }
 
   private updateValidatorsForMode(mode: 'questions' | 'materials'): void {
@@ -184,8 +243,12 @@ export class GenAiContents implements OnInit {
     this.genForm.controls['selectedType'].setValue(value);
   }
 
+  onMaterialsSelectionChange(materials: MaterialInterface[]): void {
+    this.selectedMaterials.set(materials || []);
+  }
+
   async onSubmit(): Promise<void> {
-    if (this.genForm.invalid) {
+    if (this.IsGenerating() || this.genForm.invalid) {
       this.genForm.markAllAsTouched();
       return;
     }
@@ -196,13 +259,26 @@ export class GenAiContents implements OnInit {
       } else {
         await this.submitQuestionGeneration();
       }
-    } catch {
-      this.feedbackService.showFeedback(
-        'Errore durante la generazione. Riprova.',
-        false,
-      );
+    } catch (error) {
+      const errMsg = this.getUserFacingErrorMessage(error);
+      if (errMsg.toLowerCase().includes('non contiene testo sufficiente')) {
+        const modalRef = this.modalService.open(SyllexErrorModalComponent, {
+          centered: true,
+          backdrop: 'static',
+          keyboard: false,
+        });
+        modalRef.componentInstance.title = 'Generazione Impedita';
+        modalRef.componentInstance.message = errMsg;
+        modalRef.componentInstance.buttonText = 'Ho capito, riprovo';
+      } else {
+        this.feedbackService.showFeedback(errMsg, false);
+      }
       this.IsGenerating.set(false);
     }
+  }
+
+  private getUserFacingErrorMessage(error: unknown): string {
+    return this.aiService.extractErrorMessage(error);
   }
 
   private async submitQuestionGeneration(): Promise<void> {
@@ -270,6 +346,10 @@ export class GenAiContents implements OnInit {
   }
 
   onReturnToMaterials(): void {
+    const generated = this.GeneratedMaterial();
+    if (generated?._id) {
+      this.materialiFacade.highlightedItemId.set(generated._id);
+    }
     this.IsGenerating.set(false);
     this.GenerationSuccess.set(false);
     this.GeneratedMaterial.set(null);
@@ -349,13 +429,14 @@ export class GenAiContents implements OnInit {
 
   private toReviewQuestion(
     q: GeneratedQuestion,
-    topicId: string,
+    formTopicId: string,
     subjectId: string,
     teacherId: string,
   ): ReviewQuestion {
     const tempId = crypto.randomUUID();
     const difficulty = this.genForm.controls['difficulty']
       .value as QuestionDifficulty;
+    const resolvedTopicId = q.topicId || formTopicId;
     const data: QuestionInterface = {
       _id: tempId,
       text: q.text,
@@ -363,8 +444,9 @@ export class GenAiContents implements OnInit {
       explanation: q.explanation,
       difficulty,
       options: q.options,
+      correctAnswer: q.correctAnswer,
       policy: 'private',
-      topicId,
+      topicId: resolvedTopicId,
       subjectId,
       teacherId,
     };

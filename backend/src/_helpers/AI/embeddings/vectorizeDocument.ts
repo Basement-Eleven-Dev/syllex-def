@@ -8,6 +8,7 @@ export interface VectorizeDocumentParams {
   subjectId: Types.ObjectId;
   teacherId: Types.ObjectId;
   documentText: string;
+  documentName?: string;
 }
 
 export interface DocumentChunk {
@@ -15,9 +16,9 @@ export interface DocumentChunk {
   referenced_file_id: Types.ObjectId;
   teacher_id: Types.ObjectId;
   subject: Types.ObjectId;
+  document_name: string;
   embedding: number[];
 }
-
 
 export async function vectorizeDocumentWithGemini(
   vectorizeDocumentParams: VectorizeDocumentParams,
@@ -25,9 +26,8 @@ export async function vectorizeDocumentWithGemini(
   try {
     const ai = await getGeminiClient();
     await connectDatabase();
-    const { materialId, subjectId, teacherId, documentText } =
+    const { materialId, subjectId, teacherId, documentText, documentName } =
       vectorizeDocumentParams;
-
 
     // 1. Check rapido (Idempotenza)
     const existingCount = await FileEmbedding.countDocuments({
@@ -40,7 +40,7 @@ export async function vectorizeDocumentWithGemini(
     const overlap = 200;
     const chunks: string[] = [];
 
-    for (let start = 0; start < documentText.length;) {
+    for (let start = 0; start < documentText.length; ) {
       let end = start + chunkSize;
       if (end < documentText.length) {
         const lastSpace = documentText.lastIndexOf(" ", end);
@@ -87,6 +87,7 @@ export async function vectorizeDocumentWithGemini(
             referenced_file_id: materialId,
             teacher_id: teacherId,
             subject: subjectId,
+            document_name: documentName || "",
             embedding: emb.values,
           };
         })

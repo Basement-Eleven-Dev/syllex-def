@@ -20,53 +20,28 @@
 </div>
 
 <section tourAnchor="comunicazioni_filters" class="d-flex flex-row mb-5 gap-3">
-  <div>
-    <input
-      type="text"
-      class="form-control me-3 custom-input filter"
-      id="search-term"
-      placeholder="Cerca comunicazione tramite parole chiave..."
-      style="min-width: 400px"
-      [ngModel]="SearchTerm()"
-      (ngModelChange)="onSearchTermChange($event)"
-    />
-  </div>
+  <app-syllex-search-input
+    placeholder="Cerca comunicazione tramite parole chiave..."
+    [value]="SearchTerm()"
+    (valueChange)="onSearchTermChange($event)"
+    style="min-width: 400px"
+  />
 
-  <div>
-    <select
-      class="form-select custom-input filter"
-      style="min-width: 100px"
-      id="class"
-      [ngModel]="SelectedClassId()"
-      (ngModelChange)="onClassFilterChange($event)"
-    >
-      <option value="">Classi</option>
-      @for(classe of classiService.classi(); track classe._id) {
-      <option [value]="classe._id">{{ classe.name }}</option>
-      }
-    </select>
-  </div>
-  <div>
-    <select
-      class="form-select custom-input filter"
-      style="min-width: 100px"
-      id="attachments"
-      [ngModel]="SelectedHasAttachments()"
-      (ngModelChange)="onAttachmentsFilterChange($event)"
-    >
-      <option value="">Allegati</option>
-      <option value="true">Si</option>
-      <option value="false">No</option>
-    </select>
-  </div>
-  <button
-    type="button"
-    class="btn btn-outline-danger flex-stretch-0"
-    (click)="clearFilters()"
-    title="Pulisci filtri"
-  >
-    <fa-icon [icon]="ClearIcon"></fa-icon>
-  </button>
+  <app-syllex-select-input
+    [value]="SelectedClassId()"
+    (valueChange)="onClassFilterChange($event)"
+    style="min-width: 100px"
+    placeholder="Classi"
+    [options]="classiSelectOptions()"
+  />
+  <app-syllex-select-input
+    [value]="SelectedHasAttachments()"
+    (valueChange)="onAttachmentsFilterChange($event)"
+    style="min-width: 100px"
+    placeholder="Allegati"
+    [options]="attachmentOptions"
+  />
+  <app-syllex-clear-button (clicked)="clearFilters()" />
 </section>
 
 @for(comunicazione of Comunicazioni(); track comunicazione._id; let first =

@@ -1,18 +1,26 @@
-<div class="bg-light p-4 rounded-5 d-flex flex-column gap-3 shadow-sm">
-  <label class="form-label text-dark fw-bold fs-4">
-    Domanda {{ index }}
-    <span class="badge" [class]="data.answer.result">
-      {{ getResultLabel(data.answer.result) }}
-    </span>
+<div class="p-4 rounded-4 d-flex flex-column gap-2" style="background: #eef4ff">
+  <div class="d-flex justify-content-between align-items-center">
+    <label class="form-label text-dark fw-bold fs-4 mb-0">
+      Domanda {{ index }}
+      <span class="badge" [class]="data.answer.result">
+        {{ getResultLabel(data.answer.result) }}
+      </span>
+    </label>
 
-    @if (isOpenTypeQuestion && !isReviewed) {<button
-      (click)="correctWithAI()"
-      class="btn btn-secondary btn-sm"
-    >
-      @if(aiCorrecting === true) {
-      <fa-icon [icon]="spinner" [animation]="'spin'"></fa-icon>} Correzione IA</button
-    >}
-  </label>
+    @if (isOpenTypeQuestion && !isReviewed) {
+      <app-syllex-button
+        [props]="{
+          label: aiCorrecting ? 'Correzione in corso...' : 'Correzione con IA',
+          variant: 'secondary',
+          size: 'large',
+          leftIcon: aiCorrecting ? spinner : sparklesIcon,
+          animation: aiCorrecting ? 'spin' : undefined,
+          transform: 'none'
+        }"
+        (clicked)="correctWithAI()"
+      ></app-syllex-button>
+    }
+  </div>
 
   <p class="fs-5">{{ data.question.text }}</p>
 
@@ -35,58 +43,58 @@
   </div>
   }
 
-  <section
-    class="p-3 rounded-3 border-start border-4"
-    [ngClass]="{'border-success bg-success-subtle': data.answer.isCorrect, 'border-danger bg-danger-subtle': !data.answer.isCorrect && data.answer.result !== 'dubious', 'border-warning bg-warning-subtle': data.answer.result === 'dubious'}"
-  >
-    <label class="form-label text-dark fw-bold d-flex align-items-center gap-2 mb-2">
-      Risposta dello studente:
-      @if (data?.answer?.aiProbability !== null && data?.answer?.aiProbability !== undefined) {
+  <section class="px-0 pb-0">
+    <label
+      class="form-label text-dark fw-bold d-flex align-items-center gap-2 mb-2"
+    >
+      Risposta dello studente: @if (data?.answer?.aiProbability !== null &&
+      data?.answer?.aiProbability !== undefined) {
       <span
         class="badge"
-        style="cursor: help;"
+        style="cursor: help"
         [ngClass]="{
           'bg-danger': data.answer.aiProbability > 50,
-          'bg-success': data.answer.aiProbability <= 50
+          'bg-primary': data.answer.aiProbability <= 50
         }"
         ngbTooltip="Indica quanto è probabile che questo testo sia stato scritto da un'intelligenza artificiale (es: ChatGPT)"
       >
-      {{ getAiProbabilityLabel(data.answer.aiProbability) }}
+        {{ getAiProbabilityLabel(data.answer.aiProbability) }}
       </span>
       }
     </label>
-    <p class="mb-0 fs-5">{{ data?.answer?.answer || 'Nessuna risposta' }}</p>
+    <div class="d-flex flex-row align-items-start gap-3">
+      <p class="mb-0 fs-5 flex-fill">
+        {{ data?.answer?.answer || 'Nessuna risposta' }}
+      </p>
+      <div
+        class="d-flex flex-column align-items-center flex-shrink-0"
+        style="min-width: 90px"
+      >
+        <label class="form-label text-dark fw-bold small mb-1">
+          Punteggio (max {{ data.answer.maxScore }})
+        </label>
+        <input
+          type="number"
+          class="form-control border-0 bg-white rounded-3 shadow-none fs-4 text-center"
+          [(ngModel)]="data.answer.score"
+          [max]="data.answer.maxScore"
+          min="0"
+          step="0.5"
+          [disabled]="isReviewed === true"
+          (ngModelChange)="isOpenTypeQuestion ? onScoreChange($event) : null"
+        />
+      </div>
+    </div>
   </section>
 
-  <div class="row mt-3 g-3">
-    <div class="col-12 col-md-8">
-      <label class="form-label text-dark fw-bold"
-        >Feedback per lo studente</label
-      >
-      <textarea
-        class="form-control custom-input"
-        rows="4"
-        [(ngModel)]="data.answer.feedback"
-        placeholder="Inserisci un commento..."
-        [disabled]="isReviewed === true"
-      ></textarea>
-    </div>
-
-    <div class="col-12 col-md-4">
-      <label class="form-label text-dark fw-bold">
-        Punteggio (max {{ data.answer.maxScore }})
-      </label>
-
-      <input
-        type="number"
-        class="form-control custom-input fs-4"
-        [(ngModel)]="data.answer.score"
-        [max]="data.answer.maxScore"
-        min="0"
-        step="0.5"
-        [disabled]="isReviewed === true"
-        (ngModelChange)="isOpenTypeQuestion ? onScoreChange($event) : null"
-      />
-    </div>
+  <div>
+    <label class="form-label text-dark fw-bold">Feedback per lo studente</label>
+    <textarea
+      class="form-control border-0 bg-white rounded-3 shadow-none"
+      rows="4"
+      [(ngModel)]="data.answer.feedback"
+      placeholder="Inserisci un commento..."
+      [disabled]="isReviewed === true"
+    ></textarea>
   </div>
 </div>

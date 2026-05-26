@@ -1,13 +1,11 @@
-<form [formGroup]="filtersForm" class="d-flex flex-row gap-3 mb-4">
-  <input
-    type="text"
-    class="form-control custom-input filter"
-    style="max-width: 300px"
+<div class="d-flex flex-row gap-3 mb-4">
+  <app-syllex-search-input
     placeholder="Cerca per nome o cognome..."
-    formControlName="text"
-    (input)="applyFilters()"
+    [value]="filtersForm.get('text')!.value"
+    (valueChange)="filtersForm.get('text')!.setValue($event); applyFilters()"
+    style="max-width: 420px"
   />
-</form>
+</div>
 
 <div class="card p-3">
   <div class="card-body">
@@ -19,6 +17,7 @@
             <th></th>
             <th class="text-muted fw-light">Nome</th>
             <th class="text-muted fw-light">Cognome</th>
+            <th class="text-muted fw-light">Classe</th>
             <th class="text-muted fw-light">Punteggio</th>
             <th class="text-muted fw-light">Consegnato il</th>
             <th></th>
@@ -40,6 +39,11 @@
             <td>{{ assignment.studentName }}</td>
             <td>{{ assignment.studentLastName }}</td>
             <td>
+              <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-medium px-2 py-1 small">
+                {{ assignment.className || 'Nessuna classe' }}
+              </span>
+            </td>
+            <td>
               @if(assignment.status === 'not-started') {
               <span class="text-muted">Non iniziato</span>
               } @else if(assignment.score == null) {
@@ -58,15 +62,14 @@
             </td>
             <td class="text-end">
               @if(assignment._id) {
-              <button
-                class="btn icon-btn"
-                [routerLink]="'/t/correzione/' + assignment._id"
-                [class.btn-warning]="assignment.status !== 'reviewed'"
-                [class.btn-primary]="assignment.status === 'reviewed'"
-              >
-                {{ assignment.status !== 'reviewed' ? 'Correggi' : 'Visualizza'
-                }}
-              </button>
+              <app-syllex-button
+                [props]="{
+                  label: assignment.status !== 'reviewed' ? 'Correggi' : 'Visualizza',
+                  variant: assignment.status !== 'reviewed' ? 'secondary' : 'primary',
+                  size: 'small',
+                  link: '/t/correzione/' + assignment._id
+                }"
+              />
               }
             </td>
           </tr>

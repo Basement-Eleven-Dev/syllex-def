@@ -384,8 +384,25 @@ export class MaterialiService {
         tap((response) => {
           if (parent._id === 'root') {
             this.root.update((current) => [...current, response.material]);
-          } else if (parent.content) {
-            parent.content.push(response.material);
+          } else {
+            const addToParent = (items: MaterialInterface[]): MaterialInterface[] => {
+              return items.map((item) => {
+                if (item._id === parent._id && item.content) {
+                  return {
+                    ...item,
+                    content: [...item.content, response.material],
+                  };
+                }
+                if (item.type === 'folder' && item.content) {
+                  return {
+                    ...item,
+                    content: addToParent(item.content),
+                  };
+                }
+                return item;
+              });
+            };
+            this.root.update((current) => addToParent(current));
           }
         }),
       );
@@ -396,19 +413,21 @@ export class MaterialiService {
   }
 
   private removeItemFromAllParents(itemId: string): void {
-    const removeFromArray = (items: MaterialInterface[]): void => {
-      const index = items.findIndex((i) => i._id === itemId);
-      if (index !== -1) {
-        items.splice(index, 1);
-        return;
-      }
-      items.forEach((item) => {
-        if (item.type === 'folder' && item.content) {
-          removeFromArray(item.content);
-        }
-      });
+    const removeFromList = (items: MaterialInterface[]): MaterialInterface[] => {
+      return items
+        .filter((item) => item._id !== itemId)
+        .map((item) => {
+          if (item.type === 'folder' && item.content) {
+            return {
+              ...item,
+              content: removeFromList(item.content),
+            };
+          }
+          return item;
+        });
     };
-    removeFromArray(this.root());
+
+    this.root.update((current) => removeFromList(current));
   }
 
   getMaterialById(id: string): MaterialInterface | undefined {

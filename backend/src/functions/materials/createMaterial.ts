@@ -34,11 +34,14 @@ const createMaterial = async (
   const materials = await Material.find({
     teacherId: teacherId as any,
     subjectId: context.subjectId as any,
-  })
+  });
 
   const totalBytes = materials.reduce((acc, m) => acc + (m.byteSize || 0), 0);
   if (totalBytes >= STORAGE_LIMIT_B) {
-    throw createError(400, "Limite di archiviazione (1GB) raggiunto per questa materia.");
+    throw createError(
+      400,
+      "Limite di archiviazione (1GB) raggiunto per questa materia.",
+    );
   }
 
   // Prepare material data
@@ -70,29 +73,34 @@ const createMaterial = async (
     // Add material to parent folder's content
     await Material.updateOne(
       { _id: parentId as any, teacherId: teacherId as any },
-      { $push: { content: material._id } }
+      { $push: { content: material._id } },
     );
   }
   let suggestedTopics: string[] = [];
   if (material.type !== "folder" && material.url) {
     try {
       // Start indexing in background (existing logic)
-      const { startIndexingJob } = await import("../../_triggers/backgroundVectorize");
+      const { startIndexingJob } =
+        await import("../../_triggers/backgroundVectorize");
       await startIndexingJob(material._id as any);
 
       // Topic Discovery
-      const subject = (await SubjectView
-        .findOne({ _id: context.subjectId as any }));
+      const subject = await SubjectView.findOne({
+        _id: context.subjectId as any,
+      });
 
       if (subject && material.url) {
         const buffer = await fetchBuffer(material.url);
-        const textExtracted = await extractTextFromFile(buffer, material.extension || '');
+        const textExtracted = await extractTextFromFile(
+          buffer,
+          material.extension || "",
+        );
 
         if (textExtracted && textExtracted.trim().length > 0) {
           suggestedTopics = await suggestNewTopics(
             textExtracted,
-            subject.topics.map(el => el.name),
-            subject.name
+            subject.topics.map((el) => el.name),
+            subject.name,
           );
         }
       }

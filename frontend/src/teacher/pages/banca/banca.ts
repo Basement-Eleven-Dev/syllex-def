@@ -18,7 +18,13 @@ import {
 } from '../../components/view-type-toggle/view-type-toggle';
 import { FeedbackService } from '../../../services/feedback-service';
 import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
+import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
+import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
+import { SyllexTabFilter } from '../../components/UI/syllex-tab-filter/syllex-tab-filter';
+import { SyllexEmptyState } from '../../components/UI/syllex-empty-state/syllex-empty-state';
+import { faClipboardQuestion } from '@fortawesome/pro-solid-svg-icons';
 
+type QuestionTab = 'tutti' | 'vero falso' | 'aperta' | 'scelta multipla';
 @Component({
   selector: 'app-banca',
   imports: [
@@ -31,18 +37,31 @@ import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
     FormsModule,
     ViewTypeToggle,
     TourAnchorNgBootstrapDirective,
+    SyllexPageHeader,
+    SyllexButton,
+    SyllexTabFilter,
+    SyllexEmptyState,
   ],
   templateUrl: './banca.html',
   styleUrl: './banca.scss',
 })
 export class Banca {
   // Icons
+
+  protected readonly tabOptions = [
+    { value: 'tutti', label: 'Tutti' },
+    { value: 'vero falso', label: 'Vero Falso' },
+    { value: 'aperta', label: 'Risposta Aperta' },
+    { value: 'scelta multipla', label: 'Scelta Multipla' },
+  ];
   protected readonly PlusIcon = faPlus;
+  protected readonly QuestionIcon = faClipboardQuestion;
 
   // Dependency Injection
   private readonly questionsService = inject(QuestionsService);
   protected readonly materiaService = inject(Materia);
   private readonly feedbackService = inject(FeedbackService);
+  ActiveTab = signal<QuestionTab>('tutti');
 
   // View type
   ViewType: ViewType = this.loadViewTypePreference() || 'grid';
@@ -80,10 +99,25 @@ export class Banca {
       const currentFilters = this.Filters();
       const currentPage = this.Page();
       const currentPageSize = this.PageSize();
+      const tab = this.ActiveTab();
+
+      const typeFromTab:
+        | 'scelta multipla'
+        | 'vero falso'
+        | 'risposta aperta'
+        | undefined =
+        tab === 'vero falso'
+          ? 'vero falso'
+          : tab === 'aperta'
+            ? 'risposta aperta'
+            : tab === 'scelta multipla'
+              ? 'scelta multipla'
+              : undefined;
+
       if (materia) {
         this.loadQuestions(
           currentFilters.searchTerm,
-          currentFilters.type,
+          typeFromTab ?? currentFilters.type,
           currentFilters.topicId,
           currentFilters.policy,
           currentPage,
@@ -94,6 +128,11 @@ export class Banca {
         );
       }
     });
+  }
+
+  onTabChange(tab: QuestionTab): void {
+    this.ActiveTab.set(tab);
+    this.Page.set(1);
   }
 
   onFiltersChanged(filters: {
@@ -170,7 +209,6 @@ export class Banca {
       )
       .subscribe({
         next: (response) => {
-          console.log('Domande caricate con successo:', response);
           this.RawQuestions.set(response.questions);
           this.CollectionSize.set(response.total);
         },

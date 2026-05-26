@@ -36,7 +36,7 @@ const getCommunications = async (
     } else if (context.user.role === "student") {
       // Uno studente vede solo le comunicazioni delle sue classi
       const studentClasses = await Class
-        .find({ students: context.user._id } as any)
+        .find({ students: new Types.ObjectId(context.user._id) } as any)
 
       const classIds = studentClasses.map((c) => c._id);
       filter.classIds = { $in: classIds };
@@ -46,9 +46,9 @@ const getCommunications = async (
   // Filtraggio per materia
   if (subjectId) {
     filter.subjectId = new Types.ObjectId(subjectId);
-  } else if (context.subjectId) {
-    // se non è passata via query, ma c'è nel contesto (es. endpoint annidato), filtro per quella
-    filter.subjectId = context.subjectId;
+  } else if (context.subjectId && context.user?.role !== "student") {
+    // se non è passata via query, ma c'è nel contesto (es. endpoint annidato), filtro per quella (solo se non è uno studente)
+    filter.subjectId = new Types.ObjectId(context.subjectId);
   }
   // Se non c'è subjectId e non siamo in un contesto di materia, lo studente vede tutto quello che appartiene alle sue classi
 

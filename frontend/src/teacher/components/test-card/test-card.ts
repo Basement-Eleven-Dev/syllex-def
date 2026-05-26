@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { DatePipe, TitleCasePipe } from '@angular/common';
 import {
+  faBell,
   faCheckDouble,
   faClock,
   faEllipsisH,
@@ -19,6 +20,9 @@ import {
 import { TestInterface } from '../../../services/tests-service';
 import { ClassiService } from '../../../services/classi-service';
 import { ɵɵDir } from '@angular/cdk/scrolling';
+import { SyllexBadge, SyllexBadgeColor } from '../UI/syllex-badge/syllex-badge';
+import { faCalendar } from '@fortawesome/free-solid-svg-icons';
+import { SyllexButton } from '../UI/syllex-button/syllex-button';
 
 @Component({
   selector: 'app-test-card',
@@ -31,16 +35,20 @@ import { ɵɵDir } from '@angular/cdk/scrolling';
     NgbDropdownToggle,
     NgbDropdownMenu,
     TitleCasePipe,
+    SyllexBadge,
+    SyllexButton,
   ],
   templateUrl: './test-card.html',
   styleUrl: './test-card.scss',
 })
 export class TestCard {
   BackgroundIcon = faCheckDouble;
+  BellIcon = faBell;
   ClockIcon = faClock;
   UsersIcon = faUsers;
   QuestionsIcon = faQuestionCircle;
   ThreeDotsIcon = faEllipsisVertical;
+  CalendarIcon = faCalendar;
 
   @Input() test!: TestInterface;
   @Output() delete = new EventEmitter<string>();
@@ -54,5 +62,16 @@ export class TestCard {
       return 0;
     }
     return this.test.questions.reduce((total, q) => total + q.points, 0);
+  }
+
+  getBadgeColor(): SyllexBadgeColor {
+    if (this.test.status === 'pubblicato') {
+      return 'black';
+    } else if (this.test.status === 'bozza') {
+      return 'orange';
+    } else if (this.test.status === 'archiviato') {
+      return 'gray';
+    }
+    return 'gray';
   }
 }

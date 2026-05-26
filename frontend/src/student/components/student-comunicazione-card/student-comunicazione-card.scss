@@ -5,6 +5,15 @@
   border-right: 1px solid #ddd;
 }
 
+.subject-badge {
+  flex-shrink: 0;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+}
+
 
 .attachment-badge {
   cursor: pointer;

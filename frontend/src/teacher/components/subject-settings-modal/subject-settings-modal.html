@@ -1,102 +1,90 @@
-<div class="modal-header">
-  <h5 class="modal-title">
-    Argomenti di <strong>{{ Subject()?.name }}</strong>
+
+<div class="p-3">
+<div class="modal-header border-0">
+  <h5 class="modal-title fw-bold">
+    Argomenti di <span class="text-primary">{{ Subject()?.name }}</span>
   </h5>
   <button
     type="button"
-    class="btn-close"
+    class="btn-close shadow-none"
     (click)="ActiveModal.dismiss()"
   ></button>
 </div>
 
-<div class="modal-body">
+<div class="modal-body p-4">
   @if (ErrorMessage()) {
   <div class="alert alert-danger py-2 mb-3">{{ ErrorMessage() }}</div>
-  } @if (Topics().length === 0) {
-  <p class="text-muted small mb-3">
-    Nessun topic presente. Aggiungine uno qui sotto.
-  </p>
-  } @else {
-  <ul
-    class="list-group list-group-flush mb-3"
-    style="max-height: 300px; overflow-y: auto"
-  >
-    @for (topic of Topics(); track topic._id) {
-    <li class="list-group-item px-0">
-      @if (EditingTopicId() === topic._id) {
-      <div class="d-flex gap-2 align-items-center">
-        <input
-          class="form-control form-control-sm"
-          [ngModel]="EditValue()"
-          (ngModelChange)="EditValue.set($event)"
-          (keydown)="onEditKeydown($event, topic._id)"
-          autofocus
-        />
-        <button
-          class="btn btn-sm btn-primary"
-          [disabled]="IsSaving() || !EditValue().trim()"
-          (click)="confirmRename(topic._id)"
-          title="Conferma"
-        >
-          <fa-icon [icon]="CheckIcon" />
-        </button>
-        <button
-          class="btn btn-sm btn-outline-secondary"
-          (click)="cancelEdit()"
-          title="Annulla"
-        >
-          <fa-icon [icon]="XmarkIcon" />
-        </button>
-      </div>
-      } @else {
-      <div class="d-flex justify-content-between align-items-center">
-        <span>{{ topic.name }}</span>
-        <div class="d-flex">
-          <button
-            class="btn btn-sm btn-edit"
-            (click)="startEdit(topic)"
-            title="Rinomina"
-          >
-            <fa-icon [icon]="PencilIcon" />
-          </button>
-          <button
-            class="btn btn-sm btn-red"
-            (click)="deleteTopic(topic._id)"
-            title="Elimina"
-          >
-            <fa-icon [icon]="TrashIcon" />
-          </button>
-        </div>
-      </div>
-      }
-    </li>
-    }
-  </ul>
   }
 
-  <hr class="my-3" />
+  <!-- Lista argomenti -->
+  @if (Topics().length === 0) {
+  <p class="text-muted small mb-3">
+    Nessun argomento presente. Aggiungine uno qui sotto.
+  </p>
+  } @else {
+  <div
+    class="d-flex flex-column gap-1 mb-4"
+    style="max-height: 420px; overflow-y: auto"
+  >
+    @for (topic of Topics(); track topic._id; let i = $index) {
+    <div
+      class="d-flex align-items-center gap-2 px-3 py-1 rounded-3"
+      [style.background]="i % 2 === 0 ? '#f2f7ff' : '#ffffff'"
+    >
+      @if (EditingTopicId() === topic._id) {
+      <input
+        class="form-control form-control-sm border-0 bg-white rounded-3 shadow-none flex-fill"
+        [ngModel]="EditValue()"
+        (ngModelChange)="EditValue.set($event)"
+        (keydown)="onEditKeydown($event, topic._id)"
+        autofocus
+      />
+      <app-syllex-button
+        [props]="{ label: '', variant: 'primary', size: 'small', leftIcon: CheckIcon, disabled: IsSaving() || !EditValue().trim(), shape: 'circle' }"
+        (clicked)="confirmRename(topic._id)"
+      />
+      <div class="topic-actions d-flex gap-1">
+        <app-syllex-button
+          [props]="{ label: '', variant: 'primary', color: 'danger', size: 'small', leftIcon: XmarkIcon, shape: 'circle' }"
+          (clicked)="cancelEdit()"
+        />
+      </div>
+      } @else {
+      <span class="flex-fill text-dark fw-medium">{{ topic.name }}</span>
+      <div class="topic-actions d-flex gap-1">
+        <app-syllex-button
+          [props]="{ label: '', variant: 'primary', color: 'celestine', size: 'small', leftIcon: PencilIcon, shape: 'circle' }"
+          (clicked)="startEdit(topic)"
+        />
+        <app-syllex-button
+          [props]="{ label: '', variant: 'primary', color: 'danger', size: 'small', leftIcon: TrashIcon, shape: 'circle' }"
+          (clicked)="deleteTopic(topic._id)"
+        />
+   
+      </div>
+      }
+    </div>
+    }
+  </div>
+  }
 
-  <label class="form-label small fw-semibold">Aggiungi argomento</label>
-  <div class="input-group">
+  <!-- Aggiungi argomento -->
+  <label class="form-label small fw-semibold text-muted"
+    >Aggiungi argomento</label
+  >
+  <div class="d-flex gap-2">
     <input
-      class="form-control"
+      class="form-control border-0 bg-light rounded-pill shadow-none"
       placeholder="Nome argomento..."
       [ngModel]="NewTopicName()"
       (ngModelChange)="NewTopicName.set($event)"
       (keydown)="onAddKeydown($event)"
     />
-    <button
-      class="btn btn-primary"
-      [disabled]="IsAdding() || !NewTopicName().trim()"
-      (click)="addTopic()"
-    >
-      <fa-icon [icon]="PlusIcon" />
-    </button>
+    <app-syllex-button
+      [props]="{ label: 'Aggiungi', variant: 'primary', size: 'small', leftIcon: PlusIcon, disabled: IsAdding() || !NewTopicName().trim() }"
+      (clicked)="addTopic()"
+    />
   </div>
 </div>
 
-<div class="modal-footer">
-  <button type="button" class="btn btn-secondary" (click)="ActiveModal.close()">
-    Chiudi
-  </button>
 </div>

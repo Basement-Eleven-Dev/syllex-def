@@ -20,6 +20,15 @@ import {
   ViewType,
 } from '../../components/view-type-toggle/view-type-toggle';
 import { BackTo } from '../../components/back-to/back-to';
+import {
+  KpiCardData,
+  SyllexKpiRow,
+} from '../../components/UI/syllex-kpi-row/syllex-kpi-row';
+import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
+import { SyllexSearchInput } from '../../components/UI/syllex-search-input/syllex-search-input';
+import { SyllexClearButton } from '../../components/UI/syllex-clear-button/syllex-clear-button';
+import { SyllexSelectInput } from '../../components/UI/syllex-select-input/syllex-select-input';
+import { SyllexEmptyState } from '../../components/UI/syllex-empty-state/syllex-empty-state';
 
 @Component({
   selector: 'app-classi',
@@ -29,6 +38,12 @@ import { BackTo } from '../../components/back-to/back-to';
     SyllexPagination,
     FormsModule,
     ViewTypeToggle,
+    SyllexKpiRow,
+    SyllexPageHeader,
+    SyllexSearchInput,
+    SyllexClearButton,
+    SyllexSelectInput,
+    SyllexEmptyState,
   ],
   templateUrl: './classi.html',
   styleUrl: './classi.scss',
@@ -40,6 +55,14 @@ export class Classi {
   protected readonly EyeIcon = faEye;
   protected readonly CalendarIcon = faCalendar;
   protected readonly ClearIcon = faXmark;
+
+  protected readonly yearOptions = [
+    { value: '2026', label: '2026' },
+    { value: '2027', label: '2027' },
+    { value: '2028', label: '2028' },
+    { value: '2029', label: '2029' },
+    { value: '2030', label: '2030' },
+  ];
 
   // Dependency Injection
   protected readonly materiaService = inject(Materia);
@@ -75,6 +98,15 @@ export class Classi {
   });
 
   CollectionSize = computed(() => this.FilteredClassi().length);
+
+  KpiClassi = computed<KpiCardData[]>(() =>
+    this.PaginatedClassi().map((classe) => ({
+      value: classe.name,
+      label: `${classe.students.length} student${classe.students.length === 1 ? 'e' : 'i'}`,
+      buttonLabel: 'Visualizza',
+      buttonLink: ['/t/classi', classe._id],
+    })),
+  );
 
   PaginatedClassi = computed<ClassInterface[]>(() => {
     const filtered = this.FilteredClassi();

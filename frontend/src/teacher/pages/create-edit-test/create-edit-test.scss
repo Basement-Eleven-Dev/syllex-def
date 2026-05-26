@@ -1,16 +1,206 @@
-.classBadge,
-#infiniteButton {
-  background-color: transparent;
-  outline: 1px solid var(--bs-primary);
-  color: var(--bs-primary);
+.create-test-container {
+  min-height: calc(100vh - 220px);
 
-  &:hover {
-    cursor: pointer;
-    background-color: var(--bs-primary);
-    color: white;
+
+
+  .flat-settings {
   }
-  &.selected {
-    background-color: var(--bs-primary);
-    color: white;
+
+  .wizard-step-shell {
+    max-height: calc(100vh - 320px);
+    overflow-y: auto;
+  }
+
+  .wizard-step-shell--questions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: calc(100vh - 340px);
+  }
+
+  .step3-grid {
+    .step3-control {
+      height: 42px;
+      border-radius: 50rem !important;
+    }
+
+    .syllex-input-group {
+      display: flex;
+      align-items: center;
+      border: 1px solid #e2e8f0;
+      border-radius: 50rem;
+      background-color: #fff;
+      height: 42px;
+      overflow: hidden;
+      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+      &:focus-within {
+        border-color: var(--bs-primary) !important;
+      }
+
+      .form-control {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        height: 100%;
+        padding: 0.5rem 0.75rem;
+      }
+
+      .btn {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        height: 100%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 1rem;
+        color: #6b7280;
+        transition: background-color 0.15s ease, color 0.15s ease;
+
+        &:hover {
+          background-color: #f1f5f9 !important;
+          color: var(--bs-primary) !important;
+        }
+      }
+    }
+  }
+
+  .wizard-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .wizard-footer app-syllex-stepper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+
+  .wizard-footer__right {
+    min-width: 96px;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .advanced-toggle {
+    text-decoration: none;
+  }
+
+  .advanced-area {
+    border-top: 1px dashed #e2e8f0;
+  }
+
+  .form-control-flat {
+    border: 1px solid #e2e8f0 !important;
+    background: #fff !important;
+    box-shadow: none !important;
+
+    &:focus {
+      border-color: var(--bs-primary) !important;
+      box-shadow: none !important;
+    }
+  }
+
+  .preview-col {
+    border-left: 1px solid #e2e8f0;
+  }
+
+  .preview-sticky {
+    position: sticky;
+    top: 0;
+  }
+
+  .preview-meta {
+    padding-top: 0.5rem;
+  }
+
+  .form-control-lg {
+    font-size: 1.25rem;
+    font-weight: 600;
+
+    &::placeholder {
+      font-weight: 400;
+      opacity: 0.5;
+    }
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .bg-light {
+    background-color: #f8fafc !important;
+  }
+
+  .btn-white {
+    background-color: white;
+    &:hover {
+      background-color: #f1f5f9;
+    }
+  }
+
+  .custom-switch {
+    padding-left: 3rem;
+    .form-check-input {
+      width: 2.5rem;
+      height: 1.25rem;
+      margin-left: -3rem;
+      cursor: pointer;
+
+      &:checked {
+        background-color: var(--bs-primary);
+        border-color: var(--bs-primary);
+      }
+    }
+  }
+
+  .sticky-lg-top {
+    @media (min-width: 992px) {
+      position: sticky !important;
+      top: 0 !important;
+      align-self: flex-start; /* Sblocca lo sticky impedendo alla sidebar di allungarsi quanto la colonna sinistra */
+      max-height: 100vh !important;
+      overflow-y: auto;
+      padding-top: 2rem !important;
+      padding-bottom: 3rem !important;
+
+      scrollbar-width: none;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+  }
+
+  @media (max-width: 991.98px) {
+    .wizard-step-shell {
+      max-height: none;
+      overflow-y: visible;
+    }
+
+    .mobile-full-width-btn {
+      flex-direction: column !important;
+      width: 100%;
+      
+      app-syllex-button, button {
+        width: 100%;
+        display: block;
+      }
+    }
+
+    .preview-col {
+      border-left: 0;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 1rem;
+    }
+
+    .preview-sticky {
+      position: static;
+    }
   }
 }

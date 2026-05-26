@@ -9,6 +9,8 @@ import {
 } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
+  faBell,
+  faCalendar,
   faChevronLeft,
   faChevronRight,
   faPlus,
@@ -31,6 +33,10 @@ import {
 } from '../../../services/comunicazioni-service';
 import { AddEventModal } from '../add-event-modal/add-event-modal';
 import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
+import { SyllexTabFilter } from '../UI/syllex-tab-filter/syllex-tab-filter';
+import { SyllexButton } from '../UI/syllex-button/syllex-button';
+import { SyllexBadge } from '../UI/syllex-badge/syllex-badge';
+import { ConfirmActionDirective } from '../../../directives/confirm-action.directive';
 
 export interface DayBox {
   day: number | null;
@@ -48,6 +54,10 @@ export interface DayBox {
     CalendarEventCard,
     StudentComunicazioneCard,
     TourAnchorNgBootstrapDirective,
+    SyllexTabFilter,
+    SyllexButton,
+    SyllexBadge,
+    ConfirmActionDirective,
   ],
   templateUrl: './calendario.html',
   styleUrl: './calendario.scss',
@@ -56,6 +66,14 @@ export class Calendario implements OnInit {
   protected readonly ArrowLeftIcon = faChevronLeft;
   protected readonly ArrowRightIcon = faChevronRight;
   protected readonly PlusIcon = faPlus;
+  protected readonly BellIcon = faBell;
+  protected readonly CalendarIcon = faCalendar;
+
+  protected readonly detailTabOptions = [
+    { value: 'eventi', label: 'Eventi' },
+    { value: 'comunicazioni', label: 'Comunicazioni' },
+  ];
+  ActiveDetailTab = signal<'eventi' | 'comunicazioni'>('eventi');
 
   // Kept as plain property for NgbModal componentInstance compatibility
   showCloseButton = false;
@@ -109,7 +127,7 @@ export class Calendario implements OnInit {
     ),
   );
 
-  private FilteredComunicazioni = computed(() => {
+  protected FilteredComunicazioni = computed(() => {
     const filter = this.subjectFilter();
     return filter
       ? this.Comunicazioni().filter((c) => c.subjectId === filter)
@@ -139,6 +157,12 @@ export class Calendario implements OnInit {
 
   ngOnInit(): void {
     this.loadMonthData(this.CurrentDate());
+  }
+
+  setActiveDetailTab(tab: string): void {
+    if (tab === 'eventi' || tab === 'comunicazioni') {
+      this.ActiveDetailTab.set(tab);
+    }
   }
 
   navigateMonth(delta: number): void {
@@ -227,6 +251,8 @@ export class Calendario implements OnInit {
     const modalRef = this.modalService.open(AddEventModal, { centered: true });
     modalRef.componentInstance.SelectedDate = this.SelectedDate();
     modalRef.componentInstance.EventToEdit = eventToEdit;
+    modalRef.componentInstance.SubjectId =
+      this.materiaService.materiaSelected()?._id;
 
     modalRef.result.then(
       (updated: CalendarEvent) => {
@@ -239,6 +265,25 @@ export class Calendario implements OnInit {
   }
 
   // --- Private helpers ---
+
+  deleteTest(testId: string): void {
+    this.testsService.deleteTest(testId).subscribe({
+      next: () => {
+        this.Tests.update((list) => list.filter((t) => t._id !== testId));
+        this.feedbackService.showFeedback('Test eliminato con successo', true);
+      },
+      error: () => {
+        this.feedbackService.showFeedback(
+          "Errore durante l'eliminazione del test",
+          false,
+        );
+      },
+    });
+  }
+
+  refresh(): void {
+    this.loadMonthData(this.CurrentDate());
+  }
 
   private loadMonthData(date: Date): void {
     this.calendarService
@@ -270,13 +315,11 @@ export class Calendario implements OnInit {
         );
     }
 
-    if (this.studentMode()) {
-      this.comunicazioniService
-        .getPagedComunicazioni('', '', '', 1, 100, undefined)
-        .subscribe((res) => {
-          this.Comunicazioni.set(res.communications);
-        });
-    }
+    this.comunicazioniService
+      .getPagedComunicazioni('', '', '', 1, 100, undefined)
+      .subscribe((res) => {
+        this.Comunicazioni.set(res.communications);
+      });
   }
 
   private buildCalendarGrid(date: Date): DayBox[] {

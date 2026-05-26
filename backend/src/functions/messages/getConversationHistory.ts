@@ -8,11 +8,13 @@ const getConversationHistory = async (
 ) => {
   const subjectId = context.subjectId;
   const userId = context.user?._id;
+  const conversationId = request.queryStringParameters?.['conversationId'];
 
   const keepForDashboard = true;
   const conversationHistory = await buildConversationHistory(
     subjectId!,
     userId!,
+    conversationId!,
     keepForDashboard,
   );
   return conversationHistory;

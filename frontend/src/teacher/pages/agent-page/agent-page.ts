@@ -1,82 +1,63 @@
-import { Component, effect, signal } from '@angular/core';
+import { Component, computed, signal, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Materia } from '../../../services/materia';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faHeadSideBrain } from '@fortawesome/pro-regular-svg-icons';
+import { faArrowLeft } from '@fortawesome/pro-solid-svg-icons';
 import { AgentChat } from '../../components/agent-chat/agent-chat';
-import { AgentSettingsForm } from '../../components/agent-settings-form/agent-settings-form';
 import { Auth } from '../../../services/auth';
-import { AgentService } from '../../../services/agent.service';
 import { CommonModule } from '@angular/common';
-import { FeedbackService } from '../../../services/feedback-service';
-import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 
 @Component({
   selector: 'app-agent-page',
   standalone: true,
-  imports: [
-    FormsModule,
-    FontAwesomeModule,
-    AgentChat,
-    AgentSettingsForm,
-    CommonModule,
-    TourAnchorNgBootstrapDirective,
-  ],
+  imports: [FormsModule, FontAwesomeModule, AgentChat, CommonModule],
   templateUrl: './agent-page.html',
   styleUrl: './agent-page.scss',
 })
 export class AgentPage {
-  HeadSideBrainIcon = faHeadSideBrain;
-  currentAssistantId = signal<string | null>(null);
+  faArrowLeft = faArrowLeft;
   userRole = signal<'teacher' | 'student' | 'admin' | null>(null);
   activeTab = signal<'subjects' | 'chat'>('subjects');
+
+  // Flusso unico: chat diretta
+  currentStep = signal<1 | 2>(2);
+  interactionMode = signal<'chat' | 'voice'>('chat');
+
+  // Loading state per evitare flash UI
+  isLoadingAssistant = computed(() => {
+    return this.materiaService.allMaterie().length === 0 && !this.materiaService.materiaSelected();
+  });
+
+  currentAssistantId = computed(() => {
+    const subject = this.materiaService.materiaSelected();
+    return subject?._id ? `alex-default-${subject._id}` : null;
+  });
 
   constructor(
     public materiaService: Materia,
     private authService: Auth,
-    private agentService: AgentService,
-    private feedbackService: FeedbackService,
   ) {
     this.userRole.set(this.authService.user?.role || null);
 
-    // Caricamento dell'assistente reattivo al cambio materia (utile soprattutto per studenti)
+    // Quando viene selezionata o caricata una materia, mostra direttamente la chat dell'agente
     effect(() => {
       const subject = this.materiaService.materiaSelected();
-      if (subject?._id) {
-        this.loadAssistant();
-      } else {
-        this.currentAssistantId.set(null);
+      if (subject) {
+        this.activeTab.set('chat');
       }
-    });
+    }, { allowSignalWrites: true });
   }
 
-  private loadAssistant() {
-    this.agentService.getAssistant().subscribe({
-      next: (res) => {
-        if (res.exists && res.assistant) {
-          const id = res.assistant._id?.$oid || res.assistant._id;
-          this.currentAssistantId.set(id);
-        } else {
-          this.currentAssistantId.set(null);
-        }
-      },
-      error: (err) => {
-        console.error('Error loading assistant for student:', err);
-        this.feedbackService.showFeedback(
-          "Errore nel caricamento dell'assistente",
-          false,
-        );
-        this.currentAssistantId.set(null);
-      },
-    });
+  private resetState() {
+    this.currentStep.set(2);
   }
 
-  onAssistantLoaded(id: string | null) {
-    this.currentAssistantId.set(id);
+  // Studente: torna alla lista materie
+  showSubjectsList() {
+    this.activeTab.set('subjects');
   }
 
   selectMateria(materia: any) {
-    this.currentAssistantId.set(null); // Forza lo svuotamento della UI
     this.materiaService.setSelectedSubject(materia);
     this.activeTab.set('chat');
   }

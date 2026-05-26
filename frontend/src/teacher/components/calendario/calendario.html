@@ -6,12 +6,8 @@
     aria-label="Close"
     (click)="ActiveModal!.dismiss()"
   ></button>
-  }
-
-  <div
-    [class]="'mb-4 d-flex flex-row' + (showHeadings() ? ' justify-content-between align-items-center' : '')"
-  >
-    @if(showHeadings()){
+  } @if(showHeadings()){
+  <div class="mb-4 d-flex flex-row justify-content-between align-items-center">
     <div class="flex-fill">
       <h4 class="text-dark mb-0">
         Calendario di {{ materiaService.materiaSelected()?.name }}
@@ -20,34 +16,43 @@
         Tieni traccia dei test che hai fissato per i tuoi studenti
       </p>
     </div>
-    }
-    <div
-      tourAnchor="calendario_nav"
-      class="d-flex flex-row align-items-center gap-0 border border-primary rounded-syllex"
-    >
-      <button
-        class="btn btn-link d-flex flex-column justify-content-center align-items-center"
-        (click)="navigateMonth(-1)"
-      >
-        <fa-icon [icon]="ArrowLeftIcon"></fa-icon>
-      </button>
-      <span class="text-primary">|</span>
-      <button
-        class="btn btn-link d-flex flex-column justify-content-center align-items-center"
-        (click)="navigateMonth(1)"
-      >
-        <fa-icon [icon]="ArrowRightIcon"></fa-icon>
-      </button>
-    </div>
   </div>
+  }
 
-  <div class="row">
+  <div class="d-flex flex-lg-row flex-column gap-5">
     <!-- Calendar grid -->
-    <div tourAnchor="calendario_griglia" class="col-12 col-lg-6 mb-3">
+    <div class="mb-3 w-lg-50 w-100">
+      <div class="d-flex justify-content-center mb-5">
+        <div
+          class="d-flex flex-row align-items-center gap-2 rounded-pill px-3 py-3 w-100"
+          style="background-color: #e5eeff"
+        >
+          <div class="d-flex justify-content-between align-items-center w-100">
+            <button
+              class="btn text-primary border-0 p-1 lh-1"
+              (click)="navigateMonth(-1)"
+            >
+              <fa-icon [icon]="ArrowLeftIcon"></fa-icon>
+            </button>
+            <span
+              class="fw-semibold text-capitalize fs-5 text-primary"
+              style="min-width: 140px; text-align: center"
+            >
+              {{ CurrentDate() | date: 'MMMM yyyy' : '' : 'it' }}
+            </span>
+            <button
+              class="btn text-primary border-0 p-1 lh-1"
+              (click)="navigateMonth(1)"
+            >
+              <fa-icon [icon]="ArrowRightIcon"></fa-icon>
+            </button>
+          </div>
+        </div>
+      </div>
       <div class="d-flex flex-row mb-3">
         @for (day of ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom']; track
         $index) {
-        <div class="flex-fill text-center fw-bold text-muted">
+        <div class="flex-fill text-center fw-bold text-muted" style="font-size: 0.85rem">
           {{ day | uppercase }}
         </div>
         }
@@ -62,24 +67,13 @@
         >
           @if (dayBox.isCurrentMonth) {
           <div
-            class="d-flex flex-column h-100 justify-content-center align-items-center fs-5"
+            class="d-flex fw-semibold h-100 justify-content-end align-items-start fs-6 p-2"
           >
             {{ dayBox.day }}
           </div>
-          <div class="event-badges">
-            @if (getEventCount(dayBox) > 0) {
-            <span class="event-count badge bg-primary" title="Eventi e Test">
-              {{ getEventCount(dayBox) }}
-            </span>
-            } @if (getComunicazioniCount(dayBox) > 0) {
-            <span
-              class="event-count badge bg-info text-dark"
-              title="Comunicazioni"
-            >
-              {{ getComunicazioniCount(dayBox) }}
-            </span>
-            }
-          </div>
+          @if (getEventCount(dayBox) > 0) {
+            <div class="event-dot"></div>
+          }
           }
         </div>
         }
@@ -87,47 +81,104 @@
     </div>
 
     <!-- Day detail panel -->
-    <div class="col-12 col-lg-6 d-flex flex-column mb-3">
+    <div class="d-flex w-lg-50 w-100 flex-column mb-3 syllexCard day-detail-panel">
       @if (SelectedDate()) {
       <div
-        class="d-flex flex-row align-items-center justify-content-between mb-3 px-1"
+        class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between mb-3 px-1 gap-3"
       >
-        <div>
-          <h4 class="fw-semibold text-primary mb-0">
-            Oggi / {{ SelectedDate() | date: 'fullDate' | titlecase }}
+        <div class="d-flex flex-column gap-2 text-primary">
+          <p class="m-0">Eventi della giornata</p>
+          <h4 class="fw-semibold mb-0">
+            {{ SelectedDate() | date: 'fullDate' | titlecase }}
           </h4>
         </div>
+
         @if (!readonly()) {
-        <button class="btn btn-blue btn-sm" (click)="openAddEventModal()">
-          <fa-icon [icon]="PlusIcon"></fa-icon> Nuovo Evento
-        </button>
+        <app-syllex-button
+          class="calendar-add-btn"
+          [props]="{
+            label: 'Nuovo evento',
+            variant: 'primary',
+            size: 'medium',
+            leftIcon: CalendarIcon
+          }"
+          (click)="openAddEventModal()"
+        />
         }
       </div>
 
-      <div
-        class="flex-fill p-3 rounded-syllex bg-white"
-        tourAnchor="calendario_dettaglio_giorno"
-        id="calendarDayDetailCard"
-      >
-        <!-- Scrollable Content Section -->
-        <div class="calendar-events-scrollable flex-fill pe-2">
-          @for (comunicazione of SelectedDateComunicazioni(); track
-          comunicazione._id) {
-          <div
-            app-student-comunicazione-card
-            [comunicazione]="comunicazione"
-            class="mb-3 d-block"
-          ></div>
-          } @for (event of SelectedDateEvents(); track event._id) {
-          <app-calendar-event-card
-            [Event]="event"
-            [readonly]="readonly()"
-            (Deleted)="deleteEvent($event)"
-            (Edited)="editEvent($event)"
-          />
+      <div class="flex-fill p-3 p-lg-3 border-0" id="calendarDayDetailCard">
+        <div class="calendar-events-scrollable flex-fill pe-">
+          @for (event of SelectedDateEvents(); track event._id) {
+          <div class="syllexCard border-primary bg-white mb-4 event-inner-card">
+            <div class="d-flex justify-content-between align-items-start gap-2">
+              <p class="fs-5 fw-semibold mb-2">{{ event.title }}</p>
+              <app-syllex-badge
+                class="flex-shrink-0"
+                color="green"
+                [label]="event.subjectId ? materiaService.getSubjectName(event.subjectId) : ''"
+              />
+            </div>
+            <p class="m-0">{{ event.description }}</p>
+            <div class="d-flex flex-wrap justify-content-between align-items-center mt-2 gap-2">
+              <p class="mb-0">{{ event.date | date: 'short' }}</p>
+              @if (!readonly()) {
+              <div class="d-flex flex-wrap gap-2">
+                <app-syllex-button
+                  [props]="{ label: 'Modifica', variant: 'primary', color: 'celestine', size: 'small' }"
+                  (clicked)="editEvent(event._id!)"
+                />
+                <app-syllex-button
+                  [props]="{ label: 'Elimina', variant: 'primary', color: 'danger', size: 'small' }"
+                  confirmAction
+                  confirmMessage="Sei sicuro di voler eliminare questo evento?"
+                  (confirmed)="deleteEvent(event._id!)"
+                />
+              </div>
+              }
+            </div>
+          </div>
           } @for (test of SelectedDateTests(); track test._id) {
-          <app-calendar-test-card [Test]="test" [readonly]="readonly()" />
-          } @if (!HasSelectedDateItems()) {
+          <div class="syllexCard border-primary bg-white mb-4 event-inner-card">
+            <div class="d-flex justify-content-between align-items-start gap-2">
+              <p class="fs-5 fw-semibold mb-2">{{ test.name }}</p>
+              <app-syllex-badge
+                class="flex-shrink-0"
+                color="green"
+                [label]="test.subjectId ? materiaService.getSubjectName(test.subjectId) : ''"
+              />
+            </div>
+            <p class="m-0 text-muted small">
+              @if (test.questions && test.questions.length) {
+                <span>{{ test.questions.length }} {{ test.questions.length === 1 ? 'domanda' : 'domande' }}</span>
+              }
+              @if (test.maxScore) {
+                <span [class.ms-2]="test.questions && test.questions.length">
+                  {{ (test.questions && test.questions.length) ? '• ' : '' }}Punteggio max: {{ test.maxScore }} pt
+                </span>
+              }
+              @if (test.timeLimit) {
+                <span class="ms-2">• {{ test.timeLimit }} min</span>
+              }
+            </p>
+            <div class="d-flex flex-wrap justify-content-between align-items-center mt-2 gap-2">
+              <p class="mb-0">{{ test.availableFrom | date: 'short' }}</p>
+              @if (!readonly()) {
+              <div class="d-flex flex-wrap gap-2">
+                <app-syllex-button
+                  [props]="{ label: 'Modifica', variant: 'primary', color: 'celestine', size: 'small', link: '/t/tests/edit/' + test._id }"
+                />
+                <app-syllex-button
+                  [props]="{ label: 'Elimina', variant: 'primary', color: 'danger', size: 'small' }"
+                  confirmAction
+                  confirmMessage="Sei sicuro di voler eliminare questo test?"
+                  (confirmed)="deleteTest(test._id!)"
+                />
+              </div>
+              }
+            </div>
+          </div>
+          } @if (SelectedDateEvents().length === 0 && SelectedDateTests().length === 0) {
           <p class="text-muted text-center mt-4 pt-3">
             Nessun evento per questa giornata
           </p>
@@ -135,7 +186,6 @@
         </div>
       </div>
       } @else {
-      <!-- State when no date is selected -->
       <div
         class="flex-fill p-4 rounded-syllex bg-white no-date-selected"
         id="calendarDayDetailCard"
