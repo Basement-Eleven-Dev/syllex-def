@@ -12,6 +12,7 @@ interface SyllexButtonProps {
   leftIcon?: IconDefinition;
   rightIcon?: IconDefinition;
   animation?: 'spin';
+  transform?: 'none' | 'titlecase';
   disabled?: boolean;
   onClick?: () => void;
   link?: string;

@@ -33,18 +33,6 @@
       {{ (d.status === 'delivered' ? 'da correggere' : 'corretto') | titlecase
       }}
     </span>
-    @if(d.status != 'reviewed') {
-    <app-syllex-button
-      [props]="{
-        label: 'Finalizza Correzione',
-        variant: 'primary',
-        size: 'medium',
-        leftIcon: CheckIcon,
-        disabled: isSaving() || !allQuestionsAreScored
-      }"
-      (clicked)="submitCorrection()"
-    />
-    }
   </div>
 </div>
 
@@ -113,7 +101,7 @@
         [props]="{
           label: 'Finalizza Correzione',
           variant: 'primary',
-          size: 'small',
+          size: 'large',
           leftIcon: CheckIcon,
           disabled: isSaving() || !allQuestionsAreScored
         }"

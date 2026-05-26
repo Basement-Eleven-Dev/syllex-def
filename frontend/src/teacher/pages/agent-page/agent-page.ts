@@ -1,4 +1,4 @@
-import { Component, effect, signal } from '@angular/core';
+import { Component, computed, signal, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Materia } from '../../../services/materia';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -16,7 +16,6 @@ import { CommonModule } from '@angular/common';
 })
 export class AgentPage {
   faArrowLeft = faArrowLeft;
-  currentAssistantId = signal<string | null>(null);
   userRole = signal<'teacher' | 'student' | 'admin' | null>(null);
   activeTab = signal<'subjects' | 'chat'>('subjects');
 
@@ -25,7 +24,14 @@ export class AgentPage {
   interactionMode = signal<'chat' | 'voice'>('chat');
 
   // Loading state per evitare flash UI
-  isLoadingAssistant = signal<boolean>(true);
+  isLoadingAssistant = computed(() => {
+    return this.materiaService.allMaterie().length === 0 && !this.materiaService.materiaSelected();
+  });
+
+  currentAssistantId = computed(() => {
+    const subject = this.materiaService.materiaSelected();
+    return subject?._id ? `alex-default-${subject._id}` : null;
+  });
 
   constructor(
     public materiaService: Materia,
@@ -33,22 +39,17 @@ export class AgentPage {
   ) {
     this.userRole.set(this.authService.user?.role || null);
 
-    // Flusso diretto: assistant virtuale legato alla materia selezionata
+    // Quando viene selezionata o caricata una materia, mostra direttamente la chat dell'agente
     effect(() => {
       const subject = this.materiaService.materiaSelected();
-      if (subject?._id) {
-        this.currentAssistantId.set(`alex-default-${subject._id}`);
-        this.isLoadingAssistant.set(false);
-      } else {
-        this.resetState();
+      if (subject) {
+        this.activeTab.set('chat');
       }
-    });
+    }, { allowSignalWrites: true });
   }
 
   private resetState() {
-    this.currentAssistantId.set(null);
     this.currentStep.set(2);
-    this.isLoadingAssistant.set(false);
   }
 
   // Studente: torna alla lista materie

@@ -14,7 +14,11 @@
   ></fa-icon>
   } 
   @if (props.label) {
-    {{ props.label | titlecase }} 
+    @if (props.transform === 'none') {
+      {{ props.label }}
+    } @else {
+      {{ props.label | titlecase }} 
+    }
   }
   @if (props.rightIcon) {
   <fa-icon [icon]="props.rightIcon"></fa-icon>

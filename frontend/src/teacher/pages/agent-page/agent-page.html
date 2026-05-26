@@ -1,3 +1,4 @@
+<!-- syllex update trigger -->
 <div class="d-flex flex-column h-100 overflow-hidden bg-page agent-page-root">
   <!-- Mobile Tab Switcher: Solo per studenti e solo su mobile -->
   @if (userRole() === 'student' && currentStep() === 2) {
@@ -59,6 +60,7 @@
       <div
         class="col d-flex flex-column h-100 position-relative"
         [class.d-none]="userRole() === 'student' && activeTab() !== 'chat'"
+        [class.d-lg-flex]="true"
       >
         <!-- Header per Studente (cambio materia su mobile) -->
         @if (userRole() === 'student') {

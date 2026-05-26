@@ -205,8 +205,8 @@
     <section class="d-flex flex-column gap-2">
       <div class="d-flex align-items-center gap-3">
         <app-syllex-badge
-          [label]="questionStatus === 'correct' ? 'Corretta' : questionStatus === 'wrong' ? 'Errata' : 'Parzialmente corretta'"
-          [color]="questionStatus === 'correct' ? 'green' : questionStatus === 'wrong' ? 'red' : 'orange'"
+          [label]="questionStatus === 'correct' ? 'Corretta' : (questionStatus === 'wrong' || questionStatus === 'incorrect') ? 'Errata' : 'Parzialmente corretta'"
+          [color]="questionStatus === 'correct' ? 'green' : (questionStatus === 'wrong' || questionStatus === 'incorrect') ? 'red' : 'orange'"
         />
         @if (score !== null) {
         <span class="fw-semibold">Punteggio: {{ score }}</span>

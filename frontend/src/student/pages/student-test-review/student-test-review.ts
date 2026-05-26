@@ -93,12 +93,12 @@ export class StudentTestReview implements OnInit {
 
   readonly WrongCount = computed(
     () =>
-      this.Attempt()?.questions.filter((q) => q.status === 'wrong').length ?? 0,
+      this.Attempt()?.questions.filter((q) => q.status === 'wrong' || q.status === 'incorrect').length ?? 0,
   );
 
   readonly SemiCorrectCount = computed(
     () =>
-      this.Attempt()?.questions.filter((q) => q.status === 'semi-correct')
+      this.Attempt()?.questions.filter((q) => q.status === 'semi-correct' || q.status === 'partial')
         .length ?? 0,
   );
 
