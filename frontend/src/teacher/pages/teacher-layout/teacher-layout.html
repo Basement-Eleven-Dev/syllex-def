@@ -8,9 +8,7 @@
 </div>
 } -->
 
-<app-help-chat></app-help-chat>
-
-<div class="w-100 dvh-100 d-flex flex-row">
+<div class="w-100 dvh-100 d-flex flex-row overflow-hidden">
   @if (showLoading()) {
   <div id="loadingOverlay" animate.enter="fade-in">
     <fa-icon [icon]="SpinnerIcon" [animation]="'spin'" size="3x"></fa-icon>
@@ -20,15 +18,30 @@
     </h2>
   </div>
   } @if (!showLoading()) {
-  <app-sidebar></app-sidebar>
-  <div id="content" class="flex-fill d-flex flex-column">
-    <div class="container pt-4">
+  <div
+    class="sidebar-overlay"
+    [class.active]="sidebarOpen()"
+    (click)="closeSidebar()"
+  ></div>
+  <app-sidebar
+    #sidebarRef
+    [open]="sidebarOpen()"
+    (toggleSidebar)="toggleSidebar()"
+  ></app-sidebar>
+  <div id="content" class="flex-fill d-flex flex-column" style="min-width: 0;">
+    <div class="px-3 px-md-5 pt-4 d-none d-lg-block">
       <app-nav></app-nav>
     </div>
-    <div class="flex-fill overflow-auto d-flex flex-column">
+    <div
+      class="flex-fill d-flex flex-column"
+      style="overflow-y: auto; overflow-x: hidden; min-width: 0;"
+      (scroll)="onContentScroll($event)"
+    >
       <div
-        class="container py-4 flex-grow-1 d-flex flex-column"
-        style="min-height: 0; view-transition-name: teacher-content"
+        class="px-md-5 flex-grow-1 d-flex flex-column"
+        [class.px-3]="!isAgentRoute()"
+        [class.py-4]="!isAgentRoute()"
+        style="min-height: 0; min-width: 0; view-transition-name: teacher-content"
       >
         <router-outlet></router-outlet>
       </div>
@@ -36,6 +49,30 @@
   </div>
   }
 </div>
+
+<nav class="bottom-nav d-lg-none" [class.hidden]="navHidden() || hideBottomNavRoute()">
+  <button
+    class="bottom-nav-item"
+    (click)="$event.stopPropagation(); openHelpChat()"
+  >
+    <img
+      src="/images/logo_primary.png"
+      alt="Assistente"
+      height="20"
+      style="filter: brightness(0) invert(1); opacity: 0.85"
+    />
+    <span>Assistente</span>
+  </button>
+  <div ngbDropdown placement="top-end">
+    <button class="bottom-nav-item" ngbDropdownToggle>
+      <fa-icon [icon]="UserProfileIcon"></fa-icon>
+      <span>Profilo</span>
+    </button>
+    <div ngbDropdownMenu class="p-3" style="min-width: 240px">
+      <app-user-contextual-menu></app-user-contextual-menu>
+    </div>
+  </div>
+</nav>
 
 <tour-step-template>
   <ng-template let-step="step">

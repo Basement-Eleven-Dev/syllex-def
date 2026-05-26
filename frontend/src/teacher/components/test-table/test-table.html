@@ -12,31 +12,28 @@
     </thead>
     <tbody>
       @for(test of tests; track $index){
-      <tr
-        [class.row-with-pending-corrections]="(test.uncorrectedCount || 0) > 0"
-      >
+      <tr>
         <td>
-          <div class="d-flex flex-row align-items-center gap-2">
+          <div class="d-flex fw-bold flex-row align-items-center gap-2">
             {{ test.name }} @if((test.uncorrectedCount || 0) > 0) {
-            <div class="d-flex flex-row align-items-center gap-2">
-              <span class="badge rounded-pill bg-warning text-dark px-3">
-                {{ test.uncorrectedCount }}
-              </span>
+            <div
+              class="d-flex flex-row align-items-center gap-1 text-nowrap corrections-label"
+            >
+              <fa-icon [icon]="BellIcon" class="bell-icon"></fa-icon>
+              <span>da correggere</span>
             </div>
             }
           </div>
         </td>
-        <td vertical-align="middle">
-          <div class="d-flex flex-row align-items-center gap-2">
-            <div [class]="'status-pill ' + test.status"></div>
-            {{ test.status | titlecase}}
-          </div>
+        <td>
+          <span [class]="'status-badge py-2 px-4 status-badge--' + test.status">
+            {{ test.status | titlecase }}
+          </span>
         </td>
         <td>
-          @if(test.availableFrom && test.availableTo) { Disponibile dal {{
-          test.availableFrom | date: 'd MMM y' }} al {{ test.availableTo | date:
-          'd MMM y' }} } @else if(test.availableFrom) { Disponibile dal {{
-          test.availableFrom | date: 'd MMM y' }} }
+          @if(test.availableFrom) { Dal {{ test.availableFrom | date: 'dd/MM/yy'
+          }} } @if(test.availableTo) { — Al {{ test.availableTo | date:
+          'dd/MM/yy' }} }
         </td>
         <td>
           {{ test.questions?.length || 0 }} Domande - {{ getMaxScore(test) }}
@@ -56,26 +53,20 @@
         <td
           class="d-flex flex-row justify-content-end align-items-center gap-2"
         >
-          <button
-            class="btn view-test-button"
-            [routerLink]="['/t/tests', test._id]"
-            [class.has-pending-corrections]="(test.uncorrectedCount || 0) > 0"
-          >
-            Visualizza Test
-          </button>
-
+          <app-syllex-button
+            [props]="{ label: 'Visualizza', variant: 'primary', size: 'small', link: '/t/tests/' + test._id }"
+          />
           <div
             ngbDropdown
             class="d-inline-block"
             container="body"
             placement="bottom-end"
           >
-            <button class="btn btn-primary circle-btn btn-sm" ngbDropdownToggle>
-              <fa-icon
-                class="d-inline-flex"
-                [icon]="ThreeDotsIcon"
-                style="font-size: 0.9rem"
-              ></fa-icon>
+            <button
+              class="btn btn-outline-dark bg-white text-dark btn-sm actions-btn py-2 px-4"
+              ngbDropdownToggle
+            >
+              Azioni
             </button>
             <div ngbDropdownMenu>
               <app-test-contextual-menu

@@ -1,0 +1,31 @@
+<div
+  class="syllex-banner position-relative overflow-hidden rounded-4 p-5 d-flex align-items-center bg-primary"
+  [ngClass]="bgClass"
+  [style.backgroundImage]="bgImage ? 'url(' + bgImage + ')' : ''"
+  [style.backgroundSize]="bgSize"
+  [style.backgroundPosition]="bgPosition"
+  [style.backgroundRepeat]="'no-repeat'"
+>
+  <div class="banner-content z-2 position-relative">
+    <p [innerHTML]="title" class="fs-1 text-white fw-bold mb-2"></p>
+    <p class="fs-5 text-white opacity-75 mb-4">{{ description }}</p>
+
+    <ng-container *ngIf="buttonLink">
+      <app-syllex-button
+        [props]="{
+          label: 'Provalo subito',
+          variant: 'secondary',
+          size: 'large',
+          link: buttonLink
+        }"
+      ></app-syllex-button>
+    </ng-container>
+  </div>
+
+  <!-- Decorazione astratta/sfondo -->
+  <div
+    class="banner-decoration z-1 position-absolute end-0 top-0 h-100 w-50 d-none d-md-block"
+  >
+    <ng-content></ng-content>
+  </div>
+</div>

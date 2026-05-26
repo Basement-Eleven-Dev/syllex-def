@@ -1,19 +1,13 @@
-<h5 class="fw-semibold text-dark">Come sta andando la classe?</h5>
-<p>
-  Analizza rapidamente come i tuoi studenti stanno performando nei test
-  assegnati
-</p>
-
 <div class="row">
   <div class="col-12 mb-3">
-    <div class="card p-3 h-100">
+    <div class="card card-celeste-light p-3 h-100">
       <div class="card-body">
         <app-class-performance-chart [classId]="classId()" />
       </div>
     </div>
   </div>
   <div class="col-12">
-    <div class="card p-3 h-100">
+    <div class="card card-lime-light p-3 h-100">
       <div class="card-body">
         <app-topics-performance-chart [classId]="classId()" />
       </div>

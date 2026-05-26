@@ -1,0 +1,54 @@
+.preview-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.preview-paper {
+  min-height: 800px;
+  border: 1px solid #e2e8f0;
+}
+
+.icon-box {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.question-item {
+  position: relative;
+}
+
+.border-dashed {
+  border: 1px dashed #e2e8f0;
+}
+
+.placeholder-line {
+  height: 12px;
+  background-color: #f8fafc;
+  border-radius: 6px;
+}
+
+.min-w-100 {
+  min-width: 100px;
+}
+
+.btn-close:focus {
+  box-shadow: none;
+}
+
+// Stile per le opzioni (simile a come le vedrebbe lo studente)
+.option-item {
+  transition: background-color 0.2s ease;
+  &:hover {
+    background-color: #f8fafc;
+  }
+}
+
+.mobile-split-footer {
+  app-syllex-button, button {
+    width: 100%;
+    display: block;
+  }
+}

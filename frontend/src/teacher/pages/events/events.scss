@@ -1,0 +1,99 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.com-wrapper {
+  height: 420px;
+  position: relative;
+  overflow: hidden;
+  background-color: #0e3462;
+  border-radius: 30px;
+  padding: 1rem;
+}
+
+.com-scroll {
+  position: absolute;
+  top: 100px;
+  left: 0;
+  right: 0;
+  bottom: 2rem;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0.75rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  cursor: grab;
+  user-select: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.com-item {
+  flex: 0 0 400px;
+  width: 400px;
+  max-width: 400px;
+  height: 100%;
+  overflow: hidden;
+
+  @media (max-width: 991px) {
+    flex: 0 0 280px;
+    width: 280px;
+    max-width: 85vw;
+  }
+}
+
+.com-item-title {
+  color: var(--bs-dark);
+}
+
+/* Mobile Overrides */
+@media (max-width: 991px) {
+  .com-wrapper {
+    background-color: transparent;
+    padding: 0 !important;
+    height: auto;
+    overflow: visible;
+  }
+  
+  .com-title {
+    color: var(--bs-dark);
+  }
+
+  .com-scroll {
+    position: relative;
+    top: auto;
+    bottom: auto;
+    padding-left: 0;
+    padding-bottom: 1rem;
+    gap: 1rem;
+  }
+
+  .com-card {
+    background-color: #0e3462 !important;
+    color: white !important;
+  }
+
+  .com-desc {
+    color: rgba(255, 255, 255, 0.7) !important;
+  }
+
+  .com-date {
+    color: #d2e2ff !important;
+  }
+
+  .com-item-title {
+    color: white !important;
+  }
+
+  ::ng-deep .com-card .btn-primary {
+    background-color: white !important;
+    color: #0e3462 !important;
+    border-color: white !important;
+  }
+}

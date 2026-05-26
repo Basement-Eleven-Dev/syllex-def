@@ -1,0 +1,311 @@
+<!-- Page Header -->
+<div class="page-header" tourAnchor="laboratorio_ai_header">
+  <button
+    class="back-btn"
+    [routerLink]="'/t/dashboard'"
+    aria-label="Torna alla dashboard"
+    type="button"
+  >
+    <fa-icon [icon]="ChevronLeftIcon" />
+  </button>
+  <div>
+    <h1 class="mb-0 fw-semibold" style="letter-spacing: -0.04em">
+      Crea con l'AI di Syllex
+    </h1>
+    <p class="text-muted mb-0">
+      Genera materiali didattici e domande per i test in pochi passi.
+    </p>
+  </div>
+</div>
+
+<!-- Wizard -->
+<div class="wizard-container">
+  <!-- Step indicator -->
+  <div class="wizard-indicator">
+    @for (s of StepDefs; track s.n) {
+    <div class="wizard-dot-wrap">
+      <div
+        class="wizard-dot"
+        [class.wizard-dot--active]="s.n === CurrentStep()"
+        [class.wizard-dot--completed]="s.n < CurrentStep()"
+      >
+        @if (s.n < CurrentStep()) {
+        <fa-icon [icon]="CheckIcon" />
+        } @else { {{ s.n }} }
+      </div>
+      <span class="wizard-dot-label">{{ s.label }}</span>
+    </div>
+    @if (!$last) {
+    <div
+      class="wizard-connector"
+      [class.wizard-connector--done]="s.n < CurrentStep()"
+    ></div>
+    } }
+  </div>
+
+  <!-- Main area: prev arrow | panel | next arrow -->
+  <div class="wizard-main">
+    <!-- Prev arrow -->
+    <button
+      class="wizard-nav-btn"
+      type="button"
+      (click)="goPrev()"
+      [disabled]="CurrentStep() === 1"
+      aria-label="Passo precedente"
+    >
+      <fa-icon [icon]="ChevronLeftIcon" />
+    </button>
+
+    <!-- Panel -->
+    <div class="wizard-panel">
+      <!-- ── STEP 1: Scelta ── -->
+      @if (CurrentStep() === 1) {
+      <div
+        class="wizard-step-content"
+        @stepIn
+        tourAnchor="laboratorio_ai_type_cards"
+      >
+        <h5 class="wizard-step-title">Cosa vuoi creare?</h5>
+        <p class="wizard-step-subtitle">
+          Scegli il tipo di contenuto che vuoi generare con l'AI di Syllex.
+        </p>
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <div
+              tourAnchor="laboratorio_ai_card_materials"
+              class="method-card method-card--ai"
+              (click)="onSelectInitialType('materials')"
+            >
+              <fa-icon
+                [icon]="MaterialsIcon"
+                class="method-card-icon"
+              ></fa-icon>
+              <div>
+                <h5 class="mb-1 fw-semibold">Materiale di studio</h5>
+                <p class="small mb-0 opacity-75">
+                  Genera slides, riassunti, glossari e mappe concettuali dai
+                  tuoi file
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6">
+            <div
+              tourAnchor="laboratorio_ai_card_questions"
+              class="method-card"
+              (click)="onSelectInitialType('questions')"
+            >
+              <fa-icon
+                [icon]="QuestionsIcon"
+                class="method-card-icon"
+              ></fa-icon>
+              <div>
+                <h5 class="mb-1 fw-semibold">Domande dei Test</h5>
+                <p class="small mb-0 opacity-75">
+                  Crea domande per la banca domande in modalità guidata
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      }
+
+      <!-- ── STEP 2: Tipo materiale ── -->
+      @if (CurrentStep() === 2) {
+      <div
+        class="wizard-step-content"
+        @stepIn
+        tourAnchor="gen_ai_type_selector"
+      >
+        <h5 class="wizard-step-title">Tipo di materiale</h5>
+        <p class="wizard-step-subtitle">
+          Scegli il formato del contenuto che vuoi generare.
+        </p>
+        <app-type-selector
+          [options]="MaterialTypes"
+          [(selectedValue)]="SelectedMaterialType"
+          (typeSelected)="onSelectMaterialType($event)"
+          [direction]="'row'"
+          [showDescription]="true"
+        ></app-type-selector>
+      </div>
+      }
+
+      <!-- ── STEP 3: Configura e Genera ── -->
+      @if (CurrentStep() === 3) {
+      <div
+        class="wizard-step-content"
+        @stepIn
+        tourAnchor="laboratorio_ai_content"
+      >
+        <h5 class="wizard-step-title">
+          <fa-icon [icon]="SparklesIcon" class="me-2 text-primary"></fa-icon>
+          Genera {{ SelectedMaterialTypeName() }}
+        </h5>
+        <p class="wizard-step-subtitle">
+          Configura i parametri e scegli i materiali di riferimento.
+        </p>
+
+        <div [formGroup]="genForm">
+          <div class="row g-4">
+            <!-- Left: params + CTA -->
+            <div class="col-12 col-lg-6 d-flex flex-column gap-3">
+              @if (IsSlides()) {
+              <!-- Slides-specific params -->
+              <div tourAnchor="gen_ai_m_params">
+                <div class="row g-2">
+                  <div class="col-6">
+                    <label class="wizard-field-label">N° slide</label>
+                    <input
+                      type="number"
+                      class="form-control custom-input"
+                      formControlName="numberOfSlides"
+                      min="3"
+                      max="30"
+                      aria-label="Numero di slide"
+                    />
+                  </div>
+                  <div class="col-12">
+                    <label class="wizard-field-label">Formato</label>
+                    <div class="d-flex gap-4 pt-1">
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="radio"
+                          value="pptx"
+                          id="formatPPTX"
+                          formControlName="format"
+                        />
+                        <label
+                          class="form-check-label"
+                          for="formatPPTX"
+                          style="cursor: pointer"
+                        >
+                          <span class="fw-bold">Power Point</span>
+                          <span class="text-muted small ms-1"
+                            >(PPTX modificabile)</span
+                          >
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="radio"
+                          value="pdf"
+                          id="formatPDF"
+                          formControlName="format"
+                        />
+                        <label
+                          class="form-check-label"
+                          for="formatPDF"
+                          style="cursor: pointer"
+                        >
+                          <span class="fw-bold">PDF</span>
+                          <span class="text-muted small ms-1"
+                            >(Documento statico)</span
+                          >
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              }
+
+              <!-- Lingua -->
+              <div>
+                <label class="wizard-field-label">Lingua</label>
+                <select
+                  class="form-select custom-input"
+                  formControlName="language"
+                  aria-label="Lingua"
+                  style="max-width: 220px"
+                >
+                  <option value="italiano">Italiano</option>
+                  <option value="inglese">English</option>
+                  <option value="spagnolo">Español</option>
+                  <option value="francese">Français</option>
+                  <option value="tedesco">Deutsch</option>
+                </select>
+              </div>
+
+              <!-- Istruzioni -->
+              <div
+                class="flex-fill d-flex flex-column"
+                tourAnchor="gen_ai_instructions"
+              >
+                <label class="wizard-field-label">
+                  Istruzioni aggiuntive
+                  <span class="text-muted fw-normal">(opzionale)</span>
+                </label>
+                <textarea
+                  class="form-control custom-input flex-fill"
+                  formControlName="instructions"
+                  rows="4"
+                  style="resize: none"
+                  placeholder="Stile, tono di voce, punti chiave da trattare..."
+                ></textarea>
+              </div>
+
+              <!-- CTA -->
+              <div class="pt-1">
+                <button
+                  tourAnchor="gen_ai_submit"
+                  type="button"
+                  class="btn btn-primary ai btn-lg rounded-pill fw-bold d-flex align-items-center justify-content-center gap-2 text-nowrap"
+                  [disabled]="genForm.invalid || IsGenerating()"
+                  (click)="onGenerate()"
+                >
+                  <fa-icon
+                    [icon]="IsGenerating() ? SpinnerIcon : SparklesIcon"
+                    [animation]="IsGenerating() ? 'spin' : undefined"
+                  ></fa-icon>
+                  <span>{{ IsGenerating() ? 'Generazione in corso...' : 'Genera ' +
+                  SelectedMaterialTypeName() }}</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Right: materiali -->
+            <div class="col-12 col-lg-6" tourAnchor="gen_ai_support_files">
+              <label class="wizard-field-label">Materiali di riferimento</label>
+              <p class="text-muted small mb-2">
+                L'AI userà questi file come fonte per generare il contenuto.
+              </p>
+              <app-materiali-selector></app-materiali-selector>
+            </div>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+
+    <!-- Next arrow / spacer -->
+    @if (ShowNextArrow()) {
+    <button
+      class="wizard-nav-btn"
+      type="button"
+      (click)="goNext()"
+      [disabled]="!CanGoNext()"
+      aria-label="Passo successivo"
+    >
+      <fa-icon [icon]="ChevronRightIcon" />
+    </button>
+    } @else {
+    <div class="wizard-nav-spacer"></div>
+    }
+  </div>
+</div>
+
+<!-- AI Overlay (loading + success) -->
+<app-ai-overlay
+  [visible]="IsGenerating()"
+  [success]="GenerationSuccess()"
+  loadingTitle="Generazione in corso..."
+  loadingSubtitle="Non tornare indietro e non chiudere la pagina,&#10;altrimenti la generazione andrà perduta."
+  successTitle="Materiale generato!"
+  successMessage="Il tuo materiale è pronto e disponibile in File e Risorse."
+  ctaLabel="Vai ai materiali"
+  (ctaClick)="onReturnToResources()"
+></app-ai-overlay>

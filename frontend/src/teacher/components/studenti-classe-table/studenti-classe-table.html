@@ -52,13 +52,15 @@
               {{ studentData.CompletedTests }}/{{ testsCount() }}
             </td>
             <td class="text-end">
-              <a
-                [routerLink]="['/t/student', studentData.Student._id, 'class', classeId()]"
-                class="btn icon-btn btn-primary"
-              >
-                <fa-icon [icon]="EyeIcon"></fa-icon>
-                Vedi Dettagli
-              </a>
+              <app-syllex-button
+                [props]="{
+                  label: 'Vedi Dettagli',
+                  variant: 'primary',
+                  size: 'small',
+                  leftIcon: EyeIcon,
+                  link: '/t/student/' + studentData.Student._id + '/class/' + classeId()
+                }"
+              />
             </td>
           </tr>
           }

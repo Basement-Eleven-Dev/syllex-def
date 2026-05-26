@@ -384,6 +384,12 @@ const AI_ROUTES: FunctionIntegration[] = [
     role: "logged",
   },
   {
+    apiRoute: "ai/list-materials",
+    functionPath: "ai/listMaterials.ts",
+    method: "get",
+    role: "logged",
+  },
+  {
     apiRoute: "ai/questions",
     functionPath: "ai/createAiGenQuestion.ts",
     method: "post",
@@ -465,7 +471,25 @@ const ASSISTANTS_ROUTES: FunctionIntegration[] = [
     role: "logged",
   },
   {
-    apiRoute: "messages/{messageId}/generate-audio",
+    apiRoute: "messages/save",
+    functionPath: "messages/saveLiveMessage.ts",
+    method: "post",
+    role: "logged",
+  },
+  {
+    apiRoute: "messages/list-conversations",
+    functionPath: "messages/listConversations.ts",
+    method: "get",
+    role: "logged",
+  },
+  {
+    apiRoute: "messages/{conversationId}",
+    functionPath: "messages/deleteConversation.ts",
+    method: "delete",
+    role: "logged",
+  },
+  {
+    apiRoute: "messages/{conversationId}/generate-audio",
     functionPath: "messages/listenTomessage.ts",
     method: "post",
     role: "logged",

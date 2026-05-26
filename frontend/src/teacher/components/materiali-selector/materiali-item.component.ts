@@ -40,9 +40,10 @@ import { MaterialInterface } from '../../../services/materiali/materiali-service
     @if (shouldShow()) {
       @if (isFolder(item())) {
         <!-- Folder -->
-        <li class="list-group-item p-2 mb-2" style="border-radius: 8px;">
+        <li class="list-group-item p-0 mb-3 border-0 bg-transparent">
           <div
-            class="folder-item d-flex align-items-center p-2 cursor-pointer text-dark"
+            class="folder-item d-flex align-items-center px-4 py-2 cursor-pointer text-dark border"
+            style="border-radius: 50rem; background-color: #ffffff; min-height: 48px; border: 1px solid #cbd5e1; transition: all 0.2s ease;"
             (click)="folderToggle.emit(item()._id!)"
             role="button"
             [attr.aria-expanded]="isExpanded()"
@@ -65,8 +66,8 @@ import { MaterialInterface } from '../../../services/materiali/materiali-service
           <!-- Folder Content (Recursive) -->
           <div [id]="'collapse-' + item()._id" [ngbCollapse]="!isExpanded()">
             <ul
-              class="list-group list-group-flush ms-4 text-dark"
-              style="border-radius: 8px;"
+              class="list-group list-group-flush ms-4 mt-2 text-dark"
+              style="border: none; background: transparent;"
             >
               @for (childItem of getFilteredContent(); track childItem._id) {
                 <app-materiali-item
@@ -87,8 +88,8 @@ import { MaterialInterface } from '../../../services/materiali/materiali-service
       } @else {
         <!-- File -->
         <li
-          class="list-group-item p-2 d-flex align-items-center cursor-pointer text-dark mb-2"
-          style="border-radius: 8px;"
+          class="list-group-item px-4 py-2 d-flex align-items-center cursor-pointer text-dark mb-2 border"
+          style="border-radius: 50rem; background-color: #ffffff; min-height: 48px; border: 1px solid #cbd5e1; transition: all 0.2s ease;"
           [class.bg-secondary]="isSelected()"
           (click)="materialSelect.emit(item())"
           role="button"
@@ -155,32 +156,41 @@ export class MaterialiItemComponent {
 
   shouldShow(): boolean {
     const item = this.item();
+    
     // Sempre nascosto se aiGenerated e showAiGenerated è false
     if (!this.showAiGenerated() && item.aiGenerated === true) return false;
-    if (!this.embeddingCreationMode()) return true;
-
-    const associatedIds = new Set(this.associatedMaterialIds());
-
+    
     if (this.isFolder(item)) {
-      return this.hasTextFileInFolder(item, associatedIds);
+      return this.hasSelectableContent(item);
     }
-    // Mostra se è un file di testo e NON è già associato a questo assistente
-    return isTextFile(item.extension || '') && !associatedIds.has(item._id!);
+    
+    // Se è un file e siamo in embeddingCreationMode, applica filtri speciali
+    if (this.embeddingCreationMode()) {
+      const associatedIds = new Set(this.associatedMaterialIds());
+      return isTextFile(item.extension || '') && !associatedIds.has(item._id!);
+    }
+    
+    return true;
   }
 
-  private hasTextFileInFolder(
-    folder: MaterialInterface,
-    associatedIds: Set<string>,
-  ): boolean {
-    if (!folder.content) return false;
+  private hasSelectableContent(folder: MaterialInterface): boolean {
+    if (!folder.content || folder.content.length === 0) return false;
+    const associatedIds = new Set(this.associatedMaterialIds());
+    
     return folder.content.some((child) => {
+      // Escludi materiali AI se showAiGenerated è false
       if (!this.showAiGenerated() && child.aiGenerated === true) return false;
+      
       if (this.isFolder(child)) {
-        return this.hasTextFileInFolder(child, associatedIds);
+        return this.hasSelectableContent(child);
       }
-      return (
-        isTextFile(child.extension || '') && !associatedIds.has(child._id!)
-      );
+      
+      // Se siamo in embeddingCreationMode, applica filtri speciali
+      if (this.embeddingCreationMode()) {
+        return isTextFile(child.extension || '') && !associatedIds.has(child._id!);
+      }
+      
+      return true;
     });
   }
 
@@ -200,7 +210,7 @@ export class MaterialiItemComponent {
       const associatedIds = new Set(this.associatedMaterialIds());
       content = content.filter((child) => {
         if (this.isFolder(child)) {
-          return this.hasTextFileInFolder(child, associatedIds);
+          return this.hasSelectableContent(child);
         }
         return (
           isTextFile(child.extension || '') && !associatedIds.has(child._id!)

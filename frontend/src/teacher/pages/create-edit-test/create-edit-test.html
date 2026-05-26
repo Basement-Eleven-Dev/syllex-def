@@ -1,237 +1,430 @@
-<app-back-to
-  [path]="'/t/tests'"
-  [label]="'Torna alla lista dei test'"
-></app-back-to>
-
-<h1 class="text-dark fw-medium mb-3 display-6">{{ PageTitle() }}</h1>
-<h5 class="text-dark mb-5 fw-normal">
-  Prepara il prossimo test per le tue classi
-</h5>
-
 @if (IsLoading()) {
-<div class="d-flex justify-content-center align-items-center py-5">
+<div
+  class="d-flex justify-content-center align-items-center"
+  style="height: 400px"
+>
   <div class="spinner-border text-primary" role="status">
     <span class="visually-hidden">Caricamento...</span>
   </div>
 </div>
 } @else {
-<form [formGroup]="TestForm" class="d-flex flex-column gap-4 pb-5">
-  <section class="form-section">
-    <label for="test-title" class="form-label text-dark">Titolo del test</label>
-    <input
-      type="text"
-      id="test-title"
-      class="form-control custom-input form-control-lg"
-      formControlName="title"
-      placeholder="Inserisci il titolo del test"
-    />
-  </section>
-  <section class="form-section">
-    <label class="form-label fw-light text-dark"
-      >Disponibilità agli studenti</label
-    >
-    <div class="row">
-      <div class="col-6">
-        <div class="row">
-          <div class="col-6">
-            <label for="available-from" class="form-label text-dark"
-              >Dal giorno</label
-            >
-            <input
-              type="date"
-              formControlName="availableFrom"
-              id="available-from"
-              class="form-control custom-input"
-            />
-          </div>
-          <div class="col-6">
-            <label for="available-to" class="form-label text-dark"
-              >Fino al giorno</label
-            >
-            <input
-              type="date"
-              formControlName="availableTo"
-              id="available-to"
-              class="form-control custom-input"
-            />
+<app-syllex-page-header
+  [title]="PageTitle()"
+  [description]="HeaderDescription()"
+>
+  @if (CurrentStep() === 1) {
+  <app-syllex-button
+    [props]="{
+      label: 'Ripristina',
+      variant: 'outline',
+      color: 'dark',
+      size: 'medium'
+    }"
+    (clicked)="onResetForm()"
+  ></app-syllex-button>
+  } @if (CurrentStep() === 3) {
+  <app-syllex-button
+    [props]="{
+      label: 'Anteprima',
+      variant: 'primary',
+      color: 'black',
+      size: 'medium',
+      disabled: SelectedQuestionIds().length === 0
+    }"
+    (clicked)="onPreview()"
+  ></app-syllex-button>
+  }
+</app-syllex-page-header>
+
+<form [formGroup]="TestForm" class="create-test-container bg-white">
+  <div class="row g-0">
+    <!-- COLONNA PRINCIPALE -->
+    <div class="col-12 col-lg-8 pe-lg-4">
+      @if (CurrentStep() === 1) {
+      <div class="syllexCard wizard-step-shell">
+        <div class="flat-settings py-1">
+          <div class="row g-3 g-md-4">
+            <div class="col-12">
+              <label class="form-label text-dark fw-semibold small mb-2"
+                >Titolo del Test</label
+              >
+              <input
+                type="text"
+                formControlName="title"
+                class="form-control custom-input"
+                style="height: 42px"
+                placeholder="Es: Verifica di fine modulo - Elettronica"
+              />
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label text-dark fw-semibold small mb-2"
+                >Data Inizio</label
+              >
+              <input
+                type="date"
+                formControlName="availableFrom"
+                class="form-control custom-input"
+                style="height: 42px"
+              />
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label text-dark fw-semibold small mb-2"
+                >Data Fine
+                <span class="text-muted fw-normal">(opzionale)</span></label
+              >
+              <input
+                type="date"
+                formControlName="availableTo"
+                class="form-control custom-input"
+                style="height: 42px"
+              />
+            </div>
+            <div class="col-12">
+              <label class="form-label text-dark fw-semibold small mb-2"
+                >Assegna alle Classi</label
+              >
+              <app-class-selector
+                [selectedClassIds]="assignedClasses"
+                (selectedClassIdsChange)="onClassesChange($event)"
+              >
+              </app-class-selector>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+      } @if (CurrentStep() === 2) {
+      <div class="syllexCard wizard-step-shell wizard-step-shell--questions">
+        <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-between gap-3 mb-4">
+          <div class="flex-grow-1">
+            <app-questions-search-filters
+              (filtersChanged)="questionsSearched.onFiltersChanged($event)"
+            >
+            </app-questions-search-filters>
+          </div>
+          <div class="flex-shrink-0">
+            <app-syllex-button
+              [props]="{
+                label: 'Genera con AI',
+                variant: 'secondary',
+                leftIcon: SparklesIcon,
+                size: 'medium'
+              }"
+              (clicked)="onRequestAIGeneration()"
+            ></app-syllex-button>
+          </div>
+        </div>
 
-  <section class="form-section">
-    <label class="form-label fw-light text-dark"
-      >Assegnazione e politiche di accesso al test</label
-    >
-    <div class="row">
-      <div class="col-6">
-        <label class="form-label text-dark"
-          >Classi a cui assegnare il test</label
-        >
-        <app-class-selector
-          [selectedClassIds]="assignedClasses"
-          (selectedClassIdsChange)="onClassesChange($event)"
-        ></app-class-selector>
-      </div>
-      <div class="col-6">
-        <label for="access-password" class="form-label text-dark"
-          >Password d'accesso</label
-        >
-        <div class="d-flex flex-row gap-3">
-          <input
-            type="text"
-            id="access-password"
-            class="form-control custom-input"
-            formControlName="password"
-            placeholder="Imposta una password per il test (opzionale)"
-          />
-          <button class="btn btn-primary" (click)="onGeneratePassword()">
-            <fa-icon [icon]="GenPasswordIcon"></fa-icon>
-          </button>
+        <app-questions-grid-selector
+          [questions]="questionsSearched.filteredQuestions()"
+          [selectedIds]="SelectedQuestionIds()"
+          [pointsByQuestion]="SelectedQuestionPoints()"
+          [canLoadMore]="questionsSearched.canLoadMore()"
+          [isLoadingMore]="questionsSearched.isLoading()"
+          (reachBottom)="questionsSearched.loadNextPageAppend()"
+          (pointChanged)="onQuestionPointsChanged($event)"
+          (toggleSelection)="onToggleQuestion($event)"
+        ></app-questions-grid-selector>
+
+        <div class="d-none">
+          <app-search-questions
+            #questionsSearched
+            [selectedQuestionIds]="[]"
+          ></app-search-questions>
         </div>
       </div>
-    </div>
-  </section>
+      } @if (CurrentStep() === 3) {
+      <div class="syllexCard wizard-step-shell">
+        <div class="row g-3 g-md-4 step3-grid">
+          <div class="col-12 col-md-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <label class="form-label text-dark fw-semibold small mb-0"
+                >Punteggio Idoneità *</label
+              >
+            </div>
+            <input
+              type="number"
+              formControlName="requiredScore"
+              class="form-control custom-input step3-control"
+              placeholder="Min. punti"
+              [attr.max]="maxScore"
+            />
+            <div class="d-flex justify-content-end">
+              <small class="text-muted fw-medium"
+                >{{ TestForm.get('requiredScore')?.value || 0 }} / {{ maxScore
+                }} pt</small
+              >
+            </div>
+          </div>
 
-  <section class="form-section">
-    <div
-      class="d-flex flex-row justify-content-between align-items-center mb-4"
-    >
-      <div>
-        <label class="form-label text-dark mb-0">Domande</label>
-        <p class="text-dark fw-light">
-          Cerca nella tua banca domande di
-          <span class="fw-bold">
-            {{ materiaService.materiaSelected()?.name || '...' }}
-          </span>
-          e sceglile per comporre il test
-        </p>
-      </div>
-      <button class="btn ai" type="button" (click)="onRequestAIGeneration()">
-        <fa-icon [icon]="SparklesIcon"></fa-icon>
-        Genera con AI
-      </button>
-    </div>
+          <div class="col-12 col-md-4">
+            <label class="form-label text-dark fw-semibold small mb-2"
+              >Password
+              <span class="text-muted fw-normal">(opzionale)</span></label
+            >
+            <div class="syllex-input-group">
+              <input
+                type="text"
+                formControlName="password"
+                class="form-control"
+                placeholder="Chiave d'accesso"
+              />
+              <button class="btn" type="button" (click)="onGeneratePassword()">
+                <fa-icon [icon]="GenPasswordIcon"></fa-icon>
+              </button>
+            </div>
+          </div>
 
-    <app-questions-search-filters
-      (filtersChanged)="questionsSearched.onFiltersChanged($event)"
-    ></app-questions-search-filters>
-    <div class="row mt-5">
-      <div class="col-6">
-        <app-search-questions
-          #questionsSearched
-          [selectedQuestionIds]="SelectedQuestionIds()"
-        ></app-search-questions>
-      </div>
-      <div class="col-6">
-        <app-questions-droppable-list
-          [questionsToLoad]="QuestionsToLoad()"
-          (questionsChanged)="onQuestionsChanged($event)"
-        ></app-questions-droppable-list>
-      </div>
-    </div>
-  </section>
+          <div class="col-12 col-md-4">
+            <label class="form-label text-dark fw-semibold small mb-2"
+              >Tempo Limite (minuti)</label
+            >
+            <div class="syllex-input-group">
+              <input
+                type="number"
+                formControlName="time"
+                class="form-control"
+                [placeholder]="time === null ? 'Tempo illimitato' : 'Minuti'"
+              />
+              <button
+                class="btn"
+                type="button"
+                [class.text-primary]="time === null"
+                (click)="onToggleUnlimitedTime()"
+              >
+                <fa-icon [icon]="InfinityIcon"></fa-icon>
+              </button>
+            </div>
+          </div>
 
-  <section class="form-section">
-    <label class="form-label fw-light text-dark"
-      >Requisiti per superare il test e tempo a disposizione</label
-    >
-    <div class="row">
-      <div class="col-4">
-        <label for="required-score" class="form-label text-dark"
-          >Punteggio minimo per idoneità</label
-        >
-        <input
-          type="number"
-          min="1"
-          [max]="maxScore || 100"
-          id="required-score"
-          class="form-control custom-input"
-          formControlName="requiredScore"
-          [placeholder]="maxScore > 0 ? 'Max: ' + maxScore + ' punti' : 'Imposta il punteggio minimo per superare il test'"
-        />
-        @if (maxScore > 0) {
-        <small class="text-muted"
-          >Punteggio massimo del test: {{ maxScore }} punti</small
-        >
-        }
-      </div>
-      <div class="col-4">
-        <label for="max-time" class="form-label text-dark"
-          >Tempo massimo (minuti)</label
-        >
-        <div class="d-flex flex-row gap-3">
-          <input
-            type="number"
-            min="0"
-            max="100"
-            id="max-time"
-            class="form-control custom-input"
-            formControlName="time"
-            [placeholder]="time === null ? 'Tempo illimitato' : 'Imposta il tempo massimo per il test'"
-          />
-          <button
-            class="btn"
-            id="infiniteButton"
-            [class.selected]="time === null"
-            (click)="onToggleUnlimitedTime()"
+          <div class="col-12 col-md-4">
+            <div class="d-flex flex-column gap-2 rounded-3 p-3">
+              <div class="form-check form-switch custom-switch mb-0">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  role="switch"
+                  id="random-sw"
+                  formControlName="randomizeQuestions"
+                />
+                <label class="form-check-label text-dark small" for="random-sw"
+                  >Randomizza domande</label
+                >
+              </div>
+              <div class="form-check form-switch custom-switch mb-0">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  role="switch"
+                  id="oneshot-sw"
+                  formControlName="oneShotAnswers"
+                />
+                <label class="form-check-label text-dark small" for="oneshot-sw"
+                  >Risposta secca (One-shot)</label
+                >
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="col-12 d-flex justify-content-between align-items-center gap-2 mt-1"
           >
-            <fa-icon [icon]="InfinityIcon"></fa-icon>
-          </button>
+            <div class="d-flex flex-column flex-md-row gap-2 w-100 justify-content-end mobile-full-width-btn">
+              <app-syllex-button
+                [props]="{
+                  label: 'Salva Bozza',
+                  variant: 'outline',
+                  color: 'dark',
+                  size: 'medium',
+                  disabled: IsLoading() || !CanSaveDraft()
+                }"
+                (clicked)="onSaveTest(true)"
+              ></app-syllex-button>
+              <app-syllex-button
+                [props]="{
+                  label: 'Pubblica Test',
+                  variant: 'primary',
+                  size: 'medium',
+                  disabled: IsLoading() || !CanPublish()
+                }"
+                (clicked)="onSaveTest()"
+              ></app-syllex-button>
+            </div>
+          </div>
+        </div>
+      </div>
+      }
+
+      <div class="wizard-footer p-3 mt-3">
+        <!-- MOBILE LAYOUT -->
+        <div class="d-flex flex-column w-100 d-lg-none gap-3">
+          <!-- Top row: <, Stepper, > -->
+          <div class="d-flex justify-content-between align-items-center w-100 px-3 gap-3">
+            <app-syllex-button
+              [props]="{
+                leftIcon: ArrowLeftIcon,
+                variant: 'outline',
+                color: 'dark',
+                size: 'medium',
+                shape: 'circle',
+                disabled: CurrentStep() === 1
+              }"
+              (clicked)="goPrevStep()"
+            ></app-syllex-button>
+
+            <app-syllex-stepper
+              [steps]="StepDefs"
+              [currentStep]="CurrentStep()"
+              [clickable]="true"
+              [maxClickableStep]="CanGoNextToFinalize() ? 3 : CanGoNextToQuestions() ? 2 : 1"
+              (stepSelected)="goToStep($event)"
+            ></app-syllex-stepper>
+
+            <div [class.invisible]="!ShowFooterNext()">
+              <app-syllex-button
+                [props]="{
+                  rightIcon: ArrowRightIcon,
+                  variant: 'primary',
+                  size: 'medium',
+                  shape: 'circle',
+                  disabled: !CanGoNext()
+                }"
+                (clicked)="goNextStep()"
+              ></app-syllex-button>
+            </div>
+          </div>
+
+          <!-- Bottom row: Anteprima -->
+          @if (SelectedQuestionIds().length > 0) {
+          <div class="w-100 d-flex justify-content-center px-2 mt-2">
+            <app-syllex-button
+              [props]="{
+                label: 'Mostra Anteprima',
+                leftIcon: EyeIcon,
+                variant: 'outline',
+                color: 'dark',
+                size: 'medium'
+              }"
+              (clicked)="onPreview()"
+            ></app-syllex-button>
+          </div>
+          }
+        </div>
+
+        <!-- DESKTOP LAYOUT -->
+        <div class="d-none d-lg-flex w-100 align-items-center justify-content-between">
+          <div class="wizard-footer__left d-flex justify-content-start" style="flex: 1;">
+            <app-syllex-button
+              [props]="{
+                label: 'Indietro',
+                leftIcon: ArrowLeftIcon,
+                variant: 'outline',
+                color: 'dark',
+                size: 'medium',
+                disabled: CurrentStep() === 1
+              }"
+              (clicked)="goPrevStep()"
+            ></app-syllex-button>
+          </div>
+
+          <div style="flex: 0 1 400px;" class="d-flex justify-content-center mx-4">
+            <app-syllex-stepper
+              [steps]="StepDefs"
+              [currentStep]="CurrentStep()"
+              [clickable]="true"
+              [maxClickableStep]="CanGoNextToFinalize() ? 3 : CanGoNextToQuestions() ? 2 : 1"
+              (stepSelected)="goToStep($event)"
+            ></app-syllex-stepper>
+          </div>
+
+          <div class="wizard-footer__right d-flex gap-2 justify-content-end" style="flex: 1;">
+            @if (ShowFooterNext()) {
+            <app-syllex-button
+              [props]="{
+                label: 'Avanti',
+                rightIcon: ArrowRightIcon,
+                variant: 'primary',
+                size: 'medium',
+                disabled: !CanGoNext()
+              }"
+              (clicked)="goNextStep()"
+            ></app-syllex-button>
+            }
+          </div>
         </div>
       </div>
     </div>
-  </section>
 
-  <section class="form-section">
-    <label class="form-label fw-light text-dark">Opzioni extra</label>
-    <div class="form-check form-switch">
-      <input
-        class="form-check-input"
-        type="checkbox"
-        role="switch"
-        id="randomize-questions"
-        formControlName="randomizeQuestions"
-      />
-      <label class="form-check-label text-dark" for="randomize-questions">
-        Randomizza ordine domande
-        <small class="text-muted d-block fw-light">Se attivo, ogni studente vedrà le domande in un ordine diverso e casuale</small>
-      </label>
-    </div>
-    
-    <div class="form-check form-switch mt-3">
-      <input
-        class="form-check-input"
-        type="checkbox"
-        role="switch"
-        id="one-shot-answers"
-        formControlName="oneShotAnswers"
-      />
-      <label class="form-check-label text-dark" for="one-shot-answers">
-        One-shot (risposta secca)
-        <small class="text-muted d-block fw-light">Se attivo, lo studente non potrà cambiare la sua scelta una volta data (solo domande chiuse)</small>
-      </label>
-    </div>
-  </section>
+    <!-- COLONNA PREVIEW/AZIONI -->
+    <div class="col-12 col-lg-4 ps-lg-4 mt-4 mt-lg-0 syllexCard d-none d-lg-block">
+      <div
+        class="preview-sticky h-100 d-flex flex-column justify-content-between"
+      >
+        <div class="py-1 py-md-2">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+              <h6 class="fw-bold mb-1">Anteprima rapida</h6>
+              <p class="text-muted small mb-0">
+                Stato corrente del test, senza uscire dalla pagina.
+              </p>
+            </div>
 
-  <div class="d-flex flex-row justify-content-end mt-5 gap-3">
-    <button
-      class="btn btn-link btn-lg"
-      type="button"
-      (click)="onSaveTest(true)"
-      [disabled]="IsLoading() || !CanSaveDraft()"
-    >
-      Salva Bozza
-    </button>
-    <button
-      class="btn btn-gradient-primary icon-btn btn-lg"
-      type="button"
-      (click)="onSaveTest()"
-      [disabled]="IsLoading() || !CanPublish()"
-    >
-      Salva
-    </button>
+            @if (CanPublish()) {
+            <app-syllex-badge label="Pronto" color="green"></app-syllex-badge>
+            } @else { }
+          </div>
+
+          <div class="preview-meta d-flex flex-column gap-2 small">
+            <div class="d-flex justify-content-between gap-2">
+              <span class="text-muted">Titolo</span>
+              <span class="fw-semibold text-end text-truncate"
+                >{{ TestForm.get('title')?.value || 'Non impostato' }}</span
+              >
+            </div>
+            <div class="d-flex justify-content-between gap-2">
+              <span class="text-muted">Domande</span>
+              <span class="fw-semibold"
+                >{{ SelectedQuestionIds().length }}</span
+              >
+            </div>
+            <div class="d-flex justify-content-between gap-2">
+              <span class="text-muted">Classi</span>
+              <span class="fw-semibold">{{ assignedClasses.length }}</span>
+            </div>
+            <div class="d-flex justify-content-between gap-2">
+              <span class="text-muted">Disponibilità</span>
+              <span class="fw-semibold text-end"
+                >{{ getAvailabilitySummary() }}</span
+              >
+            </div>
+            <div class="d-flex justify-content-between gap-2">
+              <span class="text-muted">Tempo</span>
+              <span class="fw-semibold">{{ getTimeSummary() }}</span>
+            </div>
+            <div class="d-flex justify-content-between gap-2">
+              <span class="text-muted">Idoneità</span>
+              <span class="fw-semibold"
+                >{{ TestForm.get('requiredScore')?.value || 0 }} / {{ maxScore
+                }}</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3 d-flex gap-2 justify-content-end">
+          <app-syllex-button
+            [props]="{
+              label: 'Anteprima',
+              variant: 'primary',
+              color: 'black',
+              size: 'medium',
+              disabled: SelectedQuestionIds().length === 0
+            }"
+            (clicked)="onPreview()"
+          ></app-syllex-button>
+        </div>
+      </div>
+    </div>
   </div>
 </form>
 }

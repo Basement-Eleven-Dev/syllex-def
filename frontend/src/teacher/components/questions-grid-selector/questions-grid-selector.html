@@ -1,0 +1,48 @@
+<div #scrollContainer class="questions-scroll-list" (scroll)="onListScroll($event)">
+  @for (question of sortedQuestions; track question._id) {
+  <div
+    class="question-row"
+    [class.question-row--selected]="isSelected(question._id)"
+    (click)="onToggle(question)"
+    role="button"
+    tabindex="0"
+    (keydown.enter)="onToggle(question)"
+  >
+    <div class="question-row__content">
+      <p class="question-row__text mb-0">{{ question.text }}</p>
+    </div>
+
+    <div class="question-row__right" (click)="$event.stopPropagation()">
+      <span
+        class="badge rounded-pill question-badge"
+        [class.question-badge--selected]="isSelected(question._id)"
+      >
+        {{ getQuestionTypeLabel(question.type) }}
+      </span>
+
+      <div class="question-row__points">
+        <label class="question-row__points-label">Punti</label>
+        <input
+          type="number"
+          min="1"
+          step="1"
+          class="form-control form-control-sm"
+          [value]="getPoints(question._id)"
+          [disabled]="!isSelected(question._id)"
+          (input)="onPointsInput(question._id, $event)"
+        />
+      </div>
+    </div>
+  </div>
+  } @empty {
+  <div class="text-center py-5 opacity-50">
+    <p class="fs-5">Nessuna domanda trovata con questi filtri.</p>
+  </div>
+  } @if (isLoadingMore) {
+  <div class="text-center py-3 text-muted small">
+    Caricamento altre domande...
+  </div>
+  } @if (!canLoadMore && questions.length > 0) {
+  <div class="text-center py-3 text-muted small">Hai raggiunto la fine.</div>
+  }
+</div>

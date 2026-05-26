@@ -10,15 +10,19 @@ import {
   faUser,
   faSpinnerThird,
   faSave,
+  faArrowLeft,
+  faChartLine,
+  faRobot,
 } from '@fortawesome/pro-solid-svg-icons';
 import { faCircle } from '@fortawesome/pro-regular-svg-icons';
 import { QuestionCorrection } from '../../components/question-correction/question-correction';
 import { TestsService } from '../../../services/tests-service';
 import { FeedbackService } from '../../../services/feedback-service';
-import { BackTo } from '../../components/back-to/back-to';
-
-import { TestAiSummaryComponent } from '../../components/test-ai-summary/test-ai-summary';
-import { StudentPerformanceChartComponent } from '../../components/student-performance-chart/student-performance-chart';
+import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
+import {
+  KpiCardData,
+  SyllexKpiRow,
+} from '../../components/UI/syllex-kpi-row/syllex-kpi-row';
 
 @Component({
   selector: 'app-correzione',
@@ -27,11 +31,10 @@ import { StudentPerformanceChartComponent } from '../../components/student-perfo
     FontAwesomeModule,
     TitleCasePipe,
     DatePipe,
+    RouterLink,
     QuestionCorrection,
-    BackTo,
-    QuestionCorrection,
-    TestAiSummaryComponent,
-    StudentPerformanceChartComponent,
+    SyllexButton,
+    SyllexKpiRow,
   ],
   templateUrl: './correzione.html',
   styleUrl: './correzione.scss',
@@ -46,6 +49,7 @@ export class Correzione implements OnInit {
   readonly data = signal<any | null>(null);
   readonly isLoading = signal<boolean>(true);
   readonly isSaving = signal<boolean>(false);
+  readonly isGeneratingInsight = signal<boolean>(false);
   readonly questionIndex = signal<number>(0);
   readonly attemptId = signal<string | null>(null);
 
@@ -58,6 +62,9 @@ export class Correzione implements OnInit {
   readonly TimesIcon = faTimes;
   readonly SpinnerIcon = faSpinnerThird;
   readonly SaveIcon = faSave;
+  readonly ArrowLeftIcon = faArrowLeft;
+  readonly ChartIcon = faChartLine;
+  readonly RobotIcon = faRobot;
 
   ngOnInit(): void {
     const attemptId = this.route.snapshot.paramMap.get('attemptId');
@@ -147,5 +154,59 @@ export class Correzione implements OnInit {
   get backUrl(): string {
     const testId = this.data()?.testId;
     return testId ? `/t/tests/${testId}` : '/t/tests';
+  }
+
+  generateAiFeedback(): void {
+    const id = this.attemptId();
+    if (!id) return;
+    this.isGeneratingInsight.set(true);
+    this.testsService.getAttemptInsight(id).subscribe({
+      next: (res) => {
+        this.data.update((d) => (d ? { ...d, aiInsight: res.insight } : d));
+        this.feedbackService.showFeedback(
+          'Feedback AI generato con successo!',
+          true,
+        );
+        this.isGeneratingInsight.set(false);
+      },
+      error: () => {
+        this.feedbackService.showFeedback(
+          'Errore durante la generazione IA',
+          false,
+        );
+        this.isGeneratingInsight.set(false);
+      },
+    });
+  }
+
+  summaryKpis(d: any): KpiCardData[] {
+    const mins = Math.floor(d.timeSpent / 60);
+    const secs = d.timeSpent % 60;
+    const time = `${mins}m ${secs}s`;
+    return [
+      {
+        label: 'Risposte esatte',
+        value: d.questionsStats.correct,
+        bgColor: '#E6FF80',
+        textColor: '#1A5511',
+      },
+      {
+        label: 'Risposte errate',
+        value: d.questionsStats.wrong,
+        bgColor: '#FFD2D2',
+        textColor: '#E51215',
+      },
+      {
+        label: 'Senza risposta',
+        value: d.questionsStats.empty,
+        bgColor: '#E4E4E4',
+        textColor: '#363636',
+      },
+      {
+        label: 'Punteggio',
+        value: `${d.score != null ? d.score : '?'} / ${d.maxScore}`,
+      },
+      { label: 'Tempo impiegato', value: time },
+    ];
   }
 }

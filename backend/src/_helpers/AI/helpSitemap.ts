@@ -12,10 +12,9 @@ export const SYLLEX_SITEMAP: Record<string, NavigablePage[]> = {
     { key: 'CLASSI', path: '/t/classi', label: 'Gestisci le tue Classi', description: 'Elenco completo delle tue classi e dei relativi studenti.' },
     { key: 'RISORSE', path: '/t/risorse', label: 'Vedi i Materiali', description: 'Accesso a documenti, slide e risorse didattiche caricate.' },
     { key: 'TESTS', path: '/t/tests', label: 'Vai ai Test', description: 'Elenco, monitoraggio e creazione delle verifiche scolastiche.' },
-    { key: 'COMUNICAZIONI', path: '/t/comunicazioni', label: 'Leggi le Comunicazioni', description: 'Centro messaggi per scambiare avvisi e comunicazioni con gli studenti.' },
     { key: 'PROFILO', path: '/t/profilo', label: 'Il tuo Profilo', description: 'Gestione delle tue informazioni personali e preferenze account.' },
     { key: 'LAB_AI', path: '/t/laboratorio-ai', label: 'Laboratorio AI', description: 'Strumenti avanzati di intelligenza artificiale per il supporto alla didattica.' },
-    { key: 'EVENTI', path: '/t/eventi', label: 'Guarda il Calendario', description: 'Calendario scolastico, scadenze, eventi e appuntamenti programmati.' }
+    { key: 'CALENDARIO', path: '/t/calendario', label: 'Guarda il Calendario', description: 'Calendario scolastico, scadenze, appuntamenti e comunicazioni con gli studenti.' }
   ],
   student: [
     { key: 'DASHBOARD', path: '/s/dashboard', label: 'Vai alla Dashboard', description: 'La tua panoramica sui progressi e sulle lezioni recenti.' },

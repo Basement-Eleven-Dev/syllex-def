@@ -1,0 +1,24 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.search-wrapper {
+  max-width: 320px;
+  min-width: 280px;
+  flex: 1;
+
+  @media (max-width: 991px) {
+    max-width: 100%;
+    min-width: 100%;
+  }
+}
+
+.select-wrapper {
+  min-width: 100px;
+  flex: 1;
+
+  @media (max-width: 991px) {
+    min-width: calc(50% - 0.5rem);
+  }
+}

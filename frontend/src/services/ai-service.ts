@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { MaterialType, QuestionType } from '../types/question.types';
 
@@ -29,6 +29,7 @@ export interface GenerateQuestionRequest {
   language?: string;
   difficulty?: QuestionDifficulty;
   numberOfAlternatives?: number;
+  count?: number;
 }
 
 export interface GeneratedQuestionOption {
@@ -42,6 +43,7 @@ export interface GeneratedQuestion {
   explanation: string;
   correctAnswer?: boolean;
   options?: GeneratedQuestionOption[];
+  topicId?: string;
 }
 
 export interface GenerateMaterialRequest {
@@ -69,6 +71,25 @@ export interface GeneratedMaterial {
 export class AiService {
   private http = inject(HttpClient);
 
+  extractErrorMessage(error: unknown): string {
+    if (error instanceof HttpErrorResponse) {
+      const payloadMessage = error.error?.message;
+      if (typeof payloadMessage === 'string' && payloadMessage.trim()) {
+        return payloadMessage;
+      }
+      if (typeof error.error === 'string' && error.error.trim()) {
+        return error.error;
+      }
+      if (typeof error.message === 'string' && error.message.trim()) {
+        return error.message;
+      }
+    }
+    if (error instanceof Error && error.message.trim()) {
+      return error.message;
+    }
+    return 'Errore durante la generazione. Riprova.';
+  }
+
   async generateQuestion(data: {
     topicId: string;
     materialIds: string[];
@@ -93,24 +114,32 @@ export class AiService {
     return response.question;
   }
 
-  /** Generates N questions sequentially to avoid Gemini rate limits.
-   * Returns the fulfilled questions plus the number of failed requests.
+  /** Generates N questions in a single backend call to ensure variety,
+   * prevent duplicates, and optimize performance.
+   * Returns the generated questions plus the number of failed requests.
    */
   async generateQuestions(
     data: Parameters<AiService['generateQuestion']>[0],
     count: number,
   ): Promise<{ questions: GeneratedQuestion[]; failedCount: number }> {
-    const results = await Promise.allSettled(
-      Array.from({ length: count }, () => this.generateQuestion(data)),
-    );
-    const questions = results
-      .filter(
-        (r): r is PromiseFulfilledResult<GeneratedQuestion> =>
-          r.status === 'fulfilled',
-      )
-      .map((r) => r.value);
-    const failedCount = results.filter((r) => r.status === 'rejected').length;
-    return { questions, failedCount };
+    const payload: GenerateQuestionRequest = {
+      topicId: data.topicId,
+      materialIds: data.materialIds,
+      type: QUESTION_TYPE_MAP[data.type],
+      instructions: data.instructions,
+      language: data.language,
+      difficulty: data.difficulty,
+      numberOfAlternatives: data.numberOfAlternatives,
+      count,
+    };
+    try {
+      const response = await firstValueFrom(
+        this.http.post<{ questions: GeneratedQuestion[] }>('ai/questions', payload),
+      );
+      return { questions: response.questions || [], failedCount: 0 };
+    } catch (error) {
+      throw new Error(this.extractErrorMessage(error));
+    }
   }
 
   async generateMaterial(data: {
@@ -129,9 +158,13 @@ export class AiService {
       additionalInstructions: data.additionalInstructions || undefined,
       language: data.language,
     };
-    const response = await firstValueFrom(
-      this.http.post<{ material: GeneratedMaterial }>('ai/materials', payload),
-    );
-    return response.material;
+    try {
+      const response = await firstValueFrom(
+        this.http.post<{ material: GeneratedMaterial }>('ai/materials', payload),
+      );
+      return response.material;
+    } catch (error) {
+      throw new Error(this.extractErrorMessage(error));
+    }
   }
 }

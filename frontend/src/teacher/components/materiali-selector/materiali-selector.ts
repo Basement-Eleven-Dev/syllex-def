@@ -50,6 +50,7 @@ export class MaterialiSelector {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   @Input() embeddingCreationMode: boolean = false;
   @Input() showAiGenerated: boolean = false;
+  @Input() compact: boolean = false;
 
   private readonly feedbackService = inject(FeedbackService);
 
@@ -62,6 +63,11 @@ export class MaterialiSelector {
 
   getIconColor(item: MaterialInterface): string {
     return getIconColor(item.extension || '');
+  }
+
+  getItemFileIcon(item: MaterialInterface): IconDefinition {
+    if (item.type === 'folder') return getFileIcon('folder');
+    return getFileIcon(item.extension || '');
   }
 
   expandedFolders = signal<Set<string>>(new Set());

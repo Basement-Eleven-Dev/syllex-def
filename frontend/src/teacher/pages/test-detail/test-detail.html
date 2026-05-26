@@ -1,8 +1,3 @@
-<app-back-to
-  [path]="'/t/tests'"
-  [label]="'Torna alla lista dei test'"
-></app-back-to>
-
 @if (IsLoading()) {
 <div class="d-flex justify-content-center align-items-center py-5">
   <fa-icon
@@ -13,72 +8,58 @@
   ></fa-icon>
 </div>
 } @else if (TestData()) {
-<div class="mb-3 d-flex flex-row justify-content-between align-items-center">
-  <h1 class="mb-0 d-flex flex-row align-items-center gap-2">
-    <span [class]="'status-pill ' + TestData()!.status"></span>
-    <span class="text-dark fw-medium mb-0 display-6"
-      >{{ TestData()!.name }}</span
-    >
-  </h1>
 
-  <div class="d-flex flex-row gap-2 align-items-center">
-    <button class="btn btn-primary icon-btn" (click)="onPrintTest()">
-      <fa-icon [icon]="PrintIcon"></fa-icon> Stampa / PDF
-    </button>
-    <button class="btn btn-primary icon-btn" (click)="onPrintResults()">
-      <fa-icon [icon]="PrintIcon"></fa-icon> Stampa risultati
-    </button>
-    <button class="btn btn-blue icon-btn" (click)="onEditTest()">
-      <fa-icon [icon]="EditIcon"></fa-icon> Modifica
-    </button>
-    <button class="btn btn-red icon-btn" (click)="onDeleteTest()">
-      <fa-icon [icon]="TrashIcon"></fa-icon> Elimina
-    </button>
-  </div>
+<!-- Header -->
+<app-back-to [path]="'/t/tests'" label="Torna ai test" />
+
+<app-syllex-page-header
+  [title]="TestData()!.name"
+  [description]="TestData()!.availableFrom ? 'Creato il ' + (TestData()!.availableFrom | date: 'd MMM y') : ''"
+>
+  <app-syllex-button
+    [props]="{ label: 'Stampa / PDF', variant: 'primary', color: 'celestine', size: 'large', leftIcon: PrintIcon }"
+    (clicked)="onPrintTest()"
+  />
+  <app-syllex-button
+    [props]="{ label: 'Stampa Risultati', variant: 'primary', color: 'celestine', size: 'large', leftIcon: PrintIcon }"
+    (clicked)="onPrintResults()"
+  />
+  <app-syllex-button
+    [props]="{ label: 'Modifica', variant: 'secondary', size: 'large', leftIcon: EditIcon }"
+    (clicked)="onEditTest()"
+  />
+  <app-syllex-button
+    [props]="{ label: 'Elimina', variant: 'primary', color: 'danger', size: 'large', leftIcon: TrashIcon }"
+    (clicked)="onDeleteTest()"
+  />
+</app-syllex-page-header>
+
+<!-- KPI -->
+<div class="mt-4">
+  <app-syllex-kpi-row [kpis]="TestStats()" />
 </div>
 
-@if (TestData()!.availableFrom) {
-<h5 class="text-dark mb-0 fw-normal">
-  Creato il {{ TestData()!.availableFrom | date: 'd MMM y' }}
-</h5>
-}
-
-<div class="row my-5">
-  @for (stat of TestStats(); track $index) {
-  <div class="col-12 col-md-6 col-lg-3 mb-3">
-    <app-stat-card [stat]="stat" />
-  </div>
-  }
+<!-- Assegnazioni -->
+<div class="section-heading mt-5">
+  <span>Assegnazioni</span>
+  <fa-icon [icon]="UsersIcon" />
 </div>
+<app-test-assignments [attempts]="Attempts()" />
 
-<div class="row">
-  <div class="col-12 col-lg-2 mb-3 mb-lg-0 d-flex flex-column gap-2">
-    @for(section of Sections; track section.id) {
-    <button
-      type="button"
-      class="p-3 rounded-syllex mb-0 section-link fs-6 fw-normal"
-      [class.active]="ActiveSection() === section.id"
-      (click)="onChangeSection(section.id)"
-    >
-      <fa-icon [icon]="section.icon" class="me-2"></fa-icon> {{ section.title }}
-    </button>
-    }
-  </div>
-
-  <div class="col-12 col-lg-10">
-    @if (ActiveSection() === 1) {
-    <app-test-assignments [attempts]="Attempts()" />
-    } @else if (ActiveSection() === 2) {
-    <div class="mb-4">
-      <app-test-ai-summary [id]="TestId()!" mode="test" />
-    </div>
-    <app-test-stats
-      [attempts]="Attempts()"
-      [maxScore]="TestData()?.maxScore || 0"
-    />
-    }
-  </div>
+<!-- Statistiche -->
+<div class="section-heading mt-5">
+  <span>Statistiche</span>
+  <fa-icon [icon]="ChartIcon" />
 </div>
+<div class="mb-4">
+  <app-test-ai-summary [id]="TestId()!" mode="test" />
+</div>
+<app-test-stats
+  [attempts]="Attempts()"
+  [maxScore]="TestData()?.maxScore || 0"
+  [classes]="Classes()"
+/>
+
 } @else {
 <div class="alert alert-warning" role="alert">Test non trovato</div>
 }

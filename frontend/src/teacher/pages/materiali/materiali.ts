@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   inject,
   signal,
   ViewChild,
@@ -23,6 +24,7 @@ import {
   faRobot,
   faXmark,
   faTrash,
+  faArrowLeft,
 } from '@fortawesome/pro-solid-svg-icons';
 import {
   NgbDropdown,
@@ -53,10 +55,15 @@ import {
 } from '../../../app/_utils/file-validation.utils';
 import { StorageLimitBar } from '../../components/storage-limit-bar/storage-limit-bar';
 import { AiOverlay } from '../../components/ai-overlay/ai-overlay';
+import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
 import { SuggestedTopicsModal } from '../../components/suggested-topics-modal/suggested-topics-modal';
 import { effect, untracked } from '@angular/core';
 import { FeedbackService } from '../../../services/feedback-service';
 import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
+import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
+import { SyllexSearchInput } from '../../components/UI/syllex-search-input/syllex-search-input';
+import { SyllexClearButton } from '../../components/UI/syllex-clear-button/syllex-clear-button';
+import { SyllexEmptyState } from '../../components/UI/syllex-empty-state/syllex-empty-state';
 
 @Component({
   selector: 'app-materiali',
@@ -72,7 +79,12 @@ import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
     MaterialeContextualMenu,
     StorageLimitBar,
     AiOverlay,
+    SyllexButton,
+    SyllexSearchInput,
+    SyllexClearButton,
     TourAnchorNgBootstrapDirective,
+    SyllexPageHeader,
+    SyllexEmptyState,
   ],
   templateUrl: './materiali.html',
   styleUrl: './materiali.scss',
@@ -112,6 +124,7 @@ export class Materiali implements OnInit {
     robot: faRobot,
     clear: faXmark,
     trash: faTrash,
+    arrowLeft: faArrowLeft,
   } as const;
 
   // ── State proxied from facade (avoids template changes) ───────────
@@ -122,6 +135,27 @@ export class Materiali implements OnInit {
   readonly selectedCount = this.facade.selectedCount;
   readonly isStorageFull = this.facade.isStorageFull;
   readonly suggestedTopics = this.facade.suggestedTopics;
+
+  readonly files = computed(() =>
+    (this.rootFolder()?.content ?? []).filter((item) => item.type === 'file'),
+  );
+
+  readonly folders = computed(() =>
+    (this.rootFolder()?.content ?? []).filter((item) => item.type === 'folder'),
+  );
+
+  readonly allItems = computed(() => {
+    const content = this.rootFolder()?.content ?? [];
+    return [...content].sort((a, b) => {
+      // Cartelle sempre prima
+      if (a.type === 'folder' && b.type !== 'folder') return -1;
+      if (a.type !== 'folder' && b.type === 'folder') return 1;
+      // Poi per data decrescente (più recente prima)
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA;
+    });
+  });
 
   // ── UI-only state ─────────────────────────────────────────────────
   protected readonly viewType = signal<ViewType>('grid');
@@ -323,12 +357,17 @@ export class Materiali implements OnInit {
   // ── GenAI ─────────────────────────────────────────────────────────
 
   protected onRequestGenerate(): void {
-    this.offcanvasService.open(GenAiContents, {
+    const offcanvasRef = this.offcanvasService.open(GenAiContents, {
       position: 'end',
       panelClass: 'offcanvas-large',
       scroll: true,
       backdrop: true,
     });
+
+    offcanvasRef.result.then(
+      () => this.facade.reload(),
+      () => this.facade.reload()
+    );
   }
 
   // ── Topic Suggestions ─────────────────────────────────────────────

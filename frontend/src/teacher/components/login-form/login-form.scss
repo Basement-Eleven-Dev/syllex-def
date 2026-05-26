@@ -1,24 +1,148 @@
+$blue: #3931ce;
+$accent: #52a0ff;
+
+// ─── Headings & labels ────────────────────────────────────────────────────────
+h3 {
+  color: $blue;
+  font-weight: 400;
+}
+
+.form-label {
+  font-weight: 400;
+  color: $accent;
+}
+
+.form-check-label {
+  color: #212529;
+}
+
+a {
+  color: $blue;
+}
+
+// ─── Inputs — blue border #52A0FF ─────────────────────────────────────────────
+.custom-input {
+  border-color: $accent;
+  border-radius: 999px !important;
+  font-weight: 600;
+  padding: 0.85rem 1.25rem;
+  font-size: 1rem;
+  min-height: 54px;
+
+  &:focus {
+    border-color: $blue;
+    box-shadow: 0 0 0 3px rgba($accent, 0.2);
+  }
+}
+
+// ─── Password toggle group ────────────────────────────────────────────────────
 .input-group-custom {
+  border: 1.5px solid $accent;
+  border-radius: 999px !important;
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
   .custom-input {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+
     &:focus {
-      border-right-color: transparent;
-      box-shadow: none;
+      box-shadow: none !important;
     }
   }
 
   .border-custom {
-    border: 1px solid #ced4da;
+    border: none;
     background-color: #fff;
     color: #495057;
+    min-height: 54px;
+    padding: 0 1.25rem;
+    border-radius: 0 999px 999px 0 !important;
 
     &:hover {
-      background-color: #f8f9fa;
-      color: #0d6efd;
+      background-color: rgba($accent, 0.06);
+      color: $blue;
     }
 
     &:focus {
       box-shadow: none;
+      outline: none;
     }
   }
+
+  &:focus-within {
+    border-color: $blue;
+    box-shadow: 0 0 0 3px rgba($accent, 0.2);
+  }
+}
+
+// ─── Premium Custom Checkbox ──────────────────────────────────────────────────
+.form-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding-left: 0;
+}
+
+.form-check-input {
+  appearance: none;
+  -webkit-appearance: none;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  border: 2px solid $accent;
+  border-radius: 6px;
+  background-color: #fff;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 6px;
+    width: 5px;
+    height: 9px;
+    border: 2.5px solid #fff;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg) scale(0);
+    transition: transform 0.15s ease;
+  }
+
+  &:hover {
+    border-color: $blue;
+    box-shadow: 0 0 0 3px rgba($accent, 0.15);
+  }
+
+  &:checked {
+    background: linear-gradient(135deg, $blue, $accent);
+    border-color: $blue;
+
+    &::after {
+      transform: rotate(45deg) scale(1);
+    }
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba($accent, 0.25);
+  }
+}
+
+// ─── SyllexButton full-width ──────────────────────────────────────────────────
+app-syllex-button {
+  width: 100%;
+  display: block;
+}
+
+app-syllex-button ::ng-deep button {
+  width: 100%;
+  min-height: 58px;
+  font-size: 1.05rem;
+  justify-content: center;
 }
 

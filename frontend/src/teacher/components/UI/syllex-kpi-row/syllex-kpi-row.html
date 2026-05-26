@@ -1,0 +1,35 @@
+<div class="row g-3">
+  @for (kpi of kpis; track $index) {
+  <div [class]="colClass">
+    <div
+      class="kpi-card d-flex justify-content-between"
+      [style.background]="kpi.bgColor || null"
+      [style.color]="kpi.textColor || null"
+    >
+      <div class="d-flex flex-column gap-1">
+        <span class="kpi-value" [style.color]="kpi.textColor || null">
+          {{ kpi.value }}@if (kpi.requirePercentage) {<small
+            class="kpi-percentage"
+            >%</small
+          >}
+        </span>
+        <span class="kpi-label" [style.color]="kpi.textColor || null"
+          >{{ kpi.label }}</span
+        >
+      </div>
+      <div class="kpi-card__top">
+        @if (kpi.buttonLabel && kpi.buttonLink) {
+        <app-syllex-button
+          [props]="{
+          label: kpi.buttonLabel,
+          variant: 'primary',
+          size: 'medium',
+          link: $any(kpi.buttonLink)
+        }"
+        ></app-syllex-button>
+        }
+      </div>
+    </div>
+  </div>
+  }
+</div>

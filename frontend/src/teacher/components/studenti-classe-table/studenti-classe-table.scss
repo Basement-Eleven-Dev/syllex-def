@@ -1,14 +1,33 @@
+.card {
+  border: none !important;
+  background-color: #f6f9fe !important;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
+}
+
+.table {
+  --bs-table-bg: transparent !important;
+  --bs-table-striped-bg: rgba(57, 49, 206, 0.02) !important;
+  --bs-table-hover-bg: rgba(57, 49, 206, 0.04) !important;
+  background-color: transparent !important;
+}
+
 tbody > tr > td {
   color: var(--bs-dark);
   border: none;
   padding: 1rem;
+  background-color: transparent !important;
+  border-bottom: 1px solid rgba(57, 49, 206, 0.06) !important;
 }
 
 thead > tr > th {
   color: var(--bs-dark);
   border: none;
   padding: 1rem;
+  background-color: transparent !important;
+  border-bottom: 2px solid rgba(57, 49, 206, 0.1) !important;
 }
+
 tr {
   &:hover {
     cursor: pointer;

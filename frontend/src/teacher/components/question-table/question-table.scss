@@ -1,11 +1,32 @@
+table {
+  border-collapse: collapse;
+}
+
+thead > tr > th {
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--bs-secondary-color);
+}
+
 tbody > tr > td {
   color: var(--bs-dark);
   border: none;
   padding: 1rem;
+  transition: background-color 0.15s ease;
 }
 
-thead > tr > th {
-  color: var(--bs-dark);
-  border: none;
-  padding: 1rem;
+tbody > tr.row-odd > td {
+  background-color: #e8f1fd !important;
+}
+
+tbody > tr.row-even > td {
+  background-color: #ffffff !important;
+}
+
+tbody > tr:hover > td {
+  background-color: #d6e8fc !important;
 }

@@ -1,0 +1,118 @@
+.questions-scroll-list {
+  max-height: min(40vh, 420px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-right: 0.25rem;
+}
+
+.question-row {
+  width: 100%;
+  text-align: left;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  border-radius: 14px;
+  padding: 0.9rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  transition: all 0.18s ease;
+
+  &:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+  }
+}
+
+.question-row--selected {
+  border-color: #84cc16 !important;
+  background: #f7fee7 !important;
+  box-shadow: 0 4px 14px rgba(132, 204, 22, 0.08);
+
+  .question-row__text {
+    color: #1a2e05 !important;
+    font-weight: 500;
+  }
+
+  .question-row__points-label {
+    color: #3f6212 !important;
+  }
+
+  .form-control {
+    border-color: #d9f99d !important;
+    background-color: #ffffff !important;
+    color: #3f6212 !important;
+    font-weight: 600;
+
+    &:focus {
+      border-color: #84cc16 !important;
+      box-shadow: 0 0 0 0.25rem rgba(132, 204, 22, 0.2) !important;
+    }
+  }
+}
+
+.question-badge {
+  background-color: #f1f5f9;
+  color: #475569;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.question-badge--selected {
+  background-color: #84cc16 !important;
+  color: #ffffff !important;
+}
+
+.question-row__content {
+  min-width: 0;
+  flex: 1;
+}
+
+.question-row__text {
+  color: #1f2937;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.question-row__right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.question-row__meta {
+  font-size: 0.78rem;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.question-row__points {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.question-row__points-label {
+  font-size: 0.76rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.question-row__points input {
+  width: 72px;
+}
+
+@media (max-width: 768px) {
+  .question-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .question-row__right {
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+}

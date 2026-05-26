@@ -1,296 +1,621 @@
-<app-back-to
-  [path]="'/t/banca'"
-  [label]="'Torna alla lista delle domande'"
-></app-back-to>
+<app-syllex-page-header
+  tourAnchor="crea_domanda_header"
+  [title]="PageTitle()"
+  [description]="PageDescription()"
+></app-syllex-page-header>
 
-<h1 tourAnchor="crea_domanda_header" class="text-dark fw-medium mb-3 display-6">
-  {{ PageTitle() }}
-</h1>
-<h5 class="text-dark mb-0 fw-normal mb-5">{{ PageDescription() }}</h5>
-<form
-  [formGroup]="QuestionForm"
-  (ngSubmit)="onSaveQuestion()"
-  class="d-flex flex-column gap-4 pb-5"
->
-  <section tourAnchor="crea_domanda_tipo" class="form-section">
-    <label class="form-label text-dark">Tipologia di risposta</label>
-    <app-type-selector
-      [options]="QuestionTypeOptions"
-      [(selectedValue)]="SelectedQuestionType"
-      (typeSelected)="onSelectQuestionType($event)"
-      [direction]="'row'"
-    ></app-type-selector>
-  </section>
-
-  <section tourAnchor="crea_domanda_argomento" class="form-section">
-    <label class="form-label text-dark">Argomento</label>
-    <select
-      class="form-select custom-input w-auto"
-      formControlName="topicId"
-      aria-label="Seleziona argomento"
-    >
-      <option value="" disabled selected>Seleziona argomento</option>
-      @for(topic of materiaService.topics; track topic._id) {
-      <option [value]="topic._id">{{ topic.name }}</option>
-      }
-    </select>
-  </section>
-
-  <section tourAnchor="crea_domanda_difficolta" class="form-section">
-    <label class="form-label text-dark">Difficoltà</label>
-    <select
-      class="form-select custom-input w-auto"
-      formControlName="difficulty"
-      aria-label="Seleziona difficoltà"
-    >
-      @for(opt of DifficultyOptions; track opt.value) {
-      <option [value]="opt.value">{{ opt.label }}</option>
-      }
-    </select>
-  </section>
-
-  <section tourAnchor="crea_domanda_contenuto" class="form-section">
-    <div
-      class="d-flex flex-row justify-content-between align-items-center mb-5"
-    >
-      <div>
-        <label class="form-label text-dark">Contenuto della domanda</label>
-        <p class="text-dark fw-light mb-0">
-          Compila i campi sottostanti per comporre la domanda.<br />Puoi sempre
-          usare l’AI per generare automaticamente un testo di partenza da
-          modificare a tuo piacimento! <fa-icon [icon]="WinkIcon"></fa-icon>
-        </p>
-      </div>
-      <button
-        class="btn icon-btn ai"
-        type="button"
-        (click)="onRequestAIGeneration()"
+<!-- Wizard -->
+@if (!SelectedMethod()) {
+<!-- ── PRE-STEP: Scelta del metodo ── -->
+<div class="pre-step">
+  <div class="row g-4">
+    <div class="col-12 col-md-6">
+      <div
+        class="h-100"
+        style="cursor: pointer"
+        (click)="onSelectMethod('ai')"
+        role="button"
+        aria-label="Genera con AI"
       >
-        <fa-icon [icon]="SparklesIcon"></fa-icon>
-        Genera con AI
-      </button>
-    </div>
-
-    <section class="row">
-      <div class="col-md-8 d-flex flex-column">
-        <label class="form-label text-dark"
-          >{{ SelectedQuestionType() === 'vero falso' ? 'Affermazione' : 'Testo'
-          }}</label
-        >
-        <textarea
-          class="form-control custom-input flex-fill"
-          formControlName="text"
-          rows="4"
-          placeholder="Inserisci il testo della domanda qui..."
-        ></textarea>
+        <app-syllex-card
+          title="Genera con AI"
+          description="L'AI creerà le domande dai tuoi materiali in pochi secondi"
+          [icon]="SparklesIcon"
+          variant="outline"
+          [showArrow]="true"
+          class="h-100 card-celeste"
+        ></app-syllex-card>
       </div>
-      <div class="col-md-4 d-flex flex-column">
-        <label class="form-label text-dark">Allega immagine</label>
-        <div
-          id="imageDropArea"
-          class="rounded-syllex p-3"
-          [class.dragging]="IsDragging()"
-          (dragover)="onDragOver($event)"
-          (dragleave)="onDragLeave($event)"
-          (drop)="onDrop($event)"
-          (click)="fileInput?.click()"
-        >
-          @if(!ImagePreview()) {
-          <div
-            class="image-drop-zone d-flex flex-column justify-content-center align-items-center rounded-3 p-3"
-          >
-            <fa-icon [icon]="ImageIcon" class="mb-3" size="3x"></fa-icon>
-            <p class="text-muted mb-0 text-center">
-              Trascina qui un'immagine o clicca per caricare
-            </p>
-          </div>
-          } @else {
-          <div class="image-preview-container position-relative">
-            <img
-              [src]="ImagePreview()"
-              alt="Preview"
-              class="img-fluid rounded-3"
-            />
-            <div class="image-actions d-flex gap-2 mt-2">
-              <button
-                type="button"
-                class="btn btn-sm btn-blue flex-fill"
-                (click)="fileInput?.click(); $event.stopPropagation()"
-              >
-                Cambia immagine
-              </button>
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-danger flex-fill"
-                (click)="removeImage(); $event.stopPropagation()"
-              >
-                Rimuovi
-              </button>
+    </div>
+    <div class="col-12 col-md-6">
+      <div
+        class="h-100"
+        style="cursor: pointer"
+        (click)="onSelectMethod('manual')"
+        role="button"
+        aria-label="Crea manualmente"
+      >
+        <app-syllex-card
+          title="Crea manualmente"
+          description="Scrivi il testo della domanda e configura le risposte passo dopo passo"
+          [icon]="PencilIcon"
+          variant="outline"
+          [showArrow]="true"
+          class="h-100 card-lime"
+        ></app-syllex-card>
+      </div>
+    </div>
+  </div>
+</div>
+} @if (SelectedMethod()) {
+<div class="wizard-container">
+  <!-- Main area: panel -->
+  <div class="wizard-main">
+    <!-- Panel -->
+    <div class="wizard-panel">
+      <!-- ── STEP 1: Tipo ── -->
+      @if (CurrentStep() === 1) {
+      <div class="wizard-step-content" @stepIn tourAnchor="crea_domanda_tipo">
+        <h5 class="wizard-step-title">Che tipo di domanda stai creando?</h5>
+        <p class="wizard-step-subtitle">
+          Scegli il formato più adatto ai tuoi obiettivi. Potrai sempre
+          cambiarlo.
+        </p>
+        <app-type-selector
+          [options]="QuestionTypeOptions"
+          [(selectedValue)]="SelectedQuestionType"
+          (typeSelected)="onSelectQuestionType($event)"
+          [direction]="'row'"
+          [showDescription]="true"
+        ></app-type-selector>
+      </div>
+      }
+
+      <!-- ── STEP 2 AI: Genera ── -->
+      @if (CurrentStep() === 2 && SelectedMethod() === 'ai') {
+      <div
+        class="wizard-step-content"
+        @stepIn
+        tourAnchor="crea_domanda_contenuto"
+      >
+        <!-- Phase A: form -->
+        @if (!AiIsReviewing()) {
+        <div [formGroup]="aiForm">
+          <div class="row g-4 align-items-stretch">
+            <!-- Left: params -->
+            <div class="col-12 col-lg-6 d-flex flex-column">
+              <div class="form-section d-flex flex-column gap-3 h-100">
+                <!-- Argomento -->
+                <div tourAnchor="crea_domanda_argomento">
+                  <label class="wizard-field-label">Su quale argomento? *</label>
+                  <select
+                    class="form-select custom-input"
+                    formControlName="topicId"
+                    aria-label="Seleziona argomento"
+                  >
+                    <option value="" disabled selected>
+                      Seleziona argomento
+                    </option>
+                    <option value="auto">Tutti gli argomenti (Intero documento)</option>
+                    @for (topic of materiaService.topics; track topic._id) {
+                    <option [value]="topic._id">{{ topic.name }}</option>
+                    }
+                  </select>
+                </div>
+
+                <!-- Parametri -->
+                <div class="row g-3" tourAnchor="crea_domanda_difficolta">
+                  <div class="col-12 col-md-6">
+                    <label class="wizard-field-label">Quante domande?</label>
+                    <input
+                      type="number"
+                      class="form-control custom-input"
+                      formControlName="numberOfQuestions"
+                      min="1"
+                      max="20"
+                      aria-label="Numero di domande"
+                    />
+                  </div>
+                  @if (IsAiFormMultipleChoice()) {
+                  <div class="col-12 col-md-6">
+                    <label class="wizard-field-label">Opzioni per risposta</label>
+                    <input
+                      type="number"
+                      class="form-control custom-input"
+                      formControlName="numberOfAlternatives"
+                      min="2"
+                      max="8"
+                      aria-label="Numero di alternative"
+                    />
+                  </div>
+                  }
+                  <div class="col-12 col-md-6">
+                    <label class="wizard-field-label">In che lingua?</label>
+                    <app-syllex-select-input
+                      formControlName="language"
+                      [options]="LanguageOptions"
+                      placeholder="Scegli lingua"
+                    ></app-syllex-select-input>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label class="wizard-field-label"
+                      >Livello di difficoltà</label
+                    >
+                    <app-syllex-select-input
+                      formControlName="difficulty"
+                      [options]="DifficultyOptions"
+                    ></app-syllex-select-input>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label class="wizard-field-label">Tipo di utilizzo</label>
+                    <app-syllex-select-input
+                      formControlName="policy"
+                      [options]="PolicyOptions"
+                    ></app-syllex-select-input>
+                  </div>
+                </div>
+
+                <!-- Istruzioni -->
+                <div class="flex-fill d-flex flex-column">
+                  <label class="wizard-field-label">
+                    Hai istruzioni particolari?
+                    <span class="text-muted fw-normal">(opzionale)</span>
+                  </label>
+                  <textarea
+                    class="form-control custom-input flex-fill"
+                    formControlName="instructions"
+                    rows="4"
+                    style="resize: none"
+                    placeholder="Es. usa linguaggio semplice, includi esempi pratici, evita domande trabocchetto..."
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: materiali -->
+            <div class="col-12 col-lg-6 d-flex flex-column" tourAnchor="gen_ai_support_files">
+              <div class="form-section d-flex flex-column h-100">
+                <label class="wizard-field-label"
+                  >Da dove vuoi che l'AI impari?</label
+                >
+                <p class="text-muted small mb-3">
+                  Carica dispense, PDF o slide: l'AI li studierà per creare domande
+                  pertinenti.
+                </p>
+                <div class="flex-grow-1 mb-3">
+                  <app-materiali-selector></app-materiali-selector>
+                </div>
+                <!-- CTA -->
+                <div class="d-flex justify-content-md-end justify-content-center pt-3 w-100 mobile-full-width-btn">
+                  <app-syllex-button
+                    [props]="{
+                      label: AiIsLoading() ? 'Generazione in corso...' : 'Genera le mie domande',
+                      variant: 'primary',
+                      size: 'large',
+                      leftIcon: AiIsLoading() ? SpinnerIcon : SparklesIcon,
+                      animation: AiIsLoading() ? 'spin' : undefined,
+                      disabled: aiForm.invalid || AiIsLoading()
+                    }"
+                    (clicked)="onGenerateAI()"
+                  />
+                </div>
+              </div>
             </div>
           </div>
+        </div>
+        }
+
+        <!-- Phase B: review -->
+        @if (AiIsReviewing()) {
+        <div @stepIn>
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <div>
+              <h5 class="wizard-step-title mb-1">
+                Scegli le domande da salvare
+              </h5>
+              <p class="wizard-step-subtitle mb-0">
+                Controlla le domande generate e tieni solo quelle che ti
+                convincono.
+              </p>
+            </div>
+            <app-syllex-button
+              [props]="{ label: AllSelected() ? 'Deseleziona tutte' : 'Seleziona tutte', variant: 'outline', size: 'small' }"
+              (clicked)="toggleAll()"
+            ></app-syllex-button>
+          </div>
+
+          @if (PartialWarningCount() > 0) {
+          <div
+            class="alert alert-warning d-flex align-items-center gap-2 py-2 px-3 mb-3 rounded-syllex"
+            role="alert"
+          >
+            <fa-icon [icon]="SparklesIcon" class="flex-shrink-0"></fa-icon>
+            <span class="small">
+              Sono state generate meno domande del previsto ({{
+              PartialWarningCount() }} {{ PartialWarningCount() === 1 ? 'non
+              riuscita' : 'non riuscite' }}).
+            </span>
+          </div>
           }
-          <input
-            type="file"
-            id="fileInput"
-            #fileInput
-            class="d-none"
-            accept="image/*"
-            (change)="onFileSelected($event)"
-          />
-        </div>
-      </div>
-    </section>
-  </section>
 
-  @if(SelectedQuestionType() === 'scelta multipla' ) {
-  <section tourAnchor="crea_domanda_opzioni" class="form-section">
-    <div class="col-8">
-      <app-multiple-choice-options
-        [options]="questionOptions"
-        (optionsChange)="onOptionsChange($event)"
-      ></app-multiple-choice-options>
-    </div>
-  </section>
-  } @if(SelectedQuestionType() === 'vero falso' ) {
-  <section tourAnchor="crea_domanda_verofalso" class="form-section">
-    <label class="form-label text-dark">Risposta corretta</label>
-    <p class="text-muted mb-3">Seleziona se l'affermazione è vera o falsa</p>
-    <div class="d-flex gap-2">
+          <div class="review-list d-flex flex-column gap-3">
+            @for (q of AiReviewQuestions(); track q.id) {
+            <div
+              class="review-card"
+              [class.review-card--deselected]="!q.selected"
+            >
+              <div class="review-card__header">
+                <span
+                  class="review-card__type badge rounded-pill bg-light text-dark border"
+                  >{{ q.data.type }}</span
+                >
+                <div class="form-check form-switch m-0 ms-auto">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    style="width: 2.4em; height: 1.3em; cursor: pointer"
+                    [checked]="q.selected"
+                    (change)="toggleQuestion(q.id)"
+                    [attr.aria-label]="'Includi: ' + q.data.text"
+                  />
+                </div>
+              </div>
+              <p class="review-card__text fw-medium mb-1">{{ q.data.text }}</p>
+              @if (q.data.type === 'scelta multipla' && q.data.options) {
+              <ul class="review-card__options mb-1">
+                @for (opt of q.data.options; track $index) {
+                <li [class.correct]="opt.isCorrect">{{ opt.label }}</li>
+                }
+              </ul>
+              } @if (q.data.type === 'vero falso') {
+              <p class="review-card__vf small mb-1">
+                Risposta:
+                <strong>{{ q.data.correctAnswer ? 'Vero' : 'Falso' }}</strong>
+              </p>
+              } @if (q.data.explanation) {
+              <p class="review-card__explanation small text-muted mb-0">
+                <strong>Spiegazione:</strong> {{ q.data.explanation }}
+              </p>
+              }
+            </div>
+            }
+          </div>
+
+          <div class="d-flex justify-content-md-end justify-content-center mt-4 w-100 mobile-full-width-btn">
+            <button
+              type="button"
+              class="btn ai btn-lg rounded-pill fw-bold px-5"
+              [disabled]="!AnySelected() || IsSavingBatch()"
+              (click)="onConfirmAiSelection()"
+            >
+              <fa-icon
+                [icon]="IsSavingBatch() ? SpinnerIcon : SparklesIcon"
+                [animation]="IsSavingBatch() ? 'spin' : undefined"
+                class="me-2"
+              ></fa-icon>
+              {{ IsSavingBatch() ? 'Salvataggio...' : 'Salva ' + SelectedCount()
+              + (SelectedCount() === 1 ? ' domanda' : ' domande') }}
+            </button>
+          </div>
+        </div>
+        }
+      </div>
+      }
+
+      <!-- ── STEP 2 Manual: Contenuto ── -->
+      @if (CurrentStep() === 2 && SelectedMethod() === 'manual') {
       <div
-        class="card typeCard shadow-sm p-1 cursor-pointer"
-        (click)="onSelectCorrectAnswer(true)"
-        [class.selected]="QuestionForm.get('correctAnswer')?.value === true"
+        class="wizard-step-content"
+        @stepIn
+        tourAnchor="crea_domanda_contenuto"
       >
-        <div class="card-body d-flex flex-row align-items-center gap-3">
-          <input
-            type="radio"
-            class="form-check-input"
-            [checked]="QuestionForm.get('correctAnswer')?.value === true"
-          />
-          <h5 class="mb-0 flex-fill">Vero</h5>
+        <div [formGroup]="QuestionForm" class="form-section d-flex flex-column gap-3">
+          <div class="row g-3">
+            <div class="col-12 col-md-6" tourAnchor="crea_domanda_argomento">
+              <label class="wizard-field-label">Su quale argomento? *</label>
+              <select
+                class="form-select bg-light border-0 shadow-none py-2 px-3 rounded-pill"
+                formControlName="topicId"
+                aria-label="Seleziona argomento"
+              >
+                <option value="" disabled selected>Seleziona argomento</option>
+                @for (topic of materiaService.topics; track topic._id) {
+                <option [value]="topic._id">{{ topic.name }}</option>
+                }
+              </select>
+            </div>
+            <div class="col-12 col-md-6" tourAnchor="crea_domanda_difficolta">
+              <label class="wizard-field-label">Quanto è difficile?</label>
+              <app-syllex-select-input
+                formControlName="difficulty"
+                [options]="DifficultyOptions"
+              ></app-syllex-select-input>
+            </div>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-8 d-flex flex-column">
+              <label class="wizard-field-label">
+                {{ SelectedQuestionType() === 'vero falso' ? 'Affermazione *' :
+                'Testo della domanda *' }}
+              </label>
+              <textarea
+                class="form-control custom-input flex-fill"
+                formControlName="text"
+                rows="5"
+                placeholder="Inserisci il testo della domanda qui..."
+              ></textarea>
+            </div>
+            <div class="col-md-4 d-flex flex-column">
+              <label class="wizard-field-label"
+                >Immagine
+                <span class="text-muted fw-normal">(opzionale)</span></label
+              >
+              <div
+                id="imageDropArea"
+                class="rounded-syllex p-3 flex-fill"
+                [class.dragging]="IsDragging()"
+                (dragover)="onDragOver($event)"
+                (dragleave)="onDragLeave($event)"
+                (drop)="onDrop($event)"
+                (click)="fileInput?.click()"
+              >
+                @if (!ImagePreview()) {
+                <div
+                  class="image-drop-zone d-flex flex-column justify-content-center align-items-center rounded-3 p-3"
+                >
+                  <fa-icon [icon]="ImageIcon" class="mb-3" size="3x"></fa-icon>
+                  <p class="text-muted mb-0 text-center small">
+                    Trascina o clicca per caricare
+                  </p>
+                </div>
+                } @else {
+                <div class="image-preview-container">
+                  <img
+                    [src]="ImagePreview()"
+                    alt="Preview"
+                    class="img-fluid rounded-3"
+                  />
+                  <div class="image-actions d-flex gap-2 mt-2">
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-primary flex-fill"
+                      (click)="fileInput?.click(); $event.stopPropagation()"
+                    >
+                      Cambia
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-danger flex-fill"
+                      (click)="removeImage(); $event.stopPropagation()"
+                    >
+                      Rimuovi
+                    </button>
+                  </div>
+                </div>
+                }
+                <input
+                  type="file"
+                  #fileInput
+                  class="d-none"
+                  accept="image/*"
+                  (change)="onFileSelected($event)"
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+      }
+
+      <!-- ── STEP 3 Manual: Risposta ── -->
+      @if (CurrentStep() === 3 && SelectedMethod() === 'manual') {
       <div
-        class="card shadow-sm typeCard p-1 cursor-pointer"
-        (click)="onSelectCorrectAnswer(false)"
-        [class.selected]="QuestionForm.get('correctAnswer')?.value === false"
+        class="wizard-step-content"
+        @stepIn
+        tourAnchor="crea_domanda_opzioni"
       >
-        <div class="card-body d-flex flex-row align-items-center gap-3">
-          <input
-            type="radio"
-            class="form-check-input"
-            [checked]="QuestionForm.get('correctAnswer')?.value === false"
-          />
-          <h5 class="mb-0 flex-fill">Falso</h5>
+        <div [formGroup]="QuestionForm" class="form-section">
+          @if (SelectedQuestionType() === 'scelta multipla') {
+          <div class="col-12 col-md-10">
+            <app-multiple-choice-options
+              [options]="questionOptions"
+              (optionsChange)="onOptionsChange($event)"
+            ></app-multiple-choice-options>
+          </div>
+          } @if (SelectedQuestionType() === 'vero falso') {
+          <div class="d-flex gap-3" tourAnchor="crea_domanda_verofalso">
+            <div
+              class="rounded-syllex typeCard p-3 flex-fill d-flex align-items-center gap-3"
+              (click)="onSelectCorrectAnswer(true)"
+              [class.selected]="QuestionForm.get('correctAnswer')?.value === true"
+              style="cursor: pointer; max-width: 200px"
+            >
+              <input
+                type="radio"
+                class="form-check-input flex-shrink-0 mt-0"
+                [checked]="QuestionForm.get('correctAnswer')?.value === true"
+              />
+              <span class="fw-semibold">Vero</span>
+            </div>
+            <div
+              class="rounded-syllex typeCard p-3 flex-fill d-flex align-items-center gap-3"
+              (click)="onSelectCorrectAnswer(false)"
+              [class.selected]="QuestionForm.get('correctAnswer')?.value === false"
+              style="cursor: pointer; max-width: 200px"
+            >
+              <input
+                type="radio"
+                class="form-check-input flex-shrink-0 mt-0"
+                [checked]="QuestionForm.get('correctAnswer')?.value === false"
+              />
+              <span class="fw-semibold">Falso</span>
+            </div>
+          </div>
+          } @if (SelectedQuestionType() === 'risposta aperta') {
+          <div class="open-answer-info">
+            <fa-icon [icon]="CheckIcon" class="me-2 text-success"></fa-icon>
+            Per le domande a risposta aperta non è necessario configurare una
+            risposta predefinita. La correzione viene effettuata dal docente.
+          </div>
+          }
         </div>
       </div>
-    </div>
-  </section>
-  }
+      }
 
-  <section tourAnchor="crea_domanda_spiegazione" class="form-section">
-    <label class="form-label text-dark"
-      >Spiegazione della risposta corretta</label
-    >
-    <textarea
-      class="form-control custom-input flex-fill"
-      formControlName="explanation"
-      rows="4"
-      placeholder="Inserisci una commento sulla risposta corretta..."
-    ></textarea>
-  </section>
+      <!-- ── STEP 4 Manual: Pubblica ── -->
+      @if (CurrentStep() === 4 && SelectedMethod() === 'manual') {
+      <div
+        class="wizard-step-content"
+        @stepIn
+        tourAnchor="crea_domanda_spiegazione"
+      >
+        <div [formGroup]="QuestionForm" class="form-section d-flex flex-column gap-4">
+          <!-- Spiegazione -->
+          <div>
+            <label class="wizard-field-label">
+              Vuoi aggiungere una spiegazione?
+              <span class="text-muted fw-normal">(opzionale)</span>
+            </label>
+            <p class="text-muted small mb-2">
+              Verrà mostrata allo studente dopo la correzione, come feedback.
+            </p>
+            <textarea
+              class="form-control custom-input"
+              formControlName="explanation"
+              rows="3"
+              placeholder="Spiega perché questa risposta è corretta..."
+            ></textarea>
+          </div>
 
-  <section tourAnchor="crea_domanda_tag" class="form-section">
-    <label class="form-label text-dark">Tag</label>
-    <p class="text-dark fw-light mb-2">
-      Aggiungi dei tag per organizzare e ritrovare più facilmente le domande.
-      Premi <kbd>Invio</kbd> o <kbd>,</kbd> per aggiungere un tag.
-    </p>
-    <div class="d-flex flex-wrap gap-2 mb-2">
-      @for(tag of QuestionForm.get('tags')?.value; track tag) {
-      <span class="badge tag-badge d-flex align-items-center gap-1">
-        <fa-icon [icon]="TagIcon" size="xs"></fa-icon>
-        {{ tag }}
-        <button
-          type="button"
-          class="btn-close btn-close-white ms-1"
-          aria-label="Rimuovi tag"
-          (click)="removeTag(tag)"
-        ></button>
-      </span>
+          <!-- Tag -->
+          <div tourAnchor="crea_domanda_tag">
+            <label class="wizard-field-label"
+              >Tag <span class="text-muted fw-normal">(opzionale)</span></label
+            >
+            <div class="d-flex flex-wrap gap-2 mb-2">
+              @for (tag of QuestionForm.get('tags')?.value; track tag) {
+              <span class="tag-badge d-inline-flex align-items-center gap-1">
+                {{ tag }}
+                <button
+                  type="button"
+                  class="btn-close"
+                  aria-label="Rimuovi tag"
+                  (click)="removeTag(tag)"
+                ></button>
+              </span>
+              }
+            </div>
+            <input
+              type="text"
+              class="form-control custom-input"
+              placeholder="Aggiungi un tag e premi Invio o virgola"
+              [value]="TagInput()"
+              (input)="TagInput.set($any($event.target).value)"
+              (keydown)="onTagKeydown($event)"
+              style="max-width: 380px"
+            />
+          </div>
+
+          <!-- Visibilità -->
+          <div tourAnchor="crea_domanda_visibilita">
+            <label class="wizard-field-label"
+              >Chi può vedere questa domanda?</label
+            >
+            <div class="d-flex gap-3 mt-2">
+              <div
+                class="rounded-syllex typeCard p-3 d-flex align-items-center gap-3"
+                (click)="onSelectPolicyType('public')"
+                [class.selected]="SelectedPolicyType() === 'public'"
+                style="cursor: pointer; max-width: 240px"
+              >
+                <input
+                  type="radio"
+                  class="form-check-input flex-shrink-0 mt-0"
+                  [checked]="SelectedPolicyType() === 'public'"
+                />
+                <div>
+                  <div class="fw-semibold small">Condivisa</div>
+                  <div class="text-muted" style="font-size: 0.75rem">
+                    Tutti i colleghi possono usarla
+                  </div>
+                </div>
+              </div>
+              <div
+                class="rounded-syllex typeCard p-3 d-flex align-items-center gap-3"
+                (click)="onSelectPolicyType('private')"
+                [class.selected]="SelectedPolicyType() === 'private'"
+                style="cursor: pointer; max-width: 240px"
+              >
+                <input
+                  type="radio"
+                  class="form-check-input flex-shrink-0 mt-0"
+                  [checked]="SelectedPolicyType() === 'private'"
+                />
+                <div>
+                  <div class="fw-semibold small">Privata</div>
+                  <div class="text-muted" style="font-size: 0.75rem">
+                    Solo tu puoi usarla
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Azioni -->
+          <div
+            class="d-flex gap-2 flex-md-row flex-column align-items-stretch align-items-md-center justify-content-md-end pt-2 w-100 mobile-full-width-btn"
+            tourAnchor="crea_domanda_salva"
+          >
+            <app-syllex-button
+              [props]="{ label: 'Annulla', variant: 'outline', size: 'medium', link: '/t/banca' }"
+            ></app-syllex-button>
+            <button
+              type="button"
+              class="btn btn-primary icon-btn btn-lg rounded-pill fw-bold"
+              [disabled]="IsLoading() || QuestionForm.invalid"
+              (click)="onSaveQuestion()"
+            >
+              <fa-icon
+                [icon]="IsLoading() ? SpinnerIcon : SaveIcon"
+                [animation]="IsLoading() ? 'spin' : undefined"
+                class="me-1"
+              ></fa-icon>
+              {{ SaveButtonLabel() }}
+            </button>
+          </div>
+        </div>
+      </div>
       }
     </div>
-    <input
-      type="text"
-      class="form-control custom-input"
-      style="max-width: 300px"
-      placeholder="Scrivi un tag e premi Invio..."
-      [ngModel]="TagInput()"
-      (ngModelChange)="TagInput.set($event)"
-      [ngModelOptions]="{ standalone: true }"
-      (keydown)="onTagKeydown($event)"
-    />
-  </section>
 
-  <section tourAnchor="crea_domanda_visibilita" class="form-section">
-    <label class="form-label text-dark"
-      >Visibilità della domanda e politiche di utilizzo</label
-    >
-    <p class="text-dark fw-light">
-      Scegli se permettere ai tuoi studenti di Scienze Nautiche di utilizzare
-      questa domanda per creare dei test di autovalutazione
-    </p>
+  </div>
 
-    <section class="d-flex gap-2">
-      <div
-        class="border rounded-syllex p-3 typeCard p-1"
-        (click)="onSelectPolicyType('public')"
-        [class.selected]="SelectedPolicyType() === 'public'"
-      >
-        <div class="card-body d-flex flex-row align-items-center gap-3">
-          <input
-            type="radio"
-            class="form-check-input"
-            [checked]="SelectedPolicyType() === 'public'"
-          />
-          <h5 class="mb-0 flex-fill">Disponibile agli studenti</h5>
-          <span class="typeIconWrapper rounded-2">
-            <fa-icon [icon]="UsersIcon" [size]="'2x'"></fa-icon>
-          </span>
-        </div>
-      </div>
-      <div
-        class="border p-3 rounded-syllex typeCard p-1"
-        (click)="onSelectPolicyType('private')"
-        [class.selected]="SelectedPolicyType() === 'private'"
-      >
-        <div class="card-body d-flex flex-row align-items-center gap-3">
-          <input
-            type="radio"
-            class="form-check-input"
-            [checked]="SelectedPolicyType() === 'private'"
-          />
-          <h5 class="mb-0 flex-fill">Disponibile solo al docente</h5>
-          <span class="typeIconWrapper rounded-2">
-            <fa-icon [icon]="GraduationIcon" [size]="'2x'"></fa-icon>
-          </span>
-        </div>
-      </div>
-    </section>
-  </section>
+  <!-- Footer navigation -->
+  <div class="wizard-footer mt-4">
+    <!-- Left: Indietro -->
+    <div>
+      <app-syllex-button
+        [props]="{ label: 'Indietro', variant: 'outline', size: 'medium', leftIcon: ChevronLeftIcon }"
+        (clicked)="goPrev()"
+      ></app-syllex-button>
+    </div>
 
-  <section
-    tourAnchor="crea_domanda_salva"
-    class="d-flex flex-row justify-content-end mt-5 gap-3"
-  >
-    <button
-      class="btn btn-primary icon-btn btn-lg"
-      type="submit"
-      [disabled]="QuestionForm.invalid || IsLoading()"
-    >
-      @if(IsLoading()){
-      <fa-icon [icon]="SpinnerIcon" [animation]="'spin'"></fa-icon>
-      } {{ SaveButtonLabel() }}
-    </button>
-  </section>
-</form>
+    <app-syllex-stepper
+      [steps]="StepDefs()"
+      [currentStep]="CurrentStep()"
+    ></app-syllex-stepper>
+
+    <!-- Right: Avanti -->
+    <div class="wizard-footer__right">
+      @if (ShowNextArrow()) {
+      <app-syllex-button
+        [props]="{ label: 'Avanti', variant: 'primary', size: 'medium', rightIcon: ChevronRightIcon, disabled: !CanGoNext() }"
+        (clicked)="goNext()"
+      ></app-syllex-button>
+      }
+    </div>
+  </div>
+</div>
+}

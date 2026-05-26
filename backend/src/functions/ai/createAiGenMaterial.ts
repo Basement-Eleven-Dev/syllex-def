@@ -8,6 +8,7 @@ import { startSlidedeckGeneration } from "../../_helpers/gammaApi";
 import { uploadContentToS3 } from "../../_helpers/uploadFileToS3";
 import { getConvertedDocument } from "../../_helpers/documents/documentConversion";
 import { askStructuredLLM } from "../../_helpers/AI/simpleCompletion";
+import { fetchBuffer } from "../../_helpers/fetchBuffer";
 import { z } from "zod";
 import { Organization } from "../../models/schemas/organization.schema";
 
@@ -34,6 +35,7 @@ const getPrompt = (
   language: string = "italian",
   numberOfSlides: number = 10,
   additionalInstructions?: string,
+  totalTextLength?: number,
 ) => {
   const guardRails: string = `
     Scrivi tutto il contenuto in ${language}.
@@ -42,7 +44,24 @@ const getPrompt = (
     `;
 
   const prompts: Record<DocumentType, string> = {
-    slides: `Scrivimi ${numberOfSlides || 10} diapositive basate sui documenti forniti. In 'content' inserisci tutto il testo che dovrebbe essere presente compreso di titoli delle slide e specifiche su come presentare le informazioni, senza alcuna spiegazione o testo aggiuntivo. Mantieni il testo conciso e adatto a una presentazione visiva in ambito educativo. Se necessario, organizza le informazioni in punti ed elenchi.`,
+    slides: `Crea esattamente ${numberOfSlides || 10} diapositive basate ESCLUSIVAMENTE sui documenti forniti, seguendo questa struttura rigida:
+
+REGOLE OBBLIGATORIE:
+- La PRIMA diapositiva è sempre la diapositiva di titolo: titolo della presentazione (max 8 parole) e un sottotitolo che elenca i principali argomenti trattati.
+- Ogni diapositiva successiva segue ESATTAMENTE questo formato:
+  ## [TITOLO SLIDE] (max 8 parole, descrittivo del contenuto)
+  - [punto 1: concetto chiave con spiegazione sintetica]
+  - [punto 2: concetto chiave con spiegazione sintetica]
+  - [punto 3: concetto chiave con spiegazione sintetica]
+  (aggiungi un 4° o 5° punto solo se strettamente necessario)
+- L'ultima diapositiva è un riepilogo dei concetti chiave.
+
+REGOLE TASSATIVE SUL CONTENUTO:
+- Ogni punto elenco deve contenere informazioni dense e precise, non frasi generiche.
+- NON inserire mai descrizioni di immagini, placeholder visivi, riferimenti a grafici o elementi grafici di alcun tipo.
+- NON scrivere frasi come "qui va un'immagine", "inserire grafico", "vedi figura" o simili.
+- Il testo è la priorità assoluta: le slide devono essere comprensibili e complete di per sé.
+- In 'content' inserisci SOLO il testo delle slide nel formato indicato, senza spiegazioni o testo aggiuntivo esterno alle slide.`,
     map: `
 Write a valid mermaid.js diagram based on these documents.
 
@@ -53,8 +72,49 @@ STRICT RULES:
 - NEVER reference undefined nodes
 - Output ONLY mermaid code, no explanations, no backticks
 `,
-    glossary: `Write me a glossary based on these documents. Use Markdown.`,
-    summary: `Write me a medium length summary of these documents. Use Markdown.`,
+    glossary: `Create a complete and professional glossary based EXCLUSIVELY on the provided documents. Use Markdown.
+
+MANDATORY FORMATTING RULES (CRITICAL):
+- You MUST use the following exact structure for every single entry:
+  ### **[Term Name]**
+  [Definition and explanation of the term. Must be at least 2-4 lines long.]
+  
+  *See also: [Related Term]*
+
+  &nbsp;
+
+- The "&nbsp;" (non-breaking space) at the end of each entry is MANDATORY to force an empty line in the final document. Do not forget it!
+
+MANDATORY RULES ON CONTENT:
+- Organize entries in alphabetical order.
+- Each definition must be complete enough to be studied on its own, without needing to consult the original text.
+- If a term has common synonyms or variants, mention them.
+- Include ALL technical terms, key concepts, relevant proper nouns, and acronyms present in the documents.
+- The glossary must be sufficiently long to cover the entire content of the provided material.`,
+    summary: `Create a complete, rich, and well-structured educational summary based EXCLUSIVELY on the provided documents. Use Markdown.
+
+MANDATORY RULES ON STRUCTURE:
+- Begin with a short introductory paragraph (3-5 lines) that contextualizes the topic and previews the themes covered.
+- Organize the content into thematic sections with second-level headings (## Section Title). Use as many sections as needed to cover all the material.
+- Each section must contain one or more paragraphs of flowing, narrative text (NOT just bullet points) that explain the concepts clearly and in depth, as a good study guide would.
+- Where useful, you may add bullet points WITHIN a section to summarize elements or characteristics, but never replace all the text with bullet lists alone.
+- Close with a "## Conclusions" or "## Summary" section that synthesizes the most important concepts.
+
+MANDATORY RULES ON CONTENT:
+- The summary must be LONG and IN-DEPTH: it must be usable as a substitute for the original text when studying.
+- Cover ALL key concepts present in the documents, without omitting any topics.
+- Use clear, precise, and didactic language appropriate for a student approaching the subject for the first time.
+- Do not write vague or generic sentences: every statement must be concrete and informative.
+- Do NOT refer to the "provided documents" or "sources": write the summary as if it were a standalone document.
+${(() => {
+  if (!totalTextLength || totalTextLength <= 0) return '';
+  // Estimate input size: ~5 chars/word, ~350 words/page
+  const estimatedWords = Math.round(totalTextLength / 5);
+  // Proportional target with diminishing returns: ~30% up to a cap of 8000 words
+  const targetWords = Math.max(800, Math.min(8000, Math.round(estimatedWords * 0.30)));
+  const targetPages = Math.round(targetWords / 350);
+  return `\n⚠️ STRICT LENGTH REQUIREMENT (NON-NEGOTIABLE):\nThe source material is approximately ${Math.round(estimatedWords / 350)} pages long. The summary MUST be at least ${targetWords} words (approximately ${targetPages} pages). This is a hard minimum — a shorter output is WRONG and must be rejected. Write more sections, add more detail to each section, and expand every explanation until you reach this target length.`;
+})()}`
   };
 
   let promptResult = prompts[type];
@@ -118,11 +178,32 @@ const createAIGenMaterial = async (
     aiGenerated: { $ne: true },
   });
 
+  // Fetch all text buffers and validate combined content length
+  let totalTextLength = 0;
+  for (const m of materialObjects) {
+    if (m.extractedTextFileUrl) {
+      try {
+        const buffer = await fetchBuffer(m.extractedTextFileUrl);
+        totalTextLength += buffer.toString("utf-8").trim().length;
+      } catch (e) {
+        console.error(`Failed to fetch buffer for material ${m._id}:`, e);
+      }
+    }
+  }
+
+  // If there are materials selected but they have less than 150 characters, reject
+  if (materialObjects.length > 0 && totalTextLength < 150) {
+    throw createHttpError.BadRequest(
+      `Non è possibile avviare la generazione automatica perché il documento selezionato non contiene testo sufficiente (rilevati solo ${totalTextLength} caratteri). Per garantire l'accuratezza didattica dei materiali ed evitare che l'Intelligenza Artificiale inventi di sana pianta concetti non presenti (fenomeno delle allucinazioni), è necessario che il file di riferimento contenga del testo concreto (come dispense, capitoli di libri o appunti). Ti invitiamo a caricare un documento completo di testo e riprovare!`
+    );
+  }
+
   const prompt = getPrompt(
     type,
     language,
     numberOfSlides,
     additionalInstructions,
+    totalTextLength,
   );
 
   console.log("Generated prompt for LLM:", prompt);
@@ -131,6 +212,8 @@ const createAIGenMaterial = async (
     title: z.string(),
     content: z.string(),
   });
+  console.log(`[AI Gen] totalTextLength: ${totalTextLength} chars — estimated words: ${Math.round(totalTextLength/5)} — type: ${type}`);
+
   const { title, content } = await askStructuredLLM(
     prompt,
     materialObjects,
@@ -182,13 +265,23 @@ const createAIGenMaterial = async (
   }
 
   if (type == "slides") {
+    const GAMMA_INSTRUCTIONS_BASE =
+      "Text and information are the absolute priority. Use images ONLY when strictly necessary to visually explain a specific concept — never for decoration. Prefer simple pictographic icons. Aim for at most 1 image every 3-4 slides.";
+    const gammaAdditionalInstructions = additionalInstructions
+      ? `${GAMMA_INSTRUCTIONS_BASE} | ${additionalInstructions}`.slice(0, 1000)
+      : GAMMA_INSTRUCTIONS_BASE;
+
     let res = await startSlidedeckGeneration({
       inputText: content,
       numCards: numberOfSlides || 10,
       textMode: "preserve",
       exportAs: format || "pptx",
+      additionalInstructions: gammaAdditionalInstructions,
       imageOptions: {
-        source: "aiGenerated",
+        source: "pictographic",
+      },
+      textOptions: {
+        amount: "medium",
       },
       cardOptions: {
         headerFooter: {

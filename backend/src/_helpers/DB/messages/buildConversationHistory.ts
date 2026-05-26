@@ -5,10 +5,15 @@ import { Types } from "mongoose";
 export async function buildConversationHistory(
   subjectId: Types.ObjectId,
   userId: Types.ObjectId,
+  conversationId: string,
   keepForDashboard: boolean = false,
 ) {
   await connectDatabase();
-  const messages = await Message.find({ subjectId: subjectId, userId: userId }).sort({ timestamp: 1 })
+  const messages = await Message.find({
+    subjectId: subjectId,
+    userId: userId,
+    conversationId: conversationId,
+  }).sort({ timestamp: 1 });
 
   if (keepForDashboard) {
     return messages.map((msg) => ({
@@ -17,6 +22,7 @@ export async function buildConversationHistory(
       content: msg.content,
       timestamp: msg.timestamp,
       audioUrl: msg.audioUrl || null,
+      inputType: msg.inputType || 'text',
     }));
   }
   return messages.map((msg) => ({

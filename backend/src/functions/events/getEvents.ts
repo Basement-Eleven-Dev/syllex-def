@@ -2,6 +2,7 @@ import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import { connectDatabase } from "../../_helpers/getDatabase";
 import { Class } from "../../models/schemas/class.schema";
+import { Types } from "mongoose";
 import { TeacherAssignment } from "../../models/schemas/teacher-assignment.schema";
 import { Event } from '../../models/schemas/event.schema'
 const getEvents = async (request: APIGatewayProxyEvent, context: Context) => {
@@ -19,7 +20,7 @@ const getEvents = async (request: APIGatewayProxyEvent, context: Context) => {
     } else if (context.user.role === "student") {
       // Uno studente vede solo gli eventi delle materie in cui è iscritto
       const studentClasses = await Class
-        .find({ students: context.user._id } as any)
+        .find({ students: new Types.ObjectId(context.user._id) } as any)
 
       const classIds = studentClasses.map((c) => c._id);
       const assignments = await TeacherAssignment
@@ -30,9 +31,9 @@ const getEvents = async (request: APIGatewayProxyEvent, context: Context) => {
     }
   }
 
-  // Se siamo in un contesto di materia specifico, restringiamo ulteriormente
-  if (context.subjectId) {
-    filter.subjectId = context.subjectId;
+  // Se siamo in un contesto di materia specifico, restringiamo ulteriormente (solo se non è uno studente)
+  if (context.subjectId && context.user?.role !== "student") {
+    filter.subjectId = new Types.ObjectId(context.subjectId);
   }
 
   if (month && year) {

@@ -1,106 +1,105 @@
+@use "sass:color";
 /* Font Family: Figtree */
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-Regular.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-Regular.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-Italic.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-Italic.ttf") format("truetype");
   font-weight: 400;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-Medium.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-Medium.ttf") format("truetype");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-MediumItalic.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-MediumItalic.ttf") format("truetype");
   font-weight: 500;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-SemiBold.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-SemiBold.ttf") format("truetype");
   font-weight: 600;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-SemiBoldItalic.ttf")
-    format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-SemiBoldItalic.ttf") format("truetype");
   font-weight: 600;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-Bold.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-Bold.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-BoldItalic.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-BoldItalic.ttf") format("truetype");
   font-weight: 700;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-Black.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-Black.ttf") format("truetype");
   font-weight: 900;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-BlackItalic.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-BlackItalic.ttf") format("truetype");
   font-weight: 900;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-ExtraBold.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-ExtraBold.ttf") format("truetype");
   font-weight: 800;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-ExtraBoldItalic.ttf")
-    format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-ExtraBoldItalic.ttf") format("truetype");
   font-weight: 800;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-Light.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-Light.ttf") format("truetype");
   font-weight: 300;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Figtree";
-  src: url("/fonts/Figtree/static/Figtree-LightItalic.ttf") format("truetype");
+  font-family: "DMSans";
+  src: url("/fonts/DMSans/static/DMSans-LightItalic.ttf") format("truetype");
   font-weight: 300;
   font-style: italic;
   font-display: swap;
 }
 
-$primary: #3931ce;
+$primary: #0b00de;
 $secondary: #c9f321;
 $info: #0dcaf0;
 $success: #16a34a;
@@ -111,7 +110,7 @@ $dark: #262626;
 $min-contrast-ratio: 4.5;
 $font-size-base: 0.9rem;
 $enable-gradients: false;
-$font-family-sans-serif: "Figtree", sans-serif;
+$font-family-sans-serif: "DMSans", sans-serif;
 $border-radius: 0.75rem;
 $border-radius-sm: 0.5rem;
 $border-radius-lg: 0.9rem;
@@ -144,25 +143,30 @@ $border-color: rgba(0, 0, 0, 0.077);
 
 @import "bootstrap/scss/bootstrap";
 
+:root {
+  --syllex-green: #c9f321;
+  --syllex-orange: #ffa052;
+}
+
 .dvh-100 {
   height: 100dvh;
 }
-
+html,
 body {
   background-color: #ffffff;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 // Riduci la spaziatura tra lettere su tutto
-html,
+/* html,
 body,
 input,
 textarea,
 select,
 button {
-  letter-spacing: -0.02em;
+  letter-spacing: 0em;
 }
-
+ */
 #authRightColumn {
   background: url("/images/auth_right.png");
   background-size: cover;
@@ -176,33 +180,81 @@ button {
 }
 
 .custom-input {
-  color: $primary;
-  border-radius: 8px;
-  padding-top: 0.8rem;
-  padding-bottom: 0.8rem;
-  &::placeholder {
-    color: rgba(var(--bs-primary-rgb), 0.4);
-  }
+  border-radius: 12px !important;
+  border: 1.5px solid #d2e2ff !important;
+  padding: 0.75rem 1rem !important;
+  font-size: 0.95rem !important;
+  transition: all 0.25s ease-in-out !important;
+  background-color: #ffffff !important;
+  color: #0e3462 !important;
+
   &:focus {
-    color: $primary;
-    border-color: darken($primary, 10%);
+    background-color: #f8faff !important;
+    border-color: #0b3c7b !important;
+    box-shadow: 0 0 0 3px rgba(11, 60, 123, 0.15) !important;
+    outline: none !important;
   }
+
+  &::placeholder {
+    color: #a0aec0 !important;
+  }
+
   &.filter {
-    border: rgb(127, 127, 127) 1px solid;
-    color: rgb(127, 127, 127);
+    border: rgb(127, 127, 127) 1px solid !important;
+    color: rgb(127, 127, 127) !important;
+    background-color: #fff !important;
     &::placeholder {
-      color: rgb(173, 173, 173);
+      color: rgb(173, 173, 173) !important;
     }
   }
 }
-.card {
-  border-radius: 8px;
-  border: none;
-  box-shadow: 0px 0px 28px 8px rgba(224, 224, 224, 0.204);
+
+// ─── Stile unificato per tutti i filtri di pagina (search + select) ───
+.filter-input-pill {
+  background-color: #f5f8ff !important;
+  border: 1.5px solid #d5e4ff !important;
+  border-radius: 999px !important;
+  color: #1a2540 !important;
+  box-shadow: none !important;
+  transition: border-color 0.15s ease !important;
+  font-size: 0.875rem !important;
+
+  &:focus,
+  &:focus-within {
+    background-color: #f5f8ff !important;
+    border-color: var(--bs-primary) !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+
+  &::placeholder {
+    color: #7a90b8 !important;
+  }
+
+  // Icona search: sfondo trasparente per non mostrare il grigio Bootstrap
+  .input-group-text {
+    background-color: transparent !important;
+    border: none !important;
+  }
+
+  // Per il form-select: freccia in tonalità scura coerente
+  &.form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%231a2540' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+    padding-right: 2.5rem !important;
+  }
 }
 
-.rounded-syllex {
-  border-radius: 8px;
+
+.syllexCard {
+  padding: 2.4rem;
+  border-radius: 30px;
+  border: none;
+  background-color: #eef4ff;
+
+  @media (max-width: 991px) {
+    padding: 1.25rem;
+    border-radius: 20px;
+  }
 }
 
 a {
@@ -285,14 +337,13 @@ textarea.custom-input {
   background: linear-gradient(
     135deg,
     var(--bs-primary) 0%,
-    color-mix(in srgb, var(--bs-primary) 70%, rgb(242, 242, 242)) 50%,
-    color-mix(in srgb, var(--bs-primary) 90%, rgb(242, 242, 242)) 100%
+    color-mix(in srgb, var(--bs-primary) 75%, black) 100%
   );
   color: white;
   border: none;
   position: relative;
   cursor: pointer;
-  transition: all 0.8s ease;
+  transition: background 0.8s ease, box-shadow 0.8s ease, transform 0.2s ease, opacity 0.2s ease;
   box-shadow: 0px 0px 28px 8px rgba(224, 224, 224, 0.204);
 
   &.not-selected {
@@ -304,8 +355,7 @@ textarea.custom-input {
     background: linear-gradient(
       135deg,
       var(--bs-primary) 0%,
-      color-mix(in srgb, var(--bs-primary) 70%, rgb(242, 242, 242)) 50%,
-      color-mix(in srgb, var(--bs-primary) 90%, rgb(242, 242, 242)) 100%
+      color-mix(in srgb, var(--bs-primary) 75%, black) 100%
     );
     color: white;
     font-weight: bold;
@@ -381,13 +431,30 @@ textarea.custom-input {
   inherits: false;
 }
 
-section {
-  &.form-section {
-    background-color: #ffffff;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0px 0px 28px 8px rgba(224, 224, 224, 0.204);
+.form-section {
+  background-color: #f8faff;
+  border-radius: 20px;
+  border: none;
+  padding: 1.75rem;
+  box-shadow: none;
+
+  @media (max-width: 991px) {
+    padding: 1rem;
+    border-radius: 12px;
   }
+}
+
+.wizard-step-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+  letter-spacing: -0.02em;
+}
+
+.wizard-step-subtitle {
+  color: var(--bs-secondary-color);
+  font-size: 0.875rem;
+  margin-bottom: 1.5rem;
 }
 
 .background-icon {
@@ -455,6 +522,10 @@ section {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.rounded-syllex {
+  border-radius: 12px !important;
 }
 
 .typeCard {
@@ -527,13 +598,26 @@ section {
   max-width: 90vw !important;
 }
 
+.offcanvas.offcanvas-end {
+  border-radius: 2.4rem 0 0 2.4rem !important;
+  border: none !important;
+  background-color: color-mix(in srgb, var(--bs-secondary) 15%, white) !important;
+  overflow: hidden;
+
+  .offcanvas-body.syllexCard {
+    background-color: transparent !important;
+    border-radius: 0 !important;
+    padding: 2.4rem 1.4rem 3.4rem 2.4rem !important;
+  }
+}
+
 .toast-success {
   background-color: #dcfce7;
   color: #166534;
 }
 
 .toast-error {
-  background-color: lighten($danger, 20%);
+  background-color: color.adjust($danger, $lightness: 20%);
   color: rgb(135, 12, 12);
 }
 
@@ -737,3 +821,42 @@ body.tour-active::after {
     opacity: 1;
   }
 }
+
+/* Global Totally Rounded (Pill) Inputs, Selects & Textareas */
+.form-control,
+.form-control-flat,
+.form-select,
+.custom-input {
+  &:not(textarea) {
+    border-radius: 50rem !important;
+  }
+  
+  &textarea,
+  &.textarea {
+    border-radius: 1.5rem !important;
+  }
+}
+
+/* Agent Page Layout Background Overrides */
+body:has(.agent-page-root) {
+  // Layer a semi-transparent white gradient on top of the image to lighten it dynamically (65% white, 35% wallpaper)
+  background-image: linear-gradient(rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.8)), url("/images/sfondo_chat.png") !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-attachment: fixed !important;
+
+  // Make only high-level layout containers transparent to let the body background show through
+  #content,
+  #content > div,
+  .bg-page,
+  .agent-page-root,
+  app-agent-chat,
+  .agent-chat-wrapper,
+  .main-content {
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+
+}
+

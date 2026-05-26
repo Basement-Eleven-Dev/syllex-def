@@ -128,6 +128,19 @@ const getTestAttemptsDetails = async (
     return `${mins}m ${secs}s`;
   };
 
+  // Mappatura studenti -> classe
+  const studentToClassMap = new Map<string, { id: string; name: string }>();
+  associatedClasses.forEach((clazz) => {
+    if (clazz.students && Array.isArray(clazz.students)) {
+      clazz.students.forEach((studentId: any) => {
+        studentToClassMap.set(studentId.toString(), {
+          id: clazz._id.toString(),
+          name: clazz.name,
+        });
+      });
+    }
+  });
+
   // Risolvi i nomi degli argomenti dalla materia del test
   const subject = test.subjectId
     ? await SubjectView.findOne({ _id: test.subjectId })
@@ -141,20 +154,25 @@ const getTestAttemptsDetails = async (
     }
   }
 
-  // Aggiungi il nome del topic a ogni domanda di ogni attempt
-  const attemptsWithTopics = attemptsWithStudents.map((attempt: any) => ({
-    ...attempt,
-    questions: (attempt.questions || []).map((q: any) => ({
-      ...q,
-      question: {
-        ...q.question,
-        topic:
-          (q.question?.topicId
-            ? topicsMap.get(q.question.topicId.toString())
-            : null) || "Generale",
-      },
-    })),
-  }));
+  // Aggiungi il nome del topic a ogni domanda di ogni attempt, più classe dello studente
+  const attemptsWithTopicsMapped = attemptsWithStudents.map((attempt: any) => {
+    const classInfo = studentToClassMap.get(attempt.studentId?.toString());
+    return {
+      ...attempt,
+      classId: classInfo?.id || null,
+      className: classInfo?.name || null,
+      questions: (attempt.questions || []).map((q: any) => ({
+        ...q,
+        question: {
+          ...q.question,
+          topic:
+            (q.question?.topicId
+              ? topicsMap.get(q.question.topicId.toString())
+              : null) || "Generale",
+        },
+      })),
+    };
+  });
 
   // Studenti assegnati senza attempt: includi con status "not-started"
   const attemptStudentIds = new Set(
@@ -171,19 +189,25 @@ const getTestAttemptsDetails = async (
         _id: { $in: missingStudentIds.map((id) => new mongo.ObjectId(id as string)) },
       }, { firstName: 1, lastName: 1 })
 
-    missingStudents = students.map((s) => ({
-      _id: null,
-      status: "not-started",
-      studentName: s.firstName,
-      studentLastName: s.lastName,
-      score: null,
-      maxScore: null,
-      deliveredAt: null,
-      questions: [],
-    }));
+    missingStudents = students.map((s) => {
+      const classInfo = studentToClassMap.get(s._id.toString());
+      return {
+        _id: null,
+        status: "not-started",
+        studentId: s._id,
+        studentName: s.firstName,
+        studentLastName: s.lastName,
+        score: null,
+        maxScore: null,
+        deliveredAt: null,
+        questions: [],
+        classId: classInfo?.id || null,
+        className: classInfo?.name || null,
+      };
+    });
   }
 
-  const allAssignees = [...attemptsWithTopics, ...missingStudents];
+  const allAssignees = [...attemptsWithTopicsMapped, ...missingStudents];
 
   return {
     test: {
@@ -194,6 +218,7 @@ const getTestAttemptsDetails = async (
       maxScore: test.maxScore,
       fitScore: test.fitScore,
     },
+    classes: associatedClasses.map(c => ({ _id: c._id.toString(), name: c.name })),
     stats: [
       { title: "Consegne", value: totalDeliveries, icon: "paper-plane" },
       {
