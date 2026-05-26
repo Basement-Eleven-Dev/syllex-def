@@ -1,18 +1,26 @@
-<div class="p-4 rounded-4 d-flex flex-column gap-2" style="background: #d2e2ff">
-  <label class="form-label text-dark fw-bold fs-4">
-    Domanda {{ index }}
-    <span class="badge" [class]="data.answer.result">
-      {{ getResultLabel(data.answer.result) }}
-    </span>
+<div class="p-4 rounded-4 d-flex flex-column gap-2" style="background: #eef4ff">
+  <div class="d-flex justify-content-between align-items-center">
+    <label class="form-label text-dark fw-bold fs-4 mb-0">
+      Domanda {{ index }}
+      <span class="badge" [class]="data.answer.result">
+        {{ getResultLabel(data.answer.result) }}
+      </span>
+    </label>
 
-    @if (isOpenTypeQuestion && !isReviewed) {<button
-      (click)="correctWithAI()"
-      class="btn btn-secondary btn-sm"
-    >
-      @if(aiCorrecting === true) {
-      <fa-icon [icon]="spinner" [animation]="'spin'"></fa-icon>} Correzione IA</button
-    >}
-  </label>
+    @if (isOpenTypeQuestion && !isReviewed) {
+      <app-syllex-button
+        [props]="{
+          label: aiCorrecting ? 'Correzione in corso...' : 'Correzione con IA',
+          variant: 'secondary',
+          size: 'large',
+          leftIcon: aiCorrecting ? spinner : sparklesIcon,
+          animation: aiCorrecting ? 'spin' : undefined,
+          transform: 'none'
+        }"
+        (clicked)="correctWithAI()"
+      ></app-syllex-button>
+    }
+  </div>
 
   <p class="fs-5">{{ data.question.text }}</p>
 

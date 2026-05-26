@@ -2,14 +2,15 @@ import { Component, inject, Input, Output, EventEmitter } from '@angular/core';
 import { NgClass, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TestsService } from '../../../services/tests-service';
-import { faSpinner, faInfoCircle } from '@fortawesome/pro-solid-svg-icons';
+import { faSpinner, faInfoCircle, faSparkles } from '@fortawesome/pro-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
 
 @Component({
   selector: 'app-question-correction',
   standalone: true,
-  imports: [NgClass, FormsModule, FontAwesomeModule, NgbTooltipModule],
+  imports: [NgClass, FormsModule, FontAwesomeModule, NgbTooltipModule, SyllexButton],
   templateUrl: './question-correction.html',
   styleUrl: './question-correction.scss',
 })
@@ -23,6 +24,7 @@ export class QuestionCorrection {
   private readonly testsService = inject(TestsService);
   readonly spinner = faSpinner;
   readonly infoIcon = faInfoCircle;
+  readonly sparklesIcon = faSparkles;
 
   getResultLabel(value: string): string {
     const labels: Record<string, string> = {
