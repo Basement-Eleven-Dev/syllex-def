@@ -77,7 +77,7 @@ export class QuestionCard {
   // ── Student mode ──────────────────────────────────────────────────────────
   @Input() selectedAnswer: number | string | null = null;
   @Input() score: number | null = null;
-  @Input() questionStatus: 'correct' | 'wrong' | 'incorrect' | 'semi-correct' | 'partial' | null = null;
+  @Input() questionStatus: 'correct' | 'wrong' | 'incorrect' | 'semi-correct' | 'partial' | 'pending' | null = null;
   @Input() teacherFeedback: string | null = null;
   @Input() feedbackLabel: string = 'Commento del docente';
   @Output() answerChange = new EventEmitter<number | string>();
