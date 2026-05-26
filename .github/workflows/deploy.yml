@@ -12,7 +12,7 @@ jobs:
       AWS_DEFAULT_OUTPUT: json
       STAGE: prod
     runs-on: ubuntu-22.04
-    if: (github.base_ref == 'prod' && github.event.pull_request.merged == true) || github.event_name == 'workflow_dispatch'
+    if: github.base_ref == 'prod' && github.event.pull_request.merged == true
     name: Deploy PRODUCTION
     defaults:
       run:
@@ -35,7 +35,7 @@ jobs:
       AWS_DEFAULT_OUTPUT: json
       STAGE: stg
     runs-on: ubuntu-22.04
-    if: (github.base_ref == 'stg' && github.event.pull_request.merged == true) || github.event_name == 'workflow_dispatch'
+    if: github.base_ref == 'stg' && github.event.pull_request.merged == true
     name: Deploy STAGING
     defaults:
       run:
