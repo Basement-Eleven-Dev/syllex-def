@@ -28,7 +28,7 @@
     [open]="sidebarOpen()"
     (toggleSidebar)="toggleSidebar()"
   ></app-sidebar>
-  <div id="content" class="flex-fill d-flex flex-column min-w-0">
+  <div id="content" class="flex-fill d-flex flex-column" style="min-width: 0;">
     <div class="px-3 px-md-5 pt-4 d-none d-lg-block">
       <app-nav></app-nav>
     </div>
@@ -38,8 +38,10 @@
       (scroll)="onContentScroll($event)"
     >
       <div
-        class="px-3 px-md-5 py-4 flex-grow-1 d-flex flex-column"
-        style="min-height: 0; view-transition-name: teacher-content"
+        class="px-md-5 flex-grow-1 d-flex flex-column"
+        [class.px-3]="!isAgentRoute()"
+        [class.py-4]="!isAgentRoute()"
+        style="min-height: 0; min-width: 0; view-transition-name: teacher-content"
       >
         <router-outlet></router-outlet>
       </div>
@@ -48,7 +50,7 @@
   }
 </div>
 
-<nav class="bottom-nav d-lg-none" [class.hidden]="navHidden()">
+<nav class="bottom-nav d-lg-none" [class.hidden]="navHidden() || hideBottomNavRoute()">
   <button
     class="bottom-nav-item"
     (click)="$event.stopPropagation(); openHelpChat()"

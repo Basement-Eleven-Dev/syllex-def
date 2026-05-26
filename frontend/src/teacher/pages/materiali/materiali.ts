@@ -147,9 +147,13 @@ export class Materiali implements OnInit {
   readonly allItems = computed(() => {
     const content = this.rootFolder()?.content ?? [];
     return [...content].sort((a, b) => {
+      // Cartelle sempre prima
       if (a.type === 'folder' && b.type !== 'folder') return -1;
       if (a.type !== 'folder' && b.type === 'folder') return 1;
-      return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+      // Poi per data decrescente (più recente prima)
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA;
     });
   });
 

@@ -49,25 +49,8 @@
 </div>
 } @if (SelectedMethod()) {
 <div class="wizard-container">
-  <!-- Step indicator -->
-  <app-syllex-stepper
-    [steps]="StepDefs()"
-    [currentStep]="CurrentStep()"
-  ></app-syllex-stepper>
-
-  <!-- Main area: prev arrow | panel | next arrow -->
+  <!-- Main area: panel -->
   <div class="wizard-main">
-    <!-- Prev arrow -->
-    <button
-      class="wizard-nav-btn"
-      type="button"
-      (click)="goPrev()"
-      [disabled]="false"
-      aria-label="Passo precedente"
-    >
-      <fa-icon [icon]="ChevronLeftIcon" />
-    </button>
-
     <!-- Panel -->
     <div class="wizard-panel">
       <!-- ── STEP 1: Tipo ── -->
@@ -97,14 +80,6 @@
       >
         <!-- Phase A: form -->
         @if (!AiIsReviewing()) {
-        <h5 class="wizard-step-title">
-          <fa-icon [icon]="SparklesIcon" class="me-2 text-primary"></fa-icon>
-          Quante domande vuoi generare?
-        </h5>
-        <p class="wizard-step-subtitle">
-          Dicci l'argomento e i parametri, l'AI creerà le domande per te.
-        </p>
-
         <div [formGroup]="aiForm">
           <div class="row g-4 align-items-stretch">
             <!-- Left: params -->
@@ -121,6 +96,7 @@
                     <option value="" disabled selected>
                       Seleziona argomento
                     </option>
+                    <option value="auto">Tutti gli argomenti (Intero documento)</option>
                     @for (topic of materiaService.topics; track topic._id) {
                     <option [value]="topic._id">{{ topic.name }}</option>
                     }
@@ -129,7 +105,7 @@
 
                 <!-- Parametri -->
                 <div class="row g-3" tourAnchor="crea_domanda_difficolta">
-                  <div class="col-6">
+                  <div class="col-12 col-md-6">
                     <label class="wizard-field-label">Quante domande?</label>
                     <input
                       type="number"
@@ -141,7 +117,7 @@
                     />
                   </div>
                   @if (IsAiFormMultipleChoice()) {
-                  <div class="col-6">
+                  <div class="col-12 col-md-6">
                     <label class="wizard-field-label">Opzioni per risposta</label>
                     <input
                       type="number"
@@ -153,7 +129,7 @@
                     />
                   </div>
                   }
-                  <div class="col-6">
+                  <div class="col-12 col-md-6">
                     <label class="wizard-field-label">In che lingua?</label>
                     <app-syllex-select-input
                       formControlName="language"
@@ -161,7 +137,7 @@
                       placeholder="Scegli lingua"
                     ></app-syllex-select-input>
                   </div>
-                  <div class="col-6">
+                  <div class="col-12 col-md-6">
                     <label class="wizard-field-label"
                       >Livello di difficoltà</label
                     >
@@ -170,7 +146,7 @@
                       [options]="DifficultyOptions"
                     ></app-syllex-select-input>
                   </div>
-                  <div class="col-6">
+                  <div class="col-12 col-md-6">
                     <label class="wizard-field-label">Tipo di utilizzo</label>
                     <app-syllex-select-input
                       formControlName="policy"
@@ -210,7 +186,7 @@
                   <app-materiali-selector></app-materiali-selector>
                 </div>
                 <!-- CTA -->
-                <div class="d-flex justify-content-end pt-3">
+                <div class="d-flex justify-content-md-end justify-content-center pt-3 w-100 mobile-full-width-btn">
                   <app-syllex-button
                     [props]="{
                       label: AiIsLoading() ? 'Generazione in corso...' : 'Genera le mie domande',
@@ -306,7 +282,7 @@
             }
           </div>
 
-          <div class="d-flex justify-content-end mt-4">
+          <div class="d-flex justify-content-md-end justify-content-center mt-4 w-100 mobile-full-width-btn">
             <button
               type="button"
               class="btn ai btn-lg rounded-pill fw-bold px-5"
@@ -334,12 +310,7 @@
         @stepIn
         tourAnchor="crea_domanda_contenuto"
       >
-        <h5 class="wizard-step-title">Qual è la tua domanda?</h5>
-        <p class="wizard-step-subtitle">
-          Scrivi la domanda e, se vuoi, arricchiscila con un'immagine.
-        </p>
-
-        <div [formGroup]="QuestionForm" class="d-flex flex-column gap-3">
+        <div [formGroup]="QuestionForm" class="form-section d-flex flex-column gap-3">
           <div class="row g-3">
             <div class="col-12 col-md-6" tourAnchor="crea_domanda_argomento">
               <label class="wizard-field-label">Su quale argomento? *</label>
@@ -445,15 +416,7 @@
         @stepIn
         tourAnchor="crea_domanda_opzioni"
       >
-        <h5 class="wizard-step-title">Qual è la risposta giusta?</h5>
-        <p class="wizard-step-subtitle">
-          @if (SelectedQuestionType() === 'scelta multipla') { Aggiungi le
-          opzioni e segna quella corretta. } @else if (SelectedQuestionType()
-          === 'vero falso') { L'affermazione che hai scritto è vera o falsa? }
-          @else { Le domande aperte vengono corrette direttamente dal docente. }
-        </p>
-
-        <div [formGroup]="QuestionForm">
+        <div [formGroup]="QuestionForm" class="form-section">
           @if (SelectedQuestionType() === 'scelta multipla') {
           <div class="col-12 col-md-10">
             <app-multiple-choice-options
@@ -508,12 +471,7 @@
         @stepIn
         tourAnchor="crea_domanda_spiegazione"
       >
-        <h5 class="wizard-step-title">Quasi fatto! Ultimi dettagli</h5>
-        <p class="wizard-step-subtitle">
-          Aggiungi contesto e scegli chi può vedere questa domanda.
-        </p>
-
-        <div [formGroup]="QuestionForm" class="d-flex flex-column gap-4">
+        <div [formGroup]="QuestionForm" class="form-section d-flex flex-column gap-4">
           <!-- Spiegazione -->
           <div>
             <label class="wizard-field-label">
@@ -607,7 +565,7 @@
 
           <!-- Azioni -->
           <div
-            class="d-flex gap-2 align-items-center justify-content-end pt-2"
+            class="d-flex gap-2 flex-md-row flex-column align-items-stretch align-items-md-center justify-content-md-end pt-2 w-100 mobile-full-width-btn"
             tourAnchor="crea_domanda_salva"
           >
             <app-syllex-button
@@ -632,20 +590,32 @@
       }
     </div>
 
-    <!-- Next arrow -->
-    @if (ShowNextArrow()) {
-    <button
-      class="wizard-nav-btn"
-      type="button"
-      (click)="goNext()"
-      [disabled]="!CanGoNext()"
-      aria-label="Passo successivo"
-    >
-      <fa-icon [icon]="ChevronRightIcon" />
-    </button>
-    } @else {
-    <div class="wizard-nav-spacer"></div>
-    }
+  </div>
+
+  <!-- Footer navigation -->
+  <div class="wizard-footer mt-4">
+    <!-- Left: Indietro -->
+    <div>
+      <app-syllex-button
+        [props]="{ label: 'Indietro', variant: 'outline', size: 'medium', leftIcon: ChevronLeftIcon }"
+        (clicked)="goPrev()"
+      ></app-syllex-button>
+    </div>
+
+    <app-syllex-stepper
+      [steps]="StepDefs()"
+      [currentStep]="CurrentStep()"
+    ></app-syllex-stepper>
+
+    <!-- Right: Avanti -->
+    <div class="wizard-footer__right">
+      @if (ShowNextArrow()) {
+      <app-syllex-button
+        [props]="{ label: 'Avanti', variant: 'primary', size: 'medium', rightIcon: ChevronRightIcon, disabled: !CanGoNext() }"
+        (clicked)="goNext()"
+      ></app-syllex-button>
+      }
+    </div>
   </div>
 </div>
 }

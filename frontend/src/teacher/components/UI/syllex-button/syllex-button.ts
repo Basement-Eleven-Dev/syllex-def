@@ -4,7 +4,7 @@ import { RouterLink, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 interface SyllexButtonProps {
-  label: string;
+  label?: string;
   variant: 'primary' | 'secondary' | 'outline' | 'underline' | 'text';
   size: 'small' | 'medium' | 'large';
   color?: 'primary' | 'white' | 'dark' | 'danger' | 'celestine' | 'black';

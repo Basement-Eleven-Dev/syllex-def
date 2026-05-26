@@ -51,7 +51,7 @@
               <input
                 type="text"
                 formControlName="title"
-                class="form-control form-control-flat"
+                class="form-control custom-input"
                 style="height: 42px"
                 placeholder="Es: Verifica di fine modulo - Elettronica"
               />
@@ -64,7 +64,7 @@
               <input
                 type="date"
                 formControlName="availableFrom"
-                class="form-control form-control-flat"
+                class="form-control custom-input"
                 style="height: 42px"
               />
             </div>
@@ -76,7 +76,7 @@
               <input
                 type="date"
                 formControlName="availableTo"
-                class="form-control form-control-flat"
+                class="form-control custom-input"
                 style="height: 42px"
               />
             </div>
@@ -95,7 +95,7 @@
       </div>
       } @if (CurrentStep() === 2) {
       <div class="syllexCard wizard-step-shell wizard-step-shell--questions">
-        <div class="d-flex flex-row flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-between gap-3 mb-4">
           <div class="flex-grow-1">
             <app-questions-search-filters
               (filtersChanged)="questionsSearched.onFiltersChanged($event)"
@@ -145,7 +145,7 @@
             <input
               type="number"
               formControlName="requiredScore"
-              class="form-control form-control-flat step3-control"
+              class="form-control custom-input step3-control"
               placeholder="Min. punti"
               [attr.max]="maxScore"
             />
@@ -229,7 +229,7 @@
           <div
             class="col-12 d-flex justify-content-between align-items-center gap-2 mt-1"
           >
-            <div class="d-flex gap-2 w-100 justify-content-end">
+            <div class="d-flex flex-column flex-md-row gap-2 w-100 justify-content-end mobile-full-width-btn">
               <app-syllex-button
                 [props]="{
                   label: 'Salva Bozza',
@@ -256,45 +256,107 @@
       }
 
       <div class="wizard-footer p-3 mt-3">
-        <div>
-          <app-syllex-button
-            [props]="{
-              label: 'Indietro',
-              variant: 'outline',
-              color: 'dark',
-              size: 'medium',
-              disabled: CurrentStep() === 1
-            }"
-            (clicked)="goPrevStep()"
-          ></app-syllex-button>
+        <!-- MOBILE LAYOUT -->
+        <div class="d-flex flex-column w-100 d-lg-none gap-3">
+          <!-- Top row: <, Stepper, > -->
+          <div class="d-flex justify-content-between align-items-center w-100 px-3 gap-3">
+            <app-syllex-button
+              [props]="{
+                leftIcon: ArrowLeftIcon,
+                variant: 'outline',
+                color: 'dark',
+                size: 'medium',
+                shape: 'circle',
+                disabled: CurrentStep() === 1
+              }"
+              (clicked)="goPrevStep()"
+            ></app-syllex-button>
+
+            <app-syllex-stepper
+              [steps]="StepDefs"
+              [currentStep]="CurrentStep()"
+              [clickable]="true"
+              [maxClickableStep]="CanGoNextToFinalize() ? 3 : CanGoNextToQuestions() ? 2 : 1"
+              (stepSelected)="goToStep($event)"
+            ></app-syllex-stepper>
+
+            <div [class.invisible]="!ShowFooterNext()">
+              <app-syllex-button
+                [props]="{
+                  rightIcon: ArrowRightIcon,
+                  variant: 'primary',
+                  size: 'medium',
+                  shape: 'circle',
+                  disabled: !CanGoNext()
+                }"
+                (clicked)="goNextStep()"
+              ></app-syllex-button>
+            </div>
+          </div>
+
+          <!-- Bottom row: Anteprima -->
+          @if (SelectedQuestionIds().length > 0) {
+          <div class="w-100 d-flex justify-content-center px-2 mt-2">
+            <app-syllex-button
+              [props]="{
+                label: 'Mostra Anteprima',
+                leftIcon: EyeIcon,
+                variant: 'outline',
+                color: 'dark',
+                size: 'medium'
+              }"
+              (clicked)="onPreview()"
+            ></app-syllex-button>
+          </div>
+          }
         </div>
 
-        <app-syllex-stepper
-          [steps]="StepDefs"
-          [currentStep]="CurrentStep()"
-          [clickable]="true"
-          [maxClickableStep]="CanGoNextToFinalize() ? 3 : CanGoNextToQuestions() ? 2 : 1"
-          (stepSelected)="goToStep($event)"
-        ></app-syllex-stepper>
+        <!-- DESKTOP LAYOUT -->
+        <div class="d-none d-lg-flex w-100 align-items-center justify-content-between">
+          <div class="wizard-footer__left d-flex justify-content-start" style="flex: 1;">
+            <app-syllex-button
+              [props]="{
+                label: 'Indietro',
+                leftIcon: ArrowLeftIcon,
+                variant: 'outline',
+                color: 'dark',
+                size: 'medium',
+                disabled: CurrentStep() === 1
+              }"
+              (clicked)="goPrevStep()"
+            ></app-syllex-button>
+          </div>
 
-        <div class="wizard-footer__right">
-          @if (ShowFooterNext()) {
-          <app-syllex-button
-            [props]="{
-              label: 'Avanti',
-              variant: 'primary',
-              size: 'medium',
-              disabled: !CanGoNext()
-            }"
-            (clicked)="goNextStep()"
-          ></app-syllex-button>
-          }
+          <div style="flex: 0 1 400px;" class="d-flex justify-content-center mx-4">
+            <app-syllex-stepper
+              [steps]="StepDefs"
+              [currentStep]="CurrentStep()"
+              [clickable]="true"
+              [maxClickableStep]="CanGoNextToFinalize() ? 3 : CanGoNextToQuestions() ? 2 : 1"
+              (stepSelected)="goToStep($event)"
+            ></app-syllex-stepper>
+          </div>
+
+          <div class="wizard-footer__right d-flex gap-2 justify-content-end" style="flex: 1;">
+            @if (ShowFooterNext()) {
+            <app-syllex-button
+              [props]="{
+                label: 'Avanti',
+                rightIcon: ArrowRightIcon,
+                variant: 'primary',
+                size: 'medium',
+                disabled: !CanGoNext()
+              }"
+              (clicked)="goNextStep()"
+            ></app-syllex-button>
+            }
+          </div>
         </div>
       </div>
     </div>
 
     <!-- COLONNA PREVIEW/AZIONI -->
-    <div class="col-12 col-lg-4 ps-lg-4 mt-4 mt-lg-0 syllexCard">
+    <div class="col-12 col-lg-4 ps-lg-4 mt-4 mt-lg-0 syllexCard d-none d-lg-block">
       <div
         class="preview-sticky h-100 d-flex flex-column justify-content-between"
       >

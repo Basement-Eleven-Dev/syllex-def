@@ -16,7 +16,7 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faInfinity, faKey, faPlus, faSparkles } from '@fortawesome/pro-solid-svg-icons';
+import { faInfinity, faKey, faPlus, faSparkles, faArrowLeft, faArrowRight, faEye } from '@fortawesome/pro-solid-svg-icons';
 import {
   QuestionsDroppableList,
   QuestionWithPoints,
@@ -80,6 +80,9 @@ export class CreateEditTest implements OnInit {
   readonly GenPasswordIcon = faKey;
   readonly PlusIcon = faPlus;
   readonly SparklesIcon = faSparkles;
+  readonly ArrowLeftIcon = faArrowLeft;
+  readonly ArrowRightIcon = faArrowRight;
+  readonly EyeIcon = faEye;
 
   // Selected questions map for preview
   selectedQuestionsMap = new Map<string, QuestionInterface>();

@@ -66,113 +66,8 @@
   min-height: 0;
 }
 
-// ─── Step Indicator ───────────────────────────────────
 
-.wizard-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-}
 
-// Variant inside footer — occupies 50% of the center wrapper
-.wizard-indicator--footer {
-  width: 50%;
-  flex-shrink: 0;
-
-  .wizard-dot {
-    width: 1.5rem;
-    height: 1.5rem;
-    font-size: 0.65rem;
-  }
-
-  .wizard-dot-label {
-    font-size: 0.58rem;
-    letter-spacing: 0.02em;
-  }
-
-  .wizard-connector {
-    flex: 1;
-    margin-bottom: 1rem;
-  }
-}
-
-// Center wrapper: full 1fr column, hairline dividers flank the dots
-.wizard-footer-center {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  width: 100%;
-  // keep dots vertically aligned with the dot circles, not the labels
-  padding-bottom: 1rem; // matches connector margin-bottom so dividers align to circle mid
-}
-
-.wizard-footer-divider {
-  flex: 1;
-  height: 1px;
-  background: var(--bs-border-color);
-  align-self: flex-start;
-  margin-top: 0.75rem; // align with dot circle center
-}
-
-.wizard-dot-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.35rem;
-}
-
-.wizard-dot {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  font-size: 0.8rem;
-  font-weight: 700;
-  border: 2px solid var(--bs-border-color);
-  color: var(--bs-secondary-color);
-  background: white;
-  transition: all 0.25s ease;
-  z-index: 1;
-
-  &--active {
-    border-color: var(--bs-primary);
-    color: var(--bs-primary);
-    background: rgba(var(--bs-primary-rgb), 0.06);
-    transform: scale(1.15);
-  }
-
-  &--completed {
-    border-color: var(--bs-primary);
-    color: white;
-    background: var(--bs-primary);
-  }
-}
-
-.wizard-dot-label {
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--bs-secondary-color);
-  white-space: nowrap;
-}
-
-.wizard-connector {
-  flex: 1;
-  height: 2px;
-  background: var(--bs-border-color);
-  margin: 0 0.25rem;
-  margin-bottom: 1.1rem;
-  transition: background 0.3s ease;
-  max-width: 80px;
-
-  &--done {
-    background: var(--bs-primary);
-  }
-}
 
 // ─── Wizard Main ──────────────────────────────────────
 
@@ -198,23 +93,15 @@
   padding: 1.5rem 2rem;
   scrollbar-width: none;
 
+  @media (max-width: 991px) {
+    padding: 1rem;
+  }
+
   &::-webkit-scrollbar {
     display: none;
   }
 }
 
-.wizard-step-title {
-  font-size: 1.15rem;
-  font-weight: 700;
-  margin-bottom: 0.2rem;
-  letter-spacing: -0.02em;
-}
-
-.wizard-step-subtitle {
-  color: var(--bs-secondary-color);
-  font-size: 0.875rem;
-  margin-bottom: 1.5rem;
-}
 
 .wizard-field-label {
   display: block;
@@ -229,18 +116,10 @@
 // ─── Wizard Footer ────────────────────────────────────
 
 .wizard-footer {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.45rem 1.5rem;
   flex-shrink: 0;
-
-  .wizard-footer__right {
-    display: flex;
-    justify-content: flex-end;
-  }
 }
+
+
 
 // ─── Method Cards ─────────────────────────────────────
 
@@ -256,6 +135,10 @@
   min-height: 90px;
   background: white;
   height: 100%;
+
+  @media (max-width: 991px) {
+    padding: 1rem;
+  }
 
   &:hover {
     border-color: var(--bs-primary);

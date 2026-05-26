@@ -3,21 +3,24 @@
   [description]="'Gestisci e visualizza le tue classi da qui.'"
 />
 
-<section class="d-flex flex-row my-5 gap-3">
+<section class="classi-filter-bar my-4">
   <app-syllex-search-input
     placeholder="Cerca classi..."
     [value]="SearchTerm()"
     (valueChange)="onSearchTermChange($event)"
-    style="min-width: 400px"
+    class="classi-filter-bar__search"
   />
+
   <app-syllex-select-input
     [value]="SelectedYear().toString()"
     (valueChange)="onYearChange($event)"
-    style="min-width: 200px"
     placeholder="Tutti gli anni"
     [options]="yearOptions"
+    class="classi-filter-bar__select"
   />
+
   <app-syllex-clear-button (clicked)="clearFilters()" />
+
   <app-view-type-toggle
     class="ms-auto"
     [viewType]="viewType"
@@ -39,7 +42,7 @@
 } @else {
   <app-syllex-kpi-row [kpis]="KpiClassi()" />
 
-  <div class="d-flex flex-row justify-content-between align-items-center mt-4">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mt-4">
     <app-syllex-pagination
       [collectionSize]="CollectionSize()"
       [page]="Page()"

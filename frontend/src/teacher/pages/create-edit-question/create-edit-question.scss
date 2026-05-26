@@ -120,104 +120,39 @@
   width: 100%;
 }
 
-// ─── Step Indicator ───────────────────────────────────
-
-.wizard-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-  margin-bottom: 1.75rem;
-}
-
-.wizard-dot-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.35rem;
-}
-
-.wizard-dot {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  font-size: 0.8rem;
-  font-weight: 700;
-  border: 2px solid var(--bs-border-color);
-  color: var(--bs-secondary-color);
-  background: white;
-  transition: all 0.25s ease;
-  z-index: 1;
-
-  &--active {
-    border-color: var(--bs-primary);
-    color: var(--bs-primary);
-    background: rgba(var(--bs-primary-rgb), 0.06);
-    transform: scale(1.15);
-  }
-
-  &--completed {
-    border-color: var(--bs-success);
-    color: white;
-    background: var(--bs-success);
-  }
-}
-
-.wizard-dot-label {
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--bs-secondary-color);
-  white-space: nowrap;
-}
-
-.wizard-connector {
-  flex: 1;
-  height: 2px;
-  background: var(--bs-border-color);
-  margin: 0 0.25rem;
-  margin-bottom: 1.1rem; // align with dot center
-  transition: background 0.3s ease;
-  max-width: 80px;
-
-  &--done {
-    background: var(--bs-success);
-  }
-}
-
 // ─── Wizard Main (arrows + panel) ─────────────────────
 
 .wizard-main {
   display: flex;
   align-items: flex-start;
   gap: 1rem;
+
+  @media (max-width: 991px) {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0;
+  }
 }
 
 .wizard-panel {
   flex: 1;
   min-height: 380px;
+
+  @media (max-width: 991px) {
+    order: 1;
+    width: 100%;
+    min-height: auto;
+  }
 }
 
 .wizard-step-content {
-  padding: 2rem;
+  padding: 0;
+  
+  @media (max-width: 991px) {
+    padding: 0;
+  }
 }
 
-.wizard-step-title {
-  font-size: 1.15rem;
-  font-weight: 700;
-  margin-bottom: 0.2rem;
-  letter-spacing: -0.02em;
-}
-
-.wizard-step-subtitle {
-  color: var(--bs-secondary-color);
-  font-size: 0.875rem;
-  margin-bottom: 1.5rem;
-}
 
 .wizard-field-label {
   display: block;
@@ -227,37 +162,32 @@
   margin-bottom: 0.5rem;
 }
 
-// ─── Nav Buttons ──────────────────────────────────────
+// ─── Nav Buttons & Footer ──────────────────────────────────────
 
-.wizard-nav-btn {
-  display: flex;
+.wizard-footer {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
-  border: none;
-  background: var(--bs-light);
-  color: var(--bs-secondary-color);
+  gap: 1rem;
+  padding: 0.45rem 1.5rem;
   flex-shrink: 0;
-  margin-top: 1.5rem;
-  transition: all 0.2s ease;
-  cursor: pointer;
 
-  &:hover:not(:disabled) {
-    background: rgba(var(--bs-primary-rgb), 0.08);
-    color: var(--bs-primary);
+  @media (max-width: 991px) {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    gap: 0.5rem;
+
+    > div:nth-child(1) { order: 2; }
+    app-syllex-stepper { order: 1; width: 100%; margin-bottom: 0.5rem; }
+    .wizard-footer__right { order: 3; }
   }
 
-  &:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
+  .wizard-footer__right {
+    display: flex;
+    justify-content: flex-end;
   }
-}
-
-.wizard-nav-spacer {
-  width: 2.5rem;
-  flex-shrink: 0;
 }
 
 // ─── Method Cards ─────────────────────────────────────
@@ -463,32 +393,13 @@
 // ─── Premium Form Styles ──────────────────────────────
 
 .form-section {
-  background-color: #ffffff;
-  border-radius: 20px;
-  border: 1px solid #eef2f6;
-  padding: 1.75rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
   height: 100%;
 }
 
-.custom-input,
-.form-select {
-  border-radius: 12px !important;
-  border: 1.5px solid #d2e2ff !important;
-  padding: 0.75rem 1rem !important;
-  font-size: 0.95rem !important;
-  transition: all 0.25s ease-in-out !important;
-  background-color: #f8faff !important;
-  color: #0e3462 !important;
-
-  &:focus {
-    background-color: #ffffff !important;
-    border-color: #0b3c7b !important;
-    box-shadow: 0 0 0 3px rgba(11, 60, 123, 0.15) !important;
-    outline: none !important;
-  }
-
-  &::placeholder {
-    color: #a0aec0 !important;
+.mobile-full-width-btn {
+  @media (max-width: 991px) {
+    button, app-syllex-button, ::ng-deep button {
+      width: 100% !important;
+    }
   }
 }

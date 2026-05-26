@@ -30,6 +30,8 @@ import {
   faWaveformLines,
   faTrash,
   faComment,
+  faBars,
+  faTimes,
 } from '@fortawesome/pro-solid-svg-icons';
 import { faSpinner } from '@fortawesome/pro-regular-svg-icons';
 import { AgentService } from '../../../services/agent.service';
@@ -72,9 +74,16 @@ export class AgentChat implements OnInit, OnDestroy {
   faWaveformLines = faWaveformLines;
   faTrash = faTrash;
   faComment = faComment;
+  faBars = faBars;
+  faTimes = faTimes;
 
   // Sidebar collassabile
   sidebarOpen = signal(true);
+  mobileHistoryOpen = signal(false);
+
+  // Inline delete confirmation
+  pendingDeleteId = signal<string | null>(null);
+  private deleteResetTimeout: any = null;
 
   // --- Services ---
   private feedbackService = inject(FeedbackService);
@@ -90,7 +99,7 @@ export class AgentChat implements OnInit, OnDestroy {
   messages = signal<ChatMessage[]>([]);
   assistantName = signal<string>('Alex');
   conversations = signal<any[]>([]);
-  currentConversationId = signal<string>('conv_' + Date.now()); // ID di default per evitare blocchi
+  currentConversationId = signal<string>('');
   inputMessage = '';
   isLoading = signal(false);
   faPlus = faPlus;
@@ -119,7 +128,6 @@ export class AgentChat implements OnInit, OnDestroy {
   private scrollContent!: ElementRef<HTMLDivElement>;
 
   ngOnInit() {
-    this.loadConversationsList();
     // Pre-fetch del token OAuth per eliminare la latenza al primo click del mic
     this.geminiLiveService.prefetchToken();
   }
@@ -127,6 +135,7 @@ export class AgentChat implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.stopRealtimeVoice();
     this.pauseAudio();
+    if (this.deleteResetTimeout) clearTimeout(this.deleteResetTimeout);
   }
 
   // Effetto: scrolla sempre in fondo quando cambia la lista dei messaggi
@@ -136,7 +145,7 @@ export class AgentChat implements OnInit, OnDestroy {
     }
   });
 
-  // Reload history when assistantId changes
+  // Carica le conversazioni al mount e ogni volta che cambia l'assistantId
   private roleWatcher = effect(() => {
     const aid = this.assistantId();
     if (aid) {
@@ -153,7 +162,6 @@ export class AgentChat implements OnInit, OnDestroy {
     const text = untracked(() => this.geminiLiveService.userTranscript());
 
     if (text.trim().length > 0) {
-      console.log('💾 [AUTO-SAVE USER VOICE]:', text);
       untracked(() => {
         this.saveVoiceMessage('user', text);
       });
@@ -171,7 +179,6 @@ export class AgentChat implements OnInit, OnDestroy {
     const text = untracked(() => this.geminiLiveService.aiTranscript());
 
     if (text.trim().length > 0 && text !== this.lastSavedAiText) {
-      console.log('💾 [AUTO-SAVE AI MESSAGE]:', text.slice(0, 80));
       this.lastSavedAiText = text;
 
       untracked(() => {
@@ -266,17 +273,18 @@ export class AgentChat implements OnInit, OnDestroy {
     this.agentService.listConversations().subscribe({
       next: (res) => {
         this.conversations.set(res);
-        if (!this.currentConversationId()) {
-          if (res.length > 0) {
-            this.selectConversation(res[0].id);
-          } else {
-            this.startNewChat();
-          }
+        // Seleziona automaticamente solo se non c'è già una conversazione attiva valida
+        // (un ID valido è uno che esiste nella lista del DB, non un ID finto locale)
+        // Popola la sidebar ma non auto-seleziona mai una vecchia conversazione:
+        // l'utente inizia sempre con una chat nuova, la cronologia è nella sidebar
+        const currentId = this.currentConversationId();
+        const isValidId = currentId && res.some((c) => c.id === currentId);
+        if (!isValidId) {
+          this.startNewChat();
         }
       },
       error: (err) => {
         console.error('Error loading conversations:', err);
-        // Se fallisce (es. 404 prima del fix), creiamo comunque una sessione locale
         if (!this.currentConversationId()) {
           this.startNewChat();
         }
@@ -294,14 +302,33 @@ export class AgentChat implements OnInit, OnDestroy {
   selectConversation(id: string) {
     this.currentConversationId.set(id);
     this.initializeChatHistory(id);
+    this.mobileHistoryOpen.set(false);
+  }
+
+  requestDeleteConversation(id: string, event: Event) {
+    event.stopPropagation();
+    if (this.deleteResetTimeout) clearTimeout(this.deleteResetTimeout);
+    this.pendingDeleteId.set(id);
+    // Auto-reset dopo 3 secondi senza conferma
+    this.deleteResetTimeout = setTimeout(() => this.pendingDeleteId.set(null), 3000);
+  }
+
+  cancelDelete(event: Event) {
+    event.stopPropagation();
+    if (this.deleteResetTimeout) clearTimeout(this.deleteResetTimeout);
+    this.pendingDeleteId.set(null);
   }
 
   deleteConversation(id: string, event: Event) {
-    event.stopPropagation(); // Prevent choosing the chat when clicking delete
-    if (confirm('Sei sicuro di voler cancellare questa conversazione?')) {
+    event.stopPropagation();
+    if (this.deleteResetTimeout) clearTimeout(this.deleteResetTimeout);
+    this.pendingDeleteId.set(null);
       this.agentService.deleteConversation(id).subscribe({
         next: () => {
-          this.feedbackService.showFeedback('Conversazione cancellata con successo', true);
+          this.feedbackService.showFeedback(
+            'Conversazione cancellata con successo',
+            true,
+          );
           this.agentService.listConversations().subscribe((res) => {
             this.conversations.set(res);
             // If we deleted the currently active conversation, switch or start a new one
@@ -316,10 +343,12 @@ export class AgentChat implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error deleting conversation:', err);
-          this.feedbackService.showFeedback('Errore nella cancellazione della conversazione', false);
-        }
+          this.feedbackService.showFeedback(
+            'Errore nella cancellazione della conversazione',
+            false,
+          );
+        },
       });
-    }
   }
 
   // ==================
@@ -412,9 +441,6 @@ export class AgentChat implements OnInit, OnDestroy {
 
       // Attendi che TUTTI i salvataggi vocali siano completati nel DB
       if (this.pendingSaves.length > 0) {
-        console.log(
-          `[Voice→Text] Attendo ${this.pendingSaves.length} salvataggi...`,
-        );
         await Promise.allSettled(this.pendingSaves);
         this.pendingSaves = [];
       }
@@ -436,7 +462,6 @@ export class AgentChat implements OnInit, OnDestroy {
   }
 
   finishTurn() {
-    console.log('🏁 Manual finish turn requested. Passing the ball natively!');
     // 1. Muta immediatamente il microfono per bloccare ulteriore invio audio e mostrare "Pensando..."
     this.isMuted.set(true);
 
@@ -449,18 +474,6 @@ export class AgentChat implements OnInit, OnDestroy {
 
     // 3. Invia il segnale nativo di fine turno al WebSocket (latenza zero)
     this.geminiLiveService.sendEndOfTurn();
-  }
-
-  private sendSilenceFrames() {
-    const sampleRate = 16000;
-    const numSamples = sampleRate; // 1 secondo di silenzio
-    const silence = new Int16Array(numSamples);
-    const bytes = new Uint8Array(silence.buffer);
-    let binary = '';
-    for (let i = 0; i < bytes.byteLength; i++) {
-      binary += String.fromCharCode(bytes[i]);
-    }
-    this.geminiLiveService.sendAudioChunk(window.btoa(binary));
   }
 
   private pollingInterval: any;
@@ -482,15 +495,19 @@ export class AgentChat implements OnInit, OnDestroy {
                 inputType: msg.inputType || 'text',
               }));
 
-              // Aggiorna i messaggi solo se il DB ha più messaggi di quelli locali
-              // (non sovrascrivere mai con una lista più corta: il messaggio AI potrebbe essere
-              // stato aggiunto localmente ma non ancora persistito)
-              if (
+              // Aggiorna se il DB ha più messaggi OPPURE se l'ultimo messaggio locale
+              // non ha ancora _id (salvataggio appena arrivato nel DB)
+              const lastLocal = this.messages()[this.messages().length - 1];
+              const lastDb = history[history.length - 1];
+              const needsUpdate =
                 history.length > this.messages().length ||
                 (history.length === this.messages().length &&
-                  history[history.length - 1]?.content !==
-                    this.messages()[this.messages().length - 1]?.content)
-              ) {
+                  lastDb?.content !== lastLocal?.content) ||
+                (history.length === this.messages().length &&
+                  !lastLocal?._id &&
+                  !!lastDb?._id);
+
+              if (needsUpdate) {
                 this.messages.set(history);
               }
             }
@@ -574,8 +591,9 @@ export class AgentChat implements OnInit, OnDestroy {
         this.geminiLiveService.sendAudioChunk(window.btoa(binary));
       };
 
+      // Collega solo source → processor (il worklet invia audio via port.postMessage,
+      // NON va connesso al destination altrimenti il mic viene ritrasmesso agli speaker)
       source.connect(this.processor);
-      this.processor.connect(this.audioContext.destination);
     } catch (err) {
       console.error('Errore avvio Realtime:', err);
       this.feedbackService.showFeedback(
@@ -641,9 +659,22 @@ export class AgentChat implements OnInit, OnDestroy {
     this.recognition.start();
   }
 
-  public exitVoiceMode() {
+  public async exitVoiceMode() {
     this.stopRealtimeVoice();
+
+    // Attendi che TUTTI i salvataggi vocali siano completati nel DB
+    if (this.pendingSaves.length > 0) {
+      await Promise.allSettled(this.pendingSaves);
+      this.pendingSaves = [];
+    }
+
     this.voiceModeActive.set(false);
+
+    // Ricarica la history dal DB per garantire coerenza con la modalità testuale
+    const convId = this.currentConversationId();
+    if (convId) {
+      this.initializeChatHistory(convId);
+    }
   }
 
   public toggleInputMode() {
@@ -696,7 +727,7 @@ export class AgentChat implements OnInit, OnDestroy {
   // CHAT HISTORY
   // ==================
 
-  async initializeChatHistory(conversationId: string) {
+  initializeChatHistory(conversationId: string) {
     this.assistantName.set('Alex');
 
     this.agentService.getConversationHistory(conversationId).subscribe({

@@ -9,6 +9,9 @@
   height: 100%;
   width: 100%;
   border-radius: 1.5rem;
+  @media (max-width: 991px) {
+    border-radius: 0;
+  }
   overflow: hidden;
 }
 
@@ -20,8 +23,29 @@
   backdrop-filter: blur(10px);
   border-left: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 1.5rem 0 0 1.5rem;
-  transition: width 0.25s ease;
+  transition:
+    width 0.25s ease,
+    transform 0.3s ease;
   position: relative;
+
+  @media (max-width: 991px) {
+    &.mobile-hidden {
+      display: none !important;
+    }
+
+    &.mobile-open {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 50;
+      border-radius: 0;
+      border-left: none;
+      background-color: #f8faff; // Solid background for mobile
+      backdrop-filter: none;
+    }
+  }
 
   &.collapsed {
     width: 40px;
@@ -116,11 +140,57 @@
       height: 20px;
       flex-shrink: 0;
 
+      &.is-confirming {
+        width: auto;
+        gap: 5px;
+
+        .delete-confirm-label {
+          font-size: 0.72rem;
+          font-weight: 600;
+          color: #dc3545;
+          white-space: nowrap;
+        }
+
+        .btn-confirm-yes {
+          font-size: 0.72rem;
+          font-weight: 700;
+          color: #fff;
+          background: #dc3545;
+          border: none;
+          border-radius: 4px;
+          padding: 2px 7px;
+          cursor: pointer;
+          transition: background 0.15s;
+          line-height: 1.4;
+
+          &:hover {
+            background: #bb2d3b;
+          }
+        }
+
+        .btn-confirm-no {
+          font-size: 0.72rem;
+          font-weight: 500;
+          color: rgba(11, 60, 123, 0.5);
+          background: transparent;
+          border: none;
+          padding: 2px 4px;
+          cursor: pointer;
+          transition: color 0.15s;
+
+          &:hover {
+            color: #0b3c7b;
+          }
+        }
+      }
+
       .conversation-date {
         font-size: 0.725rem;
         color: #0b3c7b;
         opacity: 0.55;
-        transition: opacity 0.2s ease, transform 0.2s ease;
+        transition:
+          opacity 0.2s ease,
+          transform 0.2s ease;
         pointer-events: none;
         white-space: nowrap;
       }
@@ -130,7 +200,10 @@
         opacity: 0;
         visibility: hidden;
         color: rgba(11, 60, 123, 0.4);
-        transition: opacity 0.2s ease, transform 0.2s ease, color 0.15s ease;
+        transition:
+          opacity 0.2s ease,
+          transform 0.2s ease,
+          color 0.15s ease;
         padding: 0;
         border: none;
         background: transparent;
@@ -204,7 +277,7 @@
             opacity: 0.8;
             visibility: visible;
             transform: scale(1);
-            
+
             &:hover {
               opacity: 1;
             }
@@ -244,7 +317,10 @@
 
 // --- MESSAGES (Premium Glassmorphic Bubbles) ---
 .msg-line {
-  max-width: 72%;
+  max-width: 85%;
+  @media (min-width: 768px) {
+    max-width: 72%;
+  }
   color: #1f2937;
   font-size: 1.1rem;
   backdrop-filter: blur(10px);
@@ -264,7 +340,14 @@
       margin-bottom: 0 !important;
     }
     // Also strip default margins from lists or headings if rendered
-    ul, ol, h1, h2, h3, h4, h5, h6 {
+    ul,
+    ol,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
       margin-bottom: 0 !important;
     }
   }
@@ -275,6 +358,11 @@
   max-width: 640px;
   width: 100%;
   padding: 2rem 1rem;
+  margin: auto;
+
+  @media (max-width: 991px) {
+    margin: 1rem auto auto auto;
+  }
 
   &__title {
     font-size: 2rem;
@@ -297,7 +385,7 @@
   transition:
     background 0.15s,
     transform 0.15s;
-  white-space: nowrap;
+  white-space: normal;
 
   &:hover {
     background-color: #b8d0f7;
@@ -306,6 +394,15 @@
 
   fa-icon {
     color: #3931ce;
+  }
+}
+
+.quick-btn-responsive {
+  width: 100%;
+
+  @media (min-width: 768px) {
+    width: auto;
+    white-space: nowrap;
   }
 }
 
@@ -578,7 +675,7 @@
     height: 48px;
     flex: 1;
     max-width: 480px;
-    min-width: 200px;
+    min-width: 0;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 4px 15px rgba(57, 49, 206, 0.2) !important;
 
@@ -610,7 +707,7 @@
     height: 48px;
     flex: 1;
     max-width: 480px;
-    min-width: 200px;
+    min-width: 0;
     transition: all 0.25s ease;
 
     &__dot {
@@ -624,7 +721,8 @@
 }
 
 @keyframes pulse-dot {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(0.8);
     opacity: 0.5;
   }
@@ -731,7 +829,7 @@
   height: 48px;
   flex: 1;
   max-width: 480px;
-  min-width: 280px;
+  min-width: 0;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02) !important;
 
@@ -783,7 +881,8 @@
 }
 
 @keyframes pulse-green {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(0.9);
     opacity: 0.6;
   }

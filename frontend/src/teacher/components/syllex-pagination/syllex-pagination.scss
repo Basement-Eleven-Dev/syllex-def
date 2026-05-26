@@ -19,6 +19,12 @@
     background-color 0.15s ease,
     color 0.15s ease;
 
+  @media (max-width: 991px) {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+
   &:hover:not(:disabled) {
     background-color: #d2e2ff;
   }
@@ -59,6 +65,12 @@
     transition:
       background-color 0.15s ease,
       color 0.15s ease;
+
+    @media (max-width: 991px) {
+      width: 28px;
+      height: 28px;
+      font-size: 0.75rem;
+    }
 
     &.active {
       background-color: var(--bs-primary);

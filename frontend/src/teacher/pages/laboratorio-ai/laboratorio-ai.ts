@@ -19,6 +19,8 @@ import {
   faListCheck,
   faSparkles,
   faSpinnerThird,
+  faArrowLeft,
+  faArrowRight,
 } from '@fortawesome/pro-solid-svg-icons';
 import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 import { trigger, transition, style, animate } from '@angular/animations';
@@ -37,6 +39,10 @@ import {
   MaterialType,
 } from '../../../types/question.types';
 import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
+
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { SyllexErrorModalComponent } from '../../../directives/syllex-error-modal.component';
+import { MaterialiFacadeService } from '../../../services/materiali/materiali-facade.service';
 
 interface StepDef {
   n: number;
@@ -72,6 +78,7 @@ const STYLE_PREFILL_MAP: Record<SlideStyle, string> = {
 
 @Component({
   selector: 'app-laboratorio-ai',
+  standalone: true,
   imports: [
     FontAwesomeModule,
     RouterModule,
@@ -114,6 +121,8 @@ export class LaboratorioAi {
   private readonly aiService = inject(AiService);
   private readonly feedbackService = inject(FeedbackService);
   readonly materiaService = inject(Materia);
+  private readonly modalService = inject(NgbModal);
+  private readonly materialiFacade = inject(MaterialiFacadeService);
 
   // Icons
   readonly QuestionsIcon = faCheckDouble;
@@ -123,6 +132,8 @@ export class LaboratorioAi {
   readonly ChevronLeftIcon = faChevronLeft;
   readonly ChevronRightIcon = faChevronRight;
   readonly CheckIcon = faCheck;
+  readonly ArrowLeftIcon = faArrowLeft;
+  readonly ArrowRightIcon = faArrowRight;
 
   // Options
   readonly MaterialTypes = MATERIAL_TYPE_OPTIONS;
@@ -326,7 +337,7 @@ export class LaboratorioAi {
         additionalInstructions = parts.join(' | ') || undefined;
       }
 
-      await this.aiService.generateMaterial({
+      const result = await this.aiService.generateMaterial({
         type: selectedType as MaterialType,
         materialIds: this.SelectedMaterialIds(),
         numberOfSlides: this.IsSlides()
@@ -338,11 +349,24 @@ export class LaboratorioAi {
       });
 
       this.GenerationSuccess.set(true);
-    } catch {
-      this.feedbackService.showFeedback(
-        'Errore durante la generazione. Riprova.',
-        false,
-      );
+      // Memorizza l'ID nel facade per evidenziarlo nella pagina Risorse
+      if (result?._id) {
+        this.materialiFacade.setNewlyCreatedHighlight(result._id);
+      }
+    } catch (error) {
+      const errMsg = this.aiService.extractErrorMessage(error);
+      if (errMsg.toLowerCase().includes('non contiene testo sufficiente')) {
+        const modalRef = this.modalService.open(SyllexErrorModalComponent, {
+          centered: true,
+          backdrop: 'static',
+          keyboard: false,
+        });
+        modalRef.componentInstance.title = 'Generazione Impedita';
+        modalRef.componentInstance.message = errMsg;
+        modalRef.componentInstance.buttonText = 'Ho capito, riprovo';
+      } else {
+        this.feedbackService.showFeedback(errMsg, false);
+      }
       this.IsGenerating.set(false);
     }
   }

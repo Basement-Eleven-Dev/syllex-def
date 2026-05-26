@@ -1,4 +1,4 @@
-<div class="w-100 d-flex justify-content-center mb-4">
+<div class="w-100 d-flex justify-content-center">
   <div class="wizard-indicator" style="max-width: 400px">
     @for (s of steps; track s.n) {
     <button
@@ -14,7 +14,7 @@
       >
         @if (s.n < currentStep) { ✓ } @else { {{ s.n }} }
       </div>
-      <span class="wizard-dot-label">{{ s.label }}</span>
+      <span class="wizard-dot-label d-none d-lg-block">{{ s.label }}</span>
     </button>
 
     @if (!$last) {

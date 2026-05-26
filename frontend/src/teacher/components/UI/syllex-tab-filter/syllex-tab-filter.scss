@@ -1,4 +1,19 @@
+:host {
+  display: block;
+  max-width: 100%;
+}
+
 .tab-filter {
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  width: 100%;
+  
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
   .tab-item {
     background: transparent;
     border: none;

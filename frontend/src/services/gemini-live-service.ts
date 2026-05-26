@@ -320,7 +320,7 @@ Usa search_knowledge_base per rispondere a domande su NUOVI argomenti specifici 
 - Rimani focalizzato su "${subjectName}" e sulla didattica
 
 ## STILE VOCALE
-- Lingua: speculare a quella del docente
+- Lingua: segui la lingua dell'utente. Se l'audio è ambiguo o non sei sicuro, usa l'italiano come default
 - Frasi brevi e dirette, adatte alla voce
 - Tono professionale e collaborativo
 - Presentati solo al primo messaggio o se richiesto${this.buildRecentHistoryBlock()}`;
@@ -359,7 +359,7 @@ Quando spieghi un concetto:
 Argomenti non pertinenti a "${subjectName}": rifiuta con "Sono il tutor di ${subjectName} e posso aiutarti solo su questa materia."
 
 ## STILE VOCALE
-- Lingua: speculare a quella dello studente
+- Lingua: segui la lingua dell'utente. Se l'audio è ambiguo o non sei sicuro, usa l'italiano come default
 - Frasi brevi e dirette, adatte alla voce
 - Niente introduzioni verbose
 - Presentati solo al primo messaggio o se richiesto esplicitamente${this.buildRecentHistoryBlock()}`;
@@ -387,6 +387,9 @@ ${lines}`;
         model: modelPath,
         generationConfig: {
           responseModalities: ['AUDIO'],
+          speechConfig: {
+            languageCode: 'it-IT',
+          },
         },
         inputAudioTranscription: {},
         outputAudioTranscription: {},

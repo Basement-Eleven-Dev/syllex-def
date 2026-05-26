@@ -7,7 +7,7 @@ import {
   EventEmitter,
   ViewChild,
 } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import {
   FontAwesomeModule,
   IconDefinition,
@@ -94,6 +94,7 @@ export class Sidebar {
     private authService: Auth,
     public materiaService: Materia,
     private modalService: NgbModal,
+    private router: Router
   ) {}
 
   toggleSubjectsCollapse(): void {
@@ -106,6 +107,16 @@ export class Sidebar {
 
   get selectedSubject(): MateriaObject | null {
     return this.materiaService.materiaSelected();
+  }
+
+  navigateToLabAi(): void {
+    if (this.router.url === '/t/laboratorio-ai') {
+      this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+        this.router.navigate(['/t/laboratorio-ai']);
+      });
+    } else {
+      this.router.navigate(['/t/laboratorio-ai']);
+    }
   }
 
   mainRoutes: SidebarRoute[] = [

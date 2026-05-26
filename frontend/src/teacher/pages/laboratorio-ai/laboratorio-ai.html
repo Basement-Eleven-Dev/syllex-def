@@ -95,14 +95,17 @@
         @stepIn
         tourAnchor="gen_ai_support_files"
       >
-        <div
-          class="d-flex align-items-center justify-content-between gap-2 mb-3"
-        >
-          <h5 class="wizard-step-title mb-0">
-            Seleziona i materiali di riferimento
-          </h5>
+        <div class="form-section d-flex flex-column gap-3">
+          <div class="mb-2">
+            <h5 class="wizard-step-title mb-1">
+              Materiali di riferimento
+            </h5>
+            <p class="wizard-step-subtitle mb-0">
+              Scegli i file base e l'argomento per la generazione.
+            </p>
+          </div>
           @if (SelectedMaterialIds().length > 0) {
-          <div class="d-flex align-items-center gap-2 flex-shrink-0">
+          <div class="d-flex align-items-center justify-content-end gap-2 mb-1">
             <span
               class="badge rounded-pill bg-primary"
               style="font-size: 0.72rem"
@@ -119,46 +122,47 @@
             </button>
           </div>
           }
+          <app-materiali-selector
+            [compact]="true"
+            [initialMaterialIds]="SelectedMaterialIds()"
+            (selectionChange)="onMaterialSelectionChange($event)"
+          ></app-materiali-selector>
+          @if (materiaService.materiaSelected()?.topics?.length) {
+          <div [formGroup]="genForm">
+            <label class="wizard-field-label"
+              >Argomento
+              <span class="text-muted fw-normal">(opzionale)</span></label
+            >
+            <select
+              class="form-select custom-input"
+              formControlName="topicId"
+            >
+              <option value="">Tutti gli argomenti</option>
+              @for (topic of materiaService.materiaSelected()!.topics; track
+              topic._id) {
+              <option [value]="topic._id">{{ topic.name }}</option>
+              }
+            </select>
+          </div>
+          } @if (SelectedMaterialIds().length === 0) {
+          <p class="text-muted small mb-0">
+            Seleziona almeno un file per continuare.
+          </p>
+          }
         </div>
-        <app-materiali-selector
-          [compact]="true"
-          [initialMaterialIds]="SelectedMaterialIds()"
-          (selectionChange)="onMaterialSelectionChange($event)"
-        ></app-materiali-selector>
-        @if (materiaService.materiaSelected()?.topics?.length) {
-        <div [formGroup]="genForm" class="mt-3">
-          <label class="wizard-field-label"
-            >Argomento
-            <span class="text-muted fw-normal">(opzionale)</span></label
-          >
-          <select
-            class="form-select bg-light border-0 shadow-none py-2 px-3 rounded-pill"
-            style="font-size: 0.875rem"
-            formControlName="topicId"
-          >
-            <option value="">Tutti gli argomenti</option>
-            @for (topic of materiaService.materiaSelected()!.topics; track
-            topic._id) {
-            <option [value]="topic._id">{{ topic.name }}</option>
-            }
-          </select>
-        </div>
-        } @if (SelectedMaterialIds().length === 0) {
-        <p class="text-muted small mt-2">
-          Seleziona almeno un file per continuare.
-        </p>
-        }
       </div>
       }
 
       <!-- ── STEP 3 slides: Stile ── -->
       @if (CurrentStep() === 3 && IsSlides()) {
       <div class="wizard-step-content" @stepIn tourAnchor="gen_ai_instructions">
-        <h5 class="wizard-step-title">Come vuoi le tue slide?</h5>
-        <p class="wizard-step-subtitle">
-          Scegli lo stile e l'AI adatterà la densità e il tono del testo.
-        </p>
-        <div [formGroup]="genForm" class="d-flex flex-column gap-3">
+        <div [formGroup]="genForm" class="form-section d-flex flex-column gap-3">
+          <div class="mb-2">
+            <h5 class="wizard-step-title mb-1">Come vuoi le tue slide?</h5>
+            <p class="wizard-step-subtitle mb-0">
+              Scegli lo stile e l'AI adatterà la densità e il tono del testo.
+            </p>
+          </div>
           <div class="row g-3">
             @for (opt of StyleOptions; track opt.value) {
             <div class="col-12 col-sm-4">
@@ -208,19 +212,22 @@
         @stepIn
         tourAnchor="laboratorio_ai_content"
       >
-        <h5 class="wizard-step-title">
-          Personalizza il {{ SelectedMaterialTypeName() }}
-        </h5>
-        <p class="wizard-step-subtitle">
-          Indica la lingua e aggiungi istruzioni specifiche per l'AI.
-        </p>
-        <div [formGroup]="genForm" class="d-flex flex-column gap-3">
+        <div [formGroup]="genForm" class="form-section d-flex flex-column gap-3">
+          <div class="mb-2">
+            <h5 class="wizard-step-title mb-1">
+              Personalizza il {{ SelectedMaterialTypeName() }}
+            </h5>
+            <p class="wizard-step-subtitle mb-0">
+              Indica la lingua e aggiungi istruzioni specifiche per l'AI.
+            </p>
+          </div>
           <div>
             <label class="wizard-field-label">In che lingua?</label>
-            <app-syllex-select-input
-              formControlName="language"
-              [options]="LanguageOptions"
-            ></app-syllex-select-input>
+            <select class="form-select custom-input" formControlName="language" aria-label="Lingua">
+              @for (lang of LanguageOptions; track lang.value) {
+                <option [value]="lang.value">{{ lang.label }}</option>
+              }
+            </select>
           </div>
           <div>
             <label class="wizard-field-label">
@@ -242,14 +249,16 @@
       <!-- ── STEP 4 slides: Dettagli ── -->
       @if (CurrentStep() === 4 && IsSlides()) {
       <div class="wizard-step-content" @stepIn tourAnchor="gen_ai_m_params">
-        <h5 class="wizard-step-title">
-          <fa-icon [icon]="SparklesIcon" class="me-2 text-primary"></fa-icon>
-          Ultimi dettagli
-        </h5>
-        <p class="wizard-step-subtitle">
-          Quante slide, in che lingua e il formato di output.
-        </p>
-        <div [formGroup]="genForm" class="d-flex flex-column gap-3">
+        <div [formGroup]="genForm" class="form-section d-flex flex-column gap-3">
+          <div class="mb-2">
+            <h5 class="wizard-step-title mb-1">
+              <fa-icon [icon]="SparklesIcon" class="me-2 text-primary"></fa-icon>
+              Ultimi dettagli
+            </h5>
+            <p class="wizard-step-subtitle mb-0">
+              Quante slide, in che lingua e il formato di output.
+            </p>
+          </div>
           <div class="row g-3">
             <div class="col-6">
               <label class="wizard-field-label">Quante slide?</label>
@@ -264,10 +273,11 @@
             </div>
             <div class="col-6">
               <label class="wizard-field-label">In che lingua?</label>
-              <app-syllex-select-input
-                formControlName="language"
-                [options]="LanguageOptions"
-              ></app-syllex-select-input>
+              <select class="form-select custom-input" formControlName="language" aria-label="Lingua">
+                @for (lang of LanguageOptions; track lang.value) {
+                  <option [value]="lang.value">{{ lang.label }}</option>
+                }
+              </select>
             </div>
           </div>
           <div>
@@ -321,55 +331,116 @@
     </div>
 
     <!-- Footer navigation -->
-    <div class="wizard-footer">
-      <!-- Left: Indietro -->
-      <div>
-        <app-syllex-button
-          [props]="{
-            label: 'Indietro',
-            variant: 'primary',
-            size: 'medium',
-            disabled: IsGenerating()
-          }"
-          (clicked)="goPrev()"
-        ></app-syllex-button>
+    <div class="wizard-footer p-3 mt-3 w-100">
+      <!-- MOBILE LAYOUT -->
+      <div class="d-flex flex-column w-100 d-lg-none gap-3">
+        <!-- Top row: <, Stepper, > -->
+        <div class="d-flex justify-content-between align-items-center w-100 px-3 gap-3">
+          <div [class.invisible]="CurrentStep() === 1">
+            <app-syllex-button
+              [props]="{
+                leftIcon: ArrowLeftIcon,
+                variant: 'outline',
+                color: 'dark',
+                size: 'medium',
+                shape: 'circle',
+                disabled: IsGenerating() || CurrentStep() === 1
+              }"
+              (clicked)="goPrev()"
+            ></app-syllex-button>
+          </div>
+
+          <app-syllex-stepper
+            [steps]="StepDefs()"
+            [currentStep]="CurrentStep()"
+            class="flex-grow-1 d-flex justify-content-center"
+          ></app-syllex-stepper>
+
+          <div [class.invisible]="!ShowNextArrow()">
+            <app-syllex-button
+              [props]="{
+                rightIcon: ArrowRightIcon,
+                variant: 'primary',
+                size: 'medium',
+                shape: 'circle',
+                disabled: !CanGoNext()
+              }"
+              (clicked)="goNext()"
+            ></app-syllex-button>
+          </div>
+        </div>
+
+        <!-- Bottom row: Genera -->
+        @if (!ShowNextArrow()) {
+        <div class="w-100 d-flex justify-content-center px-2 mt-2">
+          <button
+            tourAnchor="gen_ai_submit"
+            type="button"
+            class="btn btn-primary ms-2 ai rounded-pill px-4 py-3 fw-bold w-100 d-flex align-items-center justify-content-center gap-2 text-nowrap"
+            [disabled]="genForm.invalid || IsGenerating()"
+            (click)="onGenerate()"
+          >
+            <fa-icon
+              [icon]="IsGenerating() ? SpinnerIcon : SparklesIcon"
+              [animation]="IsGenerating() ? 'spin' : undefined"
+            ></fa-icon>
+            <span>{{ IsGenerating() ? 'Generazione...' : 'Genera ' + SelectedMaterialTypeName() }}</span>
+          </button>
+        </div>
+        }
       </div>
 
-      <app-syllex-stepper
-        [steps]="StepDefs()"
-        [currentStep]="CurrentStep()"
-      ></app-syllex-stepper>
+      <!-- DESKTOP LAYOUT -->
+      <div class="d-none d-lg-flex w-100 align-items-center justify-content-between">
+        <div class="wizard-footer__left d-flex justify-content-start" style="flex: 1;">
+          <app-syllex-button
+            [props]="{
+              label: 'Indietro',
+              leftIcon: ArrowLeftIcon,
+              variant: 'outline',
+              color: 'dark',
+              size: 'medium',
+              disabled: IsGenerating() || CurrentStep() === 1
+            }"
+            (clicked)="goPrev()"
+          ></app-syllex-button>
+        </div>
 
-      <!-- Right: Avanti / Genera -->
-      <div class="wizard-footer__right">
-        @if (ShowNextArrow()) {
+        <div style="flex: 0 1 400px;" class="d-flex justify-content-center mx-4">
+          <app-syllex-stepper
+            [steps]="StepDefs()"
+            [currentStep]="CurrentStep()"
+          ></app-syllex-stepper>
+        </div>
 
-        <app-syllex-button
-          [props]="{
-            label: 'Avanti',
-            variant: 'primary',
-            size: 'medium',
-            disabled: !CanGoNext()
-          }"
-          (clicked)="goNext()"
-        ></app-syllex-button>
-        } @else {
-
-        <button
-          tourAnchor="gen_ai_submit"
-          type="button"
-          class="btn btn-primary ms-2 ai icon-btn rounded-pill px-4 py-3 fw-bold"
-          [disabled]="genForm.invalid || IsGenerating()"
-          (click)="onGenerate()"
-        >
-          <fa-icon
-            [icon]="IsGenerating() ? SpinnerIcon : SparklesIcon"
-            [animation]="IsGenerating() ? 'spin' : undefined"
-          ></fa-icon>
-          {{ IsGenerating() ? 'Generazione in corso...' : 'Genera ' +
-          SelectedMaterialTypeName() }}
-        </button>
-        }
+        <div class="wizard-footer__right d-flex gap-2 justify-content-end" style="flex: 1;">
+          <div [class.d-none]="!ShowNextArrow()">
+            <app-syllex-button
+              [props]="{
+                label: 'Avanti',
+                rightIcon: ArrowRightIcon,
+                variant: 'primary',
+                size: 'medium',
+                disabled: !CanGoNext()
+              }"
+              (clicked)="goNext()"
+            ></app-syllex-button>
+          </div>
+          <button
+            [class.d-none]="ShowNextArrow()"
+            tourAnchor="gen_ai_submit"
+            type="button"
+            class="btn btn-primary ai rounded-pill px-4 py-3 fw-bold d-flex align-items-center justify-content-center gap-2 text-nowrap"
+            [disabled]="genForm.invalid || IsGenerating()"
+            (click)="onGenerate()"
+          >
+            <fa-icon
+              [icon]="IsGenerating() ? SpinnerIcon : SparklesIcon"
+              [animation]="IsGenerating() ? 'spin' : undefined"
+            ></fa-icon>
+            <span>{{ IsGenerating() ? 'Generazione in corso...' : 'Genera ' + SelectedMaterialTypeName() }}</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>

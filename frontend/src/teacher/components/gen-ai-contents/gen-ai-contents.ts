@@ -56,6 +56,7 @@ import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 import { SyllexButton } from '../UI/syllex-button/syllex-button';
 import { MaterialiFacadeService } from '../../../services/materiali/materiali-facade.service';
 import { MaterialInterface } from '../../../services/materiali/materiali-service';
+import { SyllexErrorModalComponent } from '../../../directives/syllex-error-modal.component';
 
 interface ReviewQuestion {
   readonly TempId: string;
@@ -258,13 +259,26 @@ export class GenAiContents implements OnInit {
       } else {
         await this.submitQuestionGeneration();
       }
-    } catch {
-      this.feedbackService.showFeedback(
-        'Errore durante la generazione. Riprova.',
-        false,
-      );
+    } catch (error) {
+      const errMsg = this.getUserFacingErrorMessage(error);
+      if (errMsg.toLowerCase().includes('non contiene testo sufficiente')) {
+        const modalRef = this.modalService.open(SyllexErrorModalComponent, {
+          centered: true,
+          backdrop: 'static',
+          keyboard: false,
+        });
+        modalRef.componentInstance.title = 'Generazione Impedita';
+        modalRef.componentInstance.message = errMsg;
+        modalRef.componentInstance.buttonText = 'Ho capito, riprovo';
+      } else {
+        this.feedbackService.showFeedback(errMsg, false);
+      }
       this.IsGenerating.set(false);
     }
+  }
+
+  private getUserFacingErrorMessage(error: unknown): string {
+    return this.aiService.extractErrorMessage(error);
   }
 
   private async submitQuestionGeneration(): Promise<void> {
@@ -415,13 +429,14 @@ export class GenAiContents implements OnInit {
 
   private toReviewQuestion(
     q: GeneratedQuestion,
-    topicId: string,
+    formTopicId: string,
     subjectId: string,
     teacherId: string,
   ): ReviewQuestion {
     const tempId = crypto.randomUUID();
     const difficulty = this.genForm.controls['difficulty']
       .value as QuestionDifficulty;
+    const resolvedTopicId = q.topicId || formTopicId;
     const data: QuestionInterface = {
       _id: tempId,
       text: q.text,
@@ -431,7 +446,7 @@ export class GenAiContents implements OnInit {
       options: q.options,
       correctAnswer: q.correctAnswer,
       policy: 'private',
-      topicId,
+      topicId: resolvedTopicId,
       subjectId,
       teacherId,
     };

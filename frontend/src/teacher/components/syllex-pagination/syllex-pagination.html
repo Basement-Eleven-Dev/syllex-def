@@ -1,6 +1,6 @@
 <div class="pagination-container">
   <button
-    class="nav-button py-4 px-4"
+    class="nav-button"
     [disabled]="page() === 1"
     (click)="onPrevious()"
     type="button"
@@ -18,7 +18,7 @@
     <div class="pages-container">
       @for (p of visiblePages(); track p) {
       <button
-        class="page-button py-4 px-4"
+        class="page-button"
         [class.active]="p === page()"
         (click)="onPageClick(p)"
         type="button"
@@ -30,7 +30,7 @@
   </div>
 
   <button
-    class="nav-button py-4 px-4"
+    class="nav-button"
     [disabled]="page() === totalPages()"
     (click)="onNext()"
     type="button"
@@ -40,7 +40,7 @@
   </button>
 
   <button
-    class="nav-button py-4 px-4"
+    class="nav-button"
     [disabled]="page() === totalPages()"
     (click)="onLast()"
     type="button"
