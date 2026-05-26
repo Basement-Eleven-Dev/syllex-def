@@ -88,6 +88,16 @@ export class StudentCreateTest {
         takeUntilDestroyed(),
       )
       .subscribe((res) => this.AvailableQuestionsCount.set(res.count));
+
+    // Seleziona tutti gli argomenti di default quando viene cambiata/selezionata la materia
+    effect(() => {
+      const subject = this.SelectedSubject();
+      if (subject?.topics) {
+        this.SelectedTopicIds.set(new Set(subject.topics.map((t) => t._id)));
+      } else {
+        this.SelectedTopicIds.set(new Set());
+      }
+    }, { allowSignalWrites: true });
   }
 
   readonly IsFormValid = computed(
@@ -103,7 +113,6 @@ export class StudentCreateTest {
 
   onSubjectChange(subjectId: string): void {
     this.SelectedSubjectId.set(subjectId);
-    this.SelectedTopicIds.set(new Set());
   }
 
   toggleTopic(topicId: string): void {

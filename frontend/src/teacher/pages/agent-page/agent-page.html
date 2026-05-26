@@ -59,6 +59,7 @@
       <div
         class="col d-flex flex-column h-100 position-relative"
         [class.d-none]="userRole() === 'student' && activeTab() !== 'chat'"
+        [class.d-lg-flex]="true"
       >
         <!-- Header per Studente (cambio materia su mobile) -->
         @if (userRole() === 'student') {

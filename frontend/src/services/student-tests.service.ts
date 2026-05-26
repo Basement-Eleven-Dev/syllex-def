@@ -42,7 +42,7 @@ export interface AttemptQuestionData {
   points?: number;
   score?: number;
   teacherComment?: string;
-  status?: 'correct' | 'wrong' | 'semi-correct';
+  status?: 'correct' | 'wrong' | 'incorrect' | 'semi-correct' | 'partial' | 'pending';
 }
 
 export interface StudentAttemptInterface {
