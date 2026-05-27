@@ -98,7 +98,7 @@
     [locked]="true"
     [selectedAnswer]="q.answer"
     [score]="q.score ?? null"
-    [questionStatus]="q.status ?? null"
+    [questionStatus]="(q.status === 'pending' ? null : q.status) ?? null"
     [teacherFeedback]="q.teacherComment ?? null"
     [feedbackLabel]="FeedbackLabel()"
   ></div>

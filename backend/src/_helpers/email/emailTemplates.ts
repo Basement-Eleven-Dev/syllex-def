@@ -115,7 +115,8 @@ export function newCommunicationEmail(data: NewCommunicationData) {
        </div>`
     : "";
 
-  const html = baseLayout(`
+  const html = baseLayout(
+    `
     <div style="text-align: center; margin-bottom: 24px;">
       <span style="background-color: #e0e7ff; color: ${BRAND_COLOR}; padding: 6px 14px; border-radius: 99px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">📢 Comunicazione</span>
     </div>
@@ -125,7 +126,9 @@ export function newCommunicationEmail(data: NewCommunicationData) {
     </p>
     ${preview}
     ${ctaButton("Leggi tutto", APP_URL + "/comunicazioni")}
-  `, `Nuova comunicazione da ${data.teacherName}`);
+  `,
+    `Nuova comunicazione da ${data.teacherName}`,
+  );
 
   return {
     subject: `📢 ${data.communicationTitle}`,
@@ -145,7 +148,8 @@ export interface NewEventData {
 }
 
 export function newEventEmail(data: NewEventData) {
-  const html = baseLayout(`
+  const html = baseLayout(
+    `
     <div style="text-align: center; margin-bottom: 24px;">
       <span style="background-color: #fdf2f8; color: #db2777; padding: 6px 14px; border-radius: 99px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">📅 Calendario</span>
     </div>
@@ -159,14 +163,16 @@ export function newEventEmail(data: NewEventData) {
         <tr>
           <td style="padding-bottom: 12px;">
             <div style="color: #64748b; font-size: 13px; font-weight: 600; text-transform: uppercase;">Quando</div>
-            <div style="color: #0f172a; font-size: 16px; font-weight: 700; margin-top: 4px;">${data.eventDate}${data.eventTime ? ' ore ' + data.eventTime : ''}</div>
+            <div style="color: #0f172a; font-size: 16px; font-weight: 700; margin-top: 4px;">${data.eventDate}${data.eventTime ? " ore " + data.eventTime : ""}</div>
           </td>
         </tr>
       </table>
     </div>
     
     ${ctaButton("Apri Calendario", APP_URL + "/calendario")}
-  `, `Nuovo evento: ${data.eventTitle}`);
+  `,
+    `Nuovo evento: ${data.eventTitle}`,
+  );
 
   return {
     subject: `📅 ${data.eventTitle}`,
@@ -186,7 +192,8 @@ export interface NewTestData {
 }
 
 export function newTestEmail(data: NewTestData) {
-  const html = baseLayout(`
+  const html = baseLayout(
+    `
     <div style="text-align: center; margin-bottom: 24px;">
       <span style="background-color: #fefce8; color: #ca8a04; padding: 6px 14px; border-radius: 99px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">📝 Nuovo Test</span>
     </div>
@@ -198,11 +205,13 @@ export function newTestEmail(data: NewTestData) {
     <div style="background-color: #fffbeb; border-radius: 16px; padding: 24px; border: 1px solid #fef3c7; text-align: center;">
       <div style="color: #92400e; font-size: 13px; font-weight: 600; text-transform: uppercase;">Materia</div>
       <div style="color: #451a03; font-size: 18px; font-weight: 700; margin-top: 4px;">${data.subjectName}</div>
-      ${data.questionCount ? `<div style="color: #b45309; font-size: 14px; margin-top: 8px;">${data.questionCount} domande previste</div>` : ''}
+      ${data.questionCount ? `<div style="color: #b45309; font-size: 14px; margin-top: 8px;">${data.questionCount} domande previste</div>` : ""}
     </div>
     
     ${ctaButton("Inizia il Test", APP_URL + "/test")}
-  `, `Nuovo test di ${data.subjectName}`);
+  `,
+    `Nuovo test di ${data.subjectName}`,
+  );
 
   return {
     subject: `📝 Nuovo test: ${data.testTitle}`,
@@ -237,7 +246,8 @@ export function testCorrectedEmail(data: TestCorrectedData) {
        </div>`
     : "";
 
-  const html = baseLayout(`
+  const html = baseLayout(
+    `
     <div style="text-align: center; margin-bottom: 24px;">
       <span style="background-color: #f0fdf4; color: #16a34a; padding: 6px 14px; border-radius: 99px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">✅ Valutazione</span>
     </div>
@@ -249,10 +259,53 @@ export function testCorrectedEmail(data: TestCorrectedData) {
     ${scoreBadge}
     
     ${ctaButton("Dettagli correzione", APP_URL + "/test")}
-  `, `Risultati per: ${data.testTitle}`);
+  `,
+    `Risultati per: ${data.testTitle}`,
+  );
 
   return {
     subject: `✅ Risultati Test: ${data.testTitle}`,
+    html,
+  };
+}
+
+// ─────────────────────────────────────────────────────────
+// 5. RESET PASSWORD
+// ─────────────────────────────────────────────────────────
+
+export function forgotPasswordEmail(code: string) {
+  const html = baseLayout(
+    `
+    <div style="text-align: center; margin-bottom: 24px;">
+      <span style="background-color: #eff6ff; color: #1d4ed8; padding: 6px 14px; border-radius: 99px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">🔐 Sicurezza account</span>
+    </div>
+    <h2 style="margin: 0 0 16px; color: #0f172a; font-size: 24px; font-weight: 700; text-align: center;">Ripristina la tua password</h2>
+    <p style="margin: 0 0 24px; color: #475569; font-size: 16px; line-height: 1.6; text-align: center;">
+      Hai richiesto di reimpostare la password del tuo account <strong>Syllex</strong>.<br>
+      Inserisci il codice qui sotto nell'apposito campo.
+    </p>
+
+    <div style="margin: 32px 0; text-align: center;">
+      <table role="presentation" cellspacing="0" cellpadding="0" style="margin: 0 auto;">
+        <tr>
+          <td style="background-color: #f8fafc; border: 2px solid #e2e8f0; border-radius: 16px; padding: 20px 40px; text-align: center;">
+            <div style="color: #64748b; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Codice di verifica</div>
+            <div style="font-size: 40px; font-weight: 800; letter-spacing: 14px; color: #4F46E5; font-family: monospace;">${code}</div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <p style="margin: 24px 0 0; color: #94a3b8; font-size: 14px; line-height: 1.6; text-align: center;">
+      Il codice è valido per <strong>15 minuti</strong>.<br>
+      Se non hai richiesto il reset della password, ignora questa email.
+    </p>
+  `,
+    "Il tuo codice di verifica Syllex",
+  );
+
+  return {
+    subject: "🔐 Ripristina la tua password Syllex",
     html,
   };
 }
