@@ -6,6 +6,7 @@ import {
   computed,
   inject,
   signal,
+  effect,
 } from '@angular/core';
 import {
   FormControl,
@@ -45,7 +46,6 @@ import { FeedbackService } from '../../../services/feedback-service';
 import { QuestionsSearchFilters } from '../../components/questions-search-filters/questions-search-filters';
 import { QuestionsGridSelector } from '../../components/questions-grid-selector/questions-grid-selector';
 import { TestPreviewModal } from '../../components/test-preview-modal/test-preview-modal';
-import { forkJoin } from 'rxjs';
 import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
 import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
 import { SyllexBadge } from '../../components/UI/syllex-badge/syllex-badge';
@@ -94,6 +94,23 @@ export class CreateEditTest implements OnInit {
 
   // Selected questions map for preview
   selectedQuestionsMap = new Map<string, QuestionInterface>();
+
+  constructor() {
+    effect(() => {
+      const ids = this.SelectedQuestionIds();
+      const points = this.SelectedQuestionPoints();
+      const max = ids.reduce((sum, id) => sum + (points[id] ?? 1), 0);
+
+      const requiredControl = this.TestForm.get('requiredScore');
+      if (requiredControl) {
+        const currentValue = requiredControl.value;
+        if (requiredControl.pristine && (!this.IsEditMode() || currentValue === 0 || currentValue === null)) {
+          const sixtyPercent = Math.round(max * 0.6);
+          requiredControl.setValue(sixtyPercent, { emitEvent: false });
+        }
+      }
+    });
+  }
 
   @ViewChild(QuestionsDroppableList)
   questionsComponent!: QuestionsDroppableList;
@@ -237,7 +254,7 @@ export class CreateEditTest implements OnInit {
       const ids: string[] = test.questions.map(
         (q: { questionId: string }) => q.questionId,
       );
-      forkJoin(ids.map((id: string) => this.questionsService.loadQuestion(id)))
+      this.questionsService.loadQuestionsBatch(ids)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (questions) => this.PreloadedQuestions.set(questions),
@@ -549,12 +566,8 @@ export class CreateEditTest implements OnInit {
 
     if (missingIds.length > 0) {
       this.IsLoading.set(true);
-      // Carichiamo le domande mancanti
-      const loadRequests = missingIds.map((id) =>
-        this.questionsService.loadQuestion(id),
-      );
-
-      forkJoin(loadRequests).subscribe({
+      // Carichiamo le domande mancanti in un'unica chiamata batch
+      this.questionsService.loadQuestionsBatch(missingIds).subscribe({
         next: (questions) => {
           questions.forEach((q) => this.selectedQuestionsMap.set(q._id, q));
           this.IsLoading.set(false);

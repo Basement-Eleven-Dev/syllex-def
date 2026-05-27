@@ -363,6 +363,18 @@ const QUESTIONS_ROUTES: FunctionIntegration[] = [
     role: "teacher",
   },
   {
+    apiRoute: "questions/batch",
+    functionPath: "questions/createQuestionsBatch.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "questions/list",
+    functionPath: "questions/getQuestionsBatch.ts",
+    method: "post",
+    role: "logged",
+  },
+  {
     apiRoute: "questions/{questionId}",
     functionPath: "questions/editQuestion.ts",
     method: "put",
