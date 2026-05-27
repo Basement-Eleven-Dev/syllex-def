@@ -711,4 +711,16 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
   ...ASSISTANTS_ROUTES,
   ...MATERIALS_ROUTES,
   ...ATTEMPTS_ROUTES,
+  {
+    apiRoute: "auth/forgot-password",
+    functionPath: "auth/forgotPassword.ts",
+    method: "post",
+    role: "open",
+  },
+  {
+    apiRoute: "auth/reset-password",
+    functionPath: "auth/resetPassword.ts",
+    method: "post",
+    role: "open",
+  },
 ];

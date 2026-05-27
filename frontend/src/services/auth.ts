@@ -10,8 +10,6 @@ import {
   updatePassword,
   updateUserAttribute,
   confirmUserAttribute,
-  resetPassword,
-  confirmResetPassword,
   confirmSignIn,
   setUpTOTP,
   verifyTOTPSetup,
@@ -330,27 +328,17 @@ export class Auth {
     codeValiditySeconds: number;
   }> {
     try {
-      const output = await resetPassword({ username: email });
-
-      if (
-        output.nextStep.resetPasswordStep === 'CONFIRM_RESET_PASSWORD_WITH_CODE'
-      ) {
-        return {
-          success: true,
-          message: 'Codice inviato alla tua email',
-          codeValiditySeconds: 300,
-        };
-      }
-
-      return {
-        success: false,
-        message: "Errore durante l'invio del codice",
-        codeValiditySeconds: 0,
-      };
+      return await firstValueFrom(
+        this.http.post<{
+          success: boolean;
+          message: string;
+          codeValiditySeconds: number;
+        }>('auth/forgot-password', { email }),
+      );
     } catch (error: any) {
       return {
         success: false,
-        message: error.message || "Errore durante l'invio del codice",
+        message: error?.error?.message || "Errore durante l'invio del codice",
         codeValiditySeconds: 0,
       };
     }
@@ -362,30 +350,17 @@ export class Auth {
     newPassword: string,
   ): Promise<{ success: boolean; message: string }> {
     try {
-      await confirmResetPassword({
-        username: email,
-        confirmationCode: code,
-        newPassword: newPassword,
-      });
-
-      return {
-        success: true,
-        message: 'Password resettata con successo',
-      };
+      return await firstValueFrom(
+        this.http.post<{ success: boolean; message: string }>(
+          'auth/reset-password',
+          { email, code, newPassword },
+        ),
+      );
     } catch (error: any) {
-      let message = 'Errore durante il reset della password';
-
-      if (error.name === 'CodeMismatchException') {
-        message = 'Codice non valido';
-      } else if (error.name === 'ExpiredCodeException') {
-        message = 'Codice scaduto';
-      } else if (error.name === 'InvalidPasswordException') {
-        message = 'La password non rispetta i requisiti minimi';
-      }
-
       return {
         success: false,
-        message: error.message || message,
+        message:
+          error?.error?.message || 'Errore durante il reset della password',
       };
     }
   }
