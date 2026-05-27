@@ -66,25 +66,22 @@ export class ResetPasswordForm implements OnDestroy {
   }
 
   sendEmailForm = new FormGroup({
-    email: new FormControl('dimarcantonio.luigi@gmail.com', [
-      Validators.required,
-      Validators.email,
-    ]),
+    email: new FormControl('', [Validators.required, Validators.email]),
   });
 
   checkCodeForm = new FormGroup({
-    code: new FormControl('', [Validators.required, Validators.minLength(5)]),
+    code: new FormControl('', [Validators.required, Validators.minLength(6)]),
   });
 
   resetPasswordForm = new FormGroup(
     {
-      newPassword: new FormControl('123$Ciao', [
+      newPassword: new FormControl('', [
         Validators.required,
         hasMinLenghthValidator(8),
         hasSpecialCharValidator(),
         hasNumberValidator(),
       ]),
-      confirmPassword: new FormControl('123$Ciao', [Validators.required]),
+      confirmPassword: new FormControl('', [Validators.required]),
     },
     { validators: passwordMatchValidator('newPassword', 'confirmPassword') },
   );
@@ -150,7 +147,7 @@ export class ResetPasswordForm implements OnDestroy {
       } else {
         clearInterval(this.countdownInterval);
       }
-    }, 500);
+    }, 1000);
   }
 
   sendingNewCode: boolean = false;

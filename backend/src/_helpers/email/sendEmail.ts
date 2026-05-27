@@ -1,13 +1,21 @@
 import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
 import { SendEmailPayload } from "../../_triggers/sendEmailTrigger";
-import { SendMessageCommand, SendMessageCommandInput, SQSClient } from "@aws-sdk/client-sqs";
+import {
+  SendMessageCommand,
+  SendMessageCommandInput,
+  SQSClient,
+} from "@aws-sdk/client-sqs";
 
 const sesClient = new SESClient({ region: "eu-south-1" });
 
-
-export async function sendEmail(to: string, subject: string, html: string, operation: 'send' | 'queue' = 'queue') {
+export async function sendEmail(
+  to: string,
+  subject: string,
+  html: string,
+  operation: "send" | "queue" = "queue",
+) {
   const queueUrl = process.env.EMAIL_QUEUE_URL;
-  if (operation === 'queue' && queueUrl) {
+  if (operation === "queue" && queueUrl) {
     // Invia il messaggio alla coda SQS
     const payload: SendEmailPayload = {
       subject,
@@ -21,8 +29,7 @@ export async function sendEmail(to: string, subject: string, html: string, opera
     const sqsClient = new SQSClient();
     try {
       await sqsClient.send(new SendMessageCommand(messageInput));
-    }
-    catch (error) {
+    } catch (error) {
       console.error("Errore invio email alla coda SQS:", error);
     }
     return;
