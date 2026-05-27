@@ -483,13 +483,13 @@ const ASSISTANTS_ROUTES: FunctionIntegration[] = [
     role: "logged",
   },
   {
-    apiRoute: "messages/{conversationId}",
+    apiRoute: "messages/{messageId}",
     functionPath: "messages/deleteConversation.ts",
     method: "delete",
     role: "logged",
   },
   {
-    apiRoute: "messages/{conversationId}/generate-audio",
+    apiRoute: "messages/{messageId}/generate-audio",
     functionPath: "messages/listenTomessage.ts",
     method: "post",
     role: "logged",
