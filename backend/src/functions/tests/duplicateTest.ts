@@ -1,10 +1,9 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
-import { Types, mongo } from "mongoose"; import { connectDatabase } from "../../_helpers/getDatabase";
+import { Types, mongo } from "mongoose";
+import { connectDatabase } from "../../_helpers/getDatabase";
 import { Test } from "../../models/schemas/test.schema";
-;
-
 const duplicateTest = async (
   request: APIGatewayProxyEvent,
   context: Context,
@@ -30,7 +29,8 @@ const duplicateTest = async (
     throw createError.NotFound("Test not found or not authorized");
   }
 
-  const { _id, createdAt, updatedAt, ...testData } = existingTest as any;
+  const { _id, createdAt, updatedAt, __v, ...testData } =
+    existingTest.toObject();
 
   const duplicatedTest: any = {
     ...testData,
@@ -41,10 +41,10 @@ const duplicateTest = async (
     updatedAt: new Date(),
   };
 
-  const result = await Test.insertOne(duplicatedTest);
+  const result = await Test.create(duplicatedTest);
 
   return {
-    test: result
+    test: result,
   };
 };
 

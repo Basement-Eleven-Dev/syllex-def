@@ -89,6 +89,7 @@
       leftIcon: loading ? SpinnerIcon : LoginIcon,
       animation: loading ? 'spin' : undefined
     }"
+    (clicked)="submitAuthFlow()"
   ></app-syllex-button>
   @if(hasResult){
   <div
