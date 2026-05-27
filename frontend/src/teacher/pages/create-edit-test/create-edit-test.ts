@@ -16,7 +16,15 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faInfinity, faKey, faPlus, faSparkles, faArrowLeft, faArrowRight, faEye } from '@fortawesome/pro-solid-svg-icons';
+import {
+  faInfinity,
+  faKey,
+  faPlus,
+  faSparkles,
+  faArrowLeft,
+  faArrowRight,
+  faEye,
+} from '@fortawesome/pro-solid-svg-icons';
 import {
   QuestionsDroppableList,
   QuestionWithPoints,
@@ -103,6 +111,7 @@ export class CreateEditTest implements OnInit {
   readonly QuestionsToLoad = signal<
     { questionId: string; points: number }[] | undefined
   >(undefined);
+  readonly PreloadedQuestions = signal<QuestionInterface[]>([]);
   private readonly FormChanged = signal<number>(0);
   readonly StepDefs = [
     { n: 1, label: 'Configura' },
@@ -222,6 +231,18 @@ export class CreateEditTest implements OnInit {
           {},
         ),
       );
+
+      // Pre-load full question objects so the grid shows all selected questions
+      // regardless of which search page they fall on
+      const ids: string[] = test.questions.map(
+        (q: { questionId: string }) => q.questionId,
+      );
+      forkJoin(ids.map((id: string) => this.questionsService.loadQuestion(id)))
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (questions) => this.PreloadedQuestions.set(questions),
+          error: () => {}, // silent — questions will load via normal search
+        });
     }
   }
 
@@ -610,7 +631,9 @@ export class CreateEditTest implements OnInit {
               ...questions,
               ...list.filter((existing) => !newIds.includes(existing._id)),
             ]);
-            this.questionsSearched.totalQuestions.update((tot) => tot + questions.length);
+            this.questionsSearched.totalQuestions.update(
+              (tot) => tot + questions.length,
+            );
           }
         }
       });
