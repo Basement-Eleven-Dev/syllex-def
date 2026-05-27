@@ -42,7 +42,7 @@
         
         <!-- Quante Domande -->
         <div class="col-12 col-md-6" tourAnchor="gen_ai_q_params">
-          <label class="form-label text-dark mb-2 fw-normal">Quante domande vuoi generare?</label>
+          <label class="form-label text-dark mb-2 fw-normal d-flex align-items-end" style="min-height: 42px;">Quante domande vuoi generare?</label>
           <input
             type="number"
             class="form-control custom-input"
@@ -51,11 +51,17 @@
             max="20"
             aria-label="Numero di domande"
           />
+          @if (genForm.get('numberOfQuestions')?.errors?.['max']) {
+            <div class="text-danger small mt-1">Puoi generare massimo 20 domande alla volta.</div>
+          }
+          @if (genForm.get('numberOfQuestions')?.errors?.['min']) {
+            <div class="text-danger small mt-1">Devi generare almeno 1 domanda.</div>
+          }
         </div>
 
         <!-- Argomento -->
         <div class="col-12 col-md-6" tourAnchor="gen_ai_q_topic">
-          <label class="form-label text-dark mb-2 fw-normal">Su quale argomento?</label>
+          <label class="form-label text-dark mb-2 fw-normal d-flex align-items-end" style="min-height: 42px;">Su quale argomento?</label>
           <select
             class="form-select custom-input"
             [class.text-muted]="!genForm.get('topicId')?.value"

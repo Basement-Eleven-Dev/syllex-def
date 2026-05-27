@@ -1,5 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, ViewChild, ElementRef } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import { QuestionInterface } from '../../../services/questions';
 
 @Component({
@@ -32,6 +39,7 @@ export class QuestionsGridSelector {
 
   @Input() selectedIds: string[] = [];
   @Input() pointsByQuestion: Record<string, number> = {};
+  @Input() preloadedSelected: QuestionInterface[] = [];
   @Input() canLoadMore = false;
   @Input() isLoadingMore = false;
   @Output() toggleSelection = new EventEmitter<QuestionInterface>();
@@ -42,7 +50,13 @@ export class QuestionsGridSelector {
   @Output() reachBottom = new EventEmitter<void>();
 
   get sortedQuestions(): QuestionInterface[] {
-    return [...this._questions].sort((a, b) => {
+    // Merge preloaded (from edit mode) with search-loaded questions (deduped)
+    const regularIds = new Set(this._questions.map((q) => q._id));
+    const merged = [
+      ...this.preloadedSelected.filter((q) => !regularIds.has(q._id!)),
+      ...this._questions,
+    ];
+    return merged.sort((a, b) => {
       const aSel = this.isSelected(a._id!);
       const bSel = this.isSelected(b._id!);
       if (aSel && !bSel) return -1;

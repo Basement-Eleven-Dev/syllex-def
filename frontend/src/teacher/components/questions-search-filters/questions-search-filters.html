@@ -11,8 +11,17 @@
     <div class="select-wrapper">
       <app-syllex-select-input
         formControlName="topicId"
-        placeholder="Argomento"
+        placeholder="Tutti gli argomenti"
         [options]="topicOptions()"
+      />
+    </div>
+
+    <!-- Tipologia -->
+    <div class="select-wrapper">
+      <app-syllex-select-input
+        formControlName="type"
+        placeholder="Tipologia"
+        [options]="typeOptions"
       />
     </div>
 

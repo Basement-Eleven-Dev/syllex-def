@@ -55,6 +55,16 @@ export class QuestionsService {
     return this.http.post<{ question: QuestionInterface }>('questions', q);
   }
 
+  createQuestionsBatch(
+    questions: QuestionInterface[],
+  ): Observable<{ success: boolean; questions: QuestionInterface[] }> {
+    console.log('Creating questions batch with data:', questions);
+    return this.http.post<{ success: boolean; questions: QuestionInterface[] }>(
+      'questions/batch',
+      questions,
+    );
+  }
+
   editQuestion(
     id: string,
     q: QuestionInterface,
@@ -78,6 +88,10 @@ export class QuestionsService {
 
   loadQuestion(id: string): Observable<QuestionInterface> {
     return this.http.get<QuestionInterface>(`questions/${id}`);
+  }
+
+  loadQuestionsBatch(ids: string[]): Observable<QuestionInterface[]> {
+    return this.http.post<QuestionInterface[]>('questions/list', { questionIds: ids });
   }
 
   loadPagedQuestions(
