@@ -95,7 +95,9 @@
       </div>
       } @if (CurrentStep() === 2) {
       <div class="syllexCard wizard-step-shell wizard-step-shell--questions">
-        <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-between gap-3 mb-4">
+        <div
+          class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-between gap-3 mb-4"
+        >
           <div class="flex-grow-1">
             <app-questions-search-filters
               (filtersChanged)="questionsSearched.onFiltersChanged($event)"
@@ -119,6 +121,7 @@
           [questions]="questionsSearched.filteredQuestions()"
           [selectedIds]="SelectedQuestionIds()"
           [pointsByQuestion]="SelectedQuestionPoints()"
+          [preloadedSelected]="PreloadedQuestions()"
           [canLoadMore]="questionsSearched.canLoadMore()"
           [isLoadingMore]="questionsSearched.isLoading()"
           (reachBottom)="questionsSearched.loadNextPageAppend()"
@@ -229,7 +232,9 @@
           <div
             class="col-12 d-flex justify-content-between align-items-center gap-2 mt-1"
           >
-            <div class="d-flex flex-column flex-md-row gap-2 w-100 justify-content-end mobile-full-width-btn">
+            <div
+              class="d-flex flex-column flex-md-row gap-2 w-100 justify-content-end mobile-full-width-btn"
+            >
               <app-syllex-button
                 [props]="{
                   label: 'Salva Bozza',
@@ -259,7 +264,9 @@
         <!-- MOBILE LAYOUT -->
         <div class="d-flex flex-column w-100 d-lg-none gap-3">
           <!-- Top row: <, Stepper, > -->
-          <div class="d-flex justify-content-between align-items-center w-100 px-3 gap-3">
+          <div
+            class="d-flex justify-content-between align-items-center w-100 px-3 gap-3"
+          >
             <app-syllex-button
               [props]="{
                 leftIcon: ArrowLeftIcon,
@@ -312,8 +319,13 @@
         </div>
 
         <!-- DESKTOP LAYOUT -->
-        <div class="d-none d-lg-flex w-100 align-items-center justify-content-between">
-          <div class="wizard-footer__left d-flex justify-content-start" style="flex: 1;">
+        <div
+          class="d-none d-lg-flex w-100 align-items-center justify-content-between"
+        >
+          <div
+            class="wizard-footer__left d-flex justify-content-start"
+            style="flex: 1"
+          >
             <app-syllex-button
               [props]="{
                 label: 'Indietro',
@@ -327,7 +339,10 @@
             ></app-syllex-button>
           </div>
 
-          <div style="flex: 0 1 400px;" class="d-flex justify-content-center mx-4">
+          <div
+            style="flex: 0 1 400px"
+            class="d-flex justify-content-center mx-4"
+          >
             <app-syllex-stepper
               [steps]="StepDefs"
               [currentStep]="CurrentStep()"
@@ -337,7 +352,10 @@
             ></app-syllex-stepper>
           </div>
 
-          <div class="wizard-footer__right d-flex gap-2 justify-content-end" style="flex: 1;">
+          <div
+            class="wizard-footer__right d-flex gap-2 justify-content-end"
+            style="flex: 1"
+          >
             @if (ShowFooterNext()) {
             <app-syllex-button
               [props]="{
@@ -356,7 +374,9 @@
     </div>
 
     <!-- COLONNA PREVIEW/AZIONI -->
-    <div class="col-12 col-lg-4 ps-lg-4 mt-4 mt-lg-0 syllexCard d-none d-lg-block">
+    <div
+      class="col-12 col-lg-4 ps-lg-4 mt-4 mt-lg-0 syllexCard d-none d-lg-block"
+    >
       <div
         class="preview-sticky h-100 d-flex flex-column justify-content-between"
       >

@@ -62,7 +62,7 @@ function baseLayout(content: string, preheader: string = ""): string {
               <div style="margin-bottom: 12px;">
                 <a href="${APP_URL}" style="color: ${BRAND_COLOR}; text-decoration: none; font-size: 13px; font-weight: 600;">Dashboard</a>
                 <span style="color: #cbd5e1; margin: 0 8px;">•</span>
-                <a href="${APP_URL}/profilo" style="color: ${BRAND_COLOR}; text-decoration: none; font-size: 13px; font-weight: 600;">Impostazioni</a>
+                <a href="${APP_URL}" style="color: ${BRAND_COLOR}; text-decoration: none; font-size: 13px; font-weight: 600;">Impostazioni</a>
               </div>
               <p style="margin: 0; color: #94a3b8; font-size: 11px;">
                 &copy; ${new Date().getFullYear()} ${BRAND_NAME}. Tutti i diritti riservati.
@@ -297,7 +297,7 @@ export function forgotPasswordEmail(code: string) {
     </div>
 
     <p style="margin: 24px 0 0; color: #94a3b8; font-size: 14px; line-height: 1.6; text-align: center;">
-      Il codice è valido per <strong>15 minuti</strong>.<br>
+      Il codice è valido per <strong>5 minuti</strong>.<br>
       Se non hai richiesto il reset della password, ignora questa email.
     </p>
   `,
