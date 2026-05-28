@@ -1,172 +1,32 @@
-// ── Card container ────────────────────────────────────────────────────────────
+// ── Compact Test Card Container ────────────────────────────────────────────────
 .ctc {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.85rem 1rem;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 14px;
+  flex-direction: column;
+  padding: 1rem 1.25rem;
+  background: rgba(99, 102, 241, 0.18);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: 16px;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.18);
+    background: rgba(99, 102, 241, 0.28);
+    border-color: rgba(99, 102, 241, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 
   @media (max-width: 576px) {
-    flex-wrap: wrap;
-    gap: 0.65rem;
+    padding: 0.85rem 1rem;
   }
-}
-
-// ── Left info section ─────────────────────────────────────────────────────────
-.ctc__info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  flex: 1;
-  min-width: 0;
-}
-
-.ctc__title-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 0;
 }
 
 .ctc__title {
-  margin: 0;
-  font-size: 0.88rem;
-  font-weight: 600;
   color: #ffffff;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.ctc__badge-new {
-  flex-shrink: 0;
-  display: inline-block;
-  padding: 0.15rem 0.5rem;
-  border-radius: 999px;
-  background-color: var(--syllex-green);
-  color: #0f1628;
-  font-size: 0.65rem;
+  font-size: 0.95rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  line-height: 1.4;
-}
-
-// ── Metadata row ──────────────────────────────────────────────────────────────
-.ctc__meta {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  flex-wrap: wrap;
-}
-
-.ctc__meta-item {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.55);
-  white-space: nowrap;
-}
-
-.ctc__meta-icon {
-  font-size: 0.72rem;
-  opacity: 0.7;
-}
-
-.ctc__meta-date {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.45);
-  white-space: nowrap;
-  margin-left: auto;
-}
-
-// ── Right actions section ─────────────────────────────────────────────────────
-.ctc__actions {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  flex-shrink: 0;
-
-  @media (max-width: 576px) {
-    width: 100%;
-    justify-content: flex-end;
-  }
-}
-
-// ── Score badge ───────────────────────────────────────────────────────────────
-.ctc__score {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.3rem 0.65rem;
-  background-color: rgba(123, 31, 162, 0.25);
-  border: 1px solid rgba(123, 31, 162, 0.35);
-  border-radius: 999px;
-}
-
-.ctc__score-icon {
-  font-size: 0.7rem;
-  color: #ce93d8;
-}
-
-.ctc__score-value {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: #ce93d8;
-  white-space: nowrap;
-}
-
-// ── Action button ─────────────────────────────────────────────────────────────
-.ctc__btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.45rem 1rem;
-  border: none;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: opacity 0.15s ease;
-  flex-shrink: 0;
-
-  &:hover { opacity: 0.85; }
-
-  fa-icon { font-size: 0.78rem; }
-
-  // Compila — pending
-  &.ctc__btn--pending {
-    background-color: #3b82f6;
-    color: #ffffff;
-  }
-
-  // Riprendi — in progress
-  &.ctc__btn--in-progress {
-    background-color: #f57c00;
-    color: #ffffff;
-  }
-
-  // Rivedi — completed / reviewed
-  &.ctc__btn--completed {
-    background-color: var(--syllex-green);
-    color: #0f1628;
-  }
-
-  @media (max-width: 576px) {
-    flex: 1;
-    justify-content: center;
-  }
+  letter-spacing: -0.01em;
+  margin: 0;
+  transition: color 0.15s ease;
 }

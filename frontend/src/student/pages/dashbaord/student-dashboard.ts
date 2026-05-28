@@ -28,6 +28,8 @@ import {
   faRobot,
   faPlay,
   faCheckCircle,
+  faChartLine,
+  faClipboardList,
 } from '@fortawesome/pro-solid-svg-icons';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -35,6 +37,7 @@ import { CommonModule } from '@angular/common';
 import { StudentTestCardCompact } from '../../components/student-test-card-compact/student-test-card-compact';
 import { StudentComunicazioneCard } from '../../components/student-comunicazione-card/student-comunicazione-card';
 import { StatCardData } from '../../../teacher/components/stat-card/stat-card';
+import { SyllexButton } from '../../../teacher/components/UI/syllex-button/syllex-button';
 
 @Component({
   selector: 'app-dashbaord',
@@ -45,6 +48,7 @@ import { StatCardData } from '../../../teacher/components/stat-card/stat-card';
     FontAwesomeModule,
     StudentTestCardCompact,
     StudentComunicazioneCard,
+    SyllexButton,
   ],
   templateUrl: './student-dashboard.html',
   styleUrl: './student-dashboard.scss',
@@ -63,6 +67,8 @@ export class StudentDashboard implements OnInit {
   readonly RobotIcon = faRobot;
   readonly PlayIcon = faPlay;
   readonly CheckCircleIcon = faCheckCircle;
+  readonly PerformanceIcon = faChartLine;
+  readonly ClipboardIcon = faClipboardList;
 
   User = signal<User | null>(null);
   Subjects = this.materiaService.allMaterie;

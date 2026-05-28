@@ -13,9 +13,6 @@
 <div class="dashboard-grid">
   <!-- ── TOP-LEFT: Inizia a studiare ──────────────────────────────────────── -->
   <div class="student-block student-block--study db-study d-flex flex-column">
-    <p class="mb-0 small text-white-50 fw-bold align-self-start opacity-75">
-      Inizia a studiare
-    </p>
 
     <div class="d-flex flex-column align-items-center justify-content-center flex-grow-1 text-center w-100 mt-3">
       <div class="study-mascot-wrap mb-3 d-flex align-items-center justify-content-center">
@@ -27,7 +24,7 @@
         </svg>
       </div>
       
-      <h3 class="fw-bold mb-4 text-white study-main-title">Cosa vorresti ripassare oggi?</h3>
+      <h3 class=" mb-4 text-white study-main-title">Cosa vorresti ripassare oggi?</h3>
       
       <div class="subject-pills justify-content-center block-scroll">
         @for (subject of Subjects(); track subject._id) {
@@ -47,24 +44,23 @@
 
   <!-- ── TOP-CENTER: Monitora lo studio ───────────────────────────────────── -->
   <div
-    class="student-block student-block--monitor db-monitor d-flex flex-column"
+    class="student-block student-block--monitor db-monitor d-flex flex-column justify-content-between"
   >
-    <div class="d-flex align-items-center justify-content-between mb-3 flex-shrink-0">
-      <h6 class="fw-bold mb-0 text-white">Monitora il tuo studio</h6>
-      <span class="badge bg-white bg-opacity-10 text-white-50 fw-bold py-1 px-2 small">Performance</span>
+    <div class="d-flex align-items-center gap-2 mb-3 flex-shrink-0">
+      <fa-icon [icon]="PerformanceIcon" class="text-white opacity-75" style="font-size: 1.05rem;"></fa-icon>
+      <span class="fw-semibold text-white-50" style="font-size: 0.88rem;">Performance</span>
     </div>
     
-    <div class="d-flex flex-row justify-content-around my-auto flex-shrink-0 w-100">
-      <div class="d-flex flex-column gap-1 text-center">
-        <span class="fs-1 fw-extrabold text-white lh-1" style="font-weight: 800;">{{ TotalTestsCompleted() }}</span>
-        <span class="small text-white-50 fw-semibold" style="font-size: 0.72rem;">Test da svolgere</span>
+    <div class="d-flex flex-row justify-content-between mt-auto mb-2 w-100 px-1">
+      <div class="d-flex flex-column text-start gap-1">
+        <span class="fs-1 fw-extrabold text-white lh-1" style="font-weight: 800; font-size: 3rem !important;">{{ TotalTestsCompleted() }}</span>
+        <span class="text-white-50 fw-semibold" style="font-size: 0.78rem;">Test da svolgere</span>
       </div>
-      <div class="vr bg-white bg-opacity-10 align-self-stretch" style="width: 1px; opacity: 0.2;"></div>
-      <div class="d-flex flex-column gap-1 text-center">
-        <span class="fs-1 fw-extrabold text-white lh-1" style="font-weight: 800;">
+      <div class="d-flex flex-column text-start gap-1">
+        <span class="fs-1 fw-extrabold text-white lh-1" style="font-weight: 800; font-size: 3rem !important;">
           {{ AverageScore() }}<span class="fs-4 text-white-50 ms-1">%</span>
         </span>
-        <span class="small text-white-50 fw-semibold" style="font-size: 0.72rem;">Rendimento</span>
+        <span class="text-white-50 fw-semibold" style="font-size: 0.78rem;">Rendimento</span>
       </div>
     </div>
   </div>
@@ -74,9 +70,15 @@
     <div
       class="d-flex align-items-center justify-content-between mb-3 flex-shrink-0"
     >
-      <h6 class="fw-bold mb-0 text-white">
-        Test disponibili creati dal docente
-      </h6>
+      <div class="d-flex align-items-center gap-2">
+        <fa-icon [icon]="ClipboardIcon" class="text-white opacity-75" style="font-size: 1.05rem;"></fa-icon>
+        <h6 class=" mb-0 text-white" style="font-size: 0.88rem;">
+          Test disponibili creati dal docente
+        </h6>
+      </div>
+      @if (RecentTests().length > 0) {
+        <span class="text-white-50  small opacity-75">+ {{ RecentTests().length }}</span>
+      }
     </div>
     <div class="flex-grow-1 block-scroll pr-1">
       @for (test of RecentTests(); track test._id) {
@@ -95,26 +97,32 @@
 
   <!-- ── BOTTOM-LEFT: Autovalutazione (lime green, split) ─────────────────── -->
   <div
-    class="student-block student-block--autoval db-autoval d-flex flex-row gap-4 align-items-center"
+    class="student-block student-block--autoval db-autoval d-flex flex-row gap-4"
   >
     <!-- Left: CTA -->
-    <div class="autoval-cta d-flex flex-column justify-content-center flex-grow-1 py-3">
-      <h3 class="fw-bold mb-4 autoval-title">
+    <div class="autoval-cta d-flex flex-column justify-content-center  flex-grow-1 py-4">
+      <p>Autovalutazioni</p>
+      <h3 class=" mb-4 autoval-title">
         Che ne dici di metterti alla prova?
       </h3>
-      <a
-        routerLink="/s/auto-evaluation/create"
-        class="btn btn-autoval-create mt-auto align-self-start d-flex align-items-center gap-2"
-      >
-        <fa-icon [icon]="PlayIcon"></fa-icon> Comincia con i test
-      </a>
+      <app-syllex-button
+        [props]="{
+          label: 'Comincia con le simulazioni',
+          variant: 'outline',
+          size: 'medium',
+          color: 'dark',
+          leftIcon: PlayIcon,
+          link: '/s/auto-evaluation/create'
+        }"
+        class="mt-auto align-self-start"
+      ></app-syllex-button>
     </div>
     
     <!-- Right: Ultima simulazione -->
     <div class="autoval-simulations d-flex flex-column flex-grow-1 justify-content-center py-3">
       <div class="d-flex justify-content-between align-items-center mb-3 flex-shrink-0">
-        <span class="ultima-sim__label mb-0 text-dark opacity-75 small fw-bold text-uppercase">Ultimi test</span>
-        <a routerLink="/s/auto-evaluation" class="text-dark small fw-bold text-decoration-none d-flex align-items-center gap-1 opacity-75 hover-opacity-100 transition-opacity">
+        <span class="ultima-sim__label mb-0 text-dark opacity-75 small">Ultime simulazioni</span>
+        <a routerLink="/s/auto-evaluation" class="text-dark small  text-decoration-none d-flex align-items-center gap-1 opacity-75 hover-opacity-100 transition-opacity">
           Vedi tutte <fa-icon [icon]="ArrowRight" class="small"></fa-icon>
         </a>
       </div>
@@ -122,7 +130,7 @@
       <div class="flex-grow-1 block-scroll pe-2">
         @for (test of CompletedTests(); track test._id) {
         <div class="sim-card mb-2 p-3">
-          <h6 class="fw-bold text-dark mb-3">{{ test.name }}</h6>
+          <h6 class=" text-dark mb-3">{{ test.name }}</h6>
           
           <!-- Real data: Subject and stats -->
           <div class="d-flex flex-column gap-2 text-dark opacity-75 small">
@@ -150,12 +158,12 @@
     <div
       class="d-flex align-items-center justify-content-between mb-3 flex-shrink-0"
     >
-      <h6 class="fw-bold mb-0 text-white">
+      <h6 class=" mb-0 text-white">
         Comunicazioni
       </h6>
       <div class="d-flex align-items-center gap-2">
         @if (RecentComunicazioni().length > 0) {
-        <span class="badge rounded-pill bg-dark text-white border border-white border-opacity-15 px-2 py-1" style="font-size: 0.68rem; font-weight: 700;">+{{ RecentComunicazioni().length }}</span>
+        <span class="text-white-50 small opacity-75">+ {{ RecentComunicazioni().length }}</span>
         }
       </div>
     </div>
