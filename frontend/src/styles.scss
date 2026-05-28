@@ -139,6 +139,10 @@ $select-focus-box-shadow: none;
 $input-focus-border-color: $primary;
 $form-select-focus-box-shadow: none;
 
+$student-sidebar: #25335a;
+$student-bg: #151d37;
+$student-card: #272279;
+
 $border-color: rgba(0, 0, 0, 0.077);
 
 @import "bootstrap/scss/bootstrap";
@@ -146,6 +150,9 @@ $border-color: rgba(0, 0, 0, 0.077);
 :root {
   --syllex-green: #c9f321;
   --syllex-orange: #ffa052;
+  --student-sidebar: #25335a;
+  --student-bg: #151d37;
+  --student-card: #272279;
 }
 
 .dvh-100 {
@@ -243,7 +250,6 @@ button {
     padding-right: 2.5rem !important;
   }
 }
-
 
 .syllexCard {
   padding: 2.4rem;
@@ -343,7 +349,11 @@ textarea.custom-input {
   border: none;
   position: relative;
   cursor: pointer;
-  transition: background 0.8s ease, box-shadow 0.8s ease, transform 0.2s ease, opacity 0.2s ease;
+  transition:
+    background 0.8s ease,
+    box-shadow 0.8s ease,
+    transform 0.2s ease,
+    opacity 0.2s ease;
   box-shadow: 0px 0px 28px 8px rgba(224, 224, 224, 0.204);
 
   &.not-selected {
@@ -601,7 +611,11 @@ textarea.custom-input {
 .offcanvas.offcanvas-end {
   border-radius: 2.4rem 0 0 2.4rem !important;
   border: none !important;
-  background-color: color-mix(in srgb, var(--bs-secondary) 15%, white) !important;
+  background-color: color-mix(
+    in srgb,
+    var(--bs-secondary) 15%,
+    white
+  ) !important;
   overflow: hidden;
 
   .offcanvas-body.syllexCard {
@@ -830,7 +844,7 @@ body.tour-active::after {
   &:not(textarea) {
     border-radius: 50rem !important;
   }
-  
+
   &textarea,
   &.textarea {
     border-radius: 1.5rem !important;
@@ -840,7 +854,9 @@ body.tour-active::after {
 /* Agent Page Layout Background Overrides */
 body:has(.agent-page-root) {
   // Layer a semi-transparent white gradient on top of the image to lighten it dynamically (65% white, 35% wallpaper)
-  background-image: linear-gradient(rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.8)), url("/images/sfondo_chat.png") !important;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.8)),
+    url("/images/sfondo_chat.png") !important;
   background-size: cover !important;
   background-position: center !important;
   background-repeat: no-repeat !important;
@@ -857,6 +873,125 @@ body:has(.agent-page-root) {
     background-color: transparent !important;
     background-image: none !important;
   }
-
 }
 
+/* Student Theme Dark Mode Overrides */
+.student-theme {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .display-6,
+  .fs-1,
+  .fs-2,
+  .fs-3,
+  .fs-4,
+  .fs-5 {
+    color: #ffffff !important;
+  }
+  p,
+  span,
+  label,
+  td,
+  th {
+    color: rgba(255, 255, 255, 0.9) !important;
+  }
+  .text-dark {
+    color: #ffffff !important;
+  }
+  .text-muted {
+    color: rgba(255, 255, 255, 0.6) !important;
+  }
+  .alert-info {
+    background-color: var(--student-card) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+  }
+  .alert-light {
+    background-color: var(--student-sidebar) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    color: #ffffff !important;
+    p,
+    span {
+      color: rgba(255, 255, 255, 0.8) !important;
+    }
+  }
+
+  // Sovrascrivi il blocco bianco del monitor sul dark theme (solo dentro student-block--monitor rimane bianco)
+  // Assicura che i testi dentro il blocco bianco siano scuri
+  .student-block--monitor {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    span,
+    label {
+      color: inherit !important;
+    }
+  }
+
+  // Autovalutazione: lime-green block, testi scuri
+  .student-block--autoval {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    span,
+    label {
+      color: #0f1628 !important;
+    }
+  }
+
+  // Filter pills in dark context: input e select trasparenti
+  .filter-input-pill {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.18) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+
+    input {
+      color: rgba(255, 255, 255, 0.9) !important;
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.4) !important;
+      }
+    }
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.4) !important;
+    }
+
+    .input-group-text {
+      color: rgba(255, 255, 255, 0.5) !important;
+    }
+
+    &.form-select {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgba(255,255,255,0.6)' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+      option {
+        background-color: var(--student-sidebar);
+        color: #ffffff;
+      }
+    }
+  }
+
+  // Page header testi visibili
+  app-syllex-page-header {
+    h1 {
+      color: #ffffff !important;
+    }
+    p {
+      color: rgba(255, 255, 255, 0.65) !important;
+    }
+  }
+
+  // Bottone "Crea autovalutazione" con stile gradient
+  .btn-gradient-secondary {
+    color: #0f1628 !important;
+  }
+}

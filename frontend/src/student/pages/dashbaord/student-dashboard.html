@@ -1,71 +1,141 @@
-<div class="d-flex flex-row align-items-center mb-5">
-  <div>
-    <h1 class="text-dark fw-medium mb-2 display-6">
-      Ciao @if(User()){ {{ User()?.firstName || User()?.username }} } @else {
-      ...}
-    </h1>
-    <h5 class="text-dark mb-0 fw-normal">
-      ecco un riepilogo delle tue attività e performance.
-    </h5>
-  </div>
+<!-- Welcome -->
+<div class="student-welcome mb-4">
+  <h1 class="fw-bold mb-1">
+    Ciao @if(User()){ {{ User()?.firstName || User()?.username }} } @else { ... }
+  </h1>
+  <p class="mb-0">Ecco un riepilogo delle tue attività e performance.</p>
 </div>
 
-<!-- Statistiche Rapide -->
-<section class="row mb-5">
-  <div class="col-12 col-md-6 mb-3 mb-lg-0">
-    <div class="stat-box stat-box--primary">
-      <div class="stat-box__icon">
-        <fa-icon [icon]="PieIcon"></fa-icon>
+<!-- Dashboard Grid -->
+<div class="row g-4">
+
+  <!-- LEFT COLUMN -->
+  <div class="col-12 col-xl-8 d-flex flex-column gap-4">
+
+    <!-- Block: Inizia a studiare -->
+    <div class="student-block student-block--study">
+      <div class="d-flex align-items-center gap-3 mb-4">
+        <div class="robot-icon-wrap">
+          <fa-icon [icon]="RobotIcon"></fa-icon>
+        </div>
+        <div>
+          <h5 class="fw-semibold mb-1">Inizia a studiare</h5>
+          <p class="mb-0 small opacity-text">Cosa vorresti ripassare oggi?</p>
+        </div>
       </div>
-      <div class="stat-box__content">
-        <p class="stat-box__label">Media Globale</p>
-        <h3 class="stat-box__value">
-          {{ AverageScore() }}<span class="stat-box__unit">%</span>
-        </h3>
-        <p class="stat-box__subtitle">calcolata sui test corretti</p>
+      <div class="subject-pills">
+        @for (subject of Subjects(); track subject._id) {
+          <a
+            [routerLink]="['/s/tests']"
+            [queryParams]="{ subjectId: subject._id }"
+            class="subject-pill"
+          >
+            {{ subject.name }}
+          </a>
+        } @empty {
+          <span class="opacity-text small">Nessuna materia disponibile</span>
+        }
       </div>
     </div>
-  </div>
-  <div class="col-12 col-md-6 mb-3 mb-lg-0">
-    <div class="stat-box stat-box--secondary">
-      <div class="stat-box__icon">
-        <fa-icon [icon]="TestIcon"></fa-icon>
+
+    <!-- Block: Test disponibili -->
+    <div class="student-block student-block--tests">
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <h5 class="fw-semibold mb-0">
+          <fa-icon [icon]="TestIcon" class="me-2 opacity-text"></fa-icon>
+          Test disponibili
+        </h5>
+        <a routerLink="/s/tests" class="student-link-arrow">
+          Vedi tutti <fa-icon [icon]="ArrowRight" class="ms-1"></fa-icon>
+        </a>
       </div>
-      <div class="stat-box__content">
-        <p class="stat-box__label">Test Svolti</p>
-        <h3 class="stat-box__value">{{ TotalTestsCompleted() }}</h3>
+      @for (test of RecentTests(); track test._id) {
+        <div class="mb-2">
+          <app-student-test-card-compact
+            [Test]="test"
+            [AttemptStatus]="getAttemptStatus(test._id)"
+            [AttemptScore]="getAttemptScore(test._id)"
+          />
+        </div>
+      } @empty {
+        <p class="empty-state-text mb-0">
+          Ottimo! Non hai nessun test in scadenza imminente.
+        </p>
+      }
+    </div>
+
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div class="col-12 col-xl-4 d-flex flex-column gap-4">
+
+    <!-- Block: Monitora il tuo studio -->
+    <div class="student-block student-block--monitor">
+      <div class="d-flex align-items-center gap-2 mb-4">
+        <fa-icon [icon]="PieIcon" class="monitor-icon"></fa-icon>
+        <h5 class="fw-semibold mb-0">Monitora lo studio</h5>
+      </div>
+      <p class="monitor-label mb-1">Performance</p>
+      <div class="monitor-stats">
+        <div class="monitor-stat">
+          <span class="monitor-stat__value">{{ TotalTestsCompleted() }}</span>
+          <span class="monitor-stat__label">Test completati</span>
+        </div>
+        <div class="monitor-stat-divider"></div>
+        <div class="monitor-stat">
+          <span class="monitor-stat__value">
+            {{ AverageScore() }}<span class="monitor-stat__unit">%</span>
+          </span>
+          <span class="monitor-stat__label">Rendimento</span>
+        </div>
       </div>
     </div>
-  </div>
-</section>
 
-<!-- Content Grid -->
+    <!-- Block: Autovalutazioni (lime green) -->
+    <div class="student-block student-block--autoval">
+      <h5 class="fw-semibold mb-1">Autovalutazione</h5>
+      <p class="mb-4 small autoval-subtitle">
+        Mettiti alla prova con un test personalizzato
+      </p>
+      <a routerLink="/s/auto-evaluation/create" class="btn btn-autoval-create w-100 mb-4">
+        + Nuovo test di autovalutazione
+      </a>
+      <div class="ultima-simulazione">
+        <p class="ultima-sim__label">Ultima simulazione</p>
+        @if (TotalTestsCompleted() > 0) {
+          <div class="ultima-sim__card">
+            <fa-icon [icon]="TestIcon" class="ultima-sim__icon"></fa-icon>
+            <div class="ultima-sim__info">
+              <span class="ultima-sim__score">{{ AverageScore() }}%</span>
+              <span class="ultima-sim__sublabel">Punteggio medio</span>
+            </div>
+          </div>
+        } @else {
+          <div class="ultima-sim__empty">
+            <p class="mb-0 small">Nessuna simulazione ancora effettuata</p>
+          </div>
+        }
+      </div>
+    </div>
 
-<div class="d-flex flex-column mb-4">
-  <div class="d-flex align-items-center justify-content-between mb-4">
-    <h4 class="text-dark fw-semibold mb-0">Prossimi Test</h4>
-    <a
-      routerLink="/s/tests"
-      class="btn btn-link text-decoration-none p-0 d-flex align-items-center gap-2"
-    >
-      Vedi tutti i test <fa-icon [icon]="ArrowRight"></fa-icon>
-    </a>
+    <!-- Block: Comunicazioni -->
+    <div class="student-block student-block--comunicazioni">
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <h5 class="fw-semibold mb-0">
+          <fa-icon [icon]="MegaphoneIcon" class="me-2 opacity-text"></fa-icon>
+          Comunicazioni
+        </h5>
+        <a routerLink="/s/comunicazioni" class="student-link-arrow">
+          Vedi tutte <fa-icon [icon]="ArrowRight" class="ms-1"></fa-icon>
+        </a>
+      </div>
+      @for (com of RecentComunicazioni(); track $index) {
+        <div app-student-comunicazione-card [comunicazione]="com" class="mb-2"></div>
+      } @empty {
+        <p class="empty-state-text mb-0">Nessuna comunicazione recente.</p>
+      }
+    </div>
+
   </div>
 
-  @for (test of RecentTests(); track test._id) {
-  <div class="mb-2">
-    <app-student-test-card-compact
-      [Test]="test"
-      [AttemptStatus]="getAttemptStatus(test._id)"
-      [AttemptScore]="getAttemptScore(test._id)"
-    />
-  </div>
-  } @empty {
-  <div class="alert alert-light border shadow-sm">
-    <p class="mb-0 text-muted d-flex align-items-center gap-2">
-      <fa-icon [icon]="TestIcon"></fa-icon> Ottimo! Non hai nessun test in
-      scadenza imminente.
-    </p>
-  </div>
-  }
 </div>

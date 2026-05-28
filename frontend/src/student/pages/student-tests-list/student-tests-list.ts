@@ -13,6 +13,9 @@ import { Materia } from '../../../services/materia';
 import { FeedbackService } from '../../../services/feedback-service';
 import { SyllexPagination } from '../../../teacher/components/syllex-pagination/syllex-pagination';
 import { FormsModule } from '@angular/forms';
+import { SyllexPageHeader } from '../../../teacher/components/UI/syllex-page-header/syllex-page-header';
+import { SyllexSearchInput } from '../../../teacher/components/UI/syllex-search-input/syllex-search-input';
+import { SyllexSelectInput, SelectOption } from '../../../teacher/components/UI/syllex-select-input/syllex-select-input';
 
 type AttemptStatus = 'in-progress' | 'delivered' | 'reviewed';
 
@@ -25,6 +28,9 @@ type AttemptStatus = 'in-progress' | 'delivered' | 'reviewed';
     StudentTestCard,
     SyllexPagination,
     FormsModule,
+    SyllexPageHeader,
+    SyllexSearchInput,
+    SyllexSelectInput,
   ],
   templateUrl: './student-tests-list.html',
   styleUrl: './student-tests-list.scss',
@@ -49,6 +55,9 @@ export class StudentTestsList {
   readonly CollectionSize = signal(0);
 
   readonly Subjects = this.materiaService.allMaterie;
+
+  readonly SubjectOptions = (): SelectOption[] =>
+    this.Subjects().map((s) => ({ value: s._id, label: s.name }));
 
   constructor() {
     effect(() => {

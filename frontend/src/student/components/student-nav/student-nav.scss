@@ -1,0 +1,44 @@
+.student-nav {
+  background-color: var(--student-sidebar);
+  border: none;
+  min-height: 70px;
+}
+
+.date-btn {
+  font-size: 0.95rem;
+  span {
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .fw-bold {
+    color: #fff !important;
+  }
+}
+
+.avatar-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background-color: var(--syllex-green);
+  color: #151d37;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  letter-spacing: 0.05em;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+.dropdown-menu-dark {
+  background-color: var(--student-sidebar) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}

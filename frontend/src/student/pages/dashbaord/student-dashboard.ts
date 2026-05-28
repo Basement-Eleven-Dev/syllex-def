@@ -10,7 +10,7 @@ import {
   ComunicazioniService,
   ComunicazioneInterface,
 } from '../../../services/comunicazioni-service';
-import { Materia } from '../../../services/materia';
+import { Materia, MateriaObject } from '../../../services/materia';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
@@ -18,6 +18,7 @@ import {
   faVial,
   faBullhorn,
   faArrowRight,
+  faRobot,
 } from '@fortawesome/pro-solid-svg-icons';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -34,6 +35,7 @@ import { StatCardData } from '../../../teacher/components/stat-card/stat-card';
     RouterModule,
     FontAwesomeModule,
     StudentTestCardCompact,
+    StudentComunicazioneCard,
   ],
   templateUrl: './student-dashboard.html',
   styleUrl: './student-dashboard.scss',
@@ -49,8 +51,10 @@ export class StudentDashboard implements OnInit {
   readonly TestIcon = faVial;
   readonly MegaphoneIcon = faBullhorn;
   readonly ArrowRight = faArrowRight;
+  readonly RobotIcon = faRobot;
 
   User = signal<User | null>(null);
+  Subjects = this.materiaService.allMaterie;
 
   RecentTests = signal<StudentTestInterface[]>([]);
   AttemptStatusMap = signal<

@@ -1,8 +1,65 @@
 <app-help-chat></app-help-chat>
 
-<div class="student-layout container">
-  <app-nav></app-nav>
-  <div class="student-layout__content">
-    <router-outlet></router-outlet>
+<div class="student-theme w-100 dvh-100 d-flex flex-row overflow-hidden" style="background-color: var(--student-bg); color: #fff;">
+  <div
+    class="sidebar-overlay"
+    [class.active]="sidebarOpen()"
+    (click)="closeSidebar()"
+  ></div>
+
+  <app-student-sidebar
+    #sidebarRef
+    [open]="sidebarOpen()"
+    (toggleSidebar)="toggleSidebar()"
+  ></app-student-sidebar>
+
+  <div id="content" class="flex-fill d-flex flex-column" style="min-width: 0;">
+    <!-- Desktop Navigation -->
+    <div class="px-3 px-md-5 pt-4 d-none d-lg-block">
+      <app-student-nav></app-student-nav>
+    </div>
+
+    <!-- Main Content Area -->
+    <div
+      class="flex-fill d-flex flex-column"
+      style="overflow-y: auto; overflow-x: hidden; min-width: 0;"
+      (scroll)="onContentScroll($event)"
+    >
+      <div
+        class="px-md-5 flex-grow-1 d-flex flex-column px-3 py-4"
+        style="min-height: 0; min-width: 0; view-transition-name: student-content"
+      >
+        <router-outlet></router-outlet>
+      </div>
+    </div>
   </div>
 </div>
+
+<!-- Mobile Bottom Navigation (Floating dark bar) -->
+<nav class="bottom-nav d-lg-none" [class.hidden]="navHidden()">
+  <a class="bottom-nav-item" routerLink="/s/dashboard" routerLinkActive="active">
+    <fa-icon [icon]="HouseIcon"></fa-icon>
+    <span>Home</span>
+  </a>
+  <a class="bottom-nav-item" routerLink="/s/comunicazioni" routerLinkActive="active">
+    <fa-icon [icon]="CalendarIcon"></fa-icon>
+    <span>Info</span>
+  </a>
+  <a class="bottom-nav-item" routerLink="/s/tests" routerLinkActive="active">
+    <fa-icon [icon]="TestIcon"></fa-icon>
+    <span>Test</span>
+  </a>
+  <a class="bottom-nav-item" routerLink="/s/agente" routerLinkActive="active">
+    <fa-icon [icon]="RobotIcon"></fa-icon>
+    <span>AI Chat</span>
+  </a>
+  <div ngbDropdown placement="top-end">
+    <button class="bottom-nav-item" ngbDropdownToggle style="border: none; background: transparent;">
+      <fa-icon [icon]="UserProfileIcon"></fa-icon>
+      <span>Profilo</span>
+    </button>
+    <div ngbDropdownMenu class="p-3 dropdown-menu-dark" style="min-width: 240px">
+      <app-student-user-contextual-menu></app-student-user-contextual-menu>
+    </div>
+  </div>
+</nav>

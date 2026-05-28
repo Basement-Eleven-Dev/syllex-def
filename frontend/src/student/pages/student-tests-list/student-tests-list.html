@@ -1,45 +1,34 @@
-<div class="d-flex flex-row align-items-center mb-5">
-  <div>
-    <h1 class="text-dark fw-medium mb-3 display-6">Test disponibili</h1>
-    <h5 class="text-dark mb-0 fw-normal">
-      Qui trovi i test che puoi svolgere per le tue materie
-    </h5>
-  </div>
-  <button
-    class="btn btn-gradient-secondary btn-lg ms-auto py-3 icon-btn"
+<app-syllex-page-header
+  title="Test disponibili"
+  description="Qui trovi i test che puoi svolgere per le tue materie."
+>
+  <a
+    class="btn btn-gradient-secondary btn-lg py-2 px-4"
     routerLink="/s/auto-evaluation/create"
   >
-    Crea un test di auto-valutazione
-  </button>
-</div>
+    Crea un test di autovalutazione
+  </a>
+</app-syllex-page-header>
 
-<section class="d-flex flex-row mb-5 gap-3">
-  <div>
-    <input
-      type="text"
-      id="search-term"
-      class="form-control me-3 custom-input filter"
-      placeholder="Cerca test..."
-      style="min-width: 300px"
-      [value]="SearchTerm()"
-      (input)="onSearchTermChange($any($event.target).value)"
-    />
-  </div>
-  <div>
-    <select
-      class="form-select custom-input filter"
-      [value]="SelectedSubject()"
-      (change)="onSubjectChange($any($event.target).value)"
-    >
-      <option value="">Tutte le materie</option>
-      @for (subject of Subjects(); track subject._id) {
-      <option [value]="subject._id">{{ subject.name }}</option>
-      }
-    </select>
-  </div>
+<section class="d-flex flex-row flex-wrap mb-5 gap-3 align-items-center">
+  <app-syllex-search-input
+    placeholder="Cerca test..."
+    [value]="SearchTerm()"
+    (valueChange)="onSearchTermChange($event)"
+    style="min-width: 260px; flex: 1 1 260px; max-width: 360px;"
+  />
+
+  <app-syllex-select-input
+    placeholder="Tutte le materie"
+    [value]="SelectedSubject()"
+    [options]="SubjectOptions()"
+    (valueChange)="onSubjectChange($event)"
+    style="min-width: 180px; flex: 0 0 auto;"
+  />
+
   <button
     type="button"
-    class="btn btn-outline-danger"
+    class="btn btn-outline-danger rounded-pill px-3"
     (click)="clearFilters()"
     title="Pulisci filtri"
   >
@@ -74,14 +63,14 @@
     (pageChange)="Page.set($event)"
   />
 
-  <select
-    class="form-select custom-input"
-    style="width: auto"
-    [ngModel]="PageSize()"
-    (ngModelChange)="PageSize.set($event); Page.set(1)"
-  >
-    <option [ngValue]="5">5 per pagina</option>
-    <option [ngValue]="10">10 per pagina</option>
-    <option [ngValue]="20">20 per pagina</option>
-  </select>
+  <app-syllex-select-input
+    [value]="PageSize().toString()"
+    (valueChange)="PageSize.set(+$event); Page.set(1)"
+    [options]="[
+      { value: '5',  label: '5 per pagina' },
+      { value: '10', label: '10 per pagina' },
+      { value: '20', label: '20 per pagina' }
+    ]"
+    style="width: 160px;"
+  />
 </div>
