@@ -7,17 +7,6 @@
   overflow: hidden;
 }
 
-// ── Welcome strip ─────────────────────────────────────────────────────────────
-.student-welcome {
-  flex-shrink: 0;
-  padding-bottom: 0.75rem;
-  h5 {
-    color: #ffffff;
-  }
-  p {
-    color: rgba(255, 255, 255, 0.55);
-  }
-}
 
 // ── Main Dashboard Grid ───────────────────────────────────────────────────────
 .dashboard-grid {
@@ -206,46 +195,6 @@
 .student-block--monitor {
   background-color: var(--student-card);
   border: 1px solid rgba(255, 255, 255, 0.08);
-
-  .monitor-label {
-    font-size: 0.8rem;
-    font-weight: 700;
-    background: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.8);
-    padding: 0.2rem 0.65rem;
-    border-radius: 6px;
-  }
-
-  .monitor-stat {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-
-    &__value {
-      font-size: 2.3rem;
-      font-weight: 800;
-      color: #ffffff;
-      line-height: 1;
-    }
-
-    &__unit {
-      font-size: 1.1rem;
-      color: rgba(255, 255, 255, 0.6);
-      margin-left: 0.1rem;
-    }
-
-    &__label {
-      font-size: 0.72rem;
-      color: rgba(255, 255, 255, 0.6);
-      font-weight: 500;
-    }
-  }
-
-  .monitor-stat-divider {
-    width: 1px;
-    background-color: rgba(255, 255, 255, 0.08);
-    align-self: stretch;
-  }
 }
 
 // ── Test disponibili ──────────────────────────────────────────────────────────
@@ -336,25 +285,3 @@
   }
 }
 
-.opacity-text {
-  opacity: 0.55;
-}
-
-.empty-state-text {
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.85rem;
-}
-
-.badge-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #0f1628;
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  font-size: 0.68rem;
-  font-weight: 700;
-  padding: 0.18rem 0.5rem;
-  border-radius: 999px;
-  line-height: 1;
-}

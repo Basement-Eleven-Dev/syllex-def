@@ -155,7 +155,7 @@
       </h6>
       <div class="d-flex align-items-center gap-2">
         @if (RecentComunicazioni().length > 0) {
-        <span class="badge-count">+{{ RecentComunicazioni().length }}</span>
+        <span class="badge rounded-pill bg-dark text-white border border-white border-opacity-15 px-2 py-1" style="font-size: 0.68rem; font-weight: 700;">+{{ RecentComunicazioni().length }}</span>
         }
       </div>
     </div>
@@ -167,7 +167,7 @@
         class="mb-2"
       ></div>
       } @empty {
-      <p class="empty-state-text mb-0 small">Nessuna comunicazione recente.</p>
+      <p class="text-white-50 opacity-75 mb-0 small">Nessuna comunicazione recente.</p>
       }
     </div>
   </div>
