@@ -1,51 +1,60 @@
-<div class="card p-3 h-100">
-  <div class="card-body d-flex flex-column gap-4 align-items-start">
-    <span>{{ Test().subjectName }}</span>
-    <h3
-      class="card-title text-dark ellipsis-3-lines mb-0"
-      [title]="Test().name"
-    >
-      {{ Test().name }}
-    </h3>
+<div class="stc d-flex flex-column" [routerLink]="Route()">
 
-    <section class="d-flex flex-column gap-2">
-      @if (Test().availableFrom || Test().availableTo) {
-      <div class="text-dark">
-        <fa-icon [icon]="ClockIcon" class="me-1"></fa-icon>
-        @if (Test().availableFrom && Test().availableTo) { Disponibile dal {{
-        Test().availableFrom | date: 'd MMM y' }} al {{ Test().availableTo |
-        date: 'd MMM y' }} } @else if (Test().availableFrom) { Disponibile dal
-        {{ Test().availableFrom | date: 'd MMM y' }} } @else if
-        (Test().availableTo) { Disponibile fino al {{ Test().availableTo | date:
-        'd MMM y' }} }
-      </div>
-      }
+  <!-- ── Subject chip ────────────────────────────────────────────────────── -->
+  <div class="stc__subject-chip">{{ Test().subjectName }}</div>
 
-      <div class="text-dark">
-        <fa-icon [icon]="QuestionsIcon" class="me-1"></fa-icon>
-        {{ QuestionsCount() }} Domande - {{ MaxScore() }} pt.
-      </div>
-    </section>
+  <!-- ── Title ──────────────────────────────────────────────────────────── -->
+  <h5 class="stc__title">{{ Test().name }}</h5>
 
-    <div class="mt-auto w-100">
-      <button
-        class="btn w-100"
-        [class.btn-warning]="AttemptStatus() === 'in-progress'"
-        [class.text-white]="AttemptStatus() === 'in-progress'"
-        [class.btn-success]="IsCompleted()"
-        [class.btn-primary]="!AttemptStatus()"
-        [routerLink]="Route()"
-      >
-        @if (AttemptStatus() === 'reviewed') {
-        <fa-icon [icon]="ReviewIcon" class="me-2"></fa-icon>
-        Vedi correzione } @else if (AttemptStatus() === 'delivered') {
-        <fa-icon [icon]="ReviewIcon" class="me-2"></fa-icon>
-        Rivedi test } @else if (AttemptStatus() === 'in-progress') {
-        <fa-icon [icon]="ResumeIcon" class="me-2"></fa-icon>
-        Riprendi test } @else {
-        <fa-icon [icon]="PlayIcon" class="me-2"></fa-icon>
-        Compila test }
-      </button>
-    </div>
+  <!-- ── Meta: questions + max score ────────────────────────────────────── -->
+  <div class="stc__meta">
+    <span class="stc__meta-item">
+      <fa-icon [icon]="QuestionsIcon" class="stc__meta-icon"></fa-icon>
+      {{ QuestionsCount() }} Domande
+    </span>
+    <span class="stc__meta-item">
+      <fa-icon [icon]="TrophyIcon" class="stc__meta-icon"></fa-icon>
+      {{ MaxScore() }} punti
+    </span>
   </div>
+
+  <!-- ── Conditional info row ────────────────────────────────────────────── -->
+  @if (IsCompleted()) {
+    <div class="stc__info-row stc__info-row--done">
+      <fa-icon [icon]="CheckIcon" class="stc__check-icon"></fa-icon>
+      <span>Completato</span>
+    </div>
+  } @else if (Test().availableFrom || Test().availableTo) {
+    <div class="stc__info-row stc__info-row--avail">
+      <fa-icon [icon]="CalendarIcon" class="stc__cal-icon"></fa-icon>
+      <span>
+        @if (Test().availableFrom && Test().availableTo) {
+          dal {{ Test().availableFrom | date: 'dd/MM/yy' }} al {{ Test().availableTo | date: 'dd/MM/yy' }}
+        } @else if (Test().availableFrom) {
+          dal {{ Test().availableFrom | date: 'dd/MM/yy' }}
+        } @else {
+          fino al {{ Test().availableTo | date: 'dd/MM/yy' }}
+        }
+      </span>
+    </div>
+  }
+
+  <!-- ── Action button ────────────────────────────────────────────────────── -->
+  <button
+    class="stc__btn mt-auto"
+    [class.stc__btn--pending]="!AttemptStatus()"
+    [class.stc__btn--in-progress]="AttemptStatus() === 'in-progress'"
+    [class.stc__btn--completed]="IsCompleted()"
+    (click)="$event.stopPropagation()"
+    [routerLink]="Route()"
+  >
+    @if (AttemptStatus() === 'reviewed' || AttemptStatus() === 'delivered') {
+      <fa-icon [icon]="ReviewIcon"></fa-icon> Rivedi
+    } @else if (AttemptStatus() === 'in-progress') {
+      <fa-icon [icon]="ResumeIcon"></fa-icon> Riprendi
+    } @else {
+      <fa-icon [icon]="PlayIcon"></fa-icon> Fai il test
+    }
+  </button>
+
 </div>

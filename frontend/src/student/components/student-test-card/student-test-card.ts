@@ -8,7 +8,9 @@ import {
   faPlay,
   faQuestionCircle,
   faRotateRight,
-  faStar,
+  faTrophy,
+  faCalendarDays,
+  faCheck,
 } from '@fortawesome/pro-solid-svg-icons';
 import { StudentTestInterface } from '../../../services/student-tests.service';
 
@@ -27,7 +29,9 @@ export class StudentTestCard {
 
   readonly ClockIcon = faClock;
   readonly QuestionsIcon = faQuestionCircle;
-  readonly ScoreIcon = faStar;
+  readonly TrophyIcon = faTrophy;
+  readonly CalendarIcon = faCalendarDays;
+  readonly CheckIcon = faCheck;
   readonly PlayIcon = faPlay;
   readonly ResumeIcon = faRotateRight;
   readonly ReviewIcon = faEye;

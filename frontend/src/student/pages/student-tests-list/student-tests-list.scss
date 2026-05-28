@@ -1,9 +1,8 @@
-.card {
-  transition: box-shadow 0.2s;
-
-  &:hover {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
-  }
+.stc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
 }
 
 // Dark overrides for filter pills inside student theme

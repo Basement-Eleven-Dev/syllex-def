@@ -1,19 +1,142 @@
-.card {
-  overflow: hidden;
-  transition: box-shadow 0.2s;
+// ── Host: fill grid cell ──────────────────────────────────────────────────────
+:host {
+  display: block;
+  height: 100%;
+}
+
+// ── Card container ─────────────────────────────────────────────────────────────
+.stc {
+  gap: 0.75rem;
+  padding: 1.25rem;
+  background: var(--student-sidebar);
+  border-radius: 24px;
+  color: #ffffff;
+  cursor: pointer;
+  height: 100%;
+  text-decoration: none;
+  transition: background 0.15s ease;
 
   &:hover {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  }
-
-  .card-body {
-    z-index: 1;
+    background: color-mix(in srgb, var(--student-sidebar) 85%, #fff);
   }
 }
 
-.ellipsis-3-lines {
+// ── Subject chip ──────────────────────────────────────────────────────────────
+.stc__subject-chip {
+  display: inline-block;
+  padding: 0.22rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+// ── Title ──────────────────────────────────────────────────────────────────────
+.stc__title {
+  margin: 0;
+  color: #ffffff !important;
+  font-size: 0.98rem;
+  font-weight: 600;
+  line-height: 1.35;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+// ── Meta row ──────────────────────────────────────────────────────────────────
+.stc__meta {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.stc__meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.6) !important;
+  white-space: nowrap;
+
+  span { color: rgba(255, 255, 255, 0.6) !important; }
+}
+
+.stc__meta-icon {
+  font-size: 0.72rem;
+  opacity: 0.7;
+}
+
+// ── Info row (availability / completed) ──────────────────────────────────────
+.stc__info-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  border-radius: 10px;
+  padding: 0.4rem 0.65rem;
+
+  span { color: inherit !important; }
+
+  &--avail {
+    background: rgba(255, 255, 255, 0.07);
+    color: rgba(255, 255, 255, 0.65) !important;
+  }
+
+  &--done {
+    background: rgba(201, 243, 33, 0.12);
+    color: var(--syllex-green) !important;
+  }
+}
+
+.stc__check-icon {
+  font-size: 0.75rem;
+  color: var(--syllex-green);
+}
+
+.stc__cal-icon {
+  font-size: 0.75rem;
+  opacity: 0.65;
+}
+
+// ── Action button ─────────────────────────────────────────────────────────────
+.stc__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: 100%;
+  padding: 0.65rem 1rem;
+  border: none;
+  border-radius: 14px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+  margin-top: auto;
+
+  fa-icon { font-size: 0.82rem; }
+  &:hover { opacity: 0.85; }
+
+  // Fai il test
+  &.stc__btn--pending {
+    background: #3b82f6;
+    color: #ffffff;
+  }
+
+  // Riprendi
+  &.stc__btn--in-progress {
+    background: #f57c00;
+    color: #ffffff;
+  }
+
+  // Rivedi — lilla chiaro
+  &.stc__btn--completed {
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+  }
 }

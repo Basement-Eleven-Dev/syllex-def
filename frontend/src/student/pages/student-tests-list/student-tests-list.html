@@ -36,14 +36,12 @@
   </button>
 </section>
 
-<div class="row">
+<div class="stc-grid">
   @for (test of Tests(); track test._id) {
-  <div class="col-12 col-lg-6 col-xl-4 mb-3">
-    <app-student-test-card
-      [Test]="test"
-      [AttemptStatus]="getAttemptStatus(test._id)"
-    />
-  </div>
+  <app-student-test-card
+    [Test]="test"
+    [AttemptStatus]="getAttemptStatus(test._id)"
+  />
   } @empty {
   <div class="col-12">
     <div class="alert alert-info text-center">
