@@ -15,129 +15,116 @@
 
 <!-- ── KPI strip — always visible ───────────────────────────────────────── -->
 <div class="review-kpi-bar">
-  <div class="review-kpi-pill">
-    <span class="kpi-num">{{ attempt.questions.length }}</span>
+  <div class="kpi-item">
+    <fa-icon [icon]="QuestionsIcon" class="kpi-ico"></fa-icon>
+    <span class="kpi-val">{{ attempt.questions.length }}</span>
     <span class="kpi-lbl">Domande</span>
   </div>
 
-  <div class="review-kpi-pill">
-    <span class="kpi-num">{{ AnsweredCount() }}</span>
+  <div class="kpi-item">
+    <fa-icon [icon]="AnswersIcon" class="kpi-ico"></fa-icon>
+    <span class="kpi-val">{{ AnsweredCount() }}</span>
     <span class="kpi-lbl">Risposte</span>
   </div>
 
   @if (attempt.status === 'reviewed') {
-  <div class="review-kpi-pill kpi-correct">
-    <span class="kpi-num">{{ CorrectCount() }}</span>
+  <div class="kpi-item kpi-item--correct">
+    <fa-icon [icon]="CorrectIcon" class="kpi-ico"></fa-icon>
+    <span class="kpi-val">{{ CorrectCount() }}</span>
     <span class="kpi-lbl">Corrette</span>
   </div>
-  <div class="review-kpi-pill kpi-wrong">
-    <span class="kpi-num">{{ WrongCount() }}</span>
+  <div class="kpi-item kpi-item--wrong">
+    <fa-icon [icon]="WrongIcon" class="kpi-ico"></fa-icon>
+    <span class="kpi-val">{{ WrongCount() }}</span>
     <span class="kpi-lbl">Errate</span>
   </div>
-  <div class="review-kpi-pill kpi-score">
-    <span class="kpi-num"
+  <div class="kpi-item kpi-item--score">
+    <fa-icon [icon]="ScoreIcon" class="kpi-ico"></fa-icon>
+    <span class="kpi-val"
       >{{ Score() }}<span class="kpi-max"> / {{ MaxScore() }}</span></span
     >
     <span class="kpi-lbl">Punti</span>
   </div>
   }
 
-  <div class="review-kpi-pill kpi-time">
-    <fa-icon [icon]="ClockIcon" class="kpi-icon"></fa-icon>
-    <span class="kpi-num">{{ FormattedTimeSpent() }}</span>
+  <div class="kpi-item">
+    <fa-icon [icon]="ClockIcon" class="kpi-ico"></fa-icon>
+    <span class="kpi-val">{{ FormattedTimeSpent() }}</span>
+    <span class="kpi-lbl">Tempo</span>
   </div>
 
-  <span class="review-status-badge ms-auto">{{ Status() }}</span>
+  <div class="kpi-item kpi-item--status">
+    <fa-icon [icon]="StatusIcon" class="kpi-ico"></fa-icon>
+    <span class="kpi-val kpi-val--status">{{ Status() }}</span>
+    <span class="kpi-lbl">Stato</span>
+  </div>
 </div>
 
-<!-- ── Navigation bar ───────────────────────────────────────────────────── -->
-<div class="review-nav-bar">
-  <button
-    class="review-nav-btn"
-    (click)="prev()"
-    [disabled]="ActiveIndex() === 0"
-  >
-    <fa-icon [icon]="ChevronLeft"></fa-icon>
-  </button>
-
-  <span class="review-nav-label">
-    <strong>{{ ActiveIndex() + 1 }}</strong>&nbsp;/&nbsp;{{
-    attempt.questions.length }}
-  </span>
-
-  <button
-    class="review-nav-btn"
-    (click)="next()"
-    [disabled]="ActiveIndex() === attempt.questions.length - 1"
-  >
-    <fa-icon [icon]="ChevronRight"></fa-icon>
-  </button>
-
-  @if (attempt.questions.length <= 24) {
-  <div class="review-dots">
-    @for (q of attempt.questions; track $index; let i = $index) {
+<!-- ── Carousel + vertical side navigator ──────────────────────────────── -->
+<div class="review-body">
+  <!-- Vertical side nav -->
+  <div class="review-side-nav">
     <button
-      class="review-dot"
-      [class.review-dot--active]="i === ActiveIndex()"
-      [class.review-dot--correct]="q.status === 'correct'"
-      [class.review-dot--wrong]="q.status === 'wrong' || q.status === 'incorrect'"
-      [class.review-dot--partial]="q.status === 'semi-correct' || q.status === 'partial'"
-      (click)="goTo(i)"
-      [title]="'Domanda ' + (i + 1)"
-    ></button>
-    }
-  </div>
-  }
-</div>
+      class="review-nav-arrow"
+      [disabled]="ActiveIndex() === 0"
+      (click)="prev()"
+      title="Domanda precedente"
+    >
+      <fa-icon [icon]="ChevronUp"></fa-icon>
+    </button>
 
-<!-- ── Carousel viewport ─────────────────────────────────────────────────── -->
-<div class="review-carousel-viewport" #viewport>
-  @for (q of attempt.questions; track q.question._id; let i = $index) {
-  <div
-    class="review-slide"
-    [class.review-slide--active]="i === ActiveIndex()"
-    (click)="goTo(i)"
-  >
-    <!-- Question card — score=null suppresses internal 'Punteggio: X' -->
-    <div
-      class="review-slide-qcard"
-      app-question-card
-      [question]="q.question"
-      [index]="i"
-      [showIndex]="true"
-      mode="student"
-      [locked]="true"
-      [selectedAnswer]="q.answer"
-      [score]="null"
-      [questionStatus]="(q.status === 'pending' ? null : q.status) ?? null"
-      [teacherFeedback]="q.teacherComment ?? null"
-      [feedbackLabel]="FeedbackLabel()"
-    ></div>
-
-    <!-- Footer: status badge (left) · score chip (right) -->
-    @if (attempt.status === 'reviewed' || (q.status && q.status !== 'pending'))
-    {
-    <div class="review-card-footer">
-      @if (q.status && q.status !== 'pending') {
-      <span
-        class="review-q-badge"
-        [class.review-q-badge--correct]="q.status === 'correct'"
-        [class.review-q-badge--wrong]="q.status === 'wrong' || q.status === 'incorrect'"
-        [class.review-q-badge--partial]="q.status === 'semi-correct' || q.status === 'partial'"
-      >
-        @if (q.status === 'correct') { Corretta } @else if (q.status === 'wrong'
-        || q.status === 'incorrect') { Errata } @else { Parziale }
-      </span>
-      } @else { <span></span> } @if (attempt.status === 'reviewed') {
-      <span class="review-score-chip">
-        <fa-icon [icon]="ScaleIcon" class="me-1"></fa-icon>
-        {{ q.score ?? 0 }} / {{ q.points ?? 1 }}
-      </span>
+    @if (attempt.questions.length <= 32) {
+    <div class="review-side-dots">
+      @for (q of attempt.questions; track $index; let i = $index) {
+      <button
+        class="review-dot"
+        [class.review-dot--active]="i === ActiveIndex()"
+        [class.review-dot--correct]="q.status === 'correct'"
+        [class.review-dot--wrong]="q.status === 'wrong' || q.status === 'incorrect'"
+        [class.review-dot--partial]="q.status === 'semi-correct' || q.status === 'partial'"
+        (click)="goTo(i)"
+        [title]="'Domanda ' + (i + 1)"
+      ></button>
       }
     </div>
     }
+
+    <button
+      class="review-nav-arrow"
+      [disabled]="ActiveIndex() === (attempt.questions.length - 1)"
+      (click)="next()"
+      title="Domanda successiva"
+    >
+      <fa-icon [icon]="ChevronDown"></fa-icon>
+    </button>
   </div>
-  }
+
+  <!-- Carousel viewport -->
+  <div class="review-carousel-viewport" #viewport>
+    @for (q of attempt.questions; track q.question._id; let i = $index) {
+    <div
+      class="review-slide"
+      [class.review-slide--active]="i === ActiveIndex()"
+      (click)="goTo(i)"
+    >
+      <!-- Question card — score=null suppresses internal 'Punteggio: X' -->
+      <div
+        class="review-slide-qcard"
+        app-question-card
+        [question]="q.question"
+        [index]="i"
+        [showIndex]="true"
+        mode="student"
+        [locked]="true"
+        [selectedAnswer]="q.answer"
+        [score]="null"
+        [questionStatus]="(q.status === 'pending' ? null : q.status) ?? null"
+        [teacherFeedback]="q.teacherComment ?? null"
+        [feedbackLabel]="FeedbackLabel()"
+      ></div>
+    </div>
+    }
+  </div>
 </div>
 
 }

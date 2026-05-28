@@ -5,6 +5,7 @@ import {
   DestroyRef,
   ElementRef,
   inject,
+  OnDestroy,
   OnInit,
   signal,
   ViewChild,
@@ -14,11 +15,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faCheck,
-  faChevronLeft,
-  faChevronRight,
+  faChevronUp,
+  faChevronDown,
+  faCircleCheck,
   faClock,
-  faCircle,
-  faQuestion,
+  faHashtag,
+  faPen,
   faScaleBalanced,
   faSpinnerThird,
   faXmark,
@@ -37,7 +39,7 @@ import { QuestionCard } from '../../../teacher/components/question-card/question
   templateUrl: './student-test-review.html',
   styleUrl: './student-test-review.scss',
 })
-export class StudentTestReview implements OnInit, AfterViewInit {
+export class StudentTestReview implements OnInit, AfterViewInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly testsService = inject(StudentTestsService);
   private readonly destroyRef = inject(DestroyRef);
@@ -48,11 +50,13 @@ export class StudentTestReview implements OnInit, AfterViewInit {
   readonly ClockIcon = faClock;
   readonly CorrectIcon = faCheck;
   readonly WrongIcon = faXmark;
-  readonly QuestionIcon = faQuestion;
-  readonly CircleIcon = faCircle;
-  readonly ChevronLeft = faChevronLeft;
-  readonly ChevronRight = faChevronRight;
-  readonly ScaleIcon = faScaleBalanced;
+  readonly QuestionsIcon = faHashtag;
+  readonly AnswersIcon = faPen;
+  readonly ScoreIcon = faScaleBalanced;
+  readonly StatusIcon = faCircleCheck;
+
+  readonly ChevronUp = faChevronUp;
+  readonly ChevronDown = faChevronDown;
 
   private readonly TestId = this.route.snapshot.paramMap.get('testId')!;
 
@@ -140,8 +144,74 @@ export class StudentTestReview implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // viewport is empty until attempt loads — scroll happens after data arrives
+    this._attachScrollListeners();
   }
+
+  ngOnDestroy(): void {
+    const vp = this.viewportRef?.nativeElement;
+    if (!vp) return;
+    vp.removeEventListener('wheel', this._onWheel);
+    vp.removeEventListener('scrollend', this._syncOnScrollEnd);
+    vp.removeEventListener('scroll', this._syncOnScrollThrottle);
+  }
+
+  private _wheelCooldown = false;
+  private _syncScrollTimer: ReturnType<typeof setTimeout> | null = null;
+  private _listenersAttached = false;
+
+  private _attachScrollListeners(): void {
+    if (this._listenersAttached) return;
+    const vp = this.viewportRef?.nativeElement;
+    if (!vp) return;
+    vp.addEventListener('wheel', this._onWheel, { passive: false });
+    vp.addEventListener('scrollend', this._syncOnScrollEnd);
+    vp.addEventListener('scroll', this._syncOnScrollThrottle);
+    this._listenersAttached = true;
+  }
+
+  // Fires when scroll animation fully settles (modern browsers)
+  private readonly _syncOnScrollEnd = (): void => {
+    if (this._syncScrollTimer) clearTimeout(this._syncScrollTimer);
+    this._syncIndexFromScroll();
+  };
+
+  // Debounced fallback for browsers without scrollend
+  private readonly _syncOnScrollThrottle = (): void => {
+    if (this._syncScrollTimer) clearTimeout(this._syncScrollTimer);
+    this._syncScrollTimer = setTimeout(() => this._syncIndexFromScroll(), 400);
+  };
+
+  private _syncIndexFromScroll(): void {
+    const viewport = this.viewportRef?.nativeElement;
+    if (!viewport) return;
+    const slides = Array.from(
+      viewport.querySelectorAll('.review-slide'),
+    ) as HTMLElement[];
+    const vr = viewport.getBoundingClientRect();
+    const vpCenter = vr.top + vr.height / 2;
+    let closest = 0;
+    let minDist = Infinity;
+    for (let i = 0; i < slides.length; i++) {
+      const sr = slides[i].getBoundingClientRect();
+      const dist = Math.abs(sr.top + sr.height / 2 - vpCenter);
+      if (dist < minDist) {
+        minDist = dist;
+        closest = i;
+      }
+    }
+    this.ActiveIndex.set(closest);
+  }
+
+  private readonly _onWheel = (e: WheelEvent): void => {
+    e.preventDefault();
+    if (this._wheelCooldown) return;
+    if (e.deltaY > 0) this.next();
+    else if (e.deltaY < 0) this.prev();
+    this._wheelCooldown = true;
+    setTimeout(() => {
+      this._wheelCooldown = false;
+    }, 650);
+  };
 
   prev(): void {
     if (this.ActiveIndex() > 0) {
@@ -174,9 +244,9 @@ export class StudentTestReview implements OnInit, AfterViewInit {
     if (!slide) return;
     const sr = slide.getBoundingClientRect();
     const vr = viewport.getBoundingClientRect();
-    const targetLeft =
-      viewport.scrollLeft + sr.left - vr.left - (vr.width - sr.width) / 2;
-    viewport.scrollTo({ left: targetLeft, behavior: 'smooth' });
+    const targetTop =
+      viewport.scrollTop + sr.top - vr.top - (vr.height - sr.height) / 2;
+    viewport.scrollTo({ top: targetTop, behavior: 'smooth' });
   }
 
   private loadAttempt(): void {
@@ -193,6 +263,7 @@ export class StudentTestReview implements OnInit, AfterViewInit {
             this.Attempt.set(attempt);
           }
           this.IsLoading.set(false);
+          setTimeout(() => this._attachScrollListeners());
         },
         error: () => {
           this.Error.set('Errore nel caricamento del tentativo.');
