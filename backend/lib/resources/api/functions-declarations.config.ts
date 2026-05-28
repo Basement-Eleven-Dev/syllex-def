@@ -494,18 +494,12 @@ const ASSISTANTS_ROUTES: FunctionIntegration[] = [
     method: "get",
     role: "logged",
   },
-/*   {
+  {
     apiRoute: "messages/{conversationId}",
     functionPath: "messages/deleteConversation.ts",
     method: "delete",
     role: "logged",
   },
-  {
-    apiRoute: "messages/{conversationId}/generate-audio",
-    functionPath: "messages/listenTomessage.ts",
-    method: "post",
-    role: "logged",
-  }, */
 ];
 
 const MATERIALS_ROUTES: FunctionIntegration[] = [
