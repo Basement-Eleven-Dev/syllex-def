@@ -153,11 +153,19 @@ export class StudentTestReview implements OnInit, AfterViewInit, OnDestroy {
     vp.removeEventListener('wheel', this._onWheel);
     vp.removeEventListener('scrollend', this._syncOnScrollEnd);
     vp.removeEventListener('scroll', this._syncOnScrollThrottle);
+    vp.removeEventListener('mousedown', this._onMouseDown);
+    vp.removeEventListener('mousemove', this._onMouseMove);
+    vp.removeEventListener('mouseup', this._onMouseUpOrLeave);
+    vp.removeEventListener('mouseleave', this._onMouseUpOrLeave);
   }
 
   private _wheelCooldown = false;
   private _syncScrollTimer: ReturnType<typeof setTimeout> | null = null;
   private _listenersAttached = false;
+
+  private _isDragging = false;
+  private _startY = 0;
+  private _scrollTop = 0;
 
   private _attachScrollListeners(): void {
     if (this._listenersAttached) return;
@@ -166,8 +174,42 @@ export class StudentTestReview implements OnInit, AfterViewInit, OnDestroy {
     vp.addEventListener('wheel', this._onWheel, { passive: false });
     vp.addEventListener('scrollend', this._syncOnScrollEnd);
     vp.addEventListener('scroll', this._syncOnScrollThrottle);
+    vp.addEventListener('mousedown', this._onMouseDown);
+    vp.addEventListener('mousemove', this._onMouseMove);
+    vp.addEventListener('mouseup', this._onMouseUpOrLeave);
+    vp.addEventListener('mouseleave', this._onMouseUpOrLeave);
     this._listenersAttached = true;
   }
+
+  private readonly _onMouseDown = (e: MouseEvent): void => {
+    const vp = this.viewportRef?.nativeElement;
+    if (!vp) return;
+    this._isDragging = true;
+    vp.classList.add('grabbing');
+    this._startY = e.pageY - vp.offsetTop;
+    this._scrollTop = vp.scrollTop;
+  };
+
+  private readonly _onMouseMove = (e: MouseEvent): void => {
+    if (!this._isDragging) return;
+    const vp = this.viewportRef?.nativeElement;
+    if (!vp) return;
+    e.preventDefault();
+    const y = e.pageY - vp.offsetTop;
+    const walk = (y - this._startY) * 1.5; // adjust scrolling speed ratio
+    vp.scrollTop = this._scrollTop - walk;
+  };
+
+  private readonly _onMouseUpOrLeave = (): void => {
+    if (!this._isDragging) return;
+    this._isDragging = false;
+    const vp = this.viewportRef?.nativeElement;
+    if (vp) {
+      vp.classList.remove('grabbing');
+    }
+    this._syncIndexFromScroll();
+    this._scrollToActive();
+  };
 
   // Fires when scroll animation fully settles (modern browsers)
   private readonly _syncOnScrollEnd = (): void => {

@@ -331,6 +331,13 @@
   // padding allows first/last cards to be scrolled to centre
   padding-block: clamp(12px, 6vh, 48px);
   scrollbar-width: none;
+  cursor: grab;
+  user-select: none;
+
+  &.grabbing {
+    cursor: grabbing;
+    scroll-snap-type: none !important;
+  }
 
   &::-webkit-scrollbar {
     display: none;
