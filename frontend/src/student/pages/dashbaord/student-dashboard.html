@@ -142,9 +142,9 @@
           Test disponibili creati dal docente
         </h6>
       </div>
-      @if (RecentTests().length > 0) {
+      @if (TotalTestsCount() > 3) {
       <span class="text-white-50 small opacity-75"
-        >+ {{ RecentTests().length }}</span
+        >+ {{ TotalTestsCount() }}</span
       >
       }
     </div>
@@ -245,14 +245,27 @@
     <div
       class="d-flex align-items-center justify-content-between mb-3 flex-shrink-0"
     >
-      <h6 class="mb-0 text-white">Comunicazioni</h6>
       <div class="d-flex align-items-center gap-2">
-        @if (RecentComunicazioni().length > 0) {
-        <span class="text-white-50 small opacity-75"
-          >+ {{ RecentComunicazioni().length }}</span
+        <h6 class="mb-0 text-white">Comunicazioni</h6>
+        @if (UnreadCount() > 0) {
+        <span
+          class="badge rounded-pill fw-semibold"
+          style="
+            font-size: 0.65rem;
+            background-color: var(--syllex-green);
+            color: #0f1628;
+          "
         >
+          {{ UnreadCount() }} nuove
+        </span>
         }
       </div>
+      <a
+        routerLink="/s/calendario"
+        class="text-white-50 small text-decoration-none d-flex align-items-center gap-1 opacity-75"
+      >
+        Vedi tutte <fa-icon [icon]="ArrowRight" class="small"></fa-icon>
+      </a>
     </div>
     <div class="flex-grow-1 block-scroll pr-1">
       @for (com of RecentComunicazioni(); track $index) {
