@@ -384,16 +384,16 @@ export class GenAiContents implements OnInit {
     if (!selected.length) return;
 
     this.IsSaving.set(true);
-    const requests = selected.map((q) => {
+    const payloads = selected.map((q) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { _id, ...payload } = q.data; // strip local TempId — let MongoDB generate the real _id
-      return this.questionsService.createQuestion(payload as QuestionInterface);
+      return payload as QuestionInterface;
     });
 
-    forkJoin(requests).subscribe({
-      next: (results) => {
-        const questionsWithPoints: QuestionWithPoints[] = results.map((r) => ({
-          ...r.question,
+    this.questionsService.createQuestionsBatch(payloads).subscribe({
+      next: (response) => {
+        const questionsWithPoints: QuestionWithPoints[] = response.questions.map((q) => ({
+          ...q,
           points: 1,
         }));
         this.IsSaving.set(false);
