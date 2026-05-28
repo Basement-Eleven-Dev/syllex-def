@@ -1,7 +1,7 @@
-import { Component, signal, computed, inject, effect } from '@angular/core';
+import { Component, signal, computed, inject, effect, HostListener } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faBroom, faPlus } from '@fortawesome/pro-solid-svg-icons';
+import { faBroom, faPlus, faSpinnerThird } from '@fortawesome/pro-solid-svg-icons';
 import {
   StudentTestInterface,
   StudentTestsService,
@@ -48,6 +48,7 @@ export class StudentTestsList {
 
   readonly ClearIcon = faBroom;
   readonly PlusIcon = faPlus;
+  readonly SpinnerIcon = faSpinnerThird;
 
   readonly Tests = signal<StudentTestInterface[]>([]);
   readonly AttemptStatusMap = signal<Map<string, AttemptStatus>>(new Map());
@@ -62,6 +63,7 @@ export class StudentTestsList {
   readonly Page = signal(1);
   readonly PageSize = signal(8);
   readonly CollectionSize = signal(0);
+  readonly IsLoadingMore = signal(false);
 
   readonly Subjects = this.materiaService.allMaterie;
 
@@ -76,11 +78,46 @@ export class StudentTestsList {
 
   constructor() {
     effect(() => {
-      this.loadTests();
+      // If Page is 1, we overwrite the list.
+      // If Page > 1 and we are on mobile, we append the results for infinite scroll.
+      const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+      const append = this.Page() > 1 && isMobile;
+      this.loadTests(append);
     });
   }
 
-  loadTests() {
+  @HostListener('window:scroll', [])
+  @HostListener('scroll', ['$event'])
+  onScroll(event?: any) {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    if (!isMobile) return;
+
+    let container = document.documentElement;
+    if (event && event.target && event.target !== document) {
+      container = event.target;
+    }
+
+    const threshold = 200;
+    const scrollHeight = container.scrollHeight;
+    const scrollTop = container.scrollTop || window.scrollY;
+    const clientHeight = container.clientHeight || window.innerHeight;
+
+    if (scrollTop + clientHeight >= scrollHeight - threshold) {
+      this.loadMoreMobile();
+    }
+  }
+
+  loadMoreMobile() {
+    if (this.IsLoadingMore()) return;
+    if (this.Tests().length >= this.CollectionSize()) return;
+
+    this.Page.update((p) => p + 1);
+  }
+
+  loadTests(append = false) {
+    if (this.IsLoadingMore()) return;
+    if (append) this.IsLoadingMore.set(true);
+
     this.testsService
       .getAvailableTests(
         this.SearchTerm(),
@@ -91,9 +128,14 @@ export class StudentTestsList {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
-          this.Tests.set(res.tests);
+          if (append) {
+            this.Tests.update((existing) => [...existing, ...res.tests]);
+          } else {
+            this.Tests.set(res.tests);
+          }
           this.CollectionSize.set(res.total);
           this.checkAttemptStatuses(res.tests);
+          this.IsLoadingMore.set(false);
         },
         error: (err) => {
           console.error('Errore nel caricamento dei test:', err);
@@ -101,8 +143,11 @@ export class StudentTestsList {
             'Errore nel caricamento dei test',
             false,
           );
-          this.Tests.set([]);
-          this.CollectionSize.set(0);
+          if (!append) {
+            this.Tests.set([]);
+            this.CollectionSize.set(0);
+          }
+          this.IsLoadingMore.set(false);
         },
       });
   }

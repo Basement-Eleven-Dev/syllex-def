@@ -64,6 +64,7 @@ export class StudentTestReview implements OnInit, AfterViewInit, OnDestroy {
   readonly IsLoading = signal(true);
   readonly Error = signal<string | null>(null);
   readonly ActiveIndex = signal(0);
+  readonly KpiExpanded = signal(false);
 
   readonly IsAutoEvaluation = computed(
     () => this.Attempt()?.source === 'self-evaluation',
@@ -167,6 +168,11 @@ export class StudentTestReview implements OnInit, AfterViewInit, OnDestroy {
   private _startY = 0;
   private _scrollTop = 0;
 
+  /** True when viewport width is at or below the mobile breakpoint. */
+  private get _isMobile(): boolean {
+    return window.innerWidth <= 767;
+  }
+
   private _attachScrollListeners(): void {
     if (this._listenersAttached) return;
     const vp = this.viewportRef?.nativeElement;
@@ -182,6 +188,7 @@ export class StudentTestReview implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private readonly _onMouseDown = (e: MouseEvent): void => {
+    if (this._isMobile) return;
     const vp = this.viewportRef?.nativeElement;
     if (!vp) return;
     this._isDragging = true;
@@ -220,7 +227,10 @@ export class StudentTestReview implements OnInit, AfterViewInit, OnDestroy {
   // Debounced fallback for browsers without scrollend
   private readonly _syncOnScrollThrottle = (): void => {
     if (this._syncScrollTimer) clearTimeout(this._syncScrollTimer);
-    this._syncScrollTimer = setTimeout(() => this._syncIndexFromScroll(), 400);
+    this._syncScrollTimer = setTimeout(
+      () => this._syncIndexFromScroll(),
+      this._isMobile ? 80 : 400,
+    );
   };
 
   private _syncIndexFromScroll(): void {
@@ -245,6 +255,7 @@ export class StudentTestReview implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private readonly _onWheel = (e: WheelEvent): void => {
+    if (this._isMobile) return;
     e.preventDefault();
     if (this._wheelCooldown) return;
     if (e.deltaY > 0) this.next();
@@ -277,6 +288,7 @@ export class StudentTestReview implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private _scrollToActive(): void {
+    if (this._isMobile) return;
     const viewport = this.viewportRef?.nativeElement;
     if (!viewport) return;
     const slides = Array.from(

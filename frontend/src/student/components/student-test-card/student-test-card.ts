@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faCalendarDays,
-  faChalkboardUser,
+  faGraduationCap,
   faCheck,
   faEye,
   faPlay,
@@ -35,7 +35,7 @@ export class StudentTestCard {
   readonly QuestionsIcon = faQuestionCircle;
   readonly TrophyIcon = faTrophy;
   readonly CalendarIcon = faCalendarDays;
-  readonly TeacherIcon = faChalkboardUser;
+  readonly TeacherIcon = faGraduationCap;
   readonly FlaskIcon = faVial;
   readonly PlayIcon = faPlay;
   readonly ResumeIcon = faRotateRight;

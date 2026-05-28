@@ -14,7 +14,9 @@
 } @else if (Attempt(); as attempt) {
 
 <!-- ── KPI strip — always visible ───────────────────────────────────────── -->
-<div class="review-kpi-bar">
+<div class="review-kpi-bar"
+     [class.review-kpi-bar--collapsed]="!KpiExpanded()"
+     (click)="KpiExpanded.set(!KpiExpanded())">
   <div class="kpi-item kpi-item--questions">
     <div class="kpi-val-group">
       <fa-icon [icon]="QuestionsIcon" class="kpi-ico"></fa-icon>
@@ -70,6 +72,11 @@
     <span class="kpi-val kpi-val--status">{{ Status() }}</span>
     <span class="kpi-lbl">Stato</span>
   </div>
+
+  <!-- Mobile collapse toggle (hidden on desktop) -->
+  <div class="kpi-toggle">
+    <fa-icon [icon]="KpiExpanded() ? ChevronUp : ChevronDown"></fa-icon>
+  </div>
 </div>
 
 <!-- ── Carousel + vertical side navigator ──────────────────────────────── -->
@@ -113,6 +120,18 @@
 
   <!-- Carousel viewport -->
   <div class="review-carousel-viewport" #viewport>
+    <!-- Mobile sticky progress indicator (hidden on desktop via CSS) -->
+    <div class="review-mobile-progress">
+      <span class="review-mobile-progress__label">
+        Domanda {{ ActiveIndex() + 1 }} di {{ attempt.questions.length }}
+      </span>
+      <div class="review-mobile-progress__bar">
+        <div class="review-mobile-progress__fill"
+             [style.width.%]="((ActiveIndex() + 1) / attempt.questions.length) * 100">
+        </div>
+      </div>
+    </div>
+
     @for (q of attempt.questions; track q.question._id; let i = $index) {
     <div
       class="review-slide"

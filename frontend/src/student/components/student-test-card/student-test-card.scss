@@ -6,22 +6,26 @@
 
 // ── Card container ────────────────────────────────────────────────────────────
 .stc {
-  gap: 0.75rem;
-  padding: 1.25rem;
-  background: var(--student-sidebar);
-  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  padding: 1.6rem;
+  background: #132c52;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 32px;
   color: #ffffff;
   cursor: pointer;
   height: 100%;
   text-decoration: none;
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, transform 0.15s ease;
 
   &:hover {
-    background: color-mix(in srgb, var(--student-sidebar) 85%, #fff);
+    background: color-mix(in srgb, #132c52 90%, #fff);
+    transform: translateY(-2px);
   }
 }
 
-// ── Header row: chip + type icon ──────────────────────────────────────────────
+// ── Header row ──────────────────────────────────────────────────────────────
 .stc__header-row {
   display: flex;
   align-items: center;
@@ -31,42 +35,41 @@
 
 .stc__subject-chip {
   display: inline-block;
-  padding: 0.22rem 0.65rem;
+  padding: 0.35rem 1.1rem;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.7) !important;
-  font-size: 0.62rem;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: #ffffff !important;
+  font-size: 0.72rem;
   font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  max-width: calc(100% - 1.75rem);
+  text-transform: none;
+  max-width: calc(100% - 2rem);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .stc__type-icon {
-  font-size: 0.88rem;
+  font-size: 1.1rem;
   flex-shrink: 0;
   flex-grow: 0;
 
   &--teacher {
-    color: #bfcfff;
+    color: rgba(255, 255, 255, 0.8);
   }
   &--autoval {
-    color: var(--syllex-green);
+    color: var(--syllex-green, #c9f321);
   }
 }
 
 // ── Title ─────────────────────────────────────────────────────────────────────
 .stc__title {
-  margin: 0;
+  margin: 0.2rem 0;
   color: #ffffff !important;
-  font-size: 0.98rem;
-  font-weight: 600;
-  line-height: 1.35;
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1.3;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -74,26 +77,25 @@
 // ── Meta row ──────────────────────────────────────────────────────────────────
 .stc__meta {
   display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
+  gap: 1.5rem;
 }
 
 .stc__meta-item {
   display: flex;
   align-items: center;
-  gap: 0.3rem;
-  font-size: 0.78rem;
-  color: rgba(255, 255, 255, 0.6) !important;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.85) !important;
   white-space: nowrap;
 
-  span {
-    color: rgba(255, 255, 255, 0.6) !important;
+  fa-icon {
+    color: rgba(255, 255, 255, 0.85) !important;
   }
 }
 
 .stc__meta-icon {
-  font-size: 0.72rem;
-  opacity: 0.7;
+  font-size: 0.9rem;
+  opacity: 0.9;
 }
 
 // ── Availability / esito row ──────────────────────────────────────────────────
@@ -101,65 +103,77 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: 0.78rem;
-  border-radius: 10px;
-  padding: 0.4rem 0.65rem;
-  background: rgba(255, 255, 255, 0.07);
-  color: rgba(255, 255, 255, 0.65) !important;
+  font-size: 0.85rem;
+  border-radius: 0;
+  padding: 0 !important;
+  background: transparent !important;
+  color: rgba(255, 255, 255, 0.75) !important;
+  border: none !important;
 
   span {
     color: inherit !important;
   }
 
   &--esito {
-    background: rgba(255, 255, 255, 0.06);
-    gap: 0.5rem;
+    gap: 0.9rem;
   }
 
   &--pending-review {
-    background: rgba(255, 190, 50, 0.1);
     color: rgba(255, 200, 80, 0.9) !important;
-    span {
-      color: inherit !important;
-    }
   }
 }
 
 .stc__esito-label {
-  color: rgba(255, 255, 255, 0.45) !important;
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
+  color: rgba(255, 255, 255, 0.6) !important;
+  font-size: 0.85rem;
+  text-transform: none;
   margin-right: 0.1rem;
 }
 
 .stc__esito-correct {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  color: var(--syllex-green) !important;
-  font-weight: 600;
+  gap: 0.35rem;
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-weight: 500;
 }
 
 .stc__esito-wrong {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  color: #ff6b6b !important;
-  font-weight: 600;
+  gap: 0.35rem;
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-weight: 500;
 }
 
-// Explicit icon colors (bypasses global .student-theme span override)
-.stc__esito-check-icon {
-  color: var(--syllex-green) !important;
-}
-.stc__esito-xmark-icon {
-  color: #ff6b6b !important;
+.stc__icon-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 0.68rem;
+
+  &--success {
+    background-color: var(--syllex-green, #c9f321);
+  }
+
+  &--danger {
+    background-color: #ff6b6b;
+  }
+
+  fa-icon {
+    color: #132c52 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
 
 .stc__cal-icon {
-  font-size: 0.75rem;
-  opacity: 0.65;
+  font-size: 0.9rem;
+  opacity: 0.9;
 }
 
 // ── Action button ─────────────────────────────────────────────────────────────
@@ -167,33 +181,27 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
   width: 100%;
-  padding: 0.65rem 1.25rem;
+  padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 999px; // ← pill shape
-  font-size: 0.88rem;
+  border-radius: 999px;
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   transition: opacity 0.15s ease;
-  margin-top: auto;
+  margin-top: 0.5rem;
 
-  fa-icon {
-    font-size: 0.82rem;
-  }
   &:hover {
-    opacity: 0.82;
+    opacity: 0.9;
   }
 
-  // Docente → lilla chiaro
-  &.stc__btn--teacher {
+  &.stc__btn--completed {
     background: #e3ebff;
-    color: #1a2540;
+    color: #132c52;
   }
 
-  // Autovalutazione → verde lime
-  &.stc__btn--autoval {
-    background: var(--syllex-green);
-    color: #0f1628;
+  &.stc__btn--todo {
+    background: var(--syllex-green, #c9f321);
+    color: #132c52;
   }
 }

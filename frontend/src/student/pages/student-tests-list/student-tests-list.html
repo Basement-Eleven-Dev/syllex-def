@@ -3,7 +3,7 @@
   description="Qui trovi i test che puoi svolgere per le tue materie."
 >
   <app-syllex-button
-    [props]="{ label: 'Crea un test di autovalutazione', variant: 'primary', color: 'primary', size: 'large', link: '/s/auto-evaluation/create', leftIcon: PlusIcon }"
+    [props]="{ label: 'Crea un test di autovalutazione', variant: 'primary', color: 'celestine', size: 'large', link: '/s/auto-evaluation/create', leftIcon: PlusIcon }"
   />
 </app-syllex-page-header>
 
@@ -54,6 +54,17 @@
   </div>
   }
 </div>
+
+@if (IsLoadingMore()) {
+<div class="d-flex justify-content-center align-items-center py-4 w-100">
+  <fa-icon
+    [icon]="SpinnerIcon"
+    [animation]="'spin'"
+    [size]="'2x'"
+    class="text-primary animate-spin"
+  ></fa-icon>
+</div>
+}
 
 @if (!ShowOnlyPending()) {
 <div
