@@ -3,14 +3,14 @@ import { DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
-  faClock,
+  faCalendarDays,
+  faChalkboardUser,
   faEye,
   faPlay,
   faQuestionCircle,
   faRotateRight,
   faTrophy,
-  faCalendarDays,
-  faCheck,
+  faVial,
 } from '@fortawesome/pro-solid-svg-icons';
 import { StudentTestInterface } from '../../../services/student-tests.service';
 
@@ -27,11 +27,11 @@ export class StudentTestCard {
   readonly Test = input.required<StudentTestInterface>();
   readonly AttemptStatus = input<AttemptStatus | null>(null);
 
-  readonly ClockIcon = faClock;
   readonly QuestionsIcon = faQuestionCircle;
   readonly TrophyIcon = faTrophy;
   readonly CalendarIcon = faCalendarDays;
-  readonly CheckIcon = faCheck;
+  readonly TeacherIcon = faChalkboardUser;
+  readonly FlaskIcon = faVial;
   readonly PlayIcon = faPlay;
   readonly ResumeIcon = faRotateRight;
   readonly ReviewIcon = faEye;
@@ -46,6 +46,10 @@ export class StudentTestCard {
     const status = this.AttemptStatus();
     return status === 'delivered' || status === 'reviewed';
   });
+
+  readonly IsAutoEval = computed(
+    () => this.Test().source === 'self-evaluation',
+  );
 
   readonly Route = computed(() => {
     const test = this.Test();

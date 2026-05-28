@@ -1,12 +1,21 @@
 <div class="stc d-flex flex-column" [routerLink]="Route()">
 
-  <!-- ── Subject chip ────────────────────────────────────────────────────── -->
-  <div class="stc__subject-chip">{{ Test().subjectName }}</div>
+  <!-- ── Header: subject chip + type icon ──────────────────────────────── -->
+  <div class="stc__header-row">
+    <span class="stc__subject-chip">{{ Test().subjectName }}</span>
+    <fa-icon
+      [icon]="IsAutoEval() ? FlaskIcon : TeacherIcon"
+      class="stc__type-icon"
+      [class.stc__type-icon--autoval]="IsAutoEval()"
+      [class.stc__type-icon--teacher]="!IsAutoEval()"
+      [title]="IsAutoEval() ? 'Autovalutazione' : 'Test del docente'"
+    ></fa-icon>
+  </div>
 
-  <!-- ── Title ──────────────────────────────────────────────────────────── -->
+  <!-- ── Title ─────────────────────────────────────────────────────────── -->
   <h5 class="stc__title">{{ Test().name }}</h5>
 
-  <!-- ── Meta: questions + max score ────────────────────────────────────── -->
+  <!-- ── Meta: questions + max score ──────────────────────────────────── -->
   <div class="stc__meta">
     <span class="stc__meta-item">
       <fa-icon [icon]="QuestionsIcon" class="stc__meta-icon"></fa-icon>
@@ -18,14 +27,9 @@
     </span>
   </div>
 
-  <!-- ── Conditional info row ────────────────────────────────────────────── -->
-  @if (IsCompleted()) {
-    <div class="stc__info-row stc__info-row--done">
-      <fa-icon [icon]="CheckIcon" class="stc__check-icon"></fa-icon>
-      <span>Completato</span>
-    </div>
-  } @else if (Test().availableFrom || Test().availableTo) {
-    <div class="stc__info-row stc__info-row--avail">
+  <!-- ── Availability dates (only when not yet completed) ──────────────── -->
+  @if (!IsCompleted() && (Test().availableFrom || Test().availableTo)) {
+    <div class="stc__info-row">
       <fa-icon [icon]="CalendarIcon" class="stc__cal-icon"></fa-icon>
       <span>
         @if (Test().availableFrom && Test().availableTo) {
@@ -39,12 +43,11 @@
     </div>
   }
 
-  <!-- ── Action button ────────────────────────────────────────────────────── -->
+  <!-- ── Action button ─────────────────────────────────────────────────── -->
   <button
-    class="stc__btn mt-auto"
-    [class.stc__btn--pending]="!AttemptStatus()"
-    [class.stc__btn--in-progress]="AttemptStatus() === 'in-progress'"
-    [class.stc__btn--completed]="IsCompleted()"
+    class="stc__btn"
+    [class.stc__btn--teacher]="!IsAutoEval()"
+    [class.stc__btn--autoval]="IsAutoEval()"
     (click)="$event.stopPropagation()"
     [routerLink]="Route()"
   >

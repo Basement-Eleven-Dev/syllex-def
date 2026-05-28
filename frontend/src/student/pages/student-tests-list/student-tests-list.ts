@@ -54,7 +54,7 @@ export class StudentTestsList {
 
   // Pagination
   readonly Page = signal(1);
-  readonly PageSize = signal(10);
+  readonly PageSize = signal(8);
   readonly CollectionSize = signal(0);
 
   readonly Subjects = this.materiaService.allMaterie;

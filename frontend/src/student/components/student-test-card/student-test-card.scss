@@ -1,10 +1,10 @@
-// ── Host: fill grid cell ──────────────────────────────────────────────────────
+// ── Host ──────────────────────────────────────────────────────────────────────
 :host {
   display: block;
   height: 100%;
 }
 
-// ── Card container ─────────────────────────────────────────────────────────────
+// ── Card container ────────────────────────────────────────────────────────────
 .stc {
   gap: 0.75rem;
   padding: 1.25rem;
@@ -21,20 +21,44 @@
   }
 }
 
-// ── Subject chip ──────────────────────────────────────────────────────────────
+// ── Header row: chip + type icon ──────────────────────────────────────────────
+.stc__header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
 .stc__subject-chip {
   display: inline-block;
   padding: 0.22rem 0.65rem;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-size: 0.62rem;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  max-width: calc(100% - 1.75rem);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-// ── Title ──────────────────────────────────────────────────────────────────────
+.stc__type-icon {
+  font-size: 0.88rem;
+  flex-shrink: 0;
+  flex-grow: 0;
+
+  &--teacher {
+    color: #bfcfff;
+  }
+  &--autoval {
+    color: var(--syllex-green);
+  }
+}
+
+// ── Title ─────────────────────────────────────────────────────────────────────
 .stc__title {
   margin: 0;
   color: #ffffff !important;
@@ -62,7 +86,9 @@
   color: rgba(255, 255, 255, 0.6) !important;
   white-space: nowrap;
 
-  span { color: rgba(255, 255, 255, 0.6) !important; }
+  span {
+    color: rgba(255, 255, 255, 0.6) !important;
+  }
 }
 
 .stc__meta-icon {
@@ -70,7 +96,7 @@
   opacity: 0.7;
 }
 
-// ── Info row (availability / completed) ──────────────────────────────────────
+// ── Availability row ──────────────────────────────────────────────────────────
 .stc__info-row {
   display: flex;
   align-items: center;
@@ -78,23 +104,12 @@
   font-size: 0.78rem;
   border-radius: 10px;
   padding: 0.4rem 0.65rem;
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.65) !important;
 
-  span { color: inherit !important; }
-
-  &--avail {
-    background: rgba(255, 255, 255, 0.07);
-    color: rgba(255, 255, 255, 0.65) !important;
+  span {
+    color: inherit !important;
   }
-
-  &--done {
-    background: rgba(201, 243, 33, 0.12);
-    color: var(--syllex-green) !important;
-  }
-}
-
-.stc__check-icon {
-  font-size: 0.75rem;
-  color: var(--syllex-green);
 }
 
 .stc__cal-icon {
@@ -109,34 +124,31 @@
   justify-content: center;
   gap: 0.45rem;
   width: 100%;
-  padding: 0.65rem 1rem;
+  padding: 0.65rem 1.25rem;
   border: none;
-  border-radius: 14px;
+  border-radius: 999px; // ← pill shape
   font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
   transition: opacity 0.15s ease;
   margin-top: auto;
 
-  fa-icon { font-size: 0.82rem; }
-  &:hover { opacity: 0.85; }
-
-  // Fai il test
-  &.stc__btn--pending {
-    background: #3b82f6;
-    color: #ffffff;
+  fa-icon {
+    font-size: 0.82rem;
+  }
+  &:hover {
+    opacity: 0.82;
   }
 
-  // Riprendi
-  &.stc__btn--in-progress {
-    background: #f57c00;
-    color: #ffffff;
+  // Docente → lilla chiaro
+  &.stc__btn--teacher {
+    background: #e3ebff;
+    color: #1a2540;
   }
 
-  // Rivedi — lilla chiaro
-  &.stc__btn--completed {
-    background: rgba(255, 255, 255, 0.14);
-    color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.18);
+  // Autovalutazione → verde lime
+  &.stc__btn--autoval {
+    background: var(--syllex-green);
+    color: #0f1628;
   }
 }

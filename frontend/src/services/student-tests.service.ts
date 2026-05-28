@@ -22,6 +22,7 @@ export interface StudentTestInterface {
   name: string;
   subjectName: string;
   status: string;
+  source?: 'self-evaluation' | string;
   availableFrom?: string;
   availableTo?: string;
   timeLimit?: number;
@@ -42,7 +43,13 @@ export interface AttemptQuestionData {
   points?: number;
   score?: number;
   teacherComment?: string;
-  status?: 'correct' | 'wrong' | 'incorrect' | 'semi-correct' | 'partial' | 'pending';
+  status?:
+    | 'correct'
+    | 'wrong'
+    | 'incorrect'
+    | 'semi-correct'
+    | 'partial'
+    | 'pending';
 }
 
 export interface StudentAttemptInterface {
@@ -63,7 +70,7 @@ export interface StudentAttemptInterface {
 
 @Injectable({ providedIn: 'root' })
 export class StudentTestsService {
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getAvailableTests(
     searchTerm: string = '',
