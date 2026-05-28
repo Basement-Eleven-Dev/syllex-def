@@ -5,6 +5,18 @@
   overflow: hidden;
 }
 
+// ── Back-to link styled for dark student context ──────────────────────────
+:host ::ng-deep app-back-to > div {
+  color: rgba(255, 255, 255, 0.55) !important;
+  opacity: 1 !important;
+  margin: 0 0 0.6rem 0 !important;
+
+  a {
+    color: rgba(255, 255, 255, 0.55) !important;
+    text-decoration: none !important;
+  }
+}
+
 // ── KPI strip ─────────────────────────────────────────────────────────────
 .review-kpi-bar {
   display: flex;
