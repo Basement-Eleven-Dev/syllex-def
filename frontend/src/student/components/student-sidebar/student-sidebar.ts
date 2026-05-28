@@ -51,8 +51,8 @@ export class StudentSidebar {
       icon: faHouse,
     },
     {
-      path: 'comunicazioni',
-      label: 'Comunicazioni',
+      path: 'calendario',
+      label: 'Calendario',
       icon: faCalendar,
     },
     {
