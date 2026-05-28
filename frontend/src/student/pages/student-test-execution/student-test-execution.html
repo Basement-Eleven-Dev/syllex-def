@@ -13,85 +13,104 @@
 <div class="alert alert-danger" role="alert">{{ Error() }}</div>
 } @else if (TestData() && !TestStarted()) {
 <!-- Pre-start screen -->
-<div class="d-flex flex-column align-items-center justify-content-center py-5">
-  <div class="card p-5 text-center pre-start-card">
-    <h2 class="text-dark fw-medium mb-3">
-      @if (IsResuming()) { Hai un tentativo in corso per } @else { Stai per
-      svolgere il test }
-    </h2>
-    <h1 class="display-5 fw-bold text-primary mb-4">{{ TestData()!.name }}</h1>
+<div class="test-start-container d-flex flex-column align-items-center justify-content-center py-5 text-center">
+  
+  <!-- Graduation Cap Icon -->
+  <div class="test-start-icon-container mb-3">
+    <fa-icon [icon]="GraduationIcon" class="test-start-icon"></fa-icon>
+  </div>
 
-    <p class="text-muted mb-2">
-      {{ Questions().length }} domande @if (HasTimeLimit()) { &middot; Tempo
-      limite: {{ TestData()!.timeLimit }} minuti }
-    </p>
+  <!-- Subtitle -->
+  <div class="test-start-subtitle mb-2">
+    @if (IsResuming()) {
+      Hai un tentativo in corso per un {{ IsAutoEval() ? 'test di autovalutazione' : 'test del docente' }}
+    } @else {
+      Stai svolgendo un {{ IsAutoEval() ? 'test di autovalutazione' : 'test del docente' }}
+    }
+  </div>
 
-    @if (HasDeadline()) {
-    <div
-      class="alert alert-info d-inline-flex align-items-center gap-2 mt-2 mb-4"
-    >
-      <fa-icon [icon]="ClockIcon"></fa-icon>
-      <span>
-        Questo test va consegnato entro il {{ DeadlineDate() | date: "d MMMM y
-        HH:mm" }}
-      </span>
-    </div>
-    } @if (IsPasswordProtected() && !IsResuming()) {
-    <div class="mt-3 mb-1 text-start">
-      <label class="form-label text-muted small fw-semibold">
-        <fa-icon [icon]="LockIcon" class="me-1"></fa-icon>
+  <!-- Title -->
+  <h1 class="test-start-title mb-3">{{ TestData()!.name }}</h1>
+
+  <!-- Badge Info (Domande / Tempo) -->
+  <div class="test-start-badge mb-5">
+    <span>Domande: {{ Questions().length }}</span>
+    @if (HasTimeLimit()) {
+      <span class="mx-2">&middot;</span>
+      <span>Tempo: {{ TestData()!.timeLimit }} min</span>
+    }
+  </div>
+
+  <!-- Password Protected Form -->
+  @if (IsPasswordProtected() && !IsResuming()) {
+    <div class="test-start-password-container mb-5">
+      <label class="form-label text-white-50 small fw-semibold d-flex justify-content-center align-items-center gap-2 mb-2">
+        <fa-icon [icon]="LockIcon"></fa-icon>
         Questo test è protetto da password
       </label>
       <input
         type="password"
-        class="form-control form-control-lg"
+        class="form-control test-start-password-input mx-auto"
         [class.is-invalid]="PasswordError()"
         placeholder="Inserisci la password del test"
         [value]="PasswordInput()"
         (input)="PasswordInput.set($any($event.target).value); PasswordError.set(null)"
       />
       @if (PasswordError()) {
-      <div class="invalid-feedback d-block">{{ PasswordError() }}</div>
+        <div class="invalid-feedback text-center mt-2 d-block">{{ PasswordError() }}</div>
       }
     </div>
-    }
+  }
 
-    <div class="d-flex flex-row gap-3 justify-content-center mt-3">
-      <button
-        class="btn btn-outline-secondary btn-lg px-4"
-        (click)="onGoBack()"
-        [disabled]="IsStarting()"
-      >
-        <fa-icon [icon]="BackIcon" class="me-2"></fa-icon>
-        Torna alla lista
-      </button>
-      @if (IsResuming()) {
-      <button
-        class="btn btn-warning btn-lg px-5 text-white"
-        (click)="onStartTest()"
-      >
-        <fa-icon [icon]="ResumeIcon" class="me-2"></fa-icon>
-        Riprendi test
-      </button>
-      } @else {
-      <button
-        class="btn btn-primary btn-lg px-5"
-        (click)="onStartTest()"
-        [disabled]="IsStarting() || (IsPasswordProtected() && !PasswordInput().trim())"
-      >
-        @if (IsStarting()) {
-        <fa-icon
-          [icon]="SpinnerIcon"
-          [animation]="'spin'"
-          class="me-2"
-        ></fa-icon>
-        } @else {
-        <fa-icon [icon]="PlayIcon" class="me-2"></fa-icon>
-        } {{ IsStarting() ? 'Avvio in corso...' : 'Avvia test' }}
-      </button>
-      }
+  <!-- Deadline Warning -->
+  @if (HasDeadline()) {
+    <div class="test-start-deadline mb-4 text-warning small">
+      <fa-icon [icon]="ClockIcon" class="me-1"></fa-icon>
+      Questo test va consegnato entro il {{ DeadlineDate() | date: "d MMMM y HH:mm" }}
     </div>
+  }
+
+  <!-- Action Cards -->
+  <div class="test-start-cards-grid d-flex flex-column flex-sm-row gap-4 justify-content-center align-items-stretch">
+    
+    <!-- Avvia / Riprendi Card -->
+    <button
+      class="test-action-card card-start d-flex flex-column justify-content-between p-4"
+      (click)="onStartTest()"
+      [disabled]="IsStarting() || (IsPasswordProtected() && !PasswordInput().trim())"
+    >
+      <div class="card-title text-start">
+        @if (IsStarting()) {
+          Avvio in...
+        } @else if (IsResuming()) {
+          Riprendi Test
+        } @else {
+          Avvia Test
+        }
+      </div>
+      <div class="card-icon align-self-end">
+        @if (IsStarting()) {
+          <fa-icon [icon]="SpinnerIcon" [animation]="'spin'"></fa-icon>
+        } @else {
+          <fa-icon [icon]="RocketIcon"></fa-icon>
+        }
+      </div>
+    </button>
+
+    <!-- Lo faccio più tardi Card -->
+    <button
+      class="test-action-card card-back d-flex flex-column justify-content-between p-4"
+      (click)="onGoBack()"
+      [disabled]="IsStarting()"
+    >
+      <div class="card-title text-start">Lo faccio più tardi</div>
+      <div class="card-icon align-self-end">
+        <fa-icon [icon]="UndoIcon"></fa-icon>
+      </div>
+    </button>
+
   </div>
+
 </div>
 } @else if (TestData() && TestStarted()) {
 <!-- Header -->

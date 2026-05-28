@@ -19,6 +19,9 @@ import {
   faPlay,
   faRotateRight,
   faSpinnerThird,
+  faGraduationCap,
+  faRocket,
+  faUndo,
 } from '@fortawesome/pro-solid-svg-icons';
 import {
   QuestionInterface,
@@ -57,6 +60,9 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
   readonly BackIcon = faArrowLeft;
   readonly ResumeIcon = faRotateRight;
   readonly LockIcon = faLock;
+  readonly GraduationIcon = faGraduationCap;
+  readonly RocketIcon = faRocket;
+  readonly UndoIcon = faUndo;
 
   // State
   private readonly TestId = this.route.snapshot.paramMap.get('testId')!;
@@ -84,6 +90,7 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
   readonly IsPasswordProtected = computed(
     () => !!this.TestData()?.isPasswordProtected,
   );
+  readonly IsAutoEval = computed(() => this.TestData()?.source === 'self-evaluation');
   readonly TimerExpired = computed(
     () => this.HasTimeLimit() && this.RemainingSeconds() <= 0,
   );
