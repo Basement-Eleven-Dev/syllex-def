@@ -21,19 +21,19 @@
   <div id="content" class="flex-fill d-flex flex-column" style="min-width: 0">
     
     <!-- Mobile Sticky Top Header -->
-    <div class="student-mobile-header d-flex d-lg-none justify-content-between align-items-center px-4 py-3 border-bottom border-secondary-subtle">
+    <div class="student-mobile-header d-flex d-lg-none justify-content-between align-items-center px-4 py-3">
       <img
         src="/images/logotipo.svg"
         alt="Syllex Logo"
         style="height: 28px; width: auto;"
         routerLink="/s/dashboard"
       />
-      <button class="btn btn-mobile-menu d-flex align-items-center gap-2 border-0 bg-transparent p-0" (click)="toggleMobileMenu()">
-        <span class="small fw-semibold text-white">Menù</span>
-        <div class="menu-dots-grid">
-          <span></span><span></span><span></span><span></span>
-        </div>
-      </button>
+      <div class="d-flex align-items-center gap-2">
+        <span class="small fw-semibold" style="color: #c084fc;">{{ User()?.firstName || User()?.username || 'Studente' }}</span>
+        <button class="btn d-flex align-items-center justify-content-center border-0 p-0 rounded-circle text-white btn-mobile-menu-grip" style="width: 38px; height: 38px; background-color: #252bb1; transition: transform 0.2s ease;" (click)="toggleMobileMenu()">
+          <fa-icon [icon]="GripIcon" style="font-size: 0.95rem;"></fa-icon>
+        </button>
+      </div>
     </div>
 
     <!-- Desktop Navigation -->

@@ -1,12 +1,25 @@
 <!-- Compact welcome strip -->
 <div class="flex-shrink-0 pb-2">
-  <h5 class="fw-semibold mb-0 text-white">
-    Ciao @if(User()){ {{ User()?.firstName || User()?.username }} } @else { ...
-    }
-  </h5>
-  <p class="mb-0 small text-white-50 opacity-75">
-    Ecco un riepilogo delle tue attività e performance.
-  </p>
+  <!-- Desktop Greeting -->
+  <div class="d-none d-md-block">
+    <h5 class="fw-semibold mb-0 text-white">
+      Ciao @if(User()){ {{ User()?.firstName || User()?.username }} } @else { ...
+      }
+    </h5>
+    <p class="mb-0 small text-white-50 opacity-75">
+      Ecco un riepilogo delle tue attività e performance.
+    </p>
+  </div>
+
+  <!-- Mobile Greeting (Figma high-fidelity style!) -->
+  <div class="d-md-none pt-2 mb-2">
+    <h1 class="text-white fw-semibold mb-1" style="font-size: 2.2rem; letter-spacing: -0.02em;">
+      Ciao {{ User()?.firstName || User()?.username || 'Studente' }}
+    </h1>
+    <p class="text-white-50 mb-0 fw-medium" style="font-size: 1.15rem; letter-spacing: -0.01em; opacity: 0.85;">
+      Come posso aiutarti oggi?
+    </p>
+  </div>
 </div>
 
 <!-- ─── No-Scroll Dashboard Grid ─────────────────────────────────────────── -->

@@ -9,31 +9,26 @@
 /* Mobile Top Header */
 .student-mobile-header {
   background-color: var(--student-bg);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
   flex-shrink: 0;
   z-index: 100;
 
-  .btn-mobile-menu {
-    transition: transform 0.2s ease;
-    
+  .btn-mobile-menu-grip {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    line-height: 1 !important;
+    box-shadow: none !important;
+
     &:active {
-      transform: scale(0.95);
+      transform: scale(0.92);
     }
-  }
 
-  .menu-dots-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 3px;
-    width: 14px;
-    height: 14px;
-
-    span {
-      display: block;
-      width: 5px;
-      height: 5px;
-      background-color: var(--syllex-green);
-      border-radius: 1px;
+    fa-icon {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      line-height: 1 !important;
     }
   }
 }

@@ -12,6 +12,7 @@ import {
   faRobot,
   faXmark,
   faRightFromBracket,
+  faGrip,
 } from '@fortawesome/pro-solid-svg-icons';
 import {
   NgbDropdown,
@@ -64,6 +65,7 @@ export class StudentLayout implements OnInit {
   RobotIcon = faRobot;
   XmarkIcon = faXmark;
   LogoutIcon = faRightFromBracket;
+  GripIcon = faGrip;
 
   mainRoutes = [
     {
