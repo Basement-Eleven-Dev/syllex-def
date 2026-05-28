@@ -27,9 +27,92 @@
   margin-bottom: 0.75rem;
   flex-shrink: 0;
 
-  @media (max-width: 480px) {
-    padding: 1rem 0.5rem;
+  @media (max-width: 767px) {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    row-gap: 1.25rem;
+    column-gap: 0.5rem;
+    padding: 1.25rem 1rem;
+    background: var(--student-sidebar);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+
+    .kpi-item {
+      padding: 0;
+      background: transparent !important;
+      border: none !important;
+
+      & + & {
+        border-left: none !important;
+      }
+    }
+
+    .kpi-val-group {
+      flex-direction: row !important;
+      gap: 0.35rem !important;
+    }
+
+    .kpi-item--answers {
+      display: none !important;
+    }
+
+    // Hero stats on Row 1
+    .kpi-item--score {
+      order: 1;
+      grid-column: span 2;
+      align-items: flex-start;
+      justify-content: flex-start;
+
+      .kpi-ico {
+        display: none; // Hide icon on mobile for ultra-clean look
+      }
+      .kpi-val {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #ffffff;
+      }
+      .kpi-lbl {
+        display: none !important;
+      }
+    }
+
+    .kpi-item--status {
+      order: 2;
+      grid-column: span 2;
+      align-items: flex-end;
+      justify-content: center;
+
+      .kpi-ico {
+        display: none;
+      }
+      .kpi-val--status {
+        background: rgba(201, 243, 33, 0.1) !important;
+        color: var(--syllex-green) !important;
+        padding: 0.4rem 0.85rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        border: 1px solid rgba(201, 243, 33, 0.2) !important;
+        text-align: right;
+      }
+      .kpi-lbl {
+        display: none !important;
+      }
+    }
+
+    // Minor stats on Row 2
+    .kpi-item--questions { order: 3; grid-column: span 1; }
+    .kpi-item--correct { order: 4; grid-column: span 1; }
+    .kpi-item--wrong { order: 5; grid-column: span 1; }
+    .kpi-item--time { order: 6; grid-column: span 1; }
   }
+}
+
+.kpi-val-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
 }
 
 .kpi-item {
@@ -268,6 +351,12 @@
   transform: scale(0.9);
   opacity: 0.45;
   cursor: pointer;
+
+  &:not(&--active) {
+    * {
+      pointer-events: none;
+    }
+  }
 
   &--active {
     transform: scale(1);

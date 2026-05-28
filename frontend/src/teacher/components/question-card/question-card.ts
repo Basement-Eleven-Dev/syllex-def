@@ -14,6 +14,7 @@ import {
   faChevronDown,
   faPencilAlt,
   faTrash,
+  faXmark,
 } from '@fortawesome/pro-solid-svg-icons';
 import { FormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -49,6 +50,7 @@ export type QuestionCardMode =
 export class QuestionCard {
   protected readonly TrashIcon = faTrash;
   protected readonly CheckIcon = faCheck;
+  protected readonly WrongIcon = faXmark;
   protected readonly EditIcon = faPencilAlt;
   protected readonly ChevronIcon = faChevronDown;
 

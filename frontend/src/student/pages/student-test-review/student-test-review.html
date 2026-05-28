@@ -15,41 +15,53 @@
 
 <!-- ── KPI strip — always visible ───────────────────────────────────────── -->
 <div class="review-kpi-bar">
-  <div class="kpi-item">
-    <fa-icon [icon]="QuestionsIcon" class="kpi-ico"></fa-icon>
-    <span class="kpi-val">{{ attempt.questions.length }}</span>
+  <div class="kpi-item kpi-item--questions">
+    <div class="kpi-val-group">
+      <fa-icon [icon]="QuestionsIcon" class="kpi-ico"></fa-icon>
+      <span class="kpi-val">{{ attempt.questions.length }}</span>
+    </div>
     <span class="kpi-lbl">Domande</span>
   </div>
 
-  <div class="kpi-item">
-    <fa-icon [icon]="AnswersIcon" class="kpi-ico"></fa-icon>
-    <span class="kpi-val">{{ AnsweredCount() }}</span>
+  <div class="kpi-item kpi-item--answers">
+    <div class="kpi-val-group">
+      <fa-icon [icon]="AnswersIcon" class="kpi-ico"></fa-icon>
+      <span class="kpi-val">{{ AnsweredCount() }}</span>
+    </div>
     <span class="kpi-lbl">Risposte</span>
   </div>
 
   @if (attempt.status === 'reviewed') {
   <div class="kpi-item kpi-item--correct">
-    <fa-icon [icon]="CorrectIcon" class="kpi-ico"></fa-icon>
-    <span class="kpi-val">{{ CorrectCount() }}</span>
+    <div class="kpi-val-group">
+      <fa-icon [icon]="CorrectIcon" class="kpi-ico"></fa-icon>
+      <span class="kpi-val">{{ CorrectCount() }}</span>
+    </div>
     <span class="kpi-lbl">Corrette</span>
   </div>
   <div class="kpi-item kpi-item--wrong">
-    <fa-icon [icon]="WrongIcon" class="kpi-ico"></fa-icon>
-    <span class="kpi-val">{{ WrongCount() }}</span>
+    <div class="kpi-val-group">
+      <fa-icon [icon]="WrongIcon" class="kpi-ico"></fa-icon>
+      <span class="kpi-val">{{ WrongCount() }}</span>
+    </div>
     <span class="kpi-lbl">Errate</span>
   </div>
   <div class="kpi-item kpi-item--score">
-    <fa-icon [icon]="ScoreIcon" class="kpi-ico"></fa-icon>
-    <span class="kpi-val"
-      >{{ Score() }}<span class="kpi-max"> / {{ MaxScore() }}</span></span
-    >
+    <div class="kpi-val-group">
+      <fa-icon [icon]="ScoreIcon" class="kpi-ico"></fa-icon>
+      <span class="kpi-val"
+        >{{ Score() }}<span class="kpi-max"> / {{ MaxScore() }}</span></span
+      >
+    </div>
     <span class="kpi-lbl">Punti</span>
   </div>
   }
 
-  <div class="kpi-item">
-    <fa-icon [icon]="ClockIcon" class="kpi-ico"></fa-icon>
-    <span class="kpi-val">{{ FormattedTimeSpent() }}</span>
+  <div class="kpi-item kpi-item--time">
+    <div class="kpi-val-group">
+      <fa-icon [icon]="ClockIcon" class="kpi-ico"></fa-icon>
+      <span class="kpi-val">{{ FormattedTimeSpent() }}</span>
+    </div>
     <span class="kpi-lbl">Tempo</span>
   </div>
 

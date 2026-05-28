@@ -84,6 +84,8 @@
           class="d-flex align-items-center gap-2 student-option"
           [class.selected]="selectedAnswer === label"
           [class.disabled]="locked"
+          [class.student-correct]="locked && ((label === 'Vero' && question.correctAnswer === true) || (label === 'Falso' && question.correctAnswer === false))"
+          [class.student-incorrect]="locked && selectedAnswer === label && !((label === 'Vero' && question.correctAnswer === true) || (label === 'Falso' && question.correctAnswer === false))"
           (click)="!locked && onSelectOption(label)"
           style="cursor: pointer"
         >
@@ -94,7 +96,13 @@
             [disabled]="locked"
             (change)="onSelectOption(label)"
           />
-          <label class="mb-0" style="cursor: pointer">{{ label }}</label>
+          <label class="mb-0 flex-grow-1" style="cursor: pointer">{{ label }}</label>
+          @if (locked && ((label === 'Vero' && question.correctAnswer === true) || (label === 'Falso' && question.correctAnswer === false))) {
+          <fa-icon [icon]="CheckIcon" class="text-success ms-auto"></fa-icon>
+          }
+          @if (locked && selectedAnswer === label && !((label === 'Vero' && question.correctAnswer === true) || (label === 'Falso' && question.correctAnswer === false))) {
+          <fa-icon [icon]="WrongIcon" class="text-danger ms-auto"></fa-icon>
+          }
         </li>
         }
       </ol>
@@ -105,6 +113,8 @@
           class="d-flex align-items-center gap-2 student-option"
           [class.selected]="selectedAnswer === option.label"
           [class.disabled]="locked"
+          [class.student-correct]="locked && option.isCorrect"
+          [class.student-incorrect]="locked && selectedAnswer === option.label && !option.isCorrect"
           (click)="!locked && onSelectOption(option.label)"
           style="cursor: pointer"
         >
@@ -115,7 +125,13 @@
             [disabled]="locked"
             (change)="onSelectOption(option.label)"
           />
-          <label class="mb-0" style="cursor: pointer">{{ option.label }}</label>
+          <label class="mb-0 flex-grow-1" style="cursor: pointer">{{ option.label }}</label>
+          @if (locked && option.isCorrect) {
+          <fa-icon [icon]="CheckIcon" class="text-success ms-auto"></fa-icon>
+          }
+          @if (locked && selectedAnswer === option.label && !option.isCorrect) {
+          <fa-icon [icon]="WrongIcon" class="text-danger ms-auto"></fa-icon>
+          }
         </li>
         }
       </ol>
@@ -189,14 +205,16 @@
     </section>
     }
 
-    <!-- ── Correzione (ai-review only, banca moved to footer) ── -->
-    @if (mode === 'ai-review') {
-    <section>
-      <p class="mb-0 fw-bold mt-2 text-muted" style="font-size: 0.8rem">
+    <!-- ── Correzione ── -->
+    @if (mode === 'ai-review' || (mode === 'student' && locked)) {
+    @if (question.explanation) {
+    <section class="mt-3 correction-box">
+      <p class="mb-1 fw-semibold text-muted" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">
         Correzione
       </p>
-      <p class="mb-0 text-muted">{{ question.explanation }}</p>
+      <p class="mb-0 text-muted small" style="white-space: pre-wrap;">{{ question.explanation }}</p>
     </section>
+    }
     }
 
     <!-- ── Student status feedback ── -->
