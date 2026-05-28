@@ -10,13 +10,32 @@
     (click)="closeSidebar()"
   ></div>
 
+  <!-- Hide sidebar on mobile/tablet (d-none d-lg-flex) -->
   <app-student-sidebar
     #sidebarRef
     [open]="sidebarOpen()"
     (toggleSidebar)="toggleSidebar()"
+    class="d-none d-lg-flex"
   ></app-student-sidebar>
 
   <div id="content" class="flex-fill d-flex flex-column" style="min-width: 0">
+    
+    <!-- Mobile Sticky Top Header -->
+    <div class="student-mobile-header d-flex d-lg-none justify-content-between align-items-center px-4 py-3 border-bottom border-secondary-subtle">
+      <img
+        src="/images/logotipo.svg"
+        alt="Syllex Logo"
+        style="height: 28px; width: auto;"
+        routerLink="/s/dashboard"
+      />
+      <button class="btn btn-mobile-menu d-flex align-items-center gap-2 border-0 bg-transparent p-0" (click)="toggleMobileMenu()">
+        <span class="small fw-semibold text-white">Menù</span>
+        <div class="menu-dots-grid">
+          <span></span><span></span><span></span><span></span>
+        </div>
+      </button>
+    </div>
+
     <!-- Desktop Navigation -->
     <div class="px-3 px-md-5 pt-4 d-none d-lg-block">
       <app-student-nav></app-student-nav>
@@ -42,47 +61,76 @@
   </div>
 </div>
 
-<!-- Mobile Bottom Navigation (Floating dark bar) -->
-<nav class="bottom-nav d-lg-none" [class.hidden]="navHidden()">
-  <a
-    class="bottom-nav-item"
-    routerLink="/s/dashboard"
-    routerLinkActive="active"
-  >
-    <fa-icon [icon]="HouseIcon"></fa-icon>
-    <span>Home</span>
-  </a>
-  <a
-    class="bottom-nav-item"
-    routerLink="/s/comunicazioni"
-    routerLinkActive="active"
-  >
-    <fa-icon [icon]="CalendarIcon"></fa-icon>
-    <span>Info</span>
-  </a>
-  <a class="bottom-nav-item" routerLink="/s/tests" routerLinkActive="active">
-    <fa-icon [icon]="TestIcon"></fa-icon>
-    <span>Test</span>
-  </a>
-  <a class="bottom-nav-item" routerLink="/s/agente" routerLinkActive="active">
-    <fa-icon [icon]="RobotIcon"></fa-icon>
-    <span>AI Chat</span>
-  </a>
-  <div ngbDropdown placement="top-end">
-    <button
-      class="bottom-nav-item"
-      ngbDropdownToggle
-      style="border: none; background: transparent"
-    >
-      <fa-icon [icon]="UserProfileIcon"></fa-icon>
-      <span>Profilo</span>
+<!-- Full-screen Mobile Menu Overlay -->
+<div class="mobile-menu-overlay d-lg-none" [class.active]="mobileMenuOpen()">
+  <div class="mobile-menu-header d-flex justify-content-between align-items-center px-4 py-3">
+    <img
+      src="/images/logotipo.svg"
+      alt="Syllex Logo"
+      style="height: 28px; width: auto;"
+      (click)="closeMobileMenu()"
+    />
+    <button class="btn btn-close-menu d-flex align-items-center justify-content-center" (click)="closeMobileMenu()">
+      <fa-icon [icon]="XmarkIcon" class="text-white fs-5"></fa-icon>
     </button>
-    <div
-      ngbDropdownMenu
-      class="p-3 dropdown-menu-dark"
-      style="min-width: 240px"
-    >
-      <app-student-user-contextual-menu></app-student-user-contextual-menu>
+  </div>
+  
+  <div class="mobile-menu-content d-flex flex-column px-4 py-5 flex-grow-1 justify-content-between">
+    <div>
+      <div class="user-greeting mb-5">
+        <span class="greeting-subtitle text-uppercase">Studente</span>
+        <h1 class="greeting-title fw-bold">
+          {{ User()?.firstName || User()?.username || 'Studente' }}
+        </h1>
+      </div>
+      
+      <div class="mobile-nav-routes d-flex flex-column gap-3">
+        @for(route of mainRoutes; track $index) {
+          <a
+            [routerLink]="route.path"
+            routerLinkActive="active"
+            (click)="closeMobileMenu()"
+            class="mobile-nav-route-item d-flex align-items-center gap-3 py-3 px-4 text-decoration-none"
+          >
+            <fa-icon [icon]="route.icon" class="route-icon"></fa-icon>
+            <span class="route-label fw-bold">{{ route.label }}</span>
+          </a>
+        }
+        <!-- Chat AI / Tutor AI -->
+        <a
+          routerLink="/s/agente"
+          routerLinkActive="active"
+          (click)="closeMobileMenu()"
+          class="mobile-nav-route-item d-flex align-items-center gap-3 py-3 px-4 text-decoration-none"
+        >
+          <fa-icon [icon]="RobotIcon" class="route-icon"></fa-icon>
+          <span class="route-label fw-bold">Tutor AI</span>
+        </a>
+      </div>
+    </div>
+    
+    <div class="mobile-menu-footer d-flex justify-content-between align-items-center mt-auto pt-5">
+      <div ngbDropdown placement="top-start" class="flex-fill">
+        <button
+          class="mobile-footer-btn d-flex align-items-center gap-2 border-0 bg-transparent p-0 text-white opacity-75"
+          ngbDropdownToggle
+        >
+          <fa-icon [icon]="UserProfileIcon" class="fs-5"></fa-icon>
+          <span class="fw-bold">Profilo</span>
+        </button>
+        <div
+          ngbDropdownMenu
+          class="p-3 dropdown-menu-dark"
+          style="min-width: 240px"
+        >
+          <app-student-user-contextual-menu></app-student-user-contextual-menu>
+        </div>
+      </div>
+      
+      <button class="mobile-footer-btn d-flex align-items-center gap-2 text-danger border-0 bg-transparent ms-auto p-0" (click)="onLogout()">
+        <fa-icon [icon]="LogoutIcon" class="fs-5"></fa-icon>
+        <span class="fw-bold">Logout</span>
+      </button>
     </div>
   </div>
-</nav>
+</div>

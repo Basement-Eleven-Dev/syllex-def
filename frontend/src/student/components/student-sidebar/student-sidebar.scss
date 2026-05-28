@@ -123,15 +123,34 @@
     transition: color 0.3s ease;
   }
 
-  &:hover,
-  &.active {
+  &:hover {
     cursor: pointer;
-    background-color: var(--syllex-green);
-    color: #151d37 !important;
+    background-color: #1c2542;
+    color: #ffffff !important;
     font-weight: bold;
     
     fa-icon {
-      color: #151d37 !important;
+      color: #ffffff !important;
+    }
+  }
+
+  &.active {
+    cursor: pointer;
+    background-color: var(--student-bg);
+    color: #ffffff !important;
+    font-weight: bold;
+    
+    fa-icon {
+      color: #ffffff !important;
+    }
+
+    &:hover {
+      background-color: var(--student-bg);
+      color: #ffffff !important;
+
+      fa-icon {
+        color: #ffffff !important;
+      }
     }
   }
 }
@@ -153,8 +172,23 @@
 }
 
 .ai-sidebar-btn {
+  background-color: var(--syllex-green) !important;
+  color: #0f1628 !important;
   border-radius: 30px;
   margin-bottom: 0.5rem;
+  border: none !important;
+  box-shadow: none !important;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    background-color: color-mix(in srgb, var(--syllex-green) 90%, black) !important;
+    box-shadow: 0 4px 12px rgba(201, 243, 33, 0.15) !important;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 }
 
 .ai-deco {
@@ -168,14 +202,11 @@
 }
 
 .chat-ai-label {
-  background: linear-gradient(90deg, #ffffff 0%, #6eafff 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #0f1628 !important;
 }
 
 .chat-ai-deco {
   font-size: 2.2rem;
   opacity: 1;
-  color: #6eafff;
+  color: #0f1628 !important;
 }

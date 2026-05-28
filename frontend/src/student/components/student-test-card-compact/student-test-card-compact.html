@@ -1,53 +1,48 @@
-<div class="ctc" [routerLink]="Route()">
-
-  <!-- ── Left: title, badge, metadata ─────────────────────────────────────── -->
-  <div class="ctc__info">
-    <div class="ctc__title-row">
-      <h6 class="ctc__title">{{ Test().name }}</h6>
+<div class="ctc d-flex flex-column gap-2 w-100" [routerLink]="Route()">
+  <!-- Top row: Title and Badges/Status -->
+  <div class="d-flex justify-content-between align-items-start gap-3 w-100">
+    <h6 class="ctc__title fw-bold mb-0 text-white flex-grow-1 text-start" style="font-size: 0.95rem; line-height: 1.4; white-space: normal;">
+      {{ Test().name }}
+    </h6>
+    
+    <div class="d-flex align-items-center gap-2 flex-shrink-0 mt-0.5">
+      @if (ShowScore()) {
+        <span class="badge bg-purple-light text-purple-accent px-2 py-1 rounded-pill" style="font-size: 0.72rem; font-weight: 700; background-color: rgba(139, 92, 246, 0.2) !important; color: #c084fc !important;">
+          {{ AttemptScore()!.score }}/{{ AttemptScore()!.maxScore }} pt
+        </span>
+      }
+      
       @if (!AttemptStatus()) {
-        <span class="ctc__badge-new">Nuovo</span>
+        <span class="badge bg-lime text-dark px-2 py-1 rounded-pill fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.05em; background-color: var(--syllex-green) !important;">
+          Nuovo
+        </span>
+      } @else if (AttemptStatus() === 'in-progress') {
+        <span class="badge bg-warning text-dark px-2 py-1 rounded-pill fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.05em;">
+          In corso
+        </span>
+      } @else {
+        <span class="badge bg-white bg-opacity-10 text-white px-2 py-1 rounded-pill fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.05em;">
+          Svolto
+        </span>
       }
     </div>
-    <div class="ctc__meta">
-      <span class="ctc__meta-item">
-        <fa-icon [icon]="QuestionsIcon" class="ctc__meta-icon"></fa-icon>
-        {{ QuestionsCount() }} domande
+  </div>
+
+  <!-- Bottom row: Metadata (questions, points) and Date -->
+  <div class="d-flex justify-content-between align-items-center w-100 text-white-50 mt-1" style="font-size: 0.78rem;">
+    <div class="d-flex align-items-center gap-3">
+      <span class="d-flex align-items-center gap-1 opacity-75">
+        <fa-icon [icon]="QuestionsIcon" style="font-size: 0.75rem;"></fa-icon>
+        {{ QuestionsCount() }} Domande
       </span>
-      <span class="ctc__meta-item">
-        <fa-icon [icon]="TrophyIcon" class="ctc__meta-icon"></fa-icon>
+      <span class="d-flex align-items-center gap-1 opacity-75">
+        <fa-icon [icon]="TrophyIcon" style="font-size: 0.75rem;"></fa-icon>
         {{ MaxScore() }} punti
       </span>
-      @if (Test().availableTo) {
-        <span class="ctc__meta-date">{{ Test().availableTo | date: 'dd.MM.yyyy' }}</span>
-      }
     </div>
-  </div>
-
-  <!-- ── Right: score badge + action button ────────────────────────────────── -->
-  <div class="ctc__actions">
-    @if (ShowScore()) {
-      <div class="ctc__score">
-        <fa-icon [icon]="TrophyIcon" class="ctc__score-icon"></fa-icon>
-        <span class="ctc__score-value">
-          {{ AttemptScore()!.score }} / {{ AttemptScore()!.maxScore }} pt
-        </span>
-      </div>
+    
+    @if (Test().availableTo) {
+      <span class="opacity-75">{{ Test().availableTo | date: 'dd.MM.yyyy' }}</span>
     }
-    <button
-      class="ctc__btn"
-      [class.ctc__btn--pending]="!AttemptStatus()"
-      [class.ctc__btn--in-progress]="AttemptStatus() === 'in-progress'"
-      [class.ctc__btn--completed]="IsCompleted()"
-      (click)="$event.stopPropagation(); $event.preventDefault()"
-    >
-      @if (AttemptStatus() === 'reviewed' || AttemptStatus() === 'delivered') {
-        <fa-icon [icon]="ReviewIcon"></fa-icon> Rivedi
-      } @else if (AttemptStatus() === 'in-progress') {
-        <fa-icon [icon]="ResumeIcon"></fa-icon> Riprendi
-      } @else {
-        <fa-icon [icon]="PlayIcon"></fa-icon> Compila
-      }
-    </button>
   </div>
-
 </div>

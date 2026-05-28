@@ -6,63 +6,158 @@
   color: #ffffff;
 }
 
-/* Non-desktop: il layout tiene la sidebar in flusso, niente margin-left artificiale */
-@media (max-width: 991px) {
-  /* Padding bottom per non finire sotto la bottom nav floating */
-  #content .overflow-auto {
-    padding-bottom: 88px;
+/* Mobile Top Header */
+.student-mobile-header {
+  background-color: var(--student-bg);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  flex-shrink: 0;
+  z-index: 100;
+
+  .btn-mobile-menu {
+    transition: transform 0.2s ease;
+    
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  .menu-dots-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3px;
+    width: 14px;
+    height: 14px;
+
+    span {
+      display: block;
+      width: 5px;
+      height: 5px;
+      background-color: var(--syllex-green);
+      border-radius: 1px;
+    }
   }
 }
 
-.bottom-nav {
+/* Full-screen Mobile Menu Overlay */
+.mobile-menu-overlay {
   position: fixed;
-  bottom: 1rem;
-  left: calc(64px + 1rem);
-  right: 1rem;
-  height: 56px;
-  background: var(--student-sidebar);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  border-radius: 0.5rem;
-  z-index: 1000;
-  padding: 0 0.5rem;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-around;
-  transform: translateY(0);
-  transition: transform 0.3s ease;
-
-  &.hidden {
-    transform: translateY(calc(100% + 1rem));
-  }
-}
-
-.bottom-nav-item {
+  inset: 0;
+  z-index: 2000;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.2rem;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 1.25rem;
-  padding: 0.4rem 1.5rem;
-  background: transparent;
-  border: none;
-  text-decoration: none;
-  opacity: 0.8;
-  transition: all 0.2s;
+  background: linear-gradient(135deg, #151d37 0%, #0d1222 100%);
+  overflow-y: auto;
+  
+  // High-performance smooth animations
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(1.05);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 
-  span {
-    font-size: 0.65rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-  }
-
-  &:hover,
   &.active {
     opacity: 1;
-    color: var(--syllex-green) !important;
+    pointer-events: all;
+    transform: scale(1);
+  }
+
+  .mobile-menu-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .btn-close-menu {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+
+    &:active {
+      transform: scale(0.9);
+      background-color: rgba(255, 255, 255, 0.12);
+    }
+  }
+
+  .mobile-menu-content {
+    min-height: calc(100dvh - 70px);
+  }
+
+  .user-greeting {
+    .greeting-subtitle {
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      color: var(--syllex-green);
+      font-weight: 700;
+    }
+    .greeting-title {
+      font-size: 2.4rem;
+      letter-spacing: -0.03em;
+      color: #ffffff;
+      margin-top: 0.25rem;
+    }
+  }
+
+  /* Navigation Items */
+  .mobile-nav-routes {
+    width: 100%;
+  }
+
+  .mobile-nav-route-item {
+    position: relative;
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 18px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.05rem;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+    .route-icon {
+      font-size: 1.2rem;
+      opacity: 0.75;
+      transition: transform 0.25s ease, color 0.25s ease;
+    }
+
+    // Modern Selected/Active Route Design
+    &.active {
+      background: rgba(201, 243, 33, 0.08) !important;
+      border-color: rgba(201, 243, 33, 0.25) !important;
+      color: var(--syllex-green) !important;
+      padding-left: 2.75rem !important; // shift slightly to accommodate neon stripe
+
+      .route-icon {
+        color: var(--syllex-green);
+        opacity: 1;
+        transform: scale(1.1);
+      }
+
+      // Neon glowing indicator stripe on the left
+      &::before {
+        content: '';
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 18px;
+        background-color: var(--syllex-green);
+        border-radius: 10px;
+        box-shadow: 0 0 10px var(--syllex-green);
+      }
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+
+  .mobile-footer-btn {
+    font-size: 1rem;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    
+    &:active {
+      transform: scale(0.95);
+      opacity: 1;
+    }
   }
 }
 
