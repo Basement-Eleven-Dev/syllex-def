@@ -31,7 +31,7 @@ import {
   faChartLine,
   faClipboardList,
 } from '@fortawesome/pro-solid-svg-icons';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 import { StudentTestCardCompact } from '../../components/student-test-card-compact/student-test-card-compact';
@@ -59,6 +59,7 @@ export class StudentDashboard implements OnInit {
   private readonly comunicazioniService = inject(ComunicazioniService);
   private readonly materiaService = inject(Materia);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router);
 
   readonly PieIcon = faChartPie;
   readonly TestIcon = faVial;
@@ -98,6 +99,11 @@ export class StudentDashboard implements OnInit {
   ngOnInit(): void {
     this.auth.user$.subscribe((user) => this.User.set(user));
     this.loadDashboardData();
+  }
+
+  goToAgentWithSubject(subject: MateriaObject): void {
+    this.materiaService.setSelectedSubject(subject);
+    this.router.navigate(['/s/agente']);
   }
 
   getAttemptStatus(
