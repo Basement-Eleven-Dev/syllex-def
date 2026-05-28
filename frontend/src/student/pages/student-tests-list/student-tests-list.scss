@@ -11,8 +11,15 @@
     grid-template-columns: repeat(2, 1fr);
   }
   @media (max-width: 479px) {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
   }
+}
+
+:host {
+  display: block;
+  width: 100%;
+  max-width: 100%;
 }
 
 // Dark overrides for filter pills inside student theme
@@ -54,6 +61,14 @@
 }
 
 @media (max-width: 767px) {
+  :host ::ng-deep .auto-eval-btn button {
+    white-space: normal !important;
+    text-align: center;
+    height: auto !important;
+    padding-top: 0.85rem !important;
+    padding-bottom: 0.85rem !important;
+  }
+
   .tests-filter-bar {
     flex-direction: column !important;
     align-items: stretch !important;

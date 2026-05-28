@@ -3,6 +3,7 @@
   description="Qui trovi i test che puoi svolgere per le tue materie."
 >
   <app-syllex-button
+    class="auto-eval-btn"
     [props]="{ label: 'Crea un test di autovalutazione', variant: 'primary', color: 'celestine', size: 'large', link: '/s/auto-evaluation/create', leftIcon: PlusIcon }"
   />
 </app-syllex-page-header>
@@ -23,7 +24,7 @@
     style="min-width: 180px; flex: 0 0 auto"
   />
 
-  <div class="d-flex align-items-center gap-2 form-check form-switch cursor-pointer" style="cursor: pointer;">
+  <div class="d-flex align-items-center justify-content-end justify-content-md-start gap-2 form-check form-switch cursor-pointer w-100" style="cursor: pointer;">
     <input
       class="form-check-input student-switch"
       type="checkbox"
@@ -31,9 +32,9 @@
       id="switchDaSvolgere"
       [checked]="ShowOnlyPending()"
       (change)="toggleDaFare()"
-      style="width: 2.5rem; height: 1.25rem; cursor: pointer;"
+      style="width: 2.5rem; height: 1.25rem; cursor: pointer; margin-top: 0; margin-left: 0;"
     />
-    <label class="form-check-label mb-0 text-white-50" for="switchDaSvolgere" style="font-size: 0.95rem; cursor: pointer; user-select: none;">
+    <label class="form-check-label mb-0 text-white-50" for="switchDaSvolgere" style="font-size: 0.95rem; cursor: pointer; user-select: none; padding-top: 1px;">
       Test da svolgere
     </label>
   </div>
