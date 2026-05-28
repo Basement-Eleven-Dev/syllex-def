@@ -8,92 +8,120 @@
 // ── KPI strip ─────────────────────────────────────────────────────────────
 .review-kpi-bar {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
+  align-items: stretch;
+  padding: 1.25rem 1rem;
   background: var(--student-sidebar);
   border-radius: 20px;
   margin-bottom: 0.75rem;
-  flex-wrap: wrap;
   flex-shrink: 0;
-}
 
-.review-kpi-pill {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0.4rem 0.85rem;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  min-width: 60px;
-}
-
-.kpi-icon {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.45);
-  margin-bottom: 2px;
-}
-
-.kpi-num {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #ffffff;
-  line-height: 1.2;
-}
-
-.kpi-max {
-  font-size: 0.8rem;
-  opacity: 0.55;
-}
-
-.kpi-lbl {
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: rgba(255, 255, 255, 0.45);
-  white-space: nowrap;
-}
-
-.kpi-correct .kpi-num { color: var(--syllex-green) !important; }
-.kpi-wrong   .kpi-num { color: #ff6b6b !important; }
-.kpi-score   .kpi-num { color: var(--syllex-green) !important; }
-
-.kpi-time {
-  flex-direction: row;
-  gap: 0.4rem;
-
-  .kpi-num {
-    font-size: 1rem;
+  @media (max-width: 480px) {
+    padding: 1rem 0.5rem;
   }
 }
 
-// ── Status badge ──────────────────────────────────────────────────────────
-.review-status-badge {
-  display: inline-block;
-  padding: 0.35rem 1.1rem;
-  border-radius: 999px;
-  font-size: 0.88rem;
-  font-weight: 600;
-  background: rgba(201, 243, 33, 0.14);
-  color: var(--syllex-green) !important;
-  border: 1px solid rgba(201, 243, 33, 0.28);
+.kpi-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  padding: 0 0.25rem;
+
+  & + & {
+    border-left: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  &--correct {
+    .kpi-ico,
+    .kpi-val {
+      color: var(--syllex-green);
+    }
+  }
+  &--wrong {
+    .kpi-ico,
+    .kpi-val {
+      color: #ff6b6b;
+    }
+  }
+  &--score {
+    .kpi-ico,
+    .kpi-val {
+      color: var(--syllex-green);
+    }
+  }
+  &--status {
+    flex: 1.4;
+    .kpi-ico {
+      color: var(--syllex-green);
+    }
+  }
+}
+
+.kpi-ico {
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1;
+}
+
+.kpi-val {
+  font-size: clamp(1.3rem, 3vw, 2rem);
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.1;
+
+  &--status {
+    font-size: clamp(0.6rem, 1.3vw, 0.82rem);
+    font-weight: 600;
+    color: var(--syllex-green);
+    text-align: center;
+    line-height: 1.3;
+  }
+}
+
+.kpi-max {
+  font-size: 0.72em;
+  opacity: 0.5;
+}
+
+.kpi-lbl {
+  font-size: clamp(0.52rem, 0.9vw, 0.6rem);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: rgba(255, 255, 255, 0.38);
   white-space: nowrap;
 }
 
-// ── Navigation bar ────────────────────────────────────────────────────────
-.review-nav-bar {
+// ── Status badge ──────────────────────────────────────────────────────────
+// ── Carousel body (viewport + side nav) ──────────────────────────────────
+.review-body {
+  flex: 1;
+  min-height: 0;
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0 0.5rem;
-  margin-bottom: 0.75rem;
-  flex-shrink: 0;
+  flex-direction: row;
+  gap: 0.5rem;
+  align-items: stretch;
 }
 
-.review-nav-btn {
-  width: 36px;
-  height: 36px;
+// ── Vertical side navigator ───────────────────────────────────────────────
+.review-side-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  width: 24px;
+
+  @media (max-width: 576px) {
+    width: 18px;
+    gap: 0.25rem;
+  }
+}
+
+.review-nav-arrow {
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background: rgba(255, 255, 255, 0.07);
@@ -103,34 +131,51 @@
   justify-content: center;
   cursor: pointer;
   flex-shrink: 0;
-  transition: background 0.15s ease, opacity 0.15s ease;
+  font-size: 0.6rem;
+  transition:
+    background 0.15s ease,
+    opacity 0.15s ease;
 
   &:disabled {
-    opacity: 0.25;
+    opacity: 0.2;
     cursor: not-allowed;
   }
 
   &:not(:disabled):hover {
-    background: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.16);
   }
 }
 
-.review-nav-label {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.9rem;
-  flex-shrink: 0;
-
-  strong {
-    color: #fff;
-  }
-}
-
-.review-dots {
+.review-side-dots {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 5px;
-  flex-wrap: wrap;
-  margin-left: 0.25rem;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-block: 2px;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  // Active dot is taller (not wider) in vertical orientation
+  .review-dot--active {
+    width: 8px !important;
+    height: 20px;
+    border-radius: 4px;
+  }
+  .review-dot--correct.review-dot--active {
+    width: 8px !important;
+  }
+  .review-dot--wrong.review-dot--active {
+    width: 8px !important;
+  }
+  .review-dot--partial.review-dot--active {
+    width: 8px !important;
+  }
 }
 
 .review-dot {
@@ -150,14 +195,32 @@
     background: rgba(255, 255, 255, 0.7);
   }
 
-  &--correct                  { background: rgba(201, 243, 33, 0.45); }
-  &--correct.review-dot--active { background: var(--syllex-green); width: 20px; border-radius: 4px; }
+  &--correct {
+    background: rgba(201, 243, 33, 0.45);
+  }
+  &--correct.review-dot--active {
+    background: var(--syllex-green);
+    width: 20px;
+    border-radius: 4px;
+  }
 
-  &--wrong                  { background: rgba(255, 107, 107, 0.45); }
-  &--wrong.review-dot--active { background: #ff6b6b; width: 20px; border-radius: 4px; }
+  &--wrong {
+    background: rgba(255, 107, 107, 0.45);
+  }
+  &--wrong.review-dot--active {
+    background: #ff6b6b;
+    width: 20px;
+    border-radius: 4px;
+  }
 
-  &--partial                  { background: rgba(255, 160, 82, 0.45); }
-  &--partial.review-dot--active { background: var(--syllex-orange); width: 20px; border-radius: 4px; }
+  &--partial {
+    background: rgba(255, 160, 82, 0.45);
+  }
+  &--partial.review-dot--active {
+    background: var(--syllex-orange);
+    width: 20px;
+    border-radius: 4px;
+  }
 }
 
 // ── Carousel viewport ─────────────────────────────────────────────────────
@@ -165,16 +228,13 @@
   flex: 1;
   min-height: 0;
   display: flex;
-  align-items: flex-start;
-  overflow-x: auto;
-  overflow-y: hidden;
-  gap: 20px;
-  scroll-behavior: smooth;
-  scroll-snap-type: x mandatory;
-  // Center first and last cards
-  padding-inline: calc(50% - min(350px, calc(50vw - 40px)));
-  padding-bottom: 8px;
-  // Hide scrollbar
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  gap: clamp(10px, 2vh, 18px);
+  scroll-snap-type: y mandatory;
+  // padding allows first/last cards to be scrolled to centre
+  padding-block: clamp(12px, 6vh, 48px);
   scrollbar-width: none;
 
   &::-webkit-scrollbar {
@@ -185,23 +245,17 @@
 // ── Individual slide ──────────────────────────────────────────────────────
 .review-slide {
   flex-shrink: 0;
-  width: min(700px, calc(100vw - 80px));
+  width: 100%;
   scroll-snap-align: center;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  max-height: 100%;
   border-radius: 24px;
   transition:
     transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity   0.35s ease;
-  transform: scale(0.88);
-  opacity: 0.5;
+    opacity 0.35s ease;
+  transform: scale(0.9);
+  opacity: 0.45;
   cursor: pointer;
-
-  // Hide scrollbar within slide
-  scrollbar-width: none;
-  &::-webkit-scrollbar { display: none; }
 
   &--active {
     transform: scale(1);
@@ -213,61 +267,28 @@
 .review-slide-qcard {
   flex: 1;
   min-height: 0;
-}
 
-// ── Card footer ───────────────────────────────────────────────────────────
-.review-card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.6rem 1rem;
-  background: rgba(255, 255, 255, 0.03);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 0 0 20px 20px;
-  flex-shrink: 0;
-}
-
-.review-q-badge {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: 999px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border: 1px solid transparent;
-
-  &--correct {
-    background: rgba(201, 243, 33, 0.12);
-    color: var(--syllex-green) !important;
-    border-color: rgba(201, 243, 33, 0.25);
+  // Hide the <hr> separator before the badge section (it's inside the
+  // question-card component — we only suppress it in the review context)
+  ::ng-deep hr {
+    display: none;
   }
 
-  &--wrong {
-    background: rgba(255, 107, 107, 0.12);
-    color: #ff6b6b !important;
-    border-color: rgba(255, 107, 107, 0.25);
+  // Tighten the badge/feedback section padding
+  ::ng-deep .d-flex.flex-column.gap-2 {
+    padding-top: 0.25rem;
   }
 
-  &--partial {
-    background: rgba(255, 160, 82, 0.12);
-    color: var(--syllex-orange) !important;
-    border-color: rgba(255, 160, 82, 0.25);
+  // Remove forced full-height so the card sizes to its content, not the viewport
+  ::ng-deep .question-card {
+    height: auto !important;
   }
-}
-
-.review-score-chip {
-  display: inline-flex;
-  align-items: center;
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.75);
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  padding: 0.25rem 0.65rem;
 }
 
 // ── Legacy helpers (kept for compatibility) ───────────────────────────────
-:host .review-correct { color: var(--syllex-green) !important; }
-:host .review-wrong   { color: #ff6b6b !important; }
+:host .review-correct {
+  color: var(--syllex-green) !important;
+}
+:host .review-wrong {
+  color: #ff6b6b !important;
+}
