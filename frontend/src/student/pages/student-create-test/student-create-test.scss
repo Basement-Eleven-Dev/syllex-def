@@ -55,9 +55,10 @@
   }
 
   &--selected {
-    background: var(--student-card);
-    border-color: var(--student-card);
-    color: #ffffff !important;
+    background: #d1e3ff !important;
+    border-color: #d1e3ff !important;
+    color: #0b111e !important;
+    font-weight: 600;
   }
 }
 
@@ -134,3 +135,24 @@
   font-size: 1.25rem;
   font-weight: 700;
 }
+
+.custom-input {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 12px !important;
+  color: #ffffff !important;
+  padding: 0.75rem 1rem !important;
+  transition: all 0.2s ease !important;
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.4) !important;
+  }
+
+  &:focus {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(56, 189, 248, 0.5) !important;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15) !important;
+    outline: none !important;
+  }
+}
+
