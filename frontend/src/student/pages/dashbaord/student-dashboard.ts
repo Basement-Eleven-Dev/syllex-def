@@ -26,6 +26,8 @@ import {
   faBell,
   faArrowRight,
   faRobot,
+  faPlay,
+  faCheckCircle,
 } from '@fortawesome/pro-solid-svg-icons';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -37,10 +39,6 @@ import { StatCardData } from '../../../teacher/components/stat-card/stat-card';
 @Component({
   selector: 'app-dashbaord',
   standalone: true,
-  host: {
-    style:
-      'display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden;',
-  },
   imports: [
     CommonModule,
     RouterModule,
@@ -63,6 +61,8 @@ export class StudentDashboard implements OnInit {
   readonly BellIcon = faBell;
   readonly ArrowRight = faArrowRight;
   readonly RobotIcon = faRobot;
+  readonly PlayIcon = faPlay;
+  readonly CheckCircleIcon = faCheckCircle;
 
   User = signal<User | null>(null);
   Subjects = this.materiaService.allMaterie;
