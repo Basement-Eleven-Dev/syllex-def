@@ -994,4 +994,125 @@ body:has(.agent-page-root) {
   .btn-gradient-secondary {
     color: #0f1628 !important;
   }
+
+  // ── Global dark form controls ─────────────────────────────────────────────
+  .form-select,
+  .form-control,
+  .form-control-lg {
+    background-color: rgba(255, 255, 255, 0.07) !important;
+    border-color: rgba(255, 255, 255, 0.14) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.38) !important;
+    }
+    option {
+      background-color: var(--student-sidebar);
+      color: #ffffff;
+    }
+  }
+  .form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgba(255,255,255,0.55)' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+  }
+  .form-range::-webkit-slider-thumb {
+    background: var(--syllex-green);
+  }
+  .form-range::-moz-range-thumb {
+    background: var(--syllex-green);
+  }
+  .form-check-input:checked {
+    background-color: var(--syllex-green) !important;
+    border-color: var(--syllex-green) !important;
+  }
+
+  // ── Dark alert variants ───────────────────────────────────────────────────
+  .alert-warning {
+    background-color: rgba(255, 160, 82, 0.14) !important;
+    border-color: rgba(255, 160, 82, 0.3) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+  }
+  .alert-danger {
+    background-color: rgba(255, 107, 107, 0.14) !important;
+    border-color: rgba(255, 107, 107, 0.3) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+  }
+  .alert-success {
+    background-color: rgba(201, 243, 33, 0.11) !important;
+    border-color: rgba(201, 243, 33, 0.22) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+  }
+
+  // ── Bootstrap .card → dark ────────────────────────────────────────────────
+  .card {
+    background-color: var(--student-sidebar) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  // ── Breadcrumb links ──────────────────────────────────────────────────────
+  .breadcrumb-link {
+    color: rgba(255, 255, 255, 0.65) !important;
+    text-decoration: none;
+    &:hover {
+      color: #ffffff !important;
+    }
+  }
+
+  // ── Outline secondary button ──────────────────────────────────────────────
+  .btn-outline-secondary {
+    color: rgba(255, 255, 255, 0.75) !important;
+    border-color: rgba(255, 255, 255, 0.22) !important;
+    &:hover,
+    &:active {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+      color: #ffffff !important;
+    }
+  }
+
+  // ── Primary accent → syllex-green ────────────────────────────────────────
+  .text-primary {
+    color: var(--syllex-green) !important;
+  }
+
+  // ── Light-background teacher components — restore dark text ───────────────
+  // These render inside the student layout (which has color:#fff globally)
+  // and have their own light bg. We must beat the global span/p !important rules
+  // by using higher specificity (3 classes vs 2 classes for the global rule).
+  .syllexCard,
+  .day-box,
+  .event-card {
+    color: #151d37 !important;
+
+    p,
+    span,
+    label,
+    small,
+    td,
+    th,
+    div {
+      color: #151d37 !important;
+    }
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      color: #151d37 !important;
+    }
+    .text-muted,
+    .text-secondary {
+      color: #5c6f8a !important;
+    }
+    // Primary text inside light components stays blue (not green)
+    .text-primary {
+      color: #1e40af !important;
+    }
+    // Badges and coloured elements keep their own colors
+    .badge {
+      color: inherit !important;
+    }
+    // Buttons delegate to their own styling
+    .btn {
+      color: inherit;
+    }
+  }
 }

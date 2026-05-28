@@ -1,16 +1,49 @@
-/* Minimal styles — layout handled by Bootstrap utilities */
+// ── Stat blocks ───────────────────────────────────────────────────────────
+.review-stat {
+  background: var(--student-sidebar);
+  border-radius: 20px;
+  padding: 1.75rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 100%;
+}
 
 .card-value {
   font-size: 3.5rem;
   font-weight: bold;
+  color: #ffffff !important;
 }
 
 .card-description {
   font-size: 0.875rem;
   text-align: center;
+  color: rgba(255, 255, 255, 0.6) !important;
 }
 
 .reduced {
   font-size: 1.5rem;
   opacity: 0.5;
+}
+
+// ── Status badge ──────────────────────────────────────────────────────────
+.review-status-badge {
+  display: inline-block;
+  padding: 0.35rem 1.1rem;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  background: rgba(201, 243, 33, 0.14);
+  color: var(--syllex-green) !important;
+  border: 1px solid rgba(201, 243, 33, 0.28);
+}
+
+// ── Correct / wrong colors ────────────────────────────────────────────────
+:host .review-correct {
+  color: var(--syllex-green) !important;
+}
+:host .review-wrong {
+  color: #ff6b6b !important;
 }
