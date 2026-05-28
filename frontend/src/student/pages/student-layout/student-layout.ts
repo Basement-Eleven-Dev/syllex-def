@@ -72,8 +72,8 @@ export class StudentLayout implements OnInit {
       icon: faHouse,
     },
     {
-      path: 'comunicazioni',
-      label: 'Comunicazioni',
+      path: 'calendario',
+      label: 'Calendario',
       icon: faCalendar,
     },
     {

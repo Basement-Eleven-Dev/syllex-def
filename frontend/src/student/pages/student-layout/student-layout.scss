@@ -45,14 +45,14 @@
   z-index: 2000;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #151d37 0%, #0d1222 100%);
+  background: linear-gradient(180deg, #252bb1 0%, #0c0e3a 100%);
   overflow-y: auto;
   
   // High-performance smooth animations
   opacity: 0;
   pointer-events: none;
-  transform: scale(1.05);
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: scale(1.03);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 
   &.active {
     opacity: 1;
@@ -61,20 +61,20 @@
   }
 
   .mobile-menu-header {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: none;
   }
 
   .btn-close-menu {
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.2);
+    border: none;
     transition: all 0.2s ease;
 
     &:active {
       transform: scale(0.9);
-      background-color: rgba(255, 255, 255, 0.12);
+      background-color: rgba(255, 255, 255, 0.3);
     }
   }
 
@@ -86,72 +86,60 @@
     .greeting-subtitle {
       font-size: 0.72rem;
       letter-spacing: 0.1em;
-      color: var(--syllex-green);
-      font-weight: 700;
+      color: rgba(255, 255, 255, 0.5);
+      font-weight: 500;
     }
     .greeting-title {
-      font-size: 2.4rem;
+      font-size: 2.8rem;
+      font-weight: 600;
       letter-spacing: -0.03em;
       color: #ffffff;
-      margin-top: 0.25rem;
+      margin-top: 0.1rem;
     }
   }
 
-  /* Navigation Items */
+  /* Navigation Items - Clean Flat Design */
   .mobile-nav-routes {
     width: 100%;
   }
 
   .mobile-nav-route-item {
     position: relative;
-    background-color: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 18px;
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 1.05rem;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.25rem;
+    padding: 0.75rem 0.25rem !important;
+    transition: all 0.2s ease;
 
     .route-icon {
-      font-size: 1.2rem;
-      opacity: 0.75;
-      transition: transform 0.25s ease, color 0.25s ease;
+      font-size: 1.4rem;
+      opacity: 0.8;
+      transition: transform 0.2s ease, color 0.2s ease;
     }
 
-    // Modern Selected/Active Route Design
+    // Modern Flat Selected Route Design
     &.active {
-      background: rgba(201, 243, 33, 0.08) !important;
-      border-color: rgba(201, 243, 33, 0.25) !important;
-      color: var(--syllex-green) !important;
-      padding-left: 2.75rem !important; // shift slightly to accommodate neon stripe
+      color: #ffffff !important;
+      font-weight: 600 !important;
 
       .route-icon {
-        color: var(--syllex-green);
+        color: #ffffff;
         opacity: 1;
-        transform: scale(1.1);
-      }
-
-      // Neon glowing indicator stripe on the left
-      &::before {
-        content: '';
-        position: absolute;
-        left: 16px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 4px;
-        height: 18px;
-        background-color: var(--syllex-green);
-        border-radius: 10px;
-        box-shadow: 0 0 10px var(--syllex-green);
+        transform: scale(1.05);
       }
     }
 
     &:active {
-      transform: scale(0.98);
+      transform: translateY(1px);
+      opacity: 0.9;
     }
   }
 
   .mobile-footer-btn {
-    font-size: 1rem;
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.8) !important;
     transition: opacity 0.2s ease, transform 0.2s ease;
     
     &:active {

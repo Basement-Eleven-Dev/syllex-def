@@ -78,8 +78,8 @@
   <div class="mobile-menu-content d-flex flex-column px-4 py-5 flex-grow-1 justify-content-between">
     <div>
       <div class="user-greeting mb-5">
-        <span class="greeting-subtitle text-uppercase">Studente</span>
-        <h1 class="greeting-title fw-bold">
+        <span class="greeting-subtitle">Studente</span>
+        <h1 class="greeting-title fw-semibold">
           {{ User()?.firstName || User()?.username || 'Studente' }}
         </h1>
       </div>
@@ -90,10 +90,10 @@
             [routerLink]="route.path"
             routerLinkActive="active"
             (click)="closeMobileMenu()"
-            class="mobile-nav-route-item d-flex align-items-center gap-3 py-3 px-4 text-decoration-none"
+            class="mobile-nav-route-item d-flex align-items-center gap-3 text-decoration-none"
           >
             <fa-icon [icon]="route.icon" class="route-icon"></fa-icon>
-            <span class="route-label fw-bold">{{ route.label }}</span>
+            <span class="route-label">{{ route.label }}</span>
           </a>
         }
         <!-- Chat AI / Tutor AI -->
@@ -101,10 +101,10 @@
           routerLink="/s/agente"
           routerLinkActive="active"
           (click)="closeMobileMenu()"
-          class="mobile-nav-route-item d-flex align-items-center gap-3 py-3 px-4 text-decoration-none"
+          class="mobile-nav-route-item d-flex align-items-center gap-3 text-decoration-none"
         >
           <fa-icon [icon]="RobotIcon" class="route-icon"></fa-icon>
-          <span class="route-label fw-bold">Tutor AI</span>
+          <span class="route-label">Tutor AI</span>
         </a>
       </div>
     </div>
@@ -116,7 +116,7 @@
           ngbDropdownToggle
         >
           <fa-icon [icon]="UserProfileIcon" class="fs-5"></fa-icon>
-          <span class="fw-bold">Profilo</span>
+          <span>Profilo</span>
         </button>
         <div
           ngbDropdownMenu
@@ -129,7 +129,7 @@
       
       <button class="mobile-footer-btn d-flex align-items-center gap-2 text-danger border-0 bg-transparent ms-auto p-0" (click)="onLogout()">
         <fa-icon [icon]="LogoutIcon" class="fs-5"></fa-icon>
-        <span class="fw-bold">Logout</span>
+        <span>Logout</span>
       </button>
     </div>
   </div>
