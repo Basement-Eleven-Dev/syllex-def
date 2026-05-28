@@ -1115,4 +1115,159 @@ body:has(.agent-page-root) {
       color: inherit;
     }
   }
+
+  // ── Agent Page (teacher component rendered in student context) ────────────
+  // Target: teacher/pages/agent-page/agent-page.html — only student-role view
+  .agent-page-root {
+    // Overall background
+    .bg-page {
+      background-color: var(--student-bg) !important;
+    }
+
+    // "Le Tue Materie" subjects sidebar (new .subject-sidebar class)
+    .subject-sidebar {
+      background: var(--student-sidebar) !important;
+      border-color: rgba(255, 255, 255, 0.08) !important;
+
+      // Toggle knob — dark variant
+      .subject-toggle-btn {
+        background: var(--student-card) !important;
+        border-color: rgba(255, 255, 255, 0.15) !important;
+        color: rgba(255, 255, 255, 0.85) !important;
+
+        &:hover {
+          background: var(--syllex-green) !important;
+          color: #0f1628 !important;
+        }
+      }
+    }
+
+    // Sidebar header (border-bottom divider)
+    .p-4.border-bottom {
+      border-color: rgba(255, 255, 255, 0.08) !important;
+
+      h6 {
+        color: var(--syllex-green) !important;
+      }
+    }
+
+    // Subject buttons
+    .subject-card {
+      background: rgba(255, 255, 255, 0.06) !important;
+      border-color: rgba(255, 255, 255, 0.1) !important;
+      color: rgba(255, 255, 255, 0.85) !important;
+
+      span {
+        color: rgba(255, 255, 255, 0.85) !important;
+      }
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.12) !important;
+        border-color: rgba(255, 255, 255, 0.22) !important;
+      }
+
+      &.active-subject {
+        background: var(--student-card) !important;
+        border-color: var(--student-card) !important;
+        color: #fff !important;
+
+        span {
+          color: #fff !important;
+        }
+      }
+    }
+
+    // Mobile tab switcher (Materie / Chat)
+    .nav-switcher {
+      background: var(--student-sidebar) !important;
+
+      .btn {
+        color: rgba(255, 255, 255, 0.5) !important;
+      }
+
+      .btn-white,
+      [class*="btn-white"] {
+        background: var(--student-card) !important;
+        color: #fff !important;
+        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.35) !important;
+      }
+    }
+
+    // Mobile chat header nav (back arrow + subject title)
+    .chat-header-nav {
+      background: var(--student-sidebar) !important;
+      border-color: rgba(255, 255, 255, 0.08) !important;
+
+      h6 {
+        color: #fff !important;
+      }
+
+      .btn-light {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: #fff !important;
+        border-color: transparent !important;
+      }
+    }
+
+    // ── Conversation messages ─────────────────────────────────────────────────
+    // AI messages: dark bg, white text (msg-line has color:#1f2937 on component)
+    .msg-line {
+      color: rgba(255, 255, 255, 0.88) !important;
+    }
+
+    // User message bubble: light-blue → dark glass
+    .msg-line--user {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+      color: rgba(255, 255, 255, 0.95) !important;
+    }
+
+    // ── app-agent-chat input area ─────────────────────────────────────────────
+    // CSS custom properties set here cascade into app-agent-chat regardless of
+    // ViewEncapsulation — no !important wars needed.
+    --agent-input-bg: rgba(255, 255, 255, 0.08);
+    --agent-input-border: rgba(255, 255, 255, 0.14);
+    --agent-input-text: #ffffff;
+    --agent-input-placeholder: rgba(255, 255, 255, 0.35);
+    --agent-switcher-bg: rgba(255, 255, 255, 0.08);
+
+    // Mode switcher icons
+    .input-area-container .mode-switcher {
+      .mode-switcher__icon {
+        color: rgba(255, 255, 255, 0.55) !important;
+
+        &.mode-switcher__icon--active {
+          background: var(--syllex-green) !important;
+          color: #0f1628 !important;
+        }
+      }
+    }
+
+    // Focus ring on input pill
+    .input-area-container .input-pill-mock:focus-within {
+      border-color: var(--syllex-green) !important;
+      box-shadow: 0 0 0 3px rgba(201, 243, 33, 0.12) !important;
+    }
+
+    // Textarea text/caret (no !important in component — global wins fine)
+    .main-content textarea {
+      color: #ffffff !important;
+      -webkit-text-fill-color: #ffffff !important;
+      caret-color: #ffffff;
+    }
+
+    // Mobile agent-chat header (bg-white → dark)
+    .d-flex.d-lg-none.bg-white.shadow-sm {
+      background: var(--student-sidebar) !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+
+      h6 {
+        color: var(--syllex-green) !important;
+      }
+
+      .btn-light {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: #fff !important;
+      }
+    }
+  }
 }

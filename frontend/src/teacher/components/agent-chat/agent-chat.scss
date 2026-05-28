@@ -558,7 +558,7 @@
     padding: 5px;
     border-radius: 999px;
     border: none;
-    background: #f0f0f8;
+    background: var(--agent-switcher-bg, #f0f0f8);
     cursor: pointer;
     flex-shrink: 0;
     align-self: stretch;
@@ -601,8 +601,8 @@
   // ---- INPUT PILL: max-width per collasso fluido ----
   .input-pill-mock {
     border-radius: 30px;
-    background: #ffffff !important;
-    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    background: var(--agent-input-bg, #ffffff) !important;
+    border: 1px solid var(--agent-input-border, rgba(0, 0, 0, 0.08)) !important;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02) !important;
     overflow: hidden;
     flex: 1;
@@ -623,10 +623,10 @@
       resize: none;
       font-weight: 500;
       background: transparent;
-      color: #1a1a1a;
+      color: var(--agent-input-text, #1a1a1a);
       min-width: 0;
       &::placeholder {
-        color: #7b8fd4;
+        color: var(--agent-input-placeholder, #7b8fd4);
       }
     }
   }

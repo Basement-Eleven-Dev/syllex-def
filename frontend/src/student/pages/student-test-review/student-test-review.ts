@@ -1,20 +1,25 @@
 import {
+  AfterViewInit,
   Component,
   computed,
   DestroyRef,
+  ElementRef,
   inject,
   OnInit,
   signal,
+  ViewChild,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DatePipe } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faCheck,
+  faChevronLeft,
+  faChevronRight,
   faClock,
   faCircle,
   faQuestion,
+  faScaleBalanced,
   faSpinnerThird,
   faXmark,
 } from '@fortawesome/pro-solid-svg-icons';
@@ -28,14 +33,16 @@ import { QuestionCard } from '../../../teacher/components/question-card/question
 @Component({
   selector: 'app-student-test-review',
   standalone: true,
-  imports: [FontAwesomeModule, BackTo, QuestionCard, DatePipe],
+  imports: [FontAwesomeModule, BackTo, QuestionCard],
   templateUrl: './student-test-review.html',
   styleUrl: './student-test-review.scss',
 })
-export class StudentTestReview implements OnInit {
+export class StudentTestReview implements OnInit, AfterViewInit {
   private readonly route = inject(ActivatedRoute);
   private readonly testsService = inject(StudentTestsService);
   private readonly destroyRef = inject(DestroyRef);
+
+  @ViewChild('viewport') viewportRef?: ElementRef<HTMLElement>;
 
   readonly SpinnerIcon = faSpinnerThird;
   readonly ClockIcon = faClock;
@@ -43,12 +50,16 @@ export class StudentTestReview implements OnInit {
   readonly WrongIcon = faXmark;
   readonly QuestionIcon = faQuestion;
   readonly CircleIcon = faCircle;
+  readonly ChevronLeft = faChevronLeft;
+  readonly ChevronRight = faChevronRight;
+  readonly ScaleIcon = faScaleBalanced;
 
   private readonly TestId = this.route.snapshot.paramMap.get('testId')!;
 
   readonly Attempt = signal<StudentAttemptInterface | null>(null);
   readonly IsLoading = signal(true);
   readonly Error = signal<string | null>(null);
+  readonly ActiveIndex = signal(0);
 
   readonly IsAutoEvaluation = computed(
     () => this.Attempt()?.source === 'self-evaluation',
@@ -63,7 +74,6 @@ export class StudentTestReview implements OnInit {
 
   readonly Status = computed(() => {
     const status = this.Attempt()?.status;
-    console.log('Attempt status:', status);
     switch (status) {
       case 'in-progress':
         return 'Incompleto';
@@ -93,13 +103,16 @@ export class StudentTestReview implements OnInit {
 
   readonly WrongCount = computed(
     () =>
-      this.Attempt()?.questions.filter((q) => q.status === 'wrong' || q.status === 'incorrect').length ?? 0,
+      this.Attempt()?.questions.filter(
+        (q) => q.status === 'wrong' || q.status === 'incorrect',
+      ).length ?? 0,
   );
 
   readonly SemiCorrectCount = computed(
     () =>
-      this.Attempt()?.questions.filter((q) => q.status === 'semi-correct' || q.status === 'partial')
-        .length ?? 0,
+      this.Attempt()?.questions.filter(
+        (q) => q.status === 'semi-correct' || q.status === 'partial',
+      ).length ?? 0,
   );
 
   readonly EmptyCount = computed(
@@ -126,11 +139,44 @@ export class StudentTestReview implements OnInit {
     this.loadAttempt();
   }
 
-  getSelectedAnswer(questionId: string): number | string | null {
-    const attemptQuestion = this.Attempt()?.questions.find(
-      (q) => q.question._id === questionId,
-    );
-    return attemptQuestion?.answer ?? null;
+  ngAfterViewInit(): void {
+    // viewport is empty until attempt loads — scroll happens after data arrives
+  }
+
+  prev(): void {
+    if (this.ActiveIndex() > 0) {
+      this.ActiveIndex.update((i) => i - 1);
+      this._scrollToActive();
+    }
+  }
+
+  next(): void {
+    const max = (this.Attempt()?.questions.length ?? 1) - 1;
+    if (this.ActiveIndex() < max) {
+      this.ActiveIndex.update((i) => i + 1);
+      this._scrollToActive();
+    }
+  }
+
+  goTo(index: number): void {
+    if (index === this.ActiveIndex()) return;
+    this.ActiveIndex.set(index);
+    this._scrollToActive();
+  }
+
+  private _scrollToActive(): void {
+    const viewport = this.viewportRef?.nativeElement;
+    if (!viewport) return;
+    const slides = Array.from(
+      viewport.querySelectorAll('.review-slide'),
+    ) as HTMLElement[];
+    const slide = slides[this.ActiveIndex()];
+    if (!slide) return;
+    const sr = slide.getBoundingClientRect();
+    const vr = viewport.getBoundingClientRect();
+    const targetLeft =
+      viewport.scrollLeft + sr.left - vr.left - (vr.width - sr.width) / 2;
+    viewport.scrollTo({ left: targetLeft, behavior: 'smooth' });
   }
 
   private loadAttempt(): void {

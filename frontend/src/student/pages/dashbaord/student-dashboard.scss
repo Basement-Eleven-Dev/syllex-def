@@ -11,8 +11,12 @@
 .student-welcome {
   flex-shrink: 0;
   padding-bottom: 0.75rem;
-  h5 { color: #ffffff; }
-  p  { color: rgba(255, 255, 255, 0.55); }
+  h5 {
+    color: #ffffff;
+  }
+  p {
+    color: rgba(255, 255, 255, 0.55);
+  }
 }
 
 // ── Main Dashboard Grid ───────────────────────────────────────────────────────
@@ -29,26 +33,67 @@
   overflow: hidden;
 }
 
-.db-study         { grid-area: study; }
-.db-monitor       { grid-area: monitor; }
-.db-tests         { grid-area: tests; }
-.db-autoval       { grid-area: autoval; }
-.db-comunicazioni { grid-area: comunicazioni; }
+.db-study {
+  grid-area: study;
+}
+.db-monitor {
+  grid-area: monitor;
+}
+.db-tests {
+  grid-area: tests;
+}
+.db-autoval {
+  grid-area: autoval;
+}
+.db-comunicazioni {
+  grid-area: comunicazioni;
+}
 
 // ── Mobile: restore scroll ────────────────────────────────────────────────────
 @media (max-width: 991px) {
   :host {
     overflow: visible;
     flex: none;
+    min-height: unset;
   }
   .dashboard-grid {
     display: flex;
     flex-direction: column;
     overflow: visible;
     height: auto !important;
+    gap: 0.75rem;
   }
   .student-welcome {
     padding-bottom: 0.5rem;
+  }
+
+  // Blocks: remove overflow:hidden + min-height:0 so they size to content
+  .student-block {
+    overflow: visible;
+    min-height: 160px;
+  }
+
+  // Scrollable areas: give them an explicit min/max so content is visible
+  .block-scroll {
+    min-height: 100px;
+    max-height: 280px;
+    overflow-y: auto;
+  }
+
+  // Autoval block: stack CTA and simulations vertically on mobile
+  .student-block--autoval {
+    flex-direction: column !important;
+    min-height: 220px;
+  }
+  .autoval-cta {
+    min-width: unset;
+    max-width: 100%;
+  }
+  .autoval-divider {
+    width: 100%;
+    height: 1px;
+    align-self: stretch;
+    flex-shrink: 0;
   }
 }
 
@@ -66,9 +111,13 @@
   overflow-y: auto;
   min-height: 0;
 
-  &::-webkit-scrollbar        { width: 4px; }
-  &::-webkit-scrollbar-track  { background: transparent; }
-  &::-webkit-scrollbar-thumb  {
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.18);
     border-radius: 2px;
   }
@@ -109,7 +158,9 @@
   font-size: 0.8rem;
   font-weight: 500;
   text-decoration: none;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
 
   &:hover {
     background-color: var(--syllex-green);
@@ -123,7 +174,9 @@
   background-color: #ffffff;
   color: #1a1a2e;
 
-  h5 { color: #1a1a2e; }
+  h5 {
+    color: #1a1a2e;
+  }
 
   .monitor-icon {
     color: #1976d2;
@@ -200,7 +253,10 @@
   background-color: var(--syllex-green);
   color: #0f1628;
 
-  h5, p { color: #0f1628; }
+  h5,
+  p {
+    color: #0f1628;
+  }
 }
 
 .autoval-cta {
@@ -269,7 +325,9 @@
   font-size: 0.72rem;
   color: rgba(15, 22, 40, 0.6) !important;
 
-  span { color: rgba(15, 22, 40, 0.6) !important; }
+  span {
+    color: rgba(15, 22, 40, 0.6) !important;
+  }
 }
 
 .badge-sim-done {
@@ -284,7 +342,9 @@
 }
 
 .ultima-sim__empty {
-  p { color: rgba(15, 22, 40, 0.55) !important; }
+  p {
+    color: rgba(15, 22, 40, 0.55) !important;
+  }
 }
 
 // ── Comunicazioni ─────────────────────────────────────────────────────────────
@@ -303,10 +363,14 @@
   white-space: nowrap;
   transition: color 0.15s ease;
 
-  &:hover { color: var(--syllex-green); }
+  &:hover {
+    color: var(--syllex-green);
+  }
 }
 
-.opacity-text { opacity: 0.55; }
+.opacity-text {
+  opacity: 0.55;
+}
 
 .empty-state-text {
   color: rgba(255, 255, 255, 0.5);

@@ -27,14 +27,27 @@
   <div class="flex-fill overflow-hidden container-fluid p-0">
     <!-- CHAT UNIFICATA -->
     @if (currentStep() === 2) {
-    <div class="row g-0 h-100 overflow-hidden">
+    <div class="d-flex h-100 overflow-hidden">
       <!-- Sidebar Materie (Solo Studente, visibile su desktop sempre, su mobile solo tab "subjects") -->
       @if (userRole() === 'student') {
       <div
-        class="col-12 col-lg-3 d-flex flex-column h-100 bg-white border-end"
+        class="subject-sidebar d-flex flex-column"
         [class.d-none]="activeTab() !== 'subjects'"
         [class.d-lg-flex]="true"
+        [class.collapsed]="!subjectSidebarOpen()"
       >
+        <!-- Toggle button (Desktop only) -->
+        <button
+          class="subject-toggle-btn d-none d-lg-flex"
+          (click)="subjectSidebarOpen.set(!subjectSidebarOpen())"
+          [title]="subjectSidebarOpen() ? 'Nascondi materie' : 'Mostra materie'"
+        >
+          <fa-icon
+            [icon]="subjectSidebarOpen() ? faChevronLeft : faChevronRight"
+          ></fa-icon>
+        </button>
+
+        @if (subjectSidebarOpen()) {
         <div class="p-4 border-bottom">
           <h6 class="text-primary text-uppercase ls-wide small fw-bold mb-0">
             Le Tue Materie
@@ -53,12 +66,14 @@
             }
           </div>
         </div>
+        }
       </div>
       }
 
       <!-- Area Chat Principal -->
       <div
-        class="col d-flex flex-column h-100 position-relative"
+        class="flex-fill d-flex flex-column h-100 position-relative"
+        style="min-width: 0"
         [class.d-none]="userRole() === 'student' && activeTab() !== 'chat'"
         [class.d-lg-flex]="true"
       >

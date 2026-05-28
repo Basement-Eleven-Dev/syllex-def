@@ -1,1 +1,30 @@
-<p>agent works!</p>
+<!-- Subject selector strip -->
+<div class="agent-header flex-shrink-0 pb-4">
+  <select
+    class="form-select agent-subject-select"
+    [value]="SelectedSubjectId()"
+    (change)="onSubjectChange($any($event.target).value)"
+  >
+    <option value="">Seleziona una materia...</option>
+    @for (s of Subjects(); track s._id) {
+    <option [value]="s._id">{{ s.name }}</option>
+    }
+  </select>
+</div>
+
+<!-- Chat -->
+@if (AssistantId()) {
+<app-agent-chat
+  [assistantId]="AssistantId()!"
+  [userRole]="'student'"
+></app-agent-chat>
+} @else {
+<div
+  class="agent-empty d-flex flex-column align-items-center justify-content-center flex-fill gap-3"
+>
+  <fa-icon [icon]="RobotIcon" size="3x" class="agent-empty__icon"></fa-icon>
+  <p class="mb-0 agent-empty__text">
+    Seleziona una materia per iniziare la chat con Alex
+  </p>
+</div>
+}

@@ -12,90 +12,132 @@
 } @else if (Error()) {
 <div class="alert alert-danger" role="alert">{{ Error() }}</div>
 } @else if (Attempt(); as attempt) {
-<!-- Header -->
-<div class="d-flex flex-row justify-content-between align-items-start mb-4">
-  <div>
-    <h1 class="text-dark fw-medium mb-2 display-6">Riepilogo test</h1>
-    <p class="text-muted mb-0">
-      {{ attempt.questions.length }} domande &middot; {{ AnsweredCount() }}
-      risposte fornite
-    </p>
-  </div>
-  <div class="d-flex flex-column align-items-end gap-1">
-    <span class="review-status-badge">{{ Status() }}</span>
 
-    @if (attempt.timeSpent > 0) {
-    <span class="text-muted small">
-      <fa-icon [icon]="ClockIcon" class="me-1"></fa-icon>
-      Tempo impiegato: {{ FormattedTimeSpent() }}
-    </span>
-    } @if (attempt.deliveredAt) {
-    <span class="text-muted small">
-      Consegnato il {{ attempt.deliveredAt | date: 'd MMM y, HH:mm' }}
-    </span>
+<!-- ── KPI strip — always visible ───────────────────────────────────────── -->
+<div class="review-kpi-bar">
+  <div class="review-kpi-pill">
+    <span class="kpi-num">{{ attempt.questions.length }}</span>
+    <span class="kpi-lbl">Domande</span>
+  </div>
+
+  <div class="review-kpi-pill">
+    <span class="kpi-num">{{ AnsweredCount() }}</span>
+    <span class="kpi-lbl">Risposte</span>
+  </div>
+
+  @if (attempt.status === 'reviewed') {
+  <div class="review-kpi-pill kpi-correct">
+    <span class="kpi-num">{{ CorrectCount() }}</span>
+    <span class="kpi-lbl">Corrette</span>
+  </div>
+  <div class="review-kpi-pill kpi-wrong">
+    <span class="kpi-num">{{ WrongCount() }}</span>
+    <span class="kpi-lbl">Errate</span>
+  </div>
+  <div class="review-kpi-pill kpi-score">
+    <span class="kpi-num"
+      >{{ Score() }}<span class="kpi-max"> / {{ MaxScore() }}</span></span
+    >
+    <span class="kpi-lbl">Punti</span>
+  </div>
+  }
+
+  <div class="review-kpi-pill kpi-time">
+    <fa-icon [icon]="ClockIcon" class="kpi-icon"></fa-icon>
+    <span class="kpi-num">{{ FormattedTimeSpent() }}</span>
+  </div>
+
+  <span class="review-status-badge ms-auto">{{ Status() }}</span>
+</div>
+
+<!-- ── Navigation bar ───────────────────────────────────────────────────── -->
+<div class="review-nav-bar">
+  <button
+    class="review-nav-btn"
+    (click)="prev()"
+    [disabled]="ActiveIndex() === 0"
+  >
+    <fa-icon [icon]="ChevronLeft"></fa-icon>
+  </button>
+
+  <span class="review-nav-label">
+    <strong>{{ ActiveIndex() + 1 }}</strong>&nbsp;/&nbsp;{{
+    attempt.questions.length }}
+  </span>
+
+  <button
+    class="review-nav-btn"
+    (click)="next()"
+    [disabled]="ActiveIndex() === attempt.questions.length - 1"
+  >
+    <fa-icon [icon]="ChevronRight"></fa-icon>
+  </button>
+
+  @if (attempt.questions.length <= 24) {
+  <div class="review-dots">
+    @for (q of attempt.questions; track $index; let i = $index) {
+    <button
+      class="review-dot"
+      [class.review-dot--active]="i === ActiveIndex()"
+      [class.review-dot--correct]="q.status === 'correct'"
+      [class.review-dot--wrong]="q.status === 'wrong' || q.status === 'incorrect'"
+      [class.review-dot--partial]="q.status === 'semi-correct' || q.status === 'partial'"
+      (click)="goTo(i)"
+      [title]="'Domanda ' + (i + 1)"
+    ></button>
     }
   </div>
-</div>
-
-<!-- Summary cards (visible only when reviewed) -->
-@if (attempt.status === 'reviewed') {
-<div class="row mb-4">
-  <!-- Punteggio -->
-  <div class="col-12 col-md-4 mb-3">
-    <div class="review-stat h-100">
-      <span class="card-value">
-        {{ Score() }}<span class="reduced">/{{ MaxScore() }}</span>
-      </span>
-      <p class="mb-0 card-description">Punteggio</p>
-    </div>
-  </div>
-
-  <!-- Risposte -->
-  <div class="col-12 col-md-4 mb-3">
-    <div class="review-stat h-100">
-      <div
-        class="d-flex flex-row justify-content-around align-items-center w-100 flex-fill"
-      >
-        <span class="card-value review-correct">
-          {{ CorrectCount() }}
-          <fa-icon [icon]="CorrectIcon" size="xs"></fa-icon>
-        </span>
-        <span class="card-value review-wrong">
-          {{ WrongCount() }}
-          <fa-icon [icon]="WrongIcon" size="xs"></fa-icon>
-        </span>
-      </div>
-      <p class="mb-0 card-description">Riepilogo risposte</p>
-    </div>
-  </div>
-
-  <!-- Tempo impiegato -->
-  <div class="col-12 col-md-4 mb-3">
-    <div class="review-stat h-100">
-      <span class="card-value">{{ FormattedTimeSpent() }}</span>
-      <p class="mb-0 card-description">Tempo impiegato</p>
-    </div>
-  </div>
-</div>
-}
-
-<!-- Questions (read-only) -->
-<div class="d-flex flex-column gap-3 mb-4">
-  @for (q of attempt.questions; track q.question._id; let i = $index) {
-  <div
-    class="w-100"
-    app-question-card
-    [question]="q.question"
-    [index]="i"
-    [showIndex]="true"
-    mode="student"
-    [locked]="true"
-    [selectedAnswer]="q.answer"
-    [score]="q.score ?? null"
-    [questionStatus]="(q.status === 'pending' ? null : q.status) ?? null"
-    [teacherFeedback]="q.teacherComment ?? null"
-    [feedbackLabel]="FeedbackLabel()"
-  ></div>
   }
 </div>
+
+<!-- ── Carousel viewport ─────────────────────────────────────────────────── -->
+<div class="review-carousel-viewport" #viewport>
+  @for (q of attempt.questions; track q.question._id; let i = $index) {
+  <div
+    class="review-slide"
+    [class.review-slide--active]="i === ActiveIndex()"
+    (click)="goTo(i)"
+  >
+    <!-- Question card — score=null suppresses internal 'Punteggio: X' -->
+    <div
+      class="review-slide-qcard"
+      app-question-card
+      [question]="q.question"
+      [index]="i"
+      [showIndex]="true"
+      mode="student"
+      [locked]="true"
+      [selectedAnswer]="q.answer"
+      [score]="null"
+      [questionStatus]="(q.status === 'pending' ? null : q.status) ?? null"
+      [teacherFeedback]="q.teacherComment ?? null"
+      [feedbackLabel]="FeedbackLabel()"
+    ></div>
+
+    <!-- Footer: status badge (left) · score chip (right) -->
+    @if (attempt.status === 'reviewed' || (q.status && q.status !== 'pending'))
+    {
+    <div class="review-card-footer">
+      @if (q.status && q.status !== 'pending') {
+      <span
+        class="review-q-badge"
+        [class.review-q-badge--correct]="q.status === 'correct'"
+        [class.review-q-badge--wrong]="q.status === 'wrong' || q.status === 'incorrect'"
+        [class.review-q-badge--partial]="q.status === 'semi-correct' || q.status === 'partial'"
+      >
+        @if (q.status === 'correct') { Corretta } @else if (q.status === 'wrong'
+        || q.status === 'incorrect') { Errata } @else { Parziale }
+      </span>
+      } @else { <span></span> } @if (attempt.status === 'reviewed') {
+      <span class="review-score-chip">
+        <fa-icon [icon]="ScaleIcon" class="me-1"></fa-icon>
+        {{ q.score ?? 0 }} / {{ q.points ?? 1 }}
+      </span>
+      }
+    </div>
+    }
+  </div>
+  }
+</div>
+
 }
