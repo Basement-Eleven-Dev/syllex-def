@@ -16,12 +16,12 @@
 }
 
 // Dark overrides for filter pills inside student theme
-:host {
+:host ::ng-deep {
   app-syllex-search-input,
   app-syllex-select-input {
     .filter-input-pill {
       background-color: rgba(255, 255, 255, 0.08) !important;
-      border-color: rgba(255, 255, 255, 0.15) !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
       color: rgba(255, 255, 255, 0.9) !important;
 
       &::placeholder {
@@ -30,6 +30,7 @@
 
       input {
         color: rgba(255, 255, 255, 0.9) !important;
+        background: transparent !important;
         &::placeholder {
           color: rgba(255, 255, 255, 0.45) !important;
         }
@@ -37,6 +38,7 @@
 
       .input-group-text {
         color: rgba(255, 255, 255, 0.5) !important;
+        background: transparent !important;
       }
 
       &.form-select {
@@ -48,5 +50,49 @@
         }
       }
     }
+  }
+}
+
+@media (max-width: 767px) {
+  .tests-filter-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.75rem !important;
+
+    app-syllex-search-input,
+    app-syllex-select-input,
+    app-syllex-button {
+      max-width: 100% !important;
+      width: 100% !important;
+      flex: 1 1 auto !important;
+
+      ::ng-deep {
+        .filter-input-pill,
+        .btn-syllex {
+          width: 100% !important;
+        }
+      }
+    }
+  }
+
+  .pagination-row {
+    flex-direction: column !important;
+    gap: 1.25rem !important;
+    align-items: center !important;
+  }
+}
+
+.student-switch {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+
+  &:checked {
+    background-color: var(--student-primary, #6366f1) !important;
+    border-color: var(--student-primary, #6366f1) !important;
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25) !important;
   }
 }

@@ -19,6 +19,7 @@ import {
   SyllexSelectInput,
   SelectOption,
 } from '../../../teacher/components/UI/syllex-select-input/syllex-select-input';
+import { SyllexButton } from '../../../teacher/components/UI/syllex-button/syllex-button';
 
 type AttemptStatus = 'in-progress' | 'delivered' | 'reviewed';
 
@@ -34,6 +35,7 @@ type AttemptStatus = 'in-progress' | 'delivered' | 'reviewed';
     SyllexPageHeader,
     SyllexSearchInput,
     SyllexSelectInput,
+    SyllexButton,
   ],
   templateUrl: './student-tests-list.html',
   styleUrl: './student-tests-list.scss',

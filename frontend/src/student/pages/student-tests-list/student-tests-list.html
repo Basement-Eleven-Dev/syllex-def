@@ -2,15 +2,12 @@
   title="Test disponibili"
   description="Qui trovi i test che puoi svolgere per le tue materie."
 >
-  <a
-    class="btn btn-gradient-secondary btn-lg py-2 px-4"
-    routerLink="/s/auto-evaluation/create"
-  >
-    Crea un test di autovalutazione
-  </a>
+  <app-syllex-button
+    [props]="{ label: 'Crea un test di autovalutazione', variant: 'primary', color: 'primary', size: 'large', link: '/s/auto-evaluation/create', leftIcon: PlusIcon }"
+  />
 </app-syllex-page-header>
 
-<section class="d-flex flex-row flex-wrap mb-5 gap-3 align-items-center">
+<section class="tests-filter-bar d-flex flex-row flex-wrap mb-5 gap-3 align-items-center">
   <app-syllex-search-input
     placeholder="Cerca test..."
     [value]="SearchTerm()"
@@ -26,24 +23,20 @@
     style="min-width: 180px; flex: 0 0 auto"
   />
 
-  <button
-    type="button"
-    class="btn rounded-pill px-4"
-    [class.btn-primary]="ShowOnlyPending()"
-    [class.btn-outline-secondary]="!ShowOnlyPending()"
-    (click)="toggleDaFare()"
-  >
-    Da Fare
-  </button>
-
-  <button
-    type="button"
-    class="btn btn-outline-danger rounded-pill px-3"
-    (click)="clearFilters()"
-    title="Pulisci filtri"
-  >
-    <fa-icon [icon]="ClearIcon"></fa-icon>
-  </button>
+  <div class="d-flex align-items-center gap-2 form-check form-switch cursor-pointer" style="cursor: pointer;">
+    <input
+      class="form-check-input student-switch"
+      type="checkbox"
+      role="switch"
+      id="switchDaSvolgere"
+      [checked]="ShowOnlyPending()"
+      (change)="toggleDaFare()"
+      style="width: 2.5rem; height: 1.25rem; cursor: pointer;"
+    />
+    <label class="form-check-label mb-0 text-white-50" for="switchDaSvolgere" style="font-size: 0.95rem; cursor: pointer; user-select: none;">
+      Test da svolgere
+    </label>
+  </div>
 </section>
 
 <div class="stc-grid">
@@ -64,7 +57,7 @@
 
 @if (!ShowOnlyPending()) {
 <div
-  class="mt-5 d-flex flex-row justify-content-between align-items-center mb-5"
+  class="pagination-row mt-5 d-flex flex-row justify-content-between align-items-center mb-5"
 >
   <app-syllex-pagination
     [collectionSize]="CollectionSize()"
