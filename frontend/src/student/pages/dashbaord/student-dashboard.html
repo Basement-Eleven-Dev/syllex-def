@@ -1,14 +1,16 @@
 <!-- Compact welcome strip -->
 <div class="student-welcome">
   <h5 class="fw-semibold mb-0">
-    Ciao @if(User()){ {{ User()?.firstName || User()?.username }} } @else { ... }
+    Ciao @if(User()){ {{ User()?.firstName || User()?.username }} } @else { ...
+    }
   </h5>
-  <p class="mb-0 small opacity-text">Ecco un riepilogo delle tue attività e performance.</p>
+  <p class="mb-0 small opacity-text">
+    Ecco un riepilogo delle tue attività e performance.
+  </p>
 </div>
 
 <!-- ─── No-Scroll Dashboard Grid ─────────────────────────────────────────── -->
 <div class="dashboard-grid">
-
   <!-- ── TOP-LEFT: Inizia a studiare ──────────────────────────────────────── -->
   <div class="student-block student-block--study db-study d-flex flex-column">
     <div class="d-flex align-items-center gap-3 mb-3 flex-shrink-0">
@@ -22,17 +24,23 @@
     </div>
     <div class="subject-pills flex-grow-1">
       @for (subject of Subjects(); track subject._id) {
-        <a [routerLink]="['/s/tests']" [queryParams]="{ subjectId: subject._id }" class="subject-pill">
-          {{ subject.name }}
-        </a>
+      <a
+        [routerLink]="['/s/tests']"
+        [queryParams]="{ subjectId: subject._id }"
+        class="subject-pill"
+      >
+        {{ subject.name }}
+      </a>
       } @empty {
-        <span class="opacity-text small">Nessuna materia disponibile</span>
+      <span class="opacity-text small">Nessuna materia disponibile</span>
       }
     </div>
   </div>
 
   <!-- ── TOP-CENTER: Monitora lo studio ───────────────────────────────────── -->
-  <div class="student-block student-block--monitor db-monitor d-flex flex-column">
+  <div
+    class="student-block student-block--monitor db-monitor d-flex flex-column"
+  >
     <div class="d-flex align-items-center gap-2 mb-1 flex-shrink-0">
       <fa-icon [icon]="PieIcon" class="monitor-icon"></fa-icon>
       <h5 class="fw-semibold mb-0">Monitora lo studio</h5>
@@ -55,14 +63,16 @@
 
   <!-- ── TOP-RIGHT: Test disponibili ─────────────────────────────────────── -->
   <div class="student-block student-block--tests db-tests d-flex flex-column">
-    <div class="d-flex align-items-center justify-content-between mb-3 flex-shrink-0">
+    <div
+      class="d-flex align-items-center justify-content-between mb-3 flex-shrink-0"
+    >
       <h5 class="fw-semibold mb-0">
         <fa-icon [icon]="TestIcon" class="me-2 opacity-text"></fa-icon>
         Test disponibili
       </h5>
       <div class="d-flex align-items-center gap-2">
         @if (RecentTests().length > 0) {
-          <span class="badge-count">+{{ RecentTests().length }}</span>
+        <span class="badge-count">+{{ RecentTests().length }}</span>
         }
         <a routerLink="/s/tests" class="student-link-arrow">
           Tutti <fa-icon [icon]="ArrowRight" class="ms-1"></fa-icon>
@@ -71,26 +81,33 @@
     </div>
     <div class="flex-grow-1 block-scroll">
       @for (test of RecentTests(); track test._id) {
-        <div class="mb-2">
-          <app-student-test-card-compact
-            [Test]="test"
-            [AttemptStatus]="getAttemptStatus(test._id)"
-            [AttemptScore]="getAttemptScore(test._id)"
-          />
-        </div>
+      <div class="mb-2">
+        <app-student-test-card-compact
+          [Test]="test"
+          [AttemptStatus]="getAttemptStatus(test._id)"
+          [AttemptScore]="getAttemptScore(test._id)"
+        />
+      </div>
       } @empty {
-        <p class="empty-state-text mb-0">Nessun test disponibile al momento.</p>
+      <p class="empty-state-text mb-0">Nessun test disponibile al momento.</p>
       }
     </div>
   </div>
 
   <!-- ── BOTTOM-LEFT: Autovalutazione (lime green, split) ─────────────────── -->
-  <div class="student-block student-block--autoval db-autoval d-flex flex-row gap-4">
+  <div
+    class="student-block student-block--autoval db-autoval d-flex flex-row gap-4"
+  >
     <!-- Left: CTA -->
     <div class="autoval-cta d-flex flex-column">
       <h5 class="fw-semibold mb-2">Autovalutazione</h5>
-      <p class="autoval-subtitle mb-auto">Che ne dici di metterti alla prova?</p>
-      <a routerLink="/s/auto-evaluation/create" class="btn btn-autoval-create mt-3">
+      <p class="autoval-subtitle mb-auto">
+        Che ne dici di metterti alla prova?
+      </p>
+      <a
+        routerLink="/s/auto-evaluation/create"
+        class="btn btn-autoval-create mt-3"
+      >
         + Nuovo test di autovalutazione
       </a>
     </div>
@@ -101,40 +118,44 @@
       <p class="ultima-sim__label flex-shrink-0">Ultima simulazione</p>
       <div class="flex-grow-1 block-scroll">
         @for (test of CompletedTests(); track test._id) {
-          <div class="sim-card mb-2">
-            <div class="d-flex justify-content-between align-items-start mb-1">
-              <span class="fw-medium sim-name">{{ test.name }}</span>
-              <span class="badge-sim-done">Completato</span>
-            </div>
-            <div class="d-flex gap-3 sim-meta">
-              <span>
-                <fa-icon [icon]="TestIcon" class="me-1"></fa-icon>
-                {{ test.questions?.length ?? 0 }} domande
-              </span>
-              @if (getAttemptScore(test._id); as score) {
-                <span>{{ score.score }}/{{ score.maxScore }} pt</span>
-              }
-            </div>
+        <div class="sim-card mb-2">
+          <div class="d-flex justify-content-between align-items-start mb-1">
+            <span class="fw-medium sim-name">{{ test.name }}</span>
+            <span class="badge-sim-done">Completato</span>
           </div>
+          <div class="d-flex gap-3 sim-meta">
+            <span>
+              <fa-icon [icon]="TestIcon" class="me-1"></fa-icon>
+              {{ test.questions?.length ?? 0 }} domande
+            </span>
+            @if (getAttemptScore(test._id); as score) {
+            <span>{{ score.score }}/{{ score.maxScore }} pt</span>
+            }
+          </div>
+        </div>
         } @empty {
-          <div class="ultima-sim__empty">
-            <p class="mb-0 small">Nessuna simulazione ancora effettuata</p>
-          </div>
+        <div class="ultima-sim__empty">
+          <p class="mb-0 small">Nessuna simulazione ancora effettuata</p>
+        </div>
         }
       </div>
     </div>
   </div>
 
   <!-- ── BOTTOM-RIGHT: Comunicazioni ──────────────────────────────────────── -->
-  <div class="student-block student-block--comunicazioni db-comunicazioni d-flex flex-column">
-    <div class="d-flex align-items-center justify-content-between mb-3 flex-shrink-0">
+  <div
+    class="student-block student-block--comunicazioni db-comunicazioni d-flex flex-column"
+  >
+    <div
+      class="d-flex align-items-center justify-content-between mb-3 flex-shrink-0"
+    >
       <h5 class="fw-semibold mb-0">
-        <fa-icon [icon]="MegaphoneIcon" class="me-2 opacity-text"></fa-icon>
+        <fa-icon [icon]="BellIcon" class="me-2 opacity-text"></fa-icon>
         Comunicazioni
       </h5>
       <div class="d-flex align-items-center gap-2">
         @if (RecentComunicazioni().length > 0) {
-          <span class="badge-count">+{{ RecentComunicazioni().length }}</span>
+        <span class="badge-count">+{{ RecentComunicazioni().length }}</span>
         }
         <a routerLink="/s/comunicazioni" class="student-link-arrow">
           Tutte <fa-icon [icon]="ArrowRight" class="ms-1"></fa-icon>
@@ -143,11 +164,14 @@
     </div>
     <div class="flex-grow-1 block-scroll">
       @for (com of RecentComunicazioni(); track $index) {
-        <div app-student-comunicazione-card [comunicazione]="com" class="mb-2"></div>
+      <div
+        app-student-comunicazione-card
+        [comunicazione]="com"
+        class="mb-2"
+      ></div>
       } @empty {
-        <p class="empty-state-text mb-0">Nessuna comunicazione recente.</p>
+      <p class="empty-state-text mb-0">Nessuna comunicazione recente.</p>
       }
     </div>
   </div>
-
 </div>

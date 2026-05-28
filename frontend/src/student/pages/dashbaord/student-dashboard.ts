@@ -23,7 +23,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faChartPie,
   faVial,
-  faBullhorn,
+  faBell,
   faArrowRight,
   faRobot,
 } from '@fortawesome/pro-solid-svg-icons';
@@ -60,7 +60,7 @@ export class StudentDashboard implements OnInit {
 
   readonly PieIcon = faChartPie;
   readonly TestIcon = faVial;
-  readonly MegaphoneIcon = faBullhorn;
+  readonly BellIcon = faBell;
   readonly ArrowRight = faArrowRight;
   readonly RobotIcon = faRobot;
 

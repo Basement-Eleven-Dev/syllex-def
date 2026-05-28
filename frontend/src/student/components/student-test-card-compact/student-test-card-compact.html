@@ -1,49 +1,53 @@
-<div class="compact-test-card" [routerLink]="Route()">
-  <div class="compact-test-card__header">
-    <div class="compact-test-card__title-section">
-      <h4 class="compact-test-card__title">{{ Test().name }}</h4>
-      <span class="compact-test-card__subject">{{ Test().subjectName }}</span>
-    </div>
-  </div>
+<div class="ctc" [routerLink]="Route()">
 
-  @if (ShowScore()) {
-  <div class="compact-test-card__score">
-    <fa-icon [icon]="TrophyIcon" class="score-icon"></fa-icon>
-    <span class="score-value">{{ AttemptScore()!.score }}</span>
-    <span class="score-sep">/</span>
-    <span class="score-max">{{ AttemptScore()!.maxScore }} pt</span>
-  </div>
-  }
-
-  <!--   <div class="compact-test-card__details">
-    <div class="compact-test-card__detail-item">
-      <fa-icon [icon]="QuestionsIcon" class="detail-icon"></fa-icon>
-      <span>{{ QuestionsCount() }} domande</span>
+  <!-- ── Left: title, badge, metadata ─────────────────────────────────────── -->
+  <div class="ctc__info">
+    <div class="ctc__title-row">
+      <h6 class="ctc__title">{{ Test().name }}</h6>
+      @if (!AttemptStatus()) {
+        <span class="ctc__badge-new">Nuovo</span>
+      }
     </div>
-    <div class="compact-test-card__detail-item">
-      <fa-icon [icon]="ClockIcon" class="detail-icon"></fa-icon>
-      <span class="detail-date">
-        @if (Test().availableFrom) { fino al {{ Test().availableTo | date: 'd
-        MMM' }} }
+    <div class="ctc__meta">
+      <span class="ctc__meta-item">
+        <fa-icon [icon]="QuestionsIcon" class="ctc__meta-icon"></fa-icon>
+        {{ QuestionsCount() }} domande
       </span>
+      <span class="ctc__meta-item">
+        <fa-icon [icon]="TrophyIcon" class="ctc__meta-icon"></fa-icon>
+        {{ MaxScore() }} punti
+      </span>
+      @if (Test().availableTo) {
+        <span class="ctc__meta-date">{{ Test().availableTo | date: 'dd.MM.yyyy' }}</span>
+      }
     </div>
-  </div> -->
+  </div>
 
-  <button
-    class="compact-test-card__button"
-    [class.button--in-progress]="AttemptStatus() === 'in-progress'"
-    [class.button--completed]="IsCompleted()"
-    [class.button--pending]="!AttemptStatus()"
-    (click)="$event.preventDefault()"
-  >
-    @if (AttemptStatus() === 'reviewed') {
-    <fa-icon [icon]="ReviewIcon"></fa-icon>
-    Rivedi } @else if (AttemptStatus() === 'delivered') {
-    <fa-icon [icon]="ReviewIcon"></fa-icon>
-    Rivedi } @else if (AttemptStatus() === 'in-progress') {
-    <fa-icon [icon]="ResumeIcon"></fa-icon>
-    Riprendi } @else {
-    <fa-icon [icon]="PlayIcon"></fa-icon>
-    Compila }
-  </button>
+  <!-- ── Right: score badge + action button ────────────────────────────────── -->
+  <div class="ctc__actions">
+    @if (ShowScore()) {
+      <div class="ctc__score">
+        <fa-icon [icon]="TrophyIcon" class="ctc__score-icon"></fa-icon>
+        <span class="ctc__score-value">
+          {{ AttemptScore()!.score }} / {{ AttemptScore()!.maxScore }} pt
+        </span>
+      </div>
+    }
+    <button
+      class="ctc__btn"
+      [class.ctc__btn--pending]="!AttemptStatus()"
+      [class.ctc__btn--in-progress]="AttemptStatus() === 'in-progress'"
+      [class.ctc__btn--completed]="IsCompleted()"
+      (click)="$event.stopPropagation(); $event.preventDefault()"
+    >
+      @if (AttemptStatus() === 'reviewed' || AttemptStatus() === 'delivered') {
+        <fa-icon [icon]="ReviewIcon"></fa-icon> Rivedi
+      } @else if (AttemptStatus() === 'in-progress') {
+        <fa-icon [icon]="ResumeIcon"></fa-icon> Riprendi
+      } @else {
+        <fa-icon [icon]="PlayIcon"></fa-icon> Compila
+      }
+    </button>
+  </div>
+
 </div>

@@ -2,8 +2,13 @@ import { Component, inject, Input, OnInit, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { IconDefinition } from '@fortawesome/pro-solid-svg-icons';
+import {
+  IconDefinition,
+  faClock,
+  faArrowRight,
+} from '@fortawesome/pro-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { RouterModule } from '@angular/router';
 import { ComunicazioneInterface } from '../../../services/comunicazioni-service';
 import { MaterialInterface } from '../../../services/materiali/materiali-service';
 import { FileViewer } from '../.././../teacher/components/file-viewer/file-viewer';
@@ -13,7 +18,7 @@ import { Materia } from '../../../services/materia';
 @Component({
   selector: 'div[app-student-comunicazione-card]',
   standalone: true,
-  imports: [DatePipe, FontAwesomeModule],
+  imports: [DatePipe, FontAwesomeModule, RouterModule],
   templateUrl: './student-comunicazione-card.html',
   styleUrl: './student-comunicazione-card.scss',
 })
@@ -22,6 +27,9 @@ export class StudentComunicazioneCard implements OnInit {
 
   protected readonly materiaService = inject(Materia);
 
+  readonly ClockIcon = faClock;
+  readonly ArrowIcon = faArrowRight;
+
   readonly attachments = signal<MaterialInterface[]>([]);
   readonly loading = signal(false);
 
@@ -29,6 +37,12 @@ export class StudentComunicazioneCard implements OnInit {
     private http: HttpClient,
     private modalService: NgbModal,
   ) {}
+
+  isNew(): boolean {
+    if (!this.comunicazione?.createdAt) return true;
+    const created = new Date(this.comunicazione.createdAt).getTime();
+    return Date.now() - created < 7 * 24 * 60 * 60 * 1000;
+  }
 
   ngOnInit(): void {
     const ids = this.comunicazione?.materialIds;
