@@ -52,4 +52,10 @@
 
 .calendar-section {
   background: transparent;
+
+  // Override month label and nav arrows: text-primary inherits lime in student theme
+  ::ng-deep .rounded-pill span.text-primary,
+  ::ng-deep .rounded-pill .btn.text-primary {
+    color: #1b2f6b !important;
+  }
 }
