@@ -363,6 +363,18 @@ const QUESTIONS_ROUTES: FunctionIntegration[] = [
     role: "teacher",
   },
   {
+    apiRoute: "questions/batch",
+    functionPath: "questions/createQuestionsBatch.ts",
+    method: "post",
+    role: "teacher",
+  },
+  {
+    apiRoute: "questions/list",
+    functionPath: "questions/getQuestionsBatch.ts",
+    method: "post",
+    role: "logged",
+  },
+  {
     apiRoute: "questions/{questionId}",
     functionPath: "questions/editQuestion.ts",
     method: "put",
@@ -483,13 +495,13 @@ const ASSISTANTS_ROUTES: FunctionIntegration[] = [
     role: "logged",
   },
   {
-    apiRoute: "messages/{messageId}",
+    apiRoute: "messages/{conversationId}",
     functionPath: "messages/deleteConversation.ts",
     method: "delete",
     role: "logged",
   },
   {
-    apiRoute: "messages/{messageId}/generate-audio",
+    apiRoute: "messages/{conversationId}/generate-audio",
     functionPath: "messages/listenTomessage.ts",
     method: "post",
     role: "logged",
