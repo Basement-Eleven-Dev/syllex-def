@@ -1,5 +1,4 @@
 <div class="stc d-flex flex-column" [routerLink]="Route()">
-
   <!-- ── Header: subject chip + type icon ──────────────────────────────── -->
   <div class="stc__header-row">
     <span class="stc__subject-chip">{{ Test().subjectName }}</span>
@@ -27,20 +26,36 @@
     </span>
   </div>
 
-  <!-- ── Availability dates (only when not yet completed) ──────────────── -->
-  @if (!IsCompleted() && (Test().availableFrom || Test().availableTo)) {
-    <div class="stc__info-row">
-      <fa-icon [icon]="CalendarIcon" class="stc__cal-icon"></fa-icon>
-      <span>
-        @if (Test().availableFrom && Test().availableTo) {
-          dal {{ Test().availableFrom | date: 'dd/MM/yy' }} al {{ Test().availableTo | date: 'dd/MM/yy' }}
-        } @else if (Test().availableFrom) {
-          dal {{ Test().availableFrom | date: 'dd/MM/yy' }}
-        } @else {
-          fino al {{ Test().availableTo | date: 'dd/MM/yy' }}
-        }
-      </span>
-    </div>
+  <!-- ── Info row: esito (se completato) oppure date disponibilità ──────── -->
+  @if (IsCompleted() && AttemptResult()) { @if (AttemptResult()!.correct === 0
+  && AttemptResult()!.wrong === 0) {
+  <div class="stc__info-row stc__info-row--pending-review">
+    <span>Da valutare</span>
+  </div>
+  } @else {
+  <div class="stc__info-row stc__info-row--esito">
+    <span class="stc__esito-label">Esito:</span>
+    <span class="stc__esito-correct">
+      <fa-icon [icon]="CheckIcon" class="stc__esito-check-icon"></fa-icon>
+      {{ AttemptResult()!.correct }} corrette
+    </span>
+    <span class="stc__esito-wrong">
+      <fa-icon [icon]="XmarkIcon" class="stc__esito-xmark-icon"></fa-icon>
+      {{ AttemptResult()!.wrong }} errate
+    </span>
+  </div>
+  } } @else if (!IsCompleted() && (Test().availableFrom || Test().availableTo))
+  {
+  <div class="stc__info-row">
+    <fa-icon [icon]="CalendarIcon" class="stc__cal-icon"></fa-icon>
+    <span>
+      @if (Test().availableFrom && Test().availableTo) { dal {{
+      Test().availableFrom | date: 'dd/MM/yy' }} al {{ Test().availableTo |
+      date: 'dd/MM/yy' }} } @else if (Test().availableFrom) { dal {{
+      Test().availableFrom | date: 'dd/MM/yy' }} } @else { fino al {{
+      Test().availableTo | date: 'dd/MM/yy' }} }
+    </span>
+  </div>
   }
 
   <!-- ── Action button ─────────────────────────────────────────────────── -->
@@ -52,12 +67,8 @@
     [routerLink]="Route()"
   >
     @if (AttemptStatus() === 'reviewed' || AttemptStatus() === 'delivered') {
-      <fa-icon [icon]="ReviewIcon"></fa-icon> Rivedi
-    } @else if (AttemptStatus() === 'in-progress') {
-      <fa-icon [icon]="ResumeIcon"></fa-icon> Riprendi
-    } @else {
-      <fa-icon [icon]="PlayIcon"></fa-icon> Fai il test
-    }
+    <fa-icon [icon]="ReviewIcon"></fa-icon> Rivedi } @else if (AttemptStatus()
+    === 'in-progress') { <fa-icon [icon]="ResumeIcon"></fa-icon> Riprendi }
+    @else { <fa-icon [icon]="PlayIcon"></fa-icon> Fai il test }
   </button>
-
 </div>

@@ -5,12 +5,14 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faCalendarDays,
   faChalkboardUser,
+  faCheck,
   faEye,
   faPlay,
   faQuestionCircle,
   faRotateRight,
   faTrophy,
   faVial,
+  faXmark,
 } from '@fortawesome/pro-solid-svg-icons';
 import { StudentTestInterface } from '../../../services/student-tests.service';
 
@@ -26,6 +28,9 @@ type AttemptStatus = 'in-progress' | 'delivered' | 'reviewed';
 export class StudentTestCard {
   readonly Test = input.required<StudentTestInterface>();
   readonly AttemptStatus = input<AttemptStatus | null>(null);
+  readonly AttemptResult = input<{ correct: number; wrong: number } | null>(
+    null,
+  );
 
   readonly QuestionsIcon = faQuestionCircle;
   readonly TrophyIcon = faTrophy;
@@ -35,6 +40,8 @@ export class StudentTestCard {
   readonly PlayIcon = faPlay;
   readonly ResumeIcon = faRotateRight;
   readonly ReviewIcon = faEye;
+  readonly CheckIcon = faCheck;
+  readonly XmarkIcon = faXmark;
 
   readonly QuestionsCount = computed(() => this.Test().questions?.length ?? 0);
 

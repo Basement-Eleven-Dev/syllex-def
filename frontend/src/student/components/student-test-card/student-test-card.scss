@@ -96,7 +96,7 @@
   opacity: 0.7;
 }
 
-// ── Availability row ──────────────────────────────────────────────────────────
+// ── Availability / esito row ──────────────────────────────────────────────────
 .stc__info-row {
   display: flex;
   align-items: center;
@@ -110,6 +110,51 @@
   span {
     color: inherit !important;
   }
+
+  &--esito {
+    background: rgba(255, 255, 255, 0.06);
+    gap: 0.5rem;
+  }
+
+  &--pending-review {
+    background: rgba(255, 190, 50, 0.1);
+    color: rgba(255, 200, 80, 0.9) !important;
+    span {
+      color: inherit !important;
+    }
+  }
+}
+
+.stc__esito-label {
+  color: rgba(255, 255, 255, 0.45) !important;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-right: 0.1rem;
+}
+
+.stc__esito-correct {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--syllex-green) !important;
+  font-weight: 600;
+}
+
+.stc__esito-wrong {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #ff6b6b !important;
+  font-weight: 600;
+}
+
+// Explicit icon colors (bypasses global .student-theme span override)
+.stc__esito-check-icon {
+  color: var(--syllex-green) !important;
+}
+.stc__esito-xmark-icon {
+  color: #ff6b6b !important;
 }
 
 .stc__cal-icon {

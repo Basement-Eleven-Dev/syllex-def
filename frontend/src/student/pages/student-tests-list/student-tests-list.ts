@@ -1,4 +1,4 @@
-import { Component, signal, inject, effect } from '@angular/core';
+import { Component, signal, computed, inject, effect } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faBroom, faPlus } from '@fortawesome/pro-solid-svg-icons';
@@ -49,6 +49,10 @@ export class StudentTestsList {
 
   readonly Tests = signal<StudentTestInterface[]>([]);
   readonly AttemptStatusMap = signal<Map<string, AttemptStatus>>(new Map());
+  readonly AttemptResultMap = signal<
+    Map<string, { correct: number; wrong: number }>
+  >(new Map());
+  readonly ShowOnlyPending = signal(false);
   readonly SearchTerm = signal('');
   readonly SelectedSubject = signal('');
 
@@ -58,6 +62,12 @@ export class StudentTestsList {
   readonly CollectionSize = signal(0);
 
   readonly Subjects = this.materiaService.allMaterie;
+
+  readonly FilteredTests = computed(() => {
+    if (!this.ShowOnlyPending()) return this.Tests();
+    const map = this.AttemptStatusMap();
+    return this.Tests().filter((t) => !map.has(t._id));
+  });
 
   readonly SubjectOptions = (): SelectOption[] =>
     this.Subjects().map((s) => ({ value: s._id, label: s.name }));
@@ -111,8 +121,19 @@ export class StudentTestsList {
     this.Page.set(1);
   }
 
+  toggleDaFare() {
+    const next = !this.ShowOnlyPending();
+    this.ShowOnlyPending.set(next);
+    this.Page.set(1);
+    this.PageSize.set(next ? 500 : 8);
+  }
+
   getAttemptStatus(testId: string): AttemptStatus | null {
     return this.AttemptStatusMap().get(testId) ?? null;
+  }
+
+  getAttemptResult(testId: string): { correct: number; wrong: number } | null {
+    return this.AttemptResultMap().get(testId) ?? null;
   }
 
   private checkAttemptStatuses(tests: StudentTestInterface[]): void {
@@ -127,6 +148,18 @@ export class StudentTestsList {
               this.AttemptStatusMap.update((map) => {
                 const updated = new Map(map);
                 updated.set(test._id, attempt.status);
+                return updated;
+              });
+              const correct = attempt.questions.filter(
+                (q) => q.status === 'correct',
+              ).length;
+              const wrong = attempt.questions.filter(
+                (q) =>
+                  q.status && q.status !== 'correct' && q.status !== 'pending',
+              ).length;
+              this.AttemptResultMap.update((map) => {
+                const updated = new Map(map);
+                updated.set(test._id, { correct, wrong });
                 return updated;
               });
             }
