@@ -21,59 +21,70 @@
   />
 </app-syllex-page-header>
 @if (Comunicazioni().length === 0) {
-  <div class="mb-5">
-    <div class="mb-3">
-      <h2 class="fs-2 fw-semibold mb-0">Comunicazioni recenti</h2>
-    </div>
-    <app-syllex-empty-state
-      title="Nessuna comunicazione presente"
-      description="Condividi novità, compiti o notizie importanti con i tuoi studenti per tenerli sempre aggiornati in tempo reale."
-      [icon]="MessageIcon"
-      actionLabel="Invia la tua prima Comunicazione"
-      [actionIcon]="PlusIcon"
-      (actionClicked)="openComunicazioneModal()"
-    ></app-syllex-empty-state>
+<div class="mb-5">
+  <div class="mb-3">
+    <h2 class="fs-2 fw-semibold mb-0">Comunicazioni recenti</h2>
   </div>
+  <app-syllex-empty-state
+    title="Nessuna comunicazione presente"
+    description="Condividi novità, compiti o notizie importanti con i tuoi studenti per tenerli sempre aggiornati in tempo reale."
+    [icon]="MessageIcon"
+    actionLabel="Invia la tua prima Comunicazione"
+    [actionIcon]="PlusIcon"
+    (actionClicked)="openComunicazioneModal()"
+  ></app-syllex-empty-state>
+</div>
 } @else {
-  <div class="com-wrapper mb-5" style="padding-top: 35px">
-    <div class="mb-3 flex-shrink-0 px-3 px-lg-4 text-white com-title">
-      <h2 class="fs-2 fw-semibold mb-0">Comunicazioni recenti</h2>
-    </div>
-    <div
-      class="com-scroll"
-      (wheel)="onComScroll($event)"
-      (mousedown)="onDragStart($event)"
-      (mousemove)="onDragMove($event)"
-      (mouseup)="onDragEnd()"
-      (mouseleave)="onDragEnd()"
-    >
-      @for(com of Comunicazioni(); track com._id) {
-      <div class="com-item">
-        <div
-          class="p-4 rounded-5 h-100 communication-item-card bg-white com-card d-flex flex-column shadow-sm"
-        >
-          <p class="fs-4 m-0 com-item-title">
-            {{ com.title.substring(0, 18) + "..." | titlecase }}
-          </p>
-          <p class="mb-2 ellipsis-3-lines flex-grow-1 text-muted com-desc">
-            {{ com.content }}
-          </p>
-          <div class="d-flex justify-content-between align-items-center mt-2">
+<div class="com-wrapper mb-5" style="padding-top: 35px">
+  <div class="mb-3 flex-shrink-0 px-3 px-lg-4 text-white com-title">
+    <h2 class="fs-2 fw-semibold mb-0">Comunicazioni recenti</h2>
+  </div>
+  <div
+    class="com-scroll"
+    (wheel)="onComScroll($event)"
+    (mousedown)="onDragStart($event)"
+    (mousemove)="onDragMove($event)"
+    (mouseup)="onDragEnd()"
+    (mouseleave)="onDragEnd()"
+  >
+    @for(com of Comunicazioni(); track com._id) {
+    <div class="com-item">
+      <div
+        class="p-4 rounded-5 h-100 communication-item-card bg-white com-card d-flex flex-column shadow-sm"
+      >
+        <p class="fs-4 m-0 com-item-title">
+          {{ com.title.substring(0, 18) + "..." | titlecase }}
+        </p>
+        <p class="mb-2 ellipsis-3-lines flex-grow-1 text-muted com-desc">
+          {{ com.content }}
+        </p>
+        <div class="d-flex justify-content-between align-items-center mt-2">
+          <div class="d-flex align-items-center gap-2">
             <span
               class="border-0 px-2 py-1 rounded-pill d-inline-block small text-primary com-date"
             >
               {{ com.createdAt | date:'d MMM yyyy' : '' : 'it' }}
             </span>
-            <app-syllex-button
-              [props]="{ label: 'Apri', variant: 'primary', size: 'small' }"
-              (clicked)="openComunicazioneModal(com._id)"
-            />
+            @if (com.readCount !== undefined) {
+            <span
+              class="badge bg-light text-secondary border small"
+              title="Studenti che hanno letto"
+            >
+              {{ com.readCount }} {{ com.readCount === 1 ? 'lettura' : 'letture'
+              }}
+            </span>
+            }
           </div>
+          <app-syllex-button
+            [props]="{ label: 'Apri', variant: 'primary', size: 'small' }"
+            (clicked)="openComunicazioneModal(com._id)"
+          />
         </div>
       </div>
-      }
     </div>
+    }
   </div>
+</div>
 }
 
 <!-- SEZIONE CALENDARIO -->

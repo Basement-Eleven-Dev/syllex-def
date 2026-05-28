@@ -1,0 +1,25 @@
+.detail-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1b2f6b;
+  line-height: 1.4;
+}
+
+.detail-content {
+  font-size: 0.92rem;
+  color: #374151;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.badge-unread-detail {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background-color: #e8eaf6;
+  color: #3949ab;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
