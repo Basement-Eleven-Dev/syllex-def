@@ -35,8 +35,9 @@ const getCommunications = async (
       filter.teacherId = context.user._id;
     } else if (context.user.role === "student") {
       // Uno studente vede solo le comunicazioni delle sue classi
-      const studentClasses = await Class
-        .find({ students: new Types.ObjectId(context.user._id) } as any)
+      const studentClasses = await Class.find({
+        students: new Types.ObjectId(context.user._id),
+      } as any);
 
       const classIds = studentClasses.map((c) => c._id);
       filter.classIds = { $in: classIds };
@@ -65,7 +66,10 @@ const getCommunications = async (
     const targetClassId = new Types.ObjectId(classId);
     if (filter.classIds) {
       // se c'è già un filtro (es. studente), facciamo intersezione manuale o usiamo $and
-      filter.$and = [{ classIds: targetClassId }, { classIds: filter.classIds }];
+      filter.$and = [
+        { classIds: targetClassId },
+        { classIds: filter.classIds },
+      ];
       delete filter.classIds;
     } else {
       filter.classIds = targetClassId;
@@ -83,14 +87,28 @@ const getCommunications = async (
   }
 
   // Query con paginazione, ordinata per data (più recenti prima)
-  const communications = await Communication
-    .find(filter)
+  const rawCommunications = await Communication.find(filter)
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(currentPageSize)
+    .lean();
 
   // Conto il totale per la paginazione
   const total = await Communication.countDocuments(filter);
+
+  const userId = context.user?._id
+    ? new Types.ObjectId(context.user._id)
+    : null;
+  const isStudent = context.user?.role === "student";
+
+  const communications = rawCommunications.map((com: any) => {
+    const readByList: Types.ObjectId[] = com.readBy ?? [];
+    const readCount = readByList.length;
+    const isRead =
+      isStudent && userId ? readByList.some((id) => id.equals(userId)) : false;
+    const { readBy: _readBy, ...comSafe } = com;
+    return { ...comSafe, isRead, readCount };
+  });
 
   return {
     communications,

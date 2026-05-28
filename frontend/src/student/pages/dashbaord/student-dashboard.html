@@ -3,8 +3,8 @@
   <!-- Desktop Greeting -->
   <div class="d-none d-md-block">
     <h5 class="fw-semibold mb-0 text-white">
-      Ciao @if(User()){ {{ User()?.firstName || User()?.username }} } @else { ...
-      }
+      Ciao @if(User()){ {{ User()?.firstName || User()?.username }} } @else {
+      ... }
     </h5>
     <p class="mb-0 small text-white-50 opacity-75">
       Ecco un riepilogo delle tue attività e performance.
@@ -13,10 +13,16 @@
 
   <!-- Mobile Greeting (Figma high-fidelity style!) -->
   <div class="d-md-none pt-2 mb-2">
-    <h1 class="text-white fw-semibold mb-1" style="font-size: 2.2rem; letter-spacing: -0.02em;">
+    <h1
+      class="text-white fw-semibold mb-1"
+      style="font-size: 2.2rem; letter-spacing: -0.02em"
+    >
       Ciao {{ User()?.firstName || User()?.username || 'Studente' }}
     </h1>
-    <p class="text-white-50 mb-0 fw-medium" style="font-size: 1.15rem; letter-spacing: -0.01em; opacity: 0.85;">
+    <p
+      class="text-white-50 mb-0 fw-medium"
+      style="font-size: 1.15rem; letter-spacing: -0.01em; opacity: 0.85"
+    >
       Come posso aiutarti oggi?
     </p>
   </div>
@@ -26,30 +32,54 @@
 <div class="dashboard-grid">
   <!-- ── TOP-LEFT: Inizia a studiare ──────────────────────────────────────── -->
   <div class="student-block student-block--study db-study d-flex flex-column">
-
-    <div class="d-flex flex-column align-items-center justify-content-center flex-grow-1 text-center w-100 mt-3">
-      <div class="study-mascot-wrap mb-3 d-flex align-items-center justify-content-center">
-        <svg class="study-mascot-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="20" y="20" width="60" height="60" rx="16" fill="#1b2f6b" stroke="#3b82f6" stroke-width="2"/>
+    <div
+      class="d-flex flex-column align-items-center justify-content-center flex-grow-1 text-center w-100 mt-3"
+    >
+      <div
+        class="study-mascot-wrap mb-3 d-flex align-items-center justify-content-center"
+      >
+        <svg
+          class="study-mascot-svg"
+          viewBox="0 0 100 100"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <rect
+            x="20"
+            y="20"
+            width="60"
+            height="60"
+            rx="16"
+            fill="#1b2f6b"
+            stroke="#3b82f6"
+            stroke-width="2"
+          />
           <circle cx="40" cy="45" r="4" fill="#ffffff" />
           <circle cx="60" cy="45" r="4" fill="#ffffff" />
-          <path d="M 70 20 L 75 10 L 80 20 L 90 25 L 80 30 L 75 40 L 70 30 L 60 25 Z" fill="#ffffff"/>
+          <path
+            d="M 70 20 L 75 10 L 80 20 L 90 25 L 80 30 L 75 40 L 70 30 L 60 25 Z"
+            fill="#ffffff"
+          />
         </svg>
       </div>
-      
-      <h3 class=" mb-4 text-white study-main-title">Cosa vorresti ripassare oggi?</h3>
-      
+
+      <h3 class="mb-4 text-white study-main-title">
+        Cosa vorresti ripassare oggi?
+      </h3>
+
       <div class="subject-pills justify-content-center block-scroll">
         @for (subject of Subjects(); track subject._id) {
         <a
-          [routerLink]="['/s/tests']"
-          [queryParams]="{ subjectId: subject._id }"
+          (click)="goToAgentWithSubject(subject)"
           class="subject-pill"
+          style="cursor: pointer"
         >
           {{ subject.name }}
         </a>
         } @empty {
-        <span class="text-white-50 small opacity-75">Nessuna materia disponibile</span>
+        <span class="text-white-50 small opacity-75"
+          >Nessuna materia disponibile</span
+        >
         }
       </div>
     </div>
@@ -60,20 +90,39 @@
     class="student-block student-block--monitor db-monitor d-flex flex-column justify-content-between"
   >
     <div class="d-flex align-items-center gap-2 mb-3 flex-shrink-0">
-      <fa-icon [icon]="PerformanceIcon" class="text-white opacity-75" style="font-size: 1.05rem;"></fa-icon>
-      <span class="fw-semibold text-white-50" style="font-size: 0.88rem;">Performance</span>
+      <fa-icon
+        [icon]="PerformanceIcon"
+        class="text-white opacity-75"
+        style="font-size: 1.05rem"
+      ></fa-icon>
+      <span class="fw-semibold text-white-50" style="font-size: 0.88rem"
+        >Performance</span
+      >
     </div>
-    
-    <div class="d-flex flex-row justify-content-between mt-auto mb-2 w-100 px-1">
+
+    <div
+      class="d-flex flex-row justify-content-between mt-auto mb-2 w-100 px-1"
+    >
       <div class="d-flex flex-column text-start gap-1">
-        <span class="fs-1 fw-extrabold text-white lh-1" style="font-weight: 800; font-size: 3rem !important;">{{ TotalTestsCompleted() }}</span>
-        <span class="text-white-50 fw-semibold" style="font-size: 0.78rem;">Test da svolgere</span>
+        <span
+          class="fs-1 fw-extrabold text-white lh-1"
+          style="font-weight: 800; font-size: 3rem !important"
+          >{{ TotalTestsCompleted() }}</span
+        >
+        <span class="text-white-50 fw-semibold" style="font-size: 0.78rem"
+          >Test da svolgere</span
+        >
       </div>
       <div class="d-flex flex-column text-start gap-1">
-        <span class="fs-1 fw-extrabold text-white lh-1" style="font-weight: 800; font-size: 3rem !important;">
+        <span
+          class="fs-1 fw-extrabold text-white lh-1"
+          style="font-weight: 800; font-size: 3rem !important"
+        >
           {{ AverageScore() }}<span class="fs-4 text-white-50 ms-1">%</span>
         </span>
-        <span class="text-white-50 fw-semibold" style="font-size: 0.78rem;">Rendimento</span>
+        <span class="text-white-50 fw-semibold" style="font-size: 0.78rem"
+          >Rendimento</span
+        >
       </div>
     </div>
   </div>
@@ -84,13 +133,19 @@
       class="d-flex align-items-center justify-content-between mb-3 flex-shrink-0"
     >
       <div class="d-flex align-items-center gap-2">
-        <fa-icon [icon]="ClipboardIcon" class="text-white opacity-75" style="font-size: 1.05rem;"></fa-icon>
-        <h6 class=" mb-0 text-white" style="font-size: 0.88rem;">
+        <fa-icon
+          [icon]="ClipboardIcon"
+          class="text-white opacity-75"
+          style="font-size: 1.05rem"
+        ></fa-icon>
+        <h6 class="mb-0 text-white" style="font-size: 0.88rem">
           Test disponibili creati dal docente
         </h6>
       </div>
-      @if (RecentTests().length > 0) {
-        <span class="text-white-50  small opacity-75">+ {{ RecentTests().length }}</span>
+      @if (TotalTestsCount() > 3) {
+      <span class="text-white-50 small opacity-75"
+        >+ {{ TotalTestsCount() }}</span
+      >
       }
     </div>
     <div class="flex-grow-1 block-scroll pr-1">
@@ -103,7 +158,9 @@
         />
       </div>
       } @empty {
-      <p class="text-white-50 opacity-75 mb-0 small">Nessun test disponibile al momento.</p>
+      <p class="text-white-50 opacity-75 mb-0 small">
+        Nessun test disponibile al momento.
+      </p>
       }
     </div>
   </div>
@@ -113,11 +170,11 @@
     class="student-block student-block--autoval db-autoval d-flex flex-row gap-4"
   >
     <!-- Left: CTA -->
-    <div class="autoval-cta d-flex flex-column justify-content-center  flex-grow-1 py-4">
+    <div
+      class="autoval-cta d-flex flex-column justify-content-center flex-grow-1 py-4"
+    >
       <p>Autovalutazioni</p>
-      <h3 class=" mb-4 autoval-title">
-        Che ne dici di metterti alla prova?
-      </h3>
+      <h3 class="mb-4 autoval-title">Che ne dici di metterti alla prova?</h3>
       <app-syllex-button
         [props]="{
           label: 'Comincia con le simulazioni',
@@ -130,34 +187,51 @@
         class="mt-auto align-self-start"
       ></app-syllex-button>
     </div>
-    
+
     <!-- Right: Ultima simulazione -->
-    <div class="autoval-simulations d-flex flex-column flex-grow-1 justify-content-center py-3">
-      <div class="d-flex justify-content-between align-items-center mb-3 flex-shrink-0">
-        <span class="ultima-sim__label mb-0 text-dark opacity-75 small">Ultime simulazioni</span>
-        <a routerLink="/s/auto-evaluation" class="text-dark small  text-decoration-none d-flex align-items-center gap-1 opacity-75 hover-opacity-100 transition-opacity">
+    <div
+      class="autoval-simulations d-flex flex-column flex-grow-1 justify-content-center py-3"
+    >
+      <div
+        class="d-flex justify-content-between align-items-center mb-3 flex-shrink-0"
+      >
+        <span class="ultima-sim__label mb-0 text-dark opacity-75 small"
+          >Ultime simulazioni</span
+        >
+        <a
+          routerLink="/s/auto-evaluation"
+          class="text-dark small text-decoration-none d-flex align-items-center gap-1 opacity-75 hover-opacity-100 transition-opacity"
+        >
           Vedi tutte <fa-icon [icon]="ArrowRight" class="small"></fa-icon>
         </a>
       </div>
-      
+
       <div class="flex-grow-1 block-scroll pe-2">
         @for (test of CompletedTests(); track test._id) {
         <div class="sim-card mb-2 p-3">
-          <h6 class=" text-dark mb-3">{{ test.name }}</h6>
-          
+          <h6 class="text-dark mb-3">{{ test.name }}</h6>
+
           <!-- Real data: Subject and stats -->
           <div class="d-flex flex-column gap-2 text-dark opacity-75 small">
             <div class="d-flex align-items-center gap-3">
-              <span><fa-icon [icon]="TestIcon" class="me-1"></fa-icon> {{ test.questions?.length || 0 }} domande</span>
+              <span
+                ><fa-icon [icon]="TestIcon" class="me-1"></fa-icon> {{
+                test.questions?.length || 0 }} domande</span
+              >
               @if (getAttemptScore(test._id); as score) {
-                <span><fa-icon [icon]="CheckCircleIcon" class="me-1"></fa-icon> {{ score.score }}/{{ score.maxScore }} pt</span>
+              <span
+                ><fa-icon [icon]="CheckCircleIcon" class="me-1"></fa-icon> {{
+                score.score }}/{{ score.maxScore }} pt</span
+              >
               }
             </div>
           </div>
         </div>
         } @empty {
         <div class="d-flex align-items-center justify-content-center h-100">
-          <p class="mb-0 small text-dark opacity-75">Nessuna simulazione ancora effettuata.</p>
+          <p class="mb-0 small text-dark opacity-75">
+            Nessuna simulazione ancora effettuata.
+          </p>
         </div>
         }
       </div>
@@ -171,14 +245,27 @@
     <div
       class="d-flex align-items-center justify-content-between mb-3 flex-shrink-0"
     >
-      <h6 class=" mb-0 text-white">
-        Comunicazioni
-      </h6>
       <div class="d-flex align-items-center gap-2">
-        @if (RecentComunicazioni().length > 0) {
-        <span class="text-white-50 small opacity-75">+ {{ RecentComunicazioni().length }}</span>
+        <h6 class="mb-0 text-white">Comunicazioni</h6>
+        @if (UnreadCount() > 0) {
+        <span
+          class="badge rounded-pill fw-semibold"
+          style="
+            font-size: 0.65rem;
+            background-color: var(--syllex-green);
+            color: #1b2f6b !important;
+          "
+        >
+          {{ UnreadCount() }} nuove
+        </span>
         }
       </div>
+      <a
+        routerLink="/s/calendario"
+        class="text-white-50 small text-decoration-none d-flex align-items-center gap-1 opacity-75"
+      >
+        Vedi tutte <fa-icon [icon]="ArrowRight" class="small"></fa-icon>
+      </a>
     </div>
     <div class="flex-grow-1 block-scroll pr-1">
       @for (com of RecentComunicazioni(); track $index) {
@@ -188,7 +275,9 @@
         class="mb-2"
       ></div>
       } @empty {
-      <p class="text-white-50 opacity-75 mb-0 small">Nessuna comunicazione recente.</p>
+      <p class="text-white-50 opacity-75 mb-0 small">
+        Nessuna comunicazione recente.
+      </p>
       }
     </div>
   </div>

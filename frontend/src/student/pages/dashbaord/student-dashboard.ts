@@ -31,7 +31,7 @@ import {
   faChartLine,
   faClipboardList,
 } from '@fortawesome/pro-solid-svg-icons';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 import { StudentTestCardCompact } from '../../components/student-test-card-compact/student-test-card-compact';
@@ -59,6 +59,7 @@ export class StudentDashboard implements OnInit {
   private readonly comunicazioniService = inject(ComunicazioniService);
   private readonly materiaService = inject(Materia);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router);
 
   readonly PieIcon = faChartPie;
   readonly TestIcon = faVial;
@@ -81,6 +82,7 @@ export class StudentDashboard implements OnInit {
   );
 
   RecentTests = signal<StudentTestInterface[]>([]);
+  TotalTestsCount = signal(0);
   AttemptStatusMap = signal<
     Map<string, 'in-progress' | 'delivered' | 'reviewed'>
   >(new Map());
@@ -89,6 +91,9 @@ export class StudentDashboard implements OnInit {
   );
 
   RecentComunicazioni = signal<ComunicazioneInterface[]>([]);
+  readonly UnreadCount = computed(
+    () => this.RecentComunicazioni().filter((c) => !c.isRead).length,
+  );
 
   // Statistics
   SubjectStats = signal<StatCardData[]>([]);
@@ -98,6 +103,11 @@ export class StudentDashboard implements OnInit {
   ngOnInit(): void {
     this.auth.user$.subscribe((user) => this.User.set(user));
     this.loadDashboardData();
+  }
+
+  goToAgentWithSubject(subject: MateriaObject): void {
+    this.materiaService.setSelectedSubject(subject);
+    this.router.navigate(['/s/agente']);
   }
 
   getAttemptStatus(
@@ -127,6 +137,7 @@ export class StudentDashboard implements OnInit {
             : 0;
           return dateB - dateA; // Newest first
         });
+        this.TotalTestsCount.set(tests.length);
         this.RecentTests.set(sorted.slice(0, 3));
 
         // Fetch attempt status for each
@@ -173,7 +184,7 @@ export class StudentDashboard implements OnInit {
 
     // 2. Load recent communications
     this.comunicazioniService
-      .getPagedComunicazioni('', '', '', 1, 3)
+      .getPagedComunicazioni('', '', '', 1, 10)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((res) => {
         this.RecentComunicazioni.set(res.communications || []);

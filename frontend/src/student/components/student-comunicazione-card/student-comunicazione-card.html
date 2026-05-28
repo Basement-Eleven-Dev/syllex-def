@@ -1,10 +1,9 @@
 <div class="com-card">
-
   <!-- ── Header: title + "Nuovo" badge ──────────────────────────────────── -->
   <div class="com-card__header">
     <h6 class="com-card__title">{{ comunicazione.title }}</h6>
     @if (isNew()) {
-      <span class="com-card__badge-new">Nuovo</span>
+    <span class="com-card__badge-new">Nuovo</span>
     }
   </div>
 
@@ -17,9 +16,8 @@
       <fa-icon [icon]="ClockIcon" class="com-card__meta-icon"></fa-icon>
       {{ comunicazione.createdAt | date: 'd MMM yyyy' }}
     </span>
-    <a routerLink="/s/comunicazioni" class="com-card__open">
+    <button type="button" class="com-card__open" (click)="openModal()">
       Apri <fa-icon [icon]="ArrowIcon" class="ms-1"></fa-icon>
-    </a>
+    </button>
   </div>
-
 </div>
