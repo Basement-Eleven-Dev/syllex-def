@@ -15,7 +15,10 @@ import { SyllexPagination } from '../../../teacher/components/syllex-pagination/
 import { FormsModule } from '@angular/forms';
 import { SyllexPageHeader } from '../../../teacher/components/UI/syllex-page-header/syllex-page-header';
 import { SyllexSearchInput } from '../../../teacher/components/UI/syllex-search-input/syllex-search-input';
-import { SyllexSelectInput, SelectOption } from '../../../teacher/components/UI/syllex-select-input/syllex-select-input';
+import {
+  SyllexSelectInput,
+  SelectOption,
+} from '../../../teacher/components/UI/syllex-select-input/syllex-select-input';
 
 type AttemptStatus = 'in-progress' | 'delivered' | 'reviewed';
 

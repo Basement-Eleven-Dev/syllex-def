@@ -1,4 +1,11 @@
-import { Component, OnInit, inject, signal, DestroyRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  signal,
+  computed,
+  DestroyRef,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Auth, User } from '../../../services/auth';
 import {
@@ -30,6 +37,10 @@ import { StatCardData } from '../../../teacher/components/stat-card/stat-card';
 @Component({
   selector: 'app-dashbaord',
   standalone: true,
+  host: {
+    style:
+      'display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden;',
+  },
   imports: [
     CommonModule,
     RouterModule,
@@ -55,6 +66,13 @@ export class StudentDashboard implements OnInit {
 
   User = signal<User | null>(null);
   Subjects = this.materiaService.allMaterie;
+
+  readonly CompletedTests = computed(() =>
+    this.RecentTests().filter((t) => {
+      const s = this.AttemptStatusMap().get(t._id);
+      return s === 'delivered' || s === 'reviewed';
+    }),
+  );
 
   RecentTests = signal<StudentTestInterface[]>([]);
   AttemptStatusMap = signal<

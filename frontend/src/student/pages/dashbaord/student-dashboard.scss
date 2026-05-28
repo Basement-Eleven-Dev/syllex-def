@@ -1,14 +1,77 @@
-// ── Shared block ────────────────────────────────────────────────────────────
-.student-block {
-  border-radius: 30px;
-  padding: 2rem;
-  color: #ffffff;
+// ── Host: fill parent flex column, no scroll ─────────────────────────────────
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
-// ── Welcome ──────────────────────────────────────────────────────────────────
+// ── Welcome strip ─────────────────────────────────────────────────────────────
 .student-welcome {
-  h1 { color: #ffffff; font-size: 2rem; }
-  p  { color: rgba(255, 255, 255, 0.65); }
+  flex-shrink: 0;
+  padding-bottom: 0.75rem;
+  h5 { color: #ffffff; }
+  p  { color: rgba(255, 255, 255, 0.55); }
+}
+
+// ── Main Dashboard Grid ───────────────────────────────────────────────────────
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  grid-template-areas:
+    "study monitor tests"
+    "autoval autoval comunicazioni";
+  gap: 1rem;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.db-study         { grid-area: study; }
+.db-monitor       { grid-area: monitor; }
+.db-tests         { grid-area: tests; }
+.db-autoval       { grid-area: autoval; }
+.db-comunicazioni { grid-area: comunicazioni; }
+
+// ── Mobile: restore scroll ────────────────────────────────────────────────────
+@media (max-width: 991px) {
+  :host {
+    overflow: visible;
+    flex: none;
+  }
+  .dashboard-grid {
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+    height: auto !important;
+  }
+  .student-welcome {
+    padding-bottom: 0.5rem;
+  }
+}
+
+// ── Shared block base ─────────────────────────────────────────────────────────
+.student-block {
+  border-radius: 24px;
+  padding: 1.5rem;
+  color: #ffffff;
+  min-height: 0;
+  overflow: hidden;
+}
+
+// ── Internal scrollable area ──────────────────────────────────────────────────
+.block-scroll {
+  overflow-y: auto;
+  min-height: 0;
+
+  &::-webkit-scrollbar        { width: 4px; }
+  &::-webkit-scrollbar-track  { background: transparent; }
+  &::-webkit-scrollbar-thumb  {
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 2px;
+  }
 }
 
 // ── Inizia a studiare ─────────────────────────────────────────────────────────
@@ -16,15 +79,15 @@
   background-color: var(--student-sidebar);
 
   .robot-icon-wrap {
-    width: 3rem;
-    height: 3rem;
+    width: 2.5rem;
+    height: 2.5rem;
     border-radius: 50%;
     background: rgba(201, 243, 33, 0.15);
     color: var(--syllex-green);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     flex-shrink: 0;
   }
 }
@@ -32,17 +95,18 @@
 .subject-pills {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.4rem;
+  align-content: flex-start;
 }
 
 .subject-pill {
   display: inline-block;
-  padding: 0.45rem 1.1rem;
+  padding: 0.35rem 0.9rem;
   border-radius: 999px;
   background-color: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
   color: rgba(255, 255, 255, 0.9);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 500;
   text-decoration: none;
   transition: background-color 0.15s ease, border-color 0.15s ease;
@@ -54,11 +118,6 @@
   }
 }
 
-// ── Test disponibili ──────────────────────────────────────────────────────────
-.student-block--tests {
-  background-color: var(--student-card);
-}
-
 // ── Monitora lo studio ────────────────────────────────────────────────────────
 .student-block--monitor {
   background-color: #ffffff;
@@ -68,32 +127,31 @@
 
   .monitor-icon {
     color: #1976d2;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
 }
 
 .monitor-label {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: #999;
-  margin-bottom: 0.75rem !important;
 }
 
 .monitor-stats {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
 
 .monitor-stat {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.15rem;
 
   &__value {
-    font-size: 2.2rem;
+    font-size: 2.4rem;
     font-weight: 700;
     color: #1a1a2e;
     line-height: 1;
@@ -101,12 +159,12 @@
 
   &__unit {
     font-size: 1.1rem;
-    opacity: 0.5;
-    margin-left: 0.15rem;
+    opacity: 0.4;
+    margin-left: 0.1rem;
   }
 
   &__label {
-    font-size: 0.78rem;
+    font-size: 0.72rem;
     color: #888;
     font-weight: 500;
   }
@@ -114,21 +172,57 @@
 
 .monitor-stat-divider {
   width: 1px;
-  height: 3rem;
+  height: 2.5rem;
   background-color: rgba(0, 0, 0, 0.1);
   flex-shrink: 0;
 }
 
-// ── Autovalutazione (lime green) ──────────────────────────────────────────────
+// ── Test disponibili ──────────────────────────────────────────────────────────
+.student-block--tests {
+  background-color: var(--student-card);
+}
+
+.badge-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--syllex-green);
+  color: #0f1628;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.18rem 0.5rem;
+  border-radius: 999px;
+  line-height: 1;
+}
+
+// ── Autovalutazione (lime green, 2-panel) ─────────────────────────────────────
 .student-block--autoval {
   background-color: var(--syllex-green);
   color: #0f1628;
 
   h5, p { color: #0f1628; }
+}
+
+.autoval-cta {
+  flex-shrink: 0;
+  min-width: 190px;
+  max-width: 250px;
 
   .autoval-subtitle {
+    font-size: 0.88rem;
     opacity: 0.7;
   }
+}
+
+.autoval-divider {
+  width: 1px;
+  background-color: rgba(0, 0, 0, 0.12);
+  align-self: stretch;
+  flex-shrink: 0;
+}
+
+.autoval-simulations {
+  min-width: 0;
 }
 
 .btn-autoval-create {
@@ -137,8 +231,9 @@
   border: none;
   border-radius: 999px;
   font-weight: 600;
-  padding: 0.65rem 1.25rem;
-  font-size: 0.9rem;
+  padding: 0.55rem 1rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
   transition: opacity 0.15s ease;
 
   &:hover {
@@ -147,51 +242,49 @@
   }
 }
 
-.ultima-simulazione {
-  background-color: rgba(0, 0, 0, 0.1);
-  border-radius: 16px;
-  padding: 1rem 1.25rem;
-}
-
 .ultima-sim__label {
-  font-size: 0.72rem;
-  font-weight: 600;
+  font-size: 0.68rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  opacity: 0.65;
-  margin-bottom: 0.5rem;
+  color: rgba(15, 22, 40, 0.6);
 }
 
-.ultima-sim__card {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+.sim-card {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 14px;
+  padding: 0.65rem 0.85rem;
+
+  .sim-name {
+    font-size: 0.85rem;
+    color: #0f1628 !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 55%;
+  }
 }
 
-.ultima-sim__icon {
-  font-size: 1.5rem;
-  opacity: 0.6;
+.sim-meta {
+  font-size: 0.72rem;
+  color: rgba(15, 22, 40, 0.6) !important;
+
+  span { color: rgba(15, 22, 40, 0.6) !important; }
 }
 
-.ultima-sim__info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-}
-
-.ultima-sim__score {
-  font-size: 1.6rem;
+.badge-sim-done {
+  font-size: 0.6rem;
   font-weight: 700;
+  background-color: rgba(0, 0, 0, 0.15);
   color: #0f1628;
-}
-
-.ultima-sim__sublabel {
-  font-size: 0.75rem;
-  opacity: 0.65;
+  padding: 0.18rem 0.45rem;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .ultima-sim__empty {
-  opacity: 0.65;
+  p { color: rgba(15, 22, 40, 0.55) !important; }
 }
 
 // ── Comunicazioni ─────────────────────────────────────────────────────────────
@@ -201,25 +294,21 @@
 
 // ── Shared utilities ──────────────────────────────────────────────────────────
 .student-link-arrow {
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
   text-decoration: none;
   display: flex;
   align-items: center;
-  gap: 0.3rem;
-  transition: color 0.15s ease;
+  gap: 0.25rem;
   white-space: nowrap;
+  transition: color 0.15s ease;
 
-  &:hover {
-    color: var(--syllex-green);
-  }
+  &:hover { color: var(--syllex-green); }
 }
 
-.opacity-text {
-  opacity: 0.6;
-}
+.opacity-text { opacity: 0.55; }
 
 .empty-state-text {
-  color: rgba(255, 255, 255, 0.55);
-  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
 }

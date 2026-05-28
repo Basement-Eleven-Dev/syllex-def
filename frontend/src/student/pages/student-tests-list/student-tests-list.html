@@ -15,7 +15,7 @@
     placeholder="Cerca test..."
     [value]="SearchTerm()"
     (valueChange)="onSearchTermChange($event)"
-    style="min-width: 260px; flex: 1 1 260px; max-width: 360px;"
+    style="min-width: 260px; flex: 1 1 260px; max-width: 360px"
   />
 
   <app-syllex-select-input
@@ -23,7 +23,7 @@
     [value]="SelectedSubject()"
     [options]="SubjectOptions()"
     (valueChange)="onSubjectChange($event)"
-    style="min-width: 180px; flex: 0 0 auto;"
+    style="min-width: 180px; flex: 0 0 auto"
   />
 
   <button
@@ -71,6 +71,6 @@
       { value: '10', label: '10 per pagina' },
       { value: '20', label: '20 per pagina' }
     ]"
-    style="width: 160px;"
+    style="width: 160px"
   />
 </div>
