@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faBroom,
@@ -58,6 +58,7 @@ export class StudentTestsList {
   private readonly destroyRef = inject(DestroyRef);
   private readonly materiaService = inject(Materia);
   private readonly feedbackService = inject(FeedbackService);
+  private readonly route = inject(ActivatedRoute);
 
   readonly ClearIcon = faBroom;
   readonly PlusIcon = faPlus;
@@ -69,6 +70,7 @@ export class StudentTestsList {
     Map<string, { correct: number; wrong: number }>
   >(new Map());
   readonly ShowOnlyPending = signal(false);
+  readonly ShowOnlyAutoEval = signal(false);
   readonly IsCheckingStatuses = signal(false);
   readonly SearchTerm = signal('');
   readonly SelectedSubject = signal('');
@@ -82,15 +84,30 @@ export class StudentTestsList {
   readonly Subjects = this.materiaService.allMaterie;
 
   readonly FilteredTests = computed(() => {
-    if (!this.ShowOnlyPending()) return this.Tests();
-    const map = this.AttemptStatusMap();
-    return this.Tests().filter((t) => !map.has(t._id));
+    let list = this.Tests();
+    
+    if (this.ShowOnlyAutoEval()) {
+      list = list.filter(t => t.source === 'self-evaluation');
+    }
+    
+    if (this.ShowOnlyPending()) {
+      const map = this.AttemptStatusMap();
+      list = list.filter((t) => !map.has(t._id));
+    }
+    
+    return list;
   });
 
   readonly SubjectOptions = (): SelectOption[] =>
     this.Subjects().map((s) => ({ value: s._id, label: s.name }));
 
   constructor() {
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
+      if (params['autoEval'] === 'true') {
+        this.ShowOnlyAutoEval.set(true);
+      }
+    });
+
     effect(() => {
       // If Page is 1, we overwrite the list.
       // If Page > 1 and we are on mobile, we append the results for infinite scroll.
@@ -183,10 +200,14 @@ export class StudentTestsList {
   }
 
   toggleDaFare() {
-    const next = !this.ShowOnlyPending();
-    this.ShowOnlyPending.set(next);
+    this.ShowOnlyPending.update((v) => !v);
     this.Page.set(1);
-    this.PageSize.set(next ? 500 : 6);
+    this.PageSize.set(this.ShowOnlyPending() ? 500 : 6);
+  }
+
+  toggleAutoEval() {
+    this.ShowOnlyAutoEval.update((v) => !v);
+    this.Page.set(1);
   }
 
   getAttemptStatus(testId: string): AttemptStatus | null {
