@@ -6,33 +6,18 @@
   {{ authService.user?.firstName }} {{ authService.user?.lastName }}
 </h5>
 <hr style="border-color: rgba(255, 255, 255, 0.1);" />
-<div routerLink="/s/profilo" class="w-100 link rounded-syllex btn text-start text-white">
+<div routerLink="/s/profilo" (click)="onItemClick()" class="w-100 link rounded-syllex btn text-start text-white">
   Profilo
 </div>
-<div routerLink="/s/tests" class="w-100 link rounded-syllex btn text-start text-white">
-  Lista dei test
-</div>
-<div routerLink="/s/calendario" class="w-100 link rounded-syllex btn text-start text-white">
-  Calendario
-</div>
-<div routerLink="/s/risorse" class="w-100 link rounded-syllex btn text-start text-white">
-  File e risorse
-</div>
 <div
-  (click)="onOpenCalendar()"
-  class="w-100 link rounded-syllex btn text-start text-white"
->
-  Calendario
-</div>
-<div
-  (click)="onReportBug()"
+  (click)="onReportBug(); onItemClick()"
   class="w-100 mt-4 link rounded-syllex btn text-start text-white"
 >
   Segnala un bug
 </div>
 <div
   class="w-100 link rounded-syllex btn text-start logout"
-  (click)="onLogout()"
+  (click)="onLogout(); onItemClick()"
 >
   Logout
 </div>

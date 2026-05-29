@@ -132,9 +132,9 @@
         <div
           ngbDropdownMenu
           class="p-3 dropdown-menu-dark"
-          style="min-width: 240px"
+          style="min-width: 280px"
         >
-          <app-student-user-contextual-menu></app-student-user-contextual-menu>
+          <app-student-user-contextual-menu (menuClicked)="closeMobileMenu()"></app-student-user-contextual-menu>
         </div>
       </div>
       

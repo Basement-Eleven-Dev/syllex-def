@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, EventEmitter, Output } from '@angular/core';
 import { faSignOutAlt } from '@fortawesome/pro-regular-svg-icons';
 import { Auth } from '../../../services/auth';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -15,12 +15,18 @@ import { ReportBugForm } from '../../../teacher/components/report-bug-form/repor
   styleUrl: './student-user-contextual-menu.scss',
 })
 export class StudentUserContextualMenu {
+  @Output() menuClicked = new EventEmitter<void>();
+
   LogoutIcon = faSignOutAlt;
 
   constructor(
     public authService: Auth,
     private modalService: NgbModal,
   ) {}
+
+  onItemClick() {
+    this.menuClicked.emit();
+  }
 
   onLogout() {
     this.authService.logout();
