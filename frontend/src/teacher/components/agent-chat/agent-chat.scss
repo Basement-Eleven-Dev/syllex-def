@@ -906,6 +906,62 @@
 
 // Student Theme Right Sidebar Dark Overrides
 :host-context(.student-theme) {
+  --agent-input-bg: var(--student-sidebar);
+  --agent-input-border: rgba(255, 255, 255, 0.1);
+  --agent-input-text: #ffffff;
+
+  .btn-quick-action {
+    background-color: var(--student-sidebar) !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+
+    fa-icon {
+      color: #ffffff !important;
+    }
+
+    &:hover {
+      background-color: var(--student-card) !important;
+      border-color: rgba(255, 255, 255, 0.2) !important;
+      color: #ffffff !important;
+      fa-icon {
+        color: #ffffff !important;
+      }
+    }
+  }
+
+  // --- Voice Controls Overrides ---
+  .mode-switcher--voice {
+    background-image: linear-gradient(var(--student-sidebar), var(--student-sidebar)), linear-gradient(135deg, #3931ce, #52a0ff) !important;
+  }
+  
+  .mode-switcher__icon {
+    color: #ffffff !important;
+  }
+
+  .voice-input-pill {
+    background: var(--student-sidebar) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+
+    &__status {
+      color: rgba(255, 255, 255, 0.9) !important;
+    }
+
+    &__divider {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+    }
+  }
+
+  .voice-ai-responding-pill {
+    background: var(--student-sidebar) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+
+    &__dot {
+      background-color: #ffffff !important;
+    }
+  }
+
   .chat-sidebar {
     background-color: rgba(37, 51, 90, 0.85);
     border-left: 1px solid rgba(255, 255, 255, 0.1);

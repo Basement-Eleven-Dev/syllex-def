@@ -6,6 +6,10 @@
 .bg-page {
   background-color: #f8f9fa;
   height: 100%;
+
+  :host-context(.student-theme) & {
+    background-color: var(--student-bg) !important;
+  }
 }
 
 .config-wrapper {
