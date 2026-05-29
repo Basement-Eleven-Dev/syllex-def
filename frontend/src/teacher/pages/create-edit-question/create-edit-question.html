@@ -110,11 +110,17 @@
                     <input
                       type="number"
                       class="form-control custom-input"
+                      [class.is-invalid]="aiForm.get('numberOfQuestions')?.invalid && aiForm.get('numberOfQuestions')?.touched"
                       formControlName="numberOfQuestions"
                       min="1"
                       max="20"
                       aria-label="Numero di domande"
                     />
+                    @if (aiForm.get('numberOfQuestions')?.hasError('max')) {
+                      <div class="invalid-feedback d-block mt-1">Puoi generare massimo 20 domande alla volta.</div>
+                    } @if (aiForm.get('numberOfQuestions')?.hasError('min')) {
+                      <div class="invalid-feedback d-block mt-1">Devi generare almeno 1 domanda.</div>
+                    }
                   </div>
                   @if (IsAiFormMultipleChoice()) {
                   <div class="col-12 col-md-6">
@@ -122,11 +128,17 @@
                     <input
                       type="number"
                       class="form-control custom-input"
+                      [class.is-invalid]="aiForm.get('numberOfAlternatives')?.invalid && aiForm.get('numberOfAlternatives')?.touched"
                       formControlName="numberOfAlternatives"
                       min="2"
                       max="8"
                       aria-label="Numero di alternative"
                     />
+                    @if (aiForm.get('numberOfAlternatives')?.hasError('max')) {
+                      <div class="invalid-feedback d-block mt-1">Massimo 8 opzioni.</div>
+                    } @if (aiForm.get('numberOfAlternatives')?.hasError('min')) {
+                      <div class="invalid-feedback d-block mt-1">Minimo 2 opzioni.</div>
+                    }
                   </div>
                   }
                   <div class="col-12 col-md-6">
