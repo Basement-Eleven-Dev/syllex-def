@@ -74,12 +74,7 @@ export class StudentDashboard implements OnInit {
   User = signal<User | null>(null);
   Subjects = this.materiaService.allMaterie;
 
-  readonly CompletedTests = computed(() =>
-    this.RecentTests().filter((t) => {
-      const s = this.AttemptStatusMap().get(t._id);
-      return s === 'delivered' || s === 'reviewed';
-    }),
-  );
+  CompletedTests = signal<StudentTestInterface[]>([]);
 
   RecentTests = signal<StudentTestInterface[]>([]);
   TotalTestsCount = signal(0);
@@ -123,12 +118,16 @@ export class StudentDashboard implements OnInit {
   private loadDashboardData() {
     // 1. Load recent tests
     this.testsService
-      .getAvailableTests()
+      .getAvailableTests('', '', 1, 50)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((res) => {
-        const tests = res.tests;
-        // Sort by availability and take top 3
-        const sorted = tests.sort((a, b) => {
+        const allTests = res.tests;
+        
+        const teacherTests = allTests.filter(t => t.source !== 'self-evaluation');
+        const selfEvalTests = allTests.filter(t => t.source === 'self-evaluation');
+
+        // Sort teacher tests by availability and take top 3
+        const sortedTeacher = teacherTests.sort((a, b) => {
           const dateA = a.availableFrom
             ? new Date(a.availableFrom).getTime()
             : 0;
@@ -137,10 +136,12 @@ export class StudentDashboard implements OnInit {
             : 0;
           return dateB - dateA; // Newest first
         });
-        this.TotalTestsCount.set(tests.length);
-        this.RecentTests.set(sorted.slice(0, 3));
+        this.TotalTestsCount.set(teacherTests.length);
+        this.RecentTests.set(sortedTeacher.slice(0, 3));
+        
+        this.CompletedTests.set(selfEvalTests.slice(0, 3));
 
-        // Fetch attempt status for each
+        // Fetch attempt status for Teacher tests
         this.RecentTests().forEach((test) => {
           this.testsService
             .getAttemptByTestId(test._id)
@@ -178,8 +179,46 @@ export class StudentDashboard implements OnInit {
             });
         });
 
+        // Fetch attempt status for Self Eval tests
+        this.CompletedTests().forEach((test) => {
+          this.testsService
+            .getAttemptByTestId(test._id)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe((attempt) => {
+              if (attempt) {
+                this.AttemptStatusMap.update((map) => {
+                  const newMap = new Map(map);
+                  newMap.set(test._id, attempt.status);
+                  return newMap;
+                });
+
+                if (attempt.status === 'reviewed' || attempt.status === 'delivered') {
+                  const score =
+                    attempt.score != null
+                      ? attempt.score
+                      : attempt.questions.reduce(
+                          (sum, q) => sum + (q.score ?? 0),
+                          0,
+                        );
+                  const maxScore =
+                    attempt.maxScore != null
+                      ? attempt.maxScore
+                      : attempt.questions.reduce(
+                          (sum, q) => sum + (q.points ?? 0),
+                          0,
+                        );
+                  this.AttemptScoreMap.update((map) => {
+                    const newMap = new Map(map);
+                    newMap.set(test._id, { score, maxScore });
+                    return newMap;
+                  });
+                }
+              }
+            });
+        });
+
         // Generate Subject Statistics by analyzing all available tests vs completed tests
-        this.computeSubjectStats(tests);
+        this.computeSubjectStats(allTests);
       });
 
     // 2. Load recent communications
