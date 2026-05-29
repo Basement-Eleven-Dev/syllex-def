@@ -5,24 +5,17 @@
   [class.dimmed]="dimmed"
 >
   <div class=" d-flex flex-column gap-2">
-    <!-- ── Header: topic + policy badge ── -->
-    <div
-      class="d-flex flex-row align-items-center justify-content-between gap-2 p"
-    >
-
-
-      <div class="d-flex flex-row align-items-center justify-content-between mb-3  w-100 gap-2">
-        @if (mode === 'banca') { @if (question.policy === 'private') {
+    <!-- ── Header: policy badge (banca only) ── -->
+    @if (mode === 'banca') {
+    <div class="d-flex flex-row align-items-center justify-content-between mb-3 w-100 gap-2">
+      @if (question.policy === 'private') {
         <app-syllex-badge label="Uso Test" color="green" />
-        } @else {
+      } @else {
         <app-syllex-badge label="Esercitazione" color="celestine" />
-        } }
-        @if(mode === 'banca'){
-        <app-syllex-badge [label]="question.type" color="primary" />
-        }
-      
-      </div>
+      }
+      <app-syllex-badge [label]="question.type" color="primary" />
     </div>
+    }
 
     <!-- ── Optional image ── -->
     @if (question.imageUrl) {

@@ -465,8 +465,10 @@
     display: none;
   }
 
-  // Tighten the badge/feedback section padding
-  ::ng-deep .d-flex.flex-column.gap-2 {
+  // Restore the inner padding that used to be provided by .card-body
+  // so the review cards retain their "perfect" proportions
+  ::ng-deep .question-card > .d-flex.flex-column.gap-2 {
+    padding: 1rem;
     padding-top: 0.25rem;
   }
 
