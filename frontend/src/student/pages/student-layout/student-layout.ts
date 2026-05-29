@@ -13,6 +13,7 @@ import {
   faXmark,
   faRightFromBracket,
   faGrip,
+  faSparkles
 } from '@fortawesome/pro-solid-svg-icons';
 import {
   NgbDropdown,
@@ -82,7 +83,7 @@ export class StudentLayout implements OnInit {
   CalendarIcon = faCalendar;
   FileIcon = faFile;
   TestIcon = faFileLines;
-  RobotIcon = faRobot;
+  SparklesIcon = faSparkles;
   XmarkIcon = faXmark;
   LogoutIcon = faRightFromBracket;
   GripIcon = faGrip;
@@ -94,19 +95,19 @@ export class StudentLayout implements OnInit {
       icon: faHouse,
     },
     {
-      path: 'calendario',
-      label: 'Calendario',
-      icon: faCalendar,
+      path: 'tests',
+      label: 'Test',
+      icon: faFileLines,
     },
     {
       path: 'risorse',
-      label: 'Risorse',
+      label: 'File e Risorse',
       icon: faFile,
     },
     {
-      path: 'tests',
-      label: 'I miei test',
-      icon: faFileLines,
+      path: 'calendario',
+      label: 'Calendario',
+      icon: faCalendar,
     },
   ];
 

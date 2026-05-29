@@ -156,13 +156,27 @@ li {
 
 .question-card.locked {
   textarea[readonly] {
-    background-color: var(--bs-light);
+    background-color: var(--bs-light) !important;
     cursor: default;
-    border-color: var(--bs-border-color);
+    border-color: var(--bs-border-color) !important;
   }
 
   input[type="radio"] {
     pointer-events: none;
+  }
+}
+
+.question-card {
+  textarea.form-control {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    border-color: #dee2e6 !important;
+    &::placeholder {
+      color: #adb5bd !important;
+    }
+    &[readonly] {
+      background-color: #e9ecef !important;
+    }
   }
 }
 

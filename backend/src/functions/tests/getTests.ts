@@ -77,10 +77,41 @@ const getStudentTests = async (
 
   console.log("Filter applicato:", JSON.stringify(filter));
 
-  // Esegui query con aggregation per includere subjectName
-  const pipeline = [
+  const pipeline: any[] = [
     { $match: filter },
-    { $sort: { createdAt: -1 as const } },
+    {
+      $lookup: {
+        from: "attempts",
+        let: { testId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$testId", "$$testId"] },
+                  { $eq: ["$studentId", new mongo.ObjectId(studentId)] },
+                ],
+              },
+            },
+          },
+        ],
+        as: "studentAttempt",
+      },
+    },
+    {
+      $addFields: {
+        lastActivityDate: {
+          $max: [
+            { $ifNull: [{ $arrayElemAt: ["$studentAttempt.updatedAt", 0] }, "$createdAt"] },
+            { $ifNull: [{ $arrayElemAt: ["$studentAttempt.reviewedAt", 0] }, "$createdAt"] },
+            { $ifNull: [{ $arrayElemAt: ["$studentAttempt.deliveredAt", 0] }, "$createdAt"] },
+            { $ifNull: [{ $arrayElemAt: ["$studentAttempt.startedAt", 0] }, "$createdAt"] },
+            "$createdAt",
+          ],
+        },
+      },
+    },
+    { $sort: { lastActivityDate: -1 as const } },
     {
       $lookup: {
         from: "subjects",
@@ -98,7 +129,7 @@ const getStudentTests = async (
         _id: { $toString: "$_id" },
       },
     },
-    { $project: { _subject: 0, password: 0 } },
+    { $project: { _subject: 0, password: 0, studentAttempt: 0, lastActivityDate: 0 } },
     { $skip: skip },
     { $limit: currentPageSize },
   ];
