@@ -1,7 +1,7 @@
 <!-- syllex update trigger -->
 <div class="d-flex flex-column h-100 overflow-hidden bg-page agent-page-root">
   <!-- Mobile Tab Switcher: Solo per studenti e solo su mobile -->
-  @if (userRole() === 'student' && currentStep() === 2) {
+  @if (userRole() === 'student' && currentStep() === 2 && false) {
   <div class="d-lg-none mb-3 p-3">
     <div class="nav-switcher p-1 bg-light rounded-4 d-flex">
       <button
@@ -29,7 +29,7 @@
     @if (currentStep() === 2) {
     <div class="d-flex h-100 overflow-hidden">
       <!-- Sidebar Materie (Solo Studente, visibile su desktop sempre, su mobile solo tab "subjects") -->
-      @if (userRole() === 'student') {
+      @if (userRole() === 'student' && false) {
       <div
         class="subject-sidebar d-flex flex-column"
         [class.d-none]="activeTab() !== 'subjects'"
@@ -78,7 +78,7 @@
         [class.d-lg-flex]="true"
       >
         <!-- Header per Studente (cambio materia su mobile) -->
-        @if (userRole() === 'student') {
+        @if (userRole() === 'student' && false) {
         <div
           class="chat-header-nav bg-white border-bottom px-4 py-3 d-flex align-items-center gap-3 shadow-sm d-lg-none"
           style="z-index: 10"

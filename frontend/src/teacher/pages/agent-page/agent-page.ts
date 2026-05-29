@@ -49,6 +49,9 @@ export class AgentPage {
     private authService: Auth,
   ) {
     this.userRole.set(this.authService.user?.role || null);
+    if (this.userRole() === 'student') {
+      this.activeTab.set('chat');
+    }
 
     // Quando viene selezionata o caricata una materia, mostra direttamente la chat dell'agente
     effect(

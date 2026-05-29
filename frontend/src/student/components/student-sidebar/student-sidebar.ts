@@ -51,9 +51,9 @@ export class StudentSidebar {
       icon: faHouse,
     },
     {
-      path: 'calendario',
-      label: 'Calendario',
-      icon: faCalendar,
+      path: 'tests',
+      label: 'Test',
+      icon: faFileLines,
     },
     {
       path: 'risorse',
@@ -61,9 +61,9 @@ export class StudentSidebar {
       icon: faFile,
     },
     {
-      path: 'tests',
-      label: 'Test',
-      icon: faFileLines,
+      path: 'calendario',
+      label: 'Calendario',
+      icon: faCalendar,
     },
   ];
 

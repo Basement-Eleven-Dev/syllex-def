@@ -1,4 +1,4 @@
-import { Component, inject, ViewChild } from '@angular/core';
+import { Component, inject, ViewChild, computed, signal, OnInit } from '@angular/core';
 import { DatePipe, TitleCasePipe, CommonModule, AsyncPipe } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
@@ -14,6 +14,9 @@ import { Auth } from '../../../services/auth';
 import { StudentUserContextualMenu } from '../student-user-contextual-menu/student-user-contextual-menu';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { Materia } from '../../../services/materia';
+import { SelectOption, SyllexSelectInput } from '../../../teacher/components/UI/syllex-select-input/syllex-select-input';
 
 @Component({
   selector: 'app-student-nav',
@@ -28,16 +31,42 @@ import { map } from 'rxjs/operators';
     NgbDropdownToggle,
     NgbDropdownMenu,
     StudentUserContextualMenu,
+    SyllexSelectInput,
   ],
   templateUrl: './student-nav.html',
   styleUrl: './student-nav.scss',
 })
-export class StudentNav {
+export class StudentNav implements OnInit {
   authService = inject(Auth);
+  private router = inject(Router);
+  materiaService = inject(Materia);
 
   UserProfileIcon = faUserCircle;
   ChevronDownIcon = faChevronDown;
   now: number = Date.now();
+
+  isAgentRoute = signal(false);
+
+  subjectOptions = computed<SelectOption[]>(() => {
+    return this.materiaService.allMaterie().map((m) => ({
+      value: m._id,
+      label: m.name,
+    }));
+  });
+
+  ngOnInit(): void {
+    this.isAgentRoute.set(this.router.url.includes('/s/agente'));
+    this.router.events.subscribe(() => {
+      this.isAgentRoute.set(this.router.url.includes('/s/agente'));
+    });
+  }
+
+  onSubjectChange(subjectId: string) {
+    const subject = this.materiaService.allMaterie().find((m) => m._id === subjectId);
+    if (subject) {
+      this.materiaService.setSelectedSubject(subject);
+    }
+  }
 
   getInitals(): Observable<string> {
     return this.authService.user$.pipe(

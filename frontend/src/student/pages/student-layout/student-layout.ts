@@ -1,5 +1,5 @@
-import { Component, signal, ViewChild, HostListener, inject, OnInit } from '@angular/core';
-import { RouterOutlet, RouterModule } from '@angular/router';
+import { Component, signal, ViewChild, HostListener, inject, OnInit, computed } from '@angular/core';
+import { RouterOutlet, RouterModule, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
@@ -24,6 +24,8 @@ import { StudentNav } from '../../components/student-nav/student-nav';
 import { StudentUserContextualMenu } from '../../components/student-user-contextual-menu/student-user-contextual-menu';
 import { HelpChat } from '../../../teacher/components/help-chat/help-chat';
 import { Auth, User } from '../../../services/auth';
+import { Materia } from '../../../services/materia';
+import { SelectOption, SyllexSelectInput } from '../../../teacher/components/UI/syllex-select-input/syllex-select-input';
 
 @Component({
   selector: 'app-student-layout',
@@ -40,6 +42,7 @@ import { Auth, User } from '../../../services/auth';
     StudentNav,
     StudentUserContextualMenu,
     HelpChat,
+    SyllexSelectInput,
   ],
   templateUrl: './student-layout.html',
   styleUrl: './student-layout.scss',
@@ -49,12 +52,29 @@ export class StudentLayout implements OnInit {
   @ViewChild(HelpChat) helpChatRef!: HelpChat;
 
   private readonly auth = inject(Auth);
+  private readonly router = inject(Router);
+  readonly materiaService = inject(Materia);
 
   User = signal<User | null>(null);
   sidebarOpen = signal<boolean>(false);
   mobileMenuOpen = signal<boolean>(false);
   navHidden = signal<boolean>(false);
+  isAgentRoute = signal<boolean>(false);
   private lastScrollY = 0;
+
+  subjectOptions = computed<SelectOption[]>(() => {
+    return this.materiaService.allMaterie().map((m) => ({
+      value: m._id,
+      label: m.name,
+    }));
+  });
+
+  onSubjectChange(subjectId: string) {
+    const subject = this.materiaService.allMaterie().find((m) => m._id === subjectId);
+    if (subject) {
+      this.materiaService.setSelectedSubject(subject);
+    }
+  }
 
   UserProfileIcon = faUserCircle;
   HelpIcon = faQuestionCircle;
@@ -92,6 +112,10 @@ export class StudentLayout implements OnInit {
 
   ngOnInit(): void {
     this.auth.user$.subscribe((user) => this.User.set(user));
+    this.isAgentRoute.set(this.router.url.includes('/s/agente'));
+    this.router.events.subscribe(() => {
+      this.isAgentRoute.set(this.router.url.includes('/s/agente'));
+    });
   }
 
   toggleMobileMenu() {

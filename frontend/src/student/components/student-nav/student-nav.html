@@ -10,6 +10,17 @@
       <span class="fw-bold mx-1 text-white">{{ now | date: 'd MMMM' | titlecase }}</span>
       <span>{{ now | date: 'yyyy' }}</span>
     </button>
+
+    @if (isAgentRoute()) {
+      <div style="min-width: 240px;">
+        <app-syllex-select-input
+          [options]="subjectOptions()"
+          [value]="materiaService.materiaSelected()?._id || ''"
+          (valueChange)="onSubjectChange($event)"
+          placeholder="Seleziona materia..."
+        ></app-syllex-select-input>
+      </div>
+    }
   </div>
 
   <div class="d-flex flex-row align-items-center gap-4">
