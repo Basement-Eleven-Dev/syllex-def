@@ -173,14 +173,16 @@
 
 <!-- Submit -->
 <div class="d-flex justify-content-end mb-5">
-  <button
-    class="btn btn-primary btn-lg px-5"
-    [disabled]="IsSubmitting()"
-    (click)="onSubmit()"
-  >
-    @if (IsSubmitting()) {
-    <fa-icon [icon]="SpinnerIcon" [animation]="'spin'" class="me-2"></fa-icon>
-    } Consegna test
-  </button>
+  <app-syllex-button
+    [props]="{
+      label: 'Consegna test',
+      variant: 'primary',
+      size: 'large',
+      disabled: IsSubmitting(),
+      leftIcon: IsSubmitting() ? SpinnerIcon : undefined,
+      animation: IsSubmitting() ? 'spin' : undefined
+    }"
+    (clicked)="onSubmit()"
+  ></app-syllex-button>
 </div>
 }

@@ -25,13 +25,6 @@
     <span class="kpi-lbl">Domande</span>
   </div>
 
-  <div class="kpi-item kpi-item--answers">
-    <div class="kpi-val-group">
-      <fa-icon [icon]="AnswersIcon" class="kpi-ico"></fa-icon>
-      <span class="kpi-val">{{ AnsweredCount() }}</span>
-    </div>
-    <span class="kpi-lbl">Risposte</span>
-  </div>
 
   @if (attempt.status === 'reviewed') {
   <div class="kpi-item kpi-item--correct">
