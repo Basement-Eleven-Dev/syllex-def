@@ -1,7 +1,20 @@
-import { Component, signal, computed, inject, effect, HostListener } from '@angular/core';
+import {
+  Component,
+  signal,
+  computed,
+  inject,
+  effect,
+  HostListener,
+} from '@angular/core';
+import { forkJoin } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faBroom, faPlus, faSpinnerThird } from '@fortawesome/pro-solid-svg-icons';
+import {
+  faBroom,
+  faPlus,
+  faSpinnerThird,
+} from '@fortawesome/pro-solid-svg-icons';
 import {
   StudentTestInterface,
   StudentTestsService,
@@ -56,12 +69,13 @@ export class StudentTestsList {
     Map<string, { correct: number; wrong: number }>
   >(new Map());
   readonly ShowOnlyPending = signal(false);
+  readonly IsCheckingStatuses = signal(false);
   readonly SearchTerm = signal('');
   readonly SelectedSubject = signal('');
 
   // Pagination
   readonly Page = signal(1);
-  readonly PageSize = signal(8);
+  readonly PageSize = signal(6);
   readonly CollectionSize = signal(0);
   readonly IsLoadingMore = signal(false);
 
@@ -172,7 +186,7 @@ export class StudentTestsList {
     const next = !this.ShowOnlyPending();
     this.ShowOnlyPending.set(next);
     this.Page.set(1);
-    this.PageSize.set(next ? 500 : 8);
+    this.PageSize.set(next ? 500 : 6);
   }
 
   getAttemptStatus(testId: string): AttemptStatus | null {
@@ -184,34 +198,40 @@ export class StudentTestsList {
   }
 
   private checkAttemptStatuses(tests: StudentTestInterface[]): void {
-    for (const test of tests) {
-      if (this.AttemptStatusMap().has(test._id)) continue;
-      this.testsService
-        .getAttemptByTestId(test._id)
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe({
-          next: (attempt) => {
-            if (attempt) {
-              this.AttemptStatusMap.update((map) => {
-                const updated = new Map(map);
-                updated.set(test._id, attempt.status);
-                return updated;
-              });
-              const correct = attempt.questions.filter(
-                (q) => q.status === 'correct',
-              ).length;
-              const wrong = attempt.questions.filter(
-                (q) =>
-                  q.status && q.status !== 'correct' && q.status !== 'pending',
-              ).length;
-              this.AttemptResultMap.update((map) => {
-                const updated = new Map(map);
-                updated.set(test._id, { correct, wrong });
-                return updated;
-              });
-            }
-          },
-        });
-    }
+    const toCheck = tests.filter((t) => !this.AttemptStatusMap().has(t._id));
+    if (!toCheck.length) return;
+
+    this.IsCheckingStatuses.set(true);
+
+    forkJoin(
+      toCheck.map((t) =>
+        this.testsService
+          .getAttemptByTestId(t._id)
+          .pipe(map((attempt) => ({ testId: t._id, attempt }))),
+      ),
+    )
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((results) => {
+        const statusMap = new Map(this.AttemptStatusMap());
+        const resultMap = new Map(this.AttemptResultMap());
+
+        for (const { testId, attempt } of results) {
+          if (attempt) {
+            statusMap.set(testId, attempt.status);
+            const correct = attempt.questions.filter(
+              (q) => q.status === 'correct',
+            ).length;
+            const wrong = attempt.questions.filter(
+              (q) =>
+                q.status && q.status !== 'correct' && q.status !== 'pending',
+            ).length;
+            resultMap.set(testId, { correct, wrong });
+          }
+        }
+
+        this.AttemptStatusMap.set(statusMap);
+        this.AttemptResultMap.set(resultMap);
+        this.IsCheckingStatuses.set(false);
+      });
   }
 }

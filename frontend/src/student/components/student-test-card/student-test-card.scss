@@ -18,7 +18,9 @@
   height: 100%;
   min-width: 0;
   text-decoration: none;
-  transition: background 0.15s ease, transform 0.15s ease;
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
 
   @media (max-width: 767px) {
     padding: 1rem;
@@ -131,7 +133,7 @@
   &--esito {
     gap: 0.9rem;
     flex-wrap: wrap;
-    
+
     @media (max-width: 767px) {
       gap: 0.5rem;
     }
@@ -208,7 +210,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: opacity 0.15s ease;
-  margin-top: 0.5rem;
+  margin-top: auto;
 
   &:hover {
     opacity: 0.9;
