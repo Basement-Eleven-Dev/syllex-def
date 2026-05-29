@@ -39,10 +39,10 @@
       @for (att of attachments(); track $index) {
       <button
         type="button"
-        class="btn btn-sm btn-outline-secondary rounded-pill"
+        class="attachment-btn"
         (click)="openAttachment(att)"
       >
-        <fa-icon [icon]="getFileIcon(att.extension!)" class="me-1"></fa-icon>
+        <fa-icon [icon]="getFileIcon(att.extension!)" class="attachment-btn__icon"></fa-icon>
         {{ att.name }}
       </button>
       }

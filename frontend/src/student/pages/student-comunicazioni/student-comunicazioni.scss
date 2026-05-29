@@ -4,7 +4,7 @@
 }
 
 .com-wrapper {
-  height: 380px;
+  height: 290px;
   position: relative;
   overflow: hidden;
   background-color: #0e3462;
@@ -37,15 +37,15 @@
 }
 
 .com-item {
-  flex: 0 0 340px;
-  width: 340px;
-  max-width: 340px;
+  flex: 0 0 300px;
+  width: 300px;
+  max-width: 300px;
   height: 100%;
   overflow: hidden;
 
   @media (max-width: 991px) {
-    flex: 0 0 280px;
-    width: 280px;
+    flex: 0 0 260px;
+    width: 260px;
     max-width: 85vw;
   }
 }
