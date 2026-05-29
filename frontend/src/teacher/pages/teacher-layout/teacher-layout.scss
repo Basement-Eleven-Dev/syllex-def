@@ -6,52 +6,168 @@
   }
 }
 
-.bottom-nav {
-  position: fixed;
-  bottom: 1rem;
-  left: calc(64px + 1rem);
-  right: 1rem;
-  height: 56px;
-  background: var(--bs-primary);
-  border-radius: 0.5rem;
-  z-index: 1000;
-  padding: 0 0.5rem;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-around;
-  transform: translateY(0);
-  transition: transform 0.3s ease;
+/* Mobile Top Header */
+.teacher-mobile-header {
+  background-color: var(--bs-primary);
+  flex-shrink: 0;
+  z-index: 100;
 
-  &.hidden {
-    transform: translateY(calc(100% + 1rem));
+  .btn-mobile-menu-grip {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    line-height: 1 !important;
+    box-shadow: none !important;
+
+    &:active {
+      transform: scale(0.92);
+    }
+
+    fa-icon {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      line-height: 1 !important;
+    }
   }
 }
 
-.bottom-nav-item {
+/* Full-screen Mobile Menu Overlay */
+.mobile-menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.2rem;
-  color: white;
-  font-size: 1.25rem;
-  padding: 0.4rem 1.5rem;
-  background: transparent;
-  border: none;
-  text-decoration: none;
-  opacity: 0.75;
-  transition: opacity 0.2s;
+  background: linear-gradient(180deg, var(--bs-primary) 0%, #0c0e3a 100%);
+  overflow-y: auto;
+  
+  // High-performance smooth animations
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(1.03);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 
-  span {
-    font-size: 0.65rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+  &.active {
+    opacity: 1;
+    pointer-events: all;
+    transform: scale(1);
   }
 
-  &:hover {
-    opacity: 1;
-    color: white;
+  .mobile-menu-header {
+    border-bottom: none;
+  }
+
+  .btn-close-menu {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2);
+    border: none;
+    transition: all 0.2s ease;
+
+    &:active {
+      transform: scale(0.9);
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+  }
+
+  .mobile-menu-content {
+    min-height: calc(100dvh - 70px);
+  }
+
+  .user-greeting {
+    .greeting-subtitle {
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      color: rgba(255, 255, 255, 0.5);
+      font-weight: 500;
+    }
+    .greeting-title {
+      font-size: 2.8rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      color: #ffffff;
+      margin-top: 0.1rem;
+    }
+  }
+
+  /* Navigation Items */
+  .mobile-nav-routes {
+    width: 100%;
+  }
+
+  .mobile-nav-route-item {
+    position: relative;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.05rem;
+    padding: 0.75rem 0.25rem !important;
+    transition: all 0.2s ease;
+
+    .route-icon {
+      font-size: 1.15rem;
+      opacity: 0.8;
+      transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    &.active {
+      color: #ffffff !important;
+
+      .route-icon {
+        color: #ffffff;
+        opacity: 1;
+        transform: scale(1.05);
+      }
+    }
+
+    &:active {
+      transform: translateY(1px);
+      opacity: 0.9;
+    }
+  }
+
+  .mobile-footer-btn {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.8) !important;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    
+    &:active {
+      transform: scale(0.95);
+      opacity: 1;
+    }
+  }
+}
+
+.dropdown-menu-dark {
+  background-color: var(--bs-dark) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px;
+}
+
+// Mobile top header subject selector glassmorphic overrides
+.teacher-mobile-header ::ng-deep {
+  app-syllex-select-input {
+    .filter-input-pill {
+      background-color: rgba(255, 255, 255, 0.08) !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      color: rgba(255, 255, 255, 0.9) !important;
+      padding-top: 0.4rem !important;
+      padding-bottom: 0.4rem !important;
+      font-size: 0.85rem !important;
+
+      &.form-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgba(255,255,255,0.6)' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+
+        option {
+          background-color: var(--bs-dark);
+          color: #ffffff;
+        }
+      }
+    }
   }
 }
 
