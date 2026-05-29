@@ -39,6 +39,7 @@ import { FeedbackService } from '../../../services/feedback-service';
 import { GeminiLiveService } from '../../../services/gemini-live-service';
 import { Materia } from '../../../services/materia';
 import { firstValueFrom } from 'rxjs';
+import { SyllexButton } from '../UI/syllex-button/syllex-button';
 
 export interface ChatMessage {
   _id?: string;
@@ -51,11 +52,18 @@ export interface ChatMessage {
 
 @Component({
   selector: 'app-agent-chat',
-  imports: [FormsModule, FontAwesomeModule, MarkdownComponent],
+  imports: [FormsModule, FontAwesomeModule, MarkdownComponent, SyllexButton],
   templateUrl: './agent-chat.html',
   styleUrl: './agent-chat.scss',
 })
 export class AgentChat implements OnInit, OnDestroy {
+  readonly newChatBtnProps = {
+    label: 'Nuova Chat',
+    variant: 'primary' as const,
+    color: 'celestine' as const,
+    size: 'medium' as const,
+    leftIcon: faPlus,
+  };
   // --- Icons ---
   SendIcon = faPaperPlane;
   faHeadphones = faHeadphones;
