@@ -43,6 +43,10 @@
   cursor: pointer;
 }
 
+#studentProfileDropdown::after {
+  display: none !important;
+}
+
 :host ::ng-deep {
   app-syllex-select-input {
     .filter-input-pill {
