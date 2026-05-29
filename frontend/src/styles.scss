@@ -164,6 +164,34 @@ body {
   letter-spacing: -0.02em;
 }
 
+// ──────────────────────────────────────────────────────────────────────────────
+// Global responsive overflow & typography fixes for intermediate breakpoints
+// Target: 1366×658 viewport with 250px sidebar = ~1116px content area
+// ──────────────────────────────────────────────────────────────────────────────
+@media (min-width: 992px) and (max-width: 1399px) {
+  // Prevent h1-h3 from overflowing narrow content areas
+  h1, h2, h3 {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+  }
+
+  // Tighter section titles (fs-2 is too large at this breakpoint)
+  .fs-2 {
+    font-size: 1.35rem !important;
+  }
+
+  // Reduce spacing on display-6 headings
+  .display-6 {
+    font-size: 1.5rem !important;
+  }
+
+  // Breadcrumb / header rows should wrap
+  .d-flex.flex-row {
+    min-width: 0;
+  }
+}
+
 // Riduci la spaziatura tra lettere su tutto
 /* html,
 body,
@@ -256,6 +284,11 @@ button {
   border-radius: 30px;
   border: none;
   background-color: #eef4ff;
+
+  @media (min-width: 992px) and (max-width: 1399px) {
+    padding: 1.5rem;
+    border-radius: 24px;
+  }
 
   @media (max-width: 991px) {
     padding: 1.25rem;

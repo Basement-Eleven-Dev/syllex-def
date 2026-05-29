@@ -63,7 +63,7 @@
       </button>
     </div>
 
-    <div class="px-3 px-md-5 pt-4 d-none d-lg-block">
+    <div class="nav-pad pt-4 d-none d-lg-block">
       <app-nav></app-nav>
     </div>
     <div
@@ -72,7 +72,7 @@
       (scroll)="onContentScroll($event)"
     >
       <div
-        class="px-md-5 flex-grow-1 d-flex flex-column"
+        class="content-pad flex-grow-1 d-flex flex-column"
         [class.px-3]="!isAgentRoute()"
         [class.py-4]="!isAgentRoute()"
         style="min-height: 0; min-width: 0; view-transition-name: teacher-content"

@@ -3,8 +3,8 @@
   [description]="'scopri le azioni che puoi fare oggi.'"
 />
 
-<div class="row g-4 mb-4">
-  <div class="col-12 col-lg-3">
+<div class="row g-3 mb-4">
+  <div class="col-12 col-md-6 col-xl-3">
     <app-syllex-card
       title="Carica materiali"
       description="Upload rapido di PDF, file, immagini e appunti tramite drag & drop."
@@ -14,7 +14,7 @@
       link="/t/risorse"
     ></app-syllex-card>
   </div>
-  <div class="col-12 col-lg-3">
+  <div class="col-12 col-md-6 col-xl-3">
     <app-syllex-card
       title="Genera un materiale con AI"
       description="Scegli tra diverse opzioni per creare contenuti personalizzati."
@@ -24,7 +24,7 @@
       link="/t/laboratorio-ai"
     ></app-syllex-card>
   </div>
-  <div class="col p-4">
+  <div class="col-12 col-xl-6 p-4">
     <div
       class="d-flex justify-content-between align-items-center text-primary fw-bold fs-4"
     >
@@ -46,8 +46,8 @@
   </div>
 </div>
 
-<div class="row g-4 mb-5">
-  <div class="col-12 col-lg-6">
+<div class="row g-3 mb-5">
+  <div class="col-12 col-xl-6">
     <app-syllex-banner
       [title]="bannerTitle"
       buttonText="Provalo subito"
@@ -58,7 +58,7 @@
     >
     </app-syllex-banner>
   </div>
-  <div class="col-12 col-lg-3">
+  <div class="col-12 col-md-6 col-xl-3">
     <app-syllex-card
       [title]="testsToGradeCount + ' test da correggere'"
       [description]="testsToGradeCount > 0 ? 'Hai ancora delle verifiche da correggere per ' + selectedMateriaName : 'Nessuna verifica in attesa di correzione per ' + selectedMateriaName"
@@ -69,7 +69,7 @@
       link="/t/tests"
     ></app-syllex-card>
   </div>
-  <div class="col-12 col-lg-3">
+  <div class="col-12 col-md-6 col-xl-3">
     <app-syllex-card
       title="Genera un test con AI"
       description="Scegli materia, argomento e difficoltà."

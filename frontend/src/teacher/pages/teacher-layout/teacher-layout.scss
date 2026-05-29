@@ -6,6 +6,25 @@
   }
 }
 
+// Content area responsive padding
+// At 1366px (lg-xl breakpoint) with 250px sidebar we have limited space.
+// Reduce px from 3rem to 1.5rem at intermediate widths, restore at xxl.
+.content-pad,
+.nav-pad {
+  padding-left: 1rem;
+  padding-right: 1rem;
+
+  @media (min-width: 992px) {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  @media (min-width: 1400px) {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+}
+
 /* Mobile Top Header */
 .teacher-mobile-header {
   background-color: var(--bs-primary) !important;
