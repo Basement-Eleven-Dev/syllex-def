@@ -84,6 +84,18 @@
     letter-spacing: 0.05em;
   }
 
+  app-syllex-button {
+    display: block;
+    width: 100%;
+
+    ::ng-deep .btn {
+      width: 100% !important;
+      display: flex !important;
+      justify-content: center;
+    }
+  }
+
+
   .btn-sidebar-config {
     border: none;
     background: rgba(57, 49, 206, 0.1);
@@ -1042,14 +1054,6 @@
   }
 
   app-syllex-button {
-    display: block;
-    width: 100%;
-
-    ::ng-deep .btn {
-      width: 100% !important;
-      display: flex !important;
-    }
-
     ::ng-deep .btn-celestine {
       color: var(--student-bg) !important;
       font-weight: 700 !important;
