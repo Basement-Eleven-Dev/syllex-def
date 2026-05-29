@@ -852,26 +852,28 @@ body.tour-active::after {
 }
 
 /* Agent Page Layout Background Overrides */
-body:has(.agent-page-root) {
-  // Layer a semi-transparent white gradient on top of the image to lighten it dynamically (65% white, 35% wallpaper)
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.8)),
-    url("/images/sfondo_chat.png") !important;
-  background-size: cover !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-  background-attachment: fixed !important;
+@media (min-width: 992px) {
+  body:has(.agent-page-root) {
+    // Layer a semi-transparent white gradient on top of the image to lighten it dynamically (65% white, 35% wallpaper)
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.8)),
+      url("/images/sfondo_chat.png") !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
 
-  // Make only high-level layout containers transparent to let the body background show through
-  #content,
-  #content > div,
-  .bg-page,
-  .agent-page-root,
-  app-agent-chat,
-  .agent-chat-wrapper,
-  .main-content {
-    background-color: transparent !important;
-    background-image: none !important;
+    // Make only high-level layout containers transparent to let the body background show through
+    #content,
+    #content > div,
+    .bg-page,
+    .agent-page-root,
+    app-agent-chat,
+    .agent-chat-wrapper,
+    .main-content {
+      background-color: transparent !important;
+      background-image: none !important;
+    }
   }
 }
 
