@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Auth } from '../../../../services/auth';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
+
 import {
   IconDefinition,
 } from '@fortawesome/angular-fontawesome';
@@ -23,13 +23,12 @@ interface AdminNavRoute {
   label: string;
   icon: IconDefinition;
   route: string;
-  tourAnchor?: string;
 }
 
 @Component({
   selector: 'app-admin-sidebar',
   standalone: true,
-  imports: [FontAwesomeModule, RouterModule, TourAnchorNgBootstrapDirective],
+  imports: [FontAwesomeModule, RouterModule],
   templateUrl: './admin-sidebar.html',
   styleUrl: './admin-sidebar.scss',
 })
@@ -37,16 +36,15 @@ export class AdminSidebar {
   private auth = inject(Auth);
 
   private rawRoutes: AdminNavRoute[] = [
-    { label: 'Dashboard', icon: faHouse, route: '/a/dashboard', tourAnchor: 'admin-dashboard' },
+    { label: 'Dashboard', icon: faHouse, route: '/a/dashboard' },
     { label: 'Onboarding', icon: faCirclePlay, route: '/a/onboarding' },
     {
       label: 'Organizzazioni',
       icon: faLandmark,
       route: '/a/organizzazioni',
-      tourAnchor: 'admin-organizations'
     },
-    { label: 'Statistiche', icon: faChartBar, route: '/a/stats', tourAnchor: 'admin-stats' },
-    { label: 'Knowledge Source', icon: faBook, route: '/a/knowledge-source', tourAnchor: 'admin-knowledge-source' },
+    { label: 'Statistiche', icon: faChartBar, route: '/a/stats' },
+    { label: 'Knowledge Source', icon: faBook, route: '/a/knowledge-source' },
     { label: 'Segnalazioni Bug', icon: faBug, route: '/a/reports' },
   ];
 
