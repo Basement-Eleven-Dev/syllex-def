@@ -274,16 +274,10 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
       return;
     }
 
-    from(questionIds)
+    this.questionsService
+      .loadQuestionsBatch(questionIds)
       .pipe(
-        mergeMap(
-          (id) =>
-            this.questionsService.loadQuestion(id).pipe(
-              catchError(() => of(null)) // Handle individual errors gracefully
-            ),
-          5 // MAX 5 CONCURRENT REQUESTS
-        ),
-        toArray(),
+        catchError(() => of([])),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({

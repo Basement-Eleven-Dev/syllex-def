@@ -193,16 +193,10 @@ export class TestDetail {
             return of({ test: fullTest, questions: [] });
           }
 
-          // 2. Fetch full details for each question
-          return from(fullTest.questions).pipe(
-            mergeMap(
-              (q: any) =>
-                this.questionsService.loadQuestion(q.questionId).pipe(
-                  catchError(() => of(null)) // Handle individual errors gracefully
-                ),
-              5 // MAX 5 CONCURRENT REQUESTS
-            ),
-            toArray(),
+          // 2. Fetch full details for each question in a single batch call
+          const questionIds = fullTest.questions.map((q: any) => q.questionId);
+          return this.questionsService.loadQuestionsBatch(questionIds).pipe(
+            catchError(() => of([])),
             switchMap((fullQuestions) =>
               of({ test: fullTest, questions: fullQuestions.filter(Boolean) }),
             ),

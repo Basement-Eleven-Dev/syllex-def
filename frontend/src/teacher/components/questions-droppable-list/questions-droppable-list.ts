@@ -144,19 +144,18 @@ export class QuestionsDroppableList implements OnChanges {
     const pointsMap = new Map(
       questionsData.map((d) => [d.questionId, d.points]),
     );
-    from(questionsData)
+    const questionIds = questionsData.map((d) => d.questionId);
+    this.questionsService
+      .loadQuestionsBatch(questionIds)
       .pipe(
-        mergeMap(
-          (d) =>
-            this.questionsService.loadQuestion(d.questionId).pipe(
-              catchError(() => of(null)) // Handle individual errors
-            ),
-          5 // MAX 5 CONCURRENT REQUESTS
+        catchError(() => of([])),
+        map((questions) =>
+          questions.map((q) => ({
+            ...q,
+            points: pointsMap.get(q._id) ?? 1,
+          })),
         ),
-        map((q) => (q ? { ...q, points: pointsMap.get(q._id) ?? 1 } : null)),
-        // Remove nulls if any question failed to load
-        map((q) => q as QuestionWithPoints),
-        toArray()
+        map((questions) => questions as QuestionWithPoints[])
       )
       .subscribe({
         next: (questions) => {
