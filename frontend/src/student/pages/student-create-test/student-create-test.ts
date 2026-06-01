@@ -14,13 +14,14 @@ import { StudentTestsService } from '../../../services/student-tests.service';
 import { SyllexPageHeader } from '../../../teacher/components/UI/syllex-page-header/syllex-page-header';
 import { SyllexButton } from '../../../teacher/components/UI/syllex-button/syllex-button';
 import { SelectOption, SyllexSelectInput } from '../../../teacher/components/UI/syllex-select-input/syllex-select-input';
+import { BackTo } from '../../../teacher/components/back-to/back-to';
 
 type QuestionType = 'scelta multipla' | 'vero falso' | 'risposta aperta';
 
 @Component({
   selector: 'app-student-create-test',
   standalone: true,
-  imports: [FontAwesomeModule, RouterModule, SyllexPageHeader, SyllexButton, SyllexSelectInput],
+  imports: [FontAwesomeModule, RouterModule, SyllexPageHeader, SyllexButton, SyllexSelectInput, BackTo],
   templateUrl: './student-create-test.html',
   styleUrl: './student-create-test.scss',
 })
