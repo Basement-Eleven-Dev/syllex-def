@@ -40,6 +40,7 @@ import { StudentTestCardCompact } from '../../components/student-test-card-compa
 import { StudentComunicazioneCard } from '../../components/student-comunicazione-card/student-comunicazione-card';
 import { StatCardData } from '../../../teacher/components/stat-card/stat-card';
 import { SyllexButton } from '../../../teacher/components/UI/syllex-button/syllex-button';
+import { AlexMascot } from '../../../app/shared/components/alex-mascot/alex-mascot';
 
 @Component({
   selector: 'app-dashbaord',
@@ -51,7 +52,8 @@ import { SyllexButton } from '../../../teacher/components/UI/syllex-button/sylle
     StudentTestCardCompact,
     StudentComunicazioneCard,
     SyllexButton,
-  ],
+    AlexMascot,
+],
   templateUrl: './student-dashboard.html',
   styleUrl: './student-dashboard.scss',
 })

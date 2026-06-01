@@ -40,6 +40,8 @@ import { GeminiLiveService } from '../../../services/gemini-live-service';
 import { Materia } from '../../../services/materia';
 import { firstValueFrom } from 'rxjs';
 import { SyllexButton } from '../UI/syllex-button/syllex-button';
+import { CommonModule } from '@angular/common';
+import { AlexMascot } from '../../../app/shared/components/alex-mascot/alex-mascot';
 
 export interface ChatMessage {
   _id?: string;
@@ -52,7 +54,8 @@ export interface ChatMessage {
 
 @Component({
   selector: 'app-agent-chat',
-  imports: [FormsModule, FontAwesomeModule, MarkdownComponent, SyllexButton],
+  standalone: true,
+  imports: [CommonModule, FormsModule, FontAwesomeModule, MarkdownComponent, SyllexButton, AlexMascot ],
   templateUrl: './agent-chat.html',
   styleUrl: './agent-chat.scss',
 })

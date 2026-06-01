@@ -31,6 +31,8 @@
       <div
         class="intro-welcome d-flex flex-column align-items-center justify-content-center mx-auto"
       >
+        <app-alex-mascot [variant]="userRole() === 'teacher' ? 'teacher' : 'student'"></app-alex-mascot>
+
         <h2 class="fw-bold mb-2 text-center intro-welcome__title">
           Ciao, sono Alex!
         </h2>
