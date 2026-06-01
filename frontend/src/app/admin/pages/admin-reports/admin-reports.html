@@ -1,0 +1,160 @@
+<div class="container-fluid p-4">
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <h2 class="fw-bold mb-1 d-flex align-items-center gap-2">
+        <fa-icon [icon]="BugIcon" class="text-danger"></fa-icon>
+        Segnalazioni Bug
+      </h2>
+      <p class="text-muted mb-0">Gestisci le segnalazioni di bug inviate da studenti e docenti.</p>
+    </div>
+    <div>
+      <button class="btn btn-outline-primary d-flex align-items-center gap-2" (click)="loadReports()" [disabled]="isLoading()">
+        @if(isLoading()) {
+          <fa-icon [icon]="SpinnerIcon" animation="spin"></fa-icon>
+        }
+        Aggiorna
+      </button>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0 border-radius-xl">
+    <div class="card-body p-0">
+      @if (isLoading()) {
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary" role="status"></div>
+          <p class="mt-3 text-muted fw-semibold">Caricamento segnalazioni...</p>
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col" class="ps-4">Data</th>
+                <th scope="col">Utente</th>
+                <th scope="col">Segnalazione</th>
+                <th scope="col">Stato</th>
+                <th scope="col">Azioni</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (report of reports(); track report._id) {
+                <tr>
+                  <td class="ps-4 text-muted small whitespace-nowrap">
+                    {{ formatDate(report.createdAt) }}
+                  </td>
+                  <td>
+                    @if (report.user) {
+                      <div class="d-flex flex-column">
+                        <span class="fw-bold">{{ report.user.firstName }} {{ report.user.lastName }}</span>
+                        <span class="small text-muted">{{ report.user.email }} ({{ report.user.role }})</span>
+                      </div>
+                    } @else {
+                      <span class="text-muted font-italic">Utente sconosciuto</span>
+                    }
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="text-wrap text-truncate" style="max-width: 300px; font-size: 0.9rem;">
+                        {{ report.comment }}
+                      </div>
+                      <button class="btn btn-sm btn-light border-0 text-muted" (click)="openReportModal(reportModal, report)" title="Vedi dettagli">
+                        <fa-icon [icon]="EyeIcon"></fa-icon>
+                      </button>
+                    </div>
+                  </td>
+                  <td>
+                    <span [class]="getStatusBadgeClass(report.status)">
+                      <fa-icon [icon]="getStatusIcon(report.status)" class="me-1"></fa-icon>
+                      {{ report.status | uppercase }}
+                    </span>
+                  </td>
+                  <td>
+                    <select 
+                      class="form-select form-select-sm w-auto" 
+                      [value]="report.status || 'open'" 
+                      (change)="updateStatus(report, $event)"
+                    >
+                      <option value="open">Open</option>
+                      <option value="in-progress">In Progress</option>
+                      <option value="resolved">Resolved</option>
+                      <option value="closed">Closed</option>
+                    </select>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="5" class="text-center py-5 text-muted">
+                    Nessuna segnalazione di bug trovata. Il sistema funziona perfettamente! 🎉
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<ng-template #reportModal let-modal>
+  <div class="modal-header border-0 pb-0">
+    <h5 class="modal-title fw-bold">Dettagli Segnalazione</h5>
+    <button type="button" class="btn text-muted border-0 bg-transparent" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <fa-icon [icon]="TimesIcon" class="fs-5"></fa-icon>
+    </button>
+  </div>
+  <div class="modal-body pt-3">
+    @if (selectedReport(); as report) {
+      <div class="mb-4">
+        <h6 class="text-muted fw-bold small text-uppercase mb-2">Testo Segnalazione</h6>
+        <div class="p-3 bg-light rounded-3" style="font-size: 0.95rem; line-height: 1.5;">
+          {{ report.comment }}
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <h6 class="text-muted fw-bold small text-uppercase mb-1">Utente</h6>
+          <div class="small fw-semibold">
+            @if(report.user) {
+              {{ report.user.firstName }} {{ report.user.lastName }} ({{ report.user.role }})<br>
+              <span class="text-muted fw-normal">{{ report.user.email }}</span>
+            } @else {
+              Sconosciuto
+            }
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <h6 class="text-muted fw-bold small text-uppercase mb-1">Data & Stato</h6>
+          <div class="small fw-semibold">
+            {{ formatDate(report.createdAt) }}<br>
+            <span [class]="getStatusBadgeClass(report.status)" class="mt-1 d-inline-block">
+              {{ report.status | uppercase }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      @if(report.userAgent) {
+        <div class="mb-3">
+          <h6 class="text-muted fw-bold small text-uppercase mb-1">Dispositivo/Browser (User Agent)</h6>
+          <div class="small text-muted bg-light p-2 rounded border" style="font-family: monospace; font-size: 0.75rem;">
+            {{ report.userAgent }}
+          </div>
+        </div>
+      }
+      
+      @if(report.url) {
+        <div class="mb-3">
+          <h6 class="text-muted fw-bold small text-uppercase mb-1">URL di Provenienza</h6>
+          <a [href]="report.url" target="_blank" class="small text-primary text-decoration-none">
+            {{ report.url }}
+          </a>
+        </div>
+      }
+    }
+  </div>
+  <div class="modal-footer border-0 pt-0">
+    <button type="button" class="btn btn-secondary fw-semibold" (click)="modal.close('Close click')">Chiudi</button>
+  </div>
+</ng-template>

@@ -9,29 +9,29 @@ const createReport = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
-  const teacherId = context.user?._id;
+  const userId = context.user?._id;
 
-  if (!teacherId) {
-    throw createError.Unauthorized("Teacher ID is required");
+  if (!userId) {
+    throw createError.Unauthorized("User ID is required");
   }
 
   const body = JSON.parse(request.body || "{}");
   const { comment, url, userAgent } = body;
   const subjectId = context.subjectId;
 
-  if (!subjectId || !comment) {
-    throw createError.BadRequest("subjectId and comment are required");
+  if (!comment) {
+    throw createError.BadRequest("comment is required");
   }
 
   await connectDatabase();
 
   const newReport = {
-    teacherId: teacherId,
-    subjectId: subjectId,
+    teacherId: userId, // Maintains compatibility with existing schema field name
+    subjectId: subjectId || undefined,
     comment,
     url: url || undefined,
     userAgent: userAgent || undefined,
-    status: "pending",
+    status: "open", // Correct enum value, instead of 'pending'
     createdAt: new Date(),
   };
 

@@ -16,6 +16,7 @@ import {
   faSparkles,
   faCirclePlay,
   faChartBar,
+  faBug,
 } from '@fortawesome/pro-solid-svg-icons';
 
 interface AdminNavRoute {
@@ -46,6 +47,7 @@ export class AdminSidebar {
     },
     { label: 'Statistiche', icon: faChartBar, route: '/a/stats', tourAnchor: 'admin-stats' },
     { label: 'Knowledge Source', icon: faBook, route: '/a/knowledge-source', tourAnchor: 'admin-knowledge-source' },
+    { label: 'Segnalazioni Bug', icon: faBug, route: '/a/reports' },
   ];
 
   get routes(): AdminNavRoute[] {

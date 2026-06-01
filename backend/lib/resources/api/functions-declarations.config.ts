@@ -292,9 +292,21 @@ const MISC_ROUTES: FunctionIntegration[] = [
   },
   {
     apiRoute: "reports",
+    functionPath: "reports/getReports.ts",
+    method: "get",
+    role: "admin",
+  },
+  {
+    apiRoute: "reports/:id",
+    functionPath: "reports/updateReport.ts",
+    method: "put",
+    role: "admin",
+  },
+  {
+    apiRoute: "reports",
     functionPath: "reports/createReport.ts",
     method: "post",
-    role: "teacher",
+    role: "logged",
   },
 ];
 
