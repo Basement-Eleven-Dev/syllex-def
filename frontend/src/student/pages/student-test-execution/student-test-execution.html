@@ -165,6 +165,7 @@
     mode="student"
     [locked]="isQuestionLocked(question)"
     [dimmed]="isQuestionLocked(question)"
+    [showCorrectness]="false"
     [selectedAnswer]="Answers()[question._id]"
     (answerChange)="onAnswerChange(question._id, $event)"
   ></div>

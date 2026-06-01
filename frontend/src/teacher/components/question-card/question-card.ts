@@ -82,6 +82,7 @@ export class QuestionCard {
   @Input() questionStatus: 'correct' | 'wrong' | 'incorrect' | 'semi-correct' | 'partial' | 'pending' | null = null;
   @Input() teacherFeedback: string | null = null;
   @Input() feedbackLabel: string = 'Commento del docente';
+  @Input() showCorrectness: boolean = true;
   @Output() answerChange = new EventEmitter<number | string>();
 
   onExpandImage(img: string): void {

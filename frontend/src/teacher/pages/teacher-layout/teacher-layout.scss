@@ -165,6 +165,37 @@
   background-color: var(--bs-dark) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   border-radius: 12px;
+
+  ::ng-deep {
+    app-user-contextual-menu {
+      color: #fff;
+
+      h5, span:not(.dot) {
+        color: #fff !important;
+      }
+
+      .btn.link {
+        color: rgba(255, 255, 255, 0.85) !important;
+
+        &:hover {
+          color: #fff !important;
+          background-color: rgba(255, 255, 255, 0.08) !important;
+        }
+
+        &.logout {
+          color: var(--bs-danger) !important;
+
+          &:hover {
+            background-color: rgba(239, 68, 68, 0.15) !important;
+          }
+        }
+      }
+
+      hr {
+        border-color: rgba(255, 255, 255, 0.1) !important;
+      }
+    }
+  }
 }
 
 // Mobile top header subject selector glassmorphic overrides
