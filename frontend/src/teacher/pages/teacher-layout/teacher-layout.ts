@@ -7,7 +7,9 @@ import {
   OnDestroy,
   ViewChild,
   HostListener,
+  computed,
 } from '@angular/core';
+import { SelectOption, SyllexSelectInput } from '../../components/UI/syllex-select-input/syllex-select-input';
 import {
   TourAnchorNgBootstrapDirective,
   TourService,
@@ -38,11 +40,19 @@ import {
   faBallotCheck,
   faUsers,
   faFile,
+  faClipboardQuestion,
+  faCalendarAlt,
+  faHeadSideBrain,
+  faSparkles,
+  faXmark,
+  faGrip,
+  faGear,
 } from '@fortawesome/pro-solid-svg-icons';
 import {
   NgbDropdown,
   NgbDropdownToggle,
   NgbDropdownMenu,
+  NgbModal,
 } from '@ng-bootstrap/ng-bootstrap';
 import { Materia } from '../../../services/materia';
 import { CommonModule } from '@angular/common';
@@ -56,6 +66,7 @@ import { test_steps } from '../../../tours/tour_test';
 import { comunicazioni_steps } from '../../../tours/tour_comunicazioni';
 import { eventi_steps } from '../../../tours/tour_eventi';
 import { crea_domanda_steps } from '../../../tours/tour_crea_domanda';
+import { SubjectSettingsModal } from '../../components/subject-settings-modal/subject-settings-modal';
 
 @Component({
   selector: 'app-teacher-layout',
@@ -71,6 +82,7 @@ import { crea_domanda_steps } from '../../../tours/tour_crea_domanda';
     NgbDropdownToggle,
     NgbDropdownMenu,
     UserContextualMenu,
+    SyllexSelectInput,
   ],
   templateUrl: './teacher-layout.html',
   styleUrl: './teacher-layout.scss',
@@ -81,6 +93,7 @@ export class TeacherLayout implements OnInit, OnDestroy {
   showLoading = signal<boolean>(false);
   hasTourForRoute = signal<boolean>(false);
   sidebarOpen = signal<boolean>(false);
+  mobileMenuOpen = signal<boolean>(false);
   navHidden = signal<boolean>(false);
   isAgentRoute = signal<boolean>(false);
   hideBottomNavRoute = signal<boolean>(false);
@@ -92,16 +105,63 @@ export class TeacherLayout implements OnInit, OnDestroy {
   FileIcon = faFile;
   UserProfileIcon = faUserCircle;
   HelpIcon = faQuestionCircle;
+  GripIcon = faGrip;
+  XmarkIcon = faXmark;
+  SparklesIcon = faSparkles;
+  HeadSideBrainIcon = faHeadSideBrain;
+  LogoutIcon = faSignOutAlt;
+  GearIcon = faGear;
 
   public materia = inject(Materia);
   private feedbackService = inject(FeedbackService);
   public tourService: TourService = inject(TourService) as TourService;
-  private authService = inject(Auth);
+  public authService = inject(Auth);
   private router = inject(Router);
+  private modalService = inject(NgbModal);
   private destroy$ = new Subject<void>();
 
   SpinnerIcon = faSpinnerThird;
   InfoIcon = faInfoCircle;
+
+  mainRoutes = [
+    {
+      path: 'dashboard',
+      label: 'Home',
+      icon: faGauge,
+    },
+    {
+      path: 'tests',
+      label: 'Test',
+      icon: faBallotCheck,
+    },
+    {
+      path: 'banca',
+      label: 'Banca Domande',
+      icon: faClipboardQuestion,
+    },
+    {
+      path: 'classi',
+      label: 'Classi',
+      icon: faUsers,
+    },
+    {
+      path: 'risorse',
+      label: 'File e Risorse',
+      icon: faFile,
+    },
+    {
+      path: 'calendario',
+      label: 'Calendario',
+      icon: faCalendarAlt,
+    },
+  ];
+
+  subjectOptions = computed<SelectOption[]>(() => {
+    return this.materia.allMaterie().map((m) => ({
+      value: m._id,
+      label: m.name,
+    }));
+  });
 
   constructor() {
     effect(() => {
@@ -231,5 +291,40 @@ export class TeacherLayout implements OnInit, OnDestroy {
         break;
     }
     this.tourService.start();
+  }
+
+  toggleMobileMenu() {
+    this.mobileMenuOpen.update((v) => !v);
+  }
+
+  closeMobileMenu() {
+    this.mobileMenuOpen.set(false);
+  }
+
+  onLogout(): void {
+    this.authService.logout();
+  }
+
+  navigateToLabAi(): void {
+    if (this.router.url === '/t/laboratorio-ai') {
+      this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+        this.router.navigate(['/t/laboratorio-ai']);
+      });
+    } else {
+      this.router.navigate(['/t/laboratorio-ai']);
+    }
+  }
+
+  onSubjectChange(subjectId: string) {
+    const subject = this.materia.allMaterie().find((m) => m._id === subjectId);
+    if (subject) {
+      this.materia.setSelectedSubject(subject);
+    }
+  }
+
+  onRequestSubjectSettings() {
+    this.modalService.open(SubjectSettingsModal, {
+      centered: true,
+    });
   }
 }

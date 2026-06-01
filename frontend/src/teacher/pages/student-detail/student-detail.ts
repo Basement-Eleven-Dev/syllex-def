@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, effect } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { StudentInfoComponent } from '../../components/student-info/student-info';
@@ -76,12 +76,21 @@ export class StudentDetail implements OnInit {
     faCheckCircle,
   };
 
+  constructor() {
+    effect(() => {
+      const subject = this.materiaService.materiaSelected();
+      const sId = this.studentId();
+      
+      if (sId) {
+        this.subjectId.set(subject?._id || null);
+        this.loadData();
+      }
+    }, { allowSignalWrites: true });
+  }
+
   ngOnInit() {
     this.studentId.set(this.route.snapshot.paramMap.get('studentId'));
     this.classId.set(this.route.snapshot.paramMap.get('classeId'));
-    // Usa la materia selezionata dal servizio
-    this.subjectId.set(this.materiaService.materiaSelected()?._id || null);
-    this.loadData();
   }
 
   loadData() {
@@ -107,6 +116,8 @@ export class StudentDetail implements OnInit {
 
   onPageChange(page: number) {
     this.currentPage.set(page);
+    // loadData is already called by the effect when currentPage could theoretically be tracked,
+    // but since currentPage isn't explicitly tracked in the effect yet, we call it manually here.
     this.loadData();
   }
 }

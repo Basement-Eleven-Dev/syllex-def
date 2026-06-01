@@ -11,13 +11,17 @@ import {
 } from '@fortawesome/pro-solid-svg-icons';
 import { Materia, TopicObject } from '../../../services/materia';
 import { StudentTestsService } from '../../../services/student-tests.service';
+import { SyllexPageHeader } from '../../../teacher/components/UI/syllex-page-header/syllex-page-header';
+import { SyllexButton } from '../../../teacher/components/UI/syllex-button/syllex-button';
+import { SelectOption, SyllexSelectInput } from '../../../teacher/components/UI/syllex-select-input/syllex-select-input';
+import { BackTo } from '../../../teacher/components/back-to/back-to';
 
 type QuestionType = 'scelta multipla' | 'vero falso' | 'risposta aperta';
 
 @Component({
   selector: 'app-student-create-test',
   standalone: true,
-  imports: [FontAwesomeModule, RouterModule],
+  imports: [FontAwesomeModule, RouterModule, SyllexPageHeader, SyllexButton, SyllexSelectInput, BackTo],
   templateUrl: './student-create-test.html',
   styleUrl: './student-create-test.scss',
 })
@@ -31,6 +35,9 @@ export class StudentCreateTest {
   readonly RemoveIcon = faXmark;
 
   readonly AllSubjects = this.materiaService.allMaterie;
+  readonly SubjectOptions = computed<SelectOption[]>(() =>
+    this.AllSubjects().map((s) => ({ value: s._id, label: s.name })),
+  );
   readonly AllQuestionTypes: QuestionType[] = [
     'scelta multipla',
     'vero falso',
@@ -60,7 +67,7 @@ export class StudentCreateTest {
   readonly ShowCountWarning = computed(() => {
     const count = this.QuestionCount();
     const available = this.AvailableQuestionsCount();
-    return available !== null && count > available;
+    return available !== null && available > 0 && count > available;
   });
 
   constructor() {

@@ -6,6 +6,10 @@
 .bg-page {
   background-color: #f8f9fa;
   height: 100%;
+
+  :host-context(.student-theme) & {
+    background-color: var(--student-bg) !important;
+  }
 }
 
 .config-wrapper {
@@ -16,7 +20,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start; // Partiamo dall'alto ma con padding
-  
+
   @media (min-height: 800px) {
     justify-content: center; // Centriamo solo se c'è abbastanza altezza
   }
@@ -37,6 +41,54 @@
   &.active-subject {
     background-color: #4343e8;
     color: white !important;
-    span { color: white !important; }
+    span {
+      color: white !important;
+    }
+  }
+}
+
+// ── Subjects sidebar: retractable (mirrors .chat-sidebar pattern) ─────────────
+.subject-sidebar {
+  width: 280px;
+  min-width: 280px;
+  flex-shrink: 0;
+  background-color: #fff;
+  border-right: 1px solid #dee2e6;
+  position: relative;
+  transition:
+    width 0.25s ease,
+    min-width 0.25s ease;
+
+  &.collapsed {
+    width: 40px;
+    min-width: 40px;
+  }
+
+  // Toggle knob — sits on the right edge, overlaps the chat area
+  .subject-toggle-btn {
+    position: absolute;
+    top: 50%;
+    right: -14px;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid rgba(57, 49, 206, 0.2);
+    background: #d2e2ff;
+    color: #3931ce;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    cursor: pointer;
+    z-index: 15;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    transition:
+      background 0.15s,
+      color 0.15s;
+
+    &:hover {
+      background: #3931ce;
+      color: white;
+    }
   }
 }

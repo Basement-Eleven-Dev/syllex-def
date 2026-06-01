@@ -121,7 +121,7 @@
             </div>
             <p class="m-0">{{ event.description }}</p>
             <div class="d-flex flex-wrap justify-content-between align-items-center mt-2 gap-2">
-              <p class="mb-0">{{ event.date | date: 'short' }}</p>
+              <p class="mb-0">{{ event.date | date: 'dd/MM/yyyy' }}</p>
               @if (!readonly()) {
               <div class="d-flex flex-wrap gap-2">
                 <app-syllex-button
@@ -162,7 +162,7 @@
               }
             </p>
             <div class="d-flex flex-wrap justify-content-between align-items-center mt-2 gap-2">
-              <p class="mb-0">{{ test.availableFrom | date: 'short' }}</p>
+              <p class="mb-0">{{ test.availableFrom | date: 'dd/MM/yyyy' }}</p>
               @if (!readonly()) {
               <div class="d-flex flex-wrap gap-2">
                 <app-syllex-button

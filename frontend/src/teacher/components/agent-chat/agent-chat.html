@@ -7,7 +7,7 @@
   >
     <!-- MOBILE HEADER -->
     <div
-      class="d-flex d-lg-none align-items-center justify-content-between px-3 py-3 bg-white shadow-sm"
+      class="d-flex d-lg-none align-items-center justify-content-between px-3 py-3 bg-white shadow-sm agent-mobile-header"
       style="z-index: 20"
     >
       <h6 class="mb-0 fw-bold text-primary d-flex align-items-center gap-2">
@@ -31,6 +31,8 @@
       <div
         class="intro-welcome d-flex flex-column align-items-center justify-content-center mx-auto"
       >
+        <app-alex-mascot [variant]="userRole() === 'teacher' ? 'teacher' : 'student'"></app-alex-mascot>
+
         <h2 class="fw-bold mb-2 text-center intro-welcome__title">
           Ciao, sono Alex!
         </h2>
@@ -214,11 +216,11 @@
     <!-- Mobile header for sidebar -->
     @if (mobileHistoryOpen()) {
     <div
-      class="d-flex d-lg-none justify-content-between align-items-center p-3 border-bottom bg-white"
+      class="d-flex d-lg-none justify-content-between align-items-center p-3 border-bottom bg-white mobile-sidebar-header"
     >
-      <h6 class="mb-0 fw-bold text-primary">Le tue Chat</h6>
+      <h6 class="mb-0 fw-bold text-primary mobile-sidebar-title">Le tue Chat</h6>
       <button
-        class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center"
+        class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center btn-close-mobile-history"
         style="width: 36px; height: 36px"
         (click)="mobileHistoryOpen.set(false)"
       >
@@ -239,14 +241,11 @@
     </button>
 
     @if (sidebarOpen() || mobileHistoryOpen()) {
-    <div class="p-3 pb-2">
-      <button
-        class="btn btn-primary w-100 rounded-pill d-flex align-items-center justify-content-center gap-2 py-2 shadow-sm mb-2"
-        (click)="startNewChat()"
-      >
-        <fa-icon [icon]="faPlus"></fa-icon>
-        <span>Nuova Chat</span>
-      </button>
+    <div class="p-3 pb-2 d-grid">
+      <app-syllex-button
+        [props]="newChatBtnProps"
+        (clicked)="startNewChat()"
+      ></app-syllex-button>
     </div>
 
     <div class="tiny fw-bold px-3 pb-1 pt-2 sidebar-section-label">

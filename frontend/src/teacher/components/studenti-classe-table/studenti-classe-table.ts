@@ -1,6 +1,5 @@
 import { Component, computed, input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEye } from '@fortawesome/pro-solid-svg-icons';
 import { StudentPerformanceData } from '../../../services/class-statistics.service';
@@ -9,7 +8,7 @@ import { SyllexButton } from '../UI/syllex-button/syllex-button';
 
 @Component({
   selector: 'app-studenti-classe-table',
-  imports: [FontAwesomeModule, SyllexPagination, FormsModule, RouterLink, SyllexButton],
+  imports: [FontAwesomeModule, SyllexPagination, FormsModule, SyllexButton],
   templateUrl: './studenti-classe-table.html',
   styleUrl: './studenti-classe-table.scss',
 })

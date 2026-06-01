@@ -1,4 +1,3 @@
-import { TitleCasePipe } from '@angular/common';
 import {
   Component,
   computed,
@@ -16,7 +15,6 @@ import {
 import { Materia } from '../../../services/materia';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faXmark } from '@fortawesome/pro-solid-svg-icons';
-import { SyllexClearButton } from '../UI/syllex-clear-button/syllex-clear-button';
 import { SyllexSearchInput } from '../UI/syllex-search-input/syllex-search-input';
 import { SyllexSelectInput } from '../UI/syllex-select-input/syllex-select-input';
 import {
@@ -30,9 +28,7 @@ import {
   imports: [
     FormsModule,
     ReactiveFormsModule,
-    TitleCasePipe,
     FontAwesomeModule,
-    SyllexClearButton,
     SyllexSearchInput,
     SyllexSelectInput,
   ],

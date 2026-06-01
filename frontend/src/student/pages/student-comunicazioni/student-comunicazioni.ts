@@ -1,7 +1,6 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { Calendario } from '../../../teacher/components/calendario/calendario';
 import { Materia } from '../../../services/materia';
-import { DatePipe, TitleCasePipe } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEnvelopeOpenText, faChevronRight } from '@fortawesome/pro-solid-svg-icons';
 import { StudentComunicazioneCard } from '../../components/student-comunicazione-card/student-comunicazione-card';
@@ -12,7 +11,7 @@ import {
 
 @Component({
   selector: 'app-student-comunicazioni',
-  imports: [Calendario, DatePipe, TitleCasePipe, FontAwesomeModule, StudentComunicazioneCard],
+  imports: [Calendario, FontAwesomeModule, StudentComunicazioneCard],
   templateUrl: './student-comunicazioni.html',
   styleUrl: './student-comunicazioni.scss',
 })

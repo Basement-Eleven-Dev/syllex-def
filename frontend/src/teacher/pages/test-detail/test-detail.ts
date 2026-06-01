@@ -19,7 +19,8 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TestPrintModal } from '../../components/test-print-modal/test-print-modal';
 import { TestResultsPrintModal } from '../../components/test-results-print-modal/test-results-print-modal';
 import { QuestionsService } from '../../../services/questions';
-import { forkJoin, switchMap, of, tap } from 'rxjs';
+import { forkJoin, switchMap, of, tap, from } from 'rxjs';
+import { catchError, map, mergeMap, toArray } from 'rxjs/operators';
 import {
   KpiCardData,
   SyllexKpiRow,
@@ -192,14 +193,12 @@ export class TestDetail {
             return of({ test: fullTest, questions: [] });
           }
 
-          // 2. Fetch full details for each question
-          const questionRequests = fullTest.questions.map((q: any) =>
-            this.questionsService.loadQuestion(q.questionId),
-          );
-
-          return forkJoin(questionRequests).pipe(
+          // 2. Fetch full details for each question in a single batch call
+          const questionIds = fullTest.questions.map((q: any) => q.questionId);
+          return this.questionsService.loadQuestionsBatch(questionIds).pipe(
+            catchError(() => of([])),
             switchMap((fullQuestions) =>
-              of({ test: fullTest, questions: fullQuestions }),
+              of({ test: fullTest, questions: fullQuestions.filter(Boolean) }),
             ),
           );
         }),

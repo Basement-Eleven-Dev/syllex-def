@@ -57,7 +57,6 @@ interface SidebarRoute {
     NgbCollapseModule,
     FormsModule,
     TourAnchorNgBootstrapDirective,
-    HelpChat,
   ],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.scss',

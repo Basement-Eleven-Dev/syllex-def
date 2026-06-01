@@ -48,9 +48,20 @@
         }
       </section>
 
-      <span class="small"
-        >Ultima modifica: {{ comunicazione.createdAt | date:'short' }}</span
-      >
+      <div class="d-flex align-items-center gap-2">
+        <span class="small"
+          >Ultima modifica: {{ comunicazione.createdAt | date:'short' }}</span
+        >
+        @if (comunicazione.readCount !== undefined) {
+        <span
+          class="badge bg-light text-secondary border small"
+          title="Studenti che hanno letto"
+        >
+          {{ comunicazione.readCount }} {{ comunicazione.readCount === 1 ?
+          'lettura' : 'letture' }}
+        </span>
+        }
+      </div>
     </div>
   </div>
 </div>

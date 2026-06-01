@@ -11,6 +11,8 @@ export interface ComunicazioneInterface {
   subjectId: string;
   createdAt?: Date;
   updatedAt?: Date;
+  isRead?: boolean;
+  readCount?: number;
 }
 
 @Injectable({

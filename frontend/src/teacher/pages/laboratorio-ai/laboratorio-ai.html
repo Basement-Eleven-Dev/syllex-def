@@ -265,11 +265,17 @@
               <input
                 type="number"
                 class="form-control custom-input"
+                [class.is-invalid]="genForm.get('numberOfSlides')?.invalid && genForm.get('numberOfSlides')?.touched"
                 formControlName="numberOfSlides"
                 min="3"
                 max="30"
                 aria-label="Numero di slide"
               />
+              @if (genForm.get('numberOfSlides')?.hasError('max')) {
+                <div class="invalid-feedback d-block mt-1">Massimo 30 slide alla volta.</div>
+              } @if (genForm.get('numberOfSlides')?.hasError('min')) {
+                <div class="invalid-feedback d-block mt-1">Minimo 3 slide.</div>
+              }
             </div>
             <div class="col-6">
               <label class="wizard-field-label">In che lingua?</label>

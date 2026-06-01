@@ -1,49 +1,48 @@
-<div class="compact-test-card" [routerLink]="Route()">
-  <div class="compact-test-card__header">
-    <div class="compact-test-card__title-section">
-      <h4 class="compact-test-card__title">{{ Test().name }}</h4>
-      <span class="compact-test-card__subject">{{ Test().subjectName }}</span>
+<div class="ctc d-flex flex-column gap-2 w-100" [routerLink]="Route()">
+  <!-- Top row: Title and Badges/Status -->
+  <div class="d-flex justify-content-between align-items-start gap-3 w-100">
+    <h6 class="ctc__title fw-semibold mb-0 text-white flex-grow-1 text-start" style="font-size: 0.95rem; line-height: 1.4; white-space: normal;">
+      {{ Test().name }}
+    </h6>
+    
+    <div class="d-flex align-items-center gap-2 flex-shrink-0 mt-0.5">
+      @if (ShowScore()) {
+        <span class="badge bg-purple-light text-purple-accent px-2 py-1 rounded-pill" style="font-size: 0.72rem; font-weight: 500; background-color: rgba(139, 92, 246, 0.2) !important; color: #c084fc !important;">
+          {{ AttemptScore()!.score }}/{{ AttemptScore()!.maxScore }} pt
+        </span>
+      }
+      
+      @if (!AttemptStatus()) {
+        <span class="badge bg-lime px-2 py-1 rounded-pill fw-medium" style="font-size: 0.65rem; background-color: var(--syllex-green) !important; color: #111827 !important;">
+          Nuovo
+        </span>
+      } @else if (AttemptStatus() === 'in-progress') {
+        <span class="badge bg-warning text-dark px-2 py-1 rounded-pill fw-medium" style="font-size: 0.65rem;">
+          In corso
+        </span>
+      } @else {
+        <span class="badge bg-white bg-opacity-10 text-white px-2 py-1 rounded-pill fw-medium" style="font-size: 0.65rem;">
+          Svolto
+        </span>
+      }
     </div>
   </div>
 
-  @if (ShowScore()) {
-  <div class="compact-test-card__score">
-    <fa-icon [icon]="TrophyIcon" class="score-icon"></fa-icon>
-    <span class="score-value">{{ AttemptScore()!.score }}</span>
-    <span class="score-sep">/</span>
-    <span class="score-max">{{ AttemptScore()!.maxScore }} pt</span>
-  </div>
-  }
-
-  <!--   <div class="compact-test-card__details">
-    <div class="compact-test-card__detail-item">
-      <fa-icon [icon]="QuestionsIcon" class="detail-icon"></fa-icon>
-      <span>{{ QuestionsCount() }} domande</span>
-    </div>
-    <div class="compact-test-card__detail-item">
-      <fa-icon [icon]="ClockIcon" class="detail-icon"></fa-icon>
-      <span class="detail-date">
-        @if (Test().availableFrom) { fino al {{ Test().availableTo | date: 'd
-        MMM' }} }
+  <!-- Bottom row: Metadata (questions, points) and Date -->
+  <div class="d-flex justify-content-between align-items-center w-100 text-white-50 mt-1" style="font-size: 0.78rem;">
+    <div class="d-flex align-items-center gap-3">
+      <span class="d-flex align-items-center gap-1 opacity-75">
+        <fa-icon [icon]="QuestionsIcon" style="font-size: 0.75rem;"></fa-icon>
+        {{ QuestionsCount() }} Domande
+      </span>
+      <span class="d-flex align-items-center gap-1 opacity-75">
+        <fa-icon [icon]="TrophyIcon" style="font-size: 0.75rem;"></fa-icon>
+        {{ MaxScore() }} punti
       </span>
     </div>
-  </div> -->
-
-  <button
-    class="compact-test-card__button"
-    [class.button--in-progress]="AttemptStatus() === 'in-progress'"
-    [class.button--completed]="IsCompleted()"
-    [class.button--pending]="!AttemptStatus()"
-    (click)="$event.preventDefault()"
-  >
-    @if (AttemptStatus() === 'reviewed') {
-    <fa-icon [icon]="ReviewIcon"></fa-icon>
-    Rivedi } @else if (AttemptStatus() === 'delivered') {
-    <fa-icon [icon]="ReviewIcon"></fa-icon>
-    Rivedi } @else if (AttemptStatus() === 'in-progress') {
-    <fa-icon [icon]="ResumeIcon"></fa-icon>
-    Riprendi } @else {
-    <fa-icon [icon]="PlayIcon"></fa-icon>
-    Compila }
-  </button>
+    
+    @if (Test().availableTo) {
+      <span class="opacity-75">{{ Test().availableTo | date: 'dd.MM.yyyy' }}</span>
+    }
+  </div>
 </div>

@@ -1,7 +1,7 @@
 .config-card {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0px 0px 28px 8px rgba(224, 224, 224, 0.204);
+  background: var(--student-sidebar);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   overflow: hidden;
 
   &__header {
@@ -9,8 +9,14 @@
     align-items: center;
     gap: 1rem;
     padding: 1.25rem 1.5rem;
-    background: rgba(var(--bs-primary-rgb), 0.03);
-    border-bottom: 1px solid rgba(var(--bs-primary-rgb), 0.08);
+    background: rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    h5 {
+      color: #ffffff !important;
+    }
+    p {
+      color: rgba(255, 255, 255, 0.55) !important;
+    }
   }
 
   &__step {
@@ -20,10 +26,11 @@
     min-width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: var(--bs-primary);
+    background: var(--student-card);
     color: #fff;
     font-weight: 700;
     font-size: 0.875rem;
+    flex-shrink: 0;
   }
 
   &__body {
@@ -33,29 +40,25 @@
 
 // Topic toggle buttons
 .topic-btn {
-  border: 1.5px solid rgba(var(--bs-primary-rgb), 0.25);
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
   border-radius: 20px;
   background: transparent;
-  color: var(--bs-dark);
+  color: rgba(255, 255, 255, 0.75) !important;
   font-size: 0.875rem;
   padding: 0.35rem 0.9rem;
   transition: all 0.15s ease;
 
   &:hover {
-    border-color: var(--bs-primary);
-    background: rgba(var(--bs-primary-rgb), 0.05);
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.06);
+    color: #ffffff !important;
   }
 
   &--selected {
-    background: var(--bs-primary);
-    border-color: var(--bs-primary);
-    color: #fff;
-
-    &:hover {
-      background: darken(#0044cc, 8%);
-      border-color: darken(#0044cc, 8%);
-      color: #fff;
-    }
+    background: #d1e3ff !important;
+    border-color: #d1e3ff !important;
+    color: #0b111e !important;
+    font-weight: 600;
   }
 }
 
@@ -65,33 +68,35 @@
   align-items: center;
   padding: 0.6rem 1.1rem;
   border-radius: 8px;
-  border: 1.5px solid rgba(var(--bs-success-rgb), 0.4);
-  background: rgba(var(--bs-success-rgb), 0.04);
+  border: 1.5px solid rgba(201, 243, 33, 0.28);
+  background: rgba(201, 243, 33, 0.06);
   cursor: pointer;
   font-size: 0.875rem;
   transition: all 0.15s ease;
   user-select: none;
 
   &:hover {
-    border-color: var(--bs-success);
+    border-color: rgba(201, 243, 33, 0.5);
   }
 
   &--excluded {
-    border-color: rgba(var(--bs-danger-rgb), 0.4);
-    background: rgba(var(--bs-danger-rgb), 0.04);
-
+    border-color: rgba(255, 107, 107, 0.35);
+    background: rgba(255, 107, 107, 0.07);
     &:hover {
-      border-color: var(--bs-danger);
+      border-color: rgba(255, 107, 107, 0.6);
     }
   }
 }
 
 // Summary sidebar
 .summary-card {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0px 0px 28px 8px rgba(224, 224, 224, 0.204);
+  background: var(--student-sidebar);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   padding: 1.5rem;
+  h6 {
+    color: #ffffff !important;
+  }
 }
 
 .summary-row {
@@ -99,7 +104,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.55rem 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 
   &:last-of-type {
     border-bottom: none;
@@ -108,18 +113,14 @@
 
 .summary-label {
   font-size: 0.875rem;
-  color: #6c757d;
+  color: rgba(255, 255, 255, 0.5) !important;
 }
 
 .summary-value {
   font-size: 0.875rem;
   text-align: right;
   max-width: 60%;
-}
-
-// Range input
-.form-range::-webkit-slider-thumb {
-  background: var(--bs-primary);
+  color: rgba(255, 255, 255, 0.85) !important;
 }
 
 .question-count-badge {
@@ -128,9 +129,30 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bs-primary);
+  background: var(--student-card);
   color: #fff;
   border-radius: 10px;
   font-size: 1.25rem;
   font-weight: 700;
 }
+
+.custom-input {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 12px !important;
+  color: #ffffff !important;
+  padding: 0.75rem 1rem !important;
+  transition: all 0.2s ease !important;
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.4) !important;
+  }
+
+  &:focus {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(56, 189, 248, 0.5) !important;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15) !important;
+    outline: none !important;
+  }
+}
+
