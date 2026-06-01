@@ -6,8 +6,8 @@ import {
   effect,
   HostListener,
 } from '@angular/core';
-import { forkJoin } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { forkJoin, from, of } from 'rxjs';
+import { map, mergeMap, toArray, catchError } from 'rxjs/operators';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
@@ -224,14 +224,18 @@ export class StudentTestsList {
 
     this.IsCheckingStatuses.set(true);
 
-    forkJoin(
-      toCheck.map((t) =>
-        this.testsService
-          .getAttemptByTestId(t._id)
-          .pipe(map((attempt) => ({ testId: t._id, attempt }))),
-      ),
-    )
-      .pipe(takeUntilDestroyed(this.destroyRef))
+    from(toCheck)
+      .pipe(
+        mergeMap((t) =>
+          this.testsService.getAttemptByTestId(t._id).pipe(
+            catchError(() => of(null)),
+            map((attempt) => ({ testId: t._id, attempt }))
+          ),
+          5 // MAX 5 CONCURRENT REQUESTS
+        ),
+        toArray(),
+        takeUntilDestroyed(this.destroyRef)
+      )
       .subscribe((results) => {
         const statusMap = new Map(this.AttemptStatusMap());
         const resultMap = new Map(this.AttemptResultMap());

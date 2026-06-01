@@ -13,8 +13,8 @@ import {
   StudentTestInterface,
   StudentAttemptInterface,
 } from '../../../services/student-tests.service';
-import { forkJoin, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { forkJoin, of, from } from 'rxjs';
+import { catchError, mergeMap, toArray, map } from 'rxjs/operators';
 import {
   ComunicazioniService,
   ComunicazioneInterface,
@@ -146,17 +146,19 @@ export class StudentDashboard implements OnInit {
         
         this.CompletedTests.set(selfEvalTests.slice(0, 3));
 
-        // Fetch all attempts in parallel to prevent UI flickering
-        const attemptsReqs = allTests.map(test => 
-          this.testsService.getAttemptByTestId(test._id).pipe(
-            catchError(() => of(null))
-          )
-        );
-
-        if (attemptsReqs.length > 0) {
-          forkJoin(attemptsReqs)
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe((attempts) => {
+        // Fetch all attempts in parallel but limit concurrency to 5 to prevent AWS API Gateway rate limiting
+        if (allTests.length > 0) {
+          from(allTests).pipe(
+            mergeMap((test, index) => 
+              this.testsService.getAttemptByTestId(test._id).pipe(
+                catchError(() => of(null)),
+                map(attempt => ({ index, attempt }))
+              ), 5 // MAX 5 CONCURRENT REQUESTS
+            ),
+            toArray(),
+            map(results => results.sort((a, b) => a.index - b.index).map(r => r.attempt)),
+            takeUntilDestroyed(this.destroyRef)
+          ).subscribe((attempts) => {
               const newStatusMap = new Map<string, 'in-progress' | 'delivered' | 'reviewed'>();
               const newScoreMap = new Map<string, { score: number; maxScore: number }>();
 

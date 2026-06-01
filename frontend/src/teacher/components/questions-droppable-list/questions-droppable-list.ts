@@ -21,7 +21,8 @@ import {
   QuestionsService,
 } from '../../../services/questions';
 import { QuestionCard } from '../question-card/question-card';
-import { forkJoin } from 'rxjs';
+import { from, of } from 'rxjs';
+import { catchError, map, mergeMap, toArray } from 'rxjs/operators';
 import { ConfirmActionDirective } from '../../../directives/confirm-action.directive';
 
 /** Extends QuestionInterface with the points assigned in test composition. */
@@ -143,22 +144,29 @@ export class QuestionsDroppableList implements OnChanges {
     const pointsMap = new Map(
       questionsData.map((d) => [d.questionId, d.points]),
     );
-    const requests = questionsData.map((d) =>
-      this.questionsService.loadQuestion(d.questionId),
-    );
-
-    forkJoin(requests).subscribe({
-      next: (questions) => {
-        this.selectedQuestions.set(
-          questions.map((q) => ({ ...q, points: pointsMap.get(q._id) ?? 1 })),
-        );
-        this.isLoadingQuestions.set(false);
-        this.emitChanges();
-      },
-      error: () => {
-        this.isLoadingQuestions.set(false);
-      },
-    });
+    const questionIds = questionsData.map((d) => d.questionId);
+    this.questionsService
+      .loadQuestionsBatch(questionIds)
+      .pipe(
+        catchError(() => of([])),
+        map((questions) =>
+          questions.map((q) => ({
+            ...q,
+            points: pointsMap.get(q._id) ?? 1,
+          })),
+        ),
+        map((questions) => questions as QuestionWithPoints[])
+      )
+      .subscribe({
+        next: (questions) => {
+          this.selectedQuestions.set(questions.filter(Boolean));
+          this.isLoadingQuestions.set(false);
+          this.emitChanges();
+        },
+        error: () => {
+          this.isLoadingQuestions.set(false);
+        },
+      });
   }
 
   private emitChanges(): void {

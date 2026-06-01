@@ -8,8 +8,8 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { forkJoin, of, catchError, Subject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { forkJoin, of, catchError, Subject, from } from 'rxjs';
+import { debounceTime, map, mergeMap, toArray } from 'rxjs/operators';
 import { DatePipe } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
@@ -274,12 +274,12 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
       return;
     }
 
-    const requests = questionIds.map((id) =>
-      this.questionsService.loadQuestion(id).pipe(catchError(() => of(null))),
-    );
-
-    forkJoin(requests)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+    this.questionsService
+      .loadQuestionsBatch(questionIds)
+      .pipe(
+        catchError(() => of([])),
+        takeUntilDestroyed(this.destroyRef)
+      )
       .subscribe({
         next: (results) => {
           let loaded = results.filter(
