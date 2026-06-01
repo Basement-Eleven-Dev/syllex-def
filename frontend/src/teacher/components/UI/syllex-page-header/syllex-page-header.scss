@@ -2,6 +2,17 @@
   display: block;
 }
 
+// Fluid title: 1.75rem on small/intermediate, 2.5rem on true large desktops
+.page-header-title {
+  font-size: clamp(1.5rem, 2.5vw, 2.5rem);
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+}
+
+.page-header-desc {
+  font-size: clamp(0.875rem, 1.2vw, 1.15rem);
+}
+
 .header-actions {
   display: flex;
   gap: 0.5rem;
@@ -19,5 +30,6 @@
   @media (min-width: 768px) {
     justify-content: flex-end;
     padding-bottom: 0;
+    flex-wrap: wrap; // Allow buttons to wrap when squeezed
   }
 }

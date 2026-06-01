@@ -23,6 +23,8 @@ const testSchema = new Schema({
         enum: ['bozza', 'pubblicato', 'archiviato'],
         default: 'bozza'
     },
+    oneShotAnswers: { type: Boolean, default: false },
+    randomizeQuestions: { type: Boolean, default: false },
     source: { type: String }
 }, {
     timestamps: true

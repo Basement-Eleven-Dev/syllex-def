@@ -1,0 +1,11 @@
+.whitespace-nowrap {
+  white-space: nowrap;
+}
+
+.table > :not(caption) > * > * {
+  padding: 1rem 0.5rem;
+}
+
+.border-radius-xl {
+  border-radius: 1rem;
+}

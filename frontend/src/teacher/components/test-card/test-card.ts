@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { DatePipe, TitleCasePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import {
   faBell,
   faCheckDouble,
@@ -34,7 +34,6 @@ import { SyllexButton } from '../UI/syllex-button/syllex-button';
     NgbDropdown,
     NgbDropdownToggle,
     NgbDropdownMenu,
-    TitleCasePipe,
     SyllexBadge,
     SyllexButton,
   ],

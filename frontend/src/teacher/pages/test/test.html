@@ -71,7 +71,7 @@
       <div class="row g-3">
         @for(test of RecentTests(); track test._id; let first = $first) {
         <div
-          class="col-12 col-md-6 col-lg-4 col-xl-3"
+          class="col-12 col-md-6 col-xl-4 col-xxl-3"
           [tourAnchor]="first ? 'test_first_card' : ''"
         >
           <app-test-card
@@ -125,7 +125,7 @@
     } @else {
       <div class="row g-3">
         @for(test of PendingTests(); track test._id) {
-        <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+        <div class="col-12 col-md-6 col-xl-4 col-xxl-3">
           <app-test-card
             [test]="test"
             (delete)="onDeleteTest($event)"

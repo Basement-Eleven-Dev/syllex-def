@@ -1,58 +1,117 @@
-<div class="d-flex flex-row align-items-center mb-5">
-  <div>
-    <h1 class="text-dark fw-medium mb-3 display-6">Test disponibili</h1>
-    <h5 class="text-dark mb-0 fw-normal">
-      Qui trovi i test che puoi svolgere per le tue materie
-    </h5>
-  </div>
-  <button
-    class="btn btn-gradient-secondary btn-lg ms-auto py-3 icon-btn"
-    routerLink="/s/auto-evaluation/create"
-  >
-    Crea un test di auto-valutazione
-  </button>
-</div>
+<app-syllex-page-header
+  title="Test disponibili"
+  description="Qui trovi i test che puoi svolgere per le tue materie."
+>
+  <app-syllex-button
+    class="auto-eval-btn"
+    [props]="{ label: 'Crea un test di autovalutazione', variant: 'primary', color: 'celestine', size: 'large', link: '/s/auto-evaluation/create', leftIcon: PlusIcon }"
+  />
+</app-syllex-page-header>
 
-<section class="d-flex flex-row mb-5 gap-3">
-  <div>
-    <input
-      type="text"
-      id="search-term"
-      class="form-control me-3 custom-input filter"
-      placeholder="Cerca test..."
-      style="min-width: 300px"
-      [value]="SearchTerm()"
-      (input)="onSearchTermChange($any($event.target).value)"
-    />
-  </div>
-  <div>
-    <select
-      class="form-select custom-input filter"
-      [value]="SelectedSubject()"
-      (change)="onSubjectChange($any($event.target).value)"
+<section
+  class="tests-filter-bar d-flex flex-row flex-wrap mb-5 gap-3 align-items-center"
+>
+  <app-syllex-search-input
+    placeholder="Cerca test..."
+    [value]="SearchTerm()"
+    (valueChange)="onSearchTermChange($event)"
+    style="min-width: 260px; flex: 1 1 260px; max-width: 360px"
+  />
+
+  <app-syllex-select-input
+    placeholder="Tutte le materie"
+    [value]="SelectedSubject()"
+    [options]="SubjectOptions()"
+    (valueChange)="onSubjectChange($event)"
+    style="min-width: 180px; flex: 0 0 auto"
+  />
+
+  <div class="d-flex align-items-center gap-4 flex-wrap">
+    <div
+      class="d-flex align-items-center gap-2 form-check form-switch cursor-pointer"
+      style="cursor: pointer"
     >
-      <option value="">Tutte le materie</option>
-      @for (subject of Subjects(); track subject._id) {
-      <option [value]="subject._id">{{ subject.name }}</option>
-      }
-    </select>
+      <input
+        class="form-check-input student-switch"
+        type="checkbox"
+        role="switch"
+        id="switchAutoval"
+        [checked]="ShowOnlyAutoEval()"
+        (change)="toggleAutoEval()"
+        style="
+          width: 2.5rem;
+          height: 1.25rem;
+          cursor: pointer;
+          margin-top: 0;
+          margin-left: 0;
+        "
+      />
+      <label
+        class="form-check-label mb-0 text-white-50"
+        for="switchAutoval"
+        style="
+          font-size: 0.95rem;
+          cursor: pointer;
+          user-select: none;
+          padding-top: 1px;
+        "
+      >
+        Solo autovalutazioni
+      </label>
+    </div>
+
+    <div
+      class="d-flex align-items-center gap-2 form-check form-switch cursor-pointer"
+      style="cursor: pointer"
+    >
+      <input
+        class="form-check-input student-switch"
+        type="checkbox"
+        role="switch"
+        id="switchDaSvolgere"
+        [checked]="ShowOnlyPending()"
+        (change)="toggleDaFare()"
+        style="
+          width: 2.5rem;
+          height: 1.25rem;
+          cursor: pointer;
+          margin-top: 0;
+          margin-left: 0;
+        "
+      />
+      <label
+        class="form-check-label mb-0 text-white-50"
+        for="switchDaSvolgere"
+        style="
+          font-size: 0.95rem;
+          cursor: pointer;
+          user-select: none;
+          padding-top: 1px;
+        "
+      >
+        Test da svolgere
+      </label>
+    </div>
   </div>
-  <button
-    type="button"
-    class="btn btn-outline-danger"
-    (click)="clearFilters()"
-    title="Pulisci filtri"
-  >
-    <fa-icon [icon]="ClearIcon"></fa-icon>
-  </button>
 </section>
 
-<div class="row">
-  @for (test of Tests(); track test._id) {
-  <div class="col-12 col-lg-6 col-xl-4 mb-3">
+@if (IsCheckingStatuses() && ShowOnlyPending()) {
+<div class="d-flex justify-content-center align-items-center py-5 w-100">
+  <fa-icon
+    [icon]="SpinnerIcon"
+    [animation]="'spin'"
+    [size]="'2x'"
+    class="text-primary"
+  ></fa-icon>
+</div>
+} @else {
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-xl-3 g-4 mb-4">
+  @for (test of FilteredTests(); track test._id) {
+  <div class="col">
     <app-student-test-card
       [Test]="test"
       [AttemptStatus]="getAttemptStatus(test._id)"
+      [AttemptResult]="getAttemptResult(test._id)"
     />
   </div>
   } @empty {
@@ -63,9 +122,18 @@
   </div>
   }
 </div>
-
+} @if (IsLoadingMore()) {
+<div class="d-flex justify-content-center align-items-center py-4 w-100">
+  <fa-icon
+    [icon]="SpinnerIcon"
+    [animation]="'spin'"
+    [size]="'2x'"
+    class="text-primary animate-spin"
+  ></fa-icon>
+</div>
+} @if (!ShowOnlyPending()) {
 <div
-  class="mt-5 d-flex flex-row justify-content-between align-items-center mb-5"
+  class="pagination-row mt-5 d-flex flex-row justify-content-between align-items-center mb-5"
 >
   <app-syllex-pagination
     [collectionSize]="CollectionSize()"
@@ -74,14 +142,15 @@
     (pageChange)="Page.set($event)"
   />
 
-  <select
-    class="form-select custom-input"
-    style="width: auto"
-    [ngModel]="PageSize()"
-    (ngModelChange)="PageSize.set($event); Page.set(1)"
-  >
-    <option [ngValue]="5">5 per pagina</option>
-    <option [ngValue]="10">10 per pagina</option>
-    <option [ngValue]="20">20 per pagina</option>
-  </select>
+  <app-syllex-select-input
+    [value]="PageSize().toString()"
+    (valueChange)="PageSize.set(+$event); Page.set(1)"
+    [options]="[
+      { value: '6',  label: '6 per pagina' },
+      { value: '12', label: '12 per pagina' },
+      { value: '24', label: '24 per pagina' }
+    ]"
+    style="width: 160px"
+  />
 </div>
+}

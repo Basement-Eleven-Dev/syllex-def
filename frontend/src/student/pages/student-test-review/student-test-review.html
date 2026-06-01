@@ -12,96 +12,143 @@
 } @else if (Error()) {
 <div class="alert alert-danger" role="alert">{{ Error() }}</div>
 } @else if (Attempt(); as attempt) {
-<!-- Header -->
-<div class="d-flex flex-row justify-content-between align-items-start mb-4">
-  <div>
-    <h1 class="text-dark fw-medium mb-2 display-6">Riepilogo test</h1>
-    <p class="text-muted mb-0">
-      {{ attempt.questions.length }} domande &middot; {{ AnsweredCount() }}
-      risposte fornite
-    </p>
-  </div>
-  <div class="d-flex flex-column align-items-end gap-1">
-    <span class="badge bg-success fs-6 px-3 py-2">{{ Status() }}</span>
 
-    @if (attempt.timeSpent > 0) {
-    <span class="text-muted small">
-      <fa-icon [icon]="ClockIcon" class="me-1"></fa-icon>
-      Tempo impiegato: {{ FormattedTimeSpent() }}
-    </span>
-    } @if (attempt.deliveredAt) {
-    <span class="text-muted small">
-      Consegnato il {{ attempt.deliveredAt | date: 'd MMM y, HH:mm' }}
-    </span>
+<!-- ── KPI strip — always visible ───────────────────────────────────────── -->
+<div class="review-kpi-bar"
+     [class.review-kpi-bar--collapsed]="!KpiExpanded()"
+     (click)="KpiExpanded.set(!KpiExpanded())">
+  <div class="kpi-item kpi-item--questions">
+    <div class="kpi-val-group">
+      <fa-icon [icon]="QuestionsIcon" class="kpi-ico"></fa-icon>
+      <span class="kpi-val">{{ attempt.questions.length }}</span>
+    </div>
+    <span class="kpi-lbl">Domande</span>
+  </div>
+
+
+  @if (attempt.status === 'reviewed') {
+  <div class="kpi-item kpi-item--correct">
+    <div class="kpi-val-group">
+      <fa-icon [icon]="CorrectIcon" class="kpi-ico"></fa-icon>
+      <span class="kpi-val">{{ CorrectCount() }}</span>
+    </div>
+    <span class="kpi-lbl">Corrette</span>
+  </div>
+  <div class="kpi-item kpi-item--wrong">
+    <div class="kpi-val-group">
+      <fa-icon [icon]="WrongIcon" class="kpi-ico"></fa-icon>
+      <span class="kpi-val">{{ WrongCount() }}</span>
+    </div>
+    <span class="kpi-lbl">Errate</span>
+  </div>
+  <div class="kpi-item kpi-item--score">
+    <div class="kpi-val-group">
+      <fa-icon [icon]="ScoreIcon" class="kpi-ico"></fa-icon>
+      <span class="kpi-val"
+        >{{ Score() }}<span class="kpi-max"> / {{ MaxScore() }}</span></span
+      >
+    </div>
+    <span class="kpi-lbl">Punti</span>
+  </div>
+  }
+
+  <div class="kpi-item kpi-item--time">
+    <div class="kpi-val-group">
+      <fa-icon [icon]="ClockIcon" class="kpi-ico"></fa-icon>
+      <span class="kpi-val">{{ FormattedTimeSpent() }}</span>
+    </div>
+    <span class="kpi-lbl">Tempo</span>
+  </div>
+
+  <div class="kpi-item kpi-item--status">
+    <fa-icon [icon]="StatusIcon" class="kpi-ico"></fa-icon>
+    <span class="kpi-val kpi-val--status">{{ Status() }}</span>
+    <span class="kpi-lbl">Stato</span>
+  </div>
+
+  <!-- Mobile collapse toggle (hidden on desktop) -->
+  <div class="kpi-toggle">
+    <fa-icon [icon]="KpiExpanded() ? ChevronUp : ChevronDown"></fa-icon>
+  </div>
+</div>
+
+<!-- ── Carousel + vertical side navigator ──────────────────────────────── -->
+<div class="review-body">
+  <!-- Vertical side nav -->
+  <div class="review-side-nav">
+    <button
+      class="review-nav-arrow"
+      [disabled]="ActiveIndex() === 0"
+      (click)="prev()"
+      title="Domanda precedente"
+    >
+      <fa-icon [icon]="ChevronUp"></fa-icon>
+    </button>
+
+    @if (attempt.questions.length <= 32) {
+    <div class="review-side-dots">
+      @for (q of attempt.questions; track $index; let i = $index) {
+      <button
+        class="review-dot"
+        [class.review-dot--active]="i === ActiveIndex()"
+        [class.review-dot--correct]="q.status === 'correct'"
+        [class.review-dot--wrong]="q.status === 'wrong' || q.status === 'incorrect'"
+        [class.review-dot--partial]="q.status === 'semi-correct' || q.status === 'partial'"
+        (click)="goTo(i)"
+        [title]="'Domanda ' + (i + 1)"
+      ></button>
+      }
+    </div>
+    }
+
+    <button
+      class="review-nav-arrow"
+      [disabled]="ActiveIndex() === (attempt.questions.length - 1)"
+      (click)="next()"
+      title="Domanda successiva"
+    >
+      <fa-icon [icon]="ChevronDown"></fa-icon>
+    </button>
+  </div>
+
+  <!-- Carousel viewport -->
+  <div class="review-carousel-viewport" #viewport>
+    <!-- Mobile sticky progress indicator (hidden on desktop via CSS) -->
+    <div class="review-mobile-progress">
+      <span class="review-mobile-progress__label">
+        Domanda {{ ActiveIndex() + 1 }} di {{ attempt.questions.length }}
+      </span>
+      <div class="review-mobile-progress__bar">
+        <div class="review-mobile-progress__fill"
+             [style.width.%]="((ActiveIndex() + 1) / attempt.questions.length) * 100">
+        </div>
+      </div>
+    </div>
+
+    @for (q of attempt.questions; track q.question._id; let i = $index) {
+    <div
+      class="review-slide"
+      [class.review-slide--active]="i === ActiveIndex()"
+      (click)="goTo(i)"
+    >
+      <!-- Question card — score=null suppresses internal 'Punteggio: X' -->
+      <div
+        class="review-slide-qcard"
+        app-question-card
+        [question]="q.question"
+        [index]="i"
+        [showIndex]="true"
+        mode="student"
+        [locked]="true"
+        [selectedAnswer]="q.answer"
+        [score]="null"
+        [questionStatus]="(q.status === 'pending' ? null : q.status) ?? null"
+        [teacherFeedback]="q.teacherComment ?? null"
+        [feedbackLabel]="FeedbackLabel()"
+      ></div>
+    </div>
     }
   </div>
 </div>
 
-<!-- Summary cards (visible only when reviewed) -->
-@if (attempt.status === 'reviewed') {
-<div class="row mb-4">
-  <!-- Punteggio -->
-  <div class="col-12 col-md-4 mb-3">
-    <div class="card h-100">
-      <div class="card-body d-flex flex-column align-items-center p-4">
-        <span class="card-value text-dark">
-          {{ Score() }}<span class="reduced">/{{ MaxScore() }}</span>
-        </span>
-        <p class="mb-0 card-description text-dark">Punteggio</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Risposte -->
-  <div class="col-12 col-md-4 mb-3">
-    <div class="card h-100">
-      <div class="card-body d-flex flex-column align-items-center p-4">
-        <div
-          class="d-flex flex-row justify-content-around align-items-center w-100 flex-fill"
-        >
-          <span class="card-value text-success">
-            {{ CorrectCount() }}
-            <fa-icon [icon]="CorrectIcon" size="xs"></fa-icon>
-          </span>
-          <span class="card-value text-danger">
-            {{ WrongCount() }}
-            <fa-icon [icon]="WrongIcon" size="xs"></fa-icon>
-          </span>
-        </div>
-        <p class="mb-0 card-description text-dark">Riepilogo risposte</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Tempo impiegato -->
-  <div class="col-12 col-md-4 mb-3">
-    <div class="card h-100">
-      <div class="card-body d-flex flex-column align-items-center p-4">
-        <span class="card-value text-dark">{{ FormattedTimeSpent() }}</span>
-        <p class="mb-0 card-description text-dark">Tempo impiegato</p>
-      </div>
-    </div>
-  </div>
-</div>
-}
-
-<!-- Questions (read-only) -->
-<div class="d-flex flex-column gap-3 mb-4">
-  @for (q of attempt.questions; track q.question._id; let i = $index) {
-  <div
-    class="w-100"
-    app-question-card
-    [question]="q.question"
-    [index]="i"
-    [showIndex]="true"
-    mode="student"
-    [locked]="true"
-    [selectedAnswer]="q.answer"
-    [score]="q.score ?? null"
-    [questionStatus]="(q.status === 'pending' ? null : q.status) ?? null"
-    [teacherFeedback]="q.teacherComment ?? null"
-    [feedbackLabel]="FeedbackLabel()"
-  ></div>
-  }
-</div>
 }

@@ -24,16 +24,11 @@ import {
 import { TestInterface, TestsService } from '../../../services/tests-service';
 import { StudentTestsService } from '../../../services/student-tests.service';
 import { FeedbackService } from '../../../services/feedback-service';
-import { CalendarTestCard } from '../calendar-test-card/calendar-test-card';
-import { CalendarEventCard } from '../calendar-event-card/calendar-event-card';
-import { StudentComunicazioneCard } from '../../../student/components/student-comunicazione-card/student-comunicazione-card';
 import {
   ComunicazioneInterface,
   ComunicazioniService,
 } from '../../../services/comunicazioni-service';
 import { AddEventModal } from '../add-event-modal/add-event-modal';
-import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
-import { SyllexTabFilter } from '../UI/syllex-tab-filter/syllex-tab-filter';
 import { SyllexButton } from '../UI/syllex-button/syllex-button';
 import { SyllexBadge } from '../UI/syllex-badge/syllex-badge';
 import { ConfirmActionDirective } from '../../../directives/confirm-action.directive';
@@ -50,11 +45,6 @@ export interface DayBox {
     DatePipe,
     UpperCasePipe,
     TitleCasePipe,
-    CalendarTestCard,
-    CalendarEventCard,
-    StudentComunicazioneCard,
-    TourAnchorNgBootstrapDirective,
-    SyllexTabFilter,
     SyllexButton,
     SyllexBadge,
     ConfirmActionDirective,

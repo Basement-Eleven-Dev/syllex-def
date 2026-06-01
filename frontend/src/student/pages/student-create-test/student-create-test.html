@@ -1,18 +1,12 @@
-<!-- Intestazione -->
-<div class="d-flex align-items-center gap-3 mb-5">
-  <a routerLink="/s/tests" class="btn btn-outline-secondary btn-sm">
-    <fa-icon [icon]="BackIcon" />
-  </a>
-  <div>
-    <h1 class="text-dark fw-medium display-6 mb-1">
-      Crea test di auto-valutazione
-    </h1>
-    <p class="text-muted mb-0">
-      Configura un test personalizzato per allenarti sugli argomenti che
-      preferisci
-    </p>
-  </div>
-</div>
+<!-- Back Button -->
+<app-back-to [path]="'/s/tests'" [label]="'Torna ai test'" />
+
+<!-- Page Header using Syllex Page Header component -->
+<app-syllex-page-header
+  title="Crea test di auto-valutazione"
+  description="Configura un test personalizzato per esercitarti sugli argomenti che preferisci"
+>
+</app-syllex-page-header>
 
 <div class="row g-4">
   <!-- Colonna sinistra: configurazione -->
@@ -39,7 +33,7 @@
       </div>
     </div>
 
-    <!-- Step 1: Materia -->
+    <!-- Step 1: Materia (Using Syllex Select Pill) -->
     <div class="config-card mb-4">
       <div class="config-card__header">
         <span class="config-card__step">1</span>
@@ -51,23 +45,20 @@
         </div>
       </div>
       <div class="config-card__body">
-        <select
-          class="form-select custom-input"
+        <app-syllex-select-input
+          placeholder="Seleziona una materia..."
           [value]="SelectedSubjectId()"
-          (change)="onSubjectChange($any($event.target).value)"
-        >
-          <option value="" disabled>Seleziona una materia...</option>
-          @for (subject of AllSubjects(); track subject._id) {
-          <option [value]="subject._id">{{ subject.name }}</option>
-          }
-        </select>
+          [options]="SubjectOptions()"
+          (valueChange)="onSubjectChange($event)"
+          style="width: 100%; max-width: 400px;"
+        />
       </div>
     </div>
 
     <!-- Step 2: Topic (visibile solo dopo aver scelto la materia) -->
     @if (SelectedSubject()) {
     <div class="config-card mb-4">
-      <div class="config-card__header">
+      <div class="config-card__header flex-column flex-sm-row align-items-start align-items-sm-center gap-3">
         <span class="config-card__step">2</span>
         <div class="flex-grow-1">
           <h5 class="mb-0 fw-semibold">Argomenti</h5>
@@ -75,21 +66,15 @@
             Seleziona uno o più argomenti su cui concentrarti
           </p>
         </div>
-        <div class="d-flex gap-2 ms-auto align-items-center">
-          <button
-            type="button"
-            class="btn btn-blue btn-sm"
-            (click)="selectAllTopics()"
-          >
-            Tutti
-          </button>
-          <button
-            type="button"
-            class="btn btn-outline-secondary btn-sm"
-            (click)="clearTopics()"
-          >
-            Nessuno
-          </button>
+        <div class="d-flex gap-2 align-items-center">
+          <app-syllex-button
+            [props]="{ label: 'Tutti', variant: 'primary', color: 'celestine', size: 'small' }"
+            (clicked)="selectAllTopics()"
+          />
+          <app-syllex-button
+            [props]="{ label: 'Nessuno', variant: 'outline', color: 'white', size: 'small' }"
+            (clicked)="clearTopics()"
+          />
         </div>
       </div>
       <div class="config-card__body">
@@ -315,26 +300,21 @@
       </div>
       }
 
-      <button
-        type="button"
-        class="btn btn-gradient-primary w-100 py-3"
-        [disabled]="!IsFormValid() || IsSubmitting() || ExcludedTypes().size === AllQuestionTypes.length"
-        (click)="onSubmit()"
-      >
-        @if (IsSubmitting()) {
-        <span
-          class="spinner-border spinner-border-sm me-2"
-          role="status"
-        ></span>
-        Generazione in corso... } @else if (ShowCountWarning()) {
-        <fa-icon [icon]="CheckIcon" class="me-2" />
-        Crea comunque ({{ AvailableQuestionsCount() }} dom.) } @else {
-        <fa-icon [icon]="CheckIcon" class="me-2" />
-        Crea il test }
-      </button>
+      <app-syllex-button
+        class="w-100 d-block mt-3"
+        [props]="{
+          label: IsSubmitting() ? 'Generazione in corso...' : (ShowCountWarning() ? 'Crea comunque (' + AvailableQuestionsCount() + ' dom.)' : 'Crea il test'),
+          variant: 'primary',
+          color: 'celestine',
+          size: 'large',
+          disabled: !IsFormValid() || IsSubmitting() || ExcludedTypes().size === AllQuestionTypes.length,
+          leftIcon: IsSubmitting() ? undefined : CheckIcon
+        }"
+        (clicked)="onSubmit()"
+      />
 
       @if (!IsFormValid()) {
-      <p class="text-muted small text-center mt-2 mb-0">
+      <p class="text-white-50 small text-center mt-3 mb-0">
         Completa tutti i campi obbligatori per continuare
       </p>
       }

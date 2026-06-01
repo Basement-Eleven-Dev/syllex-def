@@ -1,0 +1,20 @@
+// Breadcrumb navigation (specificity backup — also handled globally in styles.scss)
+.breadcrumb-link {
+  color: rgba(255, 255, 255, 0.65) !important;
+  text-decoration: none;
+  cursor: pointer;
+  &:hover {
+    color: #ffffff !important;
+  }
+}
+
+// Empty state
+.empty-state {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+// Rimuove lo sfondo chiaro del contenitore globale nel tema scuro studente
+.form-section {
+  background: transparent !important;
+  padding: 0 !important;
+}

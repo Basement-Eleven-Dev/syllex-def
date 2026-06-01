@@ -24,12 +24,34 @@ const askStrucuredGemini = async <T>(
     validMaterials.map((m) => fetchBuffer(m.extractedTextFileUrl!)),
   );
 
-  const textFileParts: Part[] = textFileBuffer.map((buffer) => ({
-    inlineData: {
-      mimeType: "text/plain",
-      data: buffer.toString("base64"),
-    },
-  }));
+  const MAX_CHARS = 1500000; // Very safe limit (around 400k tokens) to stay well below 1M tokens limit
+  let currentTotalChars = 0;
+
+  const textFileParts: Part[] = textFileBuffer
+    .map((buffer) => {
+      let text = buffer.toString("utf-8");
+      if (currentTotalChars + text.length > MAX_CHARS) {
+        const allowedChars = MAX_CHARS - currentTotalChars;
+        if (allowedChars > 0) {
+          text = text.substring(0, allowedChars);
+          currentTotalChars += allowedChars;
+        } else {
+          text = "";
+        }
+      } else {
+        currentTotalChars += text.length;
+      }
+
+      if (!text) return null;
+
+      return {
+        inlineData: {
+          mimeType: "text/plain",
+          data: Buffer.from(text, "utf-8").toString("base64"),
+        },
+      } as Part;
+    })
+    .filter((part): part is Part => part !== null);
 
   const client = await getGeminiClient();
 

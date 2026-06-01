@@ -2,7 +2,11 @@ import { Component, computed, signal, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Materia } from '../../../services/materia';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faArrowLeft } from '@fortawesome/pro-solid-svg-icons';
+import {
+  faArrowLeft,
+  faChevronLeft,
+  faChevronRight,
+} from '@fortawesome/pro-solid-svg-icons';
 import { AgentChat } from '../../components/agent-chat/agent-chat';
 import { Auth } from '../../../services/auth';
 import { CommonModule } from '@angular/common';
@@ -16,6 +20,10 @@ import { CommonModule } from '@angular/common';
 })
 export class AgentPage {
   faArrowLeft = faArrowLeft;
+  faChevronLeft = faChevronLeft;
+  faChevronRight = faChevronRight;
+
+  subjectSidebarOpen = signal(true);
   userRole = signal<'teacher' | 'student' | 'admin' | null>(null);
   activeTab = signal<'subjects' | 'chat'>('subjects');
 
@@ -25,7 +33,10 @@ export class AgentPage {
 
   // Loading state per evitare flash UI
   isLoadingAssistant = computed(() => {
-    return this.materiaService.allMaterie().length === 0 && !this.materiaService.materiaSelected();
+    return (
+      this.materiaService.allMaterie().length === 0 &&
+      !this.materiaService.materiaSelected()
+    );
   });
 
   currentAssistantId = computed(() => {
@@ -38,14 +49,20 @@ export class AgentPage {
     private authService: Auth,
   ) {
     this.userRole.set(this.authService.user?.role || null);
+    if (this.userRole() === 'student') {
+      this.activeTab.set('chat');
+    }
 
     // Quando viene selezionata o caricata una materia, mostra direttamente la chat dell'agente
-    effect(() => {
-      const subject = this.materiaService.materiaSelected();
-      if (subject) {
-        this.activeTab.set('chat');
-      }
-    }, { allowSignalWrites: true });
+    effect(
+      () => {
+        const subject = this.materiaService.materiaSelected();
+        if (subject) {
+          this.activeTab.set('chat');
+        }
+      },
+      { allowSignalWrites: true },
+    );
   }
 
   private resetState() {

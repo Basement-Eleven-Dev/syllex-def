@@ -3,12 +3,16 @@ import { DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
-  faClock,
+  faCalendarDays,
+  faGraduationCap,
+  faCheck,
   faEye,
   faPlay,
   faQuestionCircle,
   faRotateRight,
-  faStar,
+  faTrophy,
+  faVial,
+  faXmark,
 } from '@fortawesome/pro-solid-svg-icons';
 import { StudentTestInterface } from '../../../services/student-tests.service';
 
@@ -24,13 +28,20 @@ type AttemptStatus = 'in-progress' | 'delivered' | 'reviewed';
 export class StudentTestCard {
   readonly Test = input.required<StudentTestInterface>();
   readonly AttemptStatus = input<AttemptStatus | null>(null);
+  readonly AttemptResult = input<{ correct: number; wrong: number } | null>(
+    null,
+  );
 
-  readonly ClockIcon = faClock;
   readonly QuestionsIcon = faQuestionCircle;
-  readonly ScoreIcon = faStar;
+  readonly TrophyIcon = faTrophy;
+  readonly CalendarIcon = faCalendarDays;
+  readonly TeacherIcon = faGraduationCap;
+  readonly FlaskIcon = faVial;
   readonly PlayIcon = faPlay;
   readonly ResumeIcon = faRotateRight;
   readonly ReviewIcon = faEye;
+  readonly CheckIcon = faCheck;
+  readonly XmarkIcon = faXmark;
 
   readonly QuestionsCount = computed(() => this.Test().questions?.length ?? 0);
 
@@ -42,6 +53,10 @@ export class StudentTestCard {
     const status = this.AttemptStatus();
     return status === 'delivered' || status === 'reviewed';
   });
+
+  readonly IsAutoEval = computed(
+    () => this.Test().source === 'self-evaluation',
+  );
 
   readonly Route = computed(() => {
     const test = this.Test();

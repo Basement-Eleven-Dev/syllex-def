@@ -15,6 +15,8 @@ import { ReportBugForm } from '../report-bug-form/report-bug-form';
   styleUrl: './user-contextual-menu.scss',
 })
 export class UserContextualMenu {
+  @Output() menuClicked = new EventEmitter<void>();
+
   LogoutIcon = faSignOutAlt;
   private tourService = inject(TourService);
 
@@ -22,6 +24,10 @@ export class UserContextualMenu {
     public authService: Auth,
     private modalService: NgbModal,
   ) {}
+
+  onItemClick() {
+    this.menuClicked.emit();
+  }
 
   onLogout() {
     this.authService.logout();

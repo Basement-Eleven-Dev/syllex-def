@@ -1,16 +1,573 @@
-/* Minimal styles — layout handled by Bootstrap utilities */
-
-.card-value {
-  font-size: 3.5rem;
-  font-weight: bold;
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
 }
 
-.card-description {
-  font-size: 0.875rem;
-  text-align: center;
+// ── Back-to link styled for dark student context ──────────────────────────
+:host ::ng-deep app-back-to > div {
+  color: rgba(255, 255, 255, 0.55) !important;
+  opacity: 1 !important;
+  margin: 0 0 0.6rem 0 !important;
+
+  a {
+    color: rgba(255, 255, 255, 0.55) !important;
+    text-decoration: none !important;
+  }
 }
 
-.reduced {
-  font-size: 1.5rem;
+// ── KPI strip ─────────────────────────────────────────────────────────────
+.review-kpi-bar {
+  display: flex;
+  align-items: stretch;
+  padding: 1.25rem 1rem;
+  background: var(--student-sidebar);
+  border-radius: 20px;
+  margin-bottom: 0.75rem;
+  flex-shrink: 0;
+
+  @media (max-width: 767px) {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    row-gap: 1.25rem;
+    column-gap: 0.5rem;
+    padding: 1.25rem 1rem;
+    background: var(--student-sidebar);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+
+    .kpi-item {
+      padding: 0;
+      background: transparent !important;
+      border: none !important;
+
+      & + & {
+        border-left: none !important;
+      }
+    }
+
+    .kpi-val-group {
+      flex-direction: row !important;
+      gap: 0.35rem !important;
+    }
+
+    .kpi-item--answers {
+      display: none !important;
+    }
+
+    // Hero stats on Row 1
+    .kpi-item--score {
+      order: 1;
+      grid-column: span 2;
+      align-items: flex-start;
+      justify-content: flex-start;
+
+      .kpi-ico {
+        display: none; // Hide icon on mobile for ultra-clean look
+      }
+      .kpi-val {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #ffffff;
+      }
+      .kpi-lbl {
+        display: none !important;
+      }
+    }
+
+    .kpi-item--status {
+      order: 2;
+      grid-column: span 2;
+      align-items: center;
+      justify-content: flex-end;
+
+      .kpi-ico {
+        display: none;
+      }
+      .kpi-val--status {
+        background: rgba(201, 243, 33, 0.1) !important;
+        color: var(--syllex-green) !important;
+        padding: 0.4rem 0.85rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        border: 1px solid rgba(201, 243, 33, 0.2) !important;
+        text-align: center;
+      }
+      .kpi-lbl {
+        display: none !important;
+      }
+    }
+
+    // Minor stats on Row 2
+    .kpi-item--questions { order: 3; grid-column: span 1; }
+    .kpi-item--correct { order: 4; grid-column: span 1; }
+    .kpi-item--wrong { order: 5; grid-column: span 1; }
+    .kpi-item--time { order: 6; grid-column: span 1; }
+  }
+}
+
+// ── KPI bar: mobile collapsible ──────────────────────────────────────────
+.kpi-toggle {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .review-kpi-bar {
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+
+  .kpi-toggle {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.75rem;
+    flex-shrink: 0;
+    margin-left: auto;
+    transition: transform 0.25s ease, background 0.15s ease;
+    order: 99;
+
+    &:active {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  }
+
+  .review-kpi-bar:not(.review-kpi-bar--collapsed) .kpi-toggle {
+    transform: rotate(180deg);
+    grid-column: 1 / -1;
+    justify-self: end;
+    margin-right: 0.25rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .review-kpi-bar--collapsed {
+    display: flex !important;
+    align-items: center !important;
+    padding: 0.65rem 1rem !important;
+    gap: 0.75rem !important;
+
+    .kpi-item {
+      display: none !important;
+    }
+
+    .kpi-item--score,
+    .kpi-item--status {
+      display: flex !important;
+      padding: 0 !important;
+      border-left: none !important;
+    }
+
+    .kpi-item--score {
+      order: 1;
+      flex-direction: row !important;
+      align-items: baseline !important;
+      gap: 0.25rem !important;
+
+      .kpi-ico { display: none !important; }
+      .kpi-val-group {
+        flex-direction: row !important;
+        gap: 0.25rem !important;
+        align-items: baseline !important;
+      }
+      .kpi-val { font-size: 1.3rem !important; font-weight: 700 !important; }
+      .kpi-lbl { display: none !important; }
+    }
+
+    .kpi-item--status {
+      order: 2;
+      flex: 1;
+      align-items: center !important;
+
+      .kpi-ico { display: none !important; }
+      .kpi-lbl { display: none !important; }
+    }
+  }
+}
+
+.kpi-val-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.kpi-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  padding: 0 0.25rem;
+
+  & + & {
+    border-left: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  &--correct {
+    .kpi-ico,
+    .kpi-val {
+      color: var(--syllex-green);
+    }
+  }
+  &--wrong {
+    .kpi-ico,
+    .kpi-val {
+      color: #ff6b6b;
+    }
+  }
+  &--score {
+    .kpi-ico,
+    .kpi-val {
+      color: var(--syllex-green);
+    }
+  }
+  &--status {
+    flex: 1.4;
+    .kpi-ico {
+      color: var(--syllex-green);
+    }
+  }
+}
+
+.kpi-ico {
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1;
+}
+
+.kpi-val {
+  font-size: clamp(1.3rem, 3vw, 2rem);
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.1;
+
+  &--status {
+    font-size: clamp(0.6rem, 1.3vw, 0.82rem);
+    font-weight: 600;
+    color: var(--syllex-green);
+    text-align: center;
+    line-height: 1.3;
+  }
+}
+
+.kpi-max {
+  font-size: 0.72em;
   opacity: 0.5;
+}
+
+.kpi-lbl {
+  font-size: clamp(0.52rem, 0.9vw, 0.6rem);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: rgba(255, 255, 255, 0.38);
+  white-space: nowrap;
+}
+
+// ── Status badge ──────────────────────────────────────────────────────────
+// ── Carousel body (viewport + side nav) ──────────────────────────────────
+.review-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+// ── Vertical side navigator ───────────────────────────────────────────────
+.review-side-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  width: 24px;
+
+  @media (max-width: 576px) {
+    width: 18px;
+    gap: 0.25rem;
+  }
+}
+
+.review-nav-arrow {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  font-size: 0.6rem;
+  transition:
+    background 0.15s ease,
+    opacity 0.15s ease;
+
+  &:disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+  }
+
+  &:not(:disabled):hover {
+    background: rgba(255, 255, 255, 0.16);
+  }
+}
+
+.review-side-dots {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-block: 2px;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  // Active dot is taller (not wider) in vertical orientation
+  .review-dot--active {
+    width: 8px !important;
+    height: 20px;
+    border-radius: 4px;
+  }
+  .review-dot--correct.review-dot--active {
+    width: 8px !important;
+  }
+  .review-dot--wrong.review-dot--active {
+    width: 8px !important;
+  }
+  .review-dot--partial.review-dot--active {
+    width: 8px !important;
+  }
+}
+
+.review-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+
+  &--active {
+    width: 20px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.7);
+  }
+
+  &--correct {
+    background: rgba(201, 243, 33, 0.45);
+  }
+  &--correct.review-dot--active {
+    background: var(--syllex-green);
+    width: 20px;
+    border-radius: 4px;
+  }
+
+  &--wrong {
+    background: rgba(255, 107, 107, 0.45);
+  }
+  &--wrong.review-dot--active {
+    background: #ff6b6b;
+    width: 20px;
+    border-radius: 4px;
+  }
+
+  &--partial {
+    background: rgba(255, 160, 82, 0.45);
+  }
+  &--partial.review-dot--active {
+    background: var(--syllex-orange);
+    width: 20px;
+    border-radius: 4px;
+  }
+}
+
+// ── Carousel viewport ─────────────────────────────────────────────────────
+.review-carousel-viewport {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  gap: clamp(10px, 2vh, 18px);
+  scroll-snap-type: y mandatory;
+  // padding allows first/last cards to be scrolled to centre
+  padding-block: clamp(12px, 6vh, 48px);
+  scrollbar-width: none;
+  cursor: grab;
+  user-select: none;
+
+  &.grabbing {
+    cursor: grabbing;
+    scroll-snap-type: none !important;
+  }
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+// ── Individual slide ──────────────────────────────────────────────────────
+.review-slide {
+  flex-shrink: 0;
+  width: 100%;
+  scroll-snap-align: center;
+  display: flex;
+  flex-direction: column;
+  border-radius: 24px;
+  transition:
+    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.35s ease;
+  transform: scale(0.9);
+  opacity: 0.45;
+  cursor: pointer;
+
+  &:not(&--active) {
+    * {
+      pointer-events: none;
+    }
+  }
+
+  &--active {
+    transform: scale(1);
+    opacity: 1;
+    cursor: default;
+  }
+}
+
+.review-slide-qcard {
+  flex: 1;
+  min-height: 0;
+
+  // Hide the <hr> separator before the badge section (it's inside the
+  // question-card component — we only suppress it in the review context)
+  ::ng-deep hr {
+    display: none;
+  }
+
+  // Restore the inner padding that used to be provided by .card-body
+  // so the review cards retain their "perfect" proportions
+  ::ng-deep .question-card > .d-flex.flex-column.gap-2 {
+    padding: 1rem;
+    padding-top: 0.25rem;
+  }
+
+  // Remove forced full-height so the card sizes to its content, not the viewport
+  ::ng-deep .question-card {
+    height: auto !important;
+  }
+}
+
+// ── Mobile: full-scroll mode (replaces carousel with natural scroll) ──────
+@media (max-width: 767px) {
+  .review-side-nav {
+    display: none !important;
+  }
+
+  .review-carousel-viewport {
+    scroll-snap-type: none !important;
+    cursor: auto !important;
+    user-select: auto !important;
+    padding-block: 0 !important;
+    gap: 0.75rem !important;
+  }
+
+  .review-slide {
+    transform: none !important;
+    opacity: 1 !important;
+    cursor: default !important;
+    border-radius: 16px;
+
+    // Allow interaction on ALL slides, not just active
+    &,
+    &:not(.review-slide--active) {
+      * {
+        pointer-events: auto !important;
+      }
+    }
+  }
+
+  .review-slide-qcard {
+    ::ng-deep .question-card {
+      height: auto !important;
+      overflow: visible !important;
+
+      .card-body {
+        overflow: visible !important;
+      }
+    }
+  }
+}
+
+// ── Mobile sticky progress indicator ──────────────────────────────────────
+.review-mobile-progress {
+  display: none;
+
+  @media (max-width: 767px) {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    padding: 0.6rem 1rem;
+    background: rgba(19, 44, 82, 0.9);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 0 0 14px 14px;
+    flex-shrink: 0;
+    margin-bottom: 0.5rem;
+  }
+}
+
+.review-mobile-progress__label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+
+.review-mobile-progress__bar {
+  flex: 1;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.review-mobile-progress__fill {
+  height: 100%;
+  background: var(--syllex-green, #c9f321);
+  border-radius: 2px;
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// ── Legacy helpers (kept for compatibility) ───────────────────────────────
+:host .review-correct {
+  color: var(--syllex-green) !important;
+}
+:host .review-wrong {
+  color: #ff6b6b !important;
 }

@@ -139,6 +139,10 @@ $select-focus-box-shadow: none;
 $input-focus-border-color: $primary;
 $form-select-focus-box-shadow: none;
 
+$student-sidebar: #25335a;
+$student-bg: #151d37;
+$student-card: #272279;
+
 $border-color: rgba(0, 0, 0, 0.077);
 
 @import "bootstrap/scss/bootstrap";
@@ -146,6 +150,9 @@ $border-color: rgba(0, 0, 0, 0.077);
 :root {
   --syllex-green: #c9f321;
   --syllex-orange: #ffa052;
+  --student-sidebar: #25335a;
+  --student-bg: #151d37;
+  --student-card: #272279;
 }
 
 .dvh-100 {
@@ -155,6 +162,34 @@ html,
 body {
   background-color: #ffffff;
   letter-spacing: -0.02em;
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Global responsive overflow & typography fixes for intermediate breakpoints
+// Target: 1366×658 viewport with 250px sidebar = ~1116px content area
+// ──────────────────────────────────────────────────────────────────────────────
+@media (min-width: 992px) and (max-width: 1399px) {
+  // Prevent h1-h3 from overflowing narrow content areas
+  h1, h2, h3 {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+  }
+
+  // Tighter section titles (fs-2 is too large at this breakpoint)
+  .fs-2 {
+    font-size: 1.35rem !important;
+  }
+
+  // Reduce spacing on display-6 headings
+  .display-6 {
+    font-size: 1.5rem !important;
+  }
+
+  // Breadcrumb / header rows should wrap
+  .d-flex.flex-row {
+    min-width: 0;
+  }
 }
 
 // Riduci la spaziatura tra lettere su tutto
@@ -244,12 +279,16 @@ button {
   }
 }
 
-
 .syllexCard {
   padding: 2.4rem;
   border-radius: 30px;
   border: none;
   background-color: #eef4ff;
+
+  @media (min-width: 992px) and (max-width: 1399px) {
+    padding: 1.5rem;
+    border-radius: 24px;
+  }
 
   @media (max-width: 991px) {
     padding: 1.25rem;
@@ -343,7 +382,11 @@ textarea.custom-input {
   border: none;
   position: relative;
   cursor: pointer;
-  transition: background 0.8s ease, box-shadow 0.8s ease, transform 0.2s ease, opacity 0.2s ease;
+  transition:
+    background 0.8s ease,
+    box-shadow 0.8s ease,
+    transform 0.2s ease,
+    opacity 0.2s ease;
   box-shadow: 0px 0px 28px 8px rgba(224, 224, 224, 0.204);
 
   &.not-selected {
@@ -601,7 +644,11 @@ textarea.custom-input {
 .offcanvas.offcanvas-end {
   border-radius: 2.4rem 0 0 2.4rem !important;
   border: none !important;
-  background-color: color-mix(in srgb, var(--bs-secondary) 15%, white) !important;
+  background-color: color-mix(
+    in srgb,
+    var(--bs-secondary) 15%,
+    white
+  ) !important;
   overflow: hidden;
 
   .offcanvas-body.syllexCard {
@@ -830,7 +877,7 @@ body.tour-active::after {
   &:not(textarea) {
     border-radius: 50rem !important;
   }
-  
+
   &textarea,
   &.textarea {
     border-radius: 1.5rem !important;
@@ -838,25 +885,452 @@ body.tour-active::after {
 }
 
 /* Agent Page Layout Background Overrides */
-body:has(.agent-page-root) {
-  // Layer a semi-transparent white gradient on top of the image to lighten it dynamically (65% white, 35% wallpaper)
-  background-image: linear-gradient(rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.8)), url("/images/sfondo_chat.png") !important;
-  background-size: cover !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-  background-attachment: fixed !important;
+@media (min-width: 992px) {
+  body:has(.agent-page-root) {
+    // Layer a semi-transparent white gradient on top of the image to lighten it dynamically (65% white, 35% wallpaper)
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.8)),
+      url("/images/sfondo_chat.png") !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
 
-  // Make only high-level layout containers transparent to let the body background show through
-  #content,
-  #content > div,
-  .bg-page,
-  .agent-page-root,
-  app-agent-chat,
-  .agent-chat-wrapper,
-  .main-content {
-    background-color: transparent !important;
-    background-image: none !important;
+    // Make only high-level layout containers transparent to let the body background show through
+    #content,
+    #content > div,
+    .bg-page,
+    .agent-page-root,
+    app-agent-chat,
+    .agent-chat-wrapper,
+    .main-content {
+      background-color: transparent !important;
+      background-image: none !important;
+    }
   }
-
 }
 
+/* Student Theme Dark Mode Overrides */
+.student-theme {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .display-6,
+  .fs-1,
+  .fs-2,
+  .fs-3,
+  .fs-4,
+  .fs-5 {
+    color: #ffffff !important;
+  }
+  p,
+  span,
+  label,
+  td,
+  th {
+    color: rgba(255, 255, 255, 0.9) !important;
+  }
+  .text-dark {
+    color: #ffffff !important;
+  }
+  .text-muted {
+    color: rgba(255, 255, 255, 0.6) !important;
+  }
+  .alert-info {
+    background-color: var(--student-card) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+  }
+  .alert-light {
+    background-color: var(--student-sidebar) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    color: #ffffff !important;
+    p,
+    span {
+      color: rgba(255, 255, 255, 0.8) !important;
+    }
+  }
+
+  // Sovrascrivi il blocco bianco del monitor sul dark theme (solo dentro student-block--monitor rimane bianco)
+  // Assicura che i testi dentro il blocco bianco siano scuri
+  .student-block--monitor {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    span,
+    label {
+      color: inherit !important;
+    }
+  }
+
+  // Autovalutazione: lime-green block, testi scuri
+  .student-block--autoval {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    span,
+    label {
+      color: #0f1628 !important;
+    }
+  }
+
+  // Filter pills in dark context: input e select trasparenti
+  .filter-input-pill {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.18) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+
+    input {
+      color: rgba(255, 255, 255, 0.9) !important;
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.4) !important;
+      }
+    }
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.4) !important;
+    }
+
+    .input-group-text {
+      color: rgba(255, 255, 255, 0.5) !important;
+    }
+
+    &.form-select {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgba(255,255,255,0.6)' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+      option {
+        background-color: var(--student-sidebar);
+        color: #ffffff;
+      }
+    }
+  }
+
+  // Page header testi visibili
+  app-syllex-page-header {
+    h1 {
+      color: #ffffff !important;
+    }
+    p {
+      color: rgba(255, 255, 255, 0.65) !important;
+    }
+  }
+
+  // Bottone "Crea autovalutazione" con stile gradient
+  .btn-gradient-secondary {
+    color: #0f1628 !important;
+  }
+
+  // ── Global dark form controls ─────────────────────────────────────────────
+  .form-select,
+  .form-control,
+  .form-control-lg {
+    background-color: rgba(255, 255, 255, 0.07) !important;
+    border-color: rgba(255, 255, 255, 0.14) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.38) !important;
+    }
+    option {
+      background-color: var(--student-sidebar);
+      color: #ffffff;
+    }
+  }
+  .form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgba(255,255,255,0.55)' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+  }
+  .form-range::-webkit-slider-thumb {
+    background: var(--syllex-green);
+  }
+  .form-range::-moz-range-thumb {
+    background: var(--syllex-green);
+  }
+  .form-check-input:checked {
+    background-color: var(--syllex-green) !important;
+    border-color: var(--syllex-green) !important;
+  }
+
+  // ── Dark alert variants ───────────────────────────────────────────────────
+  .alert-warning {
+    background-color: rgba(255, 160, 82, 0.14) !important;
+    border-color: rgba(255, 160, 82, 0.3) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+  }
+  .alert-danger {
+    background-color: rgba(255, 107, 107, 0.14) !important;
+    border-color: rgba(255, 107, 107, 0.3) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+  }
+  .alert-success {
+    background-color: rgba(201, 243, 33, 0.11) !important;
+    border-color: rgba(201, 243, 33, 0.22) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+  }
+
+  // ── Bootstrap .card → dark ────────────────────────────────────────────────
+  .card {
+    background-color: var(--student-sidebar) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  // ── Breadcrumb links ──────────────────────────────────────────────────────
+  .breadcrumb-link {
+    color: rgba(255, 255, 255, 0.65) !important;
+    text-decoration: none;
+    &:hover {
+      color: #ffffff !important;
+    }
+  }
+
+  // ── Outline secondary button ──────────────────────────────────────────────
+  .btn-outline-secondary {
+    color: rgba(255, 255, 255, 0.75) !important;
+    border-color: rgba(255, 255, 255, 0.22) !important;
+    &:hover,
+    &:active {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+      color: #ffffff !important;
+    }
+  }
+
+  // ── Primary accent → syllex-green ────────────────────────────────────────
+  .text-primary {
+    color: var(--syllex-green) !important;
+  }
+
+  // ── Light-background teacher components — restore dark text ───────────────
+  // These render inside the student layout (which has color:#fff globally)
+  // and have their own light bg. We must beat the global span/p !important rules
+  // by using higher specificity (3 classes vs 2 classes for the global rule).
+  .syllexCard,
+  .day-box,
+  .event-card {
+    color: #151d37 !important;
+
+    p,
+    span,
+    label,
+    small,
+    td,
+    th,
+    div {
+      color: #151d37 !important;
+    }
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      color: #151d37 !important;
+    }
+    .text-muted,
+    .text-secondary {
+      color: #5c6f8a !important;
+    }
+    // Primary text inside light components stays blue (not green)
+    .text-primary {
+      color: #1e40af !important;
+    }
+    // Badges and coloured elements keep their own colors
+    .badge {
+      color: inherit !important;
+    }
+    // Buttons delegate to their own styling
+    .btn {
+      color: inherit;
+    }
+  }
+
+  // ── Agent Page (teacher component rendered in student context) ────────────
+  // Target: teacher/pages/agent-page/agent-page.html — only student-role view
+  .agent-page-root {
+    // Overall background
+    .bg-page {
+      background-color: var(--student-bg) !important;
+    }
+
+    // "Le Tue Materie" subjects sidebar (new .subject-sidebar class)
+    .subject-sidebar {
+      background: var(--student-sidebar) !important;
+      border-color: rgba(255, 255, 255, 0.08) !important;
+
+      // Toggle knob — dark variant
+      .subject-toggle-btn {
+        background: var(--student-card) !important;
+        border-color: rgba(255, 255, 255, 0.15) !important;
+        color: rgba(255, 255, 255, 0.85) !important;
+
+        &:hover {
+          background: var(--syllex-green) !important;
+          color: #0f1628 !important;
+        }
+      }
+    }
+
+    // Sidebar header (border-bottom divider)
+    .p-4.border-bottom {
+      border-color: rgba(255, 255, 255, 0.08) !important;
+
+      h6 {
+        color: var(--syllex-green) !important;
+      }
+    }
+
+    // Subject buttons
+    .subject-card {
+      background: rgba(255, 255, 255, 0.06) !important;
+      border-color: rgba(255, 255, 255, 0.1) !important;
+      color: rgba(255, 255, 255, 0.85) !important;
+
+      span {
+        color: rgba(255, 255, 255, 0.85) !important;
+      }
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.12) !important;
+        border-color: rgba(255, 255, 255, 0.22) !important;
+      }
+
+      &.active-subject {
+        background: var(--student-card) !important;
+        border-color: var(--student-card) !important;
+        color: #fff !important;
+
+        span {
+          color: #fff !important;
+        }
+      }
+    }
+
+    // Mobile tab switcher (Materie / Chat)
+    .nav-switcher {
+      background: var(--student-sidebar) !important;
+
+      .btn {
+        color: rgba(255, 255, 255, 0.5) !important;
+      }
+
+      .btn-white,
+      [class*="btn-white"] {
+        background: var(--student-card) !important;
+        color: #fff !important;
+        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.35) !important;
+      }
+    }
+
+    // Mobile chat header nav (back arrow + subject title)
+    .chat-header-nav {
+      background: var(--student-sidebar) !important;
+      border-color: rgba(255, 255, 255, 0.08) !important;
+
+      h6 {
+        color: #fff !important;
+      }
+
+      .btn-light {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: #fff !important;
+        border-color: transparent !important;
+      }
+    }
+
+    // ── Conversation messages ─────────────────────────────────────────────────
+    // AI messages: dark bg, white text (msg-line has color:#1f2937 on component)
+    .msg-line {
+      color: rgba(255, 255, 255, 0.88) !important;
+    }
+
+    // User message bubble: light-blue → dark glass
+    .msg-line--user {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+      color: rgba(255, 255, 255, 0.95) !important;
+    }
+
+    // ── app-agent-chat input area ─────────────────────────────────────────────
+    // CSS custom properties set here cascade into app-agent-chat regardless of
+    // ViewEncapsulation — no !important wars needed.
+    --agent-input-bg: rgba(255, 255, 255, 0.05);
+    --agent-input-border: rgba(255, 255, 255, 0.12);
+    --agent-input-text: #ffffff;
+    --agent-input-placeholder: rgba(255, 255, 255, 0.35);
+    --agent-switcher-bg: rgba(255, 255, 255, 0.06);
+
+    // Mode switcher icons
+    .input-area-container .mode-switcher {
+      .mode-switcher__icon {
+        color: rgba(255, 255, 255, 0.55) !important;
+
+        &.mode-switcher__icon--active {
+          background: var(--student-primary, #6366f1) !important;
+          color: #ffffff !important;
+        }
+      }
+    }
+
+    // Focus ring on input pill
+    .input-area-container .input-pill-mock:focus-within {
+      border-color: var(--student-primary, #6366f1) !important;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15) !important;
+    }
+
+    // Textarea transparent background and caret
+    .main-content textarea.form-control {
+      background-color: transparent !important;
+      background: transparent !important;
+      border: none !important;
+      color: #ffffff !important;
+      -webkit-text-fill-color: #ffffff !important;
+      caret-color: #ffffff;
+      
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.45) !important;
+      }
+    }
+
+    // Send button dark and brand-aligned overrides
+    .input-area-container .btn-send-new {
+      background: var(--student-primary, #6366f1) !important;
+      color: #ffffff !important;
+      border: none !important;
+      box-shadow: 0 2px 6px rgba(99, 102, 241, 0.25) !important;
+      transition: all 0.2s ease !important;
+
+      &:hover:not(:disabled) {
+        opacity: 0.9 !important;
+        transform: scale(1.05) !important;
+      }
+
+      &:disabled {
+        background: rgba(255, 255, 255, 0.08) !important;
+        color: rgba(255, 255, 255, 0.25) !important;
+        cursor: not-allowed !important;
+        box-shadow: none !important;
+      }
+    }
+
+    // Mobile agent-chat header (bg-white → dark)
+    .d-flex.d-lg-none.bg-white.shadow-sm {
+      background: var(--student-sidebar) !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+
+      h6 {
+        color: #ffffff !important;
+      }
+
+      .btn-light {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: #fff !important;
+      }
+    }
+  }
+}

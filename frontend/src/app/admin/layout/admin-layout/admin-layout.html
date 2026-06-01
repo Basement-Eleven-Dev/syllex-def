@@ -2,9 +2,8 @@
   <app-admin-sidebar></app-admin-sidebar>
 
   <div id="content" class="flex-fill d-flex flex-column h-100">
-    <div class="container pt-4">
-      <app-admin-navbar></app-admin-navbar>
-    </div>
+
+    <app-admin-navbar class="container pt-4"></app-admin-navbar>
 
     <div class="flex-fill overflow-auto d-flex flex-column">
       <div
@@ -17,33 +16,3 @@
   </div>
 </div>
 
-<tour-step-template>
-  <ng-template let-step="step">
-    <div class="popover-header mb-1 text-center bg-transparent border-0 pb-0">
-      <h5 class="fw-bold mb-0">{{ step?.title }}</h5>
-    </div>
-    <div class="popover-body text-center mt-2 px-3 pb-3">
-      <p class="mb-4">{{ step?.content }}</p>
-      
-      <div class="d-flex justify-content-between align-items-center mt-3">
-        @if (tourService.hasPrev(step)) {
-          <button class="btn btn-outline-dark btn-sm rounded-pill px-3 opacity-75" (click)="tourService.prev()">
-            Indietro
-          </button>
-        } @else {
-          <div><!-- Spacer --></div>
-        }
-        
-        @if (tourService.hasNext(step)) {
-          <button class="btn btn-primary btn-sm rounded-pill px-3" (click)="tourService.next()">
-            Naviga
-          </button>
-        } @else {
-          <button class="btn btn-primary btn-sm rounded-pill px-3" (click)="tourService.end()">
-            Fine
-          </button>
-        }
-      </div>
-    </div>
-  </ng-template>
-</tour-step-template>
