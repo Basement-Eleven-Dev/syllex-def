@@ -24,6 +24,25 @@
   </div>
 
   <div class="d-flex flex-row align-items-center gap-4">
+    <div
+      class="rounded-pill d-flex align-items-center gap-2 px-3 py-2"
+      style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer; transition: all 0.2s ease;"
+      (click)="toggleHelpChat(); $event.stopPropagation()"
+      onmouseover="this.style.background='rgba(255, 255, 255, 0.15)'"
+      onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'"
+    >
+      <span
+        class="d-none d-xl-inline slim-hide"
+        style="
+          color: #ffffff;
+          font-weight: 500;
+          font-size: 0.85rem;
+          white-space: nowrap;
+        "
+        >Come posso aiutarti?</span
+      >
+    </div>
+
     <div ngbDropdown class="d-inline-block">
       <div
         id="studentProfileDropdown"

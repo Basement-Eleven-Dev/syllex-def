@@ -174,6 +174,9 @@ export class HelpChat implements OnInit {
 
   navigateToAction(path: string): void {
     this.router.navigateByUrl(path);
-    // Non chiudiamo più la chat automaticamente
+    // Su mobile chiudiamo la chat per permettere di vedere la nuova pagina
+    if (window.innerWidth < 992) {
+      this.closeChat();
+    }
   }
 }

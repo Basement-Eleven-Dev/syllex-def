@@ -38,18 +38,29 @@
           ></app-syllex-select-input>
         </div>
       } @else {
-        <div class="d-flex align-items-center gap-2">
+        <div class="d-flex align-items-center gap-2 flex-grow-1 justify-content-end me-3">
           <span class="small fw-semibold" style="color: #c084fc;">{{ User()?.firstName || User()?.username || 'Studente' }}</span>
         </div>
       }
-      <button class="btn d-flex align-items-center justify-content-center border-0 p-0 rounded-circle text-white btn-mobile-menu-grip" style="width: 38px; height: 38px; background-color: #252bb1; transition: transform 0.2s ease;" (click)="toggleMobileMenu()">
-        <fa-icon [icon]="GripIcon" style="font-size: 0.95rem;"></fa-icon>
-      </button>
+      <div class="d-flex align-items-center gap-2">
+        <button
+          type="button"
+          class="btn d-flex align-items-center justify-content-center border-0 p-0 rounded-circle text-white btn-mobile-menu-grip"
+          style="width: 38px; height: 38px; background-color: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2) !important; transition: all 0.2s; flex-shrink: 0;"
+          (click)="openHelpChat(); $event.stopPropagation()"
+          title="Supporto"
+        >
+          <fa-icon [icon]="HelpIcon" style="font-size: 1.05rem;"></fa-icon>
+        </button>
+        <button class="btn d-flex align-items-center justify-content-center border-0 p-0 rounded-circle text-white btn-mobile-menu-grip" style="width: 38px; height: 38px; background-color: #252bb1; transition: transform 0.2s ease;" (click)="toggleMobileMenu()">
+          <fa-icon [icon]="GripIcon" style="font-size: 0.95rem;"></fa-icon>
+        </button>
+      </div>
     </div>
 
     <!-- Desktop Navigation -->
     <div class="px-3 px-md-5 pt-4 d-none d-lg-block">
-      <app-student-nav></app-student-nav>
+      <app-student-nav (openChat)="openHelpChat()"></app-student-nav>
     </div>
 
     <!-- Main Content Area -->
@@ -117,6 +128,7 @@
           <fa-icon [icon]="SparklesIcon" class="route-icon"></fa-icon>
           <span class="route-label">Chat AI</span>
         </a>
+        
       </div>
     </div>
     

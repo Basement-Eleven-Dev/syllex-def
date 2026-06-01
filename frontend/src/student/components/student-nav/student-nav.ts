@@ -1,4 +1,4 @@
-import { Component, inject, ViewChild, computed, signal, OnInit } from '@angular/core';
+import { Component, inject, ViewChild, computed, signal, OnInit, Output, EventEmitter } from '@angular/core';
 import { DatePipe, TitleCasePipe, CommonModule, AsyncPipe } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
@@ -47,6 +47,8 @@ export class StudentNav implements OnInit {
 
   isAgentRoute = signal(false);
 
+  @Output() openChat = new EventEmitter<void>();
+
   subjectOptions = computed<SelectOption[]>(() => {
     return this.materiaService.allMaterie().map((m) => ({
       value: m._id,
@@ -77,5 +79,9 @@ export class StudentNav implements OnInit {
         return user.firstName.charAt(0) + user.lastName.charAt(0);
       })
     );
+  }
+
+  toggleHelpChat() {
+    this.openChat.emit();
   }
 }
