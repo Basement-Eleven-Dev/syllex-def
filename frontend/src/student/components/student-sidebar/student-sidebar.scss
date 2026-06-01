@@ -1,0 +1,212 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  width: 250px;
+  height: 100%;
+  flex-shrink: 0;
+}
+
+.sidebar {
+  background-color: var(--student-sidebar);
+  border-radius: 0 2.4rem 2.4rem 0;
+  border: none;
+}
+
+.sidebar-header {
+  img {
+    cursor: pointer;
+  }
+
+  .logo-slim {
+    display: none;
+  }
+}
+
+/* Non-desktop: in normal flow slim, fixed only when open */
+@media (max-width: 991px) {
+  :host {
+    width: 64px;
+    height: 100%;
+    flex-shrink: 0;
+    overflow: hidden;
+    transition: width 0.3s ease;
+    position: relative;
+    z-index: auto;
+  }
+
+  :host(.open) {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100dvh;
+    width: 250px;
+    z-index: 1050;
+    overflow-x: hidden;
+  }
+
+  :host(.open) .slim-only {
+    display: none !important;
+  }
+
+  :host:not(.open) {
+    .sidebar-header {
+      justify-content: center;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+
+      .logo-extended {
+        display: none;
+      }
+
+      .logo-slim {
+        display: block;
+      }
+    }
+
+    .slim-hide {
+      display: none !important;
+    }
+
+    .slim-only {
+      display: flex !important;
+    }
+
+    .inner-content {
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      padding-bottom: 88px !important;
+    }
+
+    #mainRoutes {
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+    
+    #mainRoutes .sidebarRoute {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+      border-radius: 0 30px 30px 0 !important;
+      margin-right: 0.5rem;
+    }
+
+    .ai-sidebar-btn {
+      justify-content: center !important;
+      padding: 0.75rem 0 !important;
+      margin-left: 0 !important;
+      margin-right: 0.5rem !important;
+      border-radius: 0 30px 30px 0 !important;
+    }
+
+    .ai-deco,
+    .chat-ai-deco {
+      position: static;
+      opacity: 1;
+      transform: none;
+      color: white;
+    }
+  }
+}
+
+.sidebarRoute {
+  width: 100%;
+  border-radius: 30px;
+  padding: 0.65rem 1.25rem;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+
+  fa-icon {
+    color: rgba(255, 255, 255, 0.6);
+    transition: color 0.3s ease;
+  }
+
+  &:hover {
+    cursor: pointer;
+    background-color: #1c2542;
+    color: #ffffff !important;
+    font-weight: bold;
+    
+    fa-icon {
+      color: #ffffff !important;
+    }
+  }
+
+  &.active {
+    cursor: pointer;
+    background-color: var(--student-bg);
+    color: #ffffff !important;
+    font-weight: bold;
+    
+    fa-icon {
+      color: #ffffff !important;
+    }
+
+    &:hover {
+      background-color: var(--student-bg);
+      color: #ffffff !important;
+
+      fa-icon {
+        color: #ffffff !important;
+      }
+    }
+  }
+}
+
+.logout-btn {
+  &:hover {
+    background-color: var(--bs-danger) !important;
+    color: white !important;
+
+    fa-icon {
+      color: white !important;
+    }
+  }
+}
+
+.cursor-pointer {
+  cursor: pointer;
+  user-select: none;
+}
+
+.ai-sidebar-btn {
+  background-color: var(--syllex-green) !important;
+  color: #0f1628 !important;
+  border-radius: 30px;
+  margin-bottom: 0.5rem;
+  border: none !important;
+  box-shadow: none !important;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    background-color: color-mix(in srgb, var(--syllex-green) 90%, black) !important;
+    box-shadow: 0 4px 12px rgba(201, 243, 33, 0.15) !important;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.ai-deco {
+  position: absolute;
+  font-size: 3rem;
+  opacity: 0.15;
+  right: 0.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 0;
+}
+
+.chat-ai-label {
+  color: #25335A !important;
+}
+
+.chat-ai-deco {
+  font-size: 2.2rem;
+  opacity: 1;
+  color: #25335A !important;
+}

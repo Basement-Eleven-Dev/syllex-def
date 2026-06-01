@@ -5,10 +5,14 @@ $green: #10b981;
 $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
 .syllex-card {
-  min-height: 300px;
+  min-height: 220px;
   transition: $transition;
   border: 1px solid transparent;
   text-decoration: none;
+
+  @media (min-width: 1400px) {
+    min-height: 300px;
+  }
 
   &.is-clickable {
     cursor: pointer;

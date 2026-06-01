@@ -1,6 +1,149 @@
-.card {
-  transition: box-shadow 0.2s;
+:host {
+  display: block;
+  width: 100%;
+  max-width: 100%;
 }
-.card:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+
+// Dark overrides for filter pills inside student theme
+:host ::ng-deep {
+  app-syllex-search-input,
+  app-syllex-select-input {
+    .filter-input-pill {
+      background-color: rgba(255, 255, 255, 0.08) !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      color: rgba(255, 255, 255, 0.9) !important;
+
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.45) !important;
+      }
+
+      input {
+        color: rgba(255, 255, 255, 0.9) !important;
+        background: transparent !important;
+        &::placeholder {
+          color: rgba(255, 255, 255, 0.45) !important;
+        }
+      }
+
+      .input-group-text {
+        color: rgba(255, 255, 255, 0.5) !important;
+        background: transparent !important;
+      }
+
+      &.form-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgba(255,255,255,0.6)' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+
+        option {
+          background-color: var(--student-sidebar);
+          color: #ffffff;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  :host ::ng-deep .auto-eval-btn button {
+    white-space: normal !important;
+    text-align: center;
+    height: auto !important;
+    padding-top: 0.85rem !important;
+    padding-bottom: 0.85rem !important;
+  }
+
+  .tests-filter-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.75rem !important;
+
+    app-syllex-search-input,
+    app-syllex-select-input,
+    app-syllex-button {
+      max-width: 100% !important;
+      width: 100% !important;
+      flex: 1 1 auto !important;
+
+      ::ng-deep {
+        .filter-input-pill,
+        .btn-syllex {
+          width: 100% !important;
+        }
+      }
+    }
+  }
+
+  .pagination-row {
+    display: none !important;
+  }
+}
+
+.student-switch {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+
+  &:checked {
+    background-color: var(--student-primary, #6366f1) !important;
+    border-color: var(--student-primary, #6366f1) !important;
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25) !important;
+  }
+}
+
+:host ::ng-deep {
+  app-syllex-pagination {
+    .pagination-container {
+      background-color: rgba(255, 255, 255, 0.08) !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      border-radius: 999px !important;
+      padding: 0.25rem !important;
+
+      .nav-button {
+        background: transparent !important;
+        border: none !important;
+        color: rgba(255, 255, 255, 0.6) !important;
+
+        &:disabled {
+          opacity: 0.3 !important;
+        }
+
+        &:not(:disabled):hover {
+          color: #ffffff !important;
+          background-color: rgba(255, 255, 255, 0.08) !important;
+        }
+      }
+
+      .pages-wrapper {
+        background: transparent !important;
+
+        .selector {
+          background-color: var(--student-primary, #6366f1) !important;
+          opacity: 0.25 !important;
+          border-radius: 999px !important;
+        }
+      }
+
+      .page-button {
+        color: rgba(255, 255, 255, 0.8) !important;
+        font-weight: 500 !important;
+        background-color: transparent !important;
+
+        &:hover:not(.active) {
+          color: #ffffff !important;
+          background-color: rgba(255, 255, 255, 0.08) !important;
+        }
+
+        &.active {
+          color: #ffffff !important;
+          font-weight: 700 !important;
+          background-color: var(--student-primary, #6366f1) !important;
+          border-radius: 999px !important;
+        }
+      }
+    }
+  }
 }

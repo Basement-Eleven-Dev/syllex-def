@@ -1,148 +1,302 @@
-// Stat Boxes - Statistiche uniformate al design del progetto
-.stat-box {
-  padding: 1.5rem;
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 0.75rem;
-  transition: all 0.2s ease;
-  height: 100%;
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-
-  &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    border-color: rgba(0, 0, 0, 0.12);
-  }
-
-  // Variante Primary (Blu)
-  &--primary {
-    .stat-box__icon {
-      color: #1976d2;
-      background-color: rgba(25, 118, 210, 0.1);
-    }
-  }
-
-  // Variante Secondary (Viola)
-  &--secondary {
-    .stat-box__icon {
-      color: #7b1fa2;
-      background-color: rgba(123, 31, 162, 0.1);
-    }
-  }
-
-  // Variante Subjects
-  &--subjects {
-    flex-direction: column;
-    padding: 1.5rem;
-    background: transparent;
-    border: none;
-  }
-}
-
-.stat-box__icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 3rem;
-  height: 3rem;
-  border-radius: 0.625rem;
-  font-size: 1.5rem;
-  flex-shrink: 0;
-}
-
-.stat-box__content {
+// ── Host: fill parent flex column, no scroll ─────────────────────────────────
+:host {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
-.stat-box__label {
-  margin: 0;
-  font-size: 0.85rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-  color: #999;
+
+// ── Main Dashboard Grid ───────────────────────────────────────────────────────
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  grid-template-areas:
+    "study study monitor tests"
+    "autoval autoval comunicazioni comunicazioni";
+  gap: 1.25rem;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
-.stat-box__value {
-  margin: 0;
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1a1a1a;
-  line-height: 1;
+.db-study {
+  grid-area: study;
+}
+.db-monitor {
+  grid-area: monitor;
+}
+.db-tests {
+  grid-area: tests;
+}
+.db-autoval {
+  grid-area: autoval;
+}
+.db-comunicazioni {
+  grid-area: comunicazioni;
 }
 
-.stat-box__unit {
-  font-size: 1.2rem;
-  opacity: 0.6;
-  margin-left: 0.25rem;
+// ── Mobile: restore scroll ────────────────────────────────────────────────────
+@media (max-width: 991px) {
+  :host {
+    overflow: visible;
+    flex: none;
+    min-height: unset;
+  }
+  .dashboard-grid {
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+    height: auto !important;
+    gap: 0.75rem;
+  }
+  .student-welcome {
+    padding-bottom: 0.5rem;
+  }
+
+  // Blocks: remove overflow:hidden + min-height:0 so they size to content
+  .student-block {
+    overflow: visible;
+    min-height: unset;
+    padding: 1.15rem; // Reduced padding on mobile
+  }
+
+  // Scrollable areas: give them an explicit min/max so content is visible
+  .block-scroll {
+    min-height: 100px;
+    max-height: 350px; // Allow more scroll area on mobile
+    overflow-y: auto;
+  }
+
+  // Autoval block: stack CTA and simulations vertically on mobile
+  .student-block--autoval {
+    flex-direction: column !important;
+    align-items: stretch !important; // Allow children to take full width
+    min-height: unset;
+    gap: 0.5rem !important; // Tighter gap between the two sections
+  }
+
+  .autoval-cta {
+    width: 100% !important;
+    min-width: unset;
+    max-width: 100%;
+    align-items: center; // Center content inside CTA
+    text-align: center;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  app-syllex-button {
+    align-self: center !important; // Center the pill on mobile
+    margin-top: 0.5rem !important;
+  }
+
+  .autoval-simulations {
+    padding-top: 0.75rem !important;
+    padding-bottom: 0 !important;
+  }
+
+  .autoval-divider {
+    width: 100%;
+    height: 1px;
+    align-self: stretch;
+    flex-shrink: 0;
+  }
+  
+  .autoval-title {
+    font-size: 1.3rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  // Make the study block more prominent on mobile
+  .student-block--study {
+    margin-top: 1.5rem;
+    margin-bottom: 2.5rem; // Detach from the rest of the cards
+    padding: 0 0.5rem;
+
+    .study-mascot-wrap {
+      width: 110px;
+      height: 110px;
+      margin-bottom: 1.5rem !important;
+    }
+
+    .study-main-title {
+      font-size: 2rem !important;
+      line-height: 1.1;
+      margin-bottom: 1.5rem !important;
+    }
+    
+    .subject-pills {
+      gap: 0.6rem;
+    }
+    
+    .subject-pill {
+      padding: 0.6rem 1.25rem;
+      font-size: 0.95rem;
+    }
+  }
 }
 
-.stat-box__subtitle {
-  margin: 0;
-  font-size: 0.75rem;
-  color: #bbb;
-  font-weight: 400;
+// ── Shared block base ─────────────────────────────────────────────────────────
+.student-block {
+  border-radius: 24px;
+  padding: 1.5rem;
+  color: #ffffff;
+  min-height: 0;
+  overflow: hidden;
 }
 
-.stat-box__title {
-  margin: 0 0 0.75rem 0;
+// ── Internal scrollable area ──────────────────────────────────────────────────
+.block-scroll {
+  overflow-y: auto;
+  min-height: 0;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 2px;
+  }
+}
+
+// ── Inizia a studiare / Cosa vorresti ripassare oggi? ─────────────────────────
+.student-block--study {
+  background: transparent; // No solid card background to match Figma
+  padding: 0 1rem; // Less padding since it's not a card
+  position: relative;
+
+  // Sfondo glow animato dietro al robottino
+
+
+  .study-main-title {
+    font-size: 1.6rem;
+    letter-spacing: -0.02em;
+    position: relative;
+    z-index: 1;
+    // Gradiente premium per il testo
+    background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+
+
+.subject-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-content: flex-start;
+  padding: 0.5rem; // Evita il taglio superiore durante l'animazione di hover
+}
+
+.subject-pill {
+  display: inline-block;
+  padding: 0.45rem 1.1rem;
+  border-radius: 999px;
+  
+  // Effetto Glassmorphism Premium
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  
+  color: #e9d5ff;
   font-size: 0.85rem;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-  color: #666;
-}
-
-.stat-box__subjects-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-  gap: 0.75rem;
-  width: 100%;
-
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
-  @media (max-width: 576px) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.stat-box__subject-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.35rem;
-  padding: 0.75rem 0.5rem;
-  background-color: transparent;
-  border-radius: 0.4rem;
-  text-align: center;
-  transition: all 0.2s ease;
-  min-height: 80px;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
   &:hover {
-    background-color: rgba(25, 118, 210, 0.05);
+    background: rgba(139, 92, 246, 0.25);
+    border-color: rgba(139, 92, 246, 0.5);
+    color: #ffffff;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 6px 16px rgba(139, 92, 246, 0.2);
   }
 }
 
-.stat-box__subject-label {
-  font-size: 0.7rem;
-  font-weight: 500;
-  letter-spacing: 0.2px;
-  color: #999;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  line-height: 1.2;
+// ── Monitora lo studio & Performance ──────────────────────────────────────────
+.student-block--monitor {
+  background-color: var(--student-card);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.stat-box__subject-value {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1976d2;
+// ── Test disponibili ──────────────────────────────────────────────────────────
+.student-block--tests {
+  background-color: var(--student-sidebar);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
+
+
+// ── Autovalutazione (lime green, 2-panel) ─────────────────────────────────────
+.student-block--autoval {
+  background-color: var(--syllex-green);
+  color: #0f1628;
+
+  a {
+    color: #0f1628 !important;
+  }
+
+  .autoval-title {
+    font-size: 1.6rem;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    color: #5b21b6 !important;
+  }
+}
+
+.autoval-cta {
+  flex-shrink: 0;
+  width: 45%;
+}
+
+
+
+.sim-card {
+  background-color: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.08);
+  }
+
+  h6 {
+    font-size: 0.95rem;
+    line-height: 1.3;
+  }
+}
+
+
+// ── Comunicazioni ─────────────────────────────────────────────────────────────
+.student-block--comunicazioni {
+  background: linear-gradient(135deg, #1b2f6b 0%, #15224e 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+// ── Shared utilities ──────────────────────────────────────────────────────────
+.student-link-arrow {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: var(--syllex-green);
+  }
+}
+

@@ -23,7 +23,8 @@ export const SYLLEX_SITEMAP: Record<string, NavigablePage[]> = {
     { key: 'RISORSE', path: '/s/risorse', label: 'Materiali di Studio', description: 'Documenti e materiali caricati dai tuoi docenti per lo studio.' },
     { key: 'PROFILO', path: '/s/profilo', label: 'Il tuo Profilo', description: 'Gestione delle tue impostazioni e dei tuoi dati personali.' },
     { key: 'COMUNICAZIONI', path: '/s/comunicazioni', label: 'Comunicazioni', description: 'Ricevi avvisi e messaggi importanti dai tuoi docenti.' },
-    { key: 'AUTO_EVALUATION', path: '/s/auto-evaluation/create', label: 'Crea Auto-Valutazione', description: 'Genera nuovi test ed esercitazioni per studiare autonomamente con l\'AI.' }
+    { key: 'AUTO_EVALUATION', path: '/s/auto-evaluation/create', label: 'Crea Auto-Valutazione', description: 'Genera nuovi test ed esercitazioni per studiare autonomamente con l\'AI.' },
+    { key: 'AGENTE', path: '/s/agente', label: 'Chat AI', description: 'Interagisci con il Tutor AI Alex.' }
   ],
   admin: []
 };

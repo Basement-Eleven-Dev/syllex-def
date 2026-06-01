@@ -1,0 +1,57 @@
+.detail-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1b2f6b;
+  line-height: 1.4;
+}
+
+.detail-content {
+  font-size: 0.92rem;
+  color: #374151;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.badge-unread-detail {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background-color: #e8eaf6;
+  color: #3949ab;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.attachment-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.95rem;
+  background-color: #f1f3f9 !important;
+  border: 1px solid #dcdfe8 !important;
+  border-radius: 999px;
+  color: #1b2f6b !important;
+  font-size: 0.78rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  outline: none;
+
+  &:hover {
+    background-color: #e2e6f1 !important;
+    border-color: #c4cbdc !important;
+    color: #0d1a40 !important;
+
+    .attachment-btn__icon {
+      color: #0d1a40 !important;
+    }
+  }
+}
+
+.attachment-btn__icon {
+  color: #1b2f6b !important;
+  font-size: 0.85rem;
+  transition: color 0.2s ease;
+}

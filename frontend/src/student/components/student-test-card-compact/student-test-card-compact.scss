@@ -1,219 +1,32 @@
-.compact-test-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem;
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 0.75rem;
-  transition: all 0.2s ease;
-  cursor: pointer;
-
-  &:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    border-color: rgba(0, 0, 0, 0.12);
-  }
-
-  @media (max-width: 576px) {
-    flex-wrap: wrap;
-    gap: 0.75rem;
-  }
-}
-
-.compact-test-card__header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex: 1;
-  min-width: 0;
-
-  @media (max-width: 576px) {
-    width: 100%;
-    order: 1;
-  }
-}
-
-.compact-test-card__title-section {
+// ── Compact Test Card Container ────────────────────────────────────────────────
+.ctc {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  min-width: 0;
-}
-
-.compact-test-card__title {
-  margin: 0;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #1a1a1a;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.compact-test-card__subject {
-  font-size: 0.75rem;
-  color: #666;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-.compact-test-card__status {
-  display: inline-block;
-  padding: 0.35rem 0.75rem;
-  border-radius: 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-  white-space: nowrap;
-
-  &.status--pending {
-    background-color: #e3f2fd;
-    color: #1976d2;
-  }
-
-  &.status--in-progress {
-    background-color: #fff3e0;
-    color: #f57c00;
-  }
-
-  &.status--completed {
-    background-color: #e8f5e9;
-    color: #388e3c;
-  }
-
-  &.status--reviewed {
-    background-color: #f3e5f5;
-    color: #7b1fa2;
-  }
-
-  @media (max-width: 576px) {
-    order: 2;
-  }
-}
-
-.compact-test-card__details {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  flex: 0 0 auto;
-
-  @media (max-width: 768px) {
-    gap: 1rem;
-  }
-
-  @media (max-width: 576px) {
-    width: 100%;
-    order: 3;
-    gap: 1rem;
-  }
-}
-
-.compact-test-card__detail-item {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.85rem;
-  color: #666;
-  white-space: nowrap;
-
-  .detail-icon {
-    font-size: 0.85rem;
-    color: #999;
-    flex-shrink: 0;
-  }
-
-  .detail-date {
-    font-size: 0.85rem;
-  }
-}
-
-.compact-test-card__score {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.35rem 0.75rem;
-  background-color: rgba(123, 31, 162, 0.08);
-  border-radius: 0.5rem;
-  flex-shrink: 0;
-
-  .score-icon {
-    font-size: 0.75rem;
-    color: #7b1fa2;
-  }
-
-  .score-value {
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: #7b1fa2;
-  }
-
-  .score-sep {
-    font-size: 0.8rem;
-    color: #aaa;
-  }
-
-  .score-max {
-    font-size: 0.8rem;
-    color: #888;
-    font-weight: 500;
-  }
-
-  @media (max-width: 576px) {
-    order: 3;
-  }
-}
-
-.compact-test-card__button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 1.2rem;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 0.85rem;
-  font-weight: 600;
-  white-space: nowrap;
+  padding: 1rem 1.25rem;
+  background: rgba(99, 102, 241, 0.18);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: 16px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
 
-  &.button--pending {
-    background-color: #1976d2;
-    color: white;
-
-    &:hover {
-      background-color: #1565c0;
-    }
-  }
-
-  &.button--in-progress {
-    background-color: #f57c00;
-    color: white;
-
-    &:hover {
-      background-color: #e65100;
-    }
-  }
-
-  &.button--completed {
-    background-color: #388e3c;
-    color: white;
-
-    &:hover {
-      background-color: #2e7d32;
-    }
-  }
-
-  fa-icon {
-    font-size: 0.85rem;
+  &:hover {
+    background: rgba(99, 102, 241, 0.28);
+    border-color: rgba(99, 102, 241, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 
   @media (max-width: 576px) {
-    width: 100%;
-    order: 4;
-    justify-content: center;
+    padding: 0.85rem 1rem;
   }
+}
+
+.ctc__title {
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0;
+  transition: color 0.15s ease;
 }

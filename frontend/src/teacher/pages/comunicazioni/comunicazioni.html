@@ -19,12 +19,13 @@
   </button>
 </div>
 
-<section tourAnchor="comunicazioni_filters" class="d-flex flex-row mb-5 gap-3">
+<section tourAnchor="comunicazioni_filters" class="d-flex flex-row flex-wrap mb-5 gap-3">
   <app-syllex-search-input
     placeholder="Cerca comunicazione tramite parole chiave..."
     [value]="SearchTerm()"
     (valueChange)="onSearchTermChange($event)"
-    style="min-width: 400px"
+    class="flex-grow-1"
+    style="min-width: 180px; max-width: 100%"
   />
 
   <app-syllex-select-input

@@ -1,0 +1,60 @@
+<div class="flex-fill w-100 card sidebar">
+  <div
+    class="sidebar-header d-flex align-items-center justify-content-center gap-2 mt-5 px-4"
+  >
+    <!-- Use logotipo.svg for student side -->
+    <img
+      src="/images/logotipo.svg"
+      alt="Syllex Logo"
+      class="logo-extended"
+      routerLink="/s/dashboard"
+      style="height: 36px; width: auto; filter: brightness(0) invert(1);"
+    />
+    <img
+      src="/images/logo_primary.png"
+      alt="Syllex Logo"
+      class="logo-slim"
+      routerLink="/s/dashboard"
+      style="height: 28px; width: auto; filter: brightness(0) invert(1);"
+    />
+  </div>
+
+  <div class="w-100 px-3 py-4 d-flex flex-column flex-fill inner-content">
+    <div id="mainRoutes" class="d-flex flex-column gap-2 flex-fill mt-4" style="overflow-y: auto; overflow-x: hidden;">
+      @for(route of mainRoutes; track $index){
+      <div
+        class="sidebarRoute w-100 gap-3 d-flex py-3 px-4 align-items-center"
+        [routerLink]="route.path"
+        routerLinkActive="active"
+      >
+        <fa-icon [icon]="route.icon"></fa-icon>
+        <span class="routeLabel slim-hide">{{route.label}}</span>
+      </div>
+      }
+    </div>
+
+    <!-- AI Tools and Logout at bottom -->
+    <div class="mt-auto pt-2 d-flex flex-column gap-2">
+      <div
+        class="btn text-start ai-sidebar-btn px-4 py-3 d-flex flex-row align-items-center justify-content-between position-relative"
+        routerLink="/s/agente"
+      >
+        <p class="mb-0 position-relative chat-ai-label slim-hide fs-5 fw-bold">
+          Chat AI
+        </p>
+        <fa-icon
+          [icon]="SparklesIcon"
+          class="ai-deco chat-ai-deco me-2 fs-4"
+        ></fa-icon>
+      </div>
+
+      <div
+        class="sidebarRoute w-100 gap-3 d-flex py-3 px-4 align-items-center mt-3 cursor-pointer logout-btn"
+        (click)="onLogout()"
+      >
+        <fa-icon [icon]="LogoutIcon"></fa-icon>
+        <span class="routeLabel slim-hide">Logout</span>
+      </div>
+    </div>
+  </div>
+</div>

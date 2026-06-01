@@ -1,4 +1,11 @@
-import { Component, OnInit, inject, signal, DestroyRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  signal,
+  computed,
+  DestroyRef,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Auth, User } from '../../../services/auth';
 import {
@@ -6,25 +13,34 @@ import {
   StudentTestInterface,
   StudentAttemptInterface,
 } from '../../../services/student-tests.service';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import {
   ComunicazioniService,
   ComunicazioneInterface,
 } from '../../../services/comunicazioni-service';
-import { Materia } from '../../../services/materia';
+import { Materia, MateriaObject } from '../../../services/materia';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faChartPie,
   faVial,
-  faBullhorn,
+  faBell,
   faArrowRight,
+  faRobot,
+  faPlay,
+  faCheckCircle,
+  faChartLine,
+  faClipboardList,
 } from '@fortawesome/pro-solid-svg-icons';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 import { StudentTestCardCompact } from '../../components/student-test-card-compact/student-test-card-compact';
 import { StudentComunicazioneCard } from '../../components/student-comunicazione-card/student-comunicazione-card';
 import { StatCardData } from '../../../teacher/components/stat-card/stat-card';
+import { SyllexButton } from '../../../teacher/components/UI/syllex-button/syllex-button';
+import { AlexMascot } from '../../../app/shared/components/alex-mascot/alex-mascot';
 
 @Component({
   selector: 'app-dashbaord',
@@ -34,7 +50,10 @@ import { StatCardData } from '../../../teacher/components/stat-card/stat-card';
     RouterModule,
     FontAwesomeModule,
     StudentTestCardCompact,
-  ],
+    StudentComunicazioneCard,
+    SyllexButton,
+    AlexMascot,
+],
   templateUrl: './student-dashboard.html',
   styleUrl: './student-dashboard.scss',
 })
@@ -44,15 +63,26 @@ export class StudentDashboard implements OnInit {
   private readonly comunicazioniService = inject(ComunicazioniService);
   private readonly materiaService = inject(Materia);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router);
 
   readonly PieIcon = faChartPie;
   readonly TestIcon = faVial;
-  readonly MegaphoneIcon = faBullhorn;
+  readonly BellIcon = faBell;
   readonly ArrowRight = faArrowRight;
+  readonly RobotIcon = faRobot;
+  readonly PlayIcon = faPlay;
+  readonly CheckCircleIcon = faCheckCircle;
+  readonly PerformanceIcon = faChartLine;
+  readonly ClipboardIcon = faClipboardList;
 
   User = signal<User | null>(null);
+  Subjects = this.materiaService.allMaterie;
+
+  CompletedTests = signal<StudentTestInterface[]>([]);
 
   RecentTests = signal<StudentTestInterface[]>([]);
+  TotalTestsCount = signal(0);
+  isLoadingData = signal(true);
   AttemptStatusMap = signal<
     Map<string, 'in-progress' | 'delivered' | 'reviewed'>
   >(new Map());
@@ -61,6 +91,9 @@ export class StudentDashboard implements OnInit {
   );
 
   RecentComunicazioni = signal<ComunicazioneInterface[]>([]);
+  readonly UnreadCount = computed(
+    () => this.RecentComunicazioni().filter((c) => !c.isRead).length,
+  );
 
   // Statistics
   SubjectStats = signal<StatCardData[]>([]);
@@ -70,6 +103,11 @@ export class StudentDashboard implements OnInit {
   ngOnInit(): void {
     this.auth.user$.subscribe((user) => this.User.set(user));
     this.loadDashboardData();
+  }
+
+  goToAgentWithSubject(subject: MateriaObject): void {
+    this.materiaService.setSelectedSubject(subject);
+    this.router.navigate(['/s/agente']);
   }
 
   getAttemptStatus(
@@ -85,12 +123,16 @@ export class StudentDashboard implements OnInit {
   private loadDashboardData() {
     // 1. Load recent tests
     this.testsService
-      .getAvailableTests()
+      .getAvailableTests('', '', 1, 50)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((res) => {
-        const tests = res.tests;
-        // Sort by availability and take top 3
-        const sorted = tests.sort((a, b) => {
+        const allTests = res.tests;
+        
+        const teacherTests = allTests.filter(t => t.source !== 'self-evaluation');
+        const selfEvalTests = allTests.filter(t => t.source === 'self-evaluation');
+
+        // Sort teacher tests by availability and take top 3
+        const sortedTeacher = teacherTests.sort((a, b) => {
           const dateA = a.availableFrom
             ? new Date(a.availableFrom).getTime()
             : 0;
@@ -99,60 +141,66 @@ export class StudentDashboard implements OnInit {
             : 0;
           return dateB - dateA; // Newest first
         });
-        this.RecentTests.set(sorted.slice(0, 3));
+        this.TotalTestsCount.set(teacherTests.length);
+        this.RecentTests.set(sortedTeacher.slice(0, 3));
+        
+        this.CompletedTests.set(selfEvalTests.slice(0, 3));
 
-        // Fetch attempt status for each
-        this.RecentTests().forEach((test) => {
-          this.testsService
-            .getAttemptByTestId(test._id)
+        // Fetch all attempts in parallel to prevent UI flickering
+        const attemptsReqs = allTests.map(test => 
+          this.testsService.getAttemptByTestId(test._id).pipe(
+            catchError(() => of(null))
+          )
+        );
+
+        if (attemptsReqs.length > 0) {
+          forkJoin(attemptsReqs)
             .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe((attempt) => {
-              if (attempt) {
-                this.AttemptStatusMap.update((map) => {
-                  const newMap = new Map(map);
-                  newMap.set(test._id, attempt.status);
-                  return newMap;
-                });
+            .subscribe((attempts) => {
+              const newStatusMap = new Map<string, 'in-progress' | 'delivered' | 'reviewed'>();
+              const newScoreMap = new Map<string, { score: number; maxScore: number }>();
 
-                if (attempt.status === 'reviewed') {
-                  const score =
-                    attempt.score != null
+              allTests.forEach((test, index) => {
+                const attempt = attempts[index];
+                if (attempt) {
+                  newStatusMap.set(test._id, attempt.status);
+
+                  if (attempt.status === 'reviewed' || (test.source === 'self-evaluation' && attempt.status === 'delivered')) {
+                    const score = attempt.score != null
                       ? attempt.score
-                      : attempt.questions.reduce(
-                          (sum, q) => sum + (q.score ?? 0),
-                          0,
-                        );
-                  const maxScore =
-                    attempt.maxScore != null
+                      : attempt.questions.reduce((sum, q) => sum + (q.score ?? 0), 0);
+                    const maxScore = attempt.maxScore != null
                       ? attempt.maxScore
-                      : attempt.questions.reduce(
-                          (sum, q) => sum + (q.points ?? 0),
-                          0,
-                        );
-                  this.AttemptScoreMap.update((map) => {
-                    const newMap = new Map(map);
-                    newMap.set(test._id, { score, maxScore });
-                    return newMap;
-                  });
+                      : attempt.questions.reduce((sum, q) => sum + (q.points ?? 0), 0);
+                    
+                    newScoreMap.set(test._id, { score, maxScore });
+                  }
                 }
-              }
-            });
-        });
+              });
 
-        // Generate Subject Statistics by analyzing all available tests vs completed tests
-        this.computeSubjectStats(tests);
+              this.AttemptStatusMap.set(newStatusMap);
+              this.AttemptScoreMap.set(newScoreMap);
+
+              // Generate Subject Statistics
+              this.computeSubjectStats(allTests, attempts);
+              this.isLoadingData.set(false);
+            });
+        } else {
+          this.computeSubjectStats([], []);
+          this.isLoadingData.set(false);
+        }
       });
 
     // 2. Load recent communications
     this.comunicazioniService
-      .getPagedComunicazioni('', '', '', 1, 3)
+      .getPagedComunicazioni('', '', '', 1, 10)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((res) => {
         this.RecentComunicazioni.set(res.communications || []);
       });
   }
 
-  private computeSubjectStats(allTests: StudentTestInterface[]) {
+  private computeSubjectStats(allTests: StudentTestInterface[], attempts: (StudentAttemptInterface | null)[]) {
     const subjects = this.materiaService.allMaterie();
     const stats: StatCardData[] = [];
 
@@ -160,68 +208,56 @@ export class StudentDashboard implements OnInit {
     let totalScore = 0;
     let scoresCount = 0;
 
-    // Fetching attempts to calculate stats
-    // Note: In a real scenario, an aggregated backend endpoint would be better.
-    // Here we simulate it by checking attempts for tests
-    allTests.forEach((test) => {
-      this.testsService
-        .getAttemptByTestId(test._id)
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe((attempt) => {
-          if (
-            attempt &&
-            (attempt.status === 'delivered' || attempt.status === 'reviewed')
-          ) {
-            completedCount++;
+    allTests.forEach((test, index) => {
+      const attempt = attempts[index];
+      if (
+        attempt &&
+        (attempt.status === 'delivered' || attempt.status === 'reviewed')
+      ) {
+        completedCount++;
 
-            // Roughly calc a score if reviewed
-            if (attempt.status === 'reviewed' && attempt.questions) {
-              let attemptScore = 0;
-              let attemptMax = 0;
-              attempt.questions.forEach((q) => {
-                if (q.score !== undefined) attemptScore += q.score;
-                if (q.points !== undefined) attemptMax += q.points;
-              });
-              if (attemptMax > 0) {
-                totalScore += (attemptScore / attemptMax) * 100;
-                scoresCount++;
-              }
+        // Roughly calc a score if reviewed
+        if (attempt.status === 'reviewed' && attempt.questions) {
+          let attemptScore = 0;
+          let attemptMax = 0;
+          attempt.questions.forEach((q) => {
+            if (q.score !== undefined) attemptScore += q.score;
+            if (q.points !== undefined) attemptMax += q.points;
+          });
+          if (attemptMax > 0) {
+            totalScore += (attemptScore / attemptMax) * 100;
+            scoresCount++;
+          }
+        }
+
+        // Update subject breakdown
+        if (test.subjectId) {
+          const subj = subjects.find((s) => s._id === test.subjectId);
+          if (subj) {
+            // Find existing stat
+            let existing = stats.find((s) => s.Label === subj.name);
+            if (!existing) {
+              existing = {
+                Label: subj.name,
+                Value: 0,
+                Link: ['/s', 'tests'],
+                QueryParams: {},
+              };
+              stats.push(existing);
             }
+            existing.Value += 1;
           }
-
-          this.TotalTestsCompleted.set(completedCount);
-          if (scoresCount > 0) {
-            this.AverageScore.set(Math.round(totalScore / scoresCount));
-          }
-
-          // Update subject breakdown
-          if (test.subjectId) {
-            const subj = subjects.find((s) => s._id === test.subjectId);
-            if (subj) {
-              // Find existing stat
-              let existing = stats.find((s) => s.Label === subj.name);
-              if (!existing) {
-                existing = {
-                  Label: subj.name,
-                  Value: 0,
-                  Link: ['/s', 'tests'],
-                  QueryParams: {},
-                };
-                stats.push(existing);
-              }
-              if (
-                attempt &&
-                (attempt.status === 'delivered' ||
-                  attempt.status === 'reviewed')
-              ) {
-                existing.Value += 1;
-                this.SubjectStats.set(
-                  [...stats].sort((a, b) => b.Value - a.Value).slice(0, 4),
-                );
-              }
-            }
-          }
-        });
+        }
+      }
     });
+
+    this.TotalTestsCompleted.set(completedCount);
+    if (scoresCount > 0) {
+      this.AverageScore.set(Math.round(totalScore / scoresCount));
+    } else {
+      this.AverageScore.set(0);
+    }
+    
+    this.SubjectStats.set([...stats].sort((a, b) => b.Value - a.Value).slice(0, 4));
   }
 }

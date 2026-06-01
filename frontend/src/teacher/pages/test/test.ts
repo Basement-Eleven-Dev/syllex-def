@@ -17,7 +17,6 @@ import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
 import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
 import { SyllexSearchInput } from '../../components/UI/syllex-search-input/syllex-search-input';
-import { SyllexClearButton } from '../../components/UI/syllex-clear-button/syllex-clear-button';
 import { SyllexTabFilter } from '../../components/UI/syllex-tab-filter/syllex-tab-filter';
 import { SyllexEmptyState } from '../../components/UI/syllex-empty-state/syllex-empty-state';
 
@@ -38,7 +37,6 @@ type TestTab = 'tutti' | 'da-correggere' | 'bozze';
     SyllexPageHeader,
     SyllexButton,
     SyllexSearchInput,
-    SyllexClearButton,
     SyllexTabFilter,
     SyllexEmptyState,
   ],
@@ -78,14 +76,14 @@ export class Test implements OnDestroy {
   LoadingRecent = signal<boolean>(false);
   CollectionSizeRecent = signal<number>(0);
   PageRecent = signal<number>(1);
-  PageSizeRecent = signal<number>(8);
+  PageSizeRecent = signal<number>(12);
 
   // Section: Da Correggere
   PendingTests = signal<TestInterface[]>([]);
   LoadingPending = signal<boolean>(false);
   CollectionSizePending = signal<number>(0);
   PagePending = signal<number>(1);
-  PageSizePending = signal<number>(8);
+  PageSizePending = signal<number>(12);
 
   // Private Properties
   private SearchTermSubject = new Subject<string>();

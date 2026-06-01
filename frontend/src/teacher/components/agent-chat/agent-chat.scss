@@ -9,10 +9,10 @@
   height: 100%;
   width: 100%;
   border-radius: 1.5rem;
+  overflow: hidden;
   @media (max-width: 991px) {
     border-radius: 0;
   }
-  overflow: hidden;
 }
 
 // --- SIDEBAR ---
@@ -83,6 +83,18 @@
     color: rgba(57, 49, 206, 0.55);
     letter-spacing: 0.05em;
   }
+
+  app-syllex-button {
+    display: block;
+    width: 100%;
+
+    ::ng-deep .btn {
+      width: 100% !important;
+      display: flex !important;
+      justify-content: center;
+    }
+  }
+
 
   .btn-sidebar-config {
     border: none;
@@ -318,15 +330,14 @@
 // --- MESSAGES (Premium Glassmorphic Bubbles) ---
 .msg-line {
   max-width: 85%;
-  @media (min-width: 768px) {
-    max-width: 72%;
-  }
   color: #1f2937;
   font-size: 1.1rem;
   backdrop-filter: blur(10px);
-
   display: inline-block;
   text-align: left;
+  @media (min-width: 768px) {
+    max-width: 72%;
+  }
 
   &--user {
     background-color: rgba(210, 226, 255, 0.5);
@@ -353,7 +364,7 @@
   }
 }
 
-// --- INTRO WELCOME ---
+// --- INTRO WELCOME & MASCOT ---
 .intro-welcome {
   max-width: 640px;
   width: 100%;
@@ -558,7 +569,7 @@
     padding: 5px;
     border-radius: 999px;
     border: none;
-    background: #f0f0f8;
+    background: var(--agent-switcher-bg, #f0f0f8);
     cursor: pointer;
     flex-shrink: 0;
     align-self: stretch;
@@ -601,8 +612,8 @@
   // ---- INPUT PILL: max-width per collasso fluido ----
   .input-pill-mock {
     border-radius: 30px;
-    background: #ffffff !important;
-    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    background: var(--agent-input-bg, #ffffff) !important;
+    border: 1px solid var(--agent-input-border, rgba(0, 0, 0, 0.08)) !important;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02) !important;
     overflow: hidden;
     flex: 1;
@@ -623,10 +634,10 @@
       resize: none;
       font-weight: 500;
       background: transparent;
-      color: #1a1a1a;
+      color: var(--agent-input-text, #1a1a1a);
       min-width: 0;
       &::placeholder {
-        color: #7b8fd4;
+        color: var(--agent-input-placeholder, #7b8fd4);
       }
     }
   }
@@ -889,5 +900,222 @@
   50% {
     transform: scale(1.3);
     opacity: 1;
+  }
+}
+
+// Student Theme Right Sidebar Dark Overrides
+:host-context(.student-theme) {
+  --agent-input-bg: var(--student-sidebar);
+  --agent-input-border: rgba(255, 255, 255, 0.1);
+  --agent-input-text: #ffffff;
+
+  .btn-quick-action {
+    background-color: var(--student-sidebar) !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+
+    fa-icon {
+      color: #ffffff !important;
+    }
+
+    &:hover {
+      background-color: var(--student-card) !important;
+      border-color: rgba(255, 255, 255, 0.2) !important;
+      color: #ffffff !important;
+      fa-icon {
+        color: #ffffff !important;
+      }
+    }
+  }
+
+  // --- Voice Controls Overrides ---
+  .mode-switcher--voice {
+    background-image: linear-gradient(var(--student-sidebar), var(--student-sidebar)), linear-gradient(135deg, #3931ce, #52a0ff) !important;
+  }
+  
+  .mode-switcher__icon {
+    color: #ffffff !important;
+  }
+
+  .voice-input-pill {
+    background: var(--student-sidebar) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+
+    &__status {
+      color: rgba(255, 255, 255, 0.9) !important;
+    }
+
+    &__divider {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+    }
+  }
+
+  .voice-ai-responding-pill {
+    background: var(--student-sidebar) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+
+    &__dot {
+      background-color: #ffffff !important;
+    }
+  }
+
+  .chat-sidebar {
+    background-color: rgba(37, 51, 90, 0.85);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+
+    @media (max-width: 991px) {
+      &.mobile-open {
+        background-color: var(--student-bg) !important;
+        border-left: none !important;
+      }
+    }
+
+    .mobile-sidebar-header {
+      background-color: var(--student-sidebar) !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      border-radius: 1rem !important;
+      margin: 10px 10px 0 10px !important;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .mobile-sidebar-title {
+      color: #ffffff !important;
+    }
+
+    .btn-close-mobile-history {
+      background-color: rgba(255, 255, 255, 0.08) !important;
+      color: #ffffff !important;
+      border: none !important;
+
+      &:active {
+        background-color: rgba(255, 255, 255, 0.15) !important;
+      }
+    }
+
+    .sidebar-toggle-btn {
+      background: var(--student-sidebar);
+      color: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+
+      &:hover {
+        background: var(--student-card);
+        color: white;
+      }
+    }
+
+    .sidebar-section-label {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .history-item-container {
+      border-color: transparent;
+
+      .history-item-left {
+        .history-item-icon {
+          color: rgba(255, 255, 255, 0.7);
+        }
+        .history-item-title {
+          color: rgba(255, 255, 255, 0.9);
+        }
+      }
+
+      .history-item-right {
+        .conversation-date {
+          color: rgba(255, 255, 255, 0.5);
+        }
+        .btn-delete-conv {
+          color: rgba(255, 255, 255, 0.6);
+        }
+
+        &.is-confirming {
+          .delete-confirm-label {
+            color: #ff6b6b;
+          }
+          .btn-confirm-yes {
+            background: #ff4d4d;
+            &:hover {
+              background: #e60000;
+            }
+          }
+          .btn-confirm-no {
+            color: rgba(255, 255, 255, 0.6);
+            &:hover {
+              color: white;
+            }
+          }
+        }
+      }
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.15);
+
+        .history-item-left .history-item-icon {
+          color: white;
+          opacity: 0.9;
+        }
+        .history-item-left .history-item-title {
+          color: white;
+        }
+      }
+
+      &.active {
+        background: rgba(99, 102, 241, 0.25);
+        border-color: rgba(99, 102, 241, 0.4);
+
+        .history-item-left {
+          .history-item-icon {
+            color: white;
+            opacity: 1;
+          }
+          .history-item-title {
+            color: white;
+            font-weight: 700;
+          }
+        }
+
+        .history-item-right {
+          .conversation-date {
+            color: white;
+            opacity: 0.9;
+          }
+        }
+      }
+    }
+  }
+
+  .agent-mobile-header {
+    background-color: var(--student-sidebar) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 1rem !important;
+    margin: 10px 10px 0 10px !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
+
+    h6 {
+      color: #ffffff !important;
+    }
+
+    .btn {
+      background-color: rgba(255, 255, 255, 0.08) !important;
+      color: #ffffff !important;
+      border: none !important;
+
+      &:active {
+        background-color: rgba(255, 255, 255, 0.15) !important;
+      }
+    }
+  }
+
+  app-syllex-button {
+    ::ng-deep .btn-celestine {
+      color: var(--student-bg) !important;
+      font-weight: 700 !important;
+
+      fa-icon {
+        color: var(--student-bg) !important;
+      }
+    }
   }
 }

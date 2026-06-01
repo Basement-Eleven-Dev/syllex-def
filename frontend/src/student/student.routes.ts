@@ -68,7 +68,7 @@ export const studentRoutes: Routes = [
       ),
   },
   {
-    path: 'comunicazioni',
+    path: 'calendario',
     loadComponent: () =>
       import('./pages/student-comunicazioni/student-comunicazioni').then(
         (m) => m.StudentComunicazioni,

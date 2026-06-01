@@ -1,0 +1,312 @@
+// ── Host: fill parent flex column, no overflow ───────────────────────────────
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  height: 100%;
+}
+
+// ── Subject selector ─────────────────────────────────────────────────────────
+.agent-header {
+  flex-shrink: 0;
+}
+
+.agent-subject-select {
+  max-width: 320px;
+}
+
+// ── Chat component fills remaining height ────────────────────────────────────
+app-agent-chat {
+  flex: 1;
+  min-height: 0;
+}
+
+// ── Empty state (no subject selected) ───────────────────────────────────────
+.agent-empty {
+  &__icon {
+    color: rgba(255, 255, 255, 0.2);
+  }
+  &__text {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.95rem;
+  }
+}
+
+// ── Student dark-theme overrides for app-agent-chat ───────────────────────────
+// Teacher component stays untouched — all overrides scoped here via ::ng-deep.
+// Specificity: ::ng-deep app-agent-chat .foo has (0,2,0) which beats the global
+// .student-theme .foo (0,2,0) because component styles are injected after styles.scss.
+
+/* stylelint-disable no-descending-specificity */
+::ng-deep app-agent-chat {
+  // ── Wrapper + main area ─────────────────────────────────────────────────────
+  .agent-chat-wrapper {
+    background: var(--student-bg) !important;
+  }
+
+  // ── Mobile top header ────────────────────────────────────────────────────────
+  .d-flex.d-lg-none.align-items-center.bg-white {
+    background-color: var(--student-sidebar) !important;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.07) !important;
+
+    h6 {
+      color: var(--syllex-green) !important;
+    }
+
+    .btn-light {
+      background-color: rgba(255, 255, 255, 0.09) !important;
+      color: rgba(255, 255, 255, 0.85) !important;
+      border-color: rgba(255, 255, 255, 0.12) !important;
+    }
+  }
+
+  // ── Intro welcome screen ─────────────────────────────────────────────────────
+  .intro-welcome {
+    &__title {
+      color: #ffffff !important;
+    }
+    &__subtitle {
+      color: rgba(255, 255, 255, 0.6) !important;
+    }
+    &__prompt {
+      color: var(--syllex-green) !important;
+    }
+  }
+
+  // ── Quick-action suggestion buttons ─────────────────────────────────────────
+  .btn-quick-action {
+    background-color: rgba(255, 255, 255, 0.07) !important;
+    color: rgba(255, 255, 255, 0.88) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
+
+    fa-icon {
+      color: var(--syllex-green) !important;
+    }
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.12) !important;
+      border-color: rgba(255, 255, 255, 0.22) !important;
+    }
+  }
+
+  // ── Message bubbles ──────────────────────────────────────────────────────────
+  .msg-line {
+    color: rgba(255, 255, 255, 0.9) !important;
+
+    // markdown-rendered content
+    p,
+    span,
+    li,
+    code,
+    strong,
+    em {
+      color: rgba(255, 255, 255, 0.9) !important;
+    }
+    a {
+      color: var(--syllex-green) !important;
+    }
+
+    &--user {
+      background-color: var(--student-sidebar) !important;
+      color: #ffffff !important;
+    }
+  }
+
+  // ── Typing indicator dots ────────────────────────────────────────────────────
+  .typing-dots {
+    background: var(--student-sidebar) !important;
+    span {
+      background: rgba(255, 255, 255, 0.4) !important;
+    }
+  }
+
+  // ── Mode switcher (keyboard / waveform toggle) ───────────────────────────────
+  .mode-switcher {
+    background: rgba(255, 255, 255, 0.07) !important;
+
+    &--voice {
+      // re-use dark bg instead of white for the gradient border trick
+      background-image:
+        linear-gradient(var(--student-bg), var(--student-bg)),
+        linear-gradient(135deg, var(--syllex-green), #52a0ff) !important;
+    }
+
+    &__icon {
+      color: rgba(255, 255, 255, 0.55) !important;
+
+      &--active {
+        background: var(--syllex-green) !important;
+        color: #0f1628 !important;
+      }
+    }
+  }
+
+  // ── Input pill ───────────────────────────────────────────────────────────────
+  .input-pill-mock {
+    background: rgba(255, 255, 255, 0.06) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    box-shadow: none !important;
+
+    &:focus-within {
+      border-color: var(--syllex-green) !important;
+      box-shadow: 0 0 0 3px rgba(201, 243, 33, 0.1) !important;
+    }
+
+    textarea {
+      color: rgba(255, 255, 255, 0.9) !important;
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.3) !important;
+      }
+    }
+  }
+
+  // ── Voice mode pills ─────────────────────────────────────────────────────────
+  .voice-input-pill {
+    background: var(--student-sidebar) !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+
+    &__dot {
+      background-color: var(--syllex-green) !important;
+    }
+
+    span.text-primary {
+      color: var(--syllex-green) !important;
+    }
+
+    &__btn {
+      color: rgba(255, 255, 255, 0.75) !important;
+      &:hover {
+        color: #ffffff !important;
+      }
+    }
+  }
+
+  .voice-ai-responding-pill {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    span {
+      color: rgba(255, 255, 255, 0.8) !important;
+    }
+    &__dot {
+      background-color: var(--syllex-green) !important;
+    }
+  }
+
+  // ── Chat sidebar ─────────────────────────────────────────────────────────────
+  .chat-sidebar {
+    background-color: color-mix(
+      in srgb,
+      var(--student-bg) 55%,
+      var(--student-sidebar)
+    ) !important;
+    border-left-color: rgba(255, 255, 255, 0.06) !important;
+
+    @media (max-width: 991px) {
+      &.mobile-open {
+        background-color: var(--student-bg) !important;
+        backdrop-filter: none !important;
+      }
+
+      // Mobile sidebar header bar
+      .d-flex.d-lg-none.border-bottom.bg-white {
+        background-color: var(--student-sidebar) !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+
+        h6 {
+          color: #ffffff !important;
+        }
+
+        .btn-light {
+          background-color: rgba(255, 255, 255, 0.09) !important;
+          color: rgba(255, 255, 255, 0.85) !important;
+        }
+      }
+    }
+
+    // Desktop toggle chevron button
+    .sidebar-toggle-btn {
+      background: color-mix(
+        in srgb,
+        var(--student-bg) 55%,
+        var(--student-sidebar)
+      ) !important;
+      color: rgba(255, 255, 255, 0.55) !important;
+      border-color: rgba(255, 255, 255, 0.1) !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: #ffffff !important;
+      }
+    }
+
+    // "Cronologia" label
+    .sidebar-section-label {
+      color: rgba(255, 255, 255, 0.32) !important;
+    }
+
+    // "Nuova Chat" primary button
+    .btn.btn-primary.w-100 {
+      background: rgba(201, 243, 33, 0.1) !important;
+      border-color: rgba(201, 243, 33, 0.22) !important;
+      color: var(--syllex-green) !important;
+      box-shadow: none !important;
+
+      &:hover {
+        background: rgba(201, 243, 33, 0.16) !important;
+      }
+
+      span {
+        color: var(--syllex-green) !important;
+      }
+    }
+
+    // History items
+    .history-item-container {
+      .history-item-left {
+        .history-item-icon {
+          color: rgba(255, 255, 255, 0.3) !important;
+        }
+        .history-item-title {
+          color: rgba(255, 255, 255, 0.72) !important;
+        }
+      }
+
+      .history-item-right {
+        .conversation-date {
+          color: rgba(255, 255, 255, 0.3) !important;
+        }
+        .btn-delete-conv {
+          color: rgba(255, 255, 255, 0.28) !important;
+        }
+        .delete-confirm-label {
+          color: #ff6b6b !important;
+        }
+        .btn-confirm-no {
+          color: rgba(255, 255, 255, 0.45) !important;
+        }
+      }
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border-color: rgba(255, 255, 255, 0.07) !important;
+      }
+
+      &.active {
+        background: rgba(255, 255, 255, 0.09) !important;
+        border-color: rgba(255, 255, 255, 0.13) !important;
+
+        .history-item-title {
+          color: #ffffff !important;
+        }
+        .history-item-icon {
+          color: rgba(255, 255, 255, 0.7) !important;
+        }
+      }
+    }
+  }
+}
+/* stylelint-enable no-descending-specificity */

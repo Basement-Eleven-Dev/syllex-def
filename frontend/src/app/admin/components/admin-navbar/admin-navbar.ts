@@ -5,13 +5,8 @@ import {
   faUser,
   faRightFromBracket,
   faKey,
-  faShieldKeyhole,
-  faInfoCircle,
+  faShieldKeyhole
 } from '@fortawesome/pro-solid-svg-icons';
-import {
-  TourAnchorNgBootstrapDirective,
-  TourService,
-} from 'ngx-ui-tour-ng-bootstrap';
 import { Auth } from '../../../../services/auth';
 import {
   NgbDropdown,
@@ -29,7 +24,6 @@ import { EditPassword } from '../../../edit-password/edit-password';
     RouterModule,
     NgbDropdownModule,
     CommonModule,
-    TourAnchorNgBootstrapDirective,
   ],
   templateUrl: './admin-navbar.html',
   styleUrls: ['./admin-navbar.scss'],
@@ -37,14 +31,12 @@ import { EditPassword } from '../../../edit-password/edit-password';
 export class AdminNavbar {
   private authService = inject(Auth);
   private modalService = inject(NgbModal);
-  private tourService = inject(TourService);
   @ViewChild(NgbDropdown) mainDropdown!: NgbDropdown;
 
   faUser = faUser;
   faLogout = faRightFromBracket;
   faKey = faKey;
   faLock = faShieldKeyhole;
-  faInfoCircle = faInfoCircle;
 
   user$ = this.authService.user$;
 
@@ -57,14 +49,5 @@ export class AdminNavbar {
 
   onLogout() {
     this.authService.logout();
-  }
-
-  onStartTour() {
-    if (this.mainDropdown) {
-      this.mainDropdown.close();
-    }
-    setTimeout(() => {
-      this.tourService.start();
-    }, 100);
   }
 }

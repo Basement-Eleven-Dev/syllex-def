@@ -121,7 +121,110 @@
   border-left: 4px solid var(--bs-primary) !important;
 }
 
+.badge {
+  &.bg-success {
+    background-color: #10b981 !important;
+    color: #ffffff !important;
+  }
+  &.bg-secondary {
+    background-color: #6c757d !important;
+    color: #ffffff !important;
+  }
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+:host-context(.student-theme) {
+  h1.text-dark {
+    color: #ffffff !important;
+  }
+
+  .text-primary {
+    color: var(--syllex-green) !important;
+
+    &.small {
+      color: rgba(255, 255, 255, 0.65) !important;
+    }
+  }
+
+  .form-section {
+    background-color: var(--student-card) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: #ffffff !important;
+
+    h4 {
+      color: #ffffff !important;
+    }
+    label {
+      color: rgba(255, 255, 255, 0.6) !important;
+    }
+  }
+
+  .profile-tabs {
+    border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+
+    .tab-btn {
+      color: rgba(255, 255, 255, 0.6) !important;
+
+      &:hover {
+        color: var(--syllex-green) !important;
+        background-color: rgba(255, 255, 255, 0.05) !important;
+      }
+
+      &.active {
+        color: var(--syllex-green) !important;
+
+        &::after {
+          background-color: var(--syllex-green) !important;
+        }
+      }
+    }
+  }
+
+  .setting-item {
+    border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+
+    .setting-info {
+      .setting-title {
+        color: #ffffff !important;
+      }
+      .setting-desc {
+        color: rgba(255, 255, 255, 0.6) !important;
+      }
+    }
+  }
+
+  .btn-outline-primary {
+    color: var(--syllex-green) !important;
+    border-color: rgba(201, 243, 33, 0.3) !important;
+
+    &:hover {
+      background-color: rgba(201, 243, 33, 0.1) !important;
+      border-color: var(--syllex-green) !important;
+      color: #ffffff !important;
+    }
+  }
+
+  .text-muted {
+    color: rgba(255, 255, 255, 0.6) !important;
+  }
+
+  .bg-light {
+    background-color: var(--student-sidebar) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  }
+
+  .badge {
+    &.bg-success {
+      background-color: #10b981 !important;
+      color: #ffffff !important;
+    }
+    &.bg-secondary {
+      background-color: rgba(255, 255, 255, 0.15) !important;
+      color: rgba(255, 255, 255, 0.9) !important;
+    }
+  }
 }

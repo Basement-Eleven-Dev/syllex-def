@@ -127,6 +127,14 @@ export class HelpChat implements OnInit {
     const text = this.currentMessage.trim();
     if (!text || this.isSending()) return;
 
+    // Comando per pulire la history locale
+    if (text === '/clear') {
+      this.messages.set([]);
+      localStorage.removeItem(LS_KEY);
+      this.currentMessage = '';
+      return;
+    }
+
     // Aggiungi messaggio utente
     const userMsg: ChatMessage = { role: 'user', content: text, timestamp: Date.now() };
     this.messages.update((msgs) => [...msgs, userMsg]);
@@ -174,6 +182,9 @@ export class HelpChat implements OnInit {
 
   navigateToAction(path: string): void {
     this.router.navigateByUrl(path);
-    // Non chiudiamo più la chat automaticamente
+    // Su mobile chiudiamo la chat per permettere di vedere la nuova pagina
+    if (window.innerWidth < 992) {
+      this.closeChat();
+    }
   }
 }
