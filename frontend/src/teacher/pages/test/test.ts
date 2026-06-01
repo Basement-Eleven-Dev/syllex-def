@@ -17,7 +17,6 @@ import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
 import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
 import { SyllexSearchInput } from '../../components/UI/syllex-search-input/syllex-search-input';
-import { SyllexClearButton } from '../../components/UI/syllex-clear-button/syllex-clear-button';
 import { SyllexTabFilter } from '../../components/UI/syllex-tab-filter/syllex-tab-filter';
 import { SyllexEmptyState } from '../../components/UI/syllex-empty-state/syllex-empty-state';
 
@@ -38,7 +37,6 @@ type TestTab = 'tutti' | 'da-correggere' | 'bozze';
     SyllexPageHeader,
     SyllexButton,
     SyllexSearchInput,
-    SyllexClearButton,
     SyllexTabFilter,
     SyllexEmptyState,
   ],

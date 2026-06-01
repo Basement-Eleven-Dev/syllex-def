@@ -45,12 +45,12 @@ img {
   font-weight: 600;
   font-size: 0.9rem;
   max-width: 170px;
-  @media (min-width: 1400px) {
-    max-width: 340px;
-  }
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  @media (min-width: 1400px) {
+    max-width: 340px;
+  }
 }
 
 .subject-pill-chevron {
