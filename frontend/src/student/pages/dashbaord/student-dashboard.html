@@ -107,8 +107,13 @@
         <span
           class="fs-1 fw-extrabold text-white lh-1"
           style="font-weight: 800; font-size: 3rem !important"
-          >{{ TotalTestsCompleted() }}</span
         >
+          @if(isLoadingData()) {
+            <div class="spinner-border spinner-border-sm text-white-50" role="status" style="width: 2rem; height: 2rem; margin-top: 0.5rem; margin-bottom: 0.5rem;"></div>
+          } @else {
+            {{ TotalTestsCompleted() }}
+          }
+        </span>
         <span class="text-white-50 fw-semibold" style="font-size: 0.78rem"
           >Test da svolgere</span
         >
@@ -118,7 +123,11 @@
           class="fs-1 fw-extrabold text-white lh-1"
           style="font-weight: 800; font-size: 3rem !important"
         >
-          {{ AverageScore() }}<span class="fs-4 text-white-50 ms-1">%</span>
+          @if(isLoadingData()) {
+            <div class="spinner-border spinner-border-sm text-white-50" role="status" style="width: 2rem; height: 2rem; margin-top: 0.5rem; margin-bottom: 0.5rem;"></div>
+          } @else {
+            {{ AverageScore() }}<span class="fs-4 text-white-50 ms-1">%</span>
+          }
         </span>
         <span class="text-white-50 fw-semibold" style="font-size: 0.78rem"
           >Rendimento</span

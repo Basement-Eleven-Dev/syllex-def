@@ -13,6 +13,8 @@ import {
   StudentTestInterface,
   StudentAttemptInterface,
 } from '../../../services/student-tests.service';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import {
   ComunicazioniService,
   ComunicazioneInterface,
@@ -78,6 +80,7 @@ export class StudentDashboard implements OnInit {
 
   RecentTests = signal<StudentTestInterface[]>([]);
   TotalTestsCount = signal(0);
+  isLoadingData = signal(true);
   AttemptStatusMap = signal<
     Map<string, 'in-progress' | 'delivered' | 'reviewed'>
   >(new Map());
@@ -141,84 +144,49 @@ export class StudentDashboard implements OnInit {
         
         this.CompletedTests.set(selfEvalTests.slice(0, 3));
 
-        // Fetch attempt status for Teacher tests
-        this.RecentTests().forEach((test) => {
-          this.testsService
-            .getAttemptByTestId(test._id)
+        // Fetch all attempts in parallel to prevent UI flickering
+        const attemptsReqs = allTests.map(test => 
+          this.testsService.getAttemptByTestId(test._id).pipe(
+            catchError(() => of(null))
+          )
+        );
+
+        if (attemptsReqs.length > 0) {
+          forkJoin(attemptsReqs)
             .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe((attempt) => {
-              if (attempt) {
-                this.AttemptStatusMap.update((map) => {
-                  const newMap = new Map(map);
-                  newMap.set(test._id, attempt.status);
-                  return newMap;
-                });
+            .subscribe((attempts) => {
+              const newStatusMap = new Map<string, 'in-progress' | 'delivered' | 'reviewed'>();
+              const newScoreMap = new Map<string, { score: number; maxScore: number }>();
 
-                if (attempt.status === 'reviewed') {
-                  const score =
-                    attempt.score != null
+              allTests.forEach((test, index) => {
+                const attempt = attempts[index];
+                if (attempt) {
+                  newStatusMap.set(test._id, attempt.status);
+
+                  if (attempt.status === 'reviewed' || (test.source === 'self-evaluation' && attempt.status === 'delivered')) {
+                    const score = attempt.score != null
                       ? attempt.score
-                      : attempt.questions.reduce(
-                          (sum, q) => sum + (q.score ?? 0),
-                          0,
-                        );
-                  const maxScore =
-                    attempt.maxScore != null
+                      : attempt.questions.reduce((sum, q) => sum + (q.score ?? 0), 0);
+                    const maxScore = attempt.maxScore != null
                       ? attempt.maxScore
-                      : attempt.questions.reduce(
-                          (sum, q) => sum + (q.points ?? 0),
-                          0,
-                        );
-                  this.AttemptScoreMap.update((map) => {
-                    const newMap = new Map(map);
-                    newMap.set(test._id, { score, maxScore });
-                    return newMap;
-                  });
+                      : attempt.questions.reduce((sum, q) => sum + (q.points ?? 0), 0);
+                    
+                    newScoreMap.set(test._id, { score, maxScore });
+                  }
                 }
-              }
+              });
+
+              this.AttemptStatusMap.set(newStatusMap);
+              this.AttemptScoreMap.set(newScoreMap);
+
+              // Generate Subject Statistics
+              this.computeSubjectStats(allTests, attempts);
+              this.isLoadingData.set(false);
             });
-        });
-
-        // Fetch attempt status for Self Eval tests
-        this.CompletedTests().forEach((test) => {
-          this.testsService
-            .getAttemptByTestId(test._id)
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe((attempt) => {
-              if (attempt) {
-                this.AttemptStatusMap.update((map) => {
-                  const newMap = new Map(map);
-                  newMap.set(test._id, attempt.status);
-                  return newMap;
-                });
-
-                if (attempt.status === 'reviewed' || attempt.status === 'delivered') {
-                  const score =
-                    attempt.score != null
-                      ? attempt.score
-                      : attempt.questions.reduce(
-                          (sum, q) => sum + (q.score ?? 0),
-                          0,
-                        );
-                  const maxScore =
-                    attempt.maxScore != null
-                      ? attempt.maxScore
-                      : attempt.questions.reduce(
-                          (sum, q) => sum + (q.points ?? 0),
-                          0,
-                        );
-                  this.AttemptScoreMap.update((map) => {
-                    const newMap = new Map(map);
-                    newMap.set(test._id, { score, maxScore });
-                    return newMap;
-                  });
-                }
-              }
-            });
-        });
-
-        // Generate Subject Statistics by analyzing all available tests vs completed tests
-        this.computeSubjectStats(allTests);
+        } else {
+          this.computeSubjectStats([], []);
+          this.isLoadingData.set(false);
+        }
       });
 
     // 2. Load recent communications
@@ -230,7 +198,7 @@ export class StudentDashboard implements OnInit {
       });
   }
 
-  private computeSubjectStats(allTests: StudentTestInterface[]) {
+  private computeSubjectStats(allTests: StudentTestInterface[], attempts: (StudentAttemptInterface | null)[]) {
     const subjects = this.materiaService.allMaterie();
     const stats: StatCardData[] = [];
 
@@ -238,68 +206,56 @@ export class StudentDashboard implements OnInit {
     let totalScore = 0;
     let scoresCount = 0;
 
-    // Fetching attempts to calculate stats
-    // Note: In a real scenario, an aggregated backend endpoint would be better.
-    // Here we simulate it by checking attempts for tests
-    allTests.forEach((test) => {
-      this.testsService
-        .getAttemptByTestId(test._id)
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe((attempt) => {
-          if (
-            attempt &&
-            (attempt.status === 'delivered' || attempt.status === 'reviewed')
-          ) {
-            completedCount++;
+    allTests.forEach((test, index) => {
+      const attempt = attempts[index];
+      if (
+        attempt &&
+        (attempt.status === 'delivered' || attempt.status === 'reviewed')
+      ) {
+        completedCount++;
 
-            // Roughly calc a score if reviewed
-            if (attempt.status === 'reviewed' && attempt.questions) {
-              let attemptScore = 0;
-              let attemptMax = 0;
-              attempt.questions.forEach((q) => {
-                if (q.score !== undefined) attemptScore += q.score;
-                if (q.points !== undefined) attemptMax += q.points;
-              });
-              if (attemptMax > 0) {
-                totalScore += (attemptScore / attemptMax) * 100;
-                scoresCount++;
-              }
+        // Roughly calc a score if reviewed
+        if (attempt.status === 'reviewed' && attempt.questions) {
+          let attemptScore = 0;
+          let attemptMax = 0;
+          attempt.questions.forEach((q) => {
+            if (q.score !== undefined) attemptScore += q.score;
+            if (q.points !== undefined) attemptMax += q.points;
+          });
+          if (attemptMax > 0) {
+            totalScore += (attemptScore / attemptMax) * 100;
+            scoresCount++;
+          }
+        }
+
+        // Update subject breakdown
+        if (test.subjectId) {
+          const subj = subjects.find((s) => s._id === test.subjectId);
+          if (subj) {
+            // Find existing stat
+            let existing = stats.find((s) => s.Label === subj.name);
+            if (!existing) {
+              existing = {
+                Label: subj.name,
+                Value: 0,
+                Link: ['/s', 'tests'],
+                QueryParams: {},
+              };
+              stats.push(existing);
             }
+            existing.Value += 1;
           }
-
-          this.TotalTestsCompleted.set(completedCount);
-          if (scoresCount > 0) {
-            this.AverageScore.set(Math.round(totalScore / scoresCount));
-          }
-
-          // Update subject breakdown
-          if (test.subjectId) {
-            const subj = subjects.find((s) => s._id === test.subjectId);
-            if (subj) {
-              // Find existing stat
-              let existing = stats.find((s) => s.Label === subj.name);
-              if (!existing) {
-                existing = {
-                  Label: subj.name,
-                  Value: 0,
-                  Link: ['/s', 'tests'],
-                  QueryParams: {},
-                };
-                stats.push(existing);
-              }
-              if (
-                attempt &&
-                (attempt.status === 'delivered' ||
-                  attempt.status === 'reviewed')
-              ) {
-                existing.Value += 1;
-                this.SubjectStats.set(
-                  [...stats].sort((a, b) => b.Value - a.Value).slice(0, 4),
-                );
-              }
-            }
-          }
-        });
+        }
+      }
     });
+
+    this.TotalTestsCompleted.set(completedCount);
+    if (scoresCount > 0) {
+      this.AverageScore.set(Math.round(totalScore / scoresCount));
+    } else {
+      this.AverageScore.set(0);
+    }
+    
+    this.SubjectStats.set([...stats].sort((a, b) => b.Value - a.Value).slice(0, 4));
   }
 }
