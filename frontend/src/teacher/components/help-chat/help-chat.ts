@@ -127,6 +127,14 @@ export class HelpChat implements OnInit {
     const text = this.currentMessage.trim();
     if (!text || this.isSending()) return;
 
+    // Comando per pulire la history locale
+    if (text === '/clear') {
+      this.messages.set([]);
+      localStorage.removeItem(LS_KEY);
+      this.currentMessage = '';
+      return;
+    }
+
     // Aggiungi messaggio utente
     const userMsg: ChatMessage = { role: 'user', content: text, timestamp: Date.now() };
     this.messages.update((msgs) => [...msgs, userMsg]);
