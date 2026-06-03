@@ -1,0 +1,238 @@
+<div class="container py-4">
+  <div class="d-flex align-items-center mb-4 gap-3">
+    <button class="btn btn-light" routerLink="/a/surveys">
+      <fa-icon [icon]="faArrowLeft"></fa-icon>
+    </button>
+    <h2 class="mb-0">{{ isNew ? 'Nuovo Questionario' : 'Modifica Questionario' }}</h2>
+    <div class="ms-auto d-flex gap-2">
+      @if (!isNew && survey.slug) {
+        <button class="btn btn-outline-primary d-flex align-items-center gap-2" (click)="preview()" title="Apri il questionario in una nuova scheda">
+          <fa-icon [icon]="faEye"></fa-icon> Anteprima
+        </button>
+      }
+      <button class="btn btn-primary d-flex align-items-center gap-2" (click)="save()" [disabled]="loading">
+        <fa-icon [icon]="faSave"></fa-icon> Salva
+      </button>
+    </div>
+  </div>
+
+  @if (loading && !survey.title) {
+    <div class="p-5 text-center text-muted">
+      <div class="spinner-border spinner-border-sm me-2"></div> Caricamento...
+    </div>
+  } @else {
+    
+    @if (!isNew) {
+      <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+          <button class="nav-link" [class.active]="activeTab === 'editor'" (click)="activeTab = 'editor'">
+            Editor
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" [class.active]="activeTab === 'responses'" (click)="activeTab = 'responses'">
+            Risposte ({{ responses.length }})
+          </button>
+        </li>
+      </ul>
+    }
+
+    @if (activeTab === 'editor') {
+      <div class="row">
+        <!-- Colonna Principale: Impostazioni Generali -->
+        <div class="col-md-8">
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+              <h5 class="mb-0 fw-bold">Impostazioni Generali</h5>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <label class="form-label fw-medium">Titolo del Questionario</label>
+                <input type="text" class="form-control" [(ngModel)]="survey.title" placeholder="Es. Valutazione Docenti">
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-medium">Descrizione (Opzionale)</label>
+                <textarea class="form-control" rows="2" [(ngModel)]="survey.description" placeholder="Es. Compila questo questionario per aiutarci a migliorare..."></textarea>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-medium">Slug / URL pubblico</label>
+                <div class="input-group">
+                  <span class="input-group-text">syllex.com/survey/</span>
+                  <input type="text" class="form-control" [(ngModel)]="survey.slug" placeholder="valutazione-docenti">
+                </div>
+                <div class="form-text">L'URL che condividerai con gli utenti. Deve essere univoco e senza spazi.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+              <h5 class="mb-0 fw-bold">Domande</h5>
+              <button class="btn btn-sm btn-outline-primary d-flex align-items-center gap-2" (click)="addField()">
+                <fa-icon [icon]="faPlus"></fa-icon> Aggiungi
+              </button>
+            </div>
+            <div class="card-body bg-light">
+              @if (survey.fields?.length === 0) {
+                <div class="text-center p-4 text-muted">
+                  Nessuna domanda presente. Aggiungine una!
+                </div>
+              }
+
+              @for (field of survey.fields; track field.id; let i = $index) {
+                <div class="card mb-3 border-0 shadow-sm">
+                  <div class="card-body d-flex gap-3">
+                    <div class="text-muted" style="cursor: grab;">
+                      <fa-icon [icon]="faGripVertical"></fa-icon>
+                    </div>
+                    <div class="flex-fill">
+                      <div class="row">
+                        <div class="col-md-8 mb-3">
+                          <label class="form-label small fw-bold">Testo della Domanda</label>
+                          <input type="text" class="form-control" [(ngModel)]="field.label">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                          <label class="form-label small fw-bold">Tipo di Risposta</label>
+                          <select class="form-select" [(ngModel)]="field.type">
+                            <option value="text">Testo Breve</option>
+                            <option value="textarea">Testo Lungo</option>
+                            <option value="number">Numero</option>
+                            <option value="radio">Scelta Singola</option>
+                            <option value="checkbox">Scelta Multipla</option>
+                          </select>
+                        </div>
+                        @if (field.type === 'radio' || field.type === 'checkbox') {
+                          <div class="col-md-12 mb-3">
+                            <label class="form-label small fw-bold">Opzioni (separate da virgola)</label>
+                            <input type="text" class="form-control form-control-sm" 
+                              [ngModel]="field.options?.join(', ')" 
+                              (ngModelChange)="updateFieldOptions(field, $event)"
+                              placeholder="Es. Opzione 1, Opzione 2, Opzione 3">
+                          </div>
+                        }
+                      </div>
+
+                      <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" [id]="'req_' + field.id" [(ngModel)]="field.required">
+                          <label class="form-check-label small" [for]="'req_' + field.id">Obbligatoria</label>
+                        </div>
+                        
+                        <button class="btn btn-sm btn-outline-danger" (click)="removeField(i)">
+                          <fa-icon [icon]="faTrash"></fa-icon> Rimuovi
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Colonna Laterale: Opzioni -->
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+              <h5 class="mb-0 fw-bold">Opzioni Questionario</h5>
+            </div>
+            <div class="card-body">
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" role="switch" id="activeSwitch" [(ngModel)]="survey.active">
+                <label class="form-check-label" for="activeSwitch">Questionario Attivo</label>
+                <div class="form-text small">Se disattivato, il link non accetterà nuove compilazioni.</div>
+              </div>
+
+              <hr>
+
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" role="switch" id="stepSwitch" 
+                  [ngModel]="survey.presentationMode === 'step'" 
+                  (ngModelChange)="survey.presentationMode = $event ? 'step' : 'list'">
+                <label class="form-check-label" for="stepSwitch">Modalità a Step (Una domanda alla volta)</label>
+                <div class="form-text small">Se attivo, l'utente visualizzerà una domanda alla volta con i pulsanti Avanti/Indietro.</div>
+              </div>
+
+              <hr>
+
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="anonSwitch" [(ngModel)]="survey.isAnonymous">
+                <label class="form-check-label" for="anonSwitch">Compilazione Anonima</label>
+                <div class="form-text small">Se attivo, non richiederà l'accesso a Syllex. Se disattivo, le risposte saranno tracciate sull'account dell'utente loggato.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (activeTab === 'responses') {
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+          @if (selectedResponse) {
+            <div class="p-4">
+              <button class="btn btn-sm btn-light mb-4" (click)="closeResponse()">
+                <fa-icon [icon]="faArrowLeft"></fa-icon> Torna all'elenco
+              </button>
+              
+              <div class="mb-4">
+                <h5 class="fw-bold mb-1">
+                  Risposta di 
+                  @if (selectedResponse.respondentId) {
+                    {{ selectedResponse.respondentId.name }} <span class="text-muted fs-6 fw-normal">({{ selectedResponse.respondentId.email }})</span>
+                  } @else {
+                    Anonimo
+                  }
+                </h5>
+                <p class="text-muted small">Inviata il: {{ selectedResponse.submittedAt | date:'medium' }}</p>
+              </div>
+
+              <hr class="mb-4">
+              
+              @for (field of survey.fields; track field.id) {
+                <div class="mb-4">
+                  <h6 class="fw-bold text-primary">{{ field.label }}</h6>
+                  <div class="bg-light p-3 rounded" style="white-space: pre-wrap;">{{ selectedResponse.answers[field.id] || 'Nessuna risposta fornita' }}</div>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th class="ps-4">Data</th>
+                    <th>Utente</th>
+                    <th class="text-end pe-4">Azioni</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (resp of responses; track resp._id) {
+                    <tr>
+                      <td class="ps-4">{{ resp.submittedAt | date:'short' }}</td>
+                      <td>
+                        @if (resp.respondentId) {
+                          {{ resp.respondentId.name }} <span class="text-muted small">({{ resp.respondentId.email }})</span>
+                        } @else {
+                          <span class="text-muted fst-italic">Anonimo</span>
+                        }
+                      </td>
+                      <td class="text-end pe-4">
+                        <button class="btn btn-sm btn-outline-primary" (click)="viewResponse(resp)">Vedi Dettaglio</button>
+                      </td>
+                    </tr>
+                  }
+                  @if (responses.length === 0) {
+                    <tr>
+                      <td colspan="3" class="text-center p-4 text-muted">Nessuna risposta ricevuta finora.</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  }
+</div>

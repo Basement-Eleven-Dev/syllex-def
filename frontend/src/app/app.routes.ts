@@ -50,6 +50,11 @@ export const routes: Routes = [
     canActivate: [authGuard, adminGuard],
   },
   {
+    path: 'survey/:slug',
+    loadComponent: () =>
+      import('./survey/survey-page/survey-page.component').then((m) => m.SurveyPageComponent),
+  },
+  {
     path: '**',
     redirectTo: '',
   },
