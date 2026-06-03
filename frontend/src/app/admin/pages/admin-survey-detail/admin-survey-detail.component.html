@@ -5,6 +5,11 @@
     </button>
     <h2 class="mb-0">{{ isNew ? 'Nuovo Questionario' : 'Modifica Questionario' }}</h2>
     <div class="ms-auto d-flex gap-2">
+      @if (!isNew && survey.slug) {
+        <button class="btn btn-outline-primary d-flex align-items-center gap-2" (click)="preview()" title="Apri il questionario in una nuova scheda">
+          <fa-icon [icon]="faEye"></fa-icon> Anteprima
+        </button>
+      }
       <button class="btn btn-primary d-flex align-items-center gap-2" (click)="save()" [disabled]="loading">
         <fa-icon [icon]="faSave"></fa-icon> Salva
       </button>

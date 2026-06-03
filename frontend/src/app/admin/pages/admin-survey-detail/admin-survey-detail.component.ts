@@ -4,7 +4,7 @@ import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SurveyService, Survey, SurveyField, SurveyResponse } from '../../service/survey.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faArrowLeft, faSave, faPlus, faTrash, faGripVertical } from '@fortawesome/pro-solid-svg-icons';
+import { faArrowLeft, faSave, faPlus, faTrash, faGripVertical, faEye } from '@fortawesome/pro-solid-svg-icons';
 
 @Component({
   selector: 'app-admin-survey-detail',
@@ -40,6 +40,7 @@ export class AdminSurveyDetailComponent implements OnInit {
   faPlus = faPlus;
   faTrash = faTrash;
   faGripVertical = faGripVertical;
+  faEye = faEye;
 
   ngOnInit() {
     this.surveyId = this.route.snapshot.paramMap.get('id');
@@ -114,5 +115,11 @@ export class AdminSurveyDetailComponent implements OnInit {
         }
       });
     }
+  }
+
+  preview() {
+    if (!this.survey.slug) return;
+    const url = `${window.location.origin}/survey/${this.survey.slug}`;
+    window.open(url, '_blank');
   }
 }
