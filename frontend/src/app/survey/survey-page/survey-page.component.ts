@@ -5,11 +5,13 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { apiUrl } from '../../../environments/environment';
 import { Auth } from '../../../services/auth';
+import { faArrowLeft, faCheck, faCircleCheck, faClipboard } from '@fortawesome/pro-solid-svg-icons';
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 
 @Component({
   selector: 'app-survey-page',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FontAwesomeModule],
   templateUrl: './survey-page.component.html',
   styleUrl: './survey-page.component.scss'
 })
@@ -17,7 +19,10 @@ export class SurveyPageComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private http = inject(HttpClient);
-  private auth = inject(Auth);
+  faClipboard = faClipboard;
+  arrowLeft = faArrowLeft;
+  circleCheck = faCircleCheck;
+  auth = inject(Auth);
 
   slug: string | null = null;
   survey: any = null;
