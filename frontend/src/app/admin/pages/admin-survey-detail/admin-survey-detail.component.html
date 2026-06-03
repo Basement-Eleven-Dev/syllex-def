@@ -150,39 +150,68 @@
     @if (activeTab === 'responses') {
       <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
-          <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-              <thead class="table-light">
-                <tr>
-                  <th class="ps-4">Data</th>
-                  <th>Utente</th>
-                  <th class="text-end pe-4">Azioni</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (resp of responses; track resp._id) {
+          @if (selectedResponse) {
+            <div class="p-4">
+              <button class="btn btn-sm btn-light mb-4" (click)="closeResponse()">
+                <fa-icon [icon]="faArrowLeft"></fa-icon> Torna all'elenco
+              </button>
+              
+              <div class="mb-4">
+                <h5 class="fw-bold mb-1">
+                  Risposta di 
+                  @if (selectedResponse.respondentId) {
+                    {{ selectedResponse.respondentId.name }} <span class="text-muted fs-6 fw-normal">({{ selectedResponse.respondentId.email }})</span>
+                  } @else {
+                    Anonimo
+                  }
+                </h5>
+                <p class="text-muted small">Inviata il: {{ selectedResponse.submittedAt | date:'medium' }}</p>
+              </div>
+
+              <hr class="mb-4">
+              
+              @for (field of survey.fields; track field.id) {
+                <div class="mb-4">
+                  <h6 class="fw-bold text-primary">{{ field.label }}</h6>
+                  <div class="bg-light p-3 rounded" style="white-space: pre-wrap;">{{ selectedResponse.answers[field.id] || 'Nessuna risposta fornita' }}</div>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
                   <tr>
-                    <td class="ps-4">{{ resp.submittedAt | date:'short' }}</td>
-                    <td>
-                      @if (resp.respondentId) {
-                        {{ resp.respondentId.name }} <span class="text-muted small">({{ resp.respondentId.email }})</span>
-                      } @else {
-                        <span class="text-muted fst-italic">Anonimo</span>
-                      }
-                    </td>
-                    <td class="text-end pe-4">
-                      <button class="btn btn-sm btn-outline-primary">Vedi Dettaglio</button>
-                    </td>
+                    <th class="ps-4">Data</th>
+                    <th>Utente</th>
+                    <th class="text-end pe-4">Azioni</th>
                   </tr>
-                }
-                @if (responses.length === 0) {
-                  <tr>
-                    <td colspan="3" class="text-center p-4 text-muted">Nessuna risposta ricevuta finora.</td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  @for (resp of responses; track resp._id) {
+                    <tr>
+                      <td class="ps-4">{{ resp.submittedAt | date:'short' }}</td>
+                      <td>
+                        @if (resp.respondentId) {
+                          {{ resp.respondentId.name }} <span class="text-muted small">({{ resp.respondentId.email }})</span>
+                        } @else {
+                          <span class="text-muted fst-italic">Anonimo</span>
+                        }
+                      </td>
+                      <td class="text-end pe-4">
+                        <button class="btn btn-sm btn-outline-primary" (click)="viewResponse(resp)">Vedi Dettaglio</button>
+                      </td>
+                    </tr>
+                  }
+                  @if (responses.length === 0) {
+                    <tr>
+                      <td colspan="3" class="text-center p-4 text-muted">Nessuna risposta ricevuta finora.</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
         </div>
       </div>
     }

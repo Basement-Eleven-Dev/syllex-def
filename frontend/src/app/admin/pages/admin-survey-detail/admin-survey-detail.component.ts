@@ -33,6 +33,7 @@ export class AdminSurveyDetailComponent implements OnInit {
   };
 
   responses: SurveyResponse[] = [];
+  selectedResponse: SurveyResponse | null = null;
 
   // Icons
   faArrowLeft = faArrowLeft;
@@ -121,5 +122,13 @@ export class AdminSurveyDetailComponent implements OnInit {
     if (!this.survey.slug) return;
     const url = `${window.location.origin}/survey/${this.survey.slug}`;
     window.open(url, '_blank');
+  }
+
+  viewResponse(resp: SurveyResponse) {
+    this.selectedResponse = resp;
+  }
+
+  closeResponse() {
+    this.selectedResponse = null;
   }
 }
