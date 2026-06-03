@@ -79,8 +79,13 @@ export class AdminSurveyDetailComponent implements OnInit {
       id: 'field_' + Math.random().toString(36).substr(2, 9),
       type: 'text',
       label: 'Nuova Domanda',
-      required: false
+      required: false,
+      options: []
     });
+  }
+
+  updateFieldOptions(field: any, optionsString: string) {
+    field.options = optionsString.split(',').map(opt => opt.trim()).filter(opt => opt.length > 0);
   }
 
   removeField(index: number) {
