@@ -1,0 +1,35 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: #3b38db; /* The exact solid blue from the image */
+  width: 100%;
+}
+
+.survey-bg {
+  min-height: 100vh;
+}
+
+.logo-white {
+  filter: brightness(0) invert(1);
+}
+
+.card {
+  box-shadow: none !important;
+}
+
+input.form-control, textarea.form-control {
+  border-radius: 0.75rem;
+  background-color: #ffffff;
+  border: 1px solid #ced4da;
+  padding: 0.75rem 1rem;
+  
+  &:focus {
+    background-color: #fff;
+    border-color: #3b38db;
+    box-shadow: 0 0 0 0.25rem rgba(59, 56, 219, 0.1);
+  }
+}
+
+.progress {
+  background-color: rgba(255, 255, 255, 0.2);
+}

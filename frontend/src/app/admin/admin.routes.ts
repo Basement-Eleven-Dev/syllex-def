@@ -67,4 +67,20 @@ export const adminRoutes: Routes = [
       import('./pages/admin-reports/admin-reports').then((m) => m.AdminReports),
     canActivate: [superadminGuard],
   },
+  {
+    path: 'surveys',
+    loadComponent: () =>
+      import('./pages/admin-surveys/admin-surveys.component').then(
+        (m) => m.AdminSurveysComponent,
+      ),
+    canActivate: [superadminGuard],
+  },
+  {
+    path: 'surveys/:id',
+    loadComponent: () =>
+      import('./pages/admin-survey-detail/admin-survey-detail.component').then(
+        (m) => m.AdminSurveyDetailComponent,
+      ),
+    canActivate: [superadminGuard],
+  },
 ];

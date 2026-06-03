@@ -1,0 +1,166 @@
+<div class="container-fluid min-vh-100 py-5 survey-bg">
+  <div class="container d-flex flex-column align-items-center">
+    <div class="text-center mb-4 w-100 text-white">
+      <img src="/images/logo_primary_extended.png" class="logo-white mt-3 mb-5" alt="Syllex" height="56">
+      
+
+      <h3 class="fw-bold mb-2 mt-3">Ciao{{ (!survey?.isAnonymous && auth.user?.firstName) ? ' ' + auth.user?.firstName : '' }},</h3>
+      <h6 class="fw-normal mb-3 fs-4" style="max-width: 500px; margin: 0 auto; line-height: 1.5;">
+        {{ survey?.description || "aiutaci a migliorare l'esperienza della piattaforma rispondendo a poche e semplici domande" }}
+      </h6>
+      <p class="m-0 fs-5">Ti ruberemo solo pochi minuti</p>
+    </div>
+    
+    <div class="card p-0 mx-auto border-0 w-100 mb-5" style="max-width: 700px; border-radius: 1.5rem; overflow: hidden; background: transparent;">
+    
+    @if (loading) {
+      <div class="p-5 text-center text-muted bg-white" style="border-radius: 1.5rem;">
+        <div class="spinner-border text-primary mb-3"></div>
+        <p>Caricamento questionario...</p>
+      </div>
+    } @else if (error) {
+      <div class="p-5 text-center bg-white" style="border-radius: 1.5rem;">
+        <h4 class="text-danger mb-3">Oops!</h4>
+        <p class="text-muted">{{ error }}</p>
+      </div>
+    } @else if (submitted) {
+      <div class="p-5 text-center mt-5 bg-white" style="border-radius: 1.5rem;" >
+        <div class="mb-4 text-primary">
+          <fa-icon [icon]="circleCheck" [size]="'2xl'"></fa-icon>
+        </div>
+        <h3 class="fw-bold mb-3">Grazie per aver completato il questionario!</h3>
+        <p class="text-muted">Le tue risposte sono state registrate con successo.</p>
+      </div>
+    } @else {
+      <!-- Corpo Questionario -->
+      <div class="p-4 p-md-5">
+        
+        @if (survey.presentationMode === 'step') {
+          <div class="mb-4 d-flex flex-column align-items-center">
+            <div class="progress mb-4 w-75" style="height: 6px; border-radius: 3px;">
+              <div class="progress-bar bg-white" [style.width]="((currentStepIndex + 1) / survey.fields.length) * 100 + '%'"></div>
+            </div>
+            <p class="text-white-50 small m-0 fw-bold tracking-wider">DOMANDA {{ currentStepIndex + 1 }} DI {{ survey.fields.length }}</p>
+          </div>
+          
+          @if (currentField) {
+            <div class="bg-white p-4 p-md-5 mb-4" style="border-radius: 1.5rem;">
+              <label class="form-label fw-bold mb-3" style="font-size: 1.1rem; color: #333;">
+                {{ currentField.label }}
+                @if (currentField.required) { <span class="text-danger">*</span> }
+              </label>
+              @if (currentField.description) {
+                <p class="text-muted mb-4 small">{{ currentField.description }}</p>
+              }
+
+              @if (currentField.type === 'text') {
+                <input type="text" class="form-control" [(ngModel)]="answers[currentField.id]" placeholder="La tua risposta...">
+              }
+
+              @if (currentField.type === 'textarea') {
+                <textarea class="form-control" rows="4" [(ngModel)]="answers[currentField.id]" placeholder="Scrivi qui la tua risposta..."></textarea>
+              }
+
+              @if (currentField.type === 'number') {
+                <input type="number" class="form-control" [(ngModel)]="answers[currentField.id]" placeholder="Inserisci un numero">
+              }
+
+              @if (currentField.type === 'radio') {
+                <div class="d-flex gap-3 mt-2">
+                  @for (val of [1,2,3,4,5]; track val) {
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" [name]="currentField.id" [id]="currentField.id + '_' + val" [value]="val" [(ngModel)]="answers[currentField.id]">
+                      <label class="form-check-label" [for]="currentField.id + '_' + val">{{ val }}</label>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+          <div class="d-flex justify-content-between mt-4">
+            <button class="btn text-white border-0 btn-lg" (click)="prevStep()" [disabled]="currentStepIndex === 0" [ngStyle]="{'opacity': currentStepIndex > 0 ? 1 : 0.8}" style="font-size: medium;">
+              <fa-icon [icon]="arrowLeft" [size]="'xs'"></fa-icon>
+              Indietro
+            </button>
+            
+            @if (isLastStep) {
+              <button class="btn btn-light btn-lg rounded-pill px-5 bg-secondary text-dark fw-semibold" style="font-size: medium;" (click)="submit()" [disabled]="submitting">
+                @if (submitting) { <span class="spinner-border spinner-border-sm me-2"></span> }
+                Invia Risposte
+              </button>
+            } @else {
+              <button class="btn btn-light btn-lg rounded-pill px-5 bg-secondary text-dark fw-semibold" style="font-size: medium;" (click)="nextStep()">
+                Avanti
+              </button>
+            }
+          </div>
+
+        } @else {
+
+          <!-- List Mode UI -->
+          @for (field of survey.fields; track field.id; let i = $index) {
+            <div class="bg-white p-4 p-md-5 mb-4" style="border-radius: 1.5rem;">
+              <label class="form-label fw-bold mb-3" style="font-size: 1.1rem; color: #333;">
+                {{ i + 1 }}. {{ field.label }}
+                @if (field.required) {
+                  <span class="text-danger">*</span>
+                }
+              </label>
+              
+              @if (field.description) {
+                <p class="text-muted small mb-3">{{ field.description }}</p>
+              }
+
+              @if (field.type === 'text') {
+                <input type="text" class="form-control" [(ngModel)]="answers[field.id]" placeholder="La tua risposta...">
+              }
+
+              @if (field.type === 'textarea') {
+                <textarea class="form-control" rows="4" [(ngModel)]="answers[field.id]" placeholder="Scrivi qui la tua risposta..."></textarea>
+              }
+
+              @if (field.type === 'number') {
+                <input type="number" class="form-control" [(ngModel)]="answers[field.id]" placeholder="Inserisci un numero">
+              }
+
+              @if (field.type === 'radio') {
+                <div class="d-flex gap-3 mt-2">
+                  @for (val of [1,2,3,4,5]; track val) {
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" [name]="field.id" [id]="field.id + '_' + val" [value]="val" [(ngModel)]="answers[field.id]">
+                      <label class="form-check-label" [for]="field.id + '_' + val">{{ val }}</label>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+          <div class="d-grid mt-4">
+            <button class="btn btn-light btn-lg rounded-pill text-primary fw-bold" (click)="submit()" [disabled]="submitting">
+              @if (submitting) {
+                <span class="spinner-border spinner-border-sm me-2"></span>
+              }
+              Invia Risposte
+            </button>
+          </div>
+
+        }
+      </div>
+    }
+    
+    @if (loading) {
+      <div class="p-5 text-center text-white-50">
+        <span class="spinner-border"></span>
+        <p class="mt-3">Caricamento in corso...</p>
+      </div>
+    } @else if (error) {
+      <div class="p-5 text-center text-white">
+        <h4>{{ error }}</h4>
+      </div>
+    }
+    
+  </div>
+</div>
+</div>
