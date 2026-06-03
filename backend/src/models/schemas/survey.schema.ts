@@ -17,6 +17,7 @@ const surveySchema = new Schema({
     slug: { type: String, required: true, unique: true },
     active: { type: Boolean, default: true },
     isAnonymous: { type: Boolean, default: false },
+    presentationMode: { type: String, enum: ['list', 'step'], default: 'list' },
     fields: { type: [surveyFieldSchema], default: [] }
 }, {
     timestamps: true

@@ -29,6 +29,7 @@ export class AdminSurveyDetailComponent implements OnInit {
     slug: '',
     active: true,
     isAnonymous: false,
+    presentationMode: 'list',
     fields: []
   };
 

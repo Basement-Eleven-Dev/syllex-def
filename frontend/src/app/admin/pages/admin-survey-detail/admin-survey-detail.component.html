@@ -136,6 +136,16 @@
 
               <hr>
 
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" role="switch" id="stepSwitch" 
+                  [ngModel]="survey.presentationMode === 'step'" 
+                  (ngModelChange)="survey.presentationMode = $event ? 'step' : 'list'">
+                <label class="form-check-label" for="stepSwitch">Modalità a Step (Una domanda alla volta)</label>
+                <div class="form-text small">Se attivo, l'utente visualizzerà una domanda alla volta con i pulsanti Avanti/Indietro.</div>
+              </div>
+
+              <hr>
+
               <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" role="switch" id="anonSwitch" [(ngModel)]="survey.isAnonymous">
                 <label class="form-check-label" for="anonSwitch">Compilazione Anonima</label>

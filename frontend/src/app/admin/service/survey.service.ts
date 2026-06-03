@@ -20,6 +20,7 @@ export interface Survey {
   slug: string;
   active: boolean;
   isAnonymous: boolean;
+  presentationMode?: 'list' | 'step';
   fields: SurveyField[];
   createdAt: string;
 }

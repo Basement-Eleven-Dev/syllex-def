@@ -1,1 +1,30 @@
-// Styles for public survey page
+:host {
+  display: block;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); /* Deep blue gradient */
+  width: 100%;
+}
+
+.survey-bg {
+  min-height: 100vh;
+}
+
+.logo-white {
+  filter: brightness(0) invert(1);
+}
+
+.card {
+  box-shadow: none !important;
+}
+
+input.form-control-lg, textarea.form-control-lg {
+  border-radius: 1rem;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  
+  &:focus {
+    background-color: #fff;
+    border-color: #2a5298;
+    box-shadow: 0 0 0 0.25rem rgba(42, 82, 152, 0.1);
+  }
+}

@@ -27,6 +27,32 @@ export class SurveyPageComponent implements OnInit {
   submitting = false;
 
   answers: any = {};
+  currentStepIndex = 0;
+
+  get currentField() {
+    return this.survey?.fields?.[this.currentStepIndex];
+  }
+
+  get isLastStep() {
+    return this.survey?.fields && this.currentStepIndex === this.survey.fields.length - 1;
+  }
+
+  nextStep() {
+    const field = this.currentField;
+    if (field?.required && (this.answers[field.id] === null || this.answers[field.id] === '')) {
+      alert("Compila questo campo prima di procedere.");
+      return;
+    }
+    if (this.currentStepIndex < this.survey.fields.length - 1) {
+      this.currentStepIndex++;
+    }
+  }
+
+  prevStep() {
+    if (this.currentStepIndex > 0) {
+      this.currentStepIndex--;
+    }
+  }
 
   ngOnInit() {
     this.slug = this.route.snapshot.paramMap.get('slug');
