@@ -4,9 +4,9 @@
       <img src="/images/logo_primary_extended.png" class="logo-white mt-3 mb-5" alt="Syllex" height="56">
       
 
-      <h3 class="fw-bold mb-2 mt-3">Ciao {{ auth.user?.firstName || 'Docente' }},</h3>
+      <h3 class="fw-bold mb-2 mt-3">Ciao{{ (!survey?.isAnonymous && auth.user?.firstName) ? ' ' + auth.user?.firstName : '' }},</h3>
       <h6 class="fw-normal mb-3 fs-4" style="max-width: 500px; margin: 0 auto; line-height: 1.5;">
-        {{ survey.description || "aiutaci a migliorare l'esperienza della piattaforma rispondendo a poche e semplici domande" }}
+        {{ survey?.description || "aiutaci a migliorare l'esperienza della piattaforma rispondendo a poche e semplici domande" }}
       </h6>
       <p class="m-0 fs-5">Ti ruberemo solo pochi minuti</p>
     </div>
