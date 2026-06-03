@@ -85,16 +85,16 @@ export class StudentTestsList {
 
   readonly FilteredTests = computed(() => {
     let list = this.Tests();
-    
+
     if (this.ShowOnlyAutoEval()) {
-      list = list.filter(t => t.source === 'self-evaluation');
+      list = list.filter((t) => t.source === 'self-evaluation');
     }
-    
+
     if (this.ShowOnlyPending()) {
       const map = this.AttemptStatusMap();
       list = list.filter((t) => !map.has(t._id));
     }
-    
+
     return list;
   });
 
@@ -102,11 +102,14 @@ export class StudentTestsList {
     this.Subjects().map((s) => ({ value: s._id, label: s.name }));
 
   constructor() {
-    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
-      if (params['autoEval'] === 'true') {
-        this.ShowOnlyAutoEval.set(true);
-      }
-    });
+    this.route.queryParams
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        if (params['autoEval'] === 'true') {
+          this.ShowOnlyAutoEval.set(true);
+          this.PageSize.set(500);
+        }
+      });
 
     effect(() => {
       // If Page is 1, we overwrite the list.
@@ -208,6 +211,7 @@ export class StudentTestsList {
   toggleAutoEval() {
     this.ShowOnlyAutoEval.update((v) => !v);
     this.Page.set(1);
+    this.PageSize.set(this.ShowOnlyAutoEval() ? 500 : 6);
   }
 
   getAttemptStatus(testId: string): AttemptStatus | null {
@@ -226,15 +230,16 @@ export class StudentTestsList {
 
     from(toCheck)
       .pipe(
-        mergeMap((t) =>
-          this.testsService.getAttemptByTestId(t._id).pipe(
-            catchError(() => of(null)),
-            map((attempt) => ({ testId: t._id, attempt }))
-          ),
-          5 // MAX 5 CONCURRENT REQUESTS
+        mergeMap(
+          (t) =>
+            this.testsService.getAttemptByTestId(t._id).pipe(
+              catchError(() => of(null)),
+              map((attempt) => ({ testId: t._id, attempt })),
+            ),
+          5, // MAX 5 CONCURRENT REQUESTS
         ),
         toArray(),
-        takeUntilDestroyed(this.destroyRef)
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((results) => {
         const statusMap = new Map(this.AttemptStatusMap());
