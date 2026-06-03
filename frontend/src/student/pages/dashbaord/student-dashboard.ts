@@ -53,7 +53,7 @@ import { AlexMascot } from '../../../app/shared/components/alex-mascot/alex-masc
     StudentComunicazioneCard,
     SyllexButton,
     AlexMascot,
-],
+  ],
   templateUrl: './student-dashboard.html',
   styleUrl: './student-dashboard.scss',
 })
@@ -98,6 +98,7 @@ export class StudentDashboard implements OnInit {
   // Statistics
   SubjectStats = signal<StatCardData[]>([]);
   TotalTestsCompleted = signal(0);
+  TotalTestsPending = signal(0);
   AverageScore = signal(0);
 
   ngOnInit(): void {
@@ -127,9 +128,13 @@ export class StudentDashboard implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((res) => {
         const allTests = res.tests;
-        
-        const teacherTests = allTests.filter(t => t.source !== 'self-evaluation');
-        const selfEvalTests = allTests.filter(t => t.source === 'self-evaluation');
+
+        const teacherTests = allTests.filter(
+          (t) => t.source !== 'self-evaluation',
+        );
+        const selfEvalTests = allTests.filter(
+          (t) => t.source === 'self-evaluation',
+        );
 
         // Sort teacher tests by availability and take top 3
         const sortedTeacher = teacherTests.sort((a, b) => {
@@ -143,38 +148,62 @@ export class StudentDashboard implements OnInit {
         });
         this.TotalTestsCount.set(teacherTests.length);
         this.RecentTests.set(sortedTeacher.slice(0, 3));
-        
+
         this.CompletedTests.set(selfEvalTests.slice(0, 3));
 
         // Fetch all attempts in parallel but limit concurrency to 5 to prevent AWS API Gateway rate limiting
         if (allTests.length > 0) {
-          from(allTests).pipe(
-            mergeMap((test, index) => 
-              this.testsService.getAttemptByTestId(test._id).pipe(
-                catchError(() => of(null)),
-                map(attempt => ({ index, attempt }))
-              ), 5 // MAX 5 CONCURRENT REQUESTS
-            ),
-            toArray(),
-            map(results => results.sort((a, b) => a.index - b.index).map(r => r.attempt)),
-            takeUntilDestroyed(this.destroyRef)
-          ).subscribe((attempts) => {
-              const newStatusMap = new Map<string, 'in-progress' | 'delivered' | 'reviewed'>();
-              const newScoreMap = new Map<string, { score: number; maxScore: number }>();
+          from(allTests)
+            .pipe(
+              mergeMap(
+                (test, index) =>
+                  this.testsService.getAttemptByTestId(test._id).pipe(
+                    catchError(() => of(null)),
+                    map((attempt) => ({ index, attempt })),
+                  ),
+                5, // MAX 5 CONCURRENT REQUESTS
+              ),
+              toArray(),
+              map((results) =>
+                results.sort((a, b) => a.index - b.index).map((r) => r.attempt),
+              ),
+              takeUntilDestroyed(this.destroyRef),
+            )
+            .subscribe((attempts) => {
+              const newStatusMap = new Map<
+                string,
+                'in-progress' | 'delivered' | 'reviewed'
+              >();
+              const newScoreMap = new Map<
+                string,
+                { score: number; maxScore: number }
+              >();
 
               allTests.forEach((test, index) => {
                 const attempt = attempts[index];
                 if (attempt) {
                   newStatusMap.set(test._id, attempt.status);
 
-                  if (attempt.status === 'reviewed' || (test.source === 'self-evaluation' && attempt.status === 'delivered')) {
-                    const score = attempt.score != null
-                      ? attempt.score
-                      : attempt.questions.reduce((sum, q) => sum + (q.score ?? 0), 0);
-                    const maxScore = attempt.maxScore != null
-                      ? attempt.maxScore
-                      : attempt.questions.reduce((sum, q) => sum + (q.points ?? 0), 0);
-                    
+                  if (
+                    attempt.status === 'reviewed' ||
+                    (test.source === 'self-evaluation' &&
+                      attempt.status === 'delivered')
+                  ) {
+                    const score =
+                      attempt.score != null
+                        ? attempt.score
+                        : attempt.questions.reduce(
+                            (sum, q) => sum + (q.score ?? 0),
+                            0,
+                          );
+                    const maxScore =
+                      attempt.maxScore != null
+                        ? attempt.maxScore
+                        : attempt.questions.reduce(
+                            (sum, q) => sum + (q.points ?? 0),
+                            0,
+                          );
+
                     newScoreMap.set(test._id, { score, maxScore });
                   }
                 }
@@ -202,7 +231,10 @@ export class StudentDashboard implements OnInit {
       });
   }
 
-  private computeSubjectStats(allTests: StudentTestInterface[], attempts: (StudentAttemptInterface | null)[]) {
+  private computeSubjectStats(
+    allTests: StudentTestInterface[],
+    attempts: (StudentAttemptInterface | null)[],
+  ) {
     const subjects = this.materiaService.allMaterie();
     const stats: StatCardData[] = [];
 
@@ -253,13 +285,25 @@ export class StudentDashboard implements OnInit {
       }
     });
 
+    const pendingCount = allTests.filter((test, index) => {
+      if (test.source === 'self-evaluation') return false;
+      const attempt = attempts[index];
+      return (
+        !attempt ||
+        (attempt.status !== 'delivered' && attempt.status !== 'reviewed')
+      );
+    }).length;
+
     this.TotalTestsCompleted.set(completedCount);
+    this.TotalTestsPending.set(pendingCount);
     if (scoresCount > 0) {
       this.AverageScore.set(Math.round(totalScore / scoresCount));
     } else {
       this.AverageScore.set(0);
     }
-    
-    this.SubjectStats.set([...stats].sort((a, b) => b.Value - a.Value).slice(0, 4));
+
+    this.SubjectStats.set(
+      [...stats].sort((a, b) => b.Value - a.Value).slice(0, 4),
+    );
   }
 }
