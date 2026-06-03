@@ -44,9 +44,12 @@ export class SurveyPageComponent implements OnInit {
 
   nextStep() {
     const field = this.currentField;
-    if (field?.required && (this.answers[field.id] === null || this.answers[field.id] === '')) {
-      alert("Compila questo campo prima di procedere.");
-      return;
+    if (field?.required) {
+      const ans = this.answers[field.id];
+      if (ans === null || ans === '' || (Array.isArray(ans) && ans.length === 0)) {
+        alert("Compila questo campo prima di procedere.");
+        return;
+      }
     }
     if (this.currentStepIndex < this.survey.fields.length - 1) {
       this.currentStepIndex++;
@@ -56,6 +59,18 @@ export class SurveyPageComponent implements OnInit {
   prevStep() {
     if (this.currentStepIndex > 0) {
       this.currentStepIndex--;
+    }
+  }
+
+  toggleCheckbox(fieldId: string, option: string) {
+    if (!Array.isArray(this.answers[fieldId])) {
+      this.answers[fieldId] = [];
+    }
+    const idx = this.answers[fieldId].indexOf(option);
+    if (idx > -1) {
+      this.answers[fieldId].splice(idx, 1);
+    } else {
+      this.answers[fieldId].push(option);
     }
   }
 
@@ -85,7 +100,11 @@ export class SurveyPageComponent implements OnInit {
 
           // Inizializza answers
           for (let field of this.survey.fields) {
-            this.answers[field.id] = null;
+            if (field.type === 'checkbox') {
+              this.answers[field.id] = [];
+            } else {
+              this.answers[field.id] = null;
+            }
           }
           this.loading = false;
         } else {
@@ -103,9 +122,12 @@ export class SurveyPageComponent implements OnInit {
   submit() {
     // Validazione base
     for (let field of this.survey.fields) {
-      if (field.required && (this.answers[field.id] === null || this.answers[field.id] === '')) {
-        alert("Compila tutti i campi obbligatori.");
-        return;
+      if (field.required) {
+        const ans = this.answers[field.id];
+        if (ans === null || ans === '' || (Array.isArray(ans) && ans.length === 0)) {
+          alert("Compila tutti i campi obbligatori.");
+          return;
+        }
       }
     }
 
