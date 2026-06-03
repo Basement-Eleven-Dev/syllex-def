@@ -715,6 +715,51 @@ const ATTEMPTS_ROUTES: FunctionIntegration[] = [
   },
 ];
 
+const SURVEYS_ROUTES: FunctionIntegration[] = [
+  {
+    apiRoute: "admin/surveys",
+    functionPath: "admin/surveys/getSurveys.ts",
+    method: "get",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/surveys",
+    functionPath: "admin/surveys/createSurvey.ts",
+    method: "post",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/surveys/{surveyId}",
+    functionPath: "admin/surveys/getSurveyById.ts",
+    method: "get",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/surveys/{surveyId}",
+    functionPath: "admin/surveys/updateSurvey.ts",
+    method: "put",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/surveys/{surveyId}/responses",
+    functionPath: "admin/surveys/getSurveyResponses.ts",
+    method: "get",
+    role: "admin",
+  },
+  {
+    apiRoute: "public/surveys/{slug}",
+    functionPath: "public/surveys/getPublicSurvey.ts",
+    method: "get",
+    role: "open",
+  },
+  {
+    apiRoute: "public/surveys/{slug}/submit",
+    functionPath: "public/surveys/submitSurveyResponse.ts",
+    method: "post",
+    role: "open",
+  },
+];
+
 export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
   ...MISC_ROUTES,
   ...ADMIN_ROUTES,
@@ -729,6 +774,7 @@ export const FUNCTION_INTEGRATIONS: FunctionIntegration[] = [
   ...ASSISTANTS_ROUTES,
   ...MATERIALS_ROUTES,
   ...ATTEMPTS_ROUTES,
+  ...SURVEYS_ROUTES,
   {
     apiRoute: "auth/forgot-password",
     functionPath: "auth/forgotPassword.ts",
