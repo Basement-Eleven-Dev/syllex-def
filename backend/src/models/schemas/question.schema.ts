@@ -31,6 +31,7 @@ export const questionSchema = new Schema(
     topicId: { type: Schema.Types.ObjectId, required: true },
     subjectId: { type: Schema.Types.ObjectId, required: true },
     teacherId: { type: Schema.Types.ObjectId, required: true },
+    sourceMaterialId: { type: Schema.Types.ObjectId, ref: "Material" },
     correctAnswer: { type: Boolean },
     aiGenerated: { type: Boolean },
     difficulty: {

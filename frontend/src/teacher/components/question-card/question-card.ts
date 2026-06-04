@@ -79,7 +79,14 @@ export class QuestionCard {
   // ── Student mode ──────────────────────────────────────────────────────────
   @Input() selectedAnswer: number | string | null = null;
   @Input() score: number | null = null;
-  @Input() questionStatus: 'correct' | 'wrong' | 'incorrect' | 'semi-correct' | 'partial' | 'pending' | null = null;
+  @Input() questionStatus:
+    | 'correct'
+    | 'wrong'
+    | 'incorrect'
+    | 'semi-correct'
+    | 'partial'
+    | 'pending'
+    | null = null;
   @Input() teacherFeedback: string | null = null;
   @Input() feedbackLabel: string = 'Commento del docente';
   @Input() showCorrectness: boolean = true;
@@ -101,6 +108,14 @@ export class QuestionCard {
   onOpenAnswerChange(value: string): void {
     if (this.locked) return;
     this.answerChange.emit(value);
+  }
+
+  getSourceName(): string | null {
+    if (!this.question?.sourceMaterialId) return null;
+    if (typeof this.question.sourceMaterialId === 'object') {
+      return (this.question.sourceMaterialId as any).name || null;
+    }
+    return null;
   }
 }
 

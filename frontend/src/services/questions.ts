@@ -21,6 +21,7 @@ export interface QuestionInterface {
   correctAnswer?: boolean;
   aiGenerated?: boolean;
   tags?: string[];
+  sourceMaterialId?: string | { _id: string; name: string };
 }
 
 @Injectable({
@@ -91,7 +92,9 @@ export class QuestionsService {
   }
 
   loadQuestionsBatch(ids: string[]): Observable<QuestionInterface[]> {
-    return this.http.post<QuestionInterface[]>('questions/list', { questionIds: ids });
+    return this.http.post<QuestionInterface[]>('questions/list', {
+      questionIds: ids,
+    });
   }
 
   loadPagedQuestions(
@@ -130,14 +133,14 @@ export class QuestionsService {
     return this.http.delete<{ deleted: boolean }>(`questions/${id}`);
   }
 
-  getAllQuestions(){
-       return this.http.get<{ questions: QuestionInterface[]; total: number }>(
+  getAllQuestions() {
+    return this.http.get<{ questions: QuestionInterface[]; total: number }>(
       `questions/all`,
     );
   }
   hasQuestions(topicId: string): Observable<boolean> {
-  return this.getAllQuestions().pipe(
-    map(res => res.questions.some(q => q.topicId === topicId))
-  );
-}
+    return this.getAllQuestions().pipe(
+      map((res) => res.questions.some((q) => q.topicId === topicId)),
+    );
+  }
 }

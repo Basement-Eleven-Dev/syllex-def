@@ -124,6 +124,7 @@ export class GenAiQuestion {
         choices: question.options,
         correctAnswer: question.correctAnswer,
         difficulty,
+        sourceMaterialId: question.sourceMaterialId,
       });
     } finally {
       this.IsLoading.set(false);
