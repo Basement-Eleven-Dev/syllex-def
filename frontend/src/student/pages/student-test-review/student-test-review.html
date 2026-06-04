@@ -14,9 +14,11 @@
 } @else if (Attempt(); as attempt) {
 
 <!-- ── KPI strip — always visible ───────────────────────────────────────── -->
-<div class="review-kpi-bar"
-     [class.review-kpi-bar--collapsed]="!KpiExpanded()"
-     (click)="KpiExpanded.set(!KpiExpanded())">
+<div
+  class="review-kpi-bar"
+  [class.review-kpi-bar--collapsed]="!KpiExpanded()"
+  (click)="KpiExpanded.set(!KpiExpanded())"
+>
   <div class="kpi-item kpi-item--questions">
     <div class="kpi-val-group">
       <fa-icon [icon]="QuestionsIcon" class="kpi-ico"></fa-icon>
@@ -24,7 +26,6 @@
     </div>
     <span class="kpi-lbl">Domande</span>
   </div>
-
 
   @if (attempt.status === 'reviewed') {
   <div class="kpi-item kpi-item--correct">
@@ -91,9 +92,9 @@
       <button
         class="review-dot"
         [class.review-dot--active]="i === ActiveIndex()"
-        [class.review-dot--correct]="q.status === 'correct'"
-        [class.review-dot--wrong]="q.status === 'wrong' || q.status === 'incorrect'"
-        [class.review-dot--partial]="q.status === 'semi-correct' || q.status === 'partial'"
+        [class.review-dot--correct]="attempt.status === 'reviewed' && q.status === 'correct'"
+        [class.review-dot--wrong]="attempt.status === 'reviewed' && (q.status === 'wrong' || q.status === 'incorrect')"
+        [class.review-dot--partial]="attempt.status === 'reviewed' && (q.status === 'semi-correct' || q.status === 'partial')"
         (click)="goTo(i)"
         [title]="'Domanda ' + (i + 1)"
       ></button>
@@ -119,9 +120,10 @@
         Domanda {{ ActiveIndex() + 1 }} di {{ attempt.questions.length }}
       </span>
       <div class="review-mobile-progress__bar">
-        <div class="review-mobile-progress__fill"
-             [style.width.%]="((ActiveIndex() + 1) / attempt.questions.length) * 100">
-        </div>
+        <div
+          class="review-mobile-progress__fill"
+          [style.width.%]="((ActiveIndex() + 1) / attempt.questions.length) * 100"
+        ></div>
       </div>
     </div>
 
@@ -140,10 +142,11 @@
         [showIndex]="true"
         mode="student"
         [locked]="true"
+        [showCorrectness]="attempt.status === 'reviewed'"
         [selectedAnswer]="q.answer"
         [score]="null"
-        [questionStatus]="(q.status === 'pending' ? null : q.status) ?? null"
-        [teacherFeedback]="q.teacherComment ?? null"
+        [questionStatus]="attempt.status === 'reviewed' ? ((q.status === 'pending' ? null : q.status) ?? null) : null"
+        [teacherFeedback]="attempt.status === 'reviewed' ? (q.teacherComment ?? null) : null"
         [feedbackLabel]="FeedbackLabel()"
       ></div>
     </div>

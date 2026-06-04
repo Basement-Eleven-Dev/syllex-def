@@ -53,7 +53,7 @@ import { AlexMascot } from '../../../app/shared/components/alex-mascot/alex-masc
     StudentComunicazioneCard,
     SyllexButton,
     AlexMascot,
-],
+  ],
   templateUrl: './student-dashboard.html',
   styleUrl: './student-dashboard.scss',
 })
@@ -98,7 +98,10 @@ export class StudentDashboard implements OnInit {
   // Statistics
   SubjectStats = signal<StatCardData[]>([]);
   TotalTestsCompleted = signal(0);
+  TotalTestsPending = signal(0);
   AverageScore = signal(0);
+  OfficialAverageScore = signal(0);
+  AutoEvalAverageScore = signal(0);
 
   ngOnInit(): void {
     this.auth.user$.subscribe((user) => this.User.set(user));
@@ -127,9 +130,13 @@ export class StudentDashboard implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((res) => {
         const allTests = res.tests;
-        
-        const teacherTests = allTests.filter(t => t.source !== 'self-evaluation');
-        const selfEvalTests = allTests.filter(t => t.source === 'self-evaluation');
+
+        const teacherTests = allTests.filter(
+          (t) => t.source !== 'self-evaluation',
+        );
+        const selfEvalTests = allTests.filter(
+          (t) => t.source === 'self-evaluation',
+        );
 
         // Sort teacher tests by availability and take top 3
         const sortedTeacher = teacherTests.sort((a, b) => {
@@ -143,38 +150,62 @@ export class StudentDashboard implements OnInit {
         });
         this.TotalTestsCount.set(teacherTests.length);
         this.RecentTests.set(sortedTeacher.slice(0, 3));
-        
+
         this.CompletedTests.set(selfEvalTests.slice(0, 3));
 
         // Fetch all attempts in parallel but limit concurrency to 5 to prevent AWS API Gateway rate limiting
         if (allTests.length > 0) {
-          from(allTests).pipe(
-            mergeMap((test, index) => 
-              this.testsService.getAttemptByTestId(test._id).pipe(
-                catchError(() => of(null)),
-                map(attempt => ({ index, attempt }))
-              ), 5 // MAX 5 CONCURRENT REQUESTS
-            ),
-            toArray(),
-            map(results => results.sort((a, b) => a.index - b.index).map(r => r.attempt)),
-            takeUntilDestroyed(this.destroyRef)
-          ).subscribe((attempts) => {
-              const newStatusMap = new Map<string, 'in-progress' | 'delivered' | 'reviewed'>();
-              const newScoreMap = new Map<string, { score: number; maxScore: number }>();
+          from(allTests)
+            .pipe(
+              mergeMap(
+                (test, index) =>
+                  this.testsService.getAttemptByTestId(test._id).pipe(
+                    catchError(() => of(null)),
+                    map((attempt) => ({ index, attempt })),
+                  ),
+                5, // MAX 5 CONCURRENT REQUESTS
+              ),
+              toArray(),
+              map((results) =>
+                results.sort((a, b) => a.index - b.index).map((r) => r.attempt),
+              ),
+              takeUntilDestroyed(this.destroyRef),
+            )
+            .subscribe((attempts) => {
+              const newStatusMap = new Map<
+                string,
+                'in-progress' | 'delivered' | 'reviewed'
+              >();
+              const newScoreMap = new Map<
+                string,
+                { score: number; maxScore: number }
+              >();
 
               allTests.forEach((test, index) => {
                 const attempt = attempts[index];
                 if (attempt) {
                   newStatusMap.set(test._id, attempt.status);
 
-                  if (attempt.status === 'reviewed' || (test.source === 'self-evaluation' && attempt.status === 'delivered')) {
-                    const score = attempt.score != null
-                      ? attempt.score
-                      : attempt.questions.reduce((sum, q) => sum + (q.score ?? 0), 0);
-                    const maxScore = attempt.maxScore != null
-                      ? attempt.maxScore
-                      : attempt.questions.reduce((sum, q) => sum + (q.points ?? 0), 0);
-                    
+                  if (
+                    attempt.status === 'reviewed' ||
+                    (test.source === 'self-evaluation' &&
+                      attempt.status === 'delivered')
+                  ) {
+                    const score =
+                      attempt.score != null
+                        ? attempt.score
+                        : attempt.questions.reduce(
+                            (sum, q) => sum + (q.score ?? 0),
+                            0,
+                          );
+                    const maxScore =
+                      attempt.maxScore != null
+                        ? attempt.maxScore
+                        : attempt.questions.reduce(
+                            (sum, q) => sum + (q.points ?? 0),
+                            0,
+                          );
+
                     newScoreMap.set(test._id, { score, maxScore });
                   }
                 }
@@ -202,13 +233,22 @@ export class StudentDashboard implements OnInit {
       });
   }
 
-  private computeSubjectStats(allTests: StudentTestInterface[], attempts: (StudentAttemptInterface | null)[]) {
+  private computeSubjectStats(
+    allTests: StudentTestInterface[],
+    attempts: (StudentAttemptInterface | null)[],
+  ) {
     const subjects = this.materiaService.allMaterie();
     const stats: StatCardData[] = [];
 
     let completedCount = 0;
     let totalScore = 0;
     let scoresCount = 0;
+
+    let officialTotalScore = 0;
+    let officialScoresCount = 0;
+
+    let autoEvalTotalScore = 0;
+    let autoEvalScoresCount = 0;
 
     allTests.forEach((test, index) => {
       const attempt = attempts[index];
@@ -218,18 +258,46 @@ export class StudentDashboard implements OnInit {
       ) {
         completedCount++;
 
-        // Roughly calc a score if reviewed
-        if (attempt.status === 'reviewed' && attempt.questions) {
-          let attemptScore = 0;
-          let attemptMax = 0;
-          attempt.questions.forEach((q) => {
-            if (q.score !== undefined) attemptScore += q.score;
-            if (q.points !== undefined) attemptMax += q.points;
-          });
-          if (attemptMax > 0) {
-            totalScore += (attemptScore / attemptMax) * 100;
-            scoresCount++;
+        // Calculate score percentage
+        let hasScore = false;
+        let scorePct = 0;
+
+        if (
+          attempt.status === 'reviewed' ||
+          (test.source === 'self-evaluation' && attempt.status === 'delivered')
+        ) {
+          const score =
+            attempt.score != null
+              ? attempt.score
+              : (attempt.questions?.reduce(
+                  (sum, q) => sum + (q.score ?? 0),
+                  0,
+                ) ?? 0);
+          const maxScore =
+            attempt.maxScore != null
+              ? attempt.maxScore
+              : (attempt.questions?.reduce(
+                  (sum, q) => sum + (q.points ?? 0),
+                  0,
+                ) ?? 0);
+
+          if (maxScore > 0) {
+            scorePct = (score / maxScore) * 100;
+            hasScore = true;
           }
+        }
+
+        if (hasScore) {
+          if (test.source === 'self-evaluation') {
+            autoEvalTotalScore += scorePct;
+            autoEvalScoresCount++;
+          } else {
+            officialTotalScore += scorePct;
+            officialScoresCount++;
+          }
+
+          totalScore += scorePct;
+          scoresCount++;
         }
 
         // Update subject breakdown
@@ -253,13 +321,41 @@ export class StudentDashboard implements OnInit {
       }
     });
 
+    const pendingCount = allTests.filter((test, index) => {
+      if (test.source === 'self-evaluation') return false;
+      const attempt = attempts[index];
+      return (
+        !attempt ||
+        (attempt.status !== 'delivered' && attempt.status !== 'reviewed')
+      );
+    }).length;
+
     this.TotalTestsCompleted.set(completedCount);
+    this.TotalTestsPending.set(pendingCount);
     if (scoresCount > 0) {
       this.AverageScore.set(Math.round(totalScore / scoresCount));
     } else {
       this.AverageScore.set(0);
     }
-    
-    this.SubjectStats.set([...stats].sort((a, b) => b.Value - a.Value).slice(0, 4));
+
+    if (officialScoresCount > 0) {
+      this.OfficialAverageScore.set(
+        Math.round(officialTotalScore / officialScoresCount),
+      );
+    } else {
+      this.OfficialAverageScore.set(0);
+    }
+
+    if (autoEvalScoresCount > 0) {
+      this.AutoEvalAverageScore.set(
+        Math.round(autoEvalTotalScore / autoEvalScoresCount),
+      );
+    } else {
+      this.AutoEvalAverageScore.set(0);
+    }
+
+    this.SubjectStats.set(
+      [...stats].sort((a, b) => b.Value - a.Value).slice(0, 4),
+    );
   }
 }
