@@ -100,6 +100,8 @@ export class StudentDashboard implements OnInit {
   TotalTestsCompleted = signal(0);
   TotalTestsPending = signal(0);
   AverageScore = signal(0);
+  OfficialAverageScore = signal(0);
+  AutoEvalAverageScore = signal(0);
 
   ngOnInit(): void {
     this.auth.user$.subscribe((user) => this.User.set(user));
@@ -242,6 +244,12 @@ export class StudentDashboard implements OnInit {
     let totalScore = 0;
     let scoresCount = 0;
 
+    let officialTotalScore = 0;
+    let officialScoresCount = 0;
+
+    let autoEvalTotalScore = 0;
+    let autoEvalScoresCount = 0;
+
     allTests.forEach((test, index) => {
       const attempt = attempts[index];
       if (
@@ -250,18 +258,46 @@ export class StudentDashboard implements OnInit {
       ) {
         completedCount++;
 
-        // Roughly calc a score if reviewed
-        if (attempt.status === 'reviewed' && attempt.questions) {
-          let attemptScore = 0;
-          let attemptMax = 0;
-          attempt.questions.forEach((q) => {
-            if (q.score !== undefined) attemptScore += q.score;
-            if (q.points !== undefined) attemptMax += q.points;
-          });
-          if (attemptMax > 0) {
-            totalScore += (attemptScore / attemptMax) * 100;
-            scoresCount++;
+        // Calculate score percentage
+        let hasScore = false;
+        let scorePct = 0;
+
+        if (
+          attempt.status === 'reviewed' ||
+          (test.source === 'self-evaluation' && attempt.status === 'delivered')
+        ) {
+          const score =
+            attempt.score != null
+              ? attempt.score
+              : (attempt.questions?.reduce(
+                  (sum, q) => sum + (q.score ?? 0),
+                  0,
+                ) ?? 0);
+          const maxScore =
+            attempt.maxScore != null
+              ? attempt.maxScore
+              : (attempt.questions?.reduce(
+                  (sum, q) => sum + (q.points ?? 0),
+                  0,
+                ) ?? 0);
+
+          if (maxScore > 0) {
+            scorePct = (score / maxScore) * 100;
+            hasScore = true;
           }
+        }
+
+        if (hasScore) {
+          if (test.source === 'self-evaluation') {
+            autoEvalTotalScore += scorePct;
+            autoEvalScoresCount++;
+          } else {
+            officialTotalScore += scorePct;
+            officialScoresCount++;
+          }
+
+          totalScore += scorePct;
+          scoresCount++;
         }
 
         // Update subject breakdown
@@ -300,6 +336,22 @@ export class StudentDashboard implements OnInit {
       this.AverageScore.set(Math.round(totalScore / scoresCount));
     } else {
       this.AverageScore.set(0);
+    }
+
+    if (officialScoresCount > 0) {
+      this.OfficialAverageScore.set(
+        Math.round(officialTotalScore / officialScoresCount),
+      );
+    } else {
+      this.OfficialAverageScore.set(0);
+    }
+
+    if (autoEvalScoresCount > 0) {
+      this.AutoEvalAverageScore.set(
+        Math.round(autoEvalTotalScore / autoEvalScoresCount),
+      );
+    } else {
+      this.AutoEvalAverageScore.set(0);
     }
 
     this.SubjectStats.set(
