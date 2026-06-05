@@ -21,6 +21,9 @@ const getQuestionsBatch = async (
 
   await connectDatabase();
 
+  // Forza il caricamento dello schema Material per evitarne il tree-shaking da parte del bundler
+  const _m = Material;
+
   const objectIds = questionIds.map((id: string) => new Types.ObjectId(id));
   const questions = await Question.find({ _id: { $in: objectIds } })
     .populate("sourceMaterialId", "name")
