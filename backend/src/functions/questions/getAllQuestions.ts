@@ -11,6 +11,9 @@ const getAllQuestions = async (
 ) => {
   await connectDatabase();
 
+  // Forza il caricamento dello schema Material per evitarne il tree-shaking da parte del bundler
+  const _m = Material;
+
   // Costruisco il filtro per MongoDB
   const filter: any = {};
 

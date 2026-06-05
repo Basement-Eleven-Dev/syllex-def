@@ -17,6 +17,9 @@ const getQuestionById = async (
 
   await connectDatabase();
 
+  // Forza il caricamento dello schema Material per evitarne il tree-shaking da parte del bundler
+  const _m = Material;
+
   const question = await Question.findById(questionId)
     .populate("sourceMaterialId", "name")
     .lean();
