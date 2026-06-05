@@ -460,6 +460,8 @@ export class CreateEditQuestion {
           subjectId,
           policy,
           tags: [],
+          sourceMaterialId: item.data.sourceMaterialId,
+          aiGenerated: true,
         };
         if (item.data.type === 'scelta multipla')
           questionData.options = item.data.options;
