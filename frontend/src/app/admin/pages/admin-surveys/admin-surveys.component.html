@@ -1,0 +1,74 @@
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-1">Questionari di Valutazione</h2>
+      <p class="text-muted mb-0">Gestisci i questionari e analizza le risposte</p>
+    </div>
+    <button class="btn btn-primary d-flex align-items-center gap-2" routerLink="new">
+      <fa-icon [icon]="faPlus"></fa-icon> Nuovo Questionario
+    </button>
+  </div>
+  
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+      
+      @if (loading) {
+        <div class="p-5 text-center text-muted">
+          <div class="spinner-border spinner-border-sm me-2"></div> Caricamento...
+        </div>
+      } @else if (surveys.length === 0) {
+        <div class="p-5 text-center text-muted">
+          Nessun questionario trovato. Creane uno per iniziare.
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th class="ps-4">Titolo</th>
+                <th>Link Pubblico</th>
+                <th>Stato</th>
+                <th>Tipo</th>
+                <th class="text-end pe-4">Azioni</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (survey of surveys; track survey._id) {
+                <tr>
+                  <td class="ps-4 fw-medium">{{ survey.title }}</td>
+                  <td>
+                    <button class="btn btn-sm btn-light text-primary d-flex align-items-center gap-2" (click)="copyLink(survey.slug)">
+                      <fa-icon [icon]="faLink"></fa-icon> {{ survey.slug }}
+                    </button>
+                  </td>
+                  <td>
+                    @if (survey.active) {
+                      <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-2">
+                        <fa-icon [icon]="faCheck" class="me-1"></fa-icon> Attivo
+                      </span>
+                    } @else {
+                      <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill px-3 py-2">
+                        <fa-icon [icon]="faTimes" class="me-1"></fa-icon> Inattivo
+                      </span>
+                    }
+                  </td>
+                  <td>
+                    <span class="text-muted small">
+                      {{ survey.isAnonymous ? 'Anonimo' : 'Richiede Login' }}
+                    </span>
+                  </td>
+                  <td class="text-end pe-4">
+                    <button class="btn btn-sm btn-light me-2" [routerLink]="[survey._id]" title="Modifica">
+                      <fa-icon [icon]="faPen" class="text-muted"></fa-icon>
+                    </button>
+                    <!-- TBD link alle risposte o apri dettaglio -->
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </div>
+</div>
