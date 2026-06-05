@@ -37,11 +37,17 @@ function toObjectId(value: any): Types.ObjectId | undefined {
   return undefined;
 }
 
-function sanitizeObjectIds(question: any): AttemptQuestion['question'] {
+function sanitizeObjectIds(question: any): AttemptQuestion["question"] {
   if (!question) return question;
 
   const sanitized = { ...question };
-  const objectIdFields = ["_id", "subjectId", "teacherId", "topicId"];
+  const objectIdFields = [
+    "_id",
+    "subjectId",
+    "teacherId",
+    "topicId",
+    "sourceMaterialId",
+  ];
 
   for (const field of objectIdFields) {
     const converted = toObjectId(sanitized[field]);

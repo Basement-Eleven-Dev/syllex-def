@@ -39,6 +39,7 @@ const TrueFalseQuestionStructure = z.object({
   explanation: z.string(),
   correctAnswer: z.boolean(),
   topicId: z.string().optional(),
+  sourceMaterialId: z.string().optional(),
 });
 const MultipleChoiceQuestionStructure = z.object({
   text: z.string(),
@@ -50,11 +51,13 @@ const MultipleChoiceQuestionStructure = z.object({
     }),
   ),
   topicId: z.string().optional(),
+  sourceMaterialId: z.string().optional(),
 });
 const OpenQuestionStructure = z.object({
   text: z.string(),
   correctAnswer: z.string(),
   topicId: z.string().optional(),
+  sourceMaterialId: z.string().optional(),
 });
 
 //MAPS
@@ -79,10 +82,31 @@ CRITICAL RULES:
 - NEVER reference the source material. Do NOT use phrases like "secondo il testo", "in base al documento", "come indicato nel materiale", "il testo afferma", "dal brano si evince", "come riportato", "stando a quanto scritto", or any similar expression.
 - Explanations must be CONCISE and DIRECT: go straight to the point, state the fact, no rhetorical introductions, no greetings, no filler phrases like "ricordate che", "fate attenzione", "cari ragazzi", "è importante notare".
 - Maximum 2-3 sentences per explanation. State the correct concept plainly.
-- VARIETY: each question must use a different angle, perspective, or aspect of the topic. Vary the sentence structure, vocabulary, and the specific concept tested. Never repeat the same pattern or phrasing across questions.`;
+- VARIETY: each question must use a different angle, perspective, or aspect of the topic. Vary the sentence structure, vocabulary, and the specific concept tested. Never repeat the same pattern or phrasing across questions.
+- SOURCE TRACKING: Each attached document starts with "--- START OF DOCUMENT ---" and has a "DOCUMENT ID: [mongo-id]". For EACH question you generate, you MUST identify the exact DOCUMENT ID from which the fact/concept was extracted, and put it in the "sourceMaterialId" property of the output object.`;
 
 // 0.8-2 for high randomness
 const QUESTION_GENERATION_MODEL_TEMPERATURE = 1.4;
+
+// Helper to resolve and validate sourceMaterialId
+const resolveSourceId = (
+  inputSid: string | undefined,
+  materials: Material[],
+): any => {
+  if (materials.length === 1) {
+    return materials[0]._id;
+  }
+  if (inputSid) {
+    const match = materials.find((m) => m._id.toString() === inputSid);
+    if (match) return match._id;
+    try {
+      return new mongo.ObjectId(inputSid);
+    } catch {
+      // Ignore invalid ObjectId strings
+    }
+  }
+  return undefined;
+};
 
 export const generateTrueFalseQuestions = async (
   context: Context,
@@ -103,7 +127,7 @@ export const generateTrueFalseQuestions = async (
     ? `
 CLASSIFICATION REQUIREMENT:
 You must categorize each question by setting the "topicId" field to the MongoDB _id of the most appropriate topic from the following list. Do NOT invent new IDs; only use the exact _id strings listed below:
-${subjectTopics.map(t => `- Topic Name: "${t.name}", ID: "${t._id.toString()}"`).join("\n")}
+${subjectTopics.map((t) => `- Topic Name: "${t.name}", ID: "${t._id.toString()}"`).join("\n")}
 `
     : "";
 
@@ -126,8 +150,12 @@ ${instructions ? `\nAdditional instructions from the teacher: ${instructions}` :
 
     let resolvedTopicId = topic?._id;
     if (isAuto) {
-      const match = subjectTopics.find(t => t._id.toString() === result.topicId);
-      resolvedTopicId = match ? match._id : (subjectTopics[0]?._id || new mongo.ObjectId());
+      const match = subjectTopics.find(
+        (t) => t._id.toString() === result.topicId,
+      );
+      resolvedTopicId = match
+        ? match._id
+        : subjectTopics[0]?._id || new mongo.ObjectId();
     }
 
     const question: Partial<Question> = {
@@ -141,6 +169,10 @@ ${instructions ? `\nAdditional instructions from the teacher: ${instructions}` :
       topicId: resolvedTopicId!,
       teacherId: context.user!._id,
       subjectId: context.subjectId!,
+      sourceMaterialId: resolveSourceId(
+        result.sourceMaterialId,
+        materialObjects,
+      ),
     };
     return [question];
   }
@@ -168,8 +200,10 @@ ${instructions ? `\nAdditional instructions from the teacher: ${instructions}` :
   return result.questions.map((q) => {
     let resolvedTopicId = topic?._id;
     if (isAuto) {
-      const match = subjectTopics.find(t => t._id.toString() === q.topicId);
-      resolvedTopicId = match ? match._id : (subjectTopics[0]?._id || new mongo.ObjectId());
+      const match = subjectTopics.find((t) => t._id.toString() === q.topicId);
+      resolvedTopicId = match
+        ? match._id
+        : subjectTopics[0]?._id || new mongo.ObjectId();
     }
 
     return {
@@ -183,6 +217,7 @@ ${instructions ? `\nAdditional instructions from the teacher: ${instructions}` :
       topicId: resolvedTopicId!,
       teacherId: context.user!._id,
       subjectId: context.subjectId!,
+      sourceMaterialId: resolveSourceId(q.sourceMaterialId, materialObjects),
     };
   });
 };
@@ -206,7 +241,7 @@ export const generateOpenQuestions = async (
     ? `
 CLASSIFICATION REQUIREMENT:
 You must categorize each question by setting the "topicId" field to the MongoDB _id of the most appropriate topic from the following list. Do NOT invent new IDs; only use the exact _id strings listed below:
-${subjectTopics.map(t => `- Topic Name: "${t.name}", ID: "${t._id.toString()}"`).join("\n")}
+${subjectTopics.map((t) => `- Topic Name: "${t.name}", ID: "${t._id.toString()}"`).join("\n")}
 `
     : "";
 
@@ -230,8 +265,12 @@ ${instructions ? `\nAdditional instructions from the teacher: ${instructions}` :
 
     let resolvedTopicId = topic?._id;
     if (isAuto) {
-      const match = subjectTopics.find(t => t._id.toString() === result.topicId);
-      resolvedTopicId = match ? match._id : (subjectTopics[0]?._id || new mongo.ObjectId());
+      const match = subjectTopics.find(
+        (t) => t._id.toString() === result.topicId,
+      );
+      resolvedTopicId = match
+        ? match._id
+        : subjectTopics[0]?._id || new mongo.ObjectId();
     }
 
     const question: Partial<Question> = {
@@ -244,6 +283,10 @@ ${instructions ? `\nAdditional instructions from the teacher: ${instructions}` :
       topicId: resolvedTopicId!,
       teacherId: context.user!._id,
       subjectId: context.subjectId!,
+      sourceMaterialId: resolveSourceId(
+        result.sourceMaterialId,
+        materialObjects,
+      ),
     };
     return [question];
   }
@@ -271,8 +314,10 @@ ${instructions ? `\nAdditional instructions from the teacher: ${instructions}` :
   return result.questions.map((q) => {
     let resolvedTopicId = topic?._id;
     if (isAuto) {
-      const match = subjectTopics.find(t => t._id.toString() === q.topicId);
-      resolvedTopicId = match ? match._id : (subjectTopics[0]?._id || new mongo.ObjectId());
+      const match = subjectTopics.find((t) => t._id.toString() === q.topicId);
+      resolvedTopicId = match
+        ? match._id
+        : subjectTopics[0]?._id || new mongo.ObjectId();
     }
 
     return {
@@ -285,6 +330,7 @@ ${instructions ? `\nAdditional instructions from the teacher: ${instructions}` :
       topicId: resolvedTopicId!,
       teacherId: context.user!._id,
       subjectId: context.subjectId!,
+      sourceMaterialId: resolveSourceId(q.sourceMaterialId, materialObjects),
     };
   });
 };
@@ -309,7 +355,7 @@ export const generateMultipleChoiceQuestions = async (
     ? `
 CLASSIFICATION REQUIREMENT:
 You must categorize each question by setting the "topicId" field to the MongoDB _id of the most appropriate topic from the following list. Do NOT invent new IDs; only use the exact _id strings listed below:
-${subjectTopics.map(t => `- Topic Name: "${t.name}", ID: "${t._id.toString()}"`).join("\n")}
+${subjectTopics.map((t) => `- Topic Name: "${t.name}", ID: "${t._id.toString()}"`).join("\n")}
 `
     : "";
 
@@ -335,8 +381,12 @@ ${instructions ? `\nAdditional instructions from the teacher: ${instructions}` :
 
     let resolvedTopicId = topic?._id;
     if (isAuto) {
-      const match = subjectTopics.find(t => t._id.toString() === result.topicId);
-      resolvedTopicId = match ? match._id : (subjectTopics[0]?._id || new mongo.ObjectId());
+      const match = subjectTopics.find(
+        (t) => t._id.toString() === result.topicId,
+      );
+      resolvedTopicId = match
+        ? match._id
+        : subjectTopics[0]?._id || new mongo.ObjectId();
     }
 
     const question: Partial<Question> = {
@@ -350,6 +400,10 @@ ${instructions ? `\nAdditional instructions from the teacher: ${instructions}` :
       topicId: resolvedTopicId!,
       teacherId: context.user!._id,
       subjectId: context.subjectId!,
+      sourceMaterialId: resolveSourceId(
+        result.sourceMaterialId,
+        materialObjects,
+      ),
     };
     return [question];
   }
@@ -379,8 +433,10 @@ ${instructions ? `\nAdditional instructions from the teacher: ${instructions}` :
   return result.questions.map((q) => {
     let resolvedTopicId = topic?._id;
     if (isAuto) {
-      const match = subjectTopics.find(t => t._id.toString() === q.topicId);
-      resolvedTopicId = match ? match._id : (subjectTopics[0]?._id || new mongo.ObjectId());
+      const match = subjectTopics.find((t) => t._id.toString() === q.topicId);
+      resolvedTopicId = match
+        ? match._id
+        : subjectTopics[0]?._id || new mongo.ObjectId();
     }
 
     return {
@@ -394,6 +450,7 @@ ${instructions ? `\nAdditional instructions from the teacher: ${instructions}` :
       topicId: resolvedTopicId!,
       teacherId: context.user!._id,
       subjectId: context.subjectId!,
+      sourceMaterialId: resolveSourceId(q.sourceMaterialId, materialObjects),
     };
   });
 };
@@ -444,7 +501,7 @@ const createAIGenQuestion = async (
   // If there are materials selected but they have less than 150 characters, reject
   if (materialObjects.length > 0 && totalTextLength < 150) {
     throw createHttpError.BadRequest(
-      `Non è possibile avviare la generazione automatica perché il documento selezionato non contiene testo sufficiente (rilevati solo ${totalTextLength} caratteri). Per garantire l'accuratezza didattica del test ed evitare che l'Intelligenza Artificiale inventi di sana pianta concetti non presenti (fenomeno delle allucinazioni), è necessario che il file di riferimento contenga del testo concreto (come dispense, capitoli di libri o appunti). Ti invitiamo a caricare un documento completo di testo e riprovare!`
+      `Non è possibile avviare la generazione automatica perché il documento selezionato non contiene testo sufficiente (rilevati solo ${totalTextLength} caratteri). Per garantire l'accuratezza didattica del test ed evitare che l'Intelligenza Artificiale inventi di sana pianta concetti non presenti (fenomeno delle allucinazioni), è necessario che il file di riferimento contenga del testo concreto (come dispense, capitoli di libri o appunti). Ti invitiamo a caricare un documento completo di testo e riprovare!`,
     );
   }
 
@@ -464,7 +521,9 @@ const createAIGenQuestion = async (
       subjectId: new mongo.ObjectId(context.subjectId!),
     });
     if (subjectTopics.length === 0) {
-      throw createHttpError.BadRequest(`No topics found for subject ${context.subjectId}. You must create at least one topic first.`);
+      throw createHttpError.BadRequest(
+        `No topics found for subject ${context.subjectId}. You must create at least one topic first.`,
+      );
     }
   }
 

@@ -29,6 +29,19 @@ const editQuestion = async (
     updateData.topicId = new Types.ObjectId(questionData.topicId);
   }
 
+  if (questionData.sourceMaterialId) {
+    if (Types.ObjectId.isValid(questionData.sourceMaterialId)) {
+      updateData.sourceMaterialId = new Types.ObjectId(
+        questionData.sourceMaterialId,
+      );
+    }
+  } else if (
+    questionData.sourceMaterialId === null ||
+    questionData.sourceMaterialId === ""
+  ) {
+    updateData.sourceMaterialId = null as any;
+  }
+
   if (context.subjectId) {
     updateData.subjectId = context.subjectId;
   }

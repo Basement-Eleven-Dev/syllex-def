@@ -27,8 +27,8 @@
   </div>
 
   <!-- ── Info row: esito (se completato) oppure date disponibilità ──────── -->
-  @if (IsCompleted() && AttemptResult()) { @if (AttemptResult()!.correct === 0
-  && AttemptResult()!.wrong === 0) {
+  @if (IsCompleted() && AttemptResult()) { @if (AttemptStatus() !== 'reviewed'
+  || (AttemptResult()!.correct === 0 && AttemptResult()!.wrong === 0)) {
   <div class="stc__info-row stc__info-row--pending-review">
     <span>Da valutare</span>
   </div>
@@ -54,8 +54,8 @@
     <fa-icon [icon]="CalendarIcon" class="stc__cal-icon"></fa-icon>
     <span>
       @if (Test().availableFrom && Test().availableTo) { disponibile dal {{
-      Test().availableFrom | date: 'd MMMM' }} al {{ Test().availableTo |
-      date: 'd MMMM' }} } @else if (Test().availableFrom) { disponibile dal {{
+      Test().availableFrom | date: 'd MMMM' }} al {{ Test().availableTo | date:
+      'd MMMM' }} } @else if (Test().availableFrom) { disponibile dal {{
       Test().availableFrom | date: 'd MMMM' }} } @else { disponibile fino al {{
       Test().availableTo | date: 'd MMMM' }} }
     </span>
@@ -71,7 +71,7 @@
     [routerLink]="Route()"
   >
     @if (AttemptStatus() === 'reviewed' || AttemptStatus() === 'delivered') {
-    Vedi } @else if (AttemptStatus() === 'in-progress') { Riprendi }
-    @else { Fai il test }
+    Vedi } @else if (AttemptStatus() === 'in-progress') { Riprendi } @else { Fai
+    il test }
   </button>
 </div>

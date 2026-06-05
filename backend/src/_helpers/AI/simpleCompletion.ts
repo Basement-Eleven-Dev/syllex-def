@@ -28,13 +28,23 @@ const askStrucuredGemini = async <T>(
   let currentTotalChars = 0;
 
   const textFileParts: Part[] = textFileBuffer
-    .map((buffer) => {
-      let text = buffer.toString("utf-8");
+    .map((buffer, index) => {
+      const m = validMaterials[index];
+      let docText = buffer.toString("utf-8");
+
+      // Wrap content with clear XML boundaries and include ID & Title metadata
+      const startMarker = `\n--- START OF DOCUMENT ---\nDOCUMENT ID: ${m._id?.toString() || ""}\nDOCUMENT TITLE: ${m.name || ""}\n\n`;
+      const endMarker = `\n--- END OF DOCUMENT ---\n`;
+      let text = startMarker + docText + endMarker;
+
       if (currentTotalChars + text.length > MAX_CHARS) {
         const allowedChars = MAX_CHARS - currentTotalChars;
-        if (allowedChars > 0) {
-          text = text.substring(0, allowedChars);
-          currentTotalChars += allowedChars;
+        if (allowedChars > startMarker.length + endMarker.length) {
+          const contentLimit =
+            allowedChars - startMarker.length - endMarker.length;
+          docText = docText.substring(0, contentLimit);
+          text = startMarker + docText + endMarker;
+          currentTotalChars += text.length;
         } else {
           text = "";
         }
