@@ -3,6 +3,7 @@ import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import { connectDatabase } from "../../_helpers/getDatabase";
 import { Question } from "../../models/schemas/question.schema";
+import { Material } from "../../models/schemas/material.schema";
 
 const getQuestionById = async (
   request: APIGatewayProxyEvent,
@@ -16,7 +17,12 @@ const getQuestionById = async (
 
   await connectDatabase();
 
-  const question = await Question.findById(questionId).lean();
+  // Forza il caricamento dello schema Material per evitarne il tree-shaking da parte del bundler
+  const _m = Material;
+
+  const question = await Question.findById(questionId)
+    .populate("sourceMaterialId", "name")
+    .lean();
 
   if (!question) {
     throw createError.NotFound("Question not found");

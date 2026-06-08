@@ -85,7 +85,10 @@ export class TestStats implements OnInit, AfterViewInit, OnChanges {
   }
 
   get classOptions(): SelectOption[] {
-    return (this.classes || []).map((c) => ({ value: c._id || c.id || '', label: c.name }));
+    return (this.classes || []).map((c) => ({
+      value: c._id || c.id || '',
+      label: c.name,
+    }));
   }
 
   onClassChange(newClass: string) {
@@ -95,7 +98,10 @@ export class TestStats implements OnInit, AfterViewInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if ((changes['attempts'] && this.attempts.length > 0) || changes['classes']) {
+    if (
+      (changes['attempts'] && this.attempts.length > 0) ||
+      changes['classes']
+    ) {
       this.processData();
       this.updateCharts();
     }
@@ -105,7 +111,9 @@ export class TestStats implements OnInit, AfterViewInit, OnChanges {
     // Filtra gli attempts in base alla classe selezionata
     let filteredAttempts = [...this.attempts];
     if (this.classSelected) {
-      filteredAttempts = filteredAttempts.filter((a) => a.classId === this.classSelected);
+      filteredAttempts = filteredAttempts.filter(
+        (a) => a.classId === this.classSelected,
+      );
     }
 
     // 1. Estraiamo i punteggi per il grafico della distribuzione
@@ -139,12 +147,35 @@ export class TestStats implements OnInit, AfterViewInit, OnChanges {
           // Caso: Risposta vuota
           stats.blankCount++;
         } else {
-          // Caso: Risposta presente. Dobbiamo verificare se è corretta nelle options
-          const selectedOption = questionData.options?.find(
-            (opt: any) => opt.label === q.answer,
-          );
+          // Determiniamo se la risposta è corretta in modo robusto
+          let isCorrect = false;
 
-          if (selectedOption?.isCorrect) {
+          if (q.status !== undefined && q.status !== null) {
+            isCorrect =
+              q.status === 'correct' ||
+              q.status === 'semi-correct' ||
+              q.status === 'partial';
+          } else if (q.score !== undefined && q.score !== null) {
+            isCorrect = q.score > 0;
+          } else {
+            // Fallback manuale se non c'è ancora lo stato/punteggio (es. tentativi auto-corretti client-side o non salvati)
+            if (questionData.type === 'scelta multipla') {
+              const selectedOption = questionData.options?.find(
+                (opt: any) => opt.label === q.answer,
+              );
+              isCorrect = !!selectedOption?.isCorrect;
+            } else if (questionData.type === 'vero falso') {
+              const correctBool = questionData.correctAnswer;
+              const answerBool =
+                q.answer === 'Vero' || q.answer === true || q.answer === 'true';
+              isCorrect = answerBool === correctBool;
+            } else {
+              // Per risposte aperte non valutate di default è false
+              isCorrect = false;
+            }
+          }
+
+          if (isCorrect) {
             stats.correctCount++;
           } else {
             stats.errorCount++;

@@ -44,6 +44,7 @@ export interface GeneratedQuestion {
   correctAnswer?: boolean;
   options?: GeneratedQuestionOption[];
   topicId?: string;
+  sourceMaterialId?: string;
 }
 
 export interface GenerateMaterialRequest {
@@ -134,7 +135,10 @@ export class AiService {
     };
     try {
       const response = await firstValueFrom(
-        this.http.post<{ questions: GeneratedQuestion[] }>('ai/questions', payload),
+        this.http.post<{ questions: GeneratedQuestion[] }>(
+          'ai/questions',
+          payload,
+        ),
       );
       return { questions: response.questions || [], failedCount: 0 };
     } catch (error) {
@@ -160,7 +164,10 @@ export class AiService {
     };
     try {
       const response = await firstValueFrom(
-        this.http.post<{ material: GeneratedMaterial }>('ai/materials', payload),
+        this.http.post<{ material: GeneratedMaterial }>(
+          'ai/materials',
+          payload,
+        ),
       );
       return response.material;
     } catch (error) {

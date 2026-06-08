@@ -17,6 +17,15 @@ const getStatus = async (request: APIGatewayProxyEvent, context: Context) => {
   question.createdAt = new Date();
   question.updatedAt = new Date();
 
+  if (
+    question.sourceMaterialId &&
+    Types.ObjectId.isValid(question.sourceMaterialId)
+  ) {
+    question.sourceMaterialId = new Types.ObjectId(question.sourceMaterialId);
+  } else {
+    delete question.sourceMaterialId;
+  }
+
   const result = await Question.create(question);
   question._id = result._id;
 

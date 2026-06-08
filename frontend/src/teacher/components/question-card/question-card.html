@@ -4,14 +4,16 @@
   [class.locked]="locked"
   [class.dimmed]="dimmed"
 >
-  <div class=" d-flex flex-column gap-2">
+  <div class="d-flex flex-column gap-2">
     <!-- ── Header: policy badge (banca only) ── -->
     @if (mode === 'banca') {
-    <div class="d-flex flex-row align-items-center justify-content-between mb-3 w-100 gap-2">
+    <div
+      class="d-flex flex-row align-items-center justify-content-between mb-3 w-100 gap-2"
+    >
       @if (question.policy === 'private') {
-        <app-syllex-badge label="Uso Test" color="green" />
+      <app-syllex-badge label="Uso Test" color="green" />
       } @else {
-        <app-syllex-badge label="Esercitazione" color="celestine" />
+      <app-syllex-badge label="Esercitazione" color="celestine" />
       }
       <app-syllex-badge [label]="question.type" color="primary" />
     </div>
@@ -85,11 +87,16 @@
             [disabled]="locked"
             (change)="onSelectOption(label)"
           />
-          <label class="mb-0 flex-grow-1" style="cursor: pointer">{{ label }}</label>
-          @if (locked && showCorrectness && ((label === 'Vero' && question.correctAnswer === true) || (label === 'Falso' && question.correctAnswer === false))) {
+          <label class="mb-0 flex-grow-1" style="cursor: pointer"
+            >{{ label }}</label
+          >
+          @if (locked && showCorrectness && ((label === 'Vero' &&
+          question.correctAnswer === true) || (label === 'Falso' &&
+          question.correctAnswer === false))) {
           <fa-icon [icon]="CheckIcon" class="text-success ms-auto"></fa-icon>
-          }
-          @if (locked && showCorrectness && selectedAnswer === label && !((label === 'Vero' && question.correctAnswer === true) || (label === 'Falso' && question.correctAnswer === false))) {
+          } @if (locked && showCorrectness && selectedAnswer === label &&
+          !((label === 'Vero' && question.correctAnswer === true) || (label ===
+          'Falso' && question.correctAnswer === false))) {
           <fa-icon [icon]="WrongIcon" class="text-danger ms-auto"></fa-icon>
           }
         </li>
@@ -114,11 +121,13 @@
             [disabled]="locked"
             (change)="onSelectOption(option.label)"
           />
-          <label class="mb-0 flex-grow-1" style="cursor: pointer">{{ option.label }}</label>
+          <label class="mb-0 flex-grow-1" style="cursor: pointer"
+            >{{ option.label }}</label
+          >
           @if (locked && showCorrectness && option.isCorrect) {
           <fa-icon [icon]="CheckIcon" class="text-success ms-auto"></fa-icon>
-          }
-          @if (locked && showCorrectness && selectedAnswer === option.label && !option.isCorrect) {
+          } @if (locked && showCorrectness && selectedAnswer === option.label &&
+          !option.isCorrect) {
           <fa-icon [icon]="WrongIcon" class="text-danger ms-auto"></fa-icon>
           }
         </li>
@@ -195,16 +204,24 @@
     }
 
     <!-- ── Correzione ── -->
-    @if (mode === 'ai-review' || (mode === 'student' && locked && showCorrectness)) {
-    @if (question.explanation) {
+    @if (mode === 'ai-review' || (mode === 'student' && locked &&
+    showCorrectness)) { @if (question.explanation) {
     <section class="mt-3">
-      <p class="mb-1 fw-semibold text-muted" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">
+      <p
+        class="mb-1 fw-semibold text-muted"
+        style="
+          font-size: 0.75rem;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        "
+      >
         Correzione
       </p>
-      <p class="mb-0 text-muted small" style="white-space: pre-wrap;">{{ question.explanation }}</p>
+      <p class="mb-0 text-muted small" style="white-space: pre-wrap">
+        {{ question.explanation }}
+      </p>
     </section>
-    }
-    }
+    } }
 
     <!-- ── Student status feedback ── -->
     @if (mode === 'student' && questionStatus) {
@@ -226,6 +243,16 @@
       </div>
       }
     </section>
+    }
+
+    <!-- ── Source Material Link / Info ── -->
+    @if (getSourceName()) {
+    <div
+      class="text-end mt-2 text-muted"
+      style="font-size: 0.725rem; font-style: italic; opacity: 0.75"
+    >
+      Fonte: {{ getSourceName() }}
+    </div>
     }
   </div>
 

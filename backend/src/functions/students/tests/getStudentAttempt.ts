@@ -4,6 +4,7 @@ import { lambdaRequest } from "../../../_helpers/lambdaProxyResponse";
 import { connectDatabase } from "../../../_helpers/getDatabase";
 import { Types, mongo } from "mongoose";
 import { Attempt } from "../../../models/schemas/attempt.schema";
+import { Material } from "../../../models/schemas/material.schema";
 
 const getStudentAttempt = async (
   request: APIGatewayProxyEvent,
@@ -22,10 +23,15 @@ const getStudentAttempt = async (
 
   await connectDatabase();
 
+  // Explicitly reference Material to ensure it's registered
+  const _m = Material;
+
   const attempt = await Attempt.findOne({
     testId: new mongo.ObjectId(testId),
     studentId: new mongo.ObjectId(studentId),
-  }).sort({ _id: -1 });
+  })
+    .populate("questions.question.sourceMaterialId", "name")
+    .sort({ _id: -1 });
 
   return { attempt: attempt ?? null };
 };

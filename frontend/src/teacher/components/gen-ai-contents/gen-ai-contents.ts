@@ -144,29 +144,38 @@ export class GenAiContents implements OnInit {
   );
   readonly disableReason = computed(() => {
     const reasons: string[] = [];
-    
+
     if (this.selectedMaterials().length === 0) {
       reasons.push('Seleziona almeno una risorsa o materiale di riferimento.');
     }
-    
-    if (this.TypeMode() === 'questions' && !this.genForm.get('topicId')?.value) {
+
+    if (
+      this.TypeMode() === 'questions' &&
+      !this.genForm.get('topicId')?.value
+    ) {
       reasons.push('Seleziona un argomento per le domande.');
     }
-    
+
     if (this.formInvalid()) {
-      const topicInvalid = this.TypeMode() === 'questions' && !this.genForm.get('topicId')?.value;
+      const topicInvalid =
+        this.TypeMode() === 'questions' && !this.genForm.get('topicId')?.value;
       if (!topicInvalid) {
         reasons.push('Compila correttamente tutti i parametri richiesti.');
       }
     }
-    
+
     return reasons;
   });
   readonly submitButtonProps = computed(() => ({
-    label: this.IsGenerating() ? 'Generazione in corso...' : 'Genera ' + this.getSelectedTypeName(),
+    label: this.IsGenerating()
+      ? 'Generazione in corso...'
+      : 'Genera ' + this.getSelectedTypeName(),
     variant: 'primary' as const,
     size: 'large' as const,
-    disabled: this.formInvalid() || this.selectedMaterials().length === 0 || this.IsGenerating(),
+    disabled:
+      this.formInvalid() ||
+      this.selectedMaterials().length === 0 ||
+      this.IsGenerating(),
     leftIcon: this.IsGenerating() ? this.SpinnerIcon : this.SparklesIcon,
   }));
   readonly SelectedCount = computed(
@@ -392,10 +401,11 @@ export class GenAiContents implements OnInit {
 
     this.questionsService.createQuestionsBatch(payloads).subscribe({
       next: (response) => {
-        const questionsWithPoints: QuestionWithPoints[] = response.questions.map((q) => ({
-          ...q,
-          points: 1,
-        }));
+        const questionsWithPoints: QuestionWithPoints[] =
+          response.questions.map((q) => ({
+            ...q,
+            points: 1,
+          }));
         this.IsSaving.set(false);
         if (this.IsOffcanvasMode()) {
           this.feedbackService.showFeedback(
@@ -449,6 +459,8 @@ export class GenAiContents implements OnInit {
       topicId: resolvedTopicId,
       subjectId,
       teacherId,
+      sourceMaterialId: q.sourceMaterialId,
+      aiGenerated: true,
     };
     return { TempId: tempId, data, Selected: true };
   }

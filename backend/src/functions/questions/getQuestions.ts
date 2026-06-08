@@ -3,12 +3,16 @@ import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import { connectDatabase } from "../../_helpers/getDatabase";
 import { Types } from "mongoose";
 import { Question } from "../../models/schemas/question.schema";
+import { Material } from "../../models/schemas/material.schema";
 
 const getQuestions = async (
   request: APIGatewayProxyEvent,
   context: Context,
 ) => {
   await connectDatabase();
+
+  // Forza il caricamento dello schema Material per evitarne il tree-shaking da parte del bundler
+  const _m = Material;
 
   // Estraggo i parametri dalla query string
   const {
@@ -76,6 +80,7 @@ const getQuestions = async (
 
   // Query con paginazione
   const questions = await Question.find(filter)
+    .populate("sourceMaterialId", "name")
     .skip(skip)
     .limit(currentPageSize)
     .sort({ createdAt: -1, _id: -1 });
