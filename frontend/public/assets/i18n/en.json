@@ -115,5 +115,21 @@
       "false": "False",
       "source": "Source: {{source}}"
     }
+  },
+  "layout": {
+    "nav": {
+      "topics": "Topics",
+      "help": "How can I help you?"
+    },
+    "sidebar": {
+      "home": "Home",
+      "tests": "Tests",
+      "banca": "Question Bank",
+      "classes": "Classes",
+      "resources": "Files & Resources",
+      "calendar": "Calendar",
+      "lab_ai": "AI Lab",
+      "chat_ai": "AI Chat"
+    }
   }
 }

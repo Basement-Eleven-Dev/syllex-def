@@ -1,5 +1,6 @@
 <nav
   class="bg-primary py-3 px-3 px-md-4 d-flex flex-row align-items-center gap-3 teacher-nav container-fluid"
+  *transloco="let t; read: 'layout.nav'"
 >
   <!-- Subject selector -->
   @if (selectedSubject()) {
@@ -37,7 +38,7 @@
     </div>
     <app-syllex-button
       [props]="{
-          label: 'Argomenti',
+          label: t('topics'),
           variant: 'underline',
           color: 'white',
           size: 'small'
@@ -83,7 +84,7 @@
           font-size: 0.85rem;
           white-space: nowrap;
         "
-        >Come posso aiutarti?</span
+        >{{ t('help') }}</span
       >
     </div>
     

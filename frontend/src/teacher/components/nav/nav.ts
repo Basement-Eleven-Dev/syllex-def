@@ -35,6 +35,7 @@ import { map, Observable } from 'rxjs';
 import { HelpChat } from '../help-chat/help-chat';
 import { SyllexButton } from '../UI/syllex-button/syllex-button';
 import { LanguageSelector } from '../UI/language-selector/language-selector';
+import { TranslocoDirective, TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-nav',
@@ -52,6 +53,8 @@ import { LanguageSelector } from '../UI/language-selector/language-selector';
     HelpChat,
     SyllexButton,
     LanguageSelector,
+    TranslocoDirective,
+    TranslocoPipe,
   ],
   templateUrl: './nav.html',
   styleUrl: './nav.scss',

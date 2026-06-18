@@ -1,4 +1,4 @@
-<div class="flex-fill w-100 card sidebar">
+<div class="flex-fill w-100 card sidebar" *transloco="let t; read: 'layout.sidebar'">
   <div
     class="sidebar-header d-flex align-items-center justify-content-center gap-2 mt-5 px-4"
   >
@@ -94,7 +94,7 @@
           <path d="M3 9h18M8 3v4M16 3v4" />
         </svg>
         } }
-        <span class="routeLabel slim-hide">{{route.label}}</span>
+        <span class="routeLabel slim-hide">{{ t(route.label) }}</span>
       </div>
       }
     </div>
@@ -105,14 +105,14 @@
         (click)="navigateToLabAi()"
         tourAnchor="teacher-ai-lab"
       >
-        <span class="slim-hide">Lab AI</span>
+        <span class="slim-hide">{{ t('lab_ai') }}</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="#C8F23F" stroke-width="2">
           <path d="M9 3v5L5 14a4 4 0 0 0 3.5 6h7A4 4 0 0 0 19 14l-4-6V3" />
           <path d="M9 3h6" />
         </svg>
       </div>
       <div class="side-btn chat" routerLink="/t/agente">
-        <span class="slim-hide">Chat AI</span>
+        <span class="slim-hide">{{ t('chat_ai') }}</span>
         <svg viewBox="0 0 24 24" fill="#fff">
           <path d="M12 3l1.6 4L18 8.5l-4.4 1.5L12 14l-1.6-4L6 8.5 10.4 7z" />
           <path d="M18 13l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z" />
