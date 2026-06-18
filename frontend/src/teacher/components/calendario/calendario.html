@@ -1,3 +1,4 @@
+<ng-container *transloco="let t; read: 'calendar'">
 <div [class]="showCloseButton ? 'modal-body p-4 pt-5' : ''">
   @if (showCloseButton) {
   <button
@@ -10,10 +11,10 @@
   <div class="mb-4 d-flex flex-row justify-content-between align-items-center">
     <div class="flex-fill">
       <h4 class="text-dark mb-0">
-        Calendario di {{ materiaService.materiaSelected()?.name }}
+        {{ t('title', { subject: materiaService.materiaSelected()?.name || '' }) }}
       </h4>
       <p class="text-dark fw-light mb-0">
-        Tieni traccia dei test che hai fissato per i tuoi studenti
+        {{ t('desc') }}
       </p>
     </div>
   </div>
@@ -38,7 +39,7 @@
               class="fw-semibold text-capitalize fs-5 text-primary"
               style="min-width: 140px; text-align: center"
             >
-              {{ CurrentDate() | date: 'MMMM yyyy' : '' : 'it' }}
+              {{ CurrentDate() | date: 'MMMM yyyy' : '' : (translocoService.getActiveLang() === 'it' ? 'it' : 'en-US') }}
             </span>
             <button
               class="btn text-primary border-0 p-1 lh-1"
@@ -50,8 +51,7 @@
         </div>
       </div>
       <div class="d-flex flex-row mb-3">
-        @for (day of ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom']; track
-        $index) {
+        @for (day of translatedDays; track $index) {
         <div class="flex-fill text-center fw-bold text-muted" style="font-size: 0.85rem">
           {{ day | uppercase }}
         </div>
@@ -87,9 +87,9 @@
         class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between mb-3 px-1 gap-3"
       >
         <div class="d-flex flex-column gap-2 text-primary">
-          <p class="m-0">Eventi della giornata</p>
+          <p class="m-0">{{ t('events_of_day') }}</p>
           <h4 class="fw-semibold mb-0">
-            {{ SelectedDate() | date: 'fullDate' | titlecase }}
+            {{ SelectedDate() | date: 'fullDate' : '' : (translocoService.getActiveLang() === 'it' ? 'it' : 'en-US') | titlecase }}
           </h4>
         </div>
 
@@ -97,7 +97,7 @@
         <app-syllex-button
           class="calendar-add-btn"
           [props]="{
-            label: 'Nuovo evento',
+            label: t('btn_new_event'),
             variant: 'primary',
             size: 'medium',
             leftIcon: CalendarIcon
@@ -125,13 +125,13 @@
               @if (!readonly()) {
               <div class="d-flex flex-wrap gap-2">
                 <app-syllex-button
-                  [props]="{ label: 'Modifica', variant: 'primary', color: 'celestine', size: 'small' }"
+                  [props]="{ label: t('btn_edit'), variant: 'primary', color: 'celestine', size: 'small' }"
                   (clicked)="editEvent(event._id!)"
                 />
                 <app-syllex-button
-                  [props]="{ label: 'Elimina', variant: 'primary', color: 'danger', size: 'small' }"
+                  [props]="{ label: t('btn_delete'), variant: 'primary', color: 'danger', size: 'small' }"
                   confirmAction
-                  confirmMessage="Sei sicuro di voler eliminare questo evento?"
+                  [confirmMessage]="t('confirm_delete_event')"
                   (confirmed)="deleteEvent(event._id!)"
                 />
               </div>
@@ -150,11 +150,11 @@
             </div>
             <p class="m-0 text-muted small">
               @if (test.questions && test.questions.length) {
-                <span>{{ test.questions.length }} {{ test.questions.length === 1 ? 'domanda' : 'domande' }}</span>
+                <span>{{ test.questions.length !== 1 ? t('questions_count', { count: test.questions.length }) : t('question_count', { count: test.questions.length }) }}</span>
               }
               @if (test.maxScore) {
                 <span [class.ms-2]="test.questions && test.questions.length">
-                  {{ (test.questions && test.questions.length) ? '• ' : '' }}Punteggio max: {{ test.maxScore }} pt
+                  {{ (test.questions && test.questions.length) ? '• ' : '' }}{{ t('max_score', { score: test.maxScore }) }}
                 </span>
               }
               @if (test.timeLimit) {
@@ -166,12 +166,12 @@
               @if (!readonly()) {
               <div class="d-flex flex-wrap gap-2">
                 <app-syllex-button
-                  [props]="{ label: 'Modifica', variant: 'primary', color: 'celestine', size: 'small', link: '/t/tests/edit/' + test._id }"
+                  [props]="{ label: t('btn_edit'), variant: 'primary', color: 'celestine', size: 'small', link: '/t/tests/edit/' + test._id }"
                 />
                 <app-syllex-button
-                  [props]="{ label: 'Elimina', variant: 'primary', color: 'danger', size: 'small' }"
+                  [props]="{ label: t('btn_delete'), variant: 'primary', color: 'danger', size: 'small' }"
                   confirmAction
-                  confirmMessage="Sei sicuro di voler eliminare questo test?"
+                  [confirmMessage]="t('confirm_delete_test')"
                   (confirmed)="deleteTest(test._id!)"
                 />
               </div>
@@ -180,7 +180,7 @@
           </div>
           } @if (SelectedDateEvents().length === 0 && SelectedDateTests().length === 0) {
           <p class="text-muted text-center mt-4 pt-3">
-            Nessun evento per questa giornata
+            {{ t('empty_events') }}
           </p>
           }
         </div>
@@ -196,3 +196,4 @@
     </div>
   </div>
 </div>
+</ng-container>

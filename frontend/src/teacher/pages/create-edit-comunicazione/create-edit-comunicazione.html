@@ -1,8 +1,9 @@
+<ng-container *transloco="let t; read: 'com_modal'">
 <div [class.p-4]="activeModal" [class.p-md-5]="activeModal">
   @if (!activeModal) {
   <app-back-to
     [path]="'/t/calendario'"
-    [label]="'Torna al calendario'"
+    [label]="t('back_to')"
   ></app-back-to>
   } @else {
   <div class="d-flex justify-content-end mb-2">
@@ -18,7 +19,7 @@
   <div class="d-flex flex-row align-items-center justify-content-between mb-4">
     <div>
       <h2 class="text-dark fw-semibold mb-1 fs-3">
-        {{ PageTitle() }} comunicazione
+        {{ PageTitle() }}
       </h2>
       <p class="text-muted mb-0 small">{{ PageDescription() }}</p>
     </div>
@@ -26,7 +27,7 @@
     <div>
       <app-syllex-button
         [props]="{
-          label: 'Elimina',
+          label: t('delete'),
           variant: 'primary',
           color: 'danger',
           size: 'medium',
@@ -43,13 +44,13 @@
   <form [formGroup]="ComunicazioneForm" (ngSubmit)="onSave()" class="pb-5">
     <section class="form-section">
       <div class="mb-3">
-        <label for="titolo" class="form-label text-dark">Titolo</label>
+        <label for="titolo" class="form-label text-dark">{{ t('title_lbl') }}</label>
         <input
           type="text"
           id="titolo"
           class="form-control custom-input"
           formControlName="title"
-          placeholder="Inserisci il titolo della comunicazione"
+          [placeholder]="t('title_ph')"
           [class.is-invalid]="
             ComunicazioneForm.get('title')?.invalid &&
             ComunicazioneForm.get('title')?.touched
@@ -57,17 +58,17 @@
         />
         @if(ComunicazioneForm.get('title')?.invalid &&
         ComunicazioneForm.get('title')?.touched) {
-        <div class="invalid-feedback">Il titolo è obbligatorio</div>
+        <div class="invalid-feedback">{{ t('title_req') }}</div>
         }
       </div>
       <div class="mb-3">
-        <label for="contenuto" class="form-label text-dark">Contenuto</label>
+        <label for="contenuto" class="form-label text-dark">{{ t('content_lbl') }}</label>
         <textarea
           id="contenuto"
           class="form-control custom-input"
           formControlName="content"
           rows="6"
-          placeholder="Inserisci il contenuto della comunicazione"
+          [placeholder]="t('content_ph')"
           [class.is-invalid]="
             ComunicazioneForm.get('content')?.invalid &&
             ComunicazioneForm.get('content')?.touched
@@ -75,7 +76,7 @@
         ></textarea>
         @if(ComunicazioneForm.get('content')?.invalid &&
         ComunicazioneForm.get('content')?.touched) {
-        <div class="invalid-feedback">Il contenuto è obbligatorio</div>
+        <div class="invalid-feedback">{{ t('content_req') }}</div>
         }
       </div>
     </section>
@@ -83,19 +84,19 @@
     <section class="form-section mt-4 w-100">
       <div class="row g-4">
         <div class="col-md-5 col-12">
-          <label class="form-label text-dark mb-3">Classi destinatarie</label>
+          <label class="form-label text-dark mb-3">{{ t('classes_lbl') }}</label>
           <app-class-selector
             [selectedClassIds]="assignedClasses"
             (selectedClassIdsChange)="onClassesChange($event)"
           ></app-class-selector>
           @if(ComunicazioneForm.get('classes')?.invalid &&
           ComunicazioneForm.get('classes')?.touched) {
-          <div class="text-danger small mt-2">Seleziona almeno una classe</div>
+          <div class="text-danger small mt-2">{{ t('classes_req') }}</div>
           }
         </div>
         <div class="col-md-7 col-12">
           <label class="form-label text-dark fw-bold mb-3"
-            >Materiali allegati (opzionale)</label
+            >{{ t('materials_lbl') }}</label
           >
           <app-materiali-selector
             [initialMaterialIds]="MaterialIds()"
@@ -110,7 +111,7 @@
       @if (activeModal) {
       <app-syllex-button
         [props]="{
-          label: 'Annulla',
+          label: t('cancel'),
           variant: 'outline',
           size: 'large',
           disabled: IsLoading()
@@ -120,7 +121,7 @@
       }
       <app-syllex-button
         [props]="{
-          label: IsLoading() ? 'Salvataggio...' : 'Salva',
+          label: IsLoading() ? t('saving') : t('save'),
           variant: 'primary',
           size: 'large',
           disabled: IsLoading()
@@ -130,3 +131,4 @@
     </div>
   </form>
 </div>
+</ng-container>
