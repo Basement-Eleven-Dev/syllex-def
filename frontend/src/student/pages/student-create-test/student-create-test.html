@@ -1,323 +1,324 @@
-<!-- Back Button -->
-<app-back-to [path]="'/s/tests'" [label]="'Torna ai test'" />
+<ng-container *transloco="let t; read: 'student_create_test'">
+  <!-- Back Button -->
+  <app-back-to [path]="'/s/tests'" [label]="t('back_to_tests')" />
 
-<!-- Page Header using Syllex Page Header component -->
-<app-syllex-page-header
-  title="Crea test di auto-valutazione"
-  description="Configura un test personalizzato per esercitarti sugli argomenti che preferisci"
->
-</app-syllex-page-header>
+  <!-- Page Header using Syllex Page Header component -->
+  <app-syllex-page-header
+    [title]="t('header_title')"
+    [description]="t('header_desc')"
+  >
+  </app-syllex-page-header>
 
-<div class="row g-4">
-  <!-- Colonna sinistra: configurazione -->
-  <div class="col-12 col-xl-8">
-    <!-- Nome del test -->
-    <div class="config-card mb-4">
-      <div class="config-card__header">
-        <div>
-          <h5 class="mb-0 fw-semibold">Nome del test</h5>
-          <p class="text-muted small mb-0">
-            Assegna un nome personalizzato al test (default: Auto-valutazione)
-          </p>
+  <div class="row g-4">
+    <!-- Colonna sinistra: configurazione -->
+    <div class="col-12 col-xl-8">
+      <!-- Nome del test -->
+      <div class="config-card mb-4">
+        <div class="config-card__header">
+          <div>
+            <h5 class="mb-0 fw-semibold">{{ t('test_name_label') }}</h5>
+            <p class="text-muted small mb-0">{{ t('test_name_desc') }}</p>
+          </div>
         </div>
-      </div>
-      <div class="config-card__body">
-        <input
-          type="text"
-          class="form-control custom-input"
-          placeholder="Auto-valutazione"
-          maxlength="100"
-          [value]="TestName()"
-          (input)="TestName.set($any($event.target).value)"
-        />
-      </div>
-    </div>
-
-    <!-- Step 1: Materia (Using Syllex Select Pill) -->
-    <div class="config-card mb-4">
-      <div class="config-card__header">
-        <span class="config-card__step">1</span>
-        <div>
-          <h5 class="mb-0 fw-semibold">Materia</h5>
-          <p class="text-muted small mb-0">
-            Scegli su quale materia vuoi esercitarti
-          </p>
-        </div>
-      </div>
-      <div class="config-card__body">
-        <app-syllex-select-input
-          placeholder="Seleziona una materia..."
-          [value]="SelectedSubjectId()"
-          [options]="SubjectOptions()"
-          (valueChange)="onSubjectChange($event)"
-          style="width: 100%; max-width: 400px;"
-        />
-      </div>
-    </div>
-
-    <!-- Step 2: Topic (visibile solo dopo aver scelto la materia) -->
-    @if (SelectedSubject()) {
-    <div class="config-card mb-4">
-      <div class="config-card__header flex-column flex-sm-row align-items-start align-items-sm-center gap-3">
-        <span class="config-card__step">2</span>
-        <div class="flex-grow-1">
-          <h5 class="mb-0 fw-semibold">Argomenti</h5>
-          <p class="text-muted small mb-0">
-            Seleziona uno o più argomenti su cui concentrarti
-          </p>
-        </div>
-        <div class="d-flex gap-2 align-items-center">
-          <app-syllex-button
-            [props]="{ label: 'Tutti', variant: 'primary', color: 'celestine', size: 'small' }"
-            (clicked)="selectAllTopics()"
-          />
-          <app-syllex-button
-            [props]="{ label: 'Nessuno', variant: 'outline', color: 'white', size: 'small' }"
-            (clicked)="clearTopics()"
-          />
-        </div>
-      </div>
-      <div class="config-card__body">
-        <div class="d-flex flex-wrap gap-2">
-          @for (topic of AvailableTopics(); track topic._id) {
-          <button
-            type="button"
-            class="btn topic-btn"
-            [class.topic-btn--selected]="isTopicSelected(topic._id)"
-            (click)="toggleTopic(topic._id)"
-          >
-            @if (isTopicSelected(topic._id)) {
-            <fa-icon [icon]="CheckIcon" class="me-1 small" />
-            } {{ topic.name }}
-          </button>
-          } @empty {
-          <p class="text-muted small fst-italic mb-0">
-            Nessun argomento disponibile per questa materia
-          </p>
-          }
-        </div>
-      </div>
-    </div>
-    }
-
-    <!-- Step 3: Numero domande -->
-    @if (SelectedTopicIds().size > 0) {
-    <div class="config-card mb-4">
-      <div class="config-card__header">
-        <span class="config-card__step">3</span>
-        <div>
-          <h5 class="mb-0 fw-semibold">Numero di domande</h5>
-          <p class="text-muted small mb-0">
-            Quante domande vuoi nel test? (1 – 100)
-          </p>
-        </div>
-      </div>
-      <div class="config-card__body">
-        <div class="d-flex align-items-center gap-3">
+        <div class="config-card__body">
           <input
-            type="range"
-            class="form-range flex-grow-1"
-            min="1"
-            max="20"
-            step="1"
-            [value]="QuestionCount()"
-            (input)="setQuestionCount($any($event.target).value)"
+            type="text"
+            class="form-control custom-input"
+            [placeholder]="t('test_name_placeholder')"
+            maxlength="100"
+            [value]="TestName()"
+            (input)="TestName.set($any($event.target).value)"
           />
-          <div class="question-count-badge">{{ QuestionCount() }}</div>
-        </div>
-        <div class="d-flex justify-content-between text-muted small mt-1 px-1">
-          <span>1</span>
-          <span>5</span>
-          <span>10</span>
-          <span>15</span>
-          <span>20</span>
-        </div>
-
-        @if (AvailableQuestionsCount() !== null && AvailableQuestionsCount()! > 0) {
-        <div class="mt-3 d-flex align-items-center gap-2">
-          <fa-icon [icon]="CheckIcon" class="text-success small" />
-          <span class="text-muted small">
-            Abbiamo trovato <strong>{{ AvailableQuestionsCount() }}</strong>
-            domande per questi argomenti.
-          </span>
-        </div>
-        }
-      </div>
-    </div>
-
-    <!-- Step 4: Tipologie da escludere -->
-    <div class="config-card mb-4">
-      <div class="config-card__header">
-        <span class="config-card__step">4</span>
-        <div>
-          <h5 class="mb-0 fw-semibold">Tipologie di domanda</h5>
-          <p class="text-muted small mb-0">
-            Spunta le tipologie da <strong>escludere</strong> dal test
-          </p>
         </div>
       </div>
-      <div class="config-card__body">
-        <div class="d-flex flex-wrap gap-3">
-          @for (type of AllQuestionTypes; track type) {
-          <div
-            class="type-toggle"
-            [class.type-toggle--excluded]="isTypeExcluded(type)"
-            (click)="toggleExcludedType(type)"
-          >
-            @if (isTypeExcluded(type)) {
-            <fa-icon [icon]="RemoveIcon" class="me-2 text-danger small" />
-            <span class="text-danger text-decoration-line-through"
-              >{{ type }}</span
+
+      <!-- Step 1: Materia (Using Syllex Select Pill) -->
+      <div class="config-card mb-4">
+        <div class="config-card__header">
+          <span class="config-card__step">1</span>
+          <div>
+            <h5 class="mb-0 fw-semibold">{{ t('subject_label') }}</h5>
+            <p class="text-muted small mb-0">{{ t('subject_desc') }}</p>
+          </div>
+        </div>
+        <div class="config-card__body">
+          <app-syllex-select-input
+            [placeholder]="t('subject_select_placeholder')"
+            [value]="SelectedSubjectId()"
+            [options]="SubjectOptions()"
+            (valueChange)="onSubjectChange($event)"
+            style="width: 100%; max-width: 400px"
+          />
+        </div>
+      </div>
+
+      <!-- Topic (visibile solo dopo aver scelto la materia) -->
+      @if (SelectedSubject()) {
+      <div class="config-card mb-4">
+        <div
+          class="config-card__header flex-column flex-sm-row align-items-start align-items-sm-center gap-3"
+        >
+          <span class="config-card__step">2</span>
+          <div class="flex-grow-1">
+            <h5 class="mb-0 fw-semibold">{{ t('topics_label') }}</h5>
+            <p class="text-muted small mb-0">{{ t('topics_desc') }}</p>
+          </div>
+          <div class="d-flex gap-2 align-items-center">
+            <app-syllex-button
+              [props]="{ label: t('btn_all'), variant: 'primary', color: 'celestine', size: 'small' }"
+              (clicked)="selectAllTopics()"
+            />
+            <app-syllex-button
+              [props]="{ label: t('btn_none'), variant: 'outline', color: 'white', size: 'small' }"
+              (clicked)="clearTopics()"
+            />
+          </div>
+        </div>
+        <div class="config-card__body">
+          <div class="d-flex flex-wrap gap-2">
+            @for (topic of AvailableTopics(); track topic._id) {
+            <button
+              type="button"
+              class="btn topic-btn"
+              [class.topic-btn--selected]="isTopicSelected(topic._id)"
+              (click)="toggleTopic(topic._id)"
             >
-            } @else {
-            <fa-icon [icon]="CheckIcon" class="me-2 text-success small" />
-            <span>{{ type }}</span>
+              @if (isTopicSelected(topic._id)) {
+              <fa-icon [icon]="CheckIcon" class="me-1 small" />
+              } {{ topic.name }}
+            </button>
+            } @empty {
+            <p class="text-muted small fst-italic mb-0">
+              {{ t('no_topics_available') }}
+            </p>
             }
+          </div>
+        </div>
+      </div>
+      }
+
+      <!-- Numero domande -->
+      @if (SelectedTopicIds().size > 0) {
+      <div class="config-card mb-4">
+        <div class="config-card__header">
+          <span class="config-card__step">3</span>
+          <div>
+            <h5 class="mb-0 fw-semibold">{{ t('questions_count_label') }}</h5>
+            <p class="text-muted small mb-0">{{ t('questions_count_desc') }}</p>
+          </div>
+        </div>
+        <div class="config-card__body">
+          <div class="d-flex align-items-center gap-3">
+            <input
+              type="range"
+              class="form-range flex-grow-1"
+              min="1"
+              max="20"
+              step="1"
+              [value]="QuestionCount()"
+              (input)="setQuestionCount($any($event.target).value)"
+            />
+            <div class="question-count-badge">{{ QuestionCount() }}</div>
+          </div>
+          <div
+            class="d-flex justify-content-between text-muted small mt-1 px-1"
+          >
+            <span>1</span>
+            <span>5</span>
+            <span>10</span>
+            <span>15</span>
+            <span>20</span>
+          </div>
+
+          @if (AvailableQuestionsCount() !== null && AvailableQuestionsCount()!
+          > 0) {
+          <div class="mt-3 d-flex align-items-center gap-2">
+            <fa-icon [icon]="CheckIcon" class="text-success small" />
+            <span class="text-muted small">
+              {{ t('found_prefix') }}
+              <strong>{{ AvailableQuestionsCount() }}</strong> {{
+              t('found_suffix') }}
+            </span>
           </div>
           }
         </div>
-        @if (ExcludedTypes().size === AllQuestionTypes.length) {
-        <div class="alert alert-warning mt-3 mb-0 py-2 small">
-          Hai escluso tutte le tipologie. Almeno una deve essere attiva.
+      </div>
+
+      <!-- Tipologie da escludere -->
+      <div class="config-card mb-4">
+        <div class="config-card__header">
+          <span class="config-card__step">4</span>
+          <div>
+            <h5 class="mb-0 fw-semibold">{{ t('question_types_label') }}</h5>
+            <p class="text-muted small mb-0">
+              {{ t('question_types_desc_prefix') }}
+              <strong>{{ t('exclude') }}</strong> {{
+              t('question_types_desc_suffix') }}
+            </p>
+          </div>
+        </div>
+        <div class="config-card__body">
+          <div class="d-flex flex-wrap gap-3">
+            @for (type of AllQuestionTypes; track type) {
+            <div
+              class="type-toggle"
+              [class.type-toggle--excluded]="isTypeExcluded(type)"
+              (click)="toggleExcludedType(type)"
+            >
+              @if (isTypeExcluded(type)) {
+              <fa-icon [icon]="RemoveIcon" class="me-2 text-danger small" />
+              <span class="text-danger text-decoration-line-through"
+                >{{ t('type_' + getSanitizedType(type)) }}</span
+              >
+              } @else {
+              <fa-icon [icon]="CheckIcon" class="me-2 text-success small" />
+              <span>{{ t('type_' + getSanitizedType(type)) }}</span>
+              }
+            </div>
+            }
+          </div>
+          @if (ExcludedTypes().size === AllQuestionTypes.length) {
+          <div class="alert alert-warning mt-3 mb-0 py-2 small">
+            {{ t('excluded_all_warning') }}
+          </div>
+          }
+        </div>
+      </div>
+
+      <!-- Tempo -->
+      <div class="config-card mb-4">
+        <div class="config-card__header">
+          <span class="config-card__step">5</span>
+          <div class="flex-grow-1">
+            <h5 class="mb-0 fw-semibold">{{ t('time_limit_label') }}</h5>
+            <p class="text-muted small mb-0">{{ t('time_limit_desc') }}</p>
+          </div>
+          <div class="form-check form-switch ms-auto">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              role="switch"
+              id="timeLimitSwitch"
+              [checked]="TimeLimitEnabled()"
+              (change)="TimeLimitEnabled.set($any($event.target).checked)"
+            />
+          </div>
+        </div>
+        @if (TimeLimitEnabled()) {
+        <div class="config-card__body">
+          <div class="d-flex align-items-center gap-3">
+            <input
+              type="number"
+              class="form-control custom-input"
+              style="max-width: 120px"
+              min="1"
+              max="180"
+              [value]="TimeLimit()"
+              (input)="setTimeLimit($any($event.target).value)"
+            />
+            <span class="text-muted">{{ t('minutes') }}</span>
+          </div>
         </div>
         }
       </div>
-    </div>
-
-    <!-- Step 5: Tempo -->
-    <div class="config-card mb-4">
-      <div class="config-card__header">
-        <span class="config-card__step">5</span>
-        <div class="flex-grow-1">
-          <h5 class="mb-0 fw-semibold">Limite di tempo</h5>
-          <p class="text-muted small mb-0">
-            Imposta un conto alla rovescia (opzionale)
-          </p>
-        </div>
-        <div class="form-check form-switch ms-auto">
-          <input
-            class="form-check-input"
-            type="checkbox"
-            role="switch"
-            id="timeLimitSwitch"
-            [checked]="TimeLimitEnabled()"
-            (change)="TimeLimitEnabled.set($any($event.target).checked)"
-          />
-        </div>
-      </div>
-      @if (TimeLimitEnabled()) {
-      <div class="config-card__body">
-        <div class="d-flex align-items-center gap-3">
-          <input
-            type="number"
-            class="form-control custom-input"
-            style="max-width: 120px"
-            min="1"
-            max="180"
-            [value]="TimeLimit()"
-            (input)="setTimeLimit($any($event.target).value)"
-          />
-          <span class="text-muted">minuti</span>
-        </div>
-      </div>
       }
     </div>
-    }
-  </div>
 
-  <!-- Colonna destra: riepilogo + conferma -->
-  <div class="col-12 col-xl-4">
-    <div class="summary-card sticky-top" style="top: 80px">
-      <h6 class="fw-semibold mb-3">Riepilogo</h6>
+    <!-- Colonna destra: riepilogo + conferma -->
+    <div class="col-12 col-xl-4">
+      <div class="summary-card sticky-top" style="top: 80px">
+        <h6 class="fw-semibold mb-3">{{ t('summary_title') }}</h6>
 
-      <div class="summary-row">
-        <span class="summary-label">Nome</span>
-        <span class="summary-value fw-semibold"
-          >{{ TestName().trim() || 'Auto-valutazione' }}</span
+        <div class="summary-row">
+          <span class="summary-label">{{ t('summary_name') }}</span>
+          <span class="summary-value fw-semibold"
+            >{{ TestName().trim() || t('test_name_placeholder') }}</span
+          >
+        </div>
+
+        <div class="summary-row">
+          <span class="summary-label">{{ t('summary_subject') }}</span>
+          <span class="summary-value">
+            @if (SelectedSubject()) { {{ SelectedSubject()!.name }} } @else {
+            <span class="text-muted fst-italic">{{ t('not_selected') }}</span>
+            }
+          </span>
+        </div>
+
+        <div class="summary-row">
+          <span class="summary-label">{{ t('summary_topics') }}</span>
+          <span class="summary-value">
+            @if (SelectedTopicIds().size > 0) { {{ t('topics_selected_count', {
+            count: SelectedTopicIds().size }) }} } @else {
+            <span class="text-muted fst-italic">{{ t('none') }}</span>
+            }
+          </span>
+        </div>
+
+        <div class="summary-row">
+          <span class="summary-label">{{ t('summary_questions') }}</span>
+          <span class="summary-value fw-semibold">{{ QuestionCount() }}</span>
+        </div>
+
+        <div class="summary-row">
+          <span class="summary-label">{{ t('summary_excluded_types') }}</span>
+          <span class="summary-value">
+            @if (ExcludedTypes().size === 0) {
+            <span class="text-muted fst-italic">{{ t('none_feminine') }}</span>
+            } @else { {{ ExcludedTypes().size }} }
+          </span>
+        </div>
+
+        <div class="summary-row">
+          <span class="summary-label">{{ t('summary_time_limit') }}</span>
+          <span class="summary-value">
+            @if (TimeLimitEnabled()) { {{ TimeLimit() }} {{ t('min_abbrev') }} }
+            @else {
+            <span class="text-muted fst-italic">{{ t('none') }}</span>
+            }
+          </span>
+        </div>
+
+        <hr />
+
+        @if (ShowCountWarning()) {
+        <div
+          class="alert alert-warning mb-3 py-2 small d-flex align-items-center gap-2"
         >
-      </div>
+          <fa-icon [icon]="RemoveIcon" class="text-warning" />
+          <span>
+            {{ t('warning_few_questions', { count: AvailableQuestionsCount() })
+            }}
+          </span>
+        </div>
+        } @if (AvailableQuestionsCount() === 0 && SelectedTopicIds().size > 0) {
+        <div
+          class="alert alert-danger mb-3 py-2 small d-flex align-items-center gap-2"
+        >
+          <fa-icon [icon]="RemoveIcon" />
+          <span>{{ t('error_no_questions') }}</span>
+        </div>
+        }
 
-      <div class="summary-row">
-        <span class="summary-label">Materia</span>
-        <span class="summary-value">
-          @if (SelectedSubject()) { {{ SelectedSubject()!.name }} } @else {
-          <span class="text-muted fst-italic">Non selezionata</span>
-          }
-        </span>
-      </div>
-
-      <div class="summary-row">
-        <span class="summary-label">Argomenti</span>
-        <span class="summary-value">
-          @if (SelectedTopicIds().size > 0) { {{ SelectedTopicIds().size }}
-          selezionat{{ SelectedTopicIds().size === 1 ? 'o' : 'i' }} } @else {
-          <span class="text-muted fst-italic">Nessuno</span>
-          }
-        </span>
-      </div>
-
-      <div class="summary-row">
-        <span class="summary-label">Domande</span>
-        <span class="summary-value fw-semibold">{{ QuestionCount() }}</span>
-      </div>
-
-      <div class="summary-row">
-        <span class="summary-label">Tipologie escluse</span>
-        <span class="summary-value">
-          @if (ExcludedTypes().size === 0) {
-          <span class="text-muted fst-italic">Nessuna</span>
-          } @else { {{ ExcludedTypes().size }} }
-        </span>
-      </div>
-
-      <div class="summary-row">
-        <span class="summary-label">Tempo limite</span>
-        <span class="summary-value">
-          @if (TimeLimitEnabled()) { {{ TimeLimit() }} min } @else {
-          <span class="text-muted fst-italic">Nessuno</span>
-          }
-        </span>
-      </div>
-
-      <hr />
-
-      @if (ShowCountWarning()) {
-      <div
-        class="alert alert-warning mb-3 py-2 small d-flex align-items-center gap-2"
-      >
-        <fa-icon [icon]="RemoveIcon" class="text-warning" />
-        <span>
-          Ne abbiamo trovate solo {{ AvailableQuestionsCount() }}. Vuoi
-          proseguire comunque?
-        </span>
-      </div>
-      } @if (AvailableQuestionsCount() === 0 && SelectedTopicIds().size > 0) {
-      <div
-        class="alert alert-danger mb-3 py-2 small d-flex align-items-center gap-2"
-      >
-        <fa-icon [icon]="RemoveIcon" />
-        <span>Nessuna domanda trovata per i criteri scelti.</span>
-      </div>
-      }
-
-      <app-syllex-button
-        class="w-100 d-block mt-3"
-        [props]="{
-          label: IsSubmitting() ? 'Generazione in corso...' : (ShowCountWarning() ? 'Crea comunque (' + AvailableQuestionsCount() + ' dom.)' : 'Crea il test'),
+        <app-syllex-button
+          class="w-100 d-block mt-3"
+          [props]="{
+          label: IsSubmitting() ? t('generating') : (ShowCountWarning() ? t('create_anyway_btn', { count: AvailableQuestionsCount() }) : t('create_test_btn')),
           variant: 'primary',
           color: 'celestine',
           size: 'large',
           disabled: !IsFormValid() || IsSubmitting() || ExcludedTypes().size === AllQuestionTypes.length,
           leftIcon: IsSubmitting() ? undefined : CheckIcon
         }"
-        (clicked)="onSubmit()"
-      />
+          (clicked)="onSubmit()"
+        />
 
-      @if (!IsFormValid()) {
-      <p class="text-white-50 small text-center mt-3 mb-0">
-        Completa tutti i campi obbligatori per continuare
-      </p>
-      }
+        @if (!IsFormValid()) {
+        <p class="text-white-50 small text-center mt-3 mb-0">
+          {{ t('complete_fields_warning') }}
+        </p>
+        }
+      </div>
     </div>
   </div>
-</div>
+</ng-container>

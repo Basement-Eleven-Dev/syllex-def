@@ -1,77 +1,80 @@
-<div class="stc d-flex flex-column" [routerLink]="Route()">
-  <!-- ── Header: subject chip + type icon ──────────────────────────────── -->
-  <div class="stc__header-row">
-    <span class="stc__subject-chip">{{ Test().subjectName }}</span>
-    <fa-icon
-      [icon]="IsAutoEval() ? FlaskIcon : TeacherIcon"
-      class="stc__type-icon"
-      [class.stc__type-icon--autoval]="IsAutoEval()"
-      [class.stc__type-icon--teacher]="!IsAutoEval()"
-      [title]="IsAutoEval() ? 'Autovalutazione' : 'Test del docente'"
-    ></fa-icon>
-  </div>
+<ng-container *transloco="let t; read: 'student_test_card'">
+  <div class="stc d-flex flex-column" [routerLink]="Route()">
+    <!-- ── Header: subject chip + type icon ──────────────────────────────── -->
+    <div class="stc__header-row">
+      <span class="stc__subject-chip">{{ Test().subjectName }}</span>
+      <fa-icon
+        [icon]="IsAutoEval() ? FlaskIcon : TeacherIcon"
+        class="stc__type-icon"
+        [class.stc__type-icon--autoval]="IsAutoEval()"
+        [class.stc__type-icon--teacher]="!IsAutoEval()"
+        [title]="IsAutoEval() ? t('self_evaluation') : t('teacher_test')"
+      ></fa-icon>
+    </div>
 
-  <!-- ── Title ─────────────────────────────────────────────────────────── -->
-  <h5 class="stc__title">{{ Test().name }}</h5>
+    <!-- ── Title ─────────────────────────────────────────────────────────── -->
+    <h5 class="stc__title">{{ Test().name }}</h5>
 
-  <!-- ── Meta: questions + max score ──────────────────────────────────── -->
-  <div class="stc__meta">
-    <span class="stc__meta-item">
-      <fa-icon [icon]="QuestionsIcon" class="stc__meta-icon"></fa-icon>
-      {{ QuestionsCount() }} Domande
-    </span>
-    <span class="stc__meta-item">
-      <fa-icon [icon]="TrophyIcon" class="stc__meta-icon"></fa-icon>
-      {{ MaxScore() }} punti
-    </span>
-  </div>
-
-  <!-- ── Info row: esito (se completato) oppure date disponibilità ──────── -->
-  @if (IsCompleted() && AttemptResult()) { @if (AttemptStatus() !== 'reviewed'
-  || (AttemptResult()!.correct === 0 && AttemptResult()!.wrong === 0)) {
-  <div class="stc__info-row stc__info-row--pending-review">
-    <span>Da valutare</span>
-  </div>
-  } @else {
-  <div class="stc__info-row stc__info-row--esito">
-    <span class="stc__esito-label">Esito</span>
-    <span class="stc__esito-correct">
-      <span class="stc__icon-circle stc__icon-circle--success">
-        <fa-icon [icon]="CheckIcon"></fa-icon>
+    <!-- ── Meta: questions + max score ──────────────────────────────────── -->
+    <div class="stc__meta">
+      <span class="stc__meta-item">
+        <fa-icon [icon]="QuestionsIcon" class="stc__meta-icon"></fa-icon>
+        {{ t('questions_count', { count: QuestionsCount() }) }}
       </span>
-      {{ AttemptResult()!.correct }} corrette
-    </span>
-    <span class="stc__esito-wrong">
-      <span class="stc__icon-circle stc__icon-circle--danger">
-        <fa-icon [icon]="XmarkIcon"></fa-icon>
+      <span class="stc__meta-item">
+        <fa-icon [icon]="TrophyIcon" class="stc__meta-icon"></fa-icon>
+        {{ t('points_count', { count: MaxScore() }) }}
       </span>
-      {{ AttemptResult()!.wrong }} errate
-    </span>
-  </div>
-  } } @else if (!IsCompleted() && (Test().availableFrom || Test().availableTo))
-  {
-  <div class="stc__info-row">
-    <fa-icon [icon]="CalendarIcon" class="stc__cal-icon"></fa-icon>
-    <span>
-      @if (Test().availableFrom && Test().availableTo) { disponibile dal {{
-      Test().availableFrom | date: 'd MMMM' }} al {{ Test().availableTo | date:
-      'd MMMM' }} } @else if (Test().availableFrom) { disponibile dal {{
-      Test().availableFrom | date: 'd MMMM' }} } @else { disponibile fino al {{
-      Test().availableTo | date: 'd MMMM' }} }
-    </span>
-  </div>
-  }
+    </div>
 
-  <!-- ── Action button ─────────────────────────────────────────────────── -->
-  <button
-    class="stc__btn"
-    [class.stc__btn--completed]="IsCompleted()"
-    [class.stc__btn--todo]="!IsCompleted()"
-    (click)="$event.stopPropagation()"
-    [routerLink]="Route()"
-  >
-    @if (AttemptStatus() === 'reviewed' || AttemptStatus() === 'delivered') {
-    Vedi } @else if (AttemptStatus() === 'in-progress') { Riprendi } @else { Fai
-    il test }
-  </button>
-</div>
+    <!-- ── Info row: esito (se completato) oppure date disponibilità ──────── -->
+    @if (IsCompleted() && AttemptResult()) { @if (AttemptStatus() !== 'reviewed'
+    || (AttemptResult()!.correct === 0 && AttemptResult()!.wrong === 0)) {
+    <div class="stc__info-row stc__info-row--pending-review">
+      <span>{{ t('to_grade') }}</span>
+    </div>
+    } @else {
+    <div class="stc__info-row stc__info-row--esito">
+      <span class="stc__esito-label">{{ t('result') }}</span>
+      <span class="stc__esito-correct">
+        <span class="stc__icon-circle stc__icon-circle--success">
+          <fa-icon [icon]="CheckIcon"></fa-icon>
+        </span>
+        {{ t('correct_answers', { count: AttemptResult()!.correct }) }}
+      </span>
+      <span class="stc__esito-wrong">
+        <span class="stc__icon-circle stc__icon-circle--danger">
+          <fa-icon [icon]="XmarkIcon"></fa-icon>
+        </span>
+        {{ t('wrong_answers', { count: AttemptResult()!.wrong }) }}
+      </span>
+    </div>
+    } } @else if (!IsCompleted() && (Test().availableFrom ||
+    Test().availableTo)) {
+    <div class="stc__info-row">
+      <fa-icon [icon]="CalendarIcon" class="stc__cal-icon"></fa-icon>
+      <span>
+        @if (Test().availableFrom && Test().availableTo) { {{
+        t('available_range', { from: Test().availableFrom | date: 'd MMMM', to:
+        Test().availableTo | date: 'd MMMM' }) }} } @else if
+        (Test().availableFrom) { {{ t('available_from', { from:
+        Test().availableFrom | date: 'd MMMM' }) }} } @else { {{
+        t('available_to', { to: Test().availableTo | date: 'd MMMM' }) }} }
+      </span>
+    </div>
+    }
+
+    <!-- ── Action button ─────────────────────────────────────────────────── -->
+    <button
+      class="stc__btn"
+      [class.stc__btn--completed]="IsCompleted()"
+      [class.stc__btn--todo]="!IsCompleted()"
+      (click)="$event.stopPropagation()"
+      [routerLink]="Route()"
+    >
+      @if (AttemptStatus() === 'reviewed' || AttemptStatus() === 'delivered') {
+      {{ t('btn_view') }} } @else if (AttemptStatus() === 'in-progress') { {{
+      t('btn_resume') }} } @else { {{ t('btn_start') }} }
+    </button>
+  </div>
+</ng-container>

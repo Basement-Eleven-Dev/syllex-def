@@ -43,7 +43,7 @@
   cursor: pointer;
 }
 
-#studentProfileDropdown::after {
+::ng-deep .dropdown-toggle::after {
   display: none !important;
 }
 

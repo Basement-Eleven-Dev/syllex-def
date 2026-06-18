@@ -2,6 +2,7 @@ import { Component, computed, input } from '@angular/core';
 import { DatePipe, CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { TranslocoDirective } from '@jsverse/transloco';
 import {
   faClock,
   faEye,
@@ -19,7 +20,7 @@ type AttemptStatus = 'in-progress' | 'delivered' | 'reviewed';
 @Component({
   selector: 'app-student-test-card-compact',
   standalone: true,
-  imports: [CommonModule, FontAwesomeModule, RouterModule],
+  imports: [CommonModule, FontAwesomeModule, RouterModule, TranslocoDirective],
   templateUrl: './student-test-card-compact.html',
   styleUrl: './student-test-card-compact.scss',
 })
