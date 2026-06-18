@@ -14,6 +14,11 @@ export const authInterceptor: HttpInterceptorFn = (
 ) => {
   const subjectId = localStorage.getItem('selectedSubjectId') || undefined;
 
+  // Se la richiesta è per un asset locale (es. file di traduzione), ignorala
+  if (req.url.startsWith('/assets') || req.url.startsWith('assets')) {
+    return next(req);
+  }
+
   // Costruiamo l'URL finale
   const apiUrl = req.url.startsWith('http')
     ? req.url

@@ -39,6 +39,7 @@
     "@fortawesome/sharp-regular-svg-icons": "^7.0.0",
     "@fortawesome/sharp-solid-svg-icons": "^7.0.0",
     "@fortawesome/sharp-thin-svg-icons": "^7.0.0",
+    "@jsverse/transloco": "^8.4.0",
     "@ng-bootstrap/ng-bootstrap": "^19.0.1",
     "@popperjs/core": "^2.11.8",
     "@types/qrcode": "^1.5.6",

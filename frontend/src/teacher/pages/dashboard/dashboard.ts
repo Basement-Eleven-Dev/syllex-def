@@ -36,6 +36,7 @@ import { SyllexCard } from '../../components/UI/syllex-card/syllex-card';
 import { SyllexBanner } from '../../components/UI/syllex-banner/syllex-banner';
 import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
 import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 interface DashboardQuickLink {
   value: number | undefined;
@@ -62,7 +63,8 @@ interface DashboardAction {
     SyllexBanner,
     SyllexPageHeader,
     SyllexButton,
-  ],
+    TranslocoDirective
+],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
@@ -76,6 +78,8 @@ export class Dashboard {
   faBell = faBell;
   faPlus = faPlus;
   testsToGradeCount = 0;
+
+  private readonly translocoService = inject(TranslocoService);
 
   get selectedMateriaName() {
     return this.materiaService.materiaSelected()?.name || '';
@@ -91,9 +95,9 @@ export class Dashboard {
     private router: Router,
     private sanitizer: DomSanitizer,
   ) {
-    this.bannerTitle = this.sanitizer.bypassSecurityTrustHtml(
-      'Scopri Alex, <br/> il nuovo assistente vocale.',
-    );
+    this.translocoService.selectTranslate('dashboard.discover_alex_title').subscribe(title => {
+      this.bannerTitle = this.sanitizer.bypassSecurityTrustHtml(title);
+    });
     // Carica comunicazioni recenti quando viene selezionata una materia
     effect(() => {
       const selectedMateria = this.materiaService.materiaSelected();
@@ -101,13 +105,13 @@ export class Dashboard {
         this.loadRecentCommunications();
         this.testService.countAssignmentsToGrade().subscribe((response) => {
           this.testsToGradeCount = response.count;
-          this.quickActions[3].label = `Da correggere (${response.count})`;
+          this.quickActions[3].label = this.translocoService.translate('dashboard.quick_actions.to_grade_count', { count: response.count });
         });
       }
     });
   }
   AttachmentIcon = faPaperclip;
-  bannerTitle: SafeHtml;
+  bannerTitle: SafeHtml = '';
 
   quickActions: DashboardAction[] = [
     {

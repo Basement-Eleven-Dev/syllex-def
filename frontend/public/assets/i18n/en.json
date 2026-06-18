@@ -1,0 +1,32 @@
+{
+  "common": {
+    "welcome": "Welcome",
+    "save": "Save",
+    "cancel": "Cancel",
+    "loading": "Loading..."
+  },
+  "dashboard": {
+    "welcome_name": "Hello, {{name}}",
+    "discover_actions": "discover the actions you can take today.",
+    "upload_materials_title": "Upload materials",
+    "upload_materials_desc": "Quick upload of PDFs, files, images, and notes via drag & drop.",
+    "generate_material_ai_title": "Generate a material with AI",
+    "generate_material_ai_desc": "Choose from various options to create personalized content.",
+    "communicate_students_title": "Communicate with your students",
+    "communicate_students_desc": "Your students are ready to receive your communications.",
+    "new_communication": "New communication",
+    "discover_alex_title": "Discover Alex, <br/> the new voice assistant.",
+    "try_it_now": "Try it now",
+    "tests_to_grade_count": "{{count}} tests to grade",
+    "tests_to_grade_desc_positive": "You still have tests to grade for {{subject}}",
+    "tests_to_grade_desc_zero": "No tests waiting to be graded for {{subject}}",
+    "generate_test_ai_title": "Generate a test with AI",
+    "generate_test_ai_desc": "Choose subject, topic, and difficulty.",
+    "quick_actions": {
+      "create_new_test": "Create new test",
+      "create_new_question": "Create new question",
+      "upload_materials": "Upload materials",
+      "to_grade_count": "To grade ({{count}})"
+    }
+  }
+}

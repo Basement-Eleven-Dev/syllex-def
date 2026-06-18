@@ -5,6 +5,7 @@ import {
   provideZoneChangeDetection,
   importProvidersFrom,
   ErrorHandler,
+  isDevMode,
 } from '@angular/core';
 import { provideRouter, withViewTransitions } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
@@ -12,6 +13,8 @@ import { registerLocaleData } from '@angular/common';
 import localeIt from '@angular/common/locales/it';
 import { provideMarkdown } from 'ngx-markdown';
 import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap';
+import { provideTransloco } from '@jsverse/transloco';
+import { TranslocoHttpLoader } from './transloco-loader';
 
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
@@ -42,5 +45,14 @@ export const appConfig: ApplicationConfig = {
     provideCharts(withDefaultRegisterables()),
     { provide: ErrorHandler, useClass: LogRocketErrorHandler },
     importProvidersFrom(TourNgBootstrapModule),
+    provideTransloco({
+      config: {
+        availableLangs: ['en', 'it'],
+        defaultLang: 'it',
+        reRenderOnLangChange: true,
+        prodMode: !isDevMode(),
+      },
+      loader: TranslocoHttpLoader,
+    }),
   ],
 };

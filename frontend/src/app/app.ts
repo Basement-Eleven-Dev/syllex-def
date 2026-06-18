@@ -5,6 +5,7 @@ import { FeedbackService } from '../services/feedback-service';
 import { Auth } from '../services/auth';
 import { TermsModalComponent } from './policy-acceptance-modal/policy-acceptance-modal.component';
 import { TERMS_VERSION } from './_utils/terms-version';
+import { TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-root',
@@ -17,9 +18,15 @@ export class App {
   protected readonly feedbackService = inject(FeedbackService);
   protected readonly authService = inject(Auth);
   private readonly modalService = inject(NgbModal);
+  private readonly translocoService = inject(TranslocoService);
   private termsModalOpen = false;
 
   ngOnInit() {
+    const savedLang = localStorage.getItem('syllex-language');
+    if (savedLang) {
+      this.translocoService.setActiveLang(savedLang);
+    }
+
     this.authService.user$.subscribe((user) => {
       if (!user) return;
       const needsAcceptance = user.termsAcceptation?.version !== TERMS_VERSION;

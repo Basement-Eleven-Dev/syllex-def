@@ -1,0 +1,32 @@
+{
+  "common": {
+    "welcome": "Benvenuto",
+    "save": "Salva",
+    "cancel": "Annulla",
+    "loading": "Caricamento in corso..."
+  },
+  "dashboard": {
+    "welcome_name": "Ciao, {{name}}",
+    "discover_actions": "scopri le azioni che puoi fare oggi.",
+    "upload_materials_title": "Carica materiali",
+    "upload_materials_desc": "Upload rapido di PDF, file, immagini e appunti tramite drag & drop.",
+    "generate_material_ai_title": "Genera un materiale con AI",
+    "generate_material_ai_desc": "Scegli tra diverse opzioni per creare contenuti personalizzati.",
+    "communicate_students_title": "Comunica con i tuoi studenti",
+    "communicate_students_desc": "I tuoi studenti sono pronti a ricevere le tue comunicazioni.",
+    "new_communication": "Nuova comunicazione",
+    "discover_alex_title": "Scopri Alex, <br/> il nuovo assistente vocale.",
+    "try_it_now": "Provalo subito",
+    "tests_to_grade_count": "{{count}} test da correggere",
+    "tests_to_grade_desc_positive": "Hai ancora delle verifiche da correggere per {{subject}}",
+    "tests_to_grade_desc_zero": "Nessuna verifica in attesa di correzione per {{subject}}",
+    "generate_test_ai_title": "Genera un test con AI",
+    "generate_test_ai_desc": "Scegli materia, argomento e difficoltà.",
+    "quick_actions": {
+      "create_new_test": "Crea nuovo test",
+      "create_new_question": "Crea nuova domanda",
+      "upload_materials": "Carica materiali",
+      "to_grade_count": "Da correggere ({{count}})"
+    }
+  }
+}
