@@ -36,12 +36,20 @@ import { FeedbackService } from '../../../services/feedback-service';
 import { BackTo } from '../../../teacher/components/back-to/back-to';
 import { QuestionCard } from '../../../teacher/components/question-card/question-card';
 import { CanDeactivateComponent } from '../../../guards/test-execution.guard';
-import { SyllexButton } from "../../../teacher/components/UI/syllex-button/syllex-button";
+import { SyllexButton } from '../../../teacher/components/UI/syllex-button/syllex-button';
+import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-student-test-execution',
   standalone: true,
-  imports: [FontAwesomeModule, BackTo, QuestionCard, DatePipe, SyllexButton],
+  imports: [
+    FontAwesomeModule,
+    BackTo,
+    QuestionCard,
+    DatePipe,
+    SyllexButton,
+    TranslocoDirective,
+  ],
   templateUrl: './student-test-execution.html',
   styleUrl: './student-test-execution.scss',
 })
@@ -53,6 +61,7 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
   private readonly testsService = inject(StudentTestsService);
   private readonly feedbackService = inject(FeedbackService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly translocoService = inject(TranslocoService);
 
   // Icons
   readonly ClockIcon = faClock;
@@ -91,7 +100,9 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
   readonly IsPasswordProtected = computed(
     () => !!this.TestData()?.isPasswordProtected,
   );
-  readonly IsAutoEval = computed(() => this.TestData()?.source === 'self-evaluation');
+  readonly IsAutoEval = computed(
+    () => this.TestData()?.source === 'self-evaluation',
+  );
   readonly TimerExpired = computed(
     () => this.HasTimeLimit() && this.RemainingSeconds() <= 0,
   );
@@ -129,7 +140,11 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
     // Se il test è protetto da password e non stiamo riprendendo, valida prima
     if (this.IsPasswordProtected() && !this.IsResuming()) {
       if (!this.PasswordInput().trim()) {
-        this.PasswordError.set('Inserisci la password per avviare il test');
+        this.PasswordError.set(
+          this.translocoService.translate(
+            'student_test_execution.p_insert_password',
+          ),
+        );
         return;
       }
     }
@@ -200,7 +215,9 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
                 this.IsSubmitted.set(true);
                 this.stopTimer();
                 this.feedbackService.showFeedback(
-                  'Test consegnato con successo!',
+                  this.translocoService.translate(
+                    'student_test_execution.submit_success',
+                  ),
                   true,
                 );
                 this.router.navigate(['/s/tests']);
@@ -208,7 +225,9 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
               error: (err) => {
                 this.IsSubmitting.set(false);
                 this.feedbackService.showFeedback(
-                  "Errore nell'invio del test: " + (err?.message || err),
+                  this.translocoService.translate(
+                    'student_test_execution.submit_error_prefix',
+                  ) + (err?.message || err),
                   false,
                 );
               },
@@ -217,7 +236,9 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
         error: (err) => {
           this.IsSubmitting.set(false);
           this.feedbackService.showFeedback(
-            'Errore nel salvataggio finale: ' + (err?.message || err),
+            this.translocoService.translate(
+              'student_test_execution.save_error_prefix',
+            ) + (err?.message || err),
             false,
           );
         },
@@ -252,7 +273,11 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
           const tests = res.tests;
           const found = tests.find((t) => t._id === this.TestId);
           if (!found) {
-            this.Error.set('Test non trovato');
+            this.Error.set(
+              this.translocoService.translate(
+                'student_test_execution.test_not_found',
+              ),
+            );
             this.IsLoading.set(false);
             return;
           }
@@ -260,7 +285,11 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
           this.loadQuestions(found);
         },
         error: () => {
-          this.Error.set('Errore nel caricamento del test');
+          this.Error.set(
+            this.translocoService.translate(
+              'student_test_execution.test_load_error',
+            ),
+          );
           this.IsLoading.set(false);
         },
       });
@@ -278,7 +307,7 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
       .loadQuestionsBatch(questionIds)
       .pipe(
         catchError(() => of([])),
-        takeUntilDestroyed(this.destroyRef)
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
         next: (results) => {
@@ -303,7 +332,11 @@ export class StudentTestExecution implements OnInit, CanDeactivateComponent {
           this.checkExistingAttempt();
         },
         error: () => {
-          this.Error.set('Errore nel caricamento delle domande');
+          this.Error.set(
+            this.translocoService.translate(
+              'student_test_execution.questions_load_error',
+            ),
+          );
           this.IsLoading.set(false);
         },
       });

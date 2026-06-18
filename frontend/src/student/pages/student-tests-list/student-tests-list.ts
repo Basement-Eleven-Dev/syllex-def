@@ -33,6 +33,7 @@ import {
   SelectOption,
 } from '../../../teacher/components/UI/syllex-select-input/syllex-select-input';
 import { SyllexButton } from '../../../teacher/components/UI/syllex-button/syllex-button';
+import { TranslocoDirective } from '@jsverse/transloco';
 
 type AttemptStatus = 'in-progress' | 'delivered' | 'reviewed';
 
@@ -49,6 +50,7 @@ type AttemptStatus = 'in-progress' | 'delivered' | 'reviewed';
     SyllexSearchInput,
     SyllexSelectInput,
     SyllexButton,
+    TranslocoDirective,
   ],
   templateUrl: './student-tests-list.html',
   styleUrl: './student-tests-list.scss',

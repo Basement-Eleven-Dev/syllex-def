@@ -1,6 +1,9 @@
 import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
 import { RouterModule, Router } from '@angular/router';
-import { FontAwesomeModule, IconDefinition } from '@fortawesome/angular-fontawesome';
+import {
+  FontAwesomeModule,
+  IconDefinition,
+} from '@fortawesome/angular-fontawesome';
 import {
   faHouse,
   faCalendar,
@@ -13,20 +16,18 @@ import {
   faHeadSideBrain,
 } from '@fortawesome/pro-solid-svg-icons';
 import { Auth } from '../../../services/auth';
+import { TranslocoDirective } from '@jsverse/transloco';
 
 interface SidebarRoute {
   path: string;
-  label: string;
+  labelKey: string;
   icon: IconDefinition;
 }
 
 @Component({
   selector: 'app-student-sidebar',
   standalone: true,
-  imports: [
-    FontAwesomeModule,
-    RouterModule,
-  ],
+  imports: [FontAwesomeModule, RouterModule, TranslocoDirective],
   templateUrl: './student-sidebar.html',
   styleUrl: './student-sidebar.scss',
   host: { '[class.open]': 'open' },
@@ -41,28 +42,28 @@ export class StudentSidebar {
 
   constructor(
     private authService: Auth,
-    private router: Router
+    private router: Router,
   ) {}
 
   mainRoutes: SidebarRoute[] = [
     {
       path: 'dashboard',
-      label: 'Home',
+      labelKey: 'home',
       icon: faHouse,
     },
     {
       path: 'tests',
-      label: 'Test',
+      labelKey: 'tests',
       icon: faFileLines,
     },
     {
       path: 'risorse',
-      label: 'File e Risorse',
+      labelKey: 'resources',
       icon: faFile,
     },
     {
       path: 'calendario',
-      label: 'Calendario',
+      labelKey: 'calendar',
       icon: faCalendar,
     },
   ];

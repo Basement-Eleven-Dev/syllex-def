@@ -2,11 +2,12 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { AgentChat } from '../../../teacher/components/agent-chat/agent-chat';
 import { Materia } from '../../../services/materia';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { TranslocoDirective } from '@jsverse/transloco';
 import { faRobot } from '@fortawesome/pro-solid-svg-icons';
 
 @Component({
   selector: 'app-agent',
-  imports: [AgentChat, FontAwesomeModule],
+  imports: [AgentChat, FontAwesomeModule, TranslocoDirective],
   templateUrl: './agent.html',
   styleUrl: './agent.scss',
 })

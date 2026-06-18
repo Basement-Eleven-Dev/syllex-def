@@ -5,10 +5,11 @@ import {
   MaterialInterface,
 } from '../../../services/materiali/materiali-service';
 import { MaterialeCard } from '../../../teacher/components/materiale-card/materiale-card';
+import { TranslocoDirective } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-materiali',
-  imports: [MaterialeCard],
+  imports: [MaterialeCard, TranslocoDirective],
   templateUrl: './materiali.html',
   styleUrl: './materiali.scss',
 })

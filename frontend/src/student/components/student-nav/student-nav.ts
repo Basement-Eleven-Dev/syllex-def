@@ -1,10 +1,21 @@
-import { Component, inject, ViewChild, computed, signal, OnInit, Output, EventEmitter } from '@angular/core';
-import { DatePipe, TitleCasePipe, CommonModule, AsyncPipe } from '@angular/common';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
-  faUserCircle,
-  faChevronDown,
-} from '@fortawesome/pro-solid-svg-icons';
+  Component,
+  inject,
+  ViewChild,
+  computed,
+  signal,
+  OnInit,
+  Output,
+  EventEmitter,
+} from '@angular/core';
+import {
+  DatePipe,
+  TitleCasePipe,
+  CommonModule,
+  AsyncPipe,
+} from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faUserCircle, faChevronDown } from '@fortawesome/pro-solid-svg-icons';
 import {
   NgbDropdown,
   NgbDropdownToggle,
@@ -16,7 +27,12 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { Materia } from '../../../services/materia';
-import { SelectOption, SyllexSelectInput } from '../../../teacher/components/UI/syllex-select-input/syllex-select-input';
+import {
+  SelectOption,
+  SyllexSelectInput,
+} from '../../../teacher/components/UI/syllex-select-input/syllex-select-input';
+import { TranslocoDirective } from '@jsverse/transloco';
+import { LanguageSelector } from '../../../teacher/components/UI/language-selector/language-selector';
 
 @Component({
   selector: 'app-student-nav',
@@ -32,6 +48,8 @@ import { SelectOption, SyllexSelectInput } from '../../../teacher/components/UI/
     NgbDropdownMenu,
     StudentUserContextualMenu,
     SyllexSelectInput,
+    TranslocoDirective,
+    LanguageSelector,
   ],
   templateUrl: './student-nav.html',
   styleUrl: './student-nav.scss',
@@ -64,7 +82,9 @@ export class StudentNav implements OnInit {
   }
 
   onSubjectChange(subjectId: string) {
-    const subject = this.materiaService.allMaterie().find((m) => m._id === subjectId);
+    const subject = this.materiaService
+      .allMaterie()
+      .find((m) => m._id === subjectId);
     if (subject) {
       this.materiaService.setSelectedSubject(subject);
     }
@@ -77,7 +97,7 @@ export class StudentNav implements OnInit {
           return '';
         }
         return user.firstName.charAt(0) + user.lastName.charAt(0);
-      })
+      }),
     );
   }
 

@@ -2,6 +2,7 @@ import { Component, computed, input } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { TranslocoDirective } from '@jsverse/transloco';
 import {
   faCalendarDays,
   faGraduationCap,
@@ -21,7 +22,7 @@ type AttemptStatus = 'in-progress' | 'delivered' | 'reviewed';
 @Component({
   selector: 'app-student-test-card',
   standalone: true,
-  imports: [DatePipe, FontAwesomeModule, RouterModule],
+  imports: [DatePipe, FontAwesomeModule, RouterModule, TranslocoDirective],
   templateUrl: './student-test-card.html',
   styleUrl: './student-test-card.scss',
 })

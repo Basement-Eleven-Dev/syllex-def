@@ -1,23 +1,25 @@
-<div class="com-card">
-  <!-- ── Header: title + "Nuovo" badge ──────────────────────────────────── -->
-  <div class="com-card__header">
-    <h6 class="com-card__title">{{ comunicazione.title }}</h6>
-    @if (isNew()) {
-    <span class="com-card__badge-new">Nuovo</span>
-    }
-  </div>
+<ng-container *transloco="let t; read: 'student_com_card'">
+  <div class="com-card">
+    <!-- ── Header: title + "Nuovo" badge ──────────────────────────────────── -->
+    <div class="com-card__header">
+      <h6 class="com-card__title">{{ comunicazione.title }}</h6>
+      @if (isNew()) {
+      <span class="com-card__badge-new">{{ t('new') }}</span>
+      }
+    </div>
 
-  <!-- ── Content preview ──────────────────────────────────────────────────── -->
-  <p class="com-card__preview">{{ comunicazione.content }}</p>
+    <!-- ── Content preview ──────────────────────────────────────────────────── -->
+    <p class="com-card__preview">{{ comunicazione.content }}</p>
 
-  <!-- ── Footer: date · location · open link ──────────────────────────────── -->
-  <div class="com-card__footer">
-    <span class="com-card__meta-item">
-      <fa-icon [icon]="ClockIcon" class="com-card__meta-icon"></fa-icon>
-      {{ comunicazione.createdAt | date: 'd MMM yyyy' }}
-    </span>
-    <button type="button" class="com-card__open" (click)="openModal()">
-      Apri <fa-icon [icon]="ArrowIcon" class="ms-1"></fa-icon>
-    </button>
+    <!-- ── Footer: date · location · open link ──────────────────────────────── -->
+    <div class="com-card__footer">
+      <span class="com-card__meta-item">
+        <fa-icon [icon]="ClockIcon" class="com-card__meta-icon"></fa-icon>
+        {{ comunicazione.createdAt | date: 'd MMM yyyy' }}
+      </span>
+      <button type="button" class="com-card__open" (click)="openModal()">
+        {{ t('open') }} <fa-icon [icon]="ArrowIcon" class="ms-1"></fa-icon>
+      </button>
+    </div>
   </div>
-</div>
+</ng-container>

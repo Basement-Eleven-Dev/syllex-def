@@ -1,322 +1,326 @@
-<!-- Compact welcome strip -->
-<div class="flex-shrink-0 pb-2">
-  <!-- Desktop Greeting -->
-  <div class="d-none d-md-block">
-    <h5 class="fw-semibold mb-0 text-white">
-      Ciao @if(User()){ {{ User()?.firstName || User()?.username }} } @else {
-      ... }
-    </h5>
-    <p class="mb-0 small text-white-50 opacity-75">
-      Ecco un riepilogo delle tue attività e performance.
-    </p>
-  </div>
+<ng-container *transloco="let t; read: 'student_dashboard'">
+  <!-- Compact welcome strip -->
+  <div class="flex-shrink-0 pb-2">
+    <!-- Desktop Greeting -->
+    <div class="d-none d-md-block">
+      <h5 class="fw-semibold mb-0 text-white">
+        Ciao @if(User()){ {{ User()?.firstName || User()?.username }} } @else {
+        ... }
+      </h5>
+      <p class="mb-0 small text-white-50 opacity-75">{{ t('summary_desc') }}</p>
+    </div>
 
-  <!-- Mobile Greeting (Figma high-fidelity style!) -->
-  <div class="d-md-none pt-2 mb-2">
-    <h1
-      class="text-white fw-semibold mb-1"
-      style="font-size: 2.2rem; letter-spacing: -0.02em"
-    >
-      Ciao {{ User()?.firstName || User()?.username || 'Studente' }}
-    </h1>
-    <p
-      class="text-white-50 mb-0 fw-medium"
-      style="font-size: 1.15rem; letter-spacing: -0.01em; opacity: 0.85"
-    >
-      Come posso aiutarti oggi?
-    </p>
-  </div>
-</div>
-
-<!-- ─── No-Scroll Dashboard Grid ─────────────────────────────────────────── -->
-<div class="dashboard-grid">
-  <!-- ── TOP-LEFT: Inizia a studiare ──────────────────────────────────────── -->
-  <div class="student-block student-block--study db-study d-flex flex-column">
-    <div
-      class="d-flex flex-column align-items-center justify-content-center flex-grow-1 text-center w-100 mt-3"
-    >
-      <app-alex-mascot></app-alex-mascot>
-
-      <h3 class="mb-4 text-white study-main-title">
-        Cosa vorresti ripassare oggi?
-      </h3>
-
-      <div class="subject-pills justify-content-center block-scroll">
-        @for (subject of Subjects(); track subject._id) {
-        <a
-          (click)="goToAgentWithSubject(subject)"
-          class="subject-pill"
-          style="cursor: pointer"
-        >
-          {{ subject.name }}
-        </a>
-        } @empty {
-        <span class="text-white-50 small opacity-75"
-          >Nessuna materia disponibile</span
-        >
-        }
-      </div>
+    <!-- Mobile Greeting (Figma high-fidelity style!) -->
+    <div class="d-md-none pt-2 mb-2">
+      <h1
+        class="text-white fw-semibold mb-1"
+        style="font-size: 2.2rem; letter-spacing: -0.02em"
+      >
+        Ciao {{ User()?.firstName || User()?.username || t('welcome_fallback')
+        }}
+      </h1>
+      <p
+        class="text-white-50 mb-0 fw-medium"
+        style="font-size: 1.15rem; letter-spacing: -0.01em; opacity: 0.85"
+      >
+        {{ t('help_today') }}
+      </p>
     </div>
   </div>
 
-  <!-- ── TOP-CENTER: Monitora lo studio ───────────────────────────────────── -->
-  <div
-    class="student-block student-block--monitor db-monitor d-flex flex-column"
-  >
-    <div class="d-flex align-items-center gap-2 mb-3 flex-shrink-0">
-      <fa-icon
-        [icon]="PerformanceIcon"
-        class="text-white opacity-75"
-        style="font-size: 1.05rem"
-      ></fa-icon>
-      <span class="fw-semibold text-white-50" style="font-size: 0.88rem"
-        >Performance</span
-      >
-    </div>
-
-    <div
-      class="d-flex flex-column gap-2 justify-content-center flex-grow-1 w-100 px-1"
-    >
-      <!-- Row 1: Test da svolgere (clickable) -->
-      <a
-        [routerLink]="['/s/tests']"
-        class="performance-row d-flex align-items-center justify-content-between text-decoration-none py-2 px-2 text-white"
-        style="cursor: pointer"
-      >
-        <span class="fw-semibold performance-label text-white"
-          >Test da svolgere</span
-        >
-        <span
-          class="fw-bold text-white performance-value d-flex align-items-center justify-content-start"
-          style="min-width: 3.5rem"
-        >
-          @if(isLoadingData()) {
-          <div
-            class="spinner-border spinner-border-sm text-white-50"
-            role="status"
-            style="width: 1rem; height: 1rem"
-          ></div>
-          } @else { {{ TotalTestsPending() }} }
-        </span>
-      </a>
-
+  <!-- ─── No-Scroll Dashboard Grid ─────────────────────────────────────────── -->
+  <div class="dashboard-grid">
+    <!-- ── TOP-LEFT: Inizia a studiare ──────────────────────────────────────── -->
+    <div class="student-block student-block--study db-study d-flex flex-column">
       <div
-        class="performance-divider"
-        style="height: 1px; background-color: rgba(255, 255, 255, 0.04)"
-      ></div>
-
-      <!-- Row 2: Media test (average score) -->
-      <div
-        class="performance-row d-flex align-items-center justify-content-between py-2 px-2"
+        class="d-flex flex-column align-items-center justify-content-center flex-grow-1 text-center w-100 mt-3"
       >
-        <span class="fw-semibold performance-label text-white-50"
-          >Media test</span
-        >
-        <span
-          class="fw-bold text-white performance-value d-flex align-items-center justify-content-start"
-          style="min-width: 3.5rem"
-        >
-          @if(isLoadingData()) {
-          <div
-            class="spinner-border spinner-border-sm text-white-50"
-            role="status"
-            style="width: 1rem; height: 1rem"
-          ></div>
-          } @else { {{ OfficialAverageScore() }}<span
-            class="text-white-50 ms-1"
-            style="font-size: 0.85rem"
-            >%</span
+        <app-alex-mascot></app-alex-mascot>
+
+        <h3 class="mb-4 text-white study-main-title">
+          {{ t('what_to_review') }}
+        </h3>
+
+        <div class="subject-pills justify-content-center block-scroll">
+          @for (subject of Subjects(); track subject._id) {
+          <a
+            (click)="goToAgentWithSubject(subject)"
+            class="subject-pill"
+            style="cursor: pointer"
+          >
+            {{ subject.name }}
+          </a>
+          } @empty {
+          <span class="text-white-50 small opacity-75"
+            >{{ t('no_subjects') }}</span
           >
           }
-        </span>
-      </div>
-
-      <div
-        class="performance-divider"
-        style="height: 1px; background-color: rgba(255, 255, 255, 0.04)"
-      ></div>
-
-      <!-- Row 3: Media simulazioni (practice average score) -->
-      <div
-        class="performance-row d-flex align-items-center justify-content-between py-2 px-2"
-      >
-        <span class="fw-semibold performance-label text-white-50"
-          >Media simulazioni</span
-        >
-        <span
-          class="fw-bold text-white performance-value d-flex align-items-center justify-content-start"
-          style="min-width: 3.5rem"
-        >
-          @if(isLoadingData()) {
-          <div
-            class="spinner-border spinner-border-sm text-white-50"
-            role="status"
-            style="width: 1rem; height: 1rem"
-          ></div>
-          } @else { {{ AutoEvalAverageScore() }}<span
-            class="text-white-50 ms-1"
-            style="font-size: 0.85rem"
-            >%</span
-          >
-          }
-        </span>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- ── TOP-RIGHT: Test disponibili ─────────────────────────────────────── -->
-  <div class="student-block student-block--tests db-tests d-flex flex-column">
+    <!-- ── TOP-CENTER: Monitora lo studio ───────────────────────────────────── -->
     <div
-      class="d-flex align-items-center justify-content-between mb-3 flex-shrink-0"
+      class="student-block student-block--monitor db-monitor d-flex flex-column"
     >
-      <div class="d-flex align-items-center gap-2">
+      <div class="d-flex align-items-center gap-2 mb-3 flex-shrink-0">
         <fa-icon
-          [icon]="ClipboardIcon"
+          [icon]="PerformanceIcon"
           class="text-white opacity-75"
           style="font-size: 1.05rem"
         ></fa-icon>
-        <h6 class="mb-0 text-white" style="font-size: 0.88rem">
-          Test disponibili creati dal docente
-        </h6>
+        <span class="fw-semibold text-white-50" style="font-size: 0.88rem"
+          >{{ t('performance') }}</span
+        >
       </div>
-      @if (TotalTestsCount() > 3) {
-      <span class="text-white-50 small opacity-75"
-        >+ {{ TotalTestsCount() }}</span
-      >
-      }
-    </div>
-    <div class="flex-grow-1 block-scroll pr-1">
-      @for (test of RecentTests(); track test._id) {
-      <div class="mb-2">
-        <app-student-test-card-compact
-          [Test]="test"
-          [AttemptStatus]="getAttemptStatus(test._id)"
-          [AttemptScore]="getAttemptScore(test._id)"
-        />
-      </div>
-      } @empty {
-      <p class="text-white-50 opacity-75 mb-0 small">
-        Nessun test disponibile al momento.
-      </p>
-      }
-    </div>
-  </div>
 
-  <!-- ── BOTTOM-LEFT: Autovalutazione (lime green, split) ─────────────────── -->
-  <div
-    class="student-block student-block--autoval db-autoval d-flex flex-row gap-4"
-  >
-    <!-- Left: CTA -->
+      <div
+        class="d-flex flex-column gap-2 justify-content-center flex-grow-1 w-100 px-1"
+      >
+        <!-- Row 1: Test da svolgere (clickable) -->
+        <a
+          [routerLink]="['/s/tests']"
+          class="performance-row d-flex align-items-center justify-content-between text-decoration-none py-2 px-2 text-white"
+          style="cursor: pointer"
+        >
+          <span class="fw-semibold performance-label text-white"
+            >{{ t('tests_to_do') }}</span
+          >
+          <span
+            class="fw-bold text-white performance-value d-flex align-items-center justify-content-start"
+            style="min-width: 3.5rem"
+          >
+            @if(isLoadingData()) {
+            <div
+              class="spinner-border spinner-border-sm text-white-50"
+              role="status"
+              style="width: 1rem; height: 1rem"
+            ></div>
+            } @else { {{ TotalTestsPending() }} }
+          </span>
+        </a>
+
+        <div
+          class="performance-divider"
+          style="height: 1px; background-color: rgba(255, 255, 255, 0.04)"
+        ></div>
+
+        <!-- Row 2: Media test (average score) -->
+        <div
+          class="performance-row d-flex align-items-center justify-content-between py-2 px-2"
+        >
+          <span class="fw-semibold performance-label text-white-50"
+            >{{ t('test_average') }}</span
+          >
+          <span
+            class="fw-bold text-white performance-value d-flex align-items-center justify-content-start"
+            style="min-width: 3.5rem"
+          >
+            @if(isLoadingData()) {
+            <div
+              class="spinner-border spinner-border-sm text-white-50"
+              role="status"
+              style="width: 1rem; height: 1rem"
+            ></div>
+            } @else { {{ OfficialAverageScore() }}<span
+              class="text-white-50 ms-1"
+              style="font-size: 0.85rem"
+              >%</span
+            >
+            }
+          </span>
+        </div>
+
+        <div
+          class="performance-divider"
+          style="height: 1px; background-color: rgba(255, 255, 255, 0.04)"
+        ></div>
+
+        <!-- Row 3: Media simulazioni (practice average score) -->
+        <div
+          class="performance-row d-flex align-items-center justify-content-between py-2 px-2"
+        >
+          <span class="fw-semibold performance-label text-white-50"
+            >{{ t('simulation_average') }}</span
+          >
+          <span
+            class="fw-bold text-white performance-value d-flex align-items-center justify-content-start"
+            style="min-width: 3.5rem"
+          >
+            @if(isLoadingData()) {
+            <div
+              class="spinner-border spinner-border-sm text-white-50"
+              role="status"
+              style="width: 1rem; height: 1rem"
+            ></div>
+            } @else { {{ AutoEvalAverageScore() }}<span
+              class="text-white-50 ms-1"
+              style="font-size: 0.85rem"
+              >%</span
+            >
+            }
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TOP-RIGHT: Test disponibili ─────────────────────────────────────── -->
+    <div class="student-block student-block--tests db-tests d-flex flex-column">
+      <div
+        class="d-flex align-items-center justify-content-between mb-3 flex-shrink-0"
+      >
+        <div class="d-flex align-items-center gap-2">
+          <fa-icon
+            [icon]="ClipboardIcon"
+            class="text-white opacity-75"
+            style="font-size: 1.05rem"
+          ></fa-icon>
+          <h6 class="mb-0 text-white" style="font-size: 0.88rem">
+            {{ t('available_teacher_tests') }}
+          </h6>
+        </div>
+        @if (TotalTestsCount() > 3) {
+        <span class="text-white-50 small opacity-75"
+          >+ {{ TotalTestsCount() }}</span
+        >
+        }
+      </div>
+      <div class="flex-grow-1 block-scroll pr-1">
+        @for (test of RecentTests(); track test._id) {
+        <div class="mb-2">
+          <app-student-test-card-compact
+            [Test]="test"
+            [AttemptStatus]="getAttemptStatus(test._id)"
+            [AttemptScore]="getAttemptScore(test._id)"
+          />
+        </div>
+        } @empty {
+        <p class="text-white-50 opacity-75 mb-0 small">
+          {{ t('no_available_tests') }}
+        </p>
+        }
+      </div>
+    </div>
+
+    <!-- ── BOTTOM-LEFT: Autovalutazione (lime green, split) ─────────────────── -->
     <div
-      class="autoval-cta d-flex flex-column justify-content-center flex-grow-1 py-4"
+      class="student-block student-block--autoval db-autoval d-flex flex-row gap-4"
     >
-      <p>Autovalutazioni</p>
-      <h3 class="mb-4 autoval-title">Che ne dici di metterti alla prova?</h3>
-      <app-syllex-button
-        [props]="{
-          label: 'Comincia con le simulazioni',
+      <!-- Left: CTA -->
+      <div
+        class="autoval-cta d-flex flex-column justify-content-center flex-grow-1 py-4"
+      >
+        <p>{{ t('self_evaluations') }}</p>
+        <h3 class="mb-4 autoval-title">{{ t('try_yourself') }}</h3>
+        <app-syllex-button
+          [props]="{
+          label: t('start_simulations'),
           variant: 'outline',
           size: 'medium',
           color: 'dark',
           leftIcon: PlayIcon,
           link: '/s/auto-evaluation/create'
         }"
-        class="mt-auto align-self-start"
-      ></app-syllex-button>
-    </div>
-
-    <!-- Right: Ultima simulazione -->
-    <div
-      class="autoval-simulations d-flex flex-column flex-grow-1 justify-content-center py-3"
-    >
-      <div
-        class="d-flex justify-content-between align-items-center mb-3 flex-shrink-0"
-      >
-        <span class="ultima-sim__label mb-0 text-dark opacity-75 small"
-          >Ultime simulazioni</span
-        >
-        <a
-          [routerLink]="['/s/tests']"
-          [queryParams]="{ autoEval: 'true' }"
-          class="text-dark small text-decoration-none d-flex align-items-center gap-1 opacity-75 hover-opacity-100 transition-opacity"
-        >
-          Vedi tutte <fa-icon [icon]="ArrowRight" class="small"></fa-icon>
-        </a>
+          class="mt-auto align-self-start"
+        ></app-syllex-button>
       </div>
 
-      <div class="flex-grow-1 block-scroll pe-2">
-        @for (test of CompletedTests(); track test._id) {
-        <div class="sim-card mb-2 p-3">
-          <h6 class="text-dark mb-3">{{ test.name }}</h6>
+      <!-- Right: Ultima simulazione -->
+      <div
+        class="autoval-simulations d-flex flex-column flex-grow-1 justify-content-center py-3"
+      >
+        <div
+          class="d-flex justify-content-between align-items-center mb-3 flex-shrink-0"
+        >
+          <span class="ultima-sim__label mb-0 text-dark opacity-75 small"
+            >{{ t('latest_simulations') }}</span
+          >
+          <a
+            [routerLink]="['/s/tests']"
+            [queryParams]="{ autoEval: 'true' }"
+            class="text-dark small text-decoration-none d-flex align-items-center gap-1 opacity-75 hover-opacity-100 transition-opacity"
+          >
+            {{ t('see_all') }}
+            <fa-icon [icon]="ArrowRight" class="small"></fa-icon>
+          </a>
+        </div>
 
-          <!-- Real data: Subject and stats -->
-          <div class="d-flex flex-column gap-2 text-dark opacity-75 small">
-            <div class="d-flex align-items-center gap-3">
-              <span
-                ><fa-icon [icon]="TestIcon" class="me-1"></fa-icon> {{
-                test.questions?.length || 0 }} domande</span
-              >
-              @if (getAttemptScore(test._id); as score) {
-              <span
-                ><fa-icon [icon]="CheckCircleIcon" class="me-1"></fa-icon> {{
-                score.score }}/{{ score.maxScore }} pt</span
-              >
-              }
+        <div class="flex-grow-1 block-scroll pe-2">
+          @for (test of CompletedTests(); track test._id) {
+          <div class="sim-card mb-2 p-3">
+            <h6 class="text-dark mb-3">{{ test.name }}</h6>
+
+            <!-- Real data: Subject and stats -->
+            <div class="d-flex flex-column gap-2 text-dark opacity-75 small">
+              <div class="d-flex align-items-center gap-3">
+                <span
+                  ><fa-icon [icon]="TestIcon" class="me-1"></fa-icon> {{
+                  t('questions_count', { count: test.questions?.length || 0 })
+                  }}</span
+                >
+                @if (getAttemptScore(test._id); as score) {
+                <span
+                  ><fa-icon [icon]="CheckCircleIcon" class="me-1"></fa-icon> {{
+                  score.score }}/{{ score.maxScore }} pt</span
+                >
+                }
+              </div>
             </div>
           </div>
+          } @empty {
+          <div class="d-flex align-items-center justify-content-center h-100">
+            <p class="mb-0 small text-dark opacity-75">
+              {{ t('no_simulations_yet') }}
+            </p>
+          </div>
+          }
         </div>
-        } @empty {
-        <div class="d-flex align-items-center justify-content-center h-100">
-          <p class="mb-0 small text-dark opacity-75">
-            Nessuna simulazione ancora effettuata.
-          </p>
-        </div>
-        }
       </div>
     </div>
-  </div>
 
-  <!-- ── BOTTOM-RIGHT: Comunicazioni ──────────────────────────────────────── -->
-  <div
-    class="student-block student-block--comunicazioni db-comunicazioni d-flex flex-column"
-  >
+    <!-- ── BOTTOM-RIGHT: Comunicazioni ──────────────────────────────────────── -->
     <div
-      class="d-flex align-items-center justify-content-between mb-3 flex-shrink-0"
+      class="student-block student-block--comunicazioni db-comunicazioni d-flex flex-column"
     >
-      <div class="d-flex align-items-center gap-2">
-        <h6 class="mb-0 text-white">Comunicazioni</h6>
-        @if (UnreadCount() > 0) {
-        <span
-          class="badge rounded-pill fw-semibold"
-          style="
-            font-size: 0.65rem;
-            background-color: var(--syllex-green);
-            color: #1b2f6b !important;
-          "
+      <div
+        class="d-flex align-items-center justify-content-between mb-3 flex-shrink-0"
+      >
+        <div class="d-flex align-items-center gap-2">
+          <h6 class="mb-0 text-white">{{ t('communications') }}</h6>
+          @if (UnreadCount() > 0) {
+          <span
+            class="badge rounded-pill fw-semibold"
+            style="
+              font-size: 0.65rem;
+              background-color: var(--syllex-green);
+              color: #1b2f6b !important;
+            "
+          >
+            {{ t('unread_comms', { count: UnreadCount() }) }}
+          </span>
+          }
+        </div>
+        <a
+          routerLink="/s/calendario"
+          class="text-white-50 small text-decoration-none d-flex align-items-center gap-1 opacity-75"
         >
-          {{ UnreadCount() }} nuove
-        </span>
+          {{ t('see_all') }}
+          <fa-icon [icon]="ArrowRight" class="small"></fa-icon>
+        </a>
+      </div>
+      <div class="flex-grow-1 block-scroll pr-1">
+        @for (com of RecentComunicazioni(); track $index) {
+        <div
+          app-student-comunicazione-card
+          [comunicazione]="com"
+          class="mb-2"
+        ></div>
+        } @empty {
+        <p class="text-white-50 opacity-75 mb-0 small">
+          {{ t('no_recent_comms') }}
+        </p>
         }
       </div>
-      <a
-        routerLink="/s/calendario"
-        class="text-white-50 small text-decoration-none d-flex align-items-center gap-1 opacity-75"
-      >
-        Vedi tutte <fa-icon [icon]="ArrowRight" class="small"></fa-icon>
-      </a>
-    </div>
-    <div class="flex-grow-1 block-scroll pr-1">
-      @for (com of RecentComunicazioni(); track $index) {
-      <div
-        app-student-comunicazione-card
-        [comunicazione]="com"
-        class="mb-2"
-      ></div>
-      } @empty {
-      <p class="text-white-50 opacity-75 mb-0 small">
-        Nessuna comunicazione recente.
-      </p>
-      }
     </div>
   </div>
-</div>
+</ng-container>
