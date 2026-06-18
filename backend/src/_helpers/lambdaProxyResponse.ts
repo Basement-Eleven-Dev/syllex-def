@@ -39,13 +39,13 @@ export const lambdaRequest = (handler: Handler) => {
         defaultContentType: "application/json",
       }),
     )
-    .use(httpErrorHandler())
     .use(
       cors({
         origin: "*",
         headers: AUTHORIZED_API_HEADERS.join(','),
       }),
-    );
+    )
+    .use(httpErrorHandler());
 };
 
 export const lambdaPublicRequest = (handler: Handler) => {
@@ -61,12 +61,12 @@ export const lambdaPublicRequest = (handler: Handler) => {
         defaultContentType: "application/json",
       }),
     )
-    .use(httpErrorHandler())
     .use(
       cors({
         origin: "*",
         headers: AUTHORIZED_API_HEADERS.join(','),
       }),
-    );
+    )
+    .use(httpErrorHandler());
 };
 
