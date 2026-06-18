@@ -1,3 +1,4 @@
+<ng-container *transloco="let t; read: 'test_card'">
 <div class="position-relative h-100">
   <div class="syllexCard h-100">
     <div class="d-flex flex-column justify-content-between h-100 gap-3">
@@ -7,9 +8,9 @@
         >
           <fa-icon [icon]="CalendarIcon"></fa-icon>
           <p class="m-0" style="font-size: 0.7rem">
-            @if(test.availableFrom) { dal {{ test.availableFrom | date:
+            @if(test.availableFrom) { {{ t('from') }} {{ test.availableFrom | date:
             'dd/MM/yy' }} } @if(test.availableTo) {
-            <span>al {{ test.availableTo | date: 'dd/MM/yy' }}</span>
+            <span>{{ t('to') }} {{ test.availableTo | date: 'dd/MM/yy' }}</span>
             }
           </p>
         </div>
@@ -19,7 +20,7 @@
           }
 
           <app-syllex-badge
-            [label]="test.status!"
+            [label]="t('status_' + test.status!)"
             [color]="getBadgeColor()"
           ></app-syllex-badge>
         </div>
@@ -35,7 +36,7 @@
       <div class="w-100 gap-2">
         <section class="d-flex flex-column gap-2">
           <div class="text-dark">
-            {{ test.questions?.length || 0 }} Domande - {{ getMaxScore() }} pt.
+            {{ test.questions?.length || 0 }} {{ t('questions') }} - {{ getMaxScore() }} pt.
           </div>
           <div class="text-dark">
             <a
@@ -48,9 +49,9 @@
               classiService.getClassNameById(class) }}@if(!last &&
               test.classIds.length > 1){
               <span>, </span> } } @if(test.classIds.length > 2) {
-              <span> e altre {{ test.classIds.length - 2 }}</span>
+              <span>{{ t('and_other', {count: test.classIds.length - 2}) }}</span>
               } } @else {
-              <span>Nessuna classe assegnata</span>
+              <span>{{ t('no_class') }}</span>
               }
             </a>
           </div>
@@ -58,7 +59,7 @@
         <div class="d-flex flex-row justify-content-end align-items-center gap-2 mt-auto">
           <app-syllex-button
             [props]="{
-            label: 'Visualizza',
+            label: t('view'),
             variant: 'primary',
             size: 'medium',
             link: '/t/tests/' + test._id
@@ -85,3 +86,4 @@
     </div>
   </div>
 </div>
+</ng-container>

@@ -23,6 +23,7 @@ import { ɵɵDir } from '@angular/cdk/scrolling';
 import { SyllexBadge, SyllexBadgeColor } from '../UI/syllex-badge/syllex-badge';
 import { faCalendar } from '@fortawesome/free-solid-svg-icons';
 import { SyllexButton } from '../UI/syllex-button/syllex-button';
+import { TranslocoDirective, TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-test-card',
@@ -36,6 +37,8 @@ import { SyllexButton } from '../UI/syllex-button/syllex-button';
     NgbDropdownMenu,
     SyllexBadge,
     SyllexButton,
+    TranslocoDirective,
+    TranslocoPipe,
   ],
   templateUrl: './test-card.html',
   styleUrl: './test-card.scss',

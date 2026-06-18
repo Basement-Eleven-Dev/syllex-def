@@ -378,5 +378,25 @@
     "confirm_btn": "Conferma e accedi",
     "signin_btn": "Accedi",
     "new_password_msg": "Inserisci una nuova password per completare l'attivazione"
+  },
+  "test_card": {
+    "from": "dal",
+    "to": "al",
+    "questions": "Domande",
+    "and_other": " e altre {{count}}",
+    "no_class": "Nessuna classe assegnata",
+    "view": "Visualizza",
+    "status_pubblicato": "PUBBLICATO",
+    "status_bozza": "BOZZA",
+    "status_archiviato": "ARCHIVIATO"
+  },
+  "test_menu": {
+    "edit": "Modifica",
+    "publish": "Pubblica",
+    "duplicate": "Duplica",
+    "assign": "Assegna",
+    "delete": "Elimina",
+    "confirm_delete_title": "Conferma eliminazione del Test",
+    "confirm_delete_msg": "Sei sicuro di voler eliminare {{name}}?"
   }
 }

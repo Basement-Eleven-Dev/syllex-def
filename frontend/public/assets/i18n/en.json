@@ -378,5 +378,25 @@
     "confirm_btn": "Confirm and sign in",
     "signin_btn": "Sign in",
     "new_password_msg": "Enter a new password to complete activation"
+  },
+  "test_card": {
+    "from": "from",
+    "to": "to",
+    "questions": "Questions",
+    "and_other": " and {{count}} more",
+    "no_class": "No classes assigned",
+    "view": "View",
+    "status_pubblicato": "PUBLISHED",
+    "status_bozza": "DRAFT",
+    "status_archiviato": "ARCHIVED"
+  },
+  "test_menu": {
+    "edit": "Edit",
+    "publish": "Publish",
+    "duplicate": "Duplicate",
+    "assign": "Assign",
+    "delete": "Delete",
+    "confirm_delete_title": "Confirm Test Deletion",
+    "confirm_delete_msg": "Are you sure you want to delete {{name}}?"
   }
 }

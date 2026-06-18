@@ -1,19 +1,21 @@
+<ng-container *transloco="let t; read: 'test_menu'">
 <button ngbDropdownItem [routerLink]="'/t/tests/edit/' + test._id">
-  Modifica
+  {{ t('edit') }}
 </button>
 @if(['bozza', 'archiviato'].includes(test.status!)) {
-<button ngbDropdownItem (click)="publish.emit(test._id)">Pubblica</button>
+<button ngbDropdownItem (click)="publish.emit(test._id)">{{ t('publish') }}</button>
 }
-<button ngbDropdownItem (click)="duplicate.emit(test._id)">Duplica</button>
-<button ngbDropdownItem (click)="onRequestAssignToClass()">Assegna</button>
+<button ngbDropdownItem (click)="duplicate.emit(test._id)">{{ t('duplicate') }}</button>
+<button ngbDropdownItem (click)="onRequestAssignToClass()">{{ t('assign') }}</button>
 <div class="dropdown-divider"></div>
 <button
   ngbDropdownItem
   class="text-danger"
   confirmAction
-  [confirmMessage]="'Sei sicuro di voler eliminare ' + test.name + '?'"
-  confirmTitle="Conferma eliminazione del Test"
+  [confirmMessage]="t('confirm_delete_msg', {name: test.name})"
+  [confirmTitle]="t('confirm_delete_title')"
   (confirmed)="delete.emit(test._id)"
 >
-  Elimina
+  {{ t('delete') }}
 </button>
+</ng-container>
