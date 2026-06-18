@@ -146,5 +146,63 @@
     "student_count": "{{count}} student",
     "students_count": "{{count}} students",
     "view_button": "View"
+  },
+  "materiali": {
+    "header_title": "Files and Resources",
+    "header_desc": "Manage and view your files and resources for the selected subject.",
+    "btn_create_folder": "Create folder",
+    "btn_upload_file": "Upload file",
+    "btn_generate_ai": "Generate with AI",
+    "search_placeholder": "Search file or folder...",
+    "btn_back": "Back",
+    "btn_deselect": "Deselect",
+    "btn_delete_count": "Delete ({{count}})",
+    "empty_title": "No files or resources found",
+    "empty_desc": "Upload handouts, PDFs, or slides for this subject. Your materials will be securely analyzed by Syllex AI to generate tests and questions instantly.",
+    "empty_action": "Upload your first File",
+    "table_name": "Name",
+    "table_type": "Type",
+    "table_size": "Size",
+    "table_date": "Modified date",
+    "overlay_title": "Uploading...",
+    "overlay_subtitle": "Do not close the page,\notherwise the upload will be lost.",
+    "alert_format": "Unsupported file format. Allowed extensions: {{extensions}}",
+    "error_upload": "Error uploading file",
+    "confirm_delete_item": "Are you sure you want to delete \"{{name}}\"?",
+    "confirm_delete_multiple": "Are you sure you want to delete the {{count}} selected items?",
+    "type_folder": "Folder ({{count}})",
+    "type_file": "File",
+    "topic_added_success": "Topic \"{{topic}}\" added successfully",
+    "topic_added_error": "Error adding topic",
+    "new_folder": "New Folder",
+    "card": {
+      "processing": "Processing…",
+      "new": "New",
+      "elements_count": "{{count}} items",
+      "element_count": "{{count}} item",
+      "not_shared": "Not shared",
+      "shared_classes": "{{count}} classes",
+      "shared_class": "{{count}} class",
+      "download": "Download file"
+    },
+    "menu": {
+      "created_at": "Created on {{date}}",
+      "rename": "Rename",
+      "view": "View",
+      "present": "Present",
+      "assign": "Assign",
+      "delete": "Delete",
+      "confirm_delete_title": "Confirm deletion",
+      "confirm_delete_msg": "Are you sure you want to delete {{name}}?"
+    }
+  },
+  "assign_class": {
+    "title": "Assign to Classes",
+    "description": "Select the classes to assign to \"{{name}}\"",
+    "cancel": "Cancel",
+    "save": "Save",
+    "error_feedback": "Error updating assignment",
+    "error_update": "Failed to update class assignment",
+    "error_missing_id": "Resource ID is missing"
   }
 }

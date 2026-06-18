@@ -146,5 +146,63 @@
     "student_count": "{{count}} studente",
     "students_count": "{{count}} studenti",
     "view_button": "Visualizza"
+  },
+  "materiali": {
+    "header_title": "File e Risorse",
+    "header_desc": "Gestisci e visualizza i tuoi file e le risorse per la materia selezionata.",
+    "btn_create_folder": "Crea cartella",
+    "btn_upload_file": "Carica file",
+    "btn_generate_ai": "Genera con AI",
+    "search_placeholder": "Cerca file o cartella...",
+    "btn_back": "Indietro",
+    "btn_deselect": "Deseleziona",
+    "btn_delete_count": "Elimina ({{count}})",
+    "empty_title": "Nessun file o risorsa presente",
+    "empty_desc": "Carica dispense, PDF o slide per questa materia. I tuoi materiali saranno analizzati in modo sicuro dall'AI di Syllex per generare test e domande all'istante.",
+    "empty_action": "Carica il tuo primo File",
+    "table_name": "Nome",
+    "table_type": "Tipo",
+    "table_size": "Dimensione",
+    "table_date": "Data modifica",
+    "overlay_title": "Caricamento in corso...",
+    "overlay_subtitle": "Non chiudere la pagina,\naltrimenti il caricamento andrà perduto.",
+    "alert_format": "Formato file non supportato. Estensioni consentite: {{extensions}}",
+    "error_upload": "Errore durante il caricamento del file",
+    "confirm_delete_item": "Sei sicuro di voler eliminare \"{{name}}\"?",
+    "confirm_delete_multiple": "Sei sicuro di voler eliminare i {{count}} elementi selezionati?",
+    "type_folder": "Cartella ({{count}})",
+    "type_file": "File",
+    "topic_added_success": "Argomento \"{{topic}}\" aggiunto con successo",
+    "topic_added_error": "Errore nell'aggiunta dell'argomento",
+    "new_folder": "Nuova Cartella",
+    "card": {
+      "processing": "Elaborazione in corso…",
+      "new": "Nuovo",
+      "elements_count": "{{count}} elementi",
+      "element_count": "{{count}} elemento",
+      "not_shared": "Non condiviso",
+      "shared_classes": "{{count}} classi",
+      "shared_class": "{{count}} classe",
+      "download": "Scarica file"
+    },
+    "menu": {
+      "created_at": "Creato il {{date}}",
+      "rename": "Rinomina",
+      "view": "Visualizza",
+      "present": "Presenta",
+      "assign": "Assegna",
+      "delete": "Elimina",
+      "confirm_delete_title": "Conferma eliminazione",
+      "confirm_delete_msg": "Sei sicuro di voler eliminare {{name}}?"
+    }
+  },
+  "assign_class": {
+    "title": "Assegna alle Classi",
+    "description": "Seleziona le classi a cui assegnare \"{{name}}\"",
+    "cancel": "Annulla",
+    "save": "Salva",
+    "error_feedback": "Errore nell'aggiornamento dell'assegnazione",
+    "error_update": "Impossibile aggiornare l'assegnazione classe",
+    "error_missing_id": "ID risorsa mancante"
   }
 }

@@ -7,10 +7,11 @@ import { MaterialInterface } from '../../../services/materiali/materiali-service
 import { FileViewer } from '../file-viewer/file-viewer';
 import { AssignClass } from '../assign-class/assign-class';
 import { PptxPresenter } from '../pptx-presenter/pptx-presenter';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-materiale-contextual-menu',
-  imports: [NgbDropdownItem, ConfirmActionDirective, DatePipe],
+  imports: [NgbDropdownItem, ConfirmActionDirective, DatePipe, TranslocoDirective, TranslocoPipe],
   templateUrl: './materiale-contextual-menu.html',
   styleUrl: './materiale-contextual-menu.scss',
 })

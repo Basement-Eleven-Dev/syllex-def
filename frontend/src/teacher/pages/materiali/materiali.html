@@ -1,26 +1,18 @@
-<!--       <button
-        tourAnchor="materiali_generate_ai"
-        class="btn ai icon-btn"
-        (click)="onRequestGenerate()"
-        [disabled]="isStorageFull()"
-      >
-        <fa-icon [icon]="icons.sparkles"></fa-icon> Genera con AI
-      </button> -->
-
+<ng-container *transloco="let t; read: 'materiali'">
 <app-syllex-page-header
-  [title]="'File e Risorse'"
-  [description]="'Gestisci e visualizza i tuoi file e le risorse per la materia selezionata.'"
+  [title]="t('header_title')"
+  [description]="t('header_desc')"
 >
   <app-syllex-button
-    [props]="{ label: 'Crea cartella', variant: 'primary', color: 'celestine', size: 'medium', leftIcon: icons.plus }"
+    [props]="{ label: t('btn_create_folder'), variant: 'primary', color: 'celestine', size: 'medium', leftIcon: icons.plus }"
     (clicked)="onCreateNewFolder()"
   />
   <app-syllex-button
-    [props]="{ label: 'Carica file', variant: 'primary', color: 'celestine', size: 'medium', leftIcon: icons.upload }"
+    [props]="{ label: t('btn_upload_file'), variant: 'primary', color: 'celestine', size: 'medium', leftIcon: icons.upload }"
     (clicked)="onRequestUpload()"
   />
   <app-syllex-button
-    [props]="{ label: 'Genera con AI', variant: 'secondary', size: 'medium', leftIcon: icons.sparkles }"
+    [props]="{ label: t('btn_generate_ai'), variant: 'secondary', size: 'medium', leftIcon: icons.sparkles }"
     (clicked)="onRequestGenerate()"
   />
 </app-syllex-page-header>
@@ -40,7 +32,7 @@
     />
     <app-syllex-search-input
       class="flex-grow-1 w-100"
-      placeholder="Cerca file o cartella..."
+      [placeholder]="t('search_placeholder')"
       [value]="searchTerm()"
       (valueChange)="searchTerm.set($event)"
       style="max-width: 100%"
@@ -59,7 +51,7 @@
       @if (currentPathArray().length > 1) {
       <app-syllex-button
         [props]="{
-          label: 'Indietro',
+          label: t('btn_back'),
           variant: 'primary',
           color: 'celestine',
           size: 'small',
@@ -91,7 +83,7 @@
       @if(selectedCount() > 0) {
       <app-syllex-button
         [props]="{
-          label: 'Deseleziona',
+          label: t('btn_deselect'),
           variant: 'outline',
           size: 'small'
         }"
@@ -99,7 +91,7 @@
       />
       <app-syllex-button
         [props]="{
-          label: 'Elimina (' + selectedCount() + ')',
+          label: t('btn_delete_count', { count: selectedCount() }),
           variant: 'primary',
           color: 'danger',
           size: 'small',
@@ -121,13 +113,13 @@
   @if (folders().length === 0 && files().length === 0) {
     <div class="mt-5 mb-5">
       <app-syllex-empty-state
-        title="Nessun file o risorsa presente"
-        description="Carica dispense, PDF o slide per questa materia. I tuoi materiali saranno analizzati in modo sicuro dall'AI di Syllex per generare test e domande all'istante."
+        [title]="t('empty_title')"
+        [description]="t('empty_desc')"
         [icon]="icons.upload"
-        actionLabel="Carica il tuo primo File"
+        [actionLabel]="t('empty_action')"
         [actionIcon]="icons.upload"
         (actionClicked)="onRequestUpload()"
-        secondaryActionLabel="Genera con AI"
+        [secondaryActionLabel]="t('btn_generate_ai')"
         [secondaryActionIcon]="icons.sparkles"
         (secondaryActionClicked)="onRequestGenerate()"
       ></app-syllex-empty-state>
@@ -177,10 +169,10 @@
                 />
               </th>
               <th style="width: 40px"></th>
-              <th>Nome</th>
-              <th style="width: 120px">Tipo</th>
-              <th style="width: 120px">Dimensione</th>
-              <th style="width: 180px">Data modifica</th>
+              <th>{{ t('table_name') }}</th>
+              <th style="width: 120px">{{ t('table_type') }}</th>
+              <th style="width: 120px">{{ t('table_size') }}</th>
+              <th style="width: 180px">{{ t('table_date') }}</th>
               <th style="width: 50px"></th>
             </tr>
           </thead>
@@ -261,6 +253,7 @@
 
 <app-ai-overlay
   [visible]="isUploading()"
-  loadingTitle="Caricamento in corso..."
-  loadingSubtitle="Non chiudere la pagina,&#10;altrimenti il caricamento andrà perduto."
+  [loadingTitle]="t('overlay_title')"
+  [loadingSubtitle]="t('overlay_subtitle')"
 ></app-ai-overlay>
+</ng-container>

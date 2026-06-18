@@ -9,13 +9,14 @@ import {
 import { ClassiService } from '../../../services/classi-service';
 import { FeedbackService } from '../../../services/feedback-service';
 import { SyllexButton } from '../UI/syllex-button/syllex-button';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 type ResourceType = 'test' | 'material';
 type Resource = TestInterface | MaterialInterface;
 
 @Component({
   selector: 'app-assign-class',
-  imports: [ClassSelector, SyllexButton],
+  imports: [ClassSelector, SyllexButton, TranslocoDirective, TranslocoPipe],
   templateUrl: './assign-class.html',
   styleUrl: './assign-class.scss',
 })
@@ -25,6 +26,7 @@ export class AssignClass implements OnInit {
   private readonly materialsService = inject(MaterialiService);
   readonly classiService = inject(ClassiService);
   private readonly feedbackService = inject(FeedbackService);
+  private readonly translocoService = inject(TranslocoService);
 
   // Public properties for NgbModal compatibility
   resourceType!: ResourceType;
@@ -49,7 +51,7 @@ export class AssignClass implements OnInit {
 
     const resourceId = this.resource._id;
     if (!resourceId) {
-      this.ErrorMessage.set('Resource ID is missing');
+      this.ErrorMessage.set(this.translocoService.translate('assign_class.error_missing_id'));
       this.IsSaving.set(false);
       return;
     }
@@ -70,10 +72,10 @@ export class AssignClass implements OnInit {
           error: (err: unknown) => {
             console.error('Error updating class assignment:', err);
             this.feedbackService.showFeedback(
-              "Errore nell'aggiornamento dell'assegnazione",
+              this.translocoService.translate('assign_class.error_feedback'),
               false,
             );
-            this.ErrorMessage.set('Failed to update class assignment');
+            this.ErrorMessage.set(this.translocoService.translate('assign_class.error_update'));
             this.IsSaving.set(false);
           },
         });
@@ -93,10 +95,10 @@ export class AssignClass implements OnInit {
           error: (err: unknown) => {
             console.error('Error updating class assignment:', err);
             this.feedbackService.showFeedback(
-              "Errore nell'aggiornamento dell'assegnazione",
+              this.translocoService.translate('assign_class.error_feedback'),
               false,
             );
-            this.ErrorMessage.set('Failed to update class assignment');
+            this.ErrorMessage.set(this.translocoService.translate('assign_class.error_update'));
             this.IsSaving.set(false);
           },
         });
