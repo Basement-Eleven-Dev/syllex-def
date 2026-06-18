@@ -3,11 +3,12 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPrint, faTimes, faFilePdf } from '@fortawesome/pro-solid-svg-icons';
 import { FormsModule } from '@angular/forms';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-test-print-modal',
   standalone: true,
-  imports: [FontAwesomeModule, FormsModule],
+  imports: [FontAwesomeModule, FormsModule, TranslocoDirective, TranslocoPipe],
   templateUrl: './test-print-modal.html',
   styleUrl: './test-print-modal.scss'
 })
@@ -16,6 +17,7 @@ export class TestPrintModal {
   @Input() questions: any[] = [];
   
   activeModal = inject(NgbActiveModal);
+  translocoService = inject(TranslocoService);
   
   instructions: string = '';
   
@@ -33,8 +35,8 @@ export class TestPrintModal {
       if (q.type === 'vero falso') {
         answersHtml = `
           <div class="options">
-            <label><span class="checkbox"></span> Vero</label>
-            <label><span class="checkbox"></span> Falso</label>
+            <label><span class="checkbox"></span> ${this.translocoService.translate('test_print_modal.true_cap')}</label>
+            <label><span class="checkbox"></span> ${this.translocoService.translate('test_print_modal.false_cap')}</label>
           </div>`;
       } else if (q.type === 'scelta multipla' && q.options?.length) {
         const opts = q.options.map((opt: any) => `
@@ -64,7 +66,7 @@ export class TestPrintModal {
     }).join('');
 
     const instructionsHtml = this.instructions
-      ? `<div class="instructions"><h4>Istruzioni:</h4><p>${this.instructions.replace(/\n/g, '<br>')}</p></div>`
+      ? `<div class="instructions"><h4>${this.translocoService.translate('test_print_modal.instructions')}</h4><p>${this.instructions.replace(/\n/g, '<br>')}</p></div>`
       : '';
 
     const html = `<!DOCTYPE html>
@@ -218,17 +220,17 @@ export class TestPrintModal {
     <div class="header">
       <div>
         <h1>${this.test.name}</h1>
-        <p style="font-size: 10pt; color: #555; margin-top: 4px;">Test di valutazione</p>
+        <p style="font-size: 10pt; color: #555; margin-top: 4px;">${this.translocoService.translate('test_print_modal.subtitle')}</p>
       </div>
       <div class="meta">
-        <p><strong>Data:</strong> ________________________</p>
-        <p><strong>Classe:</strong> ______________</p>
+        <p><strong>${this.translocoService.translate('test_print_modal.date')}</strong> ________________________</p>
+        <p><strong>${this.translocoService.translate('test_print_modal.class')}</strong> ______________</p>
       </div>
     </div>
     
     <div class="student-info">
-      <div><strong>Nome:</strong> ____________________________________</div>
-      <div><strong>Cognome:</strong> _________________________________</div>
+      <div><strong>${this.translocoService.translate('test_print_modal.name')}</strong> ____________________________________</div>
+      <div><strong>${this.translocoService.translate('test_print_modal.lastname')}</strong> _________________________________</div>
     </div>
     
     ${instructionsHtml}

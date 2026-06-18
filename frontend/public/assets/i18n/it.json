@@ -472,5 +472,42 @@
     "err_id": "ID mancante per la generazione.",
     "err_service": "Servizio temporaneamente non disponibile.",
     "err_gen": "Errore durante la generazione IA"
+  },
+  "test_print_modal": {
+    "title": "Anteprima di Stampa",
+    "options_title": "Opzioni Stampa",
+    "options_label": "Istruzioni aggiuntive",
+    "options_placeholder": "Inserisci qui le istruzioni per gli studenti...",
+    "btn_print": "Stampa / Salva PDF",
+    "browser_hint": "Usa la funzione di stampa del browser per salvare come PDF.",
+    "subtitle": "Test di valutazione",
+    "date": "Data:",
+    "class": "Classe:",
+    "name": "Nome:",
+    "lastname": "Cognome:",
+    "instructions": "Istruzioni:",
+    "true_cap": "Vero",
+    "false_cap": "Falso"
+  },
+  "test_results_print_modal": {
+    "title": "Anteprima Risultati",
+    "summary": "Riepilogo",
+    "assigned": "Assegnati",
+    "delivered": "Consegnati",
+    "reviewed": "Corretti",
+    "avg_score": "Media voto",
+    "btn_print": "Stampa / Salva PDF",
+    "browser_hint": "Usa la funzione di stampa del browser per salvare come PDF.",
+    "subtitle": "Riepilogo risultati",
+    "printed_on": "Stampato il",
+    "max_score": "Voto max",
+    "min_score": "Voto min",
+    "col_student": "Studente",
+    "col_delivered": "Consegnato",
+    "col_reviewed": "Corretto",
+    "col_score": "Punteggio",
+    "yes": "Sì",
+    "no": "No",
+    "doc_generated": "Documento generato automaticamente"
   }
 }

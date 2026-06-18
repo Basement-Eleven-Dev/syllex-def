@@ -472,5 +472,42 @@
     "err_id": "Missing ID for generation.",
     "err_service": "Service temporarily unavailable.",
     "err_gen": "Error during AI generation"
+  },
+  "test_print_modal": {
+    "title": "Print Preview",
+    "options_title": "Print Options",
+    "options_label": "Additional instructions",
+    "options_placeholder": "Enter instructions for students here...",
+    "btn_print": "Print / Save PDF",
+    "browser_hint": "Use the browser's print function to save as a PDF.",
+    "subtitle": "Assessment test",
+    "date": "Date:",
+    "class": "Class:",
+    "name": "First Name:",
+    "lastname": "Last Name:",
+    "instructions": "Instructions:",
+    "true_cap": "True",
+    "false_cap": "False"
+  },
+  "test_results_print_modal": {
+    "title": "Results Preview",
+    "summary": "Summary",
+    "assigned": "Assigned",
+    "delivered": "Delivered",
+    "reviewed": "Reviewed",
+    "avg_score": "Average score",
+    "btn_print": "Print / Save PDF",
+    "browser_hint": "Use the browser's print function to save as a PDF.",
+    "subtitle": "Results summary",
+    "printed_on": "Printed on",
+    "max_score": "Max score",
+    "min_score": "Min score",
+    "col_student": "Student",
+    "col_delivered": "Delivered",
+    "col_reviewed": "Reviewed",
+    "col_score": "Score",
+    "yes": "Yes",
+    "no": "No",
+    "doc_generated": "Automatically generated document"
   }
 }
