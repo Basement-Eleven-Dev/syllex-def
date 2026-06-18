@@ -28,5 +28,39 @@
       "upload_materials": "Upload materials",
       "to_grade_count": "To grade ({{count}})"
     }
+  },
+  "test": {
+    "header_title": "Welcome to Tests,",
+    "header_desc": "here you can create new tests and publish them for your students, or grade the ones already submitted.",
+    "btn_create_new": "Create New Test",
+    "search_placeholder": "Search tests...",
+    "status": {
+      "bozza": "Draft",
+      "pubblicato": "Published",
+      "archiviato": "Archived"
+    },
+    "tabs": {
+      "tutti": "All",
+      "da_correggere": "To grade",
+      "bozze": "Drafts"
+    },
+    "empty_recent": {
+      "title": "No tests found",
+      "desc": "Start creating quizzes and tests for your students. You can compose tests from the question bank or generate new ones from your materials.",
+      "action": "Create your first Test"
+    },
+    "empty_pending": {
+      "title": "All tests are graded!",
+      "desc": "Great job! Currently there are no quizzes or submissions waiting to be graded.",
+      "action": "Back to Dashboard"
+    },
+    "feedback": {
+      "delete_success": "Test deleted successfully",
+      "delete_error": "Error deleting test",
+      "duplicate_success": "Test duplicated successfully",
+      "duplicate_error": "Error duplicating test",
+      "publish_success": "Test published successfully",
+      "publish_error": "Error publishing test"
+    }
   }
 }

@@ -1,11 +1,12 @@
+<ng-container *transloco="let t; read: 'test'">
 <div tourAnchor="test_header" class="d-flex flex-column">
   <app-syllex-page-header
-    [title]="'Benvenuto in Test,'"
-    [description]="'qui puoi creare nuovi test e pubblicarli per i tuoi studenti, oppure correggere quelli già inviati.'"
+    [title]="t('header_title')"
+    [description]="t('header_desc')"
   >
     <app-syllex-button
       [props]="{
-          label: 'Crea Nuovo Test',
+          label: t('btn_create_new'),
           variant: 'secondary',
           size: 'medium',
           link: '/t/tests/new'
@@ -29,7 +30,7 @@
     style="max-width: 100%;"
   >
     <app-syllex-search-input
-      placeholder="Cerca test..."
+      [placeholder]="t('search_placeholder')"
       [value]="SearchTerm()"
       (valueChange)="onSearchTermChange($event)"
       class="flex-grow-1 flex-md-grow-0"
@@ -51,10 +52,10 @@
   @if (RecentTests().length === 0) {
     <div class="mt-5 mb-5">
       <app-syllex-empty-state
-        title="Nessun test trovato"
-        description="Inizia a creare verifiche e test per i tuoi studenti. Puoi comporre test attingendo dalla banca domande o generarne di nuovi a partire dai tuoi materiali."
+        [title]="t('empty_recent.title')"
+        [description]="t('empty_recent.desc')"
         [icon]="ClipboardListIcon"
-        actionLabel="Crea il tuo primo Test"
+        [actionLabel]="t('empty_recent.action')"
         actionLink="/t/tests/new"
         [actionIcon]="PlusIcon"
       ></app-syllex-empty-state>
@@ -106,10 +107,10 @@
   @if (PendingTests().length === 0) {
     <div class="mt-5 mb-5">
       <app-syllex-empty-state
-        title="Tutti i test sono corretti!"
-        description="Ottimo lavoro! Al momento non ci sono verifiche o consegne inviate dai tuoi studenti in attesa di essere valutate."
+        [title]="t('empty_pending.title')"
+        [description]="t('empty_pending.desc')"
         [icon]="CircleCheckIcon"
-        actionLabel="Torna alla Dashboard"
+        [actionLabel]="t('empty_pending.action')"
         actionLink="/t/dashboard"
         actionColor="celestine"
       ></app-syllex-empty-state>
@@ -148,3 +149,4 @@
   }
 </section>
 }
+</ng-container>

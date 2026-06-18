@@ -28,5 +28,39 @@
       "upload_materials": "Carica materiali",
       "to_grade_count": "Da correggere ({{count}})"
     }
+  },
+  "test": {
+    "header_title": "Benvenuto in Test,",
+    "header_desc": "qui puoi creare nuovi test e pubblicarli per i tuoi studenti, oppure correggere quelli già inviati.",
+    "btn_create_new": "Crea Nuovo Test",
+    "search_placeholder": "Cerca test...",
+    "status": {
+      "bozza": "Bozza",
+      "pubblicato": "Pubblicato",
+      "archiviato": "Archiviato"
+    },
+    "tabs": {
+      "tutti": "Tutti",
+      "da_correggere": "Da correggere",
+      "bozze": "Bozze"
+    },
+    "empty_recent": {
+      "title": "Nessun test trovato",
+      "desc": "Inizia a creare verifiche e test per i tuoi studenti. Puoi comporre test attingendo dalla banca domande o generarne di nuovi a partire dai tuoi materiali.",
+      "action": "Crea il tuo primo Test"
+    },
+    "empty_pending": {
+      "title": "Tutti i test sono corretti!",
+      "desc": "Ottimo lavoro! Al momento non ci sono verifiche o consegne inviate dai tuoi studenti in attesa di essere valutate.",
+      "action": "Torna alla Dashboard"
+    },
+    "feedback": {
+      "delete_success": "Test eliminato con successo",
+      "delete_error": "Errore durante la cancellazione del test",
+      "duplicate_success": "Test duplicato con successo",
+      "duplicate_error": "Errore durante la duplicazione del test",
+      "publish_success": "Test pubblicato con successo",
+      "publish_error": "Errore durante la pubblicazione del test"
+    }
   }
 }
