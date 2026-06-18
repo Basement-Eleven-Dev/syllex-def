@@ -6,17 +6,20 @@ import {
   Output,
   ViewChild,
   ElementRef,
+  inject,
 } from '@angular/core';
 import { QuestionInterface } from '../../../services/questions';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-questions-grid-selector',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslocoDirective, TranslocoPipe],
   templateUrl: './questions-grid-selector.html',
   styleUrl: './questions-grid-selector.scss',
 })
 export class QuestionsGridSelector {
+  private translocoService = inject(TranslocoService);
   @ViewChild('scrollContainer') scrollContainer?: ElementRef<HTMLElement>;
 
   private _questions: QuestionInterface[] = [];
@@ -95,11 +98,11 @@ export class QuestionsGridSelector {
   getQuestionTypeLabel(type: string): string {
     switch (type) {
       case 'scelta multipla':
-        return 'Scelta Multipla';
+        return this.translocoService.translate('test_preview_modal.type_multiple');
       case 'vero falso':
-        return 'Vero/Falso';
+        return this.translocoService.translate('test_preview_modal.type_truefalse');
       case 'risposta aperta':
-        return 'Aperta';
+        return this.translocoService.translate('test_preview_modal.type_open');
       default:
         return type;
     }

@@ -30,6 +30,7 @@ import { TestStats } from '../../components/test-stats/test-stats';
 import { FeedbackService } from '../../../services/feedback-service';
 import { TestsService } from '../../../services/tests-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ConfirmService } from '../../../services/confirm.service';
 
 import { TestAiSummaryComponent } from '../../components/test-ai-summary/test-ai-summary';
 import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
@@ -88,6 +89,7 @@ export class TestDetail {
   private readonly modalService = inject(NgbModal);
   private readonly questionsService = inject(QuestionsService);
   private readonly translocoService = inject(TranslocoService);
+  private readonly confirmService = inject(ConfirmService);
 
   // Icone UI statiche
   readonly ArrowLeftIcon = faArrowLeft;
@@ -164,9 +166,14 @@ export class TestDetail {
     if (testId) this.router.navigate(['/t/tests/edit', testId]);
   }
 
-  onDeleteTest(): void {
+  async onDeleteTest(): Promise<void> {
     const testId = this.TestId();
     if (!testId) return;
+
+    const confirmed = await this.confirmService.confirm(
+      this.translocoService.translate('test_detail.confirm_delete')
+    );
+    if (!confirmed) return;
 
     this.testsService
       .deleteTest(testId)

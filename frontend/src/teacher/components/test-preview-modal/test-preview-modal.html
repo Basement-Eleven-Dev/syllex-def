@@ -1,11 +1,12 @@
+<ng-container *transloco="let t; read: 'test_preview_modal'">
 <div class="modal-header border-0 p-4 bg-light">
   <div class="d-flex align-items-center gap-3">
     <div class="icon-box bg-primary text-white rounded-3 p-2">
       <fa-icon [icon]="FileIcon"></fa-icon>
     </div>
     <div>
-      <h5 class="modal-title fw-bold mb-0">Anteprima Test</h5>
-      <p class="text-muted small mb-0">{{ testTitle || 'Senza titolo' }}</p>
+      <h5 class="modal-title fw-bold mb-0">{{ t('title') }}</h5>
+      <p class="text-muted small mb-0">{{ testTitle || t('untitled') }}</p>
     </div>
   </div>
   <button
@@ -21,12 +22,12 @@
       <!-- Intestazione Test -->
       <div class="text-center mb-5 border-bottom pb-4">
         <h2 class="fw-bold text-dark mb-2">
-          {{ testTitle || 'Nuovo Test di Valutazione' }}
+          {{ testTitle || t('new_test') }}
         </h2>
         <div class="d-flex justify-content-center gap-4 text-muted small">
           <span
             ><fa-icon [icon]="FileIcon" class="me-1"></fa-icon> {{
-            questions.length }} Domande</span
+            questions.length }} {{ t('questions') }}</span
           >
           <span
             ><fa-icon [icon]="CheckIcon" class="me-1"></fa-icon> Syllex
@@ -74,14 +75,14 @@
                 [icon]="UncheckIcon"
                 class="text-muted opacity-50"
               ></fa-icon>
-              Vero
+              {{ t('true_cap') }}
             </div>
             <div class="d-flex align-items-center gap-2">
               <fa-icon
                 [icon]="UncheckIcon"
                 class="text-muted opacity-50"
               ></fa-icon>
-              Falso
+              {{ t('false_cap') }}
             </div>
           </div>
           }
@@ -100,7 +101,7 @@
 
       <!-- Footer Test -->
       <div class="text-center mt-5 pt-4 border-top text-muted small fst-italic">
-        Fine del test. Tutte le risposte verranno salvate automaticamente.
+        {{ t('footer') }}
       </div>
     </div>
   </div>
@@ -111,7 +112,7 @@
     <app-syllex-button
       class="w-100 d-block"
       [props]="{
-            label: 'Chiudi',
+            label: t('btn_close'),
             variant: 'primary',
             size: 'medium',
           }"
@@ -122,7 +123,7 @@
     <app-syllex-button
       class="w-100 d-block"
       [props]="{
-            label: 'Conferma',
+            label: t('btn_confirm'),
             variant: 'secondary',
             size: 'medium',
           }"
@@ -130,3 +131,4 @@
     />
   </div>
 </div>
+</ng-container>

@@ -1,3 +1,4 @@
+<ng-container *transloco="let t; read: 'search_questions'">
 <div #scrollContainer class="questions-scroll-list" (scroll)="onListScroll($event)">
   @for (question of sortedQuestions; track question._id) {
   <div
@@ -21,7 +22,7 @@
       </span>
 
       <div class="question-row__points">
-        <label class="question-row__points-label">Punti</label>
+        <label class="question-row__points-label">{{ t('points') }}</label>
         <input
           type="number"
           min="1"
@@ -36,13 +37,14 @@
   </div>
   } @empty {
   <div class="text-center py-5 opacity-50">
-    <p class="fs-5">Nessuna domanda trovata con questi filtri.</p>
+    <p class="fs-5">{{ t('no_questions') }}</p>
   </div>
   } @if (isLoadingMore) {
   <div class="text-center py-3 text-muted small">
-    Caricamento altre domande...
+    {{ t('loading_more') }}
   </div>
   } @if (!canLoadMore && questions.length > 0) {
-  <div class="text-center py-3 text-muted small">Hai raggiunto la fine.</div>
+  <div class="text-center py-3 text-muted small">{{ t('end_reached') }}</div>
   }
 </div>
+</ng-container>

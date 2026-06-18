@@ -1,3 +1,4 @@
+<ng-container *transloco="let t; read: 'gen_ai_contents'">
 <div
   [class]="IsOffcanvasMode() ? 'offcanvas-body syllexCard dvh-100 overflow-scroll p-4' : 'pb-5'"
 >
@@ -13,17 +14,17 @@
 
       @if (TypeMode() === 'questions') {
         <div class="d-flex align-items-start justify-content-between w-100">
-          <h3 class="m-0">Genera nuove domande con AI da inserire nel test</h3>
+          <h3 class="m-0">{{ t('title_questions') }}</h3>
           <fa-icon [icon]="SparklesIcon" style="color: #84cc16; font-size: 1.5rem; margin-top: 2px;"></fa-icon>
         </div>
       } @else {
         <div class="d-flex align-items-start justify-content-between w-100">
-          <h3 class="m-0">Genera nuovi materiali con AI</h3>
+          <h3 class="m-0">{{ t('title_materials') }}</h3>
           <fa-icon [icon]="SparklesIcon" style="color: #84cc16; font-size: 1.5rem; margin-top: 2px;"></fa-icon>
         </div>
       }
       <label class="form-label text-dark mb-3 mt-4 fw-normal">
-        Scegli la tipologia di {{ TypeMode() === 'questions' ? 'contenuto da generare' : 'materiale di studio da produrre' }}
+        {{ TypeMode() === 'questions' ? t('lbl_type_q') : t('lbl_type_m') }}
       </label>
       <app-type-selector
         [options]="Types()"
@@ -42,7 +43,7 @@
         
         <!-- Quante Domande -->
         <div class="col-12 col-md-6" tourAnchor="gen_ai_q_params">
-          <label class="form-label text-dark mb-2 fw-normal d-flex align-items-end" style="min-height: 42px;">Quante domande vuoi generare?</label>
+          <label class="form-label text-dark mb-2 fw-normal d-flex align-items-end" style="min-height: 42px;">{{ t('lbl_q_count') }}</label>
           <input
             type="number"
             class="form-control custom-input"
@@ -52,24 +53,24 @@
             aria-label="Numero di domande"
           />
           @if (genForm.get('numberOfQuestions')?.errors?.['max']) {
-            <div class="text-danger small mt-1">Puoi generare massimo 20 domande alla volta.</div>
+            <div class="text-danger small mt-1">{{ t('err_q_max') }}</div>
           }
           @if (genForm.get('numberOfQuestions')?.errors?.['min']) {
-            <div class="text-danger small mt-1">Devi generare almeno 1 domanda.</div>
+            <div class="text-danger small mt-1">{{ t('err_q_min') }}</div>
           }
         </div>
 
         <!-- Argomento -->
         <div class="col-12 col-md-6" tourAnchor="gen_ai_q_topic">
-          <label class="form-label text-dark mb-2 fw-normal d-flex align-items-end" style="min-height: 42px;">Su quale argomento?</label>
+          <label class="form-label text-dark mb-2 fw-normal d-flex align-items-end" style="min-height: 42px;">{{ t('lbl_topic') }}</label>
           <select
             class="form-select custom-input"
             [class.text-muted]="!genForm.get('topicId')?.value"
             formControlName="topicId"
             aria-label="Seleziona argomento"
           >
-            <option value="" disabled selected class="text-muted">Seleziona...</option>
-            <option value="auto">Tutti (Intero documento)</option>
+            <option value="" disabled selected class="text-muted">{{ t('opt_select') }}</option>
+            <option value="auto">{{ t('opt_all') }}</option>
             @for (topic of materiaService.materiaSelected()?.topics; track topic._id) {
             <option [value]="topic._id">{{ topic.name }}</option>
             }
@@ -79,7 +80,7 @@
         <!-- Opzioni (se Scelta Multipla) -->
         @if (IsMultipleChoice()) {
         <div class="col-12 col-md-4">
-          <label class="form-label text-dark mb-2 fw-normal">Opzioni di risposta</label>
+          <label class="form-label text-dark mb-2 fw-normal">{{ t('lbl_options') }}</label>
           <input
             type="number"
             class="form-control custom-input"
@@ -93,25 +94,25 @@
 
         <!-- Lingua -->
         <div class="col-12 col-md-4">
-          <label class="form-label text-dark mb-2 fw-normal">In quale lingua?</label>
+          <label class="form-label text-dark mb-2 fw-normal">{{ t('lbl_lang') }}</label>
           <select class="form-select custom-input" formControlName="language" aria-label="Lingua">
-            <option value="italiano">Italiano</option>
-            <option value="inglese">English</option>
-            <option value="spagnolo">Español</option>
-            <option value="francese">Français</option>
-            <option value="tedesco">Deutsch</option>
+            <option value="italiano">{{ t('lang_it') }}</option>
+            <option value="inglese">{{ t('lang_en') }}</option>
+            <option value="spagnolo">{{ t('lang_es') }}</option>
+            <option value="francese">{{ t('lang_fr') }}</option>
+            <option value="tedesco">{{ t('lang_de') }}</option>
           </select>
         </div>
 
         <!-- Difficoltà -->
         <div class="col-12 col-md-4">
-          <label class="form-label text-dark mb-2 fw-normal">Livello di difficoltà</label>
+          <label class="form-label text-dark mb-2 fw-normal">{{ t('lbl_diff') }}</label>
           <select class="form-select custom-input" formControlName="difficulty" aria-label="Difficoltà">
-            <option value="elementary">Elementare</option>
-            <option value="easy">Facile</option>
-            <option value="medium">Media</option>
-            <option value="hard">Difficile</option>
-            <option value="very_hard">Molto difficile</option>
+            <option value="elementary">{{ t('diff_elem') }}</option>
+            <option value="easy">{{ t('diff_easy') }}</option>
+            <option value="medium">{{ t('diff_med') }}</option>
+            <option value="hard">{{ t('diff_hard') }}</option>
+            <option value="very_hard">{{ t('diff_vhard') }}</option>
           </select>
         </div>
       </div>
@@ -124,7 +125,7 @@
       <div class="row g-4">
         @if (IsSlides()) {
         <div class="col-12 col-md-6">
-          <label class="form-label text-dark mb-2 fw-normal">Quante slide vuoi creare?</label>
+          <label class="form-label text-dark mb-2 fw-normal">{{ t('lbl_slides_count') }}</label>
           <input
             type="number"
             class="form-control custom-input"
@@ -136,23 +137,23 @@
         </div>
         }
         <div class="col-12 col-md-6">
-          <label class="form-label text-dark mb-2 fw-normal">In quale lingua?</label>
+          <label class="form-label text-dark mb-2 fw-normal">{{ t('lbl_lang') }}</label>
           <select
             class="form-select custom-input"
             formControlName="language"
             aria-label="Lingua"
           >
-            <option value="italiano">Italiano</option>
-            <option value="inglese">English</option>
-            <option value="spagnolo">Español</option>
-            <option value="francese">Français</option>
-            <option value="tedesco">Deutsch</option>
+            <option value="italiano">{{ t('lang_it') }}</option>
+            <option value="inglese">{{ t('lang_en') }}</option>
+            <option value="spagnolo">{{ t('lang_es') }}</option>
+            <option value="francese">{{ t('lang_fr') }}</option>
+            <option value="tedesco">{{ t('lang_de') }}</option>
           </select>
         </div>
 
         @if (IsSlides()) {
         <div class="col-12">
-          <label class="form-label text-dark mb-3 fw-normal">Formato di esportazione</label>
+          <label class="form-label text-dark mb-3 fw-normal">{{ t('lbl_format') }}</label>
           <div class="d-flex flex-wrap gap-4">
             <div class="form-check">
               <input
@@ -168,7 +169,7 @@
                 style="cursor: pointer"
               >
                 <span class="fw-bold">Power Point</span>
-                <span class="text-muted small ms-1">(PPTX modificabile)</span>
+                <span class="text-muted small ms-1">{{ t('format_pptx_desc') }}</span>
               </label>
             </div>
             <div class="form-check">
@@ -185,7 +186,7 @@
                 style="cursor: pointer"
               >
                 <span class="fw-bold">PDF</span>
-                <span class="text-muted small ms-1">(Genera documento statico)</span>
+                <span class="text-muted small ms-1">{{ t('format_pdf_desc') }}</span>
               </label>
             </div>
           </div>
@@ -198,7 +199,7 @@
 
     <section tourAnchor="gen_ai_support_files" class="form-section">
       <label class="form-label text-dark mb-1 fw-normal">
-        Seleziona risorse di riferimento per la generazione
+        {{ t('lbl_resources') }}
       </label>
       <div class="mb-3 text-start">
         <button
@@ -208,21 +209,19 @@
           (click)="openWhyMaterialsModal()"
         >
           <fa-icon [icon]="QuestionIcon" style="font-size: 0.95rem;"></fa-icon>
-          <span>Perché non vedo tutti i miei materiali qui? Scopri di più</span>
+          <span>{{ t('lbl_why_materials') }}</span>
         </button>
       </div>
       <app-materiali-selector (selectionChange)="onMaterialsSelectionChange($event)"></app-materiali-selector>
     </section>
 
     <section tourAnchor="gen_ai_instructions" class="form-section">
-      <label class="form-label text-dark mb-2 fw-normal">Scrivi maggiori informazioni da fornire all’ai per generare un contenuto su misura per le tue esigenze</label>
+      <label class="form-label text-dark mb-2 fw-normal">{{ t('lbl_instructions') }}</label>
       <textarea
         class="form-control custom-input"
         formControlName="instructions"
         rows="3"
-        [placeholder]="TypeMode() === 'questions'
-          ? 'Es. Genera domande a risposta multipla basate sul manuale di bordo, con focus sulle procedure di emergenza ed opzioni altamente plausibili.'
-          : 'Es. Concentrati sui protocolli di sicurezza marittima, usa una terminologia tecnica chiara e aggiungi una sezione di sintesi finale con le procedure chiave.'"
+        [placeholder]="TypeMode() === 'questions' ? t('ph_instructions_q') : t('ph_instructions_m')"
       ></textarea>
     </section>
 
@@ -236,7 +235,7 @@
         <div class="mt-3 p-3 text-start" style="background-color: #fef2f2; border: 1px solid #fca5a5; border-radius: 14px;">
           <div class="fw-semibold text-danger d-flex align-items-center gap-2 mb-1" style="font-size: 0.85rem;">
             <fa-icon [icon]="TimesIcon"></fa-icon>
-            <span>Requisiti mancanti per la generazione:</span>
+            <span>{{ t('lbl_missing_reqs') }}</span>
           </div>
           <ul class="mb-0 ps-3 text-muted" style="font-size: 0.8rem; line-height: 1.4;">
             @for (reason of disableReason(); track reason) {
@@ -259,9 +258,7 @@
     >
       <fa-icon [icon]="SparklesIcon" class="flex-shrink-0"></fa-icon>
       <span class="small"
-        >Sono state generate meno domande di quelle richieste ({{
-        PartialGenerationWarning() }} {{ PartialGenerationWarning() === 1 ? 'non
-        riuscita' : 'non riuscite' }}).</span
+        >{{ t('msg_partial_gen', { count: PartialGenerationWarning() }) }}</span
       >
     </div>
     }
@@ -275,11 +272,11 @@
         (click)="onBackToForm()"
       >
         <fa-icon [icon]="TimesIcon" class="me-1"></fa-icon>
-        Nuova generazione
+        {{ t('btn_new_gen') }}
       </button>
       <button class="btn icon-btn btn-blue" type="button" (click)="toggleAll()">
         <fa-icon [icon]="CheckAllIcon" class="me-1"></fa-icon>
-        {{ AllSelected() ? 'Deseleziona tutte' : 'Seleziona tutte' }}
+        {{ AllSelected() ? t('btn_deselect_all') : t('btn_select_all') }}
       </button>
     </div>
 
@@ -323,10 +320,7 @@
           [animation]="IsSaving() ? 'spin' : undefined"
           class="me-2"
         ></fa-icon>
-        {{ IsSaving() ? 'Salvataggio...' : IsOffcanvasMode() ? 'Aggiungi ' +
-        SelectedCount() + (SelectedCount() === 1 ? ' domanda' : ' domande') + '
-        al test' : 'Salva ' + SelectedCount() + (SelectedCount() === 1 ? '
-        domanda' : ' domande') + ' nella banca domande' }}
+        {{ IsSaving() ? t('btn_saving') : IsOffcanvasMode() ? t('btn_add_to_test', { count: SelectedCount() }) : t('btn_save_to_bank', { count: SelectedCount() }) }}
       </button>
     </div>
   </div>
@@ -337,18 +331,18 @@
 <app-ai-overlay
   [visible]="IsGenerating()"
   [success]="GenerationSuccess()"
-  loadingTitle="Generazione in corso..."
-  loadingSubtitle="Non tornare indietro e non chiudere la pagina,&#10;altrimenti la generazione andrà perduta."
-  successTitle="Generazione completata!"
-  successMessage="Il tuo materiale è pronto per essere consultato."
-  ctaLabel="Vai ai materiali"
+  [loadingTitle]="t('loading_title')"
+  [loadingSubtitle]="t('loading_subtitle')"
+  [successTitle]="t('success_title')"
+  [successMessage]="t('success_msg')"
+  [ctaLabel]="t('btn_go_to_materials')"
   (ctaClick)="onReturnToMaterials()"
 ></app-ai-overlay>
 
 <!-- ─── MATERIAL SUCCESS MODAL ──────────────────────────────────────────── -->
 <ng-template #materialSuccessModal let-modal>
   <div class="modal-header border-0 pb-0">
-    <h5 class="modal-title fw-semibold">Materiale generato</h5>
+    <h5 class="modal-title fw-semibold">{{ t('modal_success_title') }}</h5>
     <button
       type="button"
       class="btn-close"
@@ -362,7 +356,7 @@
       class="text-primary mb-3 d-block"
       style="font-size: 2rem"
     ></fa-icon>
-    <p class="mb-0">Il tuo file è stato generato</p>
+    <p class="mb-0">{{ t('modal_success_msg') }}</p>
   </div>
   <div class="modal-footer border-0 pt-0 justify-content-center">
     <button
@@ -370,7 +364,7 @@
       class="btn btn-primary"
       (click)="navigateToResources()"
     >
-      Vai a file e risorse
+      {{ t('modal_success_btn') }}
     </button>
   </div>
 </ng-template>
@@ -380,7 +374,7 @@
   <div class="modal-header border-0 pb-0">
     <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2">
       <fa-icon [icon]="QuestionIcon" style="color: #0284c7;"></fa-icon>
-      <span>Materiali di Riferimento</span>
+      <span>{{ t('modal_why_title') }}</span>
     </h5>
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
   </div>
@@ -388,31 +382,30 @@
     <div class="d-flex flex-column gap-3">
       <div class="p-3 rounded bg-light border-start border-4" style="border-color: #0284c7 !important;">
         <p class="mb-0 text-dark small fw-semibold">
-          Perché non tutti i file sono selezionabili per la generazione AI?
+          {{ t('modal_why_q') }}
         </p>
       </div>
       
-      <p class="text-muted small mb-0" style="line-height: 1.6;">
-        Per garantire l'<strong>integrità didattica</strong> e l'<strong>accuratezza tecnica</strong> dei contenuti generati, la piattaforma applica una regola di progettazione fondamentale:
-      </p>
+      <p class="text-muted small mb-0" style="line-height: 1.6;" [innerHTML]="t('modal_why_desc1')"></p>
 
       <div class="p-3 border rounded-syllex bg-light">
         <ul class="mb-0 ps-3 text-muted small d-flex flex-column gap-2" style="list-style-type: disc;">
           <li>
-            <strong>Fonti Originali Certificate:</strong> La generazione di domande e dispense deve basarsi esclusivamente su documentazione ufficiale, manualistica di bordo o testi caricati direttamente dai docenti.
+            <strong>{{ t('modal_why_li1_title') }}</strong> {{ t('modal_why_li1_desc') }}
           </li>
           <li>
-            <strong>Prevenzione del Degrado Didattico:</strong> I materiali già contrassegnati come <em>generati dall'Intelligenza Artificiale</em> vengono intenzionalmente esclusi. Questo evita il fenomeno della degradazione ricorsiva e riduce a zero il rischio di allucinazioni AI a cascata.
+            <strong>{{ t('modal_why_li2_title') }}</strong> <span [innerHTML]="t('modal_why_li2_desc')"></span>
           </li>
         </ul>
       </div>
 
       <p class="text-muted small mb-0 mt-1">
-        Trovi tutti i tuoi file originali accessibili ed organizzati per cartelle, pronti per essere utilizzati come solide fondamenta per i tuoi test.
+        {{ t('modal_why_desc2') }}
       </p>
     </div>
   </div>
   <div class="modal-footer border-0 pt-0">
-    <button type="button" class="btn btn-dark w-100" (click)="modal.close()" style="border-radius: 12px;">Ho capito</button>
+    <button type="button" class="btn btn-dark w-100" (click)="modal.close()" style="border-radius: 12px;">{{ t('modal_why_btn') }}</button>
   </div>
 </ng-template>
+</ng-container>
