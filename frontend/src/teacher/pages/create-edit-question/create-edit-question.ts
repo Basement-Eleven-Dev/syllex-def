@@ -20,11 +20,12 @@ import {
   faSpinnerThird,
   faTag,
   faXmark,
+  faSpellCheck,
+  faSquareCheck,
+  faMarker,
 } from '@fortawesome/pro-solid-svg-icons';
 import { MultipleChoiceOptions } from '../../components/multiple-choice-options/multiple-choice-options';
 import {
-  QUESTION_TYPE_OPTIONS,
-  DIFFICULTY_OPTIONS,
   QuestionDifficulty,
 } from '../../../types/question.types';
 import { TypeSelector } from '../../components/type-selector/type-selector';
@@ -48,10 +49,9 @@ import {
   style,
   transition,
   animate,
-  query,
-  animateChild,
 } from '@angular/animations';
 import { firstValueFrom } from 'rxjs';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 export interface AnswerOption {
   label: string;
@@ -86,6 +86,8 @@ interface StepDef {
     SyllexStepper,
     TourAnchorNgBootstrapDirective,
     MaterialiSelector,
+    TranslocoDirective,
+    TranslocoPipe,
   ],
   templateUrl: './create-edit-question.html',
   styleUrl: './create-edit-question.scss',
@@ -117,6 +119,7 @@ export class CreateEditQuestion {
   private readonly destroyRef = inject(DestroyRef);
   private readonly aiService = inject(AiService);
   private readonly modalService = inject(NgbModal);
+  private readonly translocoService = inject(TranslocoService);
 
   @ViewChild(MaterialiSelector) private materialiSelector!: MaterialiSelector;
 
@@ -134,8 +137,35 @@ export class CreateEditQuestion {
   readonly ChevronRightIcon = faChevronRight;
 
   // Data
-  readonly QuestionTypeOptions = QUESTION_TYPE_OPTIONS;
-  readonly DifficultyOptions = DIFFICULTY_OPTIONS;
+  readonly QuestionTypeOptions = computed(() => [
+    {
+      label: this.translocoService.translate('create_edit_question.types.scelta_multipla.label') || 'Scelta multipla',
+      description: this.translocoService.translate('create_edit_question.types.scelta_multipla.desc') || 'Domande con più opzioni di risposta, di cui una corretta',
+      icon: faSpellCheck,
+      value: 'scelta multipla',
+    },
+    {
+      label: this.translocoService.translate('create_edit_question.types.vero_falso.label') || 'Vero o falso',
+      description: this.translocoService.translate('create_edit_question.types.vero_falso.desc') || 'Domande a cui rispondere con Vero o Falso',
+      icon: faSquareCheck,
+      value: 'vero falso',
+    },
+    {
+      label: this.translocoService.translate('create_edit_question.types.risposta_aperta.label') || 'Risposta aperta',
+      description: this.translocoService.translate('create_edit_question.types.risposta_aperta.desc') || 'Domande che richiedono una risposta testuale libera',
+      icon: faMarker,
+      value: 'risposta aperta',
+    },
+  ]);
+
+  readonly DifficultyOptions = computed(() => [
+    { value: 'elementary', label: this.translocoService.translate('create_edit_question.difficulty_elementary') || 'Elementare' },
+    { value: 'easy', label: this.translocoService.translate('create_edit_question.difficulty_easy') || 'Facile' },
+    { value: 'medium', label: this.translocoService.translate('create_edit_question.difficulty_medium') || 'Media' },
+    { value: 'hard', label: this.translocoService.translate('create_edit_question.difficulty_hard') || 'Difficile' },
+    { value: 'very_hard', label: this.translocoService.translate('create_edit_question.difficulty_very_hard') || 'Molto difficile' },
+  ]);
+
   readonly LanguageOptions = [
     { value: 'it', label: 'Italiano' },
     { value: 'en', label: 'English' },
@@ -143,10 +173,10 @@ export class CreateEditQuestion {
     { value: 'fr', label: 'Français' },
     { value: 'de', label: 'Deutsch' },
   ];
-  readonly PolicyOptions = [
-    { value: 'public', label: 'Esercitazione' },
-    { value: 'private', label: 'Uso Test' },
-  ];
+  readonly PolicyOptions = computed(() => [
+    { value: 'public', label: this.translocoService.translate('create_edit_question.policy_public') || 'Esercitazione' },
+    { value: 'private', label: this.translocoService.translate('create_edit_question.policy_private') || 'Uso Test' },
+  ]);
   private readonly QuestionId = this.activatedRoute.snapshot.paramMap.get('id');
   private CurrentQuestionId = signal<string | null>(null);
 
@@ -175,14 +205,14 @@ export class CreateEditQuestion {
   readonly StepDefs = computed<StepDef[]>(() =>
     this.SelectedMethod() === 'ai'
       ? [
-          { n: 1, label: 'Tipo' },
-          { n: 2, label: 'Genera' },
+          { n: 1, label: this.translocoService.translate('create_edit_question.step_type') || 'Tipo' },
+          { n: 2, label: this.translocoService.translate('create_edit_question.step_generate') || 'Genera' },
         ]
       : [
-          { n: 1, label: 'Tipo' },
-          { n: 2, label: 'Contenuto' },
-          { n: 3, label: 'Risposta' },
-          { n: 4, label: 'Pubblica' },
+          { n: 1, label: this.translocoService.translate('create_edit_question.step_type') || 'Tipo' },
+          { n: 2, label: this.translocoService.translate('create_edit_question.step_content') || 'Contenuto' },
+          { n: 3, label: this.translocoService.translate('create_edit_question.step_answer') || 'Risposta' },
+          { n: 4, label: this.translocoService.translate('create_edit_question.step_publish') || 'Pubblica' },
         ],
   );
   // Manual step 3 valid — needs options check (was step 4)
@@ -200,15 +230,19 @@ export class CreateEditQuestion {
   });
 
   readonly PageTitle = computed(() =>
-    this.IsEditMode() ? 'Modifica domanda' : 'Crea nuova domanda',
+    this.IsEditMode()
+      ? this.translocoService.translate('create_edit_question.title_edit') || 'Modifica domanda'
+      : this.translocoService.translate('create_edit_question.title_create') || 'Crea nuova domanda',
   );
   readonly PageDescription = computed(() =>
     this.IsEditMode()
-      ? 'Modifica i dettagli della domanda selezionata.'
-      : 'Crea la tua domanda in pochi passi guidati.',
+      ? this.translocoService.translate('create_edit_question.desc_edit') || 'Modifica i dettagli della domanda selezionata.'
+      : this.translocoService.translate('create_edit_question.desc_create') || 'Crea la tua domanda in pochi passi guidati.',
   );
   readonly SaveButtonLabel = computed(() =>
-    this.IsEditMode() ? 'Aggiorna domanda' : 'Salva domanda',
+    this.IsEditMode()
+      ? this.translocoService.translate('create_edit_question.btn_save_question_update') || 'Aggiorna domanda'
+      : this.translocoService.translate('create_edit_question.btn_save_question_create') || 'Salva domanda',
   );
   readonly IsAiFormMultipleChoice = computed(
     () => this.SelectedQuestionType() === 'scelta multipla',
@@ -390,7 +424,7 @@ export class CreateEditQuestion {
 
       if (questions.length === 0) {
         this.feedbackService.showFeedback(
-          'Nessuna domanda generata. Riprova.',
+          this.translocoService.translate('create_edit_question.err_ai_empty'),
           false,
         );
         return;
@@ -413,9 +447,9 @@ export class CreateEditQuestion {
           backdrop: 'static',
           keyboard: false,
         });
-        modalRef.componentInstance.title = 'Generazione Impedita';
+        modalRef.componentInstance.title = this.translocoService.translate('create_edit_question.error_modal_title');
         modalRef.componentInstance.message = errMsg;
-        modalRef.componentInstance.buttonText = 'Ho capito, riprovo';
+        modalRef.componentInstance.buttonText = this.translocoService.translate('create_edit_question.error_modal_btn');
       } else {
         this.feedbackService.showFeedback(errMsg, false);
       }
@@ -477,10 +511,13 @@ export class CreateEditQuestion {
     }
 
     this.IsSavingBatch.set(false);
-    this.feedbackService.showFeedback(
-      `${savedCount} domand${savedCount === 1 ? 'a salvata' : 'e salvate'} nella banca!`,
-      true,
-    );
+    const successMsg = this.translocoService.translate('create_edit_question.save_batch_success', {
+      count: savedCount,
+      word: savedCount === 1 
+        ? this.translocoService.translate('create_edit_question.save_batch_word_singular')
+        : this.translocoService.translate('create_edit_question.save_batch_word_plural')
+    });
+    this.feedbackService.showFeedback(successMsg, true);
     window.history.back();
   }
 
@@ -508,15 +545,15 @@ export class CreateEditQuestion {
     serviceCall.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         const message = this.CurrentQuestionId()
-          ? 'Domanda modificata con successo!'
-          : 'Domanda salvata con successo!';
+          ? this.translocoService.translate('create_edit_question.success_save_update')
+          : this.translocoService.translate('create_edit_question.success_save_create');
         this.feedbackService.showFeedback(message, true);
         this.IsLoading.set(false);
         window.history.back();
       },
       error: () => {
         this.feedbackService.showFeedback(
-          'Errore durante il salvataggio della domanda',
+          this.translocoService.translate('create_edit_question.err_save'),
           false,
         );
         this.IsLoading.set(false);
@@ -609,14 +646,17 @@ export class CreateEditQuestion {
   private validateFile(file: File): boolean {
     if (!file.type.startsWith('image/')) {
       this.feedbackService.showFeedback(
-        'Carica un file immagine valido',
+        this.translocoService.translate('create_edit_question.err_image_invalid'),
         false,
       );
       return false;
     }
     const MAX = 5 * 1024 * 1024;
     if (file.size > MAX) {
-      this.feedbackService.showFeedback('Dimensione massima: 5MB', false);
+      this.feedbackService.showFeedback(
+        this.translocoService.translate('create_edit_question.err_image_size'),
+        false,
+      );
       return false;
     }
     return true;
@@ -646,7 +686,7 @@ export class CreateEditQuestion {
         },
         error: () => {
           this.feedbackService.showFeedback(
-            'Errore durante il caricamento della domanda',
+            this.translocoService.translate('create_edit_question.err_load'),
             false,
           );
         },
