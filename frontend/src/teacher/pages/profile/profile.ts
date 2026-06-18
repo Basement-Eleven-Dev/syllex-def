@@ -31,10 +31,11 @@ import { SetupMfa } from '../../../app/setup-mfa/setup-mfa';
 import { FormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FeedbackService } from '../../../services/feedback-service';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-profile',
-  imports: [FontAwesomeModule, AsyncPipe, FormsModule],
+  imports: [FontAwesomeModule, AsyncPipe, FormsModule, TranslocoDirective, TranslocoPipe],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
 })
@@ -45,6 +46,7 @@ export class Profile {
   private classiService = inject(ClassiService);
   private modalService = inject(NgbModal);
   private feedbackService = inject(FeedbackService);
+  private translocoService = inject(TranslocoService);
 
   // User Signal for reactivity
   private userSignal = toSignal(this.authService.user$);
@@ -185,7 +187,7 @@ export class Profile {
     const result = await this.authService.updateNotificationSettings(settings);
     if (result.success) {
       this.feedbackService.showFeedback(
-        'Impostazioni salvate con successo',
+        this.translocoService.translate('profile.save_success'),
         true,
       );
     } else {
@@ -194,7 +196,7 @@ export class Profile {
         result.message,
       );
       this.feedbackService.showFeedback(
-        'Errore durante il salvataggio delle impostazioni',
+        this.translocoService.translate('profile.save_error'),
         false,
       );
     }

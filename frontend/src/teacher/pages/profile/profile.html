@@ -1,16 +1,17 @@
+<ng-container *transloco="let t; read: 'profile'">
 <div class="d-flex justify-content-between align-items-center mb-4">
   <div>
-    <h1 class="text-dark fw-medium mb-1 display-6">Il mio Account</h1>
-    <h5 class="text-primary mb-0 fw-normal small">Gestisci i tuoi dati personali e le preferenze di sistema</h5>
+    <h1 class="text-dark fw-medium mb-1 display-6">{{ t('title') }}</h1>
+    <h5 class="text-primary mb-0 fw-normal small">{{ t('subtitle') }}</h5>
   </div>
 </div>
 
 <div class="profile-tabs mb-4">
   <button class="tab-btn" [class.active]="activeTab() === 'profile'" (click)="setTab('profile')">
-    <fa-icon [icon]="ProfileIcon" class="me-2"></fa-icon> Profilo
+    <fa-icon [icon]="ProfileIcon" class="me-2"></fa-icon> {{ t('tab_profile') }}
   </button>
   <button class="tab-btn" [class.active]="activeTab() === 'settings'" (click)="setTab('settings')">
-    <fa-icon [icon]="SettingsIcon" class="me-2"></fa-icon> Impostazioni
+    <fa-icon [icon]="SettingsIcon" class="me-2"></fa-icon> {{ t('tab_settings') }}
   </button>
 </div>
 
@@ -21,7 +22,7 @@
     <div class="col-md-6 mb-3">
       <section class="form-section h-100">
         <label for="name" class="form-label text-dark">
-          <fa-icon [icon]="BuildingIcon" class="me-2 text-primary"></fa-icon>Organizzazione</label>
+          <fa-icon [icon]="BuildingIcon" class="me-2 text-primary"></fa-icon>{{ t('org_teacher') }}</label>
         <h4 class="fw-light text-dark mb-0">
           {{ authService.organizationName$ | async }}
         </h4>
@@ -33,7 +34,7 @@
     <div class="col-md-6 mb-3">
       <section class="form-section h-100">
         <label for="name" class="form-label text-dark">
-          <fa-icon [icon]="BuildingIcon" class="me-2 text-primary"></fa-icon>La tua Istituzione</label>
+          <fa-icon [icon]="BuildingIcon" class="me-2 text-primary"></fa-icon>{{ t('org_student') }}</label>
         <h4 class="fw-light text-dark mb-0">
           {{ authService.organizationName$ | async }}
         </h4>
@@ -45,7 +46,7 @@
   <div class="row mt-3">
     <div class="col-md-6 mb-3">
       <section class="form-section h-100">
-        <label class="form-label text-dark">Nome e Cognome</label>
+        <label class="form-label text-dark">{{ t('name_lbl') }}</label>
         <h4 class="fw-light text-dark mb-0">
           {{ authService.user?.firstName }} {{ authService.user?.lastName }}
         </h4>
@@ -53,10 +54,10 @@
     </div>
     <div class="col-md-6 mb-3">
       <section class="form-section h-100">
-        <label class="form-label text-dark">Ruolo</label>
+        <label class="form-label text-dark">{{ t('role_lbl') }}</label>
         <h4 class="fw-light text-dark mb-0">
-          @switch(authService.user?.role) { @case('teacher'){Docente}
-          @case('student'){Studente} @default{ {{ authService.user?.role }} } }
+          @switch(authService.user?.role) { @case('teacher'){ {{ t('teacher') }} }
+          @case('student'){ {{ t('student') }} } @default{ {{ authService.user?.role }} } }
         </h4>
       </section>
     </div>
@@ -68,7 +69,7 @@
       <section class="form-section">
         <label for="name" class="form-label text-dark mb-4 d-flex align-items-center">
           <fa-icon [icon]="BookIcon" class="me-2 text-primary"></fa-icon>
-          Materie di insegnamento
+          {{ t('subjects_teacher') }}
         </label>
         <div class="row">
           @for(materia of getMaterie(); track materia._id) {
@@ -78,9 +79,7 @@
               <div class="card-body">
                 <h5 class="card-title mb-1">{{ materia.name }}</h5>
                 <p class="mb-0 text-muted small">
-                  {{ countClasses(materia._id) || 'Nessuna' }} class{{
-                  countClasses(materia._id) > 1 ? 'i' : 'e' }} assegnat{{
-                  countClasses(materia._id) > 1 ? 'e' : 'a' }}
+                  {{ countClasses(materia._id) === 0 ? t('no_classes') : countClasses(materia._id) === 1 ? t('classes_assigned_1') : t('classes_assigned_n', {count: countClasses(materia._id)}) }}
                 </p>
               </div>
             </div>
@@ -88,7 +87,7 @@
           } @empty {
           <div class="col-12">
             <div class="p-4 text-center bg-light rounded-3">
-              <p class="text-muted mb-0">Nessuna materia assegnata</p>
+              <p class="text-muted mb-0">{{ t('no_subjects') }}</p>
             </div>
           </div>
           }
@@ -102,7 +101,7 @@
       <section class="form-section">
         <label for="name" class="form-label text-dark mb-4 d-flex align-items-center">
           <fa-icon [icon]="BookIcon" class="me-2 text-primary"></fa-icon>
-          Materie seguite
+          {{ t('subjects_student') }}
         </label>
         <div class="row">
           @for(materia of getMaterie(); track materia._id) {
@@ -112,8 +111,7 @@
               <div class="card-body">
                 <h5 class="card-title mb-1">{{ materia.name }}</h5>
                 <p class="mb-0 text-muted small">
-                  {{ countClasses(materia._id) || 'Nessuna' }} class{{
-                  countClasses(materia._id) > 1 ? 'i' : 'e' }}
+                  {{ countClasses(materia._id) === 0 ? t('no_classes') : countClasses(materia._id) === 1 ? t('classes_enrolled_1') : t('classes_enrolled_n', {count: countClasses(materia._id)}) }}
                 </p>
               </div>
             </div>
@@ -121,7 +119,7 @@
           } @empty {
           <div class="col-12">
             <div class="p-4 text-center bg-light rounded-3">
-              <p class="text-muted mb-0">Nessuna materia assegnata</p>
+              <p class="text-muted mb-0">{{ t('no_subjects') }}</p>
             </div>
           </div>
           }
@@ -140,16 +138,16 @@
     <div class="col-12 mb-4">
       <h5 class="text-dark mb-3 d-flex align-items-center">
         <fa-icon [icon]="SecurityIcon" class="me-2 text-primary"></fa-icon>
-        Sicurezza e Accesso
+        {{ t('security_title') }}
       </h5>
     </div>
 
     <div class="col-md-6 mb-3">
       <section class="form-section h-100">
         <div class="d-flex justify-content-between align-items-start mb-2">
-          <label class="form-label text-dark mb-0">Email</label>
+          <label class="form-label text-dark mb-0">{{ t('email') }}</label>
           <button class="btn btn-sm btn-outline-primary py-1 px-2" (click)="onChangeEmail()">
-            <fa-icon [icon]="EditIcon" class="me-1"></fa-icon> Modifica
+            <fa-icon [icon]="EditIcon" class="me-1"></fa-icon> {{ t('edit') }}
           </button>
         </div>
         <h4 class="fw-light text-dark mb-0 text-break">{{ authService.user?.email }}</h4>
@@ -159,9 +157,9 @@
     <div class="col-md-6 mb-3">
       <section class="form-section h-100">
         <div class="d-flex justify-content-between align-items-start mb-2">
-          <label class="form-label text-dark mb-0">Password</label>
+          <label class="form-label text-dark mb-0">{{ t('password') }}</label>
           <button class="btn btn-sm btn-outline-primary py-1 px-2" (click)="onChangePassword()">
-            <fa-icon [icon]="EditIcon" class="me-1"></fa-icon> Modifica
+            <fa-icon [icon]="EditIcon" class="me-1"></fa-icon> {{ t('edit') }}
           </button>
         </div>
         <h4 class="fw-light text-dark mb-0">••••••••</h4>
@@ -171,22 +169,22 @@
     <div class="col-md-6 mb-3">
       <section class="form-section h-100">
         <div class="d-flex justify-content-between align-items-start mb-3">
-          <label class="form-label text-dark mb-0">Autenticazione a due fattori (2FA)</label>
+          <label class="form-label text-dark mb-0">{{ t('mfa_lbl') }}</label>
           @if (mfaEnabled() === true) {
-          <button class="btn btn-sm btn-outline-danger py-1 px-2" (click)="onDisable2FA()">Disattiva</button>
+          <button class="btn btn-sm btn-outline-danger py-1 px-2" (click)="onDisable2FA()">{{ t('mfa_disable') }}</button>
           } @else if (mfaEnabled() === false) {
-          <button class="btn btn-sm btn-outline-primary py-1 px-2" (click)="onSetup2FA()">Configura</button>
+          <button class="btn btn-sm btn-outline-primary py-1 px-2" (click)="onSetup2FA()">{{ t('mfa_setup') }}</button>
           }
         </div>
         <div class="d-flex align-items-center">
           @if (mfaEnabled() === null) {
-          <span class="text-muted small">Caricamento...</span>
+          <span class="text-muted small">{{ t('mfa_loading') }}</span>
           } @else if (mfaEnabled()) {
-          <span class="badge bg-success px-3 py-2 rounded-pill">Attivo</span>
-          <span class="ms-3 text-muted small d-none d-sm-inline">Il tuo account è protetto</span>
+          <span class="badge bg-success px-3 py-2 rounded-pill">{{ t('mfa_active') }}</span>
+          <span class="ms-3 text-muted small d-none d-sm-inline">{{ t('mfa_active_desc') }}</span>
           } @else {
-          <span class="badge bg-secondary px-3 py-2 rounded-pill">Non attivo</span>
-          <span class="ms-3 text-muted small d-none d-sm-inline">Aggiungi un livello di sicurezza extra</span>
+          <span class="badge bg-secondary px-3 py-2 rounded-pill">{{ t('mfa_inactive') }}</span>
+          <span class="ms-3 text-muted small d-none d-sm-inline">{{ t('mfa_inactive_desc') }}</span>
           }
         </div>
       </section>
@@ -199,20 +197,20 @@
     <div class="col-12 mb-4">
       <h5 class="text-dark mb-3 d-flex align-items-center">
         <fa-icon [icon]="BellIcon" class="me-2 text-primary"></fa-icon>
-        Preferenze Notifiche Email
+        {{ t('notif_title') }}
       </h5>
-      <p class="text-muted small">Scegli quando ricevere notifiche email per le attività del sistema.</p>
+      <p class="text-muted small">{{ t('notif_desc') }}</p>
     </div>
 
     @if (!settingsInitialized()) {
     <div class="col-12 mb-4">
       <div class="alert alert-soft-primary border-0 d-flex align-items-center justify-content-between p-4 shadow-sm">
         <div>
-          <h6 class="fw-bold mb-1">Configura le notifiche per i tuoi studenti</h6>
-          <p class="small mb-0 opacity-75">Non hai ancora attivato le notifiche automatiche. Inizializzale ora con le impostazioni suggerite.</p>
+          <h6 class="fw-bold mb-1">{{ t('notif_setup_title') }}</h6>
+          <p class="small mb-0 opacity-75">{{ t('notif_setup_desc') }}</p>
         </div>
         <button class="btn btn-primary px-4" (click)="saveNotificationSettings()">
-          Attiva ora
+          {{ t('notif_setup_btn') }}
         </button>
       </div>
     </div>
@@ -222,8 +220,8 @@
       <section class="form-section">
         <div class="setting-item">
           <div class="setting-info">
-            <span class="setting-title">Nuove comunicazioni</span>
-            <span class="setting-desc">Invia un'email quando viene creata una nuova comunicazione</span>
+            <span class="setting-title">{{ t('notif_new_com') }}</span>
+            <span class="setting-desc">{{ t('notif_new_com_desc') }}</span>
           </div>
           <div class="form-check form-switch custom-switch">
             <input class="form-check-input" type="checkbox" role="switch"
@@ -234,8 +232,8 @@
 
         <div class="setting-item">
           <div class="setting-info">
-            <span class="setting-title">Nuovi eventi</span>
-            <span class="setting-desc">Invia un'email ai tuoi studenti quando viene creato un nuovo evento</span>
+            <span class="setting-title">{{ t('notif_new_event') }}</span>
+            <span class="setting-desc">{{ t('notif_new_event_desc') }}</span>
           </div>
           <div class="form-check form-switch custom-switch">
             <input class="form-check-input" type="checkbox" role="switch" [ngModel]="notificationSettings.newEvent()"
@@ -245,8 +243,8 @@
 
         <div class="setting-item">
           <div class="setting-info">
-            <span class="setting-title">Nuovo test creato</span>
-            <span class="setting-desc">Comunica ai tuoi studenti quando viene creato un nuovo test</span>
+            <span class="setting-title">{{ t('notif_new_test') }}</span>
+            <span class="setting-desc">{{ t('notif_new_test_desc') }}</span>
           </div>
           <div class="form-check form-switch custom-switch">
             <input class="form-check-input" type="checkbox" role="switch" [ngModel]="notificationSettings.newTest()"
@@ -256,8 +254,8 @@
 
         <div class="setting-item">
           <div class="setting-info">
-            <span class="setting-title">Test corretto</span>
-            <span class="setting-desc">Comunica quando un test viene corretto</span>
+            <span class="setting-title">{{ t('notif_test_corrected') }}</span>
+            <span class="setting-desc">{{ t('notif_test_corrected_desc') }}</span>
           </div>
           <div class="form-check form-switch custom-switch">
             <input class="form-check-input" type="checkbox" role="switch"
@@ -271,3 +269,4 @@
   }
 </div>
 }
+</ng-container>

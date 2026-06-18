@@ -7,10 +7,11 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Calendario } from '../calendario/calendario';
 import { RouterModule } from '@angular/router';
 import { ReportBugForm } from '../report-bug-form/report-bug-form';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-user-contextual-menu',
-  imports: [FontAwesomeModule, RouterModule],
+  imports: [FontAwesomeModule, RouterModule, TranslocoDirective, TranslocoPipe],
   templateUrl: './user-contextual-menu.html',
   styleUrl: './user-contextual-menu.scss',
 })
@@ -19,6 +20,7 @@ export class UserContextualMenu {
 
   LogoutIcon = faSignOutAlt;
   private tourService = inject(TourService);
+  protected readonly translocoService = inject(TranslocoService);
 
   constructor(
     public authService: Auth,

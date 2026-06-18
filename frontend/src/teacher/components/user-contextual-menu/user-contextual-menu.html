@@ -1,23 +1,25 @@
+<ng-container *transloco="let t; read: 'user_menu'">
 <div class="d-flex flex-row align-items-center gap-2">
   <span class="dot"></span>
-  <span>Docente</span>
+  <span>{{ authService.user?.role === 'student' ? t('student') : t('teacher') }}</span>
 </div>
 <h5 class="fw-medium my-2">
   {{ authService.user?.firstName }} {{ authService.user?.lastName }}
 </h5>
 <hr />
 <div routerLink="/t/profilo" (click)="onItemClick()" class="w-100 link rounded-syllex btn text-start">
-  Profilo
+  {{ t('profile') }}
 </div>
 <div
   (click)="onReportBug(); onItemClick()"
   class="w-100 mt-4 link rounded-syllex btn text-start"
 >
-  Segnala un bug
+  {{ t('report_bug') }}
 </div>
 <div
   class="w-100 link rounded-syllex btn text-start logout"
   (click)="onLogout(); onItemClick()"
 >
-  Logout
+  {{ t('logout') }}
 </div>
+</ng-container>
