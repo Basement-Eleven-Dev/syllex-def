@@ -255,6 +255,12 @@ const MISC_ROUTES: FunctionIntegration[] = [
     role: "open",
   },
   {
+    apiRoute: "error-manager",
+    functionPath: "health/error.ts",
+    method: "get",
+    role: "open",
+  },
+  {
     apiRoute: "profile",
     functionPath: "profile/getMyProfile.ts",
     method: "get",
