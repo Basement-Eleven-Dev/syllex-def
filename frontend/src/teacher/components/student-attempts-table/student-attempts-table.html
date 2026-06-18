@@ -1,19 +1,20 @@
+<ng-container *transloco="let t; read: 'student_detail'">
 <div class="card border-0 shadow-sm rounded-4 mt-4">
   <div class="card-body p-4">
     <h5 class="fw-bold mb-4">
       <fa-icon [icon]="icons.faClipboardCheck" class="text-primary me-2"></fa-icon>
-      Storico Test
+      {{ t('table_title') }}
     </h5>
 
     <div class="table-responsive">
       <table class="table table-hover align-middle">
         <thead class="bg-light">
           <tr>
-            <th class="border-0 rounded-start">Test</th>
-            <th class="border-0">Data Consegna</th>
-            <th class="border-0">Punteggio</th>
-            <th class="border-0">Stato</th>
-            <th class="border-0 rounded-end text-end">Azioni</th>
+            <th class="border-0 rounded-start">{{ t('col_test') }}</th>
+            <th class="border-0">{{ t('col_date') }}</th>
+            <th class="border-0">{{ t('col_score') }}</th>
+            <th class="border-0">{{ t('col_status') }}</th>
+            <th class="border-0 rounded-end text-end">{{ t('col_actions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -26,25 +27,25 @@
               </td>
               <td>
                 <span class="badge" [ngClass]="getScoreBadgeClass(attempt.score, attempt.maxScore)">
-                  {{ attempt.score !== null ? attempt.score + '/' + attempt.maxScore : 'N/D' }}
+                  {{ attempt.score !== null ? attempt.score + '/' + attempt.maxScore : t('badge_nd') }}
                 </span>
               </td>
               <td>
                 <span class="badge rounded-pill" [ngClass]="getStatusBadgeClass(attempt.status)">
-                  {{ attempt.status === 'reviewed' ? 'Corretto' : 'Da correggere' }}
+                  {{ attempt.status === 'reviewed' ? t('status_reviewed') : t('status_pending') }}
                 </span>
               </td>
               <td class="text-end">
                 <a [routerLink]="['/t/correzione', attempt._id]" class="btn btn-sm btn-light rounded-pill">
                   <fa-icon [icon]="icons.faExternalLinkAlt" class="me-1"></fa-icon>
-                  Vedi
+                  {{ t('btn_view') }}
                 </a>
               </td>
             </tr>
           } @empty {
             <tr>
               <td colspan="5" class="text-center py-4 text-muted">
-                Nessun test completato finora.
+                {{ t('empty_history') }}
               </td>
             </tr>
           }
@@ -56,8 +57,8 @@
     @if (pagination && pagination.totalPages > 1) {
       <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
         <div class="text-muted small">
-          Pagina <strong>{{ pagination.page }}</strong> di <strong>{{ pagination.totalPages }}</strong>
-          <span class="ms-2">({{ pagination.total }} risultati)</span>
+          <span [innerHTML]="t('page_info', { page: pagination.page, total_pages: pagination.totalPages })"></span>
+          <span class="ms-2">{{ t('results_count', { count: pagination.total }) }}</span>
         </div>
         <div class="btn-group">
           <button 
@@ -66,14 +67,14 @@
             [disabled]="pagination.page === 1"
             (click)="pageChange.emit(pagination.page - 1)">
             <fa-icon [icon]="icons.faChevronLeft" class="me-1"></fa-icon>
-            Precedente
+            {{ t('btn_prev') }}
           </button>
           <button 
             type="button" 
             class="btn btn-blue btn-sm rounded-end-pill px-3"
             [disabled]="pagination.page === pagination.totalPages"
             (click)="pageChange.emit(pagination.page + 1)">
-            Successiva
+            {{ t('btn_next') }}
             <fa-icon [icon]="icons.faChevronRight" class="ms-1"></fa-icon>
           </button>
         </div>
@@ -81,3 +82,4 @@
     }
   </div>
 </div>
+</ng-container>

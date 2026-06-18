@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faExternalLinkAlt, faCalendarAlt, faClipboardCheck, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { RouterModule } from '@angular/router';
+import { TranslocoDirective, TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-student-attempts-table',
   standalone: true,
-  imports: [CommonModule, FontAwesomeModule, RouterModule],
+  imports: [CommonModule, FontAwesomeModule, RouterModule, TranslocoDirective, TranslocoPipe],
   templateUrl: './student-attempts-table.html',
   styleUrl: './student-attempts-table.scss'
 })

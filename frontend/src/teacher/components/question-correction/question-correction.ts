@@ -6,11 +6,12 @@ import { faSpinner, faInfoCircle, faSparkles } from '@fortawesome/pro-solid-svg-
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-question-correction',
   standalone: true,
-  imports: [NgClass, FormsModule, FontAwesomeModule, NgbTooltipModule, SyllexButton],
+  imports: [NgClass, FormsModule, FontAwesomeModule, NgbTooltipModule, SyllexButton, TranslocoDirective, TranslocoPipe],
   templateUrl: './question-correction.html',
   styleUrl: './question-correction.scss',
 })
@@ -22,22 +23,25 @@ export class QuestionCorrection {
   @Output() scoreChanged = new EventEmitter<void>();
   aiCorrecting = false;
   private readonly testsService = inject(TestsService);
+  private readonly translocoService = inject(TranslocoService);
   readonly spinner = faSpinner;
   readonly infoIcon = faInfoCircle;
   readonly sparklesIcon = faSparkles;
 
   getResultLabel(value: string): string {
     const labels: Record<string, string> = {
-      correct: 'Corretta',
-      wrong: 'Sbagliata',
-      dubious: 'Dubbia',
-      empty: 'Non risposta',
+      correct: this.translocoService.translate('question_correction.result.correct'),
+      wrong: this.translocoService.translate('question_correction.result.wrong'),
+      dubious: this.translocoService.translate('question_correction.result.dubious'),
+      empty: this.translocoService.translate('question_correction.result.empty'),
     };
     return labels[value] || '';
   }
 
   getAiProbabilityLabel(value: number): string {
-    return value > 50 ? 'Probabile IA' : 'Probabilmente non IA';
+    return value > 50 
+      ? this.translocoService.translate('question_correction.ai_prob.high') 
+      : this.translocoService.translate('question_correction.ai_prob.low');
   }
 
   get isOpenTypeQuestion(): boolean {

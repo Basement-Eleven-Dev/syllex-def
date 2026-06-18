@@ -5,10 +5,11 @@ import { faEye } from '@fortawesome/pro-solid-svg-icons';
 import { StudentPerformanceData } from '../../../services/class-statistics.service';
 import { SyllexPagination } from '../syllex-pagination/syllex-pagination';
 import { SyllexButton } from '../UI/syllex-button/syllex-button';
+import { TranslocoDirective, TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-studenti-classe-table',
-  imports: [FontAwesomeModule, SyllexPagination, FormsModule, SyllexButton],
+  imports: [FontAwesomeModule, SyllexPagination, FormsModule, SyllexButton, TranslocoDirective, TranslocoPipe],
   templateUrl: './studenti-classe-table.html',
   styleUrl: './studenti-classe-table.scss',
 })

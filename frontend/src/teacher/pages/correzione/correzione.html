@@ -1,3 +1,4 @@
+<ng-container *transloco="let t; read: 'correzione'">
 @if (isLoading()) {
 <div class="d-flex justify-content-center align-items-center py-5">
   <fa-icon
@@ -11,18 +12,18 @@
 
 <!-- Header -->
 <div class="class-header">
-  <button class="back-btn" [routerLink]="backUrl" aria-label="Torna al test">
+  <button class="back-btn" [routerLink]="backUrl" [attr.aria-label]="t('back')">
     <fa-icon [icon]="ArrowLeftIcon" />
   </button>
   <div class="flex-fill">
     <span class="class-header__title">{{ d.studentName }}</span>
-    <p class="text-muted mb-0 mt-1">Test: {{ d.testTitle }}</p>
+    <p class="text-muted mb-0 mt-1">{{ t('test_label', { title: d.testTitle }) }}</p>
   </div>
   <div class="d-flex flex-row gap-2 align-items-center">
     <span class="text-muted small">
       <fa-icon [icon]="ClockIcon" class="me-1"></fa-icon>
-      @if (d.submissionDate) { Consegnato il {{ d.submissionDate | date: 'dd MMM
-      y, HH:mm' }} } @else { Non ancora consegnato }
+      @if (d.submissionDate) { {{ t('delivered_on') }} {{ d.submissionDate | date: 'dd MMM y, HH:mm' }} } 
+      @else { {{ t('not_delivered') }} }
     </span>
     <span
       class="badge fs-6 rounded-pill px-3 py-2"
@@ -30,15 +31,14 @@
       [class.da-correggere]="d.status === 'delivered'"
       [class.corretto]="d.status === 'reviewed'"
     >
-      {{ (d.status === 'delivered' ? 'da correggere' : 'corretto') | titlecase
-      }}
+      {{ (d.status === 'delivered' ? t('status_delivered') : t('status_reviewed')) | titlecase }}
     </span>
   </div>
 </div>
 
 <!-- Riepilogo -->
 <div class="section-heading mt-5">
-  <span>Riepilogo</span>
+  <span>{{ t('summary') }}</span>
   <fa-icon [icon]="CheckIcon" />
 </div>
 <div class="mt-4 mb-4">
@@ -47,10 +47,10 @@
 
 <div class="ai-feedback-card mt-4">
   <div class="d-flex justify-content-between align-items-center mb-2">
-    <span class="fw-semibold text-primary">Feedback AI</span>
+    <span class="fw-semibold text-primary">{{ t('ai_feedback') }}</span>
     <app-syllex-button
       [props]="{
-        label: isGeneratingInsight() ? 'Generazione...' : (d.aiInsight ? 'Aggiorna' : 'Genera'),
+        label: isGeneratingInsight() ? t('btn_generating') : (d.aiInsight ? t('btn_update') : t('btn_generate')),
         variant: 'primary',
         size: 'small',
         color: 'celestine',
@@ -63,21 +63,19 @@
   <p class="mb-0 ai-feedback-text">&ldquo;{{ d.aiInsight }}&rdquo;</p>
   } @else {
   <p class="mb-0 text-muted small fst-italic">
-    Genera il feedback AI per ricevere un'analisi personalizzata sulle risposte
-    dello studente.
+    {{ t('ai_feedback_empty') }}
   </p>
   }
 </div>
 
 <!-- Correzione / Precorrezione -->
 <div class="section-heading mt-5">
-  <span>{{ d.status === 'reviewed' ? 'Correzione' : 'Precorrezione AI' }}</span>
+  <span>{{ d.status === 'reviewed' ? t('section_correction') : t('section_precorrection') }}</span>
   <fa-icon [icon]="CheckIcon" />
 </div>
 <section class="correzione-box">
   <p class="text-muted small mb-4">
-    L'AI ha già analizzato il compito. Revisiona le domande e conferma la
-    correzione finale.
+    {{ t('correction_desc') }}
   </p>
   <div class="d-flex flex-row align-items-center gap-2 flex-wrap mb-5">
     <div class="d-flex flex-row flex-wrap gap-2 align-items-center flex-fill">
@@ -99,7 +97,7 @@
       @if(d.status !== 'reviewed') {
       <app-syllex-button
         [props]="{
-          label: 'Finalizza Correzione',
+          label: t('btn_finalize'),
           variant: 'primary',
           size: 'large',
           leftIcon: CheckIcon,
@@ -122,5 +120,6 @@
 </section>
 
 } @else {
-<div class="alert alert-warning">Impossibile caricare i dati del test.</div>
+<div class="alert alert-warning">{{ t('err_load') }}</div>
 }
+</ng-container>

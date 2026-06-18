@@ -1,24 +1,27 @@
-import { Component, ElementRef, OnDestroy, effect, input, viewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, effect, input, viewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 Chart.register(...registerables);
 
 @Component({
   selector: 'app-student-performance-chart',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslocoDirective, TranslocoPipe],
   template: `
+    <ng-container *transloco="let t; read: 'student_detail'">
     @if (!data() || data().length === 0) {
       <div class="empty-chart">
         <div class="empty-chart-icon">📊</div>
-        <p class="text-muted mb-0">Nessun dato disponibile</p>
+        <p class="text-muted mb-0">{{ t('chart_empty') }}</p>
       </div>
     } @else {
       <div class="chart-wrapper">
         <canvas #chartCanvas></canvas>
       </div>
     }
+    </ng-container>
   `,
   styleUrl: './student-performance-chart.scss'
 })
@@ -29,6 +32,7 @@ export class StudentPerformanceChartComponent implements OnDestroy {
 
   canvasRef = viewChild<ElementRef<HTMLCanvasElement>>('chartCanvas');
   private chart?: Chart;
+  private translocoService = inject(TranslocoService);
 
   constructor() {
     effect(() => {
@@ -118,7 +122,7 @@ export class StudentPerformanceChartComponent implements OnDestroy {
           return date.toLocaleDateString('it-IT', { day: '2-digit', month: 'short' });
         }),
         datasets: [{
-          label: 'Punteggio %',
+          label: this.translocoService.translate('student_detail.chart_line_label'),
           data: data.map(d => d.score),
           borderColor: '#3931ce',
           backgroundColor: 'rgba(57, 49, 206, 0.08)',
@@ -144,7 +148,7 @@ export class StudentPerformanceChartComponent implements OnDestroy {
             padding: 10,
             cornerRadius: 8,
             callbacks: {
-              label: (ctx) => `Punteggio: ${ctx.parsed.y}%`
+              label: (ctx) => this.translocoService.translate('student_detail.chart_line_tooltip', { val: ctx.parsed.y })
             }
           }
         },
@@ -181,7 +185,7 @@ export class StudentPerformanceChartComponent implements OnDestroy {
     const classColor = '#3931ce33'; // Primary with low opacity
 
     const datasets: any[] = [{
-      label: 'Studente',
+      label: this.translocoService.translate('student_detail.chart_bar_student'),
       data: data.map(d => d.percentage ?? d.score ?? 0),
       backgroundColor: studentColor,
       borderRadius: 4,
@@ -190,7 +194,7 @@ export class StudentPerformanceChartComponent implements OnDestroy {
 
     if (compareData && compareData.length > 0) {
       datasets.unshift({
-        label: 'Media Classe',
+        label: this.translocoService.translate('student_detail.chart_bar_class'),
         data: data.map(d => {
           const comp = compareData.find(c => c.name === d.name);
           return comp ? (comp.percentage ?? comp.score ?? 0) : 0;
