@@ -1042,5 +1042,33 @@
       "chart_bar_student": "Student",
       "chart_bar_class": "Class Average"
     }
+  },
+  "agent_chat": {
+    "welcome_title": "Hi, I'm Alex!",
+    "welcome_subtitle": "I'm your Personal Learning Assistant in Syllex. I'm ready to help you summarize your materials, find key answers or test your knowledge with personalized quizzes.",
+    "welcome_prompt": "How can I help you today?",
+    "summary_btn": "Quick summary",
+    "topics_btn": "Main topics",
+    "quiz_btn": "Test me with a quiz",
+    "write_placeholder": "Type here...",
+    "listening_status": "I'm listening...",
+    "finish_btn": "I'm done",
+    "responding_status": "Alex is responding...",
+    "searching_status": "Searching materials...",
+    "thinking_status": "Alex is thinking...",
+    "new_chat_btn": "New Chat",
+    "history_label": "History",
+    "delete_confirm": "Delete?",
+    "yes": "Yes",
+    "no": "No",
+    "delete_tooltip": "Delete conversation"
+  },
+  "help_chat": {
+    "header_title": "Syllex Assistant",
+    "header_subtitle": "Platform Support",
+    "welcome_greeting": "Hi {{name}}!",
+    "welcome_desc": "In this section I can help you use Syllex. What do you need?",
+    "write_placeholder": "Type a message…",
+    "error_response": "Sorry, a technical error occurred. Please try again later."
   }
 }

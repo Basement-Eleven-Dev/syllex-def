@@ -1042,5 +1042,33 @@
       "chart_bar_student": "Studente",
       "chart_bar_class": "Media Classe"
     }
+  },
+  "agent_chat": {
+    "welcome_title": "Ciao, sono Alex!",
+    "welcome_subtitle": "Sono il tuo Assistente Didattico Personale in Syllex. Sono pronto ad aiutarti a riassumere i tuoi materiali, trovare le risposte chiave o metterti alla prova con quiz personalizzati.",
+    "welcome_prompt": "Come posso aiutarti oggi?",
+    "summary_btn": "Riassunto sintetico",
+    "topics_btn": "Argomenti principali",
+    "quiz_btn": "Mettimi alla prova con un quiz",
+    "write_placeholder": "Scrivi qui...",
+    "listening_status": "Ti sto ascoltando...",
+    "finish_btn": "Ho finito",
+    "responding_status": "Alex sta rispondendo...",
+    "searching_status": "Sto cercando nei materiali...",
+    "thinking_status": "Alex sta pensando...",
+    "new_chat_btn": "Nuova Chat",
+    "history_label": "Cronologia",
+    "delete_confirm": "Elimina?",
+    "yes": "Sì",
+    "no": "No",
+    "delete_tooltip": "Elimina conversazione"
+  },
+  "help_chat": {
+    "header_title": "Assistente Syllex",
+    "header_subtitle": "Supporto alla piattaforma",
+    "welcome_greeting": "Ciao {{name}}!",
+    "welcome_desc": "In questa sezione posso aiutarti ad usare Syllex. Di cosa hai bisogno?",
+    "write_placeholder": "Scrivi un messaggio…",
+    "error_response": "Scusa, si è verificato un errore tecnico. Riprova più tardi."
   }
 }

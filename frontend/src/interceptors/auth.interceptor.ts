@@ -38,8 +38,10 @@ export const authInterceptor: HttpInterceptorFn = (
         return next(req.clone({ url: apiUrl }));
       }
 
+      const lang = localStorage.getItem('syllex-language') || 'it';
       const headers: Record<string, string> = {
         Authorization: `Bearer ${token}`,
+        'Accept-Language': lang,
       };
 
       if (subjectId) {

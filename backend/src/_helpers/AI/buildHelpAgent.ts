@@ -5,6 +5,7 @@ export async function buildHelpAgent(
   history: { role: string; content: string }[],
   userRole: "student" | "teacher" | "admin",
   currentPath?: string,
+  language: string = "it",
 ) {
   const sitemap = getSitemapForRole(userRole);
   const sitemapContext = sitemap
@@ -17,6 +18,15 @@ export async function buildHelpAgent(
         `${msg.role === "user" ? "Utente" : "Assistente Supporto"}: ${msg.content}`,
     )
     .join("\n");
+
+  const languageNames: Record<string, string> = {
+    it: "italiano",
+    en: "inglese",
+    es: "spagnolo",
+    fr: "francese",
+    de: "tedesco",
+  };
+  const targetLanguage = languageNames[language] || language;
 
   const systemPrompt = `
 # RUOLO
@@ -55,7 +65,7 @@ Usa esclusivamente tag HTML: <b>, <ul>, <li>, <br>.
 4. **Nessuna Informazione Tecnica**: Non condividere dettagli tecnici o di sviluppo su Syllex che potrebbero mettere a rischio la sicurezza o la privacy degli utenti e della piattaforma stessa.
 
 # LINGUA
-Rispondi nella stessa lingua dell'utente.
+Rispondi OBBLIGATORIAMENTE in lingua ${targetLanguage}. Tutta la tua risposta, spiegazioni e indicazioni devono essere formulate in ${targetLanguage}.
 `;
 
   return systemPrompt;

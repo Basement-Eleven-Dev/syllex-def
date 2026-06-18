@@ -49,11 +49,14 @@ const generateResponse = async (
     conversationId,
   );
 
+  const language = context.language || "it";
+
   const aiResponse = await generateAIResponseGemini(
     query,
     subjectId,
     userRole ?? "student",
     messagesHistory,
+    language,
   );
 
   if (!aiResponse) {

@@ -59,10 +59,12 @@ const submitStudentAttempt = async (
           const answerBool = answer === "Vero";
           score = answerBool === correctBool ? maxPoints : 0;
         } else if (type === "risposta aperta") {
+          const language = context.language || "it";
           const result = await correctStudentQuestion(
             answer ?? "",
             maxPoints,
             q.question?.explanation ?? "",
+            language,
           );
           score = result.score;
           teacherComment = result.explanation;

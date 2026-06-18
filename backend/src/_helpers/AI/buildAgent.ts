@@ -6,6 +6,7 @@ export async function buildAgent(
   subjectId: Types.ObjectId,
   userRole: "teacher" | "student" | "admin" = "student",
   hasMaterials: boolean = false,
+  language: string = "it",
 ) {
   await connectDatabase();
   // Flusso senza collection assistants: identita fissa
@@ -15,9 +16,30 @@ export async function buildAgent(
 
   const isTeacher = userRole === "teacher" || userRole === "admin";
 
+  const languageNames: Record<string, string> = {
+    it: "italiano",
+    en: "inglese",
+    es: "spagnolo",
+    fr: "francese",
+    de: "tedesco",
+  };
+  const targetLanguage = languageNames[language] || language;
+
   return isTeacher
-    ? buildTeacherPrompt(name, subject!.name, tone, hasMaterials)
-    : buildStudentPrompt(name, subject!.name, tone, hasMaterials);
+    ? buildTeacherPrompt(
+        name,
+        subject!.name,
+        tone,
+        hasMaterials,
+        targetLanguage,
+      )
+    : buildStudentPrompt(
+        name,
+        subject!.name,
+        tone,
+        hasMaterials,
+        targetLanguage,
+      );
 }
 
 function buildTeacherPrompt(
@@ -25,10 +47,14 @@ function buildTeacherPrompt(
   subjectName: string,
   tone: string,
   hasMaterials: boolean,
+  targetLanguage: string,
 ): string {
   return `
 ## IDENTITÀ
 Sei ${name}, assistente didattico per il docente della materia "${subjectName}". Il tuo obiettivo è supportare la preparazione delle lezioni, la creazione di materiali, la strutturazione degli argomenti e qualsiasi altra necessità didattica del docente. Tono: ${tone}.
+
+## LINGUA DI RISPOSTA
+Rispondi OBBLIGATORIAMENTE in lingua ${targetLanguage}. Tutta la tua risposta, spiegazioni e indicazioni devono essere formulate esclusivamente in ${targetLanguage}.
 
 ## FONTE DI CONOSCENZA
 ${
@@ -71,7 +97,7 @@ Rimani focalizzato su "${subjectName}" e sulla didattica in generale. Per richie
 ---
 
 ## STILE DI RISPOSTA
-- **Lingua**: speculare a quella del docente.
+- **Lingua**: Rispondi esclusivamente in ${targetLanguage}.
 - **Identità**: presentati solo al primo messaggio o se richiesto.
 - **Formato**: usa strutture chiare (liste, sezioni) quando utile per la preparazione didattica.
 - **Tono**: professionale e collaborativo, da collega esperto.
@@ -83,10 +109,14 @@ function buildStudentPrompt(
   subjectName: string,
   tone: string,
   hasMaterials: boolean,
+  targetLanguage: string,
 ): string {
   return `
 ## IDENTITÀ
 Sei ${name}, tutor di studio per la materia "${subjectName}". Il tuo unico scopo è aiutare lo studente a CAPIRE i concetti della materia, non a fornire risposte preconfezionate. Tono: ${tone}.
+
+## LINGUA DI RISPOSTA
+Rispondi OBBLIGATORIAMENTE in lingua ${targetLanguage}. Tutta la tua risposta, spiegazioni e indicazioni devono essere formate esclusivamente in ${targetLanguage}.
 
 ## FONTE DI CONOSCENZA — UNICA E ASSOLUTA
 ${
@@ -140,7 +170,7 @@ Sei il tutor ESCLUSIVO di "${subjectName}". Argomenti non pertinenti (ricette, a
 ---
 
 ## STILE DI RISPOSTA
-- **Lingua**: speculare a quella dello studente.
+- **Lingua**: Rispondi esclusivamente in ${targetLanguage}.
 - **Identità**: presentati solo al primo messaggio o se richiesto esplicitamente.
 - **Formato**: elenchi puntati per concetti multipli. Struttura scansionabile. Niente introduzioni verbose.
 - **Tono**: diretto, incoraggiante, mai condiscendente.

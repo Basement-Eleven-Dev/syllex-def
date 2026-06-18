@@ -21,16 +21,23 @@ const askSyllexHelpAssistant = async (
 
   // Mappa il ruolo dell'utente per il RAG (admin viene trattato come teacher o gestito via sitemap)
   const userRole = user.role as "student" | "teacher" | "admin";
+  const language = context.language || "it";
 
   // Genera la risposta con eventuale azione suggerita (stateless)
-  const result = await generateHelpResponseGemini(query, history || [], userRole, currentPath);
+  const result = await generateHelpResponseGemini(
+    query,
+    history || [],
+    userRole,
+    currentPath,
+    language,
+  );
 
   return {
     success: true,
     data: {
       content: result.content,
-      suggestedAction: result.suggestedAction
-    }
+      suggestedAction: result.suggestedAction,
+    },
   };
 };
 

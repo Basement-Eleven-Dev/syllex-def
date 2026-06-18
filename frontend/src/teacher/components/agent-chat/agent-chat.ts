@@ -42,6 +42,7 @@ import { firstValueFrom } from 'rxjs';
 import { SyllexButton } from '../UI/syllex-button/syllex-button';
 import { CommonModule } from '@angular/common';
 import { AlexMascot } from '../../../app/shared/components/alex-mascot/alex-mascot';
+import { TranslocoDirective, TranslocoPipe } from '@jsverse/transloco';
 
 export interface ChatMessage {
   _id?: string;
@@ -55,7 +56,14 @@ export interface ChatMessage {
 @Component({
   selector: 'app-agent-chat',
   standalone: true,
-  imports: [CommonModule, FormsModule, FontAwesomeModule, MarkdownComponent, SyllexButton, AlexMascot ],
+  imports: [
+    CommonModule,
+    FormsModule,
+    FontAwesomeModule,
+    MarkdownComponent,
+    AlexMascot,
+    TranslocoDirective,
+  ],
   templateUrl: './agent-chat.html',
   styleUrl: './agent-chat.scss',
 })
@@ -304,6 +312,8 @@ export class AgentChat implements OnInit, OnDestroy {
   }
 
   startNewChat() {
+    this.geminiLiveService.aiTranscript.set('');
+    this.lastSavedAiText = '';
     const newId = 'conv_' + Date.now();
     this.currentConversationId.set(newId);
     this.messages.set([]);
@@ -321,7 +331,10 @@ export class AgentChat implements OnInit, OnDestroy {
     if (this.deleteResetTimeout) clearTimeout(this.deleteResetTimeout);
     this.pendingDeleteId.set(id);
     // Auto-reset dopo 3 secondi senza conferma
-    this.deleteResetTimeout = setTimeout(() => this.pendingDeleteId.set(null), 3000);
+    this.deleteResetTimeout = setTimeout(
+      () => this.pendingDeleteId.set(null),
+      3000,
+    );
   }
 
   cancelDelete(event: Event) {
@@ -334,32 +347,32 @@ export class AgentChat implements OnInit, OnDestroy {
     event.stopPropagation();
     if (this.deleteResetTimeout) clearTimeout(this.deleteResetTimeout);
     this.pendingDeleteId.set(null);
-      this.agentService.deleteConversation(id).subscribe({
-        next: () => {
-          this.feedbackService.showFeedback(
-            'Conversazione cancellata con successo',
-            true,
-          );
-          this.agentService.listConversations().subscribe((res) => {
-            this.conversations.set(res);
-            // If we deleted the currently active conversation, switch or start a new one
-            if (this.currentConversationId() === id) {
-              if (res.length > 0) {
-                this.selectConversation(res[0].id);
-              } else {
-                this.startNewChat();
-              }
+    this.agentService.deleteConversation(id).subscribe({
+      next: () => {
+        this.feedbackService.showFeedback(
+          'Conversazione cancellata con successo',
+          true,
+        );
+        this.agentService.listConversations().subscribe((res) => {
+          this.conversations.set(res);
+          // If we deleted the currently active conversation, switch or start a new one
+          if (this.currentConversationId() === id) {
+            if (res.length > 0) {
+              this.selectConversation(res[0].id);
+            } else {
+              this.startNewChat();
             }
-          });
-        },
-        error: (err) => {
-          console.error('Error deleting conversation:', err);
-          this.feedbackService.showFeedback(
-            'Errore nella cancellazione della conversazione',
-            false,
-          );
-        },
-      });
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Error deleting conversation:', err);
+        this.feedbackService.showFeedback(
+          'Errore nella cancellazione della conversazione',
+          false,
+        );
+      },
+    });
   }
 
   // ==================

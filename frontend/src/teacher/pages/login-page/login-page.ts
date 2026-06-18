@@ -6,7 +6,7 @@ import { TranslocoDirective, TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-login-page',
-  imports: [LoginForm, TranslocoDirective, TranslocoPipe],
+  imports: [LoginForm, TranslocoDirective],
   templateUrl: './login-page.html',
   styleUrl: './login-page.scss',
 })

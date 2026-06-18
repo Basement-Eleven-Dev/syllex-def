@@ -54,7 +54,6 @@ import { TranslocoDirective, TranslocoPipe } from '@jsverse/transloco';
     SyllexButton,
     LanguageSelector,
     TranslocoDirective,
-    TranslocoPipe,
   ],
   templateUrl: './nav.html',
   styleUrl: './nav.scss',
