@@ -22,7 +22,7 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, from, of, startWith, switchMap } from 'rxjs';
 import { AttemptInterface, TestsService } from '../../../services/tests-service';
 import { computed, inject, input } from '@angular/core';
-import { TranslocoService } from '@jsverse/transloco';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 // Register Chart.js components
 Chart.register(
@@ -54,7 +54,7 @@ const SCHOOL_MONTHS = [8, 9, 10, 11, 0, 1, 2, 3, 4, 5];
 
 @Component({
   selector: 'app-class-performance-chart',
-  imports: [],
+  imports: [TranslocoDirective, TranslocoPipe],
   templateUrl: './class-performance-chart.html',
   styleUrl: './class-performance-chart.scss',
 })

@@ -25,7 +25,7 @@ import {
   TestsService,
   TopicPerformance,
 } from '../../../services/tests-service';
-import { TranslocoService } from '@jsverse/transloco';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 Chart.register(
   BarController,
@@ -39,7 +39,7 @@ Chart.register(
 
 @Component({
   selector: 'app-topics-performance-chart',
-  imports: [],
+  imports: [TranslocoDirective, TranslocoPipe],
   templateUrl: './topics-performance-chart.html',
   styleUrl: './topics-performance-chart.scss',
 })
