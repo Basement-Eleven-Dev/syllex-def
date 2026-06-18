@@ -1,7 +1,8 @@
+<ng-container *transloco="let t; read: 'question_correction'">
 <div class="p-4 rounded-4 d-flex flex-column gap-2" style="background: #eef4ff">
   <div class="d-flex justify-content-between align-items-center">
     <label class="form-label text-dark fw-bold fs-4 mb-0">
-      Domanda {{ index }}
+      {{ t('question_num', { index: index }) }}
       <span class="badge" [class]="data.answer.result">
         {{ getResultLabel(data.answer.result) }}
       </span>
@@ -10,7 +11,7 @@
     @if (isOpenTypeQuestion && !isReviewed) {
       <app-syllex-button
         [props]="{
-          label: aiCorrecting ? 'Correzione in corso...' : 'Correzione con IA',
+          label: aiCorrecting ? t('ai_correcting') : t('ai_correct'),
           variant: 'secondary',
           size: 'large',
           leftIcon: aiCorrecting ? spinner : sparklesIcon,
@@ -32,11 +33,11 @@
   />
   } @if(data.question.options && data.question.options.length > 0){
   <div>
-    <label class="form-label text-dark fw-bold">Opzioni:</label>
+    <label class="form-label text-dark fw-bold">{{ t('options') }}</label>
     <ol type="A" class="ps-3">
       @for(option of data.question.options; track $index){
       <li [class.correct]="option.isCorrect" [class.fw-bold]="option.isCorrect">
-        {{ option.label }} @if(option.isCorrect) { (Corretta) }
+        {{ option.label }} @if(option.isCorrect) { {{ t('correct_paren') }} }
       </li>
       }
     </ol>
@@ -47,7 +48,7 @@
     <label
       class="form-label text-dark fw-bold d-flex align-items-center gap-2 mb-2"
     >
-      Risposta dello studente: @if (data?.answer?.aiProbability !== null &&
+      {{ t('student_answer') }} @if (data?.answer?.aiProbability !== null &&
       data?.answer?.aiProbability !== undefined) {
       <span
         class="badge"
@@ -56,7 +57,7 @@
           'bg-danger': data.answer.aiProbability > 50,
           'bg-primary': data.answer.aiProbability <= 50
         }"
-        ngbTooltip="Indica quanto è probabile che questo testo sia stato scritto da un'intelligenza artificiale (es: ChatGPT)"
+        [ngbTooltip]="t('ai_prob_tooltip')"
       >
         {{ getAiProbabilityLabel(data.answer.aiProbability) }}
       </span>
@@ -64,14 +65,14 @@
     </label>
     <div class="d-flex flex-row align-items-start gap-3">
       <p class="mb-0 fs-5 flex-fill">
-        {{ data?.answer?.answer || 'Nessuna risposta' }}
+        {{ data?.answer?.answer || t('no_answer') }}
       </p>
       <div
         class="d-flex flex-column align-items-center flex-shrink-0"
         style="min-width: 90px"
       >
         <label class="form-label text-dark fw-bold small mb-1">
-          Punteggio (max {{ data.answer.maxScore }})
+          {{ t('score_max', { max: data.answer.maxScore }) }}
         </label>
         <input
           type="number"
@@ -88,13 +89,14 @@
   </section>
 
   <div>
-    <label class="form-label text-dark fw-bold">Feedback per lo studente</label>
+    <label class="form-label text-dark fw-bold">{{ t('feedback_label') }}</label>
     <textarea
       class="form-control border-0 bg-white rounded-3 shadow-none"
       rows="4"
       [(ngModel)]="data.answer.feedback"
-      placeholder="Inserisci un commento..."
+      [placeholder]="t('feedback_ph')"
       [disabled]="isReviewed === true"
     ></textarea>
   </div>
 </div>
+</ng-container>

@@ -25,6 +25,7 @@ import {
   TestsService,
   TopicPerformance,
 } from '../../../services/tests-service';
+import { TranslocoService } from '@jsverse/transloco';
 
 Chart.register(
   BarController,
@@ -44,6 +45,7 @@ Chart.register(
 })
 export class TopicsPerformanceChart implements OnDestroy {
   private readonly testsService = inject(TestsService);
+  private readonly translocoService = inject(TranslocoService);
 
   readonly classId = input.required<string>();
   readonly ChartRef = viewChild<ElementRef<HTMLCanvasElement>>('chart');
@@ -105,7 +107,7 @@ export class TopicsPerformanceChart implements OnDestroy {
         labels: data.map((t) => t.topicName),
         datasets: [
           {
-            label: 'Performance media',
+            label: this.translocoService.translate('class_detail.chart_topics_label'),
             data: data.map((t) => t.percentage),
             backgroundColor: '#C9F321',
             borderRadius: 16,
@@ -135,7 +137,7 @@ export class TopicsPerformanceChart implements OnDestroy {
           legend: { display: false },
           tooltip: {
             callbacks: {
-              label: (context) => `Performance: ${context.parsed.y}%`,
+              label: (context) => this.translocoService.translate('class_detail.chart_perf_tooltip', { val: context.parsed.y }),
             },
           },
         },
