@@ -45,6 +45,7 @@ const IconMap: Record<string, any> = {
 
 import { BackTo } from '../../components/back-to/back-to';
 import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-test-detail',
@@ -60,6 +61,8 @@ import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-
     SyllexButton,
     BackTo,
     SyllexPageHeader,
+    TranslocoDirective,
+    TranslocoPipe,
   ],
   templateUrl: './test-detail.html',
   styleUrl: './test-detail.scss',
@@ -84,6 +87,7 @@ export class TestDetail {
   private readonly destroyRef = inject(DestroyRef);
   private readonly modalService = inject(NgbModal);
   private readonly questionsService = inject(QuestionsService);
+  private readonly translocoService = inject(TranslocoService);
 
   // Icone UI statiche
   readonly ArrowLeftIcon = faArrowLeft;
@@ -108,10 +112,13 @@ export class TestDetail {
   readonly TestStats = computed<KpiCardData[]>(() => {
     return this.BackendStats()
       .filter((stat) => stat.title !== 'Assegnazioni')
-      .map((stat) => ({
-        label: stat.title,
-        value: stat.value,
-      }));
+      .map((stat) => {
+        const translationKey = 'test_detail.kpi_' + stat.title.toLowerCase().replace(/ /g, '_');
+        return {
+          label: this.translocoService.translate(translationKey) || stat.title,
+          value: stat.value,
+        };
+      });
   });
 
   constructor() {
@@ -121,7 +128,7 @@ export class TestDetail {
   private loadTestData(): void {
     const testId = this.TestId();
     if (!testId) {
-      this.feedbackService.showFeedback('Test ID non trovato', false);
+      this.feedbackService.showFeedback(this.translocoService.translate('test_detail.err_not_found'), false);
       this.router.navigate(['/t/tests']);
       return;
     }
@@ -143,7 +150,7 @@ export class TestDetail {
         error: (error) => {
           console.error('Error loading test details:', error);
           this.feedbackService.showFeedback(
-            'Errore nel caricamento dei dati',
+            this.translocoService.translate('test_detail.err_loading'),
             false,
           );
           this.IsLoading.set(false);
@@ -167,13 +174,13 @@ export class TestDetail {
       .subscribe({
         next: () => {
           this.feedbackService.showFeedback(
-            'Test eliminato con successo',
+            this.translocoService.translate('test_detail.success_delete'),
             true,
           );
           this.router.navigate(['/t/tests']);
         },
         error: () =>
-          this.feedbackService.showFeedback('Errore eliminazione', false),
+          this.feedbackService.showFeedback(this.translocoService.translate('test_detail.err_delete'), false),
       });
   }
 
@@ -221,7 +228,7 @@ export class TestDetail {
           console.error('Error fetching data for print:', err);
           this.IsLoading.set(false);
           this.feedbackService.showFeedback(
-            'Errore nel caricamento dei dati per la stampa',
+            this.translocoService.translate('test_detail.err_print'),
             false,
           );
         },

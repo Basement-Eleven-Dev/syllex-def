@@ -23,6 +23,7 @@ import {
 import { SyllexPagination } from '../syllex-pagination/syllex-pagination';
 import { SyllexButton } from '../UI/syllex-button/syllex-button';
 import { SyllexSearchInput } from '../UI/syllex-search-input/syllex-search-input';
+import { TranslocoDirective, TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-test-assignments',
@@ -36,6 +37,8 @@ import { SyllexSearchInput } from '../UI/syllex-search-input/syllex-search-input
     SyllexPagination,
     SyllexButton,
     SyllexSearchInput,
+    TranslocoDirective,
+    TranslocoPipe,
   ],
   templateUrl: './test-assignments.html',
   styleUrl: './test-assignments.scss',

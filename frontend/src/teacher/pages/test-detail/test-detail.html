@@ -1,3 +1,4 @@
+<ng-container *transloco="let t; read: 'test_detail'">
 @if (IsLoading()) {
 <div class="d-flex justify-content-center align-items-center py-5">
   <fa-icon
@@ -10,26 +11,26 @@
 } @else if (TestData()) {
 
 <!-- Header -->
-<app-back-to [path]="'/t/tests'" label="Torna ai test" />
+<app-back-to [path]="'/t/tests'" [label]="t('back')" />
 
 <app-syllex-page-header
   [title]="TestData()!.name"
-  [description]="TestData()!.availableFrom ? 'Creato il ' + (TestData()!.availableFrom | date: 'd MMM y') : ''"
+  [description]="TestData()!.availableFrom ? t('created') + (TestData()!.availableFrom | date: 'd MMM y') : ''"
 >
   <app-syllex-button
-    [props]="{ label: 'Stampa / PDF', variant: 'primary', color: 'celestine', size: 'large', leftIcon: PrintIcon }"
+    [props]="{ label: t('print'), variant: 'primary', color: 'celestine', size: 'large', leftIcon: PrintIcon }"
     (clicked)="onPrintTest()"
   />
   <app-syllex-button
-    [props]="{ label: 'Stampa Risultati', variant: 'primary', color: 'celestine', size: 'large', leftIcon: PrintIcon }"
+    [props]="{ label: t('print_results'), variant: 'primary', color: 'celestine', size: 'large', leftIcon: PrintIcon }"
     (clicked)="onPrintResults()"
   />
   <app-syllex-button
-    [props]="{ label: 'Modifica', variant: 'secondary', size: 'large', leftIcon: EditIcon }"
+    [props]="{ label: t('edit'), variant: 'secondary', size: 'large', leftIcon: EditIcon }"
     (clicked)="onEditTest()"
   />
   <app-syllex-button
-    [props]="{ label: 'Elimina', variant: 'primary', color: 'danger', size: 'large', leftIcon: TrashIcon }"
+    [props]="{ label: t('delete'), variant: 'primary', color: 'danger', size: 'large', leftIcon: TrashIcon }"
     (clicked)="onDeleteTest()"
   />
 </app-syllex-page-header>
@@ -41,14 +42,14 @@
 
 <!-- Assegnazioni -->
 <div class="section-heading mt-5">
-  <span>Assegnazioni</span>
+  <span>{{ t('assignments') }}</span>
   <fa-icon [icon]="UsersIcon" />
 </div>
 <app-test-assignments [attempts]="Attempts()" />
 
 <!-- Statistiche -->
 <div class="section-heading mt-5">
-  <span>Statistiche</span>
+  <span>{{ t('stats') }}</span>
   <fa-icon [icon]="ChartIcon" />
 </div>
 <div class="mb-4">
@@ -61,5 +62,6 @@
 />
 
 } @else {
-<div class="alert alert-warning" role="alert">Test non trovato</div>
+<div class="alert alert-warning" role="alert">{{ t('not_found') }}</div>
 }
+</ng-container>

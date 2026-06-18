@@ -414,5 +414,63 @@
     "no_class": "Nessuna classe assegnata",
     "view": "Visualizza",
     "actions": "Azioni"
+  },
+  "test_detail": {
+    "back": "Torna ai test",
+    "created": "Creato il ",
+    "print": "Stampa / PDF",
+    "print_results": "Stampa Risultati",
+    "edit": "Modifica",
+    "delete": "Elimina",
+    "assignments": "Assegnazioni",
+    "stats": "Statistiche",
+    "not_found": "Test non trovato",
+    "kpi_consegne": "Consegne",
+    "kpi_punteggio_medio": "Punteggio medio",
+    "kpi_idonei": "Idonei",
+    "kpi_tempo_medio": "Tempo medio",
+    "kpi_assegnazioni": "Assegnazioni"
+  },
+  "test_assignments": {
+    "search": "Cerca per nome o cognome...",
+    "col_name": "Nome",
+    "col_lastname": "Cognome",
+    "col_class": "Classe",
+    "col_score": "Punteggio",
+    "col_delivered": "Consegnato il",
+    "no_class": "Nessuna classe",
+    "not_started": "Non iniziato",
+    "to_correct": "da correggere",
+    "btn_correct": "Correggi",
+    "btn_view": "Visualizza",
+    "no_data": "Nessuna consegna trovata"
+  },
+  "test_stats": {
+    "all_classes": "Tutte le classi",
+    "perf_topic": "Performance per argomento",
+    "all_topics": "Tutti gli argomenti",
+    "perf_question": "Performance singole domande",
+    "col_question": "Domanda",
+    "col_correct": "Corrette",
+    "col_wrong": "Errate",
+    "col_blank": "Vuote",
+    "col_success": "Successo (%)",
+    "per_page_5": "5 per pagina",
+    "per_page_10": "10 per pagina",
+    "chart_students": "Studenti",
+    "chart_avg": "Performance media (%)"
+  },
+  "test_ai_summary": {
+    "title_class": "Analisi IA della Classe",
+    "title_student": "Feedback IA",
+    "btn_update": "Aggiorna",
+    "btn_generate": "Genera",
+    "loading": "L'IA sta elaborando i dati...",
+    "retry": "Riprova",
+    "desc_class": "L'IA analizzerà le risposte di tutta la classe per identificare punti di forza e aree di miglioramento.",
+    "desc_student": "Ottieni un suggerimento personalizzato basato sulle risposte e la velocità dello studente.",
+    "err_id": "ID mancante per la generazione.",
+    "err_service": "Servizio temporaneamente non disponibile.",
+    "err_gen": "Errore durante la generazione IA"
   }
 }

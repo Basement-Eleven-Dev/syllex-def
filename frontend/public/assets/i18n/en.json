@@ -414,5 +414,63 @@
     "no_class": "No classes assigned",
     "view": "View",
     "actions": "Actions"
+  },
+  "test_detail": {
+    "back": "Back to tests",
+    "created": "Created on ",
+    "print": "Print / PDF",
+    "print_results": "Print Results",
+    "edit": "Edit",
+    "delete": "Delete",
+    "assignments": "Assignments",
+    "stats": "Statistics",
+    "not_found": "Test not found",
+    "kpi_consegne": "Deliveries",
+    "kpi_punteggio_medio": "Average score",
+    "kpi_idonei": "Passed",
+    "kpi_tempo_medio": "Average time",
+    "kpi_assegnazioni": "Assignments"
+  },
+  "test_assignments": {
+    "search": "Search by first or last name...",
+    "col_name": "First Name",
+    "col_lastname": "Last Name",
+    "col_class": "Class",
+    "col_score": "Score",
+    "col_delivered": "Delivered on",
+    "no_class": "No class",
+    "not_started": "Not started",
+    "to_correct": "to correct",
+    "btn_correct": "Correct",
+    "btn_view": "View",
+    "no_data": "No delivery found"
+  },
+  "test_stats": {
+    "all_classes": "All classes",
+    "perf_topic": "Performance by topic",
+    "all_topics": "All topics",
+    "perf_question": "Single question performance",
+    "col_question": "Question",
+    "col_correct": "Correct",
+    "col_wrong": "Wrong",
+    "col_blank": "Blank",
+    "col_success": "Success (%)",
+    "per_page_5": "5 per page",
+    "per_page_10": "10 per page",
+    "chart_students": "Students",
+    "chart_avg": "Average performance (%)"
+  },
+  "test_ai_summary": {
+    "title_class": "AI Class Analysis",
+    "title_student": "AI Feedback",
+    "btn_update": "Update",
+    "btn_generate": "Generate",
+    "loading": "AI is processing data...",
+    "retry": "Retry",
+    "desc_class": "AI will analyze the entire class responses to identify strengths and areas for improvement.",
+    "desc_student": "Get a personalized suggestion based on the student's responses and speed.",
+    "err_id": "Missing ID for generation.",
+    "err_service": "Service temporarily unavailable.",
+    "err_gen": "Error during AI generation"
   }
 }

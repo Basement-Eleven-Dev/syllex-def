@@ -23,6 +23,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { TestsService } from '../../../services/tests-service';
 import { FeedbackService } from '../../../services/feedback-service';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 Chart.register(...registerables);
 
@@ -36,6 +37,8 @@ Chart.register(...registerables);
     ReactiveFormsModule,
     SlicePipe,
     SyllexSelectInput,
+    TranslocoDirective,
+    TranslocoPipe,
   ],
   templateUrl: './test-stats.html',
   styleUrl: './test-stats.scss',
@@ -48,6 +51,7 @@ export class TestStats implements OnInit, AfterViewInit, OnChanges {
   private readonly router = inject(Router);
   private readonly testsService = inject(TestsService);
   private readonly feedbackService = inject(FeedbackService);
+  private readonly translocoService = inject(TranslocoService);
 
   readonly data = signal<any | null>(null);
   readonly isLoading = signal<boolean>(true);
@@ -241,7 +245,7 @@ export class TestStats implements OnInit, AfterViewInit, OnChanges {
         labels: labels,
         datasets: [
           {
-            label: 'Studenti',
+            label: this.translocoService.translate('test_stats.chart_students'),
             data: data,
             backgroundColor: '#375ec985',
             borderRadius: 8,
@@ -285,7 +289,11 @@ export class TestStats implements OnInit, AfterViewInit, OnChanges {
       this.topicChart = new Chart(ctx, {
         type: 'pie',
         data: {
-          labels: ['Corrette', 'Errate', 'Vuote'],
+          labels: [
+            this.translocoService.translate('test_stats.col_correct'),
+            this.translocoService.translate('test_stats.col_wrong'),
+            this.translocoService.translate('test_stats.col_blank')
+          ],
           datasets: [
             {
               data: [c, e, b],
@@ -311,7 +319,7 @@ export class TestStats implements OnInit, AfterViewInit, OnChanges {
           labels: this.topicPerformanceData.map((d) => d.topicName),
           datasets: [
             {
-              label: 'Performance media (%)',
+              label: this.translocoService.translate('test_stats.chart_avg'),
               data: this.topicPerformanceData.map((d) => d.percentage),
               backgroundColor: '#13214985',
               borderRadius: 8,
@@ -375,7 +383,7 @@ export class TestStats implements OnInit, AfterViewInit, OnChanges {
       error: (err) => {
         console.error('Errore:', err);
         this.feedbackService.showFeedback(
-          'Errore nel caricamento delle statistiche',
+          this.translocoService.translate('test_detail.err_loading'),
           false,
         );
         this.isLoading.set(false);
