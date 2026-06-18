@@ -1,8 +1,8 @@
-<form [formGroup]="SearchForm" class="d-flex flex-column gap-2 mb-0 w-100">
+<form [formGroup]="SearchForm" class="d-flex flex-column gap-2 mb-0 w-100" *transloco="let t; read: 'banca.filters'">
   <div class="d-flex flex-row flex-wrap gap-2 w-100">
     <div class="search-wrapper">
       <app-syllex-search-input
-        placeholder="Cerca per testo della domanda..."
+        [placeholder]="t('search_placeholder')"
         formControlName="searchTerm"
       />
     </div>
@@ -11,7 +11,7 @@
     <div class="select-wrapper">
       <app-syllex-select-input
         formControlName="topicId"
-        placeholder="Tutti gli argomenti"
+        [placeholder]="t('all_topics')"
         [options]="topicOptions()"
       />
     </div>
@@ -20,7 +20,7 @@
     <div class="select-wrapper">
       <app-syllex-select-input
         formControlName="type"
-        placeholder="Tipologia"
+        [placeholder]="t('type_placeholder')"
         [options]="typeOptions"
       />
     </div>
@@ -29,7 +29,7 @@
     <div class="select-wrapper">
       <app-syllex-select-input
         formControlName="difficulty"
-        placeholder="Difficoltà"
+        [placeholder]="t('difficulty_placeholder')"
         [options]="DifficultyOptions"
       />
     </div>

@@ -1,3 +1,4 @@
+<ng-container *transloco="let t; read: 'banca.card'">
 <div
   class="syllexCard d-flex gap-2 question-card flex-column h-100"
   [class.moveable]="mode === 'test-composition'"
@@ -11,11 +12,11 @@
       class="d-flex flex-row align-items-center justify-content-between mb-3 w-100 gap-2"
     >
       @if (question.policy === 'private') {
-      <app-syllex-badge label="Uso Test" color="green" />
+      <app-syllex-badge [label]="policyLabel" color="green" />
       } @else {
-      <app-syllex-badge label="Esercitazione" color="celestine" />
+      <app-syllex-badge [label]="policyLabel" color="celestine" />
       }
-      <app-syllex-badge [label]="question.type" color="primary" />
+      <app-syllex-badge [label]="typeLabel" color="primary" />
     </div>
     }
 
@@ -88,7 +89,7 @@
             (change)="onSelectOption(label)"
           />
           <label class="mb-0 flex-grow-1" style="cursor: pointer"
-            >{{ label }}</label
+            >{{ label === 'Vero' ? t('true') : t('false') }}</label
           >
           @if (locked && showCorrectness && ((label === 'Vero' &&
           question.correctAnswer === true) || (label === 'Falso' &&
@@ -148,7 +149,7 @@
             [checked]="(label === 'Vero' && question.correctAnswer === true) || (label === 'Falso' && question.correctAnswer === false)"
             disabled
           />
-          <span>{{ label }}</span>
+          <span>{{ label === 'Vero' ? t('true') : t('false') }}</span>
           @if ((label === 'Vero' && question.correctAnswer === true) || (label
           === 'Falso' && question.correctAnswer === false)) {
           <fa-icon [icon]="CheckIcon"></fa-icon>
@@ -182,7 +183,7 @@
         @for (label of ['Vero', 'Falso']; track label) {
         <li class="d-flex align-items-center gap-2">
           <input type="radio" [name]="'vf_' + question._id" disabled />
-          <span>{{ label }}</span>
+          <span>{{ label === 'Vero' ? t('true') : t('false') }}</span>
         </li>
         }
       </ol>
@@ -215,7 +216,7 @@
           letter-spacing: 0.05em;
         "
       >
-        Correzione
+        {{ t('correction') }}
       </p>
       <p class="mb-0 text-muted small" style="white-space: pre-wrap">
         {{ question.explanation }}
@@ -229,16 +230,16 @@
     <section class="d-flex flex-column gap-2">
       <div class="d-flex align-items-center gap-3">
         <app-syllex-badge
-          [label]="questionStatus === 'correct' ? 'Corretta' : (questionStatus === 'wrong' || questionStatus === 'incorrect') ? 'Errata' : questionStatus === 'pending' ? 'In attesa' : 'Parzialmente corretta'"
+          [label]="translatedStatus"
           [color]="questionStatus === 'correct' ? 'green' : (questionStatus === 'wrong' || questionStatus === 'incorrect') ? 'red' : questionStatus === 'pending' ? 'gray' : 'orange'"
         />
         @if (score !== null) {
-        <span class="fw-semibold">Punteggio: {{ score }}</span>
+        <span class="fw-semibold">{{ t('score', {score: score}) }}</span>
         }
       </div>
       @if(teacherFeedback){
       <div>
-        <p class="mb-0 fw-light text-muted">{{ feedbackLabel }}</p>
+        <p class="mb-0 fw-light text-muted">{{ feedbackLabel === 'Commento del docente' ? t('teacher_comment') : feedbackLabel }}</p>
         <p class="mb-0">{{ teacherFeedback }}</p>
       </div>
       }
@@ -251,7 +252,7 @@
       class="text-end mt-2 text-muted"
       style="font-size: 0.725rem; font-style: italic; opacity: 0.75"
     >
-      Fonte: {{ getSourceName() }}
+      {{ t('source', {source: getSourceName()}) }}
     </div>
     }
   </div>
@@ -268,7 +269,7 @@
           letter-spacing: 0.05em;
         "
       >
-        Correzione
+        {{ t('correction') }}
       </p>
       <p class="mb-0 text-muted small">{{ question.explanation || '—' }}</p>
     </div>
@@ -276,14 +277,14 @@
       class="d-flex flex-row gap-1 flex-shrink-0 align-items-center justify-content-end mt-4"
     >
       <app-syllex-button
-        [props]="{ label: 'Modifica', variant: 'primary', color: 'dark', size: 'medium', link: '/t/edit-question/' + question._id }"
+        [props]="{ label: t('edit'), variant: 'primary', color: 'dark', size: 'medium', link: '/t/edit-question/' + question._id }"
       />
       <app-syllex-button
         [props]="{ label: '', variant: 'primary', color: 'danger',   size: 'medium', shape: 'circle', leftIcon: TrashIcon }"
         confirmAction
-        [confirmMessage]="'Vuoi eliminare questa domanda? L\'azione non può essere annullata.'"
-        [confirmTitle]="'Elimina domanda'"
-        [confirmButtonText]="'Elimina'"
+        [confirmMessage]="t('delete_confirm_msg')"
+        [confirmTitle]="t('delete_confirm_title')"
+        [confirmButtonText]="t('delete_btn')"
         (confirmed)="removeMe.emit(question._id)"
       />
     </div>
@@ -302,7 +303,7 @@
       step="1"
       min="1"
       max="100"
-      placeholder="Punti se corretta"
+      [placeholder]="t('points_placeholder')"
     />
     <button
       type="button"
@@ -318,3 +319,4 @@
   <!-- CDK drag placeholder -->
   <div class="drag-placeholder" *cdkDragPlaceholder></div>
 </div>
+</ng-container>

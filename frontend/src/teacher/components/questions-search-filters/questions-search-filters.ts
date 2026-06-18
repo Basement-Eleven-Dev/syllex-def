@@ -21,6 +21,7 @@ import {
   DIFFICULTY_OPTIONS,
   QuestionDifficulty,
 } from '../../../types/question.types';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-questions-search-filters',
@@ -31,6 +32,8 @@ import {
     FontAwesomeModule,
     SyllexSearchInput,
     SyllexSelectInput,
+    TranslocoDirective,
+    TranslocoPipe,
   ],
   templateUrl: './questions-search-filters.html',
   styleUrl: './questions-search-filters.scss',
@@ -49,14 +52,25 @@ export class QuestionsSearchFilters implements OnInit {
   // Icons
   protected readonly ClearIcon = faXmark;
 
-  // Data
-  protected readonly DifficultyOptions = DIFFICULTY_OPTIONS;
+  // Dependency Injection
+  protected readonly materiaService = inject(Materia);
+  private readonly translocoService = inject(TranslocoService);
 
-  protected readonly typeOptions = [
-    { value: 'scelta multipla', label: 'Scelta multipla' },
-    { value: 'vero falso', label: 'Vero falso' },
-    { value: 'risposta aperta', label: 'Risposta aperta' },
-  ];
+  // Data
+  get DifficultyOptions() {
+    return DIFFICULTY_OPTIONS.map((opt) => ({
+      value: opt.value,
+      label: this.translocoService.translate(`banca.filters.difficulty.${opt.value}`)
+    }));
+  }
+
+  get typeOptions() {
+    return [
+      { value: 'scelta multipla', label: this.translocoService.translate('banca.tabs.scelta_multipla') },
+      { value: 'vero falso', label: this.translocoService.translate('banca.tabs.vero_falso') },
+      { value: 'risposta aperta', label: this.translocoService.translate('banca.tabs.aperta') },
+    ];
+  }
 
   protected readonly topicOptions = computed(() =>
     (this.materiaService.materiaSelected()?.topics ?? []).map((t) => ({
@@ -64,9 +78,6 @@ export class QuestionsSearchFilters implements OnInit {
       label: t.name,
     })),
   );
-
-  // Dependency Injection
-  protected readonly materiaService = inject(Materia);
 
   protected SearchForm: FormGroup = new FormGroup({
     searchTerm: new FormControl(''),

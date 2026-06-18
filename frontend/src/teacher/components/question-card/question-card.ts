@@ -23,6 +23,7 @@ import { Materia } from '../../../services/materia';
 import { ConfirmActionDirective } from '../../../directives/confirm-action.directive';
 import { SyllexBadge } from '../UI/syllex-badge/syllex-badge';
 import { SyllexButton } from '../UI/syllex-button/syllex-button';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 /** Controls what the card renders and which actions are visible. */
 export type QuestionCardMode =
@@ -43,6 +44,8 @@ export type QuestionCardMode =
     ConfirmActionDirective,
     SyllexBadge,
     SyllexButton,
+    TranslocoDirective,
+    TranslocoPipe,
   ],
   templateUrl: './question-card.html',
   styleUrl: './question-card.scss',
@@ -58,6 +61,37 @@ export class QuestionCard {
 
   private readonly modalServ = inject(NgbModal);
   protected readonly materiaService = inject(Materia);
+  private readonly translocoService = inject(TranslocoService);
+
+  get policyLabel() {
+    return this.question.policy === 'private'
+      ? this.translocoService.translate('banca.card.policy_private')
+      : this.translocoService.translate('banca.card.policy_public');
+  }
+
+  get typeLabel() {
+    switch (this.question.type) {
+      case 'scelta multipla':
+        return this.translocoService.translate('banca.tabs.scelta_multipla').toUpperCase();
+      case 'vero falso':
+        return this.translocoService.translate('banca.tabs.vero_falso').toUpperCase();
+      case 'risposta aperta':
+        return this.translocoService.translate('banca.tabs.aperta').toUpperCase();
+      default:
+        return this.question.type;
+    }
+  }
+
+  get translatedStatus() {
+    if (!this.questionStatus) return '';
+    switch (this.questionStatus) {
+      case 'correct': return this.translocoService.translate('banca.card.status_correct');
+      case 'wrong':
+      case 'incorrect': return this.translocoService.translate('banca.card.status_wrong');
+      case 'pending': return this.translocoService.translate('banca.card.status_pending');
+      default: return this.translocoService.translate('banca.card.status_partial');
+    }
+  }
 
   // ── Core ─────────────────────────────────────────────────────────────────
   @Input({ required: true }) question!: QuestionInterface;

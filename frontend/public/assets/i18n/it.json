@@ -62,5 +62,58 @@
       "publish_success": "Test pubblicato con successo",
       "publish_error": "Errore durante la pubblicazione del test"
     }
+  },
+  "banca": {
+    "header_title": "Banca Domande",
+    "header_desc": "Qui puoi trovare tutte le domande con cui comporre i test di {{subject}}.",
+    "btn_create": "Crea Domanda",
+    "tabs": {
+      "tutti": "Tutti",
+      "vero_falso": "Vero Falso",
+      "aperta": "Risposta Aperta",
+      "scelta_multipla": "Scelta Multipla"
+    },
+    "empty": {
+      "title": "La tua banca domande è vuota",
+      "desc": "Inizia a creare domande personalizzate per i tuoi test o lascia che l'AI di Syllex ne generi una serie a partire dai tuoi materiali in pochi secondi.",
+      "action": "Crea o Genera Domanda"
+    },
+    "feedback": {
+      "delete_success": "Domanda eliminata con successo",
+      "delete_error": "Errore nella cancellazione della domanda",
+      "load_error": "Errore nel caricamento delle domande"
+    },
+    "filters": {
+      "search_placeholder": "Cerca per testo della domanda...",
+      "all_topics": "Tutti gli argomenti",
+      "type_placeholder": "Tipologia",
+      "difficulty_placeholder": "Difficoltà",
+      "difficulty": {
+        "elementary": "Elementare",
+        "easy": "Facile",
+        "medium": "Media",
+        "hard": "Difficile",
+        "very_hard": "Molto difficile"
+      }
+    },
+    "card": {
+      "policy_private": "Uso Test",
+      "policy_public": "Esercitazione",
+      "correction": "Correzione",
+      "score": "Punteggio: {{score}}",
+      "edit": "Modifica",
+      "delete_confirm_msg": "Vuoi eliminare questa domanda? L'azione non può essere annullata.",
+      "delete_confirm_title": "Elimina domanda",
+      "delete_btn": "Elimina",
+      "points_placeholder": "Punti se corretta",
+      "status_correct": "Corretta",
+      "status_wrong": "Errata",
+      "status_pending": "In attesa",
+      "status_partial": "Parzialmente corretta",
+      "teacher_comment": "Commento del docente",
+      "true": "Vero",
+      "false": "Falso",
+      "source": "Fonte: {{source}}"
+    }
   }
 }
