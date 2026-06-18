@@ -1,3 +1,4 @@
+<ng-container *transloco="let t; read: 'create_edit_question'">
 <app-syllex-page-header
   tourAnchor="crea_domanda_header"
   [title]="PageTitle()"
@@ -15,11 +16,11 @@
         style="cursor: pointer"
         (click)="onSelectMethod('ai')"
         role="button"
-        aria-label="Genera con AI"
+        [attr.aria-label]="t('btn_ai_title')"
       >
         <app-syllex-card
-          title="Genera con AI"
-          description="L'AI creerà le domande dai tuoi materiali in pochi secondi"
+          [title]="t('btn_ai_title')"
+          [description]="t('btn_ai_desc')"
           [icon]="SparklesIcon"
           variant="outline"
           [showArrow]="true"
@@ -33,11 +34,11 @@
         style="cursor: pointer"
         (click)="onSelectMethod('manual')"
         role="button"
-        aria-label="Crea manualmente"
+        [attr.aria-label]="t('btn_manual_title')"
       >
         <app-syllex-card
-          title="Crea manualmente"
-          description="Scrivi il testo della domanda e configura le risposte passo dopo passo"
+          [title]="t('btn_manual_title')"
+          [description]="t('btn_manual_desc')"
           [icon]="PencilIcon"
           variant="outline"
           [showArrow]="true"
@@ -56,13 +57,12 @@
       <!-- ── STEP 1: Tipo ── -->
       @if (CurrentStep() === 1) {
       <div class="wizard-step-content" @stepIn tourAnchor="crea_domanda_tipo">
-        <h5 class="wizard-step-title">Che tipo di domanda stai creando?</h5>
+        <h5 class="wizard-step-title">{{ t('title_step1') }}</h5>
         <p class="wizard-step-subtitle">
-          Scegli il formato più adatto ai tuoi obiettivi. Potrai sempre
-          cambiarlo.
+          {{ t('desc_step1') }}
         </p>
         <app-type-selector
-          [options]="QuestionTypeOptions"
+          [options]="QuestionTypeOptions()"
           [(selectedValue)]="SelectedQuestionType"
           (typeSelected)="onSelectQuestionType($event)"
           [direction]="'row'"
@@ -87,16 +87,16 @@
               <div class="form-section d-flex flex-column gap-3 h-100">
                 <!-- Argomento -->
                 <div tourAnchor="crea_domanda_argomento">
-                  <label class="wizard-field-label">Su quale argomento? *</label>
+                  <label class="wizard-field-label">{{ t('topic_label') }}</label>
                   <select
                     class="form-select custom-input"
                     formControlName="topicId"
                     aria-label="Seleziona argomento"
                   >
                     <option value="" disabled selected>
-                      Seleziona argomento
+                      {{ t('select_topic_ph') }}
                     </option>
-                    <option value="auto">Tutti gli argomenti (Intero documento)</option>
+                    <option value="auto">{{ t('all_topics_doc') }}</option>
                     @for (topic of materiaService.topics; track topic._id) {
                     <option [value]="topic._id">{{ topic.name }}</option>
                     }
@@ -106,7 +106,7 @@
                 <!-- Parametri -->
                 <div class="row g-3" tourAnchor="crea_domanda_difficolta">
                   <div class="col-12 col-md-6">
-                    <label class="wizard-field-label">Quante domande?</label>
+                    <label class="wizard-field-label">{{ t('questions_count') }}</label>
                     <input
                       type="number"
                       class="form-control custom-input"
@@ -117,14 +117,14 @@
                       aria-label="Numero di domande"
                     />
                     @if (aiForm.get('numberOfQuestions')?.hasError('max')) {
-                      <div class="invalid-feedback d-block mt-1">Puoi generare massimo 20 domande alla volta.</div>
+                      <div class="invalid-feedback d-block mt-1">{{ t('max_questions_err') }}</div>
                     } @if (aiForm.get('numberOfQuestions')?.hasError('min')) {
-                      <div class="invalid-feedback d-block mt-1">Devi generare almeno 1 domanda.</div>
+                      <div class="invalid-feedback d-block mt-1">{{ t('min_questions_err') }}</div>
                     }
                   </div>
                   @if (IsAiFormMultipleChoice()) {
                   <div class="col-12 col-md-6">
-                    <label class="wizard-field-label">Opzioni per risposta</label>
+                    <label class="wizard-field-label">{{ t('options_per_question') }}</label>
                     <input
                       type="number"
                       class="form-control custom-input"
@@ -135,34 +135,34 @@
                       aria-label="Numero di alternative"
                     />
                     @if (aiForm.get('numberOfAlternatives')?.hasError('max')) {
-                      <div class="invalid-feedback d-block mt-1">Massimo 8 opzioni.</div>
+                      <div class="invalid-feedback d-block mt-1">{{ t('max_options_err') }}</div>
                     } @if (aiForm.get('numberOfAlternatives')?.hasError('min')) {
-                      <div class="invalid-feedback d-block mt-1">Minimo 2 opzioni.</div>
+                      <div class="invalid-feedback d-block mt-1">{{ t('min_options_err') }}</div>
                     }
                   </div>
                   }
                   <div class="col-12 col-md-6">
-                    <label class="wizard-field-label">In che lingua?</label>
+                    <label class="wizard-field-label">{{ t('language_label') }}</label>
                     <app-syllex-select-input
                       formControlName="language"
                       [options]="LanguageOptions"
-                      placeholder="Scegli lingua"
+                      [placeholder]="t('language_label')"
                     ></app-syllex-select-input>
                   </div>
                   <div class="col-12 col-md-6">
                     <label class="wizard-field-label"
-                      >Livello di difficoltà</label
+                      >{{ t('difficulty_label') }}</label
                     >
                     <app-syllex-select-input
                       formControlName="difficulty"
-                      [options]="DifficultyOptions"
+                      [options]="DifficultyOptions()"
                     ></app-syllex-select-input>
                   </div>
                   <div class="col-12 col-md-6">
-                    <label class="wizard-field-label">Tipo di utilizzo</label>
+                    <label class="wizard-field-label">{{ t('use_type_label') }}</label>
                     <app-syllex-select-input
                       formControlName="policy"
-                      [options]="PolicyOptions"
+                      [options]="PolicyOptions()"
                     ></app-syllex-select-input>
                   </div>
                 </div>
@@ -170,15 +170,15 @@
                 <!-- Istruzioni -->
                 <div class="flex-fill d-flex flex-column">
                   <label class="wizard-field-label">
-                    Hai istruzioni particolari?
-                    <span class="text-muted fw-normal">(opzionale)</span>
+                    {{ t('instructions_particular') }}
+                    <span class="text-muted fw-normal">{{ t('optional') }}</span>
                   </label>
                   <textarea
                     class="form-control custom-input flex-fill"
                     formControlName="instructions"
                     rows="4"
                     style="resize: none"
-                    placeholder="Es. usa linguaggio semplice, includi esempi pratici, evita domande trabocchetto..."
+                    [placeholder]="t('instructions_placeholder')"
                   ></textarea>
                 </div>
               </div>
@@ -188,11 +188,10 @@
             <div class="col-12 col-lg-6 d-flex flex-column" tourAnchor="gen_ai_support_files">
               <div class="form-section d-flex flex-column h-100">
                 <label class="wizard-field-label"
-                  >Da dove vuoi che l'AI impari?</label
+                  >{{ t('source_ai_label') }}</label
                 >
                 <p class="text-muted small mb-3">
-                  Carica dispense, PDF o slide: l'AI li studierà per creare domande
-                  pertinenti.
+                  {{ t('source_ai_desc') }}
                 </p>
                 <div class="flex-grow-1 mb-3">
                   <app-materiali-selector></app-materiali-selector>
@@ -201,7 +200,7 @@
                 <div class="d-flex justify-content-md-end justify-content-center pt-3 w-100 mobile-full-width-btn">
                   <app-syllex-button
                     [props]="{
-                      label: AiIsLoading() ? 'Generazione in corso...' : 'Genera le mie domande',
+                      label: AiIsLoading() ? t('btn_generating_long') : t('btn_generate_submit'),
                       variant: 'primary',
                       size: 'large',
                       leftIcon: AiIsLoading() ? SpinnerIcon : SparklesIcon,
@@ -223,15 +222,14 @@
           <div class="d-flex align-items-center justify-content-between mb-3">
             <div>
               <h5 class="wizard-step-title mb-1">
-                Scegli le domande da salvare
+                {{ t('review_title') }}
               </h5>
               <p class="wizard-step-subtitle mb-0">
-                Controlla le domande generate e tieni solo quelle che ti
-                convincono.
+                {{ t('review_subtitle') }}
               </p>
             </div>
             <app-syllex-button
-              [props]="{ label: AllSelected() ? 'Deseleziona tutte' : 'Seleziona tutte', variant: 'outline', size: 'small' }"
+              [props]="{ label: AllSelected() ? t('btn_deselect_all') : t('btn_select_all'), variant: 'outline', size: 'small' }"
               (clicked)="toggleAll()"
             ></app-syllex-button>
           </div>
@@ -243,9 +241,7 @@
           >
             <fa-icon [icon]="SparklesIcon" class="flex-shrink-0"></fa-icon>
             <span class="small">
-              Sono state generate meno domande del previsto ({{
-              PartialWarningCount() }} {{ PartialWarningCount() === 1 ? 'non
-              riuscita' : 'non riuscite' }}).
+              {{ t('partial_warning', { count: PartialWarningCount(), word: PartialWarningCount() === 1 ? t('word_failed_singular') : t('word_failed_plural') }) }}
             </span>
           </div>
           }
@@ -269,7 +265,7 @@
                     style="width: 2.4em; height: 1.3em; cursor: pointer"
                     [checked]="q.selected"
                     (change)="toggleQuestion(q.id)"
-                    [attr.aria-label]="'Includi: ' + q.data.text"
+                    [attr.aria-label]="t('btn_select_all') + ': ' + q.data.text"
                   />
                 </div>
               </div>
@@ -282,12 +278,12 @@
               </ul>
               } @if (q.data.type === 'vero falso') {
               <p class="review-card__vf small mb-1">
-                Risposta:
-                <strong>{{ q.data.correctAnswer ? 'Vero' : 'Falso' }}</strong>
+                {{ t('review_answer') }}
+                <strong>{{ q.data.correctAnswer ? t('review_true') : t('review_false') }}</strong>
               </p>
               } @if (q.data.explanation) {
               <p class="review-card__explanation small text-muted mb-0">
-                <strong>Spiegazione:</strong> {{ q.data.explanation }}
+                <strong>{{ t('review_explanation') }}</strong> {{ q.data.explanation }}
               </p>
               }
             </div>
@@ -306,8 +302,7 @@
                 [animation]="IsSavingBatch() ? 'spin' : undefined"
                 class="me-2"
               ></fa-icon>
-              {{ IsSavingBatch() ? 'Salvataggio...' : 'Salva ' + SelectedCount()
-              + (SelectedCount() === 1 ? ' domanda' : ' domande') }}
+              {{ IsSavingBatch() ? t('btn_saving') : (SelectedCount() === 1 ? t('btn_save_count_singular', { count: SelectedCount() }) : t('btn_save_count_plural', { count: SelectedCount() })) }}
             </button>
           </div>
         </div>
@@ -325,23 +320,23 @@
         <div [formGroup]="QuestionForm" class="form-section d-flex flex-column gap-3">
           <div class="row g-3">
             <div class="col-12 col-md-6" tourAnchor="crea_domanda_argomento">
-              <label class="wizard-field-label">Su quale argomento? *</label>
+              <label class="wizard-field-label">{{ t('topic_label') }}</label>
               <select
                 class="form-select bg-light border-0 shadow-none py-2 px-3 rounded-pill"
                 formControlName="topicId"
                 aria-label="Seleziona argomento"
               >
-                <option value="" disabled selected>Seleziona argomento</option>
+                <option value="" disabled selected>{{ t('select_topic_ph') }}</option>
                 @for (topic of materiaService.topics; track topic._id) {
                 <option [value]="topic._id">{{ topic.name }}</option>
                 }
               </select>
             </div>
             <div class="col-12 col-md-6" tourAnchor="crea_domanda_difficolta">
-              <label class="wizard-field-label">Quanto è difficile?</label>
+              <label class="wizard-field-label">{{ t('difficulty_label') }}</label>
               <app-syllex-select-input
                 formControlName="difficulty"
-                [options]="DifficultyOptions"
+                [options]="DifficultyOptions()"
               ></app-syllex-select-input>
             </div>
           </div>
@@ -349,20 +344,19 @@
           <div class="row g-3">
             <div class="col-md-8 d-flex flex-column">
               <label class="wizard-field-label">
-                {{ SelectedQuestionType() === 'vero falso' ? 'Affermazione *' :
-                'Testo della domanda *' }}
+                {{ SelectedQuestionType() === 'vero falso' ? t('manual_title_vf') : t('manual_title_generic') }}
               </label>
               <textarea
                 class="form-control custom-input flex-fill"
                 formControlName="text"
                 rows="5"
-                placeholder="Inserisci il testo della domanda qui..."
+                [placeholder]="t('manual_text_ph')"
               ></textarea>
             </div>
             <div class="col-md-4 d-flex flex-column">
               <label class="wizard-field-label"
-                >Immagine
-                <span class="text-muted fw-normal">(opzionale)</span></label
+                >{{ t('image_label') }}
+                <span class="text-muted fw-normal">{{ t('optional') }}</span></label
               >
               <div
                 id="imageDropArea"
@@ -379,7 +373,7 @@
                 >
                   <fa-icon [icon]="ImageIcon" class="mb-3" size="3x"></fa-icon>
                   <p class="text-muted mb-0 text-center small">
-                    Trascina o clicca per caricare
+                    {{ t('image_drop_ph') }}
                   </p>
                 </div>
                 } @else {
@@ -395,14 +389,14 @@
                       class="btn btn-sm btn-primary flex-fill"
                       (click)="fileInput?.click(); $event.stopPropagation()"
                     >
-                      Cambia
+                      {{ t('btn_image_change') }}
                     </button>
                     <button
                       type="button"
                       class="btn btn-sm btn-outline-danger flex-fill"
                       (click)="removeImage(); $event.stopPropagation()"
                     >
-                      Rimuovi
+                      {{ t('btn_image_remove') }}
                     </button>
                   </div>
                 </div>
@@ -449,7 +443,7 @@
                 class="form-check-input flex-shrink-0 mt-0"
                 [checked]="QuestionForm.get('correctAnswer')?.value === true"
               />
-              <span class="fw-semibold">Vero</span>
+              <span class="fw-semibold">{{ t('review_true') }}</span>
             </div>
             <div
               class="rounded-syllex typeCard p-3 flex-fill d-flex align-items-center gap-3"
@@ -462,14 +456,13 @@
                 class="form-check-input flex-shrink-0 mt-0"
                 [checked]="QuestionForm.get('correctAnswer')?.value === false"
               />
-              <span class="fw-semibold">Falso</span>
+              <span class="fw-semibold">{{ t('review_false') }}</span>
             </div>
           </div>
           } @if (SelectedQuestionType() === 'risposta aperta') {
           <div class="open-answer-info">
             <fa-icon [icon]="CheckIcon" class="me-2 text-success"></fa-icon>
-            Per le domande a risposta aperta non è necessario configurare una
-            risposta predefinita. La correzione viene effettuata dal docente.
+            {{ t('open_answer_info') }}
           </div>
           }
         </div>
@@ -487,24 +480,24 @@
           <!-- Spiegazione -->
           <div>
             <label class="wizard-field-label">
-              Vuoi aggiungere una spiegazione?
-              <span class="text-muted fw-normal">(opzionale)</span>
+              {{ t('add_explanation_label') }}
+              <span class="text-muted fw-normal">{{ t('optional') }}</span>
             </label>
             <p class="text-muted small mb-2">
-              Verrà mostrata allo studente dopo la correzione, come feedback.
+              {{ t('add_explanation_desc') }}
             </p>
             <textarea
               class="form-control custom-input"
               formControlName="explanation"
               rows="3"
-              placeholder="Spiega perché questa risposta è corretta..."
+              [placeholder]="t('explanation_ph')"
             ></textarea>
           </div>
 
           <!-- Tag -->
           <div tourAnchor="crea_domanda_tag">
             <label class="wizard-field-label"
-              >Tag <span class="text-muted fw-normal">(opzionale)</span></label
+              >{{ t('tags_label') }} <span class="text-muted fw-normal">{{ t('optional') }}</span></label
             >
             <div class="d-flex flex-wrap gap-2 mb-2">
               @for (tag of QuestionForm.get('tags')?.value; track tag) {
@@ -513,7 +506,7 @@
                 <button
                   type="button"
                   class="btn-close"
-                  aria-label="Rimuovi tag"
+                  [attr.aria-label]="t('tags_remove')"
                   (click)="removeTag(tag)"
                 ></button>
               </span>
@@ -522,7 +515,7 @@
             <input
               type="text"
               class="form-control custom-input"
-              placeholder="Aggiungi un tag e premi Invio o virgola"
+              [placeholder]="t('tags_ph')"
               [value]="TagInput()"
               (input)="TagInput.set($any($event.target).value)"
               (keydown)="onTagKeydown($event)"
@@ -533,7 +526,7 @@
           <!-- Visibilità -->
           <div tourAnchor="crea_domanda_visibilita">
             <label class="wizard-field-label"
-              >Chi può vedere questa domanda?</label
+              >{{ t('visibility_label') }}</label
             >
             <div class="d-flex gap-3 mt-2">
               <div
@@ -548,9 +541,9 @@
                   [checked]="SelectedPolicyType() === 'public'"
                 />
                 <div>
-                  <div class="fw-semibold small">Condivisa</div>
+                  <div class="fw-semibold small">{{ t('visibility_shared_title') }}</div>
                   <div class="text-muted" style="font-size: 0.75rem">
-                    Tutti i colleghi possono usarla
+                    {{ t('visibility_shared_desc') }}
                   </div>
                 </div>
               </div>
@@ -566,9 +559,9 @@
                   [checked]="SelectedPolicyType() === 'private'"
                 />
                 <div>
-                  <div class="fw-semibold small">Privata</div>
+                  <div class="fw-semibold small">{{ t('visibility_private_title') }}</div>
                   <div class="text-muted" style="font-size: 0.75rem">
-                    Solo tu puoi usarla
+                    {{ t('visibility_private_desc') }}
                   </div>
                 </div>
               </div>
@@ -581,7 +574,7 @@
             tourAnchor="crea_domanda_salva"
           >
             <app-syllex-button
-              [props]="{ label: 'Annulla', variant: 'outline', size: 'medium', link: '/t/banca' }"
+              [props]="{ label: t('btn_cancel'), variant: 'outline', size: 'medium', link: '/t/banca' }"
             ></app-syllex-button>
             <button
               type="button"
@@ -609,7 +602,7 @@
     <!-- Left: Indietro -->
     <div>
       <app-syllex-button
-        [props]="{ label: 'Indietro', variant: 'outline', size: 'medium', leftIcon: ChevronLeftIcon }"
+        [props]="{ label: t('btn_back'), variant: 'outline', size: 'medium', leftIcon: ChevronLeftIcon }"
         (clicked)="goPrev()"
       ></app-syllex-button>
     </div>
@@ -623,7 +616,7 @@
     <div class="wizard-footer__right">
       @if (ShowNextArrow()) {
       <app-syllex-button
-        [props]="{ label: 'Avanti', variant: 'primary', size: 'medium', rightIcon: ChevronRightIcon, disabled: !CanGoNext() }"
+        [props]="{ label: t('btn_next'), variant: 'primary', size: 'medium', rightIcon: ChevronRightIcon, disabled: !CanGoNext() }"
         (clicked)="goNext()"
       ></app-syllex-button>
       }
@@ -631,3 +624,4 @@
   </div>
 </div>
 }
+</ng-container>

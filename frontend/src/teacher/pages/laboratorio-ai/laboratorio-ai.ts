@@ -21,6 +21,10 @@ import {
   faSpinnerThird,
   faArrowLeft,
   faArrowRight,
+  faPresentationScreen,
+  faAlignLeft,
+  faList,
+  faChartDiagram,
 } from '@fortawesome/pro-solid-svg-icons';
 import { TourAnchorNgBootstrapDirective } from 'ngx-ui-tour-ng-bootstrap';
 import { trigger, transition, style, animate } from '@angular/animations';
@@ -34,7 +38,6 @@ import { FeedbackService } from '../../../services/feedback-service';
 import { MaterialInterface } from '../../../services/materiali/materiali-service';
 import { Materia } from '../../../services/materia';
 import {
-  MATERIAL_TYPE_OPTIONS,
   MaterialType,
 } from '../../../types/question.types';
 import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
@@ -42,6 +45,7 @@ import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SyllexErrorModalComponent } from '../../../directives/syllex-error-modal.component';
 import { MaterialiFacadeService } from '../../../services/materiali/materiali-facade.service';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 interface StepDef {
   n: number;
@@ -58,23 +62,6 @@ interface StyleOption {
   recommended?: boolean;
 }
 
-const STYLE_INSTRUCTION_MAP: Record<SlideStyle, string> = {
-  schematica:
-    'Le slide devono essere schematiche e telegrafiche: massimo 3 punti brevi per slide, frasi nominali, nessuna spiegazione estesa.',
-  bilanciata: '',
-  descrittiva:
-    'Le slide devono essere descrittive e approfondite: ogni punto deve contenere spiegazioni complete e contestualizzate, con esempi dove utile.',
-};
-
-const STYLE_PREFILL_MAP: Record<SlideStyle, string> = {
-  schematica:
-    'Rendi le slide estremamente sintetiche: massimo 3 punti brevissimi per slide, usa frasi nominali, elimina ogni spiegazione ridondante. La chiarezza conta più della completezza.',
-  bilanciata:
-    'Struttura ogni slide con un titolo chiaro e 3-4 punti ben distinti. Ogni punto deve essere autonomo e comprensibile, senza essere né troppo lungo né troppo telegrafico. Adatta il linguaggio al livello della classe.',
-  descrittiva:
-    'Sviluppa ogni concetto in modo approfondito: ogni punto deve includere una spiegazione contestualizzata e, dove possibile, un esempio concreto o un collegamento con la realtà. Privilegia la comprensione profonda rispetto alla sintesi.',
-};
-
 @Component({
   selector: 'app-laboratorio-ai',
   standalone: true,
@@ -89,6 +76,8 @@ const STYLE_PREFILL_MAP: Record<SlideStyle, string> = {
     SyllexStepper,
     TourAnchorNgBootstrapDirective,
     SyllexButton,
+    TranslocoDirective,
+    TranslocoPipe,
   ],
   templateUrl: './laboratorio-ai.html',
   styleUrl: './laboratorio-ai.scss',
@@ -121,6 +110,7 @@ export class LaboratorioAi {
   readonly materiaService = inject(Materia);
   private readonly modalService = inject(NgbModal);
   private readonly materialiFacade = inject(MaterialiFacadeService);
+  private readonly translocoService = inject(TranslocoService);
 
   // Icons
   readonly QuestionsIcon = faCheckDouble;
@@ -134,7 +124,33 @@ export class LaboratorioAi {
   readonly ArrowRightIcon = faArrowRight;
 
   // Options
-  readonly MaterialTypes = MATERIAL_TYPE_OPTIONS;
+  readonly MaterialTypes = computed(() => [
+    {
+      label: this.translocoService.translate('laboratorio_ai.types.slides.label'),
+      description: this.translocoService.translate('laboratorio_ai.types.slides.desc'),
+      icon: faPresentationScreen,
+      value: 'slides',
+    },
+    {
+      label: this.translocoService.translate('laboratorio_ai.types.riassunto.label'),
+      description: this.translocoService.translate('laboratorio_ai.types.riassunto.desc'),
+      icon: faAlignLeft,
+      value: 'riassunto',
+    },
+    {
+      label: this.translocoService.translate('laboratorio_ai.types.glossario.label'),
+      description: this.translocoService.translate('laboratorio_ai.types.glossario.desc'),
+      icon: faList,
+      value: 'glossario',
+    },
+    {
+      label: this.translocoService.translate('laboratorio_ai.types.mappe-concettuali.label'),
+      description: this.translocoService.translate('laboratorio_ai.types.mappe-concettuali.desc'),
+      icon: faChartDiagram,
+      value: 'mappe-concettuali',
+    },
+  ]);
+
   readonly LanguageOptions = [
     { value: 'italiano', label: 'Italiano' },
     { value: 'inglese', label: 'English' },
@@ -143,27 +159,27 @@ export class LaboratorioAi {
     { value: 'tedesco', label: 'Deutsch' },
   ];
 
-  readonly StyleOptions: StyleOption[] = [
+  readonly StyleOptions = computed<StyleOption[]>(() => [
     {
       value: 'schematica',
-      label: 'Schematica',
-      description: 'Solo titoli e punti chiave, massima sintesi',
+      label: this.translocoService.translate('laboratorio_ai.style_options.schematica.label'),
+      description: this.translocoService.translate('laboratorio_ai.style_options.schematica.desc'),
       icon: faListCheck,
     },
     {
       value: 'bilanciata',
-      label: 'Bilanciata',
-      description: 'Equilibrio tra sintesi e completezza',
+      label: this.translocoService.translate('laboratorio_ai.style_options.bilanciata.label'),
+      description: this.translocoService.translate('laboratorio_ai.style_options.bilanciata.desc'),
       icon: faBarsStaggered,
       recommended: true,
     },
     {
       value: 'descrittiva',
-      label: 'Descrittiva',
-      description: 'Spiegazioni estese con esempi',
+      label: this.translocoService.translate('laboratorio_ai.style_options.descrittiva.label'),
+      description: this.translocoService.translate('laboratorio_ai.style_options.descrittiva.desc'),
       icon: faFileLines,
     },
-  ];
+  ]);
 
   // State
   readonly InitialChoice = signal<'materials' | null>(null);
@@ -180,22 +196,22 @@ export class LaboratorioAi {
   readonly StepDefs = computed<StepDef[]>(() => {
     if (this.IsSlides()) {
       return [
-        { n: 1, label: 'Tipo' },
-        { n: 2, label: 'File' },
-        { n: 3, label: 'Stile' },
-        { n: 4, label: 'Genera' },
+        { n: 1, label: this.translocoService.translate('laboratorio_ai.step_type') },
+        { n: 2, label: this.translocoService.translate('laboratorio_ai.step_file') },
+        { n: 3, label: this.translocoService.translate('laboratorio_ai.step_style') },
+        { n: 4, label: this.translocoService.translate('laboratorio_ai.step_generate') },
       ];
     }
     return [
-      { n: 1, label: 'Tipo' },
-      { n: 2, label: 'File' },
-      { n: 3, label: 'Genera' },
+      { n: 1, label: this.translocoService.translate('laboratorio_ai.step_type') },
+      { n: 2, label: this.translocoService.translate('laboratorio_ai.step_file') },
+      { n: 3, label: this.translocoService.translate('laboratorio_ai.step_custom') },
     ];
   });
 
   readonly SelectedMaterialTypeName = computed(
     () =>
-      this.MaterialTypes.find((t) => t.value === this.SelectedMaterialType())
+      this.MaterialTypes().find((t) => t.value === this.SelectedMaterialType())
         ?.label ?? 'materiale',
   );
 
@@ -235,7 +251,7 @@ export class LaboratorioAi {
         const style = this.genForm.controls['slideStyle'].value as SlideStyle;
         if (style) {
           this.genForm.controls['instructions'].setValue(
-            STYLE_PREFILL_MAP[style],
+            this.translocoService.translate(`laboratorio_ai.style_prefills.${style}`),
           );
         }
       }
@@ -271,7 +287,7 @@ export class LaboratorioAi {
     // Reset instructions to type-appropriate default
     if (type === 'slides') {
       this.genForm.controls['instructions'].setValue(
-        STYLE_PREFILL_MAP['bilanciata'],
+        this.translocoService.translate('laboratorio_ai.style_prefills.bilanciata'),
       );
     } else {
       this.genForm.controls['instructions'].setValue('');
@@ -295,7 +311,9 @@ export class LaboratorioAi {
 
   onStyleSelect(value: SlideStyle): void {
     this.genForm.controls['slideStyle'].setValue(value);
-    this.genForm.controls['instructions'].setValue(STYLE_PREFILL_MAP[value]);
+    this.genForm.controls['instructions'].setValue(
+      this.translocoService.translate(`laboratorio_ai.style_prefills.${value}`),
+    );
   }
 
   // ─── Generate ─────────────────────────────────────────
@@ -324,7 +342,7 @@ export class LaboratorioAi {
       let additionalInstructions: string | undefined;
       if (this.IsSlides()) {
         const styleInstruction = slideStyle
-          ? STYLE_INSTRUCTION_MAP[slideStyle]
+          ? this.translocoService.translate(`laboratorio_ai.style_instructions.${slideStyle}`)
           : '';
         const parts = [topicInstruction, styleInstruction, instructions].filter(
           Boolean,
@@ -359,9 +377,9 @@ export class LaboratorioAi {
           backdrop: 'static',
           keyboard: false,
         });
-        modalRef.componentInstance.title = 'Generazione Impedita';
+        modalRef.componentInstance.title = this.translocoService.translate('laboratorio_ai.error_modal_title');
         modalRef.componentInstance.message = errMsg;
-        modalRef.componentInstance.buttonText = 'Ho capito, riprovo';
+        modalRef.componentInstance.buttonText = this.translocoService.translate('laboratorio_ai.error_modal_btn');
       } else {
         this.feedbackService.showFeedback(errMsg, false);
       }
