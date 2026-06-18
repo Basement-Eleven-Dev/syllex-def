@@ -398,5 +398,21 @@
     "delete": "Elimina",
     "confirm_delete_title": "Conferma eliminazione del Test",
     "confirm_delete_msg": "Sei sicuro di voler eliminare {{name}}?"
+  },
+  "test_table": {
+    "col_name": "Nome Test",
+    "col_status": "Stato",
+    "col_availability": "Disponibilità",
+    "col_questions": "Domande",
+    "col_classes": "Classi Assegnate",
+    "col_actions": "Azioni",
+    "to_correct": "da correggere",
+    "from_cap": "Dal",
+    "to_cap": "Al",
+    "questions": "Domande",
+    "and_other": " e altre {{count}}",
+    "no_class": "Nessuna classe assegnata",
+    "view": "Visualizza",
+    "actions": "Azioni"
   }
 }

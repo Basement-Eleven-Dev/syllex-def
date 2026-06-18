@@ -398,5 +398,21 @@
     "delete": "Delete",
     "confirm_delete_title": "Confirm Test Deletion",
     "confirm_delete_msg": "Are you sure you want to delete {{name}}?"
+  },
+  "test_table": {
+    "col_name": "Test Name",
+    "col_status": "Status",
+    "col_availability": "Availability",
+    "col_questions": "Questions",
+    "col_classes": "Assigned Classes",
+    "col_actions": "Actions",
+    "to_correct": "to correct",
+    "from_cap": "From",
+    "to_cap": "To",
+    "questions": "Questions",
+    "and_other": " and {{count}} more",
+    "no_class": "No classes assigned",
+    "view": "View",
+    "actions": "Actions"
   }
 }
