@@ -107,14 +107,14 @@ MANDATORY RULES ON CONTENT:
 - Do not write vague or generic sentences: every statement must be concrete and informative.
 - Do NOT refer to the "provided documents" or "sources": write the summary as if it were a standalone document.
 ${(() => {
-  if (!totalTextLength || totalTextLength <= 0) return '';
-  // Estimate input size: ~5 chars/word, ~350 words/page
-  const estimatedWords = Math.round(totalTextLength / 5);
-  // Proportional target with diminishing returns: ~30% up to a cap of 8000 words
-  const targetWords = Math.max(800, Math.min(8000, Math.round(estimatedWords * 0.30)));
-  const targetPages = Math.round(targetWords / 350);
-  return `\n⚠️ STRICT LENGTH REQUIREMENT (NON-NEGOTIABLE):\nThe source material is approximately ${Math.round(estimatedWords / 350)} pages long. The summary MUST be at least ${targetWords} words (approximately ${targetPages} pages). This is a hard minimum — a shorter output is WRONG and must be rejected. Write more sections, add more detail to each section, and expand every explanation until you reach this target length.`;
-})()}`
+        if (!totalTextLength || totalTextLength <= 0) return '';
+        // Estimate input size: ~5 chars/word, ~350 words/page
+        const estimatedWords = Math.round(totalTextLength / 5);
+        // Proportional target with diminishing returns: ~30% up to a cap of 8000 words
+        const targetWords = Math.max(800, Math.min(8000, Math.round(estimatedWords * 0.30)));
+        const targetPages = Math.round(targetWords / 350);
+        return `\n⚠️ STRICT LENGTH REQUIREMENT (NON-NEGOTIABLE):\nThe source material is approximately ${Math.round(estimatedWords / 350)} pages long. The summary MUST be at least ${targetWords} words (approximately ${targetPages} pages). This is a hard minimum — a shorter output is WRONG and must be rejected. Write more sections, add more detail to each section, and expand every explanation until you reach this target length.`;
+      })()}`
   };
 
   let promptResult = prompts[type];
@@ -141,7 +141,7 @@ const createAIGenMaterial = async (
     additionalInstructions,
     language,
   } = JSON.parse(request.body || "{}") as AIGenMaterialInput;
-
+  console.log(JSON.stringify(JSON.parse(request.body || "{}"), null, 2), "Received request body");
   //error handling
   if (!type || !isDocumentType(type))
     throw createHttpError.BadRequest(
@@ -212,7 +212,7 @@ const createAIGenMaterial = async (
     title: z.string(),
     content: z.string(),
   });
-  console.log(`[AI Gen] totalTextLength: ${totalTextLength} chars — estimated words: ${Math.round(totalTextLength/5)} — type: ${type}`);
+  console.log(`[AI Gen] totalTextLength: ${totalTextLength} chars — estimated words: ${Math.round(totalTextLength / 5)} — type: ${type}`);
 
   const { title, content } = await askStructuredLLM(
     prompt,
