@@ -131,5 +131,20 @@
       "lab_ai": "AI Lab",
       "chat_ai": "AI Chat"
     }
+  },
+  "classi": {
+    "header_title": "Your classes for {{subject}}",
+    "header_desc": "Manage and view your classes from here.",
+    "search_placeholder": "Search classes...",
+    "all_years": "All years",
+    "empty": {
+      "title": "No class assigned",
+      "desc": "There are no classes associated with your account for this subject yet. Contact your school administrator to request the assignment of your classes.",
+      "action": "Back to Dashboard"
+    },
+    "per_page": "{{count}} per page",
+    "student_count": "{{count}} student",
+    "students_count": "{{count}} students",
+    "view_button": "View"
   }
 }

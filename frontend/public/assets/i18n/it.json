@@ -131,5 +131,20 @@
       "lab_ai": "Lab AI",
       "chat_ai": "Chat AI"
     }
+  },
+  "classi": {
+    "header_title": "Le tue classi di {{subject}}",
+    "header_desc": "Gestisci e visualizza le tue classi da qui.",
+    "search_placeholder": "Cerca classi...",
+    "all_years": "Tutti gli anni",
+    "empty": {
+      "title": "Nessuna classe assegnata",
+      "desc": "Non ci sono ancora classi associate al tuo account per questa materia. Contatta l'amministratore del tuo istituto per richiedere l'assegnazione delle tue classi.",
+      "action": "Torna alla Dashboard"
+    },
+    "per_page": "{{count}} per pagina",
+    "student_count": "{{count}} studente",
+    "students_count": "{{count}} studenti",
+    "view_button": "Visualizza"
   }
 }

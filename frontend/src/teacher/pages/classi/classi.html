@@ -1,11 +1,12 @@
+<ng-container *transloco="let t; read: 'classi'">
 <app-syllex-page-header
-  [title]="'Le tue classi di ' + materiaService.materiaSelected()!.name"
-  [description]="'Gestisci e visualizza le tue classi da qui.'"
+  [title]="t('header_title', { subject: materiaService.materiaSelected()!.name })"
+  [description]="t('header_desc')"
 />
 
 <section class="classi-filter-bar my-4">
   <app-syllex-search-input
-    placeholder="Cerca classi..."
+    [placeholder]="t('search_placeholder')"
     [value]="SearchTerm()"
     (valueChange)="onSearchTermChange($event)"
     class="classi-filter-bar__search"
@@ -14,7 +15,7 @@
   <app-syllex-select-input
     [value]="SelectedYear().toString()"
     (valueChange)="onYearChange($event)"
-    placeholder="Tutti gli anni"
+    [placeholder]="t('all_years')"
     [options]="yearOptions"
     class="classi-filter-bar__select"
   />
@@ -32,10 +33,10 @@
 @if (FilteredClassi().length === 0) {
   <div class="mt-5 mb-5">
     <app-syllex-empty-state
-      title="Nessuna classe assegnata"
-      description="Non ci sono ancora classi associate al tuo account per questa materia. Contatta l'amministratore del tuo istituto per richiedere l'assegnazione delle tue classi."
+      [title]="t('empty.title')"
+      [description]="t('empty.desc')"
       [icon]="UsersIcon"
-      actionLabel="Torna alla Dashboard"
+      [actionLabel]="t('empty.action')"
       actionLink="/t/dashboard"
     ></app-syllex-empty-state>
   </div>
@@ -56,9 +57,10 @@
       [ngModel]="PageSize()"
       (ngModelChange)="onPageSizeChange($event)"
     >
-      <option [ngValue]="5">5 per pagina</option>
-      <option [ngValue]="10">10 per pagina</option>
-      <option [ngValue]="20">20 per pagina</option>
+      <option [ngValue]="5">{{ t('per_page', {count: 5}) }}</option>
+      <option [ngValue]="10">{{ t('per_page', {count: 10}) }}</option>
+      <option [ngValue]="20">{{ t('per_page', {count: 20}) }}</option>
     </select>
   </div>
 }
+</ng-container>
