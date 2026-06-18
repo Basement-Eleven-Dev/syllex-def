@@ -356,5 +356,27 @@
     "notif_test_corrected_desc": "Notify when a test is corrected",
     "save_success": "Settings saved successfully",
     "save_error": "Error saving settings"
+  },
+  "login": {
+    "welcome": "Welcome to Syllex",
+    "subtitle": "Enter the platform.",
+    "staging": "You are on staging environment",
+    "mfa_verify": "Verify identity",
+    "activation": "Account Activation",
+    "signin": "Sign In",
+    "email": "Email",
+    "email_ph": "email@syllex.com",
+    "password": "Password",
+    "password_ph": "Minimum 8 characters",
+    "mfa_lbl": "Code from app (6 digits)",
+    "mfa_ph": "000000",
+    "forgot_pwd": "Forgot your password?",
+    "privacy_1": "I declare that I have read the",
+    "privacy_policy": "Privacy Policy",
+    "privacy_2": "regarding the processing of personal data.",
+    "verify_btn": "Verify",
+    "confirm_btn": "Confirm and sign in",
+    "signin_btn": "Sign in",
+    "new_password_msg": "Enter a new password to complete activation"
   }
 }

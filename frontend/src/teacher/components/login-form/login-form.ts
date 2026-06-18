@@ -17,6 +17,8 @@ import {
 import { SyllexButton } from '../UI/syllex-button/syllex-button';
 import { Auth } from '../../../services/auth';
 import { isStaging } from '../../../environments/environment';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { inject } from '@angular/core';
 
 @Component({
   selector: 'app-login-form',
@@ -26,6 +28,8 @@ import { isStaging } from '../../../environments/environment';
     FontAwesomeModule,
     RouterModule,
     SyllexButton,
+    TranslocoDirective,
+    TranslocoPipe,
   ],
   templateUrl: './login-form.html',
   styleUrl: './login-form.scss',
@@ -37,6 +41,7 @@ export class LoginForm {
   EyeSlashIcon = faEyeSlash;
   isStaging = isStaging;
   showPassword = false;
+  private readonly translocoService = inject(TranslocoService);
 
   loginForm = new FormGroup({
     email: new FormControl('', [Validators.required]),
@@ -94,7 +99,7 @@ export class LoginForm {
         this.loginForm.get('password')?.setValue('');
         this.hasResult = {
           success: true,
-          message: "Inserisci una nuova password per completare l'attivazione",
+          message: this.translocoService.translate('login.new_password_msg'),
         };
         return;
       }

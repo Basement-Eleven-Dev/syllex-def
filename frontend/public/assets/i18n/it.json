@@ -356,5 +356,27 @@
     "notif_test_corrected_desc": "Comunica quando un test viene corretto",
     "save_success": "Impostazioni salvate con successo",
     "save_error": "Errore durante il salvataggio delle impostazioni"
+  },
+  "login": {
+    "welcome": "Benvenuti in Syllex",
+    "subtitle": "Entra nella piattaforma.",
+    "staging": "Sei su ambiente staging",
+    "mfa_verify": "Verifica identità",
+    "activation": "Attivazione Account",
+    "signin": "Accedi",
+    "email": "Email",
+    "email_ph": "email@syllex.com",
+    "password": "Password",
+    "password_ph": "Minimo 8 caratteri",
+    "mfa_lbl": "Codice dall'app (6 cifre)",
+    "mfa_ph": "000000",
+    "forgot_pwd": "Hai dimenticato la password?",
+    "privacy_1": "Dichiaro di aver preso visione della",
+    "privacy_policy": "Privacy Policy",
+    "privacy_2": "relativa al trattamento dei dati personali.",
+    "verify_btn": "Verifica",
+    "confirm_btn": "Conferma e accedi",
+    "signin_btn": "Accedi",
+    "new_password_msg": "Inserisci una nuova password per completare l'attivazione"
   }
 }
