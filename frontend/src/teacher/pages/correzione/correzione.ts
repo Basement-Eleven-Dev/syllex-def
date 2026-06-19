@@ -23,7 +23,11 @@ import {
   KpiCardData,
   SyllexKpiRow,
 } from '../../components/UI/syllex-kpi-row/syllex-kpi-row';
-import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import {
+  TranslocoDirective,
+  TranslocoPipe,
+  TranslocoService,
+} from '@jsverse/transloco';
 
 @Component({
   selector: 'app-correzione',
@@ -37,7 +41,6 @@ import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/tr
     SyllexButton,
     SyllexKpiRow,
     TranslocoDirective,
-    TranslocoPipe,
   ],
   templateUrl: './correzione.html',
   styleUrl: './correzione.scss',
@@ -183,34 +186,34 @@ export class Correzione implements OnInit {
     });
   }
 
-  summaryKpis(d: any): KpiCardData[] {
+  summaryKpis(d: any, t: any): KpiCardData[] {
     const mins = Math.floor(d.timeSpent / 60);
     const secs = d.timeSpent % 60;
-    const time = this.translocoService.translate('correzione.time_format', { mins, secs });
+    const time = t('time_format', { mins, secs });
     return [
       {
-        label: this.translocoService.translate('correzione.kpi_correct'),
+        label: t('kpi_correct'),
         value: d.questionsStats.correct,
         bgColor: '#E6FF80',
         textColor: '#1A5511',
       },
       {
-        label: this.translocoService.translate('correzione.kpi_wrong'),
+        label: t('kpi_wrong'),
         value: d.questionsStats.wrong,
         bgColor: '#FFD2D2',
         textColor: '#E51215',
       },
       {
-        label: this.translocoService.translate('correzione.kpi_empty'),
+        label: t('kpi_empty'),
         value: d.questionsStats.empty,
         bgColor: '#E4E4E4',
         textColor: '#363636',
       },
       {
-        label: this.translocoService.translate('correzione.kpi_score'),
+        label: t('kpi_score'),
         value: `${d.score != null ? d.score : '?'} / ${d.maxScore}`,
       },
-      { label: this.translocoService.translate('correzione.kpi_time'), value: time },
+      { label: t('kpi_time'), value: time },
     ];
   }
 }

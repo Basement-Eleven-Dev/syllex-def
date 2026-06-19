@@ -26,7 +26,6 @@ import {
     NgbTooltipModule,
     SyllexButton,
     TranslocoDirective,
-    TranslocoPipe,
   ],
   templateUrl: './question-correction.html',
   styleUrl: './question-correction.scss',
@@ -38,11 +37,16 @@ export class QuestionCorrection {
   @Input() isReviewed!: any;
   @Output() scoreChanged = new EventEmitter<void>();
   aiCorrecting = false;
+  showAiDetails = false;
   private readonly testsService = inject(TestsService);
   private readonly translocoService = inject(TranslocoService);
   readonly spinner = faSpinner;
   readonly infoIcon = faInfoCircle;
   readonly sparklesIcon = faSparkles;
+
+  toggleAiDetails(): void {
+    this.showAiDetails = !this.showAiDetails;
+  }
 
   getResultLabel(value: string): string {
     const labels: Record<string, string> = {

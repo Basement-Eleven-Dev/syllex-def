@@ -51,38 +51,42 @@
     }
 
     <section class="px-0 pb-0">
-      <label
-        class="form-label text-dark fw-bold d-flex align-items-center gap-2 mb-2"
-      >
-        {{ t('student_answer') }} @if (data?.answer?.aiProbability !== null &&
-        data?.answer?.aiProbability !== undefined) {
+      <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
+        <label class="form-label text-dark fw-bold mb-0">
+          {{ t('student_answer') }}
+        </label>
+        @if (data?.answer?.aiProbability !== null && data?.answer?.aiProbability
+        !== undefined) {
         <span
           class="badge"
-          style="cursor: help"
+          style="cursor: pointer"
           [ngClass]="{
-          'bg-danger': data.answer.aiProbability > 50,
-          'bg-primary': data.answer.aiProbability <= 50
-        }"
+            'bg-danger': data.answer.aiProbability > 50,
+            'bg-primary': data.answer.aiProbability <= 50
+          }"
           [ngbTooltip]="t('ai_prob_tooltip')"
+          (click)="toggleAiDetails()"
         >
           {{ getAiProbabilityLabel(data.answer.aiProbability) }}
         </span>
+        } @if (showAiDetails && data?.answer?.aiMarkers &&
+        data.answer.aiMarkers.length > 0) {
+        <div class="d-flex flex-wrap gap-1 align-items-center ms-2">
+          @for (marker of data.answer.aiMarkers; track marker) {
+          <span
+            class="badge bg-light text-danger-emphasis border border-danger-subtle d-inline-flex align-items-center gap-1"
+            style="cursor: help"
+            [ngbTooltip]="marker"
+          >
+            <fa-icon [icon]="infoIcon" class="small"></fa-icon> {{ marker }}
+          </span>
+          }
+        </div>
         }
-      </label>
+      </div>
       <div class="d-flex flex-row align-items-start gap-3">
         <div class="flex-fill">
           <p class="mb-0 fs-5">{{ data?.answer?.answer || t('no_answer') }}</p>
-          @if (data?.answer?.aiMarkers && data.answer.aiMarkers.length > 0) {
-          <div class="d-flex flex-wrap gap-1 mt-2">
-            @for (marker of data.answer.aiMarkers; track marker) {
-            <span
-              class="badge bg-light text-danger-emphasis border border-danger-subtle d-inline-flex align-items-center gap-1"
-            >
-              <fa-icon [icon]="infoIcon" class="small"></fa-icon> {{ marker }}
-            </span>
-            }
-          </div>
-          }
         </div>
         <div
           class="d-flex flex-column align-items-center flex-shrink-0"

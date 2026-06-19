@@ -1,125 +1,131 @@
 <ng-container *transloco="let t; read: 'correzione'">
-@if (isLoading()) {
-<div class="d-flex justify-content-center align-items-center py-5">
-  <fa-icon
-    [icon]="SpinnerIcon"
-    [animation]="'spin'"
-    size="3x"
-    class="text-primary"
-  ></fa-icon>
-</div>
-} @else if (data(); as d) {
-
-<!-- Header -->
-<div class="class-header">
-  <button class="back-btn" [routerLink]="backUrl" [attr.aria-label]="t('back')">
-    <fa-icon [icon]="ArrowLeftIcon" />
-  </button>
-  <div class="flex-fill">
-    <span class="class-header__title">{{ d.studentName }}</span>
-    <p class="text-muted mb-0 mt-1">{{ t('test_label', { title: d.testTitle }) }}</p>
+  @if (isLoading()) {
+  <div class="d-flex justify-content-center align-items-center py-5">
+    <fa-icon
+      [icon]="SpinnerIcon"
+      [animation]="'spin'"
+      size="3x"
+      class="text-primary"
+    ></fa-icon>
   </div>
-  <div class="d-flex flex-row gap-2 align-items-center">
-    <span class="text-muted small">
-      <fa-icon [icon]="ClockIcon" class="me-1"></fa-icon>
-      @if (d.submissionDate) { {{ t('delivered_on') }} {{ d.submissionDate | date: 'dd MMM y, HH:mm' }} } 
-      @else { {{ t('not_delivered') }} }
-    </span>
-    <span
-      class="badge fs-6 rounded-pill px-3 py-2"
-      id="statusBadge"
-      [class.da-correggere]="d.status === 'delivered'"
-      [class.corretto]="d.status === 'reviewed'"
+  } @else if (data(); as d) {
+
+  <!-- Header -->
+  <div class="class-header">
+    <button
+      class="back-btn"
+      [routerLink]="backUrl"
+      [attr.aria-label]="t('back')"
     >
-      {{ (d.status === 'delivered' ? t('status_delivered') : t('status_reviewed')) | titlecase }}
-    </span>
+      <fa-icon [icon]="ArrowLeftIcon" />
+    </button>
+    <div class="flex-fill">
+      <span class="class-header__title">{{ d.studentName }}</span>
+      <p class="text-muted mb-0 mt-1">
+        {{ t('test_label', { title: d.testTitle }) }}
+      </p>
+    </div>
+    <div class="d-flex flex-row gap-2 align-items-center">
+      <span class="text-muted small">
+        <fa-icon [icon]="ClockIcon" class="me-1"></fa-icon>
+        @if (d.submissionDate) { {{ t('delivered_on') }} {{ d.submissionDate |
+        date: 'dd MMM y, HH:mm' }} } @else { {{ t('not_delivered') }} }
+      </span>
+      <span
+        class="badge fs-6 rounded-pill px-3 py-2"
+        id="statusBadge"
+        [class.da-correggere]="d.status === 'delivered'"
+        [class.corretto]="d.status === 'reviewed'"
+      >
+        {{ (d.status === 'delivered' ? t('status_delivered') :
+        t('status_reviewed')) | titlecase }}
+      </span>
+    </div>
   </div>
-</div>
 
-<!-- Riepilogo -->
-<div class="section-heading mt-5">
-  <span>{{ t('summary') }}</span>
-  <fa-icon [icon]="CheckIcon" />
-</div>
-<div class="mt-4 mb-4">
-  <app-syllex-kpi-row [kpis]="summaryKpis(d)" colClass="col" />
-</div>
+  <!-- Riepilogo -->
+  <div class="section-heading mt-5">
+    <span>{{ t('summary') }}</span>
+    <fa-icon [icon]="CheckIcon" />
+  </div>
+  <div class="mt-4 mb-4">
+    <app-syllex-kpi-row [kpis]="summaryKpis(d, t)" colClass="col" />
+  </div>
 
-<div class="ai-feedback-card mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-2">
-    <span class="fw-semibold text-primary">{{ t('ai_feedback') }}</span>
-    <app-syllex-button
-      [props]="{
+  <div class="ai-feedback-card mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <span class="fw-semibold text-primary">{{ t('ai_feedback') }}</span>
+      <app-syllex-button
+        [props]="{
         label: isGeneratingInsight() ? t('btn_generating') : (d.aiInsight ? t('btn_update') : t('btn_generate')),
         variant: 'primary',
         size: 'small',
         color: 'celestine',
         disabled: isGeneratingInsight()
       }"
-      (clicked)="generateAiFeedback()"
-    />
-  </div>
-  @if (d.aiInsight) {
-  <p class="mb-0 ai-feedback-text">&ldquo;{{ d.aiInsight }}&rdquo;</p>
-  } @else {
-  <p class="mb-0 text-muted small fst-italic">
-    {{ t('ai_feedback_empty') }}
-  </p>
-  }
-</div>
-
-<!-- Correzione / Precorrezione -->
-<div class="section-heading mt-5">
-  <span>{{ d.status === 'reviewed' ? t('section_correction') : t('section_precorrection') }}</span>
-  <fa-icon [icon]="CheckIcon" />
-</div>
-<section class="correzione-box">
-  <p class="text-muted small mb-4">
-    {{ t('correction_desc') }}
-  </p>
-  <div class="d-flex flex-row align-items-center gap-2 flex-wrap mb-5">
-    <div class="d-flex flex-row flex-wrap gap-2 align-items-center flex-fill">
-      @for(q of d.questions; track $index) {
-      <button
-        class="btn-question"
-        [class.q-correct]="q?.answer?.result === 'correct'"
-        [class.q-wrong]="q?.answer?.result === 'wrong'"
-        [class.q-dubious]="q?.answer?.result === 'dubious'"
-        [class.q-empty]="q?.answer?.result === 'empty'"
-        [class.q-selected]="questionIndex() === $index"
-        (click)="selectQuestion($index)"
-      >
-        {{ $index + 1 }}
-      </button>
-      }
+        (clicked)="generateAiFeedback()"
+      />
     </div>
-    <div class="d-flex flex-row gap-2 align-items-center flex-shrink-0">
-      @if(d.status !== 'reviewed') {
-      <app-syllex-button
-        [props]="{
+    @if (d.aiInsight) {
+    <p class="mb-0 ai-feedback-text">&ldquo;{{ d.aiInsight }}&rdquo;</p>
+    } @else {
+    <p class="mb-0 text-muted small fst-italic">{{ t('ai_feedback_empty') }}</p>
+    }
+  </div>
+
+  <!-- Correzione / Precorrezione -->
+  <div class="section-heading mt-5">
+    <span
+      >{{ d.status === 'reviewed' ? t('section_correction') :
+      t('section_precorrection') }}</span
+    >
+    <fa-icon [icon]="CheckIcon" />
+  </div>
+  <section class="correzione-box">
+    <p class="text-muted small mb-4">{{ t('correction_desc') }}</p>
+    <div class="d-flex flex-row align-items-center gap-2 flex-wrap mb-5">
+      <div class="d-flex flex-row flex-wrap gap-2 align-items-center flex-fill">
+        @for(q of d.questions; track $index) {
+        <button
+          class="btn-question"
+          [class.q-correct]="q?.answer?.result === 'correct'"
+          [class.q-wrong]="q?.answer?.result === 'wrong'"
+          [class.q-dubious]="q?.answer?.result === 'dubious'"
+          [class.q-empty]="q?.answer?.result === 'empty'"
+          [class.q-selected]="questionIndex() === $index"
+          (click)="selectQuestion($index)"
+        >
+          {{ $index + 1 }}
+        </button>
+        }
+      </div>
+      <div class="d-flex flex-row gap-2 align-items-center flex-shrink-0">
+        @if(d.status !== 'reviewed') {
+        <app-syllex-button
+          [props]="{
           label: t('btn_finalize'),
           variant: 'primary',
           size: 'large',
           leftIcon: CheckIcon,
           disabled: isSaving() || !allQuestionsAreScored
         }"
-        (clicked)="submitCorrection()"
-      />
-      }
+          (clicked)="submitCorrection()"
+        />
+        }
+      </div>
     </div>
-  </div>
-  @if (attemptId(); as id) { @if (d.questions[questionIndex()]) {
-  <app-question-correction
-    [index]="questionIndex() + 1"
-    [data]="d.questions[questionIndex()]"
-    [isReviewed]="d.status === 'reviewed'"
-    [attemptId]="id"
-    (scoreChanged)="onScoreChanged()"
-  />
-  } }
-</section>
+    @if (attemptId(); as id) { @if (d.questions[questionIndex()]) {
+    <app-question-correction
+      [index]="questionIndex() + 1"
+      [data]="d.questions[questionIndex()]"
+      [isReviewed]="d.status === 'reviewed'"
+      [attemptId]="id"
+      (scoreChanged)="onScoreChanged()"
+    />
+    } }
+  </section>
 
-} @else {
-<div class="alert alert-warning">{{ t('err_load') }}</div>
-}
+  } @else {
+  <div class="alert alert-warning">{{ t('err_load') }}</div>
+  }
 </ng-container>
