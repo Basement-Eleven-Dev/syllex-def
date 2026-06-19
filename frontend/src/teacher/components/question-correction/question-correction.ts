@@ -2,16 +2,32 @@ import { Component, inject, Input, Output, EventEmitter } from '@angular/core';
 import { NgClass, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TestsService } from '../../../services/tests-service';
-import { faSpinner, faInfoCircle, faSparkles } from '@fortawesome/pro-solid-svg-icons';
+import {
+  faSpinner,
+  faInfoCircle,
+  faSparkles,
+} from '@fortawesome/pro-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
-import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import {
+  TranslocoDirective,
+  TranslocoPipe,
+  TranslocoService,
+} from '@jsverse/transloco';
 
 @Component({
   selector: 'app-question-correction',
   standalone: true,
-  imports: [NgClass, FormsModule, FontAwesomeModule, NgbTooltipModule, SyllexButton, TranslocoDirective, TranslocoPipe],
+  imports: [
+    NgClass,
+    FormsModule,
+    FontAwesomeModule,
+    NgbTooltipModule,
+    SyllexButton,
+    TranslocoDirective,
+    TranslocoPipe,
+  ],
   templateUrl: './question-correction.html',
   styleUrl: './question-correction.scss',
 })
@@ -30,17 +46,25 @@ export class QuestionCorrection {
 
   getResultLabel(value: string): string {
     const labels: Record<string, string> = {
-      correct: this.translocoService.translate('question_correction.result.correct'),
-      wrong: this.translocoService.translate('question_correction.result.wrong'),
-      dubious: this.translocoService.translate('question_correction.result.dubious'),
-      empty: this.translocoService.translate('question_correction.result.empty'),
+      correct: this.translocoService.translate(
+        'question_correction.result.correct',
+      ),
+      wrong: this.translocoService.translate(
+        'question_correction.result.wrong',
+      ),
+      dubious: this.translocoService.translate(
+        'question_correction.result.dubious',
+      ),
+      empty: this.translocoService.translate(
+        'question_correction.result.empty',
+      ),
     };
     return labels[value] || '';
   }
 
   getAiProbabilityLabel(value: number): string {
-    return value > 50 
-      ? this.translocoService.translate('question_correction.ai_prob.high') 
+    return value > 50
+      ? this.translocoService.translate('question_correction.ai_prob.high')
       : this.translocoService.translate('question_correction.ai_prob.low');
   }
 
@@ -68,10 +92,12 @@ export class QuestionCorrection {
       .subscribe((response) => {
         const threshold = this.data.answer.maxScore / 2;
         this.data.answer.isCorrect = response.score >= threshold;
-        this.data.answer.result = response.score >= threshold ? 'correct' : 'wrong';
+        this.data.answer.result =
+          response.score >= threshold ? 'correct' : 'wrong';
         this.data.answer.score = response.score;
         this.data.answer.feedback = response.explanation; // spiegazione dettagliata
         this.data.answer.aiProbability = response.aiProbability;
+        this.data.answer.aiMarkers = response.aiMarkers || [];
         this.aiCorrecting = false;
         this.scoreChanged.emit();
       });

@@ -57,12 +57,13 @@ const correctAttemptWithAI = async (
   const language = context.language || "it";
 
   // 5. Chiamata all'AI con il maxScore reale preso dal Test
-  const { score, explanation, aiProbability } = await correctStudentQuestion(
-    question.answer || "",
-    maxScore,
-    question.question.explanation || "",
-    language,
-  );
+  const { score, explanation, aiProbability, aiMarkers } =
+    await correctStudentQuestion(
+      question.answer || "",
+      maxScore,
+      question.question.explanation || "",
+      language,
+    );
 
   // 6. Update Atomico del tentativo
   await Attempt.updateOne(
@@ -74,6 +75,7 @@ const correctAttemptWithAI = async (
         [`questions.${questionIndex}.status`]:
           score >= maxScore / 2 ? "correct" : "wrong",
         [`questions.${questionIndex}.aiProbability`]: aiProbability,
+        [`questions.${questionIndex}.aiMarkers`]: aiMarkers,
         updatedAt: new Date(),
       },
     },
@@ -85,6 +87,7 @@ const correctAttemptWithAI = async (
     explanation,
     maxScore, // Lo restituiamo per debug o UI
     aiProbability,
+    aiMarkers,
   };
 };
 

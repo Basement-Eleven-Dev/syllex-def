@@ -5,7 +5,12 @@ export async function correctStudentQuestion(
   maxScore: number,
   correctAnswer: string,
   language: string = "it",
-): Promise<{ score: number; explanation: string; aiProbability: number }> {
+): Promise<{
+  score: number;
+  explanation: string;
+  aiProbability: number;
+  aiMarkers: string[];
+}> {
   console.log(maxScore, "lo score massimo");
 
   if (!answer || answer.trim() === "") {
@@ -30,17 +35,27 @@ e fornisci una breve spiegazione.
 
 IMPORTANTE: Fornisci la spiegazione sintetica ("spiegazione") esclusivamente in lingua ${targetLanguage}.
 
-Stima la probabilità (0-100) che il testo sia generato da un'IA. 
-Analizza la risposta. Sii molto cauto nell'assegnare probabilità elevate. Se trovi analogie creative, termini colloquiali o lievi imperfezioni sintattiche, abbassa drasticamente la probabilità AI (sotto il 30%). Considera 'Alta Probabilità' (sopra il 70%) solo se il testo è eccessivamente formale, strutturato con elenchi puntati perfetti e privo di qualsiasi 'colore' individuale.
+Analizza attentamente lo stile di scrittura della risposta dello studente sotto tre profili linguistici:
+1. Uniformità del ritmo (le frasi sono tutte della stessa lunghezza o perfettamente simmetriche?).
+2. Uso ripetitivo di connettivi o transizioni standard tipiche dell'AI (es: "Tuttavia", "In conclusione", "Inoltre", "Pertanto", "È importante notare che").
+3. Assenza completa di variazioni personali, espressioni colloquiali o micro-imperfezioni naturali (un testo troppo formale o asettico).
+
+Se rilevi uno o più di questi pattern, stima una probabilità realistica di autorevolezza AI (0-100) basata sull'intensità di questi elementi e popola un array di brevi marker descrittivi in lingua ${targetLanguage} (es: per l'italiano "Stile sintattico estremamente uniforme", "Transizioni standard tipiche di AI", "Tono eccessivamente formale/neutro").
+Se il testo contiene analogie creative individuali, termini gergali/colloquiali o lievi imperfezioni sintattiche umane, abbassa drasticamente la probabilità (sotto il 20-30%) e non aggiungere marker di segnalazione (lascia l'array vuoto). Sii molto cauto nell'indicare probabilità alte.
 
 IMPORTANTE: Rispondi SOLO con un oggetto JSON valido nel seguente formato, senza testo aggiuntivo:
-{"punteggio": <numero da 0 a ${maxScore}>, "spiegazione": "<breve spiegazione in lingua ${targetLanguage}>", "aiProbability": <numero da 0 a 100>}`;
+{
+  "punteggio": <numero da 0 a ${maxScore}>,
+  "spiegazione": "<breve spiegazione in lingua ${targetLanguage}>",
+  "aiProbability": <numero da 0 a 100>,
+  "aiMarkers": [<array di stringhe con i marker descrittivi o array vuoto>]
+}`;
 
   try {
     const ai = await getGeminiClient();
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: "gemini-3.1-flash-lite",
       contents: [
         {
           role: "user",
@@ -48,9 +63,9 @@ IMPORTANTE: Rispondi SOLO con un oggetto JSON valido nel seguente formato, senza
         },
       ],
       config: {
-        systemInstruction: `Sei un docente esperto che corregge le risposte degli studenti. Scrivi la spiegazione del voto nella lingua: ${targetLanguage}. Rispondi sempre e solo con JSON valido.`,
+        systemInstruction: `Sei un docente esperto che corregge le risposte degli studenti e ne analizza lo stile di scrittura. Scrivi la spiegazione del voto e gli eventuali marker linguistici nella lingua: ${targetLanguage}. Rispondi sempre e solo con JSON valido.`,
         temperature: 0,
-        maxOutputTokens: 300,
+        maxOutputTokens: 500,
         responseMimeType: "application/json",
       },
     });
@@ -65,6 +80,7 @@ IMPORTANTE: Rispondi SOLO con un oggetto JSON valido nel seguente formato, senza
       explanation: parsed.spiegazione || "",
       aiProbability:
         typeof parsed.aiProbability === "number" ? parsed.aiProbability : 0,
+      aiMarkers: Array.isArray(parsed.aiMarkers) ? parsed.aiMarkers : [],
     };
   } catch (error) {
     console.error("Errore nella correzione con Gemini:", error);
@@ -72,6 +88,7 @@ IMPORTANTE: Rispondi SOLO con un oggetto JSON valido nel seguente formato, senza
       score: 0,
       explanation: "Errore durante la correzione automatica.",
       aiProbability: 0,
+      aiMarkers: [],
     };
   }
 }

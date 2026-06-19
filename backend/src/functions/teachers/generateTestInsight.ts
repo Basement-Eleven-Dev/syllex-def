@@ -28,36 +28,44 @@ const generateTestInsight = async (
 
   // 2. Get All Reviewed Attempts with student details and questions
   const attempts = await Attempt.aggregate([
-    { $match: { testId: testObjectId, status: 'reviewed' } },
+    { $match: { testId: testObjectId, status: "reviewed" } },
     {
       $lookup: {
         from: "users",
         localField: "studentId",
         foreignField: "_id",
-        as: "studentData"
-      }
+        as: "studentData",
+      },
     },
-    { $unwind: "$studentData" }
-  ])
+    { $unwind: "$studentData" },
+  ]);
 
   if (attempts.length === 0) {
-    return { insight: "Non ci sono ancora abbastanza tentativi corretti per generare un'analisi della classe." };
+    return {
+      insight:
+        "Non ci sono ancora abbastanza tentativi corretti per generare un'analisi della classe.",
+    };
   }
 
   // 3. Prepare aggregated data for AI
   const totalStudents = attempts.length;
-  const avgScore = attempts.reduce((acc, curr) => acc + (curr.score || 0), 0) / totalStudents;
-  const totalTime = attempts.reduce((acc, curr) => acc + (curr.timeSpent || 0), 0);
+  const avgScore =
+    attempts.reduce((acc, curr) => acc + (curr.score || 0), 0) / totalStudents;
+  const totalTime = attempts.reduce(
+    (acc, curr) => acc + (curr.timeSpent || 0),
+    0,
+  );
   const avgTime = totalTime / totalStudents;
 
   // Topic mastery aggregation
-  const topicStats: Record<string, { total: number, correct: number }> = {};
-  attempts.forEach(attempt => {
+  const topicStats: Record<string, { total: number; correct: number }> = {};
+  attempts.forEach((attempt) => {
     attempt.questions?.forEach((q: any) => {
       const topic = q.question?.topic || "Generale";
       if (!topicStats[topic]) topicStats[topic] = { total: 0, correct: 0 };
       topicStats[topic].total++;
-      if (q.status === 'correct' || (q.score && q.score > 0)) { // Simple heuristic for topic performance
+      if (q.status === "correct" || (q.score && q.score > 0)) {
+        // Simple heuristic for topic performance
         topicStats[topic].correct++;
       }
     });
@@ -65,7 +73,7 @@ const generateTestInsight = async (
 
   const topicPerformance = Object.entries(topicStats).map(([name, stats]) => ({
     topic: name,
-    percentage: Math.round((stats.correct / stats.total) * 100)
+    percentage: Math.round((stats.correct / stats.total) * 100),
   }));
 
   const prompt = `Sei un esperto pedagogista. Analizza i risultati della classe per il test "${test.name}" per fornire un'analisi professionale al docente.
@@ -87,8 +95,10 @@ const generateTestInsight = async (
   try {
     const ai = await getGeminiClient();
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
-      contents: [{ role: "user", parts: [{ text: "Genera l'analisi della classe." }] }],
+      model: "gemini-3.1-flash-lite",
+      contents: [
+        { role: "user", parts: [{ text: "Genera l'analisi della classe." }] },
+      ],
       config: {
         systemInstruction: prompt,
         temperature: 0.7,
@@ -97,11 +107,13 @@ const generateTestInsight = async (
     });
 
     return {
-      insight: response.text || "Impossibile generare l'analisi al momento."
+      insight: response.text || "Impossibile generare l'analisi al momento.",
     };
   } catch (error) {
     console.error("Errore generazione test insight:", error);
-    return { insight: "Errore durante la generazione dell'analisi IA della classe." };
+    return {
+      insight: "Errore durante la generazione dell'analisi IA della classe.",
+    };
   }
 };
 

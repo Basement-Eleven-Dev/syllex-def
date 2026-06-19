@@ -1,14 +1,17 @@
 <ng-container *transloco="let t; read: 'question_correction'">
-<div class="p-4 rounded-4 d-flex flex-column gap-2" style="background: #eef4ff">
-  <div class="d-flex justify-content-between align-items-center">
-    <label class="form-label text-dark fw-bold fs-4 mb-0">
-      {{ t('question_num', { index: index }) }}
-      <span class="badge" [class]="data.answer.result">
-        {{ getResultLabel(data.answer.result) }}
-      </span>
-    </label>
+  <div
+    class="p-4 rounded-4 d-flex flex-column gap-2"
+    style="background: #eef4ff"
+  >
+    <div class="d-flex justify-content-between align-items-center">
+      <label class="form-label text-dark fw-bold fs-4 mb-0">
+        {{ t('question_num', { index: index }) }}
+        <span class="badge" [class]="data.answer.result">
+          {{ getResultLabel(data.answer.result) }}
+        </span>
+      </label>
 
-    @if (isOpenTypeQuestion && !isReviewed) {
+      @if (isOpenTypeQuestion && !isReviewed) {
       <app-syllex-button
         [props]="{
           label: aiCorrecting ? t('ai_correcting') : t('ai_correct'),
@@ -20,83 +23,99 @@
         }"
         (clicked)="correctWithAI()"
       ></app-syllex-button>
-    }
-  </div>
-
-  <p class="fs-5">{{ data.question.text }}</p>
-
-  @if(data.question.imageUrl){
-  <img
-    [src]="data.question.imageUrl"
-    class="img-fluid rounded-3 mb-3"
-    style="max-height: 300px; width: auto"
-  />
-  } @if(data.question.options && data.question.options.length > 0){
-  <div>
-    <label class="form-label text-dark fw-bold">{{ t('options') }}</label>
-    <ol type="A" class="ps-3">
-      @for(option of data.question.options; track $index){
-      <li [class.correct]="option.isCorrect" [class.fw-bold]="option.isCorrect">
-        {{ option.label }} @if(option.isCorrect) { {{ t('correct_paren') }} }
-      </li>
       }
-    </ol>
-  </div>
-  }
+    </div>
 
-  <section class="px-0 pb-0">
-    <label
-      class="form-label text-dark fw-bold d-flex align-items-center gap-2 mb-2"
-    >
-      {{ t('student_answer') }} @if (data?.answer?.aiProbability !== null &&
-      data?.answer?.aiProbability !== undefined) {
-      <span
-        class="badge"
-        style="cursor: help"
-        [ngClass]="{
+    <p class="fs-5">{{ data.question.text }}</p>
+
+    @if(data.question.imageUrl){
+    <img
+      [src]="data.question.imageUrl"
+      class="img-fluid rounded-3 mb-3"
+      style="max-height: 300px; width: auto"
+    />
+    } @if(data.question.options && data.question.options.length > 0){
+    <div>
+      <label class="form-label text-dark fw-bold">{{ t('options') }}</label>
+      <ol type="A" class="ps-3">
+        @for(option of data.question.options; track $index){
+        <li
+          [class.correct]="option.isCorrect"
+          [class.fw-bold]="option.isCorrect"
+        >
+          {{ option.label }} @if(option.isCorrect) { {{ t('correct_paren') }} }
+        </li>
+        }
+      </ol>
+    </div>
+    }
+
+    <section class="px-0 pb-0">
+      <label
+        class="form-label text-dark fw-bold d-flex align-items-center gap-2 mb-2"
+      >
+        {{ t('student_answer') }} @if (data?.answer?.aiProbability !== null &&
+        data?.answer?.aiProbability !== undefined) {
+        <span
+          class="badge"
+          style="cursor: help"
+          [ngClass]="{
           'bg-danger': data.answer.aiProbability > 50,
           'bg-primary': data.answer.aiProbability <= 50
         }"
-        [ngbTooltip]="t('ai_prob_tooltip')"
-      >
-        {{ getAiProbabilityLabel(data.answer.aiProbability) }}
-      </span>
-      }
-    </label>
-    <div class="d-flex flex-row align-items-start gap-3">
-      <p class="mb-0 fs-5 flex-fill">
-        {{ data?.answer?.answer || t('no_answer') }}
-      </p>
-      <div
-        class="d-flex flex-column align-items-center flex-shrink-0"
-        style="min-width: 90px"
-      >
-        <label class="form-label text-dark fw-bold small mb-1">
-          {{ t('score_max', { max: data.answer.maxScore }) }}
-        </label>
-        <input
-          type="number"
-          class="form-control border-0 bg-white rounded-3 shadow-none fs-4 text-center"
-          [(ngModel)]="data.answer.score"
-          [max]="data.answer.maxScore"
-          min="0"
-          step="0.5"
-          [disabled]="isReviewed === true"
-          (ngModelChange)="isOpenTypeQuestion ? onScoreChange($event) : null"
-        />
+          [ngbTooltip]="t('ai_prob_tooltip')"
+        >
+          {{ getAiProbabilityLabel(data.answer.aiProbability) }}
+        </span>
+        }
+      </label>
+      <div class="d-flex flex-row align-items-start gap-3">
+        <div class="flex-fill">
+          <p class="mb-0 fs-5">{{ data?.answer?.answer || t('no_answer') }}</p>
+          @if (data?.answer?.aiMarkers && data.answer.aiMarkers.length > 0) {
+          <div class="d-flex flex-wrap gap-1 mt-2">
+            @for (marker of data.answer.aiMarkers; track marker) {
+            <span
+              class="badge bg-light text-danger-emphasis border border-danger-subtle d-inline-flex align-items-center gap-1"
+            >
+              <fa-icon [icon]="infoIcon" class="small"></fa-icon> {{ marker }}
+            </span>
+            }
+          </div>
+          }
+        </div>
+        <div
+          class="d-flex flex-column align-items-center flex-shrink-0"
+          style="min-width: 90px"
+        >
+          <label class="form-label text-dark fw-bold small mb-1">
+            {{ t('score_max', { max: data.answer.maxScore }) }}
+          </label>
+          <input
+            type="number"
+            class="form-control border-0 bg-white rounded-3 shadow-none fs-4 text-center"
+            [(ngModel)]="data.answer.score"
+            [max]="data.answer.maxScore"
+            min="0"
+            step="0.5"
+            [disabled]="isReviewed === true"
+            (ngModelChange)="isOpenTypeQuestion ? onScoreChange($event) : null"
+          />
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <div>
-    <label class="form-label text-dark fw-bold">{{ t('feedback_label') }}</label>
-    <textarea
-      class="form-control border-0 bg-white rounded-3 shadow-none"
-      rows="4"
-      [(ngModel)]="data.answer.feedback"
-      [placeholder]="t('feedback_ph')"
-      [disabled]="isReviewed === true"
-    ></textarea>
+    <div>
+      <label class="form-label text-dark fw-bold"
+        >{{ t('feedback_label') }}</label
+      >
+      <textarea
+        class="form-control border-0 bg-white rounded-3 shadow-none"
+        rows="4"
+        [(ngModel)]="data.answer.feedback"
+        [placeholder]="t('feedback_ph')"
+        [disabled]="isReviewed === true"
+      ></textarea>
+    </div>
   </div>
-</div>
 </ng-container>

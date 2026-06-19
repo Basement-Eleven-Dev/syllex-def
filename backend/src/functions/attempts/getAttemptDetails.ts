@@ -114,6 +114,7 @@ const getAttemptDetails = async (request: APIGatewayProxyEvent) => {
         maxScore: questionMaxScore,
         feedback: q.teacherComment || "",
         aiProbability: q.aiProbability ?? null,
+        aiMarkers: (q as any).aiMarkers ?? [],
       },
     };
   });
