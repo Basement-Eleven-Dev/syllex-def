@@ -23,6 +23,7 @@ import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
 import { SyllexTabFilter } from '../../components/UI/syllex-tab-filter/syllex-tab-filter';
 import { SyllexEmptyState } from '../../components/UI/syllex-empty-state/syllex-empty-state';
 import { faClipboardQuestion } from '@fortawesome/pro-solid-svg-icons';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 type QuestionTab = 'tutti' | 'vero falso' | 'aperta' | 'scelta multipla';
 @Component({
@@ -41,6 +42,8 @@ type QuestionTab = 'tutti' | 'vero falso' | 'aperta' | 'scelta multipla';
     SyllexButton,
     SyllexTabFilter,
     SyllexEmptyState,
+    TranslocoDirective,
+    TranslocoPipe,
   ],
   templateUrl: './banca.html',
   styleUrl: './banca.scss',
@@ -48,20 +51,25 @@ type QuestionTab = 'tutti' | 'vero falso' | 'aperta' | 'scelta multipla';
 export class Banca {
   // Icons
 
-  protected readonly tabOptions = [
-    { value: 'tutti', label: 'Tutti' },
-    { value: 'vero falso', label: 'Vero Falso' },
-    { value: 'aperta', label: 'Risposta Aperta' },
-    { value: 'scelta multipla', label: 'Scelta Multipla' },
-  ];
   protected readonly PlusIcon = faPlus;
   protected readonly QuestionIcon = faClipboardQuestion;
 
   // Dependency Injection
   private readonly questionsService = inject(QuestionsService);
-  protected readonly materiaService = inject(Materia);
+  public readonly materiaService = inject(Materia);
   private readonly feedbackService = inject(FeedbackService);
+  private readonly translocoService = inject(TranslocoService);
+  
   ActiveTab = signal<QuestionTab>('tutti');
+
+  get tabOptions() {
+    return [
+      { value: 'tutti', label: this.translocoService.translate('banca.tabs.tutti') },
+      { value: 'vero falso', label: this.translocoService.translate('banca.tabs.vero_falso') },
+      { value: 'aperta', label: this.translocoService.translate('banca.tabs.aperta') },
+      { value: 'scelta multipla', label: this.translocoService.translate('banca.tabs.scelta_multipla') },
+    ];
+  }
 
   // View type
   ViewType: ViewType = this.loadViewTypePreference() || 'grid';
@@ -157,14 +165,14 @@ export class Banca {
         );
         this.CollectionSize.update((n) => n - 1);
         this.feedbackService.showFeedback(
-          'Domanda eliminata con successo',
+          this.translocoService.translate('banca.feedback.delete_success'),
           true,
         );
       },
       error: (err) => {
         console.error('Errore nella cancellazione della domanda:', err);
         this.feedbackService.showFeedback(
-          'Errore nella cancellazione della domanda',
+          this.translocoService.translate('banca.feedback.delete_error'),
           false,
         );
       },
@@ -215,7 +223,7 @@ export class Banca {
         error: (err) => {
           console.error('Errore nel caricamento delle domande:', err);
           this.feedbackService.showFeedback(
-            'Errore nel caricamento delle domande',
+            this.translocoService.translate('banca.feedback.load_error'),
             false,
           );
         },

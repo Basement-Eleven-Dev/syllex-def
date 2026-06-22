@@ -67,6 +67,7 @@ import { comunicazioni_steps } from '../../../tours/tour_comunicazioni';
 import { eventi_steps } from '../../../tours/tour_eventi';
 import { crea_domanda_steps } from '../../../tours/tour_crea_domanda';
 import { SubjectSettingsModal } from '../../components/subject-settings-modal/subject-settings-modal';
+import { LanguageSelector } from '../../components/UI/language-selector/language-selector';
 
 @Component({
   selector: 'app-teacher-layout',
@@ -83,6 +84,7 @@ import { SubjectSettingsModal } from '../../components/subject-settings-modal/su
     NgbDropdownMenu,
     UserContextualMenu,
     SyllexSelectInput,
+    LanguageSelector,
   ],
   templateUrl: './teacher-layout.html',
   styleUrl: './teacher-layout.scss',

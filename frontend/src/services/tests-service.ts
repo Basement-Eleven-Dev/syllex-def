@@ -170,7 +170,8 @@ export class TestsService {
     return this.http.post<{
       score: number;
       explanation: string;
-      aiProbability: string;
+      aiProbability: number;
+      aiMarkers: string[];
     }>(`attempts/${attemptId}/questions/${questionId}/ai-correction`, {});
   }
 

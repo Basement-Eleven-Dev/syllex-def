@@ -1,4 +1,5 @@
 import { Component, computed, effect, inject, signal, ViewChild } from '@angular/core';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { RouterModule } from '@angular/router';
 import { Calendario } from '../../components/calendario/calendario';
 import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
@@ -31,6 +32,8 @@ import { AddEventModal } from '../../components/add-event-modal/add-event-modal'
     FontAwesomeModule,
     TitleCasePipe,
     SyllexEmptyState,
+    TranslocoDirective,
+    TranslocoPipe,
   ],
   templateUrl: './events.html',
   styleUrl: './events.scss',
@@ -46,6 +49,7 @@ export class Events {
 
   private readonly comunicazioniService = inject(ComunicazioniService);
   private readonly modalService = inject(NgbModal);
+  protected readonly translocoService = inject(TranslocoService);
 
   protected readonly materiaService = inject(Materia);
 

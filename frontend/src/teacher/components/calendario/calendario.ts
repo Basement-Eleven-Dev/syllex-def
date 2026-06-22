@@ -32,6 +32,7 @@ import { AddEventModal } from '../add-event-modal/add-event-modal';
 import { SyllexButton } from '../UI/syllex-button/syllex-button';
 import { SyllexBadge } from '../UI/syllex-badge/syllex-badge';
 import { ConfirmActionDirective } from '../../../directives/confirm-action.directive';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 export interface DayBox {
   day: number | null;
@@ -48,6 +49,8 @@ export interface DayBox {
     SyllexButton,
     SyllexBadge,
     ConfirmActionDirective,
+    TranslocoDirective,
+    TranslocoPipe,
   ],
   templateUrl: './calendario.html',
   styleUrl: './calendario.scss',
@@ -77,6 +80,7 @@ export class Calendario implements OnInit {
   private readonly comunicazioniService = inject(ComunicazioniService);
   private readonly modalService = inject(NgbModal);
   private readonly feedbackService = inject(FeedbackService);
+  protected readonly translocoService = inject(TranslocoService);
 
   // State signals
   CurrentDate = signal(new Date());
@@ -142,6 +146,18 @@ export class Calendario implements OnInit {
       this.SelectedDateTests().length > 0 ||
       this.SelectedDateComunicazioni().length > 0,
   );
+
+  get translatedDays() {
+    return [
+      this.translocoService.translate('calendar.mon'),
+      this.translocoService.translate('calendar.tue'),
+      this.translocoService.translate('calendar.wed'),
+      this.translocoService.translate('calendar.thu'),
+      this.translocoService.translate('calendar.fri'),
+      this.translocoService.translate('calendar.sat'),
+      this.translocoService.translate('calendar.sun'),
+    ];
+  }
 
   constructor() {}
 
@@ -221,13 +237,13 @@ export class Calendario implements OnInit {
       next: () => {
         this.Events.update((list) => list.filter((e) => e._id !== eventId));
         this.feedbackService.showFeedback(
-          'Evento eliminato con successo',
+          this.translocoService.translate('calendar.event_deleted_success'),
           true,
         );
       },
       error: () => {
         this.feedbackService.showFeedback(
-          "Errore durante l'eliminazione dell'evento",
+          this.translocoService.translate('calendar.event_deleted_error'),
           false,
         );
       },
@@ -260,11 +276,11 @@ export class Calendario implements OnInit {
     this.testsService.deleteTest(testId).subscribe({
       next: () => {
         this.Tests.update((list) => list.filter((t) => t._id !== testId));
-        this.feedbackService.showFeedback('Test eliminato con successo', true);
+        this.feedbackService.showFeedback(this.translocoService.translate('calendar.test_deleted_success'), true);
       },
       error: () => {
         this.feedbackService.showFeedback(
-          "Errore durante l'eliminazione del test",
+          this.translocoService.translate('calendar.test_deleted_error'),
           false,
         );
       },

@@ -70,6 +70,7 @@ export async function generateAIResponseGemini(
   subjectId: Types.ObjectId,
   userRole: "teacher" | "student" | "admin" = "student",
   messagesHistory: { role: string; content: string }[],
+  language: string = "it",
 ) {
   try {
     const ai = await getGeminiClient();
@@ -91,7 +92,12 @@ export async function generateAIResponseGemini(
     const realMaterialIds = realMaterials.map((m) => m._id as Types.ObjectId);
 
     // 2. System prompt (senza materiale inline — arriva via tool se necessario)
-    const systemPrompt = await buildAgent(subjectId, userRole, hasMaterials);
+    const systemPrompt = await buildAgent(
+      subjectId,
+      userRole,
+      hasMaterials,
+      language,
+    );
 
     // 3. Multi-turn contents: storico + query corrente
     const historyContents = messagesHistory.map((msg) => ({
@@ -239,7 +245,9 @@ export async function generateAIResponseGemini(
   }
 }
 
-export async function generateConversationTitleGemini(query: string): Promise<string> {
+export async function generateConversationTitleGemini(
+  query: string,
+): Promise<string> {
   try {
     const ai = await getGeminiClient();
     const prompt = `Genera un titolo riassuntivo estremamente sintetico (massimo 4 parole) in italiano per descrivere l'argomento principale di questa domanda: "${query}". Rispondi SOLO con il titolo, senza virgolette, senza punteggiatura, e capitalizza la prima lettera.`;

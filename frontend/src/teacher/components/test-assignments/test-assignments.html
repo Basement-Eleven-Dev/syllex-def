@@ -1,6 +1,7 @@
+<ng-container *transloco="let t; read: 'test_assignments'">
 <div class="d-flex flex-row gap-3 mb-4">
   <app-syllex-search-input
-    placeholder="Cerca per nome o cognome..."
+    [placeholder]="t('search')"
     [value]="filtersForm.get('text')!.value"
     (valueChange)="filtersForm.get('text')!.setValue($event); applyFilters()"
     style="max-width: 420px"
@@ -15,11 +16,11 @@
         <thead>
           <tr>
             <th></th>
-            <th class="text-muted fw-light">Nome</th>
-            <th class="text-muted fw-light">Cognome</th>
-            <th class="text-muted fw-light">Classe</th>
-            <th class="text-muted fw-light">Punteggio</th>
-            <th class="text-muted fw-light">Consegnato il</th>
+            <th class="text-muted fw-light">{{ t('col_name') }}</th>
+            <th class="text-muted fw-light">{{ t('col_lastname') }}</th>
+            <th class="text-muted fw-light">{{ t('col_class') }}</th>
+            <th class="text-muted fw-light">{{ t('col_score') }}</th>
+            <th class="text-muted fw-light">{{ t('col_delivered') }}</th>
             <th></th>
           </tr>
         </thead>
@@ -40,14 +41,14 @@
             <td>{{ assignment.studentLastName }}</td>
             <td>
               <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-medium px-2 py-1 small">
-                {{ assignment.className || 'Nessuna classe' }}
+                {{ assignment.className || t('no_class') }}
               </span>
             </td>
             <td>
               @if(assignment.status === 'not-started') {
-              <span class="text-muted">Non iniziato</span>
+              <span class="text-muted">{{ t('not_started') }}</span>
               } @else if(assignment.score == null) {
-              <span class="text-warning fw-bold">da correggere</span>
+              <span class="text-warning fw-bold">{{ t('to_correct') }}</span>
               } @else {
               <span
                 >{{ assignment.score }} / {{ assignment.maxScore ?? "100"
@@ -64,7 +65,7 @@
               @if(assignment._id) {
               <app-syllex-button
                 [props]="{
-                  label: assignment.status !== 'reviewed' ? 'Correggi' : 'Visualizza',
+                  label: assignment.status !== 'reviewed' ? t('btn_correct') : t('btn_view'),
                   variant: assignment.status !== 'reviewed' ? 'secondary' : 'primary',
                   size: 'small',
                   link: '/t/correzione/' + assignment._id
@@ -90,8 +91,9 @@
     } @else {
     <div class="d-flex flex-column align-items-center gap-3 py-5">
       <fa-icon [icon]="fileIcon" class="text-muted" size="4x"></fa-icon>
-      <p class="text-muted fs-5 mb-0">Nessuna consegna trovata</p>
+      <p class="text-muted fs-5 mb-0">{{ t('no_data') }}</p>
     </div>
     }
   </div>
 </div>
+</ng-container>

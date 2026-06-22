@@ -2,12 +2,14 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEnvelope, faUserCircle, faGraduationCap, faCheckCircle, faFileAlt } from '@fortawesome/free-solid-svg-icons';
+import { TranslocoDirective, TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-student-info',
   standalone: true,
-  imports: [CommonModule, FontAwesomeModule],
+  imports: [CommonModule, FontAwesomeModule, TranslocoDirective, TranslocoPipe],
   template: `
+    <ng-container *transloco="let t; read: 'student_detail'">
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
       <div class="card-body p-4 text-center">
         <div class="mb-3">
@@ -27,7 +29,7 @@ import { faEnvelope, faUserCircle, faGraduationCap, faCheckCircle, faFileAlt } f
                 <fa-icon [icon]="icons.faGraduationCap" class="text-primary"></fa-icon>
               </div>
               <div class="fw-bold fs-3 text-dark">{{ stats.avgScore }}%</div>
-              <div class="text-muted x-small-text text-uppercase fw-semibold">Media Voti</div>
+              <div class="text-muted x-small-text text-uppercase fw-semibold">{{ t('avg_score') }}</div>
             </div>
           </div>
           <!-- Completed Tests -->
@@ -37,12 +39,13 @@ import { faEnvelope, faUserCircle, faGraduationCap, faCheckCircle, faFileAlt } f
                 <fa-icon [icon]="icons.faCheckCircle" class="text-dark-green"></fa-icon>
               </div>
               <div class="fw-bold fs-3 text-dark">{{ stats.completedTests }}</div>
-              <div class="text-muted x-small-text text-uppercase fw-semibold">Test Fatti</div>
+              <div class="text-muted x-small-text text-uppercase fw-semibold">{{ t('tests_done') }}</div>
             </div>
           </div>
         </div>
       </div>
     </div>
+    </ng-container>
   `,
   styleUrl: './student-info.scss'
 })

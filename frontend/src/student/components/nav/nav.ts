@@ -16,16 +16,17 @@ import {
   faXmark,
 } from '@fortawesome/pro-solid-svg-icons';
 import { Auth } from '../../../services/auth';
+import { TranslocoDirective } from '@jsverse/transloco';
 
 export interface NavRoute {
-  label: string;
+  labelKey: string;
   icon: IconDefinition;
   route: string;
 }
 
 @Component({
   selector: 'app-nav',
-  imports: [FontAwesomeModule, RouterModule],
+  imports: [FontAwesomeModule, RouterModule, TranslocoDirective],
   templateUrl: './nav.html',
   styleUrl: './nav.scss',
 })
@@ -39,16 +40,16 @@ export class Nav {
   menuOpen = signal(false);
 
   routes: NavRoute[] = [
-    { label: 'Dashboard', icon: faHouse, route: '/s/dashboard' },
+    { labelKey: 'dashboard', icon: faHouse, route: '/s/dashboard' },
     {
-      label: 'Comunicazioni ed eventi',
+      labelKey: 'communications',
       icon: faCalendar,
       route: '/s/comunicazioni',
     },
-    { label: 'File e risorse', icon: faFile, route: '/s/risorse' },
-    { label: 'Test', icon: faFileLines, route: '/s/tests' },
-    { label: 'Agenti', icon: faRobot, route: '/s/agente' },
-    { label: 'Profilo', icon: faUser, route: '/s/profilo' },
+    { labelKey: 'resources', icon: faFile, route: '/s/risorse' },
+    { labelKey: 'tests', icon: faFileLines, route: '/s/tests' },
+    { labelKey: 'agents', icon: faRobot, route: '/s/agente' },
+    { labelKey: 'profile', icon: faUser, route: '/s/profilo' },
   ];
 
   toggleMenu(): void {

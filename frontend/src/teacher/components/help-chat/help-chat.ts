@@ -11,10 +11,14 @@ import {
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { FormsModule } from '@angular/forms';
 import { faTimes } from '@fortawesome/pro-solid-svg-icons';
-import { faPaperPlane, faChevronRight } from '@fortawesome/pro-regular-svg-icons';
+import {
+  faPaperPlane,
+  faChevronRight,
+} from '@fortawesome/pro-regular-svg-icons';
 import { Auth } from '../../../services/auth';
 import { HelpChat as HelpChatService } from '../../../services/help-chat';
 import { Router } from '@angular/router';
+import { TranslocoDirective } from '@jsverse/transloco';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -32,7 +36,8 @@ const TTL_MS = 24 * 60 * 60 * 1000;
 
 @Component({
   selector: 'app-help-chat',
-  imports: [FontAwesomeModule, FormsModule],
+  standalone: true,
+  imports: [FontAwesomeModule, FormsModule, TranslocoDirective],
   templateUrl: './help-chat.html',
   styleUrl: './help-chat.scss',
 })
@@ -136,7 +141,11 @@ export class HelpChat implements OnInit {
     }
 
     // Aggiungi messaggio utente
-    const userMsg: ChatMessage = { role: 'user', content: text, timestamp: Date.now() };
+    const userMsg: ChatMessage = {
+      role: 'user',
+      content: text,
+      timestamp: Date.now(),
+    };
     this.messages.update((msgs) => [...msgs, userMsg]);
     this.currentMessage = '';
     this.isSending.set(true);
@@ -145,9 +154,9 @@ export class HelpChat implements OnInit {
     // Mapping storia per il backend
     const history = this.messages()
       .slice(-15)
-      .map(m => ({
+      .map((m) => ({
         role: m.role === 'assistant' ? 'agent' : 'user',
-        content: m.content
+        content: m.content,
       }));
 
     // Passiamo anche la rotta corrente
@@ -157,7 +166,7 @@ export class HelpChat implements OnInit {
           role: 'assistant',
           content: res.data.content,
           suggestedAction: res.data.suggestedAction,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         };
         this.messages.update((msgs) => [...msgs, assistantMsg]);
         this.isSending.set(false);
@@ -171,12 +180,15 @@ export class HelpChat implements OnInit {
         console.error('Errore chat assistenza:', err);
         const errorMsg: ChatMessage = {
           role: 'assistant',
-          content: 'Scusa, si è verificato un errore tecnico. Riprova più tardi.',
-          timestamp: Date.now()
+          content:
+            localStorage.getItem('syllex-language') === 'en'
+              ? 'Sorry, a technical error occurred. Please try again later.'
+              : 'Scusa, si è verificato un errore tecnico. Riprova più tardi.',
+          timestamp: Date.now(),
         };
         this.messages.update((msgs) => [...msgs, errorMsg]);
         this.isSending.set(false);
-      }
+      },
     });
   }
 

@@ -1,67 +1,84 @@
-<div class="d-flex flex-row align-items-center mb-4">
-  <div>
-    <h1 class="text-dark fw-medium mb-2 display-6">Comunicazioni ed eventi</h1>
-    <h5 class="text-dark mb-0 fw-normal">
-      Tieniti sempre aggiornato con i messaggi dei docenti e le scadenze didattiche
-    </h5>
-  </div>
-</div>
-
-<section class="d-flex flex-row mb-4 gap-3">
-  <select
-    class="form-select custom-input filter"
-    style="max-width: 280px"
-    [value]="SelectedSubject()"
-    (change)="onSubjectChange($any($event.target).value)"
-  >
-    <option value="">Tutte le materie</option>
-    @for (subject of Subjects(); track subject._id) {
-    <option [value]="subject._id">{{ subject.name }}</option>
-    }
-  </select>
-</section>
-
-<!-- SEZIONE COMUNICAZIONI RECENTI (CAROUSEL) -->
-@if (Comunicazioni().length === 0) {
-<div class="mb-5">
-  <div class="alert alert-light border shadow-sm p-4 text-center rounded-4">
-    <fa-icon [icon]="EnvelopeIcon" class="text-primary fs-3 mb-2 d-block"></fa-icon>
-    <p class="mb-0 text-muted">Nessuna comunicazione recente disponibile.</p>
-  </div>
-</div>
-} @else {
-<div class="com-wrapper mb-5">
-  <div class="mb-3 text-white flex-shrink-0 px-2 d-flex align-items-center gap-2">
-    <fa-icon [icon]="EnvelopeIcon" class="fs-5 text-info"></fa-icon>
-    <h3 class="fs-4 fw-semibold mb-0 text-white">Comunicazioni recenti</h3>
-  </div>
-  <div
-    class="com-scroll"
-    (wheel)="onComScroll($event)"
-    (mousedown)="onDragStart($event)"
-    (mousemove)="onDragMove($event)"
-    (mouseup)="onDragEnd($event)"
-    (mouseleave)="onDragEnd($event)"
-  >
-    @for (com of Comunicazioni(); track com._id) {
-    <div class="com-item">
-      <div app-student-comunicazione-card [comunicazione]="com" class="h-100"></div>
+<ng-container *transloco="let t; read: 'student_comunicazioni'">
+  <div class="d-flex flex-row align-items-center mb-4">
+    <div>
+      <h1 class="text-dark fw-medium mb-2 display-6">
+        {{ t('header_title') }}
+      </h1>
+      <h5 class="text-dark mb-0 fw-normal">{{ t('header_desc') }}</h5>
     </div>
-    }
   </div>
-</div>
-}
 
-<!-- SEZIONE CALENDARIO -->
-<section class="calendar-section pb-4">
-  <div class="mb-4">
-    <h3 class="fs-4 fw-semibold text-dark mb-1">Calendario didattico</h3>
-    <p class="text-muted small">Esplora test ed eventi pianificati per le tue materie</p>
+  <section class="d-flex flex-row mb-4 gap-3">
+    <select
+      class="form-select custom-input filter"
+      style="max-width: 280px"
+      [value]="SelectedSubject()"
+      (change)="onSubjectChange($any($event.target).value)"
+    >
+      <option value="">{{ t('all_subjects') }}</option>
+      @for (subject of Subjects(); track subject._id) {
+      <option [value]="subject._id">{{ subject.name }}</option>
+      }
+    </select>
+  </section>
+
+  <!-- SEZIONE COMUNICAZIONI RECENTI (CAROUSEL) -->
+  @if (Comunicazioni().length === 0) {
+  <div class="mb-5">
+    <div class="alert alert-light border shadow-sm p-4 text-center rounded-4">
+      <fa-icon
+        [icon]="EnvelopeIcon"
+        class="text-primary fs-3 mb-2 d-block"
+      ></fa-icon>
+      <p class="mb-0 text-muted">
+        {{ t('no_recent_communications_available') }}
+      </p>
+    </div>
   </div>
-  <app-calendario
-    [showHeadings]="false"
-    [readonly]="true"
-    [studentMode]="true"
-    [subjectFilter]="SelectedSubject()"
-  ></app-calendario>
-</section>
+  } @else {
+  <div class="com-wrapper mb-5">
+    <div
+      class="mb-3 text-white flex-shrink-0 px-2 d-flex align-items-center gap-2"
+    >
+      <fa-icon [icon]="EnvelopeIcon" class="fs-5 text-info"></fa-icon>
+      <h3 class="fs-4 fw-semibold mb-0 text-white">
+        {{ t('recent_communications') }}
+      </h3>
+    </div>
+    <div
+      class="com-scroll"
+      (wheel)="onComScroll($event)"
+      (mousedown)="onDragStart($event)"
+      (mousemove)="onDragMove($event)"
+      (mouseup)="onDragEnd($event)"
+      (mouseleave)="onDragEnd($event)"
+    >
+      @for (com of Comunicazioni(); track com._id) {
+      <div class="com-item">
+        <div
+          app-student-comunicazione-card
+          [comunicazione]="com"
+          class="h-100"
+        ></div>
+      </div>
+      }
+    </div>
+  </div>
+  }
+
+  <!-- SEZIONE CALENDARIO -->
+  <section class="calendar-section pb-4">
+    <div class="mb-4">
+      <h3 class="fs-4 fw-semibold text-dark mb-1">
+        {{ t('didactic_calendar') }}
+      </h3>
+      <p class="text-muted small">{{ t('calendar_desc') }}</p>
+    </div>
+    <app-calendario
+      [showHeadings]="false"
+      [readonly]="true"
+      [studentMode]="true"
+      [subjectFilter]="SelectedSubject()"
+    ></app-calendario>
+  </section>
+</ng-container>

@@ -1,10 +1,11 @@
+<ng-container *transloco="let t; read: 'banca'">
 <app-syllex-page-header
-  [title]="'Banca Domande'"
-  [description]="'Qui puoi trovare tutte le domande con cui comporre i test di ' + (materiaService.materiaSelected()?.name || '') + '.'"
+  [title]="t('header_title')"
+  [description]="t('header_desc', { subject: materiaService.materiaSelected()?.name || '' })"
 >
   <app-syllex-button
     [props]="{
-          label: 'Crea Domanda',
+          label: t('btn_create'),
           variant: 'secondary',
           size: 'medium'
         }"
@@ -42,10 +43,10 @@
 @if (Questions().length === 0) {
   <div class="mt-5 mb-5">
     <app-syllex-empty-state
-      title="La tua banca domande è vuota"
-      description="Inizia a creare domande personalizzate per i tuoi test o lascia che l'AI di Syllex ne generi una serie a partire dai tuoi materiali in pochi secondi."
+      [title]="t('empty.title')"
+      [description]="t('empty.desc')"
       [icon]="QuestionIcon"
-      actionLabel="Crea o Genera Domanda"
+      [actionLabel]="t('empty.action')"
       actionLink="/t/create-question"
       [actionIcon]="PlusIcon"
     ></app-syllex-empty-state>
@@ -86,3 +87,4 @@
   />
 </div>
 }
+</ng-container>

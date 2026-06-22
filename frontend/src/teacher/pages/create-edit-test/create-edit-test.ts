@@ -35,6 +35,7 @@ import { SearchQuestions } from '../../components/search-questions/search-questi
 import { ClassSelector } from '../../components/class-selector/class-selector';
 import { ClassiService } from '../../../services/classi-service';
 import { GenAiContents } from '../../components/gen-ai-contents/gen-ai-contents';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { Materia } from '../../../services/materia';
 import { TestsService, TestInterface } from '../../../services/tests-service';
@@ -66,6 +67,8 @@ import { SyllexStepper } from '../../components/UI/syllex-stepper/syllex-stepper
     SyllexButton,
     SyllexBadge,
     SyllexStepper,
+    TranslocoDirective,
+    TranslocoPipe,
   ],
   templateUrl: './create-edit-test.html',
   styleUrl: './create-edit-test.scss',
@@ -82,6 +85,7 @@ export class CreateEditTest implements OnInit {
   private readonly feedbackService = inject(FeedbackService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly modalService = inject(NgbModal);
+  private readonly translocoService = inject(TranslocoService);
 
   // Icons
   readonly InfinityIcon = faInfinity;
@@ -130,26 +134,26 @@ export class CreateEditTest implements OnInit {
   >(undefined);
   readonly PreloadedQuestions = signal<QuestionInterface[]>([]);
   private readonly FormChanged = signal<number>(0);
-  readonly StepDefs = [
-    { n: 1, label: 'Configura' },
-    { n: 2, label: 'Domande' },
-    { n: 3, label: 'Finalizza' },
-  ] as const;
+  readonly StepDefs = computed(() => [
+    { n: 1, label: this.translocoService.translate('create_edit_test.step_1') },
+    { n: 2, label: this.translocoService.translate('create_edit_test.step_2') },
+    { n: 3, label: this.translocoService.translate('create_edit_test.step_3') },
+  ]);
 
   // Computed
   readonly IsEditMode = computed(() => !!this.TestId());
   readonly PageTitle = computed(() =>
-    this.IsEditMode() ? 'Modifica Test di valutazione' : 'Crea test',
+    this.IsEditMode() ? this.translocoService.translate('create_edit_test.title_edit') : this.translocoService.translate('create_edit_test.title_create'),
   );
   readonly HeaderDescription = computed(() => {
     const step = this.CurrentStep();
     if (step === 1) {
-      return 'Step 1 di 3 - Imposta titolo, date e classi del test.';
+      return this.translocoService.translate('create_edit_test.desc_step_1');
     }
     if (step === 2) {
-      return 'Step 2 di 3 - Seleziona le domande dalla banca.';
+      return this.translocoService.translate('create_edit_test.desc_step_2');
     }
-    return 'Step 3 di 3 - Finalizza regole e pubblicazione.';
+    return this.translocoService.translate('create_edit_test.desc_step_3');
   });
 
   readonly TestForm: FormGroup = new FormGroup({
@@ -205,7 +209,7 @@ export class CreateEditTest implements OnInit {
         error: (error) => {
           console.error('Error loading test:', error);
           this.feedbackService.showFeedback(
-            'Impossibile caricare il test',
+            this.translocoService.translate('create_edit_test.err_load'),
             false,
           );
           this.router.navigate(['/t/tests']);
@@ -291,16 +295,16 @@ export class CreateEditTest implements OnInit {
     this.FormChanged();
     const form = this.TestForm.value;
     const blockers: string[] = [];
-    if (!form.title) blockers.push('Inserisci un titolo');
-    if (!form.availableFrom) blockers.push('Imposta la data di inizio');
-    if (!form.classes?.length) blockers.push('Assegna almeno una classe');
+    if (!form.title) blockers.push(this.translocoService.translate('create_edit_test.err_title'));
+    if (!form.availableFrom) blockers.push(this.translocoService.translate('create_edit_test.err_date'));
+    if (!form.classes?.length) blockers.push(this.translocoService.translate('create_edit_test.err_class'));
     if (!this.SelectedQuestionIds().length)
-      blockers.push('Seleziona almeno una domanda');
+      blockers.push(this.translocoService.translate('create_edit_test.err_question'));
     if (!form.requiredScore || form.requiredScore <= 0)
-      blockers.push('Imposta un punteggio di idoneità');
+      blockers.push(this.translocoService.translate('create_edit_test.err_score'));
     if (form.requiredScore > this.maxScore)
       blockers.push(
-        `Punteggio idoneità (${form.requiredScore}) maggiore del massimo (${this.maxScore})`,
+        this.translocoService.translate('create_edit_test.err_score_max', { score: form.requiredScore, max: this.maxScore }),
       );
     return blockers;
   });
@@ -317,9 +321,9 @@ export class CreateEditTest implements OnInit {
     const form = this.TestForm.value;
     const blockers: string[] = [];
 
-    if (!form.title) blockers.push('Inserisci un titolo');
-    if (!form.availableFrom) blockers.push('Imposta la data di inizio');
-    if (!form.classes?.length) blockers.push('Assegna almeno una classe');
+    if (!form.title) blockers.push(this.translocoService.translate('create_edit_test.err_title'));
+    if (!form.availableFrom) blockers.push(this.translocoService.translate('create_edit_test.err_date'));
+    if (!form.classes?.length) blockers.push(this.translocoService.translate('create_edit_test.err_class'));
 
     return blockers;
   });
@@ -416,20 +420,20 @@ export class CreateEditTest implements OnInit {
     const start = this.TestForm.get('availableFrom')?.value;
     const end = this.TestForm.get('availableTo')?.value;
 
-    if (!start && !end) return 'Non impostata';
+    if (!start && !end) return this.translocoService.translate('create_edit_test.not_set');
     if (start && end) {
       return `${this.formatDateLabel(start)} - ${this.formatDateLabel(end)}`;
     }
-    if (start) return `Da ${this.formatDateLabel(start)}`;
-    return `Fino a ${this.formatDateLabel(end)}`;
+    if (start) return `${this.translocoService.translate('create_edit_test.from')} ${this.formatDateLabel(start)}`;
+    return `${this.translocoService.translate('create_edit_test.to')} ${this.formatDateLabel(end)}`;
   }
 
   getTimeSummary(): string {
     const value = this.TestForm.get('time')?.value;
     if (value === null || value === undefined || value === '' || value <= 0) {
-      return 'Illimitato';
+      return this.translocoService.translate('create_edit_test.unlimited');
     }
-    return `${value} min`;
+    return `${value} ${this.translocoService.translate('create_edit_test.min')}`;
   }
 
   private formatDateLabel(value: string): string {
@@ -461,7 +465,7 @@ export class CreateEditTest implements OnInit {
   onSaveTest(asDraft: boolean = false): void {
     const selectedSubject = this.materiaService.materiaSelected();
     if (!selectedSubject) {
-      this.feedbackService.showFeedback('Seleziona una materia', false);
+      this.feedbackService.showFeedback(this.translocoService.translate('create_edit_test.err_subject'), false);
       return;
     }
 
@@ -474,15 +478,15 @@ export class CreateEditTest implements OnInit {
     request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         const message = this.IsEditMode()
-          ? 'Test aggiornato con successo!'
-          : 'Test creato con successo!';
+          ? this.translocoService.translate('create_edit_test.success_edit')
+          : this.translocoService.translate('create_edit_test.success_create');
         this.feedbackService.showFeedback(message, true);
         this.router.navigate(['/t/tests']);
       },
       error: (error) => {
         console.error('Error saving test:', error);
         this.feedbackService.showFeedback(
-          'Errore durante il salvataggio del test',
+          this.translocoService.translate('create_edit_test.err_save'),
           false,
         );
         this.IsLoading.set(false);
@@ -575,7 +579,7 @@ export class CreateEditTest implements OnInit {
         },
         error: () => {
           this.feedbackService.showFeedback(
-            "Errore nel caricamento dell'anteprima",
+            this.translocoService.translate('create_edit_test.err_preview'),
             false,
           );
           this.IsLoading.set(false);

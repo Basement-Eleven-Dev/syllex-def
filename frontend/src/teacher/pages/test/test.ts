@@ -19,6 +19,7 @@ import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
 import { SyllexSearchInput } from '../../components/UI/syllex-search-input/syllex-search-input';
 import { SyllexTabFilter } from '../../components/UI/syllex-tab-filter/syllex-tab-filter';
 import { SyllexEmptyState } from '../../components/UI/syllex-empty-state/syllex-empty-state';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 type TestStatus = 'bozza' | 'pubblicato' | 'archiviato' | '';
 type TestTab = 'tutti' | 'da-correggere' | 'bozze';
@@ -39,6 +40,8 @@ type TestTab = 'tutti' | 'da-correggere' | 'bozze';
     SyllexSearchInput,
     SyllexTabFilter,
     SyllexEmptyState,
+    TranslocoDirective,
+    TranslocoPipe,
   ],
   templateUrl: './test.html',
   styleUrl: './test.scss',
@@ -50,20 +53,26 @@ export class Test implements OnDestroy {
   protected readonly ClipboardListIcon = faClipboardList;
   protected readonly CircleCheckIcon = faCircleCheck;
 
-  protected readonly statusOptions = [
-    { value: 'bozza', label: 'Bozza' },
-    { value: 'pubblicato', label: 'Pubblicato' },
-    { value: 'archiviato', label: 'Archiviato' },
-  ];
-
-  protected readonly tabOptions = [
-    { value: 'tutti', label: 'Tutti' },
-    { value: 'da-correggere', label: 'Da correggere' },
-    { value: 'bozze', label: 'Bozze' },
-  ];
   // Dependency Injection
   private testsService = inject(TestsService);
   private feedbackService = inject(FeedbackService);
+  private readonly translocoService = inject(TranslocoService);
+
+  get statusOptions() {
+    return [
+      { value: 'bozza', label: this.translocoService.translate('test.status.bozza') },
+      { value: 'pubblicato', label: this.translocoService.translate('test.status.pubblicato') },
+      { value: 'archiviato', label: this.translocoService.translate('test.status.archiviato') },
+    ];
+  }
+
+  get tabOptions() {
+    return [
+      { value: 'tutti', label: this.translocoService.translate('test.tabs.tutti') },
+      { value: 'da-correggere', label: this.translocoService.translate('test.tabs.da_correggere') },
+      { value: 'bozze', label: this.translocoService.translate('test.tabs.bozze') },
+    ];
+  }
 
   // Shared filters
   SearchTerm = signal<string>('');
@@ -244,12 +253,12 @@ export class Test implements OnDestroy {
           );
           this.CollectionSizePending.update((size) => size - 1);
         }
-        this.feedbackService.showFeedback('Test eliminato con successo', true);
+        this.feedbackService.showFeedback(this.translocoService.translate('test.feedback.delete_success'), true);
       },
       error: (err: Error) => {
         console.error('Errore durante la cancellazione del test:', err);
         this.feedbackService.showFeedback(
-          'Errore durante la cancellazione del test',
+          this.translocoService.translate('test.feedback.delete_error'),
           false,
         );
       },
@@ -261,12 +270,12 @@ export class Test implements OnDestroy {
       next: (response) => {
         this.RecentTests.update((tests) => [response.test, ...tests]);
         this.CollectionSizeRecent.update((size) => size + 1);
-        this.feedbackService.showFeedback('Test duplicato con successo', true);
+        this.feedbackService.showFeedback(this.translocoService.translate('test.feedback.duplicate_success'), true);
       },
       error: (err: Error) => {
         console.error('Errore durante la duplicazione del test:', err);
         this.feedbackService.showFeedback(
-          'Errore durante la duplicazione del test',
+          this.translocoService.translate('test.feedback.duplicate_error'),
           false,
         );
       },
@@ -282,12 +291,12 @@ export class Test implements OnDestroy {
           );
         this.RecentTests.update(updater);
         this.PendingTests.update(updater);
-        this.feedbackService.showFeedback('Test pubblicato con successo', true);
+        this.feedbackService.showFeedback(this.translocoService.translate('test.feedback.publish_success'), true);
       },
       error: (err: Error) => {
         console.error('Errore durante la pubblicazione del test:', err);
         this.feedbackService.showFeedback(
-          'Errore durante la pubblicazione del test',
+          this.translocoService.translate('test.feedback.publish_error'),
           false,
         );
       },

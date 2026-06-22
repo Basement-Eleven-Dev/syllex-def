@@ -1,101 +1,104 @@
-<div
-  id="chat"
-  role="dialog"
-  aria-label="Assistente Syllex"
-  [class.open]="chatVisible()"
-  [attr.aria-hidden]="!chatVisible()"
-  class="d-flex flex-column"
->
-  <!-- Header -->
-  <div class="chat-header d-flex align-items-center justify-content-between px-4 py-3">
-    <div class="d-flex align-items-center gap-3">
-      <div class="chat-header__avatar">
-        <img src="/images/logotipo.svg" alt="Syllex" height="18" />
-      </div>
-      <div>
-        <p class="chat-header__name mb-0">Assistente Syllex</p>
-        <p class="chat-header__sub mb-0">Supporto alla piattaforma</p>
-      </div>
-    </div>
-    <a
-      class="chat-close-btn"
-      (click)="closeChat()"
-      aria-label="Chiudi chat"
-      title="Chiudi"
-      role="button"
+<ng-container *transloco="let t; read: 'help_chat'">
+  <div
+    id="chat"
+    role="dialog"
+    [attr.aria-label]="t('header_title')"
+    [class.open]="chatVisible()"
+    [attr.aria-hidden]="!chatVisible()"
+    class="d-flex flex-column"
+  >
+    <!-- Header -->
+    <div
+      class="chat-header d-flex align-items-center justify-content-between px-4 py-3"
     >
-      <fa-icon [icon]="timesIcon"></fa-icon>
-    </a>
-  </div>
+      <div class="d-flex align-items-center gap-3">
+        <div class="chat-header__avatar">
+          <img src="/images/logotipo.svg" alt="Syllex" height="18" />
+        </div>
+        <div>
+          <p class="chat-header__name mb-0">{{ t('header_title') }}</p>
+          <p class="chat-header__sub mb-0">{{ t('header_subtitle') }}</p>
+        </div>
+      </div>
+      <a
+        class="chat-close-btn"
+        (click)="closeChat()"
+        [attr.aria-label]="t('close_chat') || 'Chiudi'"
+        [title]="t('close_chat') || 'Chiudi'"
+        role="button"
+      >
+        <fa-icon [icon]="timesIcon"></fa-icon>
+      </a>
+    </div>
 
-  <!-- Body -->
-  <div class="flex-fill position-relative overflow-hidden">
-    <div class="chat-body px-4 py-3">
-      @if (messages().length === 0) {
+    <!-- Body -->
+    <div class="flex-fill position-relative overflow-hidden">
+      <div class="chat-body px-4 py-3">
+        @if (messages().length === 0) {
         <div class="empty-state">
           <div class="empty-state__orb mb-4">
             <img src="/images/logo_primary.png" alt="" height="28" />
           </div>
-          <p class="empty-state__greeting mb-1">Ciao {{ userName }}!</p>
-          <p class="empty-state__sub">In questa sezione posso aiutarti ad usare Syllex. Di cosa hai bisogno?</p>
+          <p class="empty-state__greeting mb-1">
+            {{ t('welcome_greeting', { name: userName }) }}
+          </p>
+          <p class="empty-state__sub">{{ t('welcome_desc') }}</p>
         </div>
-      } @else {
-        @for (msg of messages(); track $index) {
-          <div
-            class="message mb-3"
-            [class.user]="msg.role === 'user'"
-            [class.assistant]="msg.role === 'assistant'"
-          >
-            <span
-              class="message-bubble py-2 px-3"
-              [innerHTML]="msg.content"
-            ></span>
-            @if (msg.role === 'assistant' && msg.suggestedAction) {
-              <div class="mt-2 text-start">
-                <button
-                  class="suggested-action-btn d-inline-flex align-items-center gap-2"
-                  (click)="navigateToAction(msg.suggestedAction.path)"
-                >
-                  <fa-icon [icon]="actionIcon"></fa-icon>
-                  <span>{{ msg.suggestedAction.label }}</span>
-                </button>
-              </div>
-            }
+        } @else { @for (msg of messages(); track $index) {
+        <div
+          class="message mb-3"
+          [class.user]="msg.role === 'user'"
+          [class.assistant]="msg.role === 'assistant'"
+        >
+          <span
+            class="message-bubble py-2 px-3"
+            [innerHTML]="msg.content"
+          ></span>
+          @if (msg.role === 'assistant' && msg.suggestedAction) {
+          <div class="mt-2 text-start">
+            <button
+              class="suggested-action-btn d-inline-flex align-items-center gap-2"
+              (click)="navigateToAction(msg.suggestedAction.path)"
+            >
+              <fa-icon [icon]="actionIcon"></fa-icon>
+              <span>{{ msg.suggestedAction.label }}</span>
+            </button>
           </div>
-        }
-      }
-      @if (isSending()) {
+          }
+        </div>
+        } } @if (isSending()) {
         <div class="message assistant mb-3">
           <span class="message-bubble typing-indicator py-2 px-3">
             <span></span><span></span><span></span>
           </span>
         </div>
-      }
-      <div #chatBottom></div>
+        }
+        <div #chatBottom></div>
+      </div>
     </div>
-  </div>
 
-  <!-- Input area -->
-  <div class="chat-input px-3 py-3">
-    <div class="chat-input__row d-flex align-items-center gap-2">
-      <input
-        type="text"
-        class="chat-input__field form-control"
-        placeholder="Scrivi un messaggio…"
-        [(ngModel)]="currentMessage"
-        (keydown.enter)="sendMessage()"
-        [disabled]="isSending()"
-        aria-label="Messaggio"
-      />
-      <button
-        class="chat-input__send"
-        type="button"
-        (click)="sendMessage()"
-        [disabled]="!currentMessage.trim() || isSending()"
-        aria-label="Invia messaggio"
-      >
-        <fa-icon [icon]="sendIcon"></fa-icon>
-      </button>
+    <!-- Input area -->
+    <div class="chat-input px-3 py-3">
+      <div class="chat-input__row d-flex align-items-center gap-2">
+        <input
+          type="text"
+          class="chat-input__field form-control"
+          [placeholder]="t('write_placeholder')"
+          [(ngModel)]="currentMessage"
+          (keydown.enter)="sendMessage()"
+          [disabled]="isSending()"
+          [attr.aria-label]="t('write_placeholder')"
+        />
+        <button
+          class="chat-input__send"
+          type="button"
+          (click)="sendMessage()"
+          [disabled]="!currentMessage.trim() || isSending()"
+          [attr.aria-label]="t('send_label') || 'Invia'"
+        >
+          <fa-icon [icon]="sendIcon"></fa-icon>
+        </button>
+      </div>
     </div>
   </div>
-</div>
+</ng-container>

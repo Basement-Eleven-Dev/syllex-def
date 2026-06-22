@@ -2,16 +2,25 @@ import { Component, computed, effect, inject, signal } from '@angular/core';
 import { Calendario } from '../../../teacher/components/calendario/calendario';
 import { Materia } from '../../../services/materia';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faEnvelopeOpenText, faChevronRight } from '@fortawesome/pro-solid-svg-icons';
+import {
+  faEnvelopeOpenText,
+  faChevronRight,
+} from '@fortawesome/pro-solid-svg-icons';
 import { StudentComunicazioneCard } from '../../components/student-comunicazione-card/student-comunicazione-card';
 import {
   ComunicazioneInterface,
   ComunicazioniService,
 } from '../../../services/comunicazioni-service';
+import { TranslocoDirective } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-student-comunicazioni',
-  imports: [Calendario, FontAwesomeModule, StudentComunicazioneCard],
+  imports: [
+    Calendario,
+    FontAwesomeModule,
+    StudentComunicazioneCard,
+    TranslocoDirective,
+  ],
   templateUrl: './student-comunicazioni.html',
   styleUrl: './student-comunicazioni.scss',
 })

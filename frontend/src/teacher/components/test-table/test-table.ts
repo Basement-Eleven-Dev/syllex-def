@@ -18,6 +18,7 @@ import { TestContextualMenu } from '../test-contextual-menu/test-contextual-menu
 import { RouterModule } from '@angular/router';
 import { ClassiService } from '../../../services/classi-service';
 import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
+import { TranslocoDirective, TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-test-table',
@@ -33,6 +34,8 @@ import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
     TestContextualMenu,
     RouterModule,
     SyllexButton,
+    TranslocoDirective,
+    TranslocoPipe,
   ],
   standalone: true,
   templateUrl: './test-table.html',

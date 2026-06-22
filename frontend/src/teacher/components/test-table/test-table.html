@@ -1,13 +1,14 @@
+<ng-container *transloco="let t; read: 'test_table'">
 <div class="table-responsive">
   <table class="table table-hover table-striped align-middle">
     <thead>
       <tr>
-        <th class="text-muted fw-light">Nome Test</th>
-        <th class="text-muted fw-light">Stato</th>
-        <th class="text-muted fw-light">Disponibilità</th>
-        <th class="text-muted fw-light">Domande</th>
-        <th class="text-muted fw-light">Classi Assegnate</th>
-        <th class="text-muted fw-light text-end">Azioni</th>
+        <th class="text-muted fw-light">{{ t('col_name') }}</th>
+        <th class="text-muted fw-light">{{ t('col_status') }}</th>
+        <th class="text-muted fw-light">{{ t('col_availability') }}</th>
+        <th class="text-muted fw-light">{{ t('col_questions') }}</th>
+        <th class="text-muted fw-light">{{ t('col_classes') }}</th>
+        <th class="text-muted fw-light text-end">{{ t('col_actions') }}</th>
       </tr>
     </thead>
     <tbody>
@@ -20,23 +21,23 @@
               class="d-flex flex-row align-items-center gap-1 text-nowrap corrections-label"
             >
               <fa-icon [icon]="BellIcon" class="bell-icon"></fa-icon>
-              <span>da correggere</span>
+              <span>{{ t('to_correct') }}</span>
             </div>
             }
           </div>
         </td>
         <td>
           <span [class]="'status-badge py-2 px-4 status-badge--' + test.status">
-            {{ test.status | titlecase }}
+            {{ ('test_card.status_' + test.status | transloco) | titlecase }}
           </span>
         </td>
         <td>
-          @if(test.availableFrom) { Dal {{ test.availableFrom | date: 'dd/MM/yy'
-          }} } @if(test.availableTo) { — Al {{ test.availableTo | date:
+          @if(test.availableFrom) { {{ t('from_cap') }} {{ test.availableFrom | date: 'dd/MM/yy'
+          }} } @if(test.availableTo) { — {{ t('to_cap') }} {{ test.availableTo | date:
           'dd/MM/yy' }} }
         </td>
         <td>
-          {{ test.questions?.length || 0 }} Domande - {{ getMaxScore(test) }}
+          {{ test.questions?.length || 0 }} {{ t('questions') }} - {{ getMaxScore(test) }}
           pt.
         </td>
         <td>
@@ -45,16 +46,16 @@
           classiService.getClassNameById(class) }}@if(!last &&
           test.classIds.length > 1){
           <span>, </span> } } @if(test.classIds.length > 2) {
-          <span> e altre {{ test.classIds.length - 2 }}</span>
+          <span>{{ t('and_other', {count: test.classIds.length - 2}) }}</span>
           } } @else {
-          <span>Nessuna classe assegnata</span>
+          <span>{{ t('no_class') }}</span>
           }
         </td>
         <td
           class="d-flex flex-row justify-content-end align-items-center gap-2"
         >
           <app-syllex-button
-            [props]="{ label: 'Visualizza', variant: 'primary', size: 'small', link: '/t/tests/' + test._id }"
+            [props]="{ label: t('view'), variant: 'primary', size: 'small', link: '/t/tests/' + test._id }"
           />
           <div
             ngbDropdown
@@ -66,7 +67,7 @@
               class="btn btn-outline-dark bg-white text-dark btn-sm actions-btn py-2 px-4"
               ngbDropdownToggle
             >
-              Azioni
+              {{ t('actions') }}
             </button>
             <div ngbDropdownMenu>
               <app-test-contextual-menu
@@ -83,3 +84,4 @@
     </tbody>
   </table>
 </div>
+</ng-container>

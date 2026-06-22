@@ -1,23 +1,29 @@
-<div class="d-flex flex-row align-items-center gap-2 text-white">
-  <span class="dot" style="background-color: var(--syllex-green);"></span>
-  <span class="text-white opacity-75">Studente</span>
-</div>
-<h5 class="fw-medium my-2 text-white">
-  {{ authService.user?.firstName }} {{ authService.user?.lastName }}
-</h5>
-<hr style="border-color: rgba(255, 255, 255, 0.1);" />
-<div routerLink="/s/profilo" (click)="onItemClick()" class="w-100 link rounded-syllex btn text-start text-white">
-  Profilo
-</div>
-<div
-  (click)="onReportBug(); onItemClick()"
-  class="w-100 mt-4 link rounded-syllex btn text-start text-white"
->
-  Segnala un bug
-</div>
-<div
-  class="w-100 link rounded-syllex btn text-start logout"
-  (click)="onLogout(); onItemClick()"
->
-  Logout
-</div>
+<ng-container *transloco="let t; read: 'user_menu'">
+  <div class="d-flex flex-row align-items-center gap-2 text-white">
+    <span class="dot" style="background-color: var(--syllex-green)"></span>
+    <span class="text-white opacity-75">{{ t('student') }}</span>
+  </div>
+  <h5 class="fw-medium my-2 text-white">
+    {{ authService.user?.firstName }} {{ authService.user?.lastName }}
+  </h5>
+  <hr style="border-color: rgba(255, 255, 255, 0.1)" />
+  <div
+    routerLink="/s/profilo"
+    (click)="onItemClick()"
+    class="w-100 link rounded-syllex btn text-start text-white"
+  >
+    {{ t('profile') }}
+  </div>
+  <div
+    (click)="onReportBug(); onItemClick()"
+    class="w-100 mt-4 link rounded-syllex btn text-start text-white"
+  >
+    {{ t('report_bug') }}
+  </div>
+  <div
+    class="w-100 link rounded-syllex btn text-start logout"
+    (click)="onLogout(); onItemClick()"
+  >
+    {{ t('logout') }}
+  </div>
+</ng-container>

@@ -23,6 +23,11 @@ import {
   KpiCardData,
   SyllexKpiRow,
 } from '../../components/UI/syllex-kpi-row/syllex-kpi-row';
+import {
+  TranslocoDirective,
+  TranslocoPipe,
+  TranslocoService,
+} from '@jsverse/transloco';
 
 @Component({
   selector: 'app-correzione',
@@ -35,6 +40,7 @@ import {
     QuestionCorrection,
     SyllexButton,
     SyllexKpiRow,
+    TranslocoDirective,
   ],
   templateUrl: './correzione.html',
   styleUrl: './correzione.scss',
@@ -44,6 +50,7 @@ export class Correzione implements OnInit {
   private readonly router = inject(Router);
   private readonly testsService = inject(TestsService);
   private readonly feedbackService = inject(FeedbackService);
+  private readonly translocoService = inject(TranslocoService);
 
   // State
   readonly data = signal<any | null>(null);
@@ -84,7 +91,7 @@ export class Correzione implements OnInit {
       },
       error: () => {
         this.feedbackService.showFeedback(
-          'Errore nel caricamento del compito',
+          this.translocoService.translate('correzione.err_load_backend'),
           false,
         );
         this.isLoading.set(false);
@@ -130,7 +137,7 @@ export class Correzione implements OnInit {
     this.testsService.saveCorrection(attemptId, payload).subscribe({
       next: () => {
         this.feedbackService.showFeedback(
-          'Correzione salvata con successo!',
+          this.translocoService.translate('correzione.success_save'),
           true,
         );
         this.router.navigate(['/t/tests']);
@@ -164,14 +171,14 @@ export class Correzione implements OnInit {
       next: (res) => {
         this.data.update((d) => (d ? { ...d, aiInsight: res.insight } : d));
         this.feedbackService.showFeedback(
-          'Feedback AI generato con successo!',
+          this.translocoService.translate('correzione.success_ai'),
           true,
         );
         this.isGeneratingInsight.set(false);
       },
       error: () => {
         this.feedbackService.showFeedback(
-          'Errore durante la generazione IA',
+          this.translocoService.translate('correzione.err_ai'),
           false,
         );
         this.isGeneratingInsight.set(false);
@@ -179,34 +186,34 @@ export class Correzione implements OnInit {
     });
   }
 
-  summaryKpis(d: any): KpiCardData[] {
+  summaryKpis(d: any, t: any): KpiCardData[] {
     const mins = Math.floor(d.timeSpent / 60);
     const secs = d.timeSpent % 60;
-    const time = `${mins}m ${secs}s`;
+    const time = t('time_format', { mins, secs });
     return [
       {
-        label: 'Risposte esatte',
+        label: t('kpi_correct'),
         value: d.questionsStats.correct,
         bgColor: '#E6FF80',
         textColor: '#1A5511',
       },
       {
-        label: 'Risposte errate',
+        label: t('kpi_wrong'),
         value: d.questionsStats.wrong,
         bgColor: '#FFD2D2',
         textColor: '#E51215',
       },
       {
-        label: 'Senza risposta',
+        label: t('kpi_empty'),
         value: d.questionsStats.empty,
         bgColor: '#E4E4E4',
         textColor: '#363636',
       },
       {
-        label: 'Punteggio',
+        label: t('kpi_score'),
         value: `${d.score != null ? d.score : '?'} / ${d.maxScore}`,
       },
-      { label: 'Tempo impiegato', value: time },
+      { label: t('kpi_time'), value: time },
     ];
   }
 }

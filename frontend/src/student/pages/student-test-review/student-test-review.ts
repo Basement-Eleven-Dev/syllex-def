@@ -31,11 +31,12 @@ import {
 } from '../../../services/student-tests.service';
 import { BackTo } from '../../../teacher/components/back-to/back-to';
 import { QuestionCard } from '../../../teacher/components/question-card/question-card';
+import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-student-test-review',
   standalone: true,
-  imports: [FontAwesomeModule, BackTo, QuestionCard],
+  imports: [FontAwesomeModule, BackTo, QuestionCard, TranslocoDirective],
   templateUrl: './student-test-review.html',
   styleUrl: './student-test-review.scss',
 })
@@ -43,6 +44,7 @@ export class StudentTestReview implements OnInit, AfterViewInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly testsService = inject(StudentTestsService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly translocoService = inject(TranslocoService);
 
   @ViewChild('viewport') viewportRef?: ElementRef<HTMLElement>;
 
@@ -81,15 +83,25 @@ export class StudentTestReview implements OnInit, AfterViewInit, OnDestroy {
     const status = this.Attempt()?.status;
     switch (status) {
       case 'in-progress':
-        return 'Incompleto';
+        return this.translocoService.translate(
+          'student_test_review.status_in_progress',
+        );
       case 'delivered':
-        return 'Consegnato';
+        return this.translocoService.translate(
+          'student_test_review.status_delivered',
+        );
       case 'reviewed':
         return this.IsAutoEvaluation()
-          ? "Corretto dall'AI di Syllex"
-          : 'Corretto dal docente';
+          ? this.translocoService.translate(
+              'student_test_review.status_reviewed_ai',
+            )
+          : this.translocoService.translate(
+              'student_test_review.status_reviewed_teacher',
+            );
       default:
-        return 'Sconosciuto';
+        return this.translocoService.translate(
+          'student_test_review.status_unknown',
+        );
     }
   });
 
@@ -137,7 +149,11 @@ export class StudentTestReview implements OnInit, AfterViewInit, OnDestroy {
   );
 
   readonly FeedbackLabel = computed(() =>
-    this.IsAutoEvaluation() ? "Commento dell'AI" : 'Commento del docente',
+    this.IsAutoEvaluation()
+      ? this.translocoService.translate('student_test_review.feedback_label_ai')
+      : this.translocoService.translate(
+          'student_test_review.feedback_label_teacher',
+        ),
   );
 
   ngOnInit(): void {
@@ -311,7 +327,9 @@ export class StudentTestReview implements OnInit, AfterViewInit, OnDestroy {
         next: (attempt) => {
           if (!attempt || attempt.status === 'in-progress') {
             this.Error.set(
-              'Nessun tentativo consegnato trovato per questo test.',
+              this.translocoService.translate(
+                'student_test_review.no_attempt_found',
+              ),
             );
           } else {
             this.Attempt.set(attempt);
@@ -320,7 +338,11 @@ export class StudentTestReview implements OnInit, AfterViewInit, OnDestroy {
           setTimeout(() => this._attachScrollListeners());
         },
         error: () => {
-          this.Error.set('Errore nel caricamento del tentativo.');
+          this.Error.set(
+            this.translocoService.translate(
+              'student_test_review.attempt_load_error',
+            ),
+          );
           this.IsLoading.set(false);
         },
       });

@@ -1,156 +1,160 @@
-<app-syllex-page-header
-  title="Test disponibili"
-  description="Qui trovi i test che puoi svolgere per le tue materie."
->
-  <app-syllex-button
-    class="auto-eval-btn"
-    [props]="{ label: 'Crea un test di autovalutazione', variant: 'primary', color: 'celestine', size: 'large', link: '/s/auto-evaluation/create', leftIcon: PlusIcon }"
-  />
-</app-syllex-page-header>
+<ng-container *transloco="let t; read: 'student_tests_list'">
+  <app-syllex-page-header
+    [title]="t('header_title')"
+    [description]="t('header_desc')"
+  >
+    <app-syllex-button
+      class="auto-eval-btn"
+      [props]="{ label: t('create_self_eval_btn'), variant: 'primary', color: 'celestine', size: 'large', link: '/s/auto-evaluation/create', leftIcon: PlusIcon }"
+    />
+  </app-syllex-page-header>
 
-<section
-  class="tests-filter-bar d-flex flex-row flex-wrap mb-5 gap-3 align-items-center"
->
-  <app-syllex-search-input
-    placeholder="Cerca test..."
-    [value]="SearchTerm()"
-    (valueChange)="onSearchTermChange($event)"
-    style="min-width: 260px; flex: 1 1 260px; max-width: 360px"
-  />
+  <section
+    class="tests-filter-bar d-flex flex-row flex-wrap mb-5 gap-3 align-items-center"
+  >
+    <app-syllex-search-input
+      [placeholder]="t('search_placeholder')"
+      [value]="SearchTerm()"
+      (valueChange)="onSearchTermChange($event)"
+      style="min-width: 260px; flex: 1 1 260px; max-width: 360px"
+    />
 
-  <app-syllex-select-input
-    placeholder="Tutte le materie"
-    [value]="SelectedSubject()"
-    [options]="SubjectOptions()"
-    (valueChange)="onSubjectChange($event)"
-    style="min-width: 180px; flex: 0 0 auto"
-  />
+    <app-syllex-select-input
+      [placeholder]="t('all_subjects')"
+      [value]="SelectedSubject()"
+      [options]="SubjectOptions()"
+      (valueChange)="onSubjectChange($event)"
+      style="min-width: 180px; flex: 0 0 auto"
+    />
 
-  <div class="d-flex align-items-center gap-4 flex-wrap">
-    <div
-      class="d-flex align-items-center gap-2 form-check form-switch cursor-pointer"
-      style="cursor: pointer"
-    >
-      <input
-        class="form-check-input student-switch"
-        type="checkbox"
-        role="switch"
-        id="switchAutoval"
-        [checked]="ShowOnlyAutoEval()"
-        (change)="toggleAutoEval()"
-        style="
-          width: 2.5rem;
-          height: 1.25rem;
-          cursor: pointer;
-          margin-top: 0;
-          margin-left: 0;
-        "
-      />
-      <label
-        class="form-check-label mb-0 text-white-50"
-        for="switchAutoval"
-        style="
-          font-size: 0.95rem;
-          cursor: pointer;
-          user-select: none;
-          padding-top: 1px;
-        "
+    <div class="d-flex align-items-center gap-4 flex-wrap">
+      <div
+        class="d-flex align-items-center gap-2 form-check form-switch cursor-pointer"
+        style="cursor: pointer"
       >
-        Solo autovalutazioni
-      </label>
-    </div>
+        <input
+          class="form-check-input student-switch"
+          type="checkbox"
+          role="switch"
+          id="switchAutoval"
+          [checked]="ShowOnlyAutoEval()"
+          (change)="toggleAutoEval()"
+          style="
+            width: 2.5rem;
+            height: 1.25rem;
+            cursor: pointer;
+            margin-top: 0;
+            margin-left: 0;
+          "
+        />
+        <label
+          class="form-check-label mb-0 text-white-50"
+          for="switchAutoval"
+          style="
+            font-size: 0.95rem;
+            cursor: pointer;
+            user-select: none;
+            padding-top: 1px;
+          "
+        >
+          {{ t('only_self_eval') }}
+        </label>
+      </div>
 
-    <div
-      class="d-flex align-items-center gap-2 form-check form-switch cursor-pointer"
-      style="cursor: pointer"
-    >
-      <input
-        class="form-check-input student-switch"
-        type="checkbox"
-        role="switch"
-        id="switchDaSvolgere"
-        [checked]="ShowOnlyPending()"
-        (change)="toggleDaFare()"
-        style="
-          width: 2.5rem;
-          height: 1.25rem;
-          cursor: pointer;
-          margin-top: 0;
-          margin-left: 0;
-        "
-      />
-      <label
-        class="form-check-label mb-0 text-white-50"
-        for="switchDaSvolgere"
-        style="
-          font-size: 0.95rem;
-          cursor: pointer;
-          user-select: none;
-          padding-top: 1px;
-        "
+      <div
+        class="d-flex align-items-center gap-2 form-check form-switch cursor-pointer"
+        style="cursor: pointer"
       >
-        Test da svolgere
-      </label>
+        <input
+          class="form-check-input student-switch"
+          type="checkbox"
+          role="switch"
+          id="switchDaSvolgere"
+          [checked]="ShowOnlyPending()"
+          (change)="toggleDaFare()"
+          style="
+            width: 2.5rem;
+            height: 1.25rem;
+            cursor: pointer;
+            margin-top: 0;
+            margin-left: 0;
+          "
+        />
+        <label
+          class="form-check-label mb-0 text-white-50"
+          for="switchDaSvolgere"
+          style="
+            font-size: 0.95rem;
+            cursor: pointer;
+            user-select: none;
+            padding-top: 1px;
+          "
+        >
+          {{ t('tests_to_do') }}
+        </label>
+      </div>
     </div>
+  </section>
+
+  @if (IsCheckingStatuses() && ShowOnlyPending()) {
+  <div class="d-flex justify-content-center align-items-center py-5 w-100">
+    <fa-icon
+      [icon]="SpinnerIcon"
+      [animation]="'spin'"
+      [size]="'2x'"
+      class="text-primary"
+    ></fa-icon>
   </div>
-</section>
+  } @else {
+  <div
+    class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-xl-3 g-4 mb-4"
+  >
+    @for (test of FilteredTests(); track test._id) {
+    <div class="col">
+      <app-student-test-card
+        [Test]="test"
+        [AttemptStatus]="getAttemptStatus(test._id)"
+        [AttemptResult]="getAttemptResult(test._id)"
+      />
+    </div>
+    } @empty {
+    <div class="col-12">
+      <div class="alert alert-info text-center">
+        {{ t('no_tests_available') }}
+      </div>
+    </div>
+    }
+  </div>
+  } @if (IsLoadingMore()) {
+  <div class="d-flex justify-content-center align-items-center py-4 w-100">
+    <fa-icon
+      [icon]="SpinnerIcon"
+      [animation]="'spin'"
+      [size]="'2x'"
+      class="text-primary animate-spin"
+    ></fa-icon>
+  </div>
+  } @if (!ShowOnlyPending() && !ShowOnlyAutoEval()) {
+  <div
+    class="pagination-row mt-5 d-flex flex-row justify-content-between align-items-center mb-5"
+  >
+    <app-syllex-pagination
+      [collectionSize]="CollectionSize()"
+      [page]="Page()"
+      [pageSize]="PageSize()"
+      (pageChange)="Page.set($event)"
+    />
 
-@if (IsCheckingStatuses() && ShowOnlyPending()) {
-<div class="d-flex justify-content-center align-items-center py-5 w-100">
-  <fa-icon
-    [icon]="SpinnerIcon"
-    [animation]="'spin'"
-    [size]="'2x'"
-    class="text-primary"
-  ></fa-icon>
-</div>
-} @else {
-<div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-xl-3 g-4 mb-4">
-  @for (test of FilteredTests(); track test._id) {
-  <div class="col">
-    <app-student-test-card
-      [Test]="test"
-      [AttemptStatus]="getAttemptStatus(test._id)"
-      [AttemptResult]="getAttemptResult(test._id)"
+    <app-syllex-select-input
+      [value]="PageSize().toString()"
+      (valueChange)="PageSize.set(+$event); Page.set(1)"
+      [options]="[
+      { value: '6',  label: t('per_page', {count: 6}) },
+      { value: '12', label: t('per_page', {count: 12}) },
+      { value: '24', label: t('per_page', {count: 24}) }
+    ]"
+      style="width: 160px"
     />
   </div>
-  } @empty {
-  <div class="col-12">
-    <div class="alert alert-info text-center">
-      Nessun test disponibile al momento.
-    </div>
-  </div>
   }
-</div>
-} @if (IsLoadingMore()) {
-<div class="d-flex justify-content-center align-items-center py-4 w-100">
-  <fa-icon
-    [icon]="SpinnerIcon"
-    [animation]="'spin'"
-    [size]="'2x'"
-    class="text-primary animate-spin"
-  ></fa-icon>
-</div>
-} @if (!ShowOnlyPending() && !ShowOnlyAutoEval()) {
-<div
-  class="pagination-row mt-5 d-flex flex-row justify-content-between align-items-center mb-5"
->
-  <app-syllex-pagination
-    [collectionSize]="CollectionSize()"
-    [page]="Page()"
-    [pageSize]="PageSize()"
-    (pageChange)="Page.set($event)"
-  />
-
-  <app-syllex-select-input
-    [value]="PageSize().toString()"
-    (valueChange)="PageSize.set(+$event); Page.set(1)"
-    [options]="[
-      { value: '6',  label: '6 per pagina' },
-      { value: '12', label: '12 per pagina' },
-      { value: '24', label: '24 per pagina' }
-    ]"
-    style="width: 160px"
-  />
-</div>
-}
+</ng-container>

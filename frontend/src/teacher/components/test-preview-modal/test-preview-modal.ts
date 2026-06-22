@@ -10,16 +10,18 @@ import {
 } from '@fortawesome/pro-solid-svg-icons';
 import { QuestionInterface } from '../../../services/questions';
 import { SyllexButton } from '../UI/syllex-button/syllex-button';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-test-preview-modal',
   standalone: true,
-  imports: [CommonModule, FontAwesomeModule, SyllexButton],
+  imports: [CommonModule, FontAwesomeModule, SyllexButton, TranslocoDirective, TranslocoPipe],
   templateUrl: './test-preview-modal.html',
   styleUrl: './test-preview-modal.scss',
 })
 export class TestPreviewModal {
   activeModal = inject(NgbActiveModal);
+  private translocoService = inject(TranslocoService);
 
   @Input() testTitle: string = '';
   @Input() questions: QuestionInterface[] = [];
@@ -32,11 +34,11 @@ export class TestPreviewModal {
   getQuestionTypeLabel(type: string): string {
     switch (type) {
       case 'scelta multipla':
-        return 'Scelta Multipla';
+        return this.translocoService.translate('test_preview_modal.type_multiple');
       case 'vero falso':
-        return 'Vero/Falso';
+        return this.translocoService.translate('test_preview_modal.type_truefalse');
       case 'risposta aperta':
-        return 'Risposta Aperta';
+        return this.translocoService.translate('test_preview_modal.type_open');
       default:
         return type;
     }

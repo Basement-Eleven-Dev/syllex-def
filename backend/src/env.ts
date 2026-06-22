@@ -14,4 +14,6 @@ export const AUTHORIZED_API_HEADERS: string[] = [
   "Subject-Id",
   "subject-id",
   "X-Impersonate-User",
+  "Accept-Language",
+  "accept-language",
 ];

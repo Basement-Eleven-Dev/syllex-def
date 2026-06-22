@@ -1,23 +1,25 @@
+<ng-container *transloco="let t; read: 'materiali.menu'">
 <small class="dropdown-header">{{ item.name }}</small>
 <small class="dropdown-header"
-  >Creato il {{ item.createdAt | date:'short' }}</small
+  >{{ t('created_at', {date: (item.createdAt | date:'short') }) }}</small
 >
-<button ngbDropdownItem (click)="onRequestRenameItem()">Rinomina</button>
+<button ngbDropdownItem (click)="onRequestRenameItem()">{{ t('rename') }}</button>
 @if(item.type !== 'folder') {
-<button ngbDropdownItem (click)="onRequestViewItem()">Visualizza</button>
+<button ngbDropdownItem (click)="onRequestViewItem()">{{ t('view') }}</button>
 @if (isPptx) {
-<button ngbDropdownItem (click)="onRequestPresent()">Presenta</button>
+<button ngbDropdownItem (click)="onRequestPresent()">{{ t('present') }}</button>
 }
-<button ngbDropdownItem (click)="onRequestAssignToClass()">Assegna</button>
+<button ngbDropdownItem (click)="onRequestAssignToClass()">{{ t('assign') }}</button>
 }
 <div class="dropdown-divider"></div>
 <button
   ngbDropdownItem
   class="text-danger"
   confirmAction
-  [confirmMessage]="'Sei sicuro di voler eliminare ' + item.name + '?'"
-  confirmTitle="Conferma eliminazione"
+  [confirmMessage]="t('confirm_delete_msg', { name: item.name })"
+  [confirmTitle]="t('confirm_delete_title')"
   (confirmed)="onRequestDeleteItem()"
 >
-  Elimina
+  {{ t('delete') }}
 </button>
+</ng-container>

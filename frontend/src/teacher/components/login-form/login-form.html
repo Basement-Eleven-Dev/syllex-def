@@ -1,5 +1,6 @@
+<ng-container *transloco="let t; read: 'login'">
 @if (isStaging) {
-<div class="alert alert-warning" role="alert">Sei su ambiente staging</div>
+<div class="alert alert-warning" role="alert">{{ t('staging') }}</div>
 }
 <form
   [formGroup]="isMfaChallenge ? mfaCodeForm : loginForm"
@@ -7,26 +8,25 @@
   class="d-flex flex-column gap-3"
 >
   <h3 class="login-heading">
-    {{ isMfaChallenge ? 'Verifica identità' : (isChallenge ? 'Attivazione
-    Account' : 'Accedi') }}
+    {{ isMfaChallenge ? t('mfa_verify') : (isChallenge ? t('activation') : t('signin')) }}
   </h3>
   <div [hidden]="isChallenge || isMfaChallenge">
-    <label for="email" class="form-label">Email</label>
+    <label for="email" class="form-label">{{ t('email') }}</label>
     <input
       type="text"
       class="form-control custom-input"
-      placeholder="email@syllex.com"
+      [placeholder]="t('email_ph')"
       formControlName="email"
     />
   </div>
   <div [hidden]="isMfaChallenge">
-    <label for="password" class="form-label">Password</label>
+    <label for="password" class="form-label">{{ t('password') }}</label>
     <div class="input-group input-group-custom">
       <input
         formControlName="password"
         [type]="showPassword ? 'text' : 'password'"
         class="form-control custom-input"
-        placeholder="Minimo 8 caratteri"
+        [placeholder]="t('password_ph')"
       />
       <button
         class="btn border-custom"
@@ -41,14 +41,14 @@
   @if (isMfaChallenge) {
   <div>
     <label for="mfa-code" class="form-label fw-bold"
-      >Codice dall'app (6 cifre)</label
+      >{{ t('mfa_lbl') }}</label
     >
     <input
       [formControl]="mfaCodeForm.controls.code"
       type="text"
       id="mfa-code"
       class="form-control custom-input text-center fw-bold"
-      placeholder="000000"
+      [placeholder]="t('mfa_ph')"
       maxlength="6"
       inputmode="numeric"
       autocomplete="one-time-code"
@@ -57,7 +57,7 @@
   } @if (!isChallenge && !isMfaChallenge) {
   <div class="text-start mb-4">
     <a href="#" class="fw-semibold text-dark" routerLink="/password-reset"
-      >Hai dimenticato la password?</a
+      >{{ t('forgot_pwd') }}</a
     >
   </div>
   <div class="form-check">
@@ -68,21 +68,21 @@
       formControlName="privacyAccepted"
     />
     <label class="form-check-label small" for="privacyAccepted">
-      Dichiaro di aver preso visione della
+      {{ t('privacy_1') }}
       <a
         href="https://www.iubenda.com/privacy-policy/45755357"
         target="_blank"
         rel="noopener noreferrer"
         class="fw-semibold"
-        >Privacy Policy</a
+        >{{ t('privacy_policy') }}</a
       >
-      relativa al trattamento dei dati personali.
+      {{ t('privacy_2') }}
     </label>
   </div>
   }
   <app-syllex-button
     [props]="{
-      label: isMfaChallenge ? 'Verifica' : (isChallenge ? 'Conferma e accedi' : 'Accedi'),
+      label: isMfaChallenge ? t('verify_btn') : (isChallenge ? t('confirm_btn') : t('signin_btn')),
       variant: 'primary',
       size: 'large',
       disabled: (isMfaChallenge ? mfaCodeForm.invalid : loginForm.invalid) || loading,
@@ -101,3 +101,4 @@
   </div>
   }
 </form>
+</ng-container>

@@ -136,6 +136,7 @@
 
 .wizard-panel {
   flex: 1;
+  position: relative;
   min-height: 380px;
 
   @media (max-width: 991px) {
@@ -147,6 +148,7 @@
 
 .wizard-step-content {
   padding: 0;
+  width: 100%;
   
   @media (max-width: 991px) {
     padding: 0;

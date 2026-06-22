@@ -8,6 +8,7 @@ import { StudentAttemptsTableComponent } from '../../components/student-attempts
 import { StudentAiSummaryComponent } from '../../components/student-ai-summary/student-ai-summary';
 import { BackTo } from '../../components/back-to/back-to';
 import { StudentsService } from '../../../services/students-service';
+import { TranslocoDirective, TranslocoPipe } from '@jsverse/transloco';
 import { Materia } from '../../../services/materia';
 import {
   faChartLine,
@@ -49,6 +50,8 @@ interface StudentDetailsData {
     StudentAttemptsTableComponent,
     StudentAiSummaryComponent,
     BackTo,
+    TranslocoDirective,
+    TranslocoPipe,
   ],
   templateUrl: './student-detail.html',
   styleUrl: './student-detail.scss',

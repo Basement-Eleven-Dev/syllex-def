@@ -12,14 +12,16 @@ import {
 } from '../../../services/calendar-service';
 import { FeedbackService } from '../../../services/feedback-service';
 import { DatePipe } from '@angular/common';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-add-event-modal',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, TranslocoDirective, TranslocoPipe],
   template: `
+    <ng-container *transloco="let t; read: 'event_modal'">
     <div class="modal-header">
       <h5 class="modal-title">
-        {{ EventToEdit ? 'Modifica evento' : 'Nuovo evento' }}
+        {{ EventToEdit ? t('title_edit') : t('title_new') }}
       </h5>
       <button
         type="button"
@@ -31,28 +33,28 @@ import { DatePipe } from '@angular/common';
     <div class="modal-body">
       <form [formGroup]="Form">
         <div class="mb-3">
-          <label for="title" class="form-label">Titolo *</label>
+          <label for="title" class="form-label">{{ t('title_lbl') }}</label>
           <input
             type="text"
             class="form-control custom-input"
             id="title"
             formControlName="title"
-            placeholder="Es. Riunione genitori"
+            [placeholder]="t('title_ph')"
           />
         </div>
         <div class="mb-3">
-          <label for="description" class="form-label">Descrizione</label>
+          <label for="description" class="form-label">{{ t('desc_lbl') }}</label>
           <textarea
             class="form-control custom-input"
             id="description"
             formControlName="description"
             rows="3"
-            placeholder="Descrizione dell'evento (opzionale)"
+            [placeholder]="t('desc_ph')"
           ></textarea>
         </div>
         <div class="row">
           <div class="col-6">
-            <label for="date" class="form-label">Data *</label>
+            <label for="date" class="form-label">{{ t('date_lbl') }}</label>
             <input
               type="date"
               class="form-control custom-input"
@@ -61,7 +63,7 @@ import { DatePipe } from '@angular/common';
             />
           </div>
           <div class="col-6">
-            <label for="time" class="form-label">Ora</label>
+            <label for="time" class="form-label">{{ t('time_lbl') }}</label>
             <input
               type="time"
               class="form-control custom-input"
@@ -78,7 +80,7 @@ import { DatePipe } from '@angular/common';
         class="btn btn-blue"
         (click)="ActiveModal.dismiss()"
       >
-        Annulla
+        {{ t('cancel') }}
       </button>
       <button
         type="button"
@@ -86,9 +88,10 @@ import { DatePipe } from '@angular/common';
         [disabled]="Form.invalid || Saving()"
         (click)="onSave()"
       >
-        {{ Saving() ? 'Salvataggio...' : EventToEdit ? 'Aggiorna' : 'Salva' }}
+        {{ Saving() ? t('saving') : EventToEdit ? t('update') : t('save') }}
       </button>
     </div>
+    </ng-container>
   `,
 })
 export class AddEventModal implements OnInit {
@@ -96,6 +99,7 @@ export class AddEventModal implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly calendarService = inject(CalendarService);
   private readonly feedbackService = inject(FeedbackService);
+  private readonly translocoService = inject(TranslocoService);
 
   /** Set via componentInstance from the calendar */
   SelectedDate!: Date;
@@ -150,14 +154,14 @@ export class AddEventModal implements OnInit {
       this.calendarService.updateEvent(this.EventToEdit._id, data).subscribe({
         next: (res) => {
           this.feedbackService.showFeedback(
-            'Evento aggiornato con successo',
+            this.translocoService.translate('event_modal.success_update'),
             true,
           );
           this.ActiveModal.close(res.event);
         },
         error: () => {
           this.feedbackService.showFeedback(
-            "Errore durante l'aggiornamento dell'evento",
+            this.translocoService.translate('event_modal.error_update'),
             false,
           );
           this.Saving.set(false);
@@ -167,12 +171,12 @@ export class AddEventModal implements OnInit {
       // Crea nuovo evento
       this.calendarService.createEvent(data).subscribe({
         next: (res) => {
-          this.feedbackService.showFeedback('Evento creato con successo', true);
+          this.feedbackService.showFeedback(this.translocoService.translate('event_modal.success_create'), true);
           this.ActiveModal.close(res.event);
         },
         error: () => {
           this.feedbackService.showFeedback(
-            "Errore durante la creazione dell'evento",
+            this.translocoService.translate('event_modal.error_create'),
             false,
           );
           this.Saving.set(false);

@@ -4,6 +4,7 @@ import { toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { of } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { TranslocoDirective } from '@jsverse/transloco';
 import {
   faArrowLeft,
   faCheck,
@@ -13,7 +14,10 @@ import { Materia, TopicObject } from '../../../services/materia';
 import { StudentTestsService } from '../../../services/student-tests.service';
 import { SyllexPageHeader } from '../../../teacher/components/UI/syllex-page-header/syllex-page-header';
 import { SyllexButton } from '../../../teacher/components/UI/syllex-button/syllex-button';
-import { SelectOption, SyllexSelectInput } from '../../../teacher/components/UI/syllex-select-input/syllex-select-input';
+import {
+  SelectOption,
+  SyllexSelectInput,
+} from '../../../teacher/components/UI/syllex-select-input/syllex-select-input';
 import { BackTo } from '../../../teacher/components/back-to/back-to';
 
 type QuestionType = 'scelta multipla' | 'vero falso' | 'risposta aperta';
@@ -21,7 +25,15 @@ type QuestionType = 'scelta multipla' | 'vero falso' | 'risposta aperta';
 @Component({
   selector: 'app-student-create-test',
   standalone: true,
-  imports: [FontAwesomeModule, RouterModule, SyllexPageHeader, SyllexButton, SyllexSelectInput, BackTo],
+  imports: [
+    FontAwesomeModule,
+    RouterModule,
+    SyllexPageHeader,
+    SyllexButton,
+    SyllexSelectInput,
+    BackTo,
+    TranslocoDirective,
+  ],
   templateUrl: './student-create-test.html',
   styleUrl: './student-create-test.scss',
 })
@@ -33,6 +45,10 @@ export class StudentCreateTest {
   readonly BackIcon = faArrowLeft;
   readonly CheckIcon = faCheck;
   readonly RemoveIcon = faXmark;
+
+  getSanitizedType(type: string): string {
+    return type.replace(/ /g, '_');
+  }
 
   readonly AllSubjects = this.materiaService.allMaterie;
   readonly SubjectOptions = computed<SelectOption[]>(() =>
@@ -97,14 +113,17 @@ export class StudentCreateTest {
       .subscribe((res) => this.AvailableQuestionsCount.set(res.count));
 
     // Seleziona tutti gli argomenti di default quando viene cambiata/selezionata la materia
-    effect(() => {
-      const subject = this.SelectedSubject();
-      if (subject?.topics) {
-        this.SelectedTopicIds.set(new Set(subject.topics.map((t) => t._id)));
-      } else {
-        this.SelectedTopicIds.set(new Set());
-      }
-    }, { allowSignalWrites: true });
+    effect(
+      () => {
+        const subject = this.SelectedSubject();
+        if (subject?.topics) {
+          this.SelectedTopicIds.set(new Set(subject.topics.map((t) => t._id)));
+        } else {
+          this.SelectedTopicIds.set(new Set());
+        }
+      },
+      { allowSignalWrites: true },
+    );
   }
 
   readonly IsFormValid = computed(

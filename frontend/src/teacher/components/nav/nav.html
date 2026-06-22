@@ -1,5 +1,6 @@
 <nav
   class="bg-primary py-3 px-3 px-md-4 d-flex flex-row align-items-center gap-3 teacher-nav container-fluid"
+  *transloco="let t; read: 'layout.nav'"
 >
   <!-- Subject selector -->
   @if (selectedSubject()) {
@@ -37,7 +38,7 @@
     </div>
     <app-syllex-button
       [props]="{
-          label: 'Argomenti',
+          label: t('topics'),
           variant: 'underline',
           color: 'white',
           size: 'small'
@@ -47,7 +48,7 @@
   </div>
   }
 
-  <div class="flex-fill d-flex flex-row justify-content-end gap-4">
+  <div class="flex-fill d-flex flex-row justify-content-end align-items-center gap-4">
     <div class="d-flex flex-row gap-3">
       <button
         class="btn calendarBtn bg-transparent d-none d-xxl-block flex-shrink-0 py-3"
@@ -83,9 +84,12 @@
           font-size: 0.85rem;
           white-space: nowrap;
         "
-        >Come posso aiutarti?</span
+        >{{ t('help') }}</span
       >
     </div>
+    
+    <app-language-selector></app-language-selector>
+
     <div ngbDropdown class="d-inline-block" tourAnchor="teacher-profile">
       <div
         id="dropdownBasic1"

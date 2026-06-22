@@ -1,5 +1,6 @@
+<ng-container *transloco="let t; read: 'report_bug'">
 <div class="modal-header">
-  <h5 class="modal-title">Segnala un problema</h5>
+  <h5 class="modal-title">{{ t('title') }}</h5>
   <button
     type="button"
     class="btn-close"
@@ -10,12 +11,7 @@
 </div>
 
 <div class="modal-body">
-  <p class="text-muted mb-3">
-    Se hai riscontrato un problema o un comportamento anomalo, descrivilo
-    dettagliatamente nel campo sottostante. Il nostro team esaminerà la
-    segnalazione e lavorerà per risolvere il problema il prima possibile.<br /><br />Grazie
-    per il tuo aiuto nel migliorare Syllex!
-  </p>
+  <p class="text-muted mb-3" [innerHTML]="t('desc')"></p>
 
   @if (errorMessage()) {
   <div class="alert alert-danger" role="alert">{{ errorMessage() }}</div>
@@ -24,7 +20,7 @@
   <form (ngSubmit)="submit()">
     <div class="mb-3">
       <label for="comment" class="form-label">
-        Cosa non ha funzionato?
+        {{ t('comment_lbl') }}
         <span class="text-danger">*</span>
       </label>
       <textarea
@@ -32,20 +28,20 @@
         class="form-control custom-input"
         [formControl]="commentControl"
         rows="6"
-        placeholder="Descrivi il problema..."
+        [placeholder]="t('comment_ph')"
         [class.is-invalid]="commentControl.invalid && commentControl.touched"
         [disabled]="isSubmitting()"
       ></textarea>
       @if (commentControl.invalid && commentControl.touched) {
       <div class="invalid-feedback">
-        @if (commentControl.errors?.['required']) { Il campo è obbligatorio }
-        @if (commentControl.errors?.['minlength']) { Inserisci almeno 10
-        caratteri } @if (commentControl.errors?.['maxlength']) { Massimo 1000
-        caratteri }
+        @if (commentControl.errors?.['required']) { {{ t('required') }} }
+        @if (commentControl.errors?.['minlength']) { {{ t('minlength') }}
+        } @if (commentControl.errors?.['maxlength']) { {{ t('maxlength') }}
+        }
       </div>
       }
       <small class="form-text text-muted">
-        {{ commentControl.value?.length || 0 }} / 1000 caratteri
+        {{ commentControl.value?.length || 0 }} / 1000 {{ t('chars') }}
       </small>
     </div>
   </form>
@@ -58,7 +54,7 @@
     (click)="cancel()"
     [disabled]="isSubmitting()"
   >
-    Annulla
+    {{ t('cancel') }}
   </button>
   <button
     type="button"
@@ -68,6 +64,7 @@
   >
     @if (isSubmitting()) {
     <fa-icon [icon]="SpinnerIcon" [animation]="'spin'"></fa-icon>
-    Invio in corso... } @else { Invia segnalazione }
+    {{ t('submitting') }} } @else { {{ t('submit') }} }
   </button>
 </div>
+</ng-container>

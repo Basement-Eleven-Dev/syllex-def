@@ -4,10 +4,11 @@ import { ConfirmActionDirective } from '../../../directives/confirm-action.direc
 import { TestInterface } from '../../../services/tests-service';
 import { RouterLink, RouterModule } from '@angular/router';
 import { AssignClass } from '../assign-class/assign-class';
+import { TranslocoDirective, TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-test-contextual-menu',
-  imports: [NgbDropdownItem, ConfirmActionDirective, RouterLink, RouterModule],
+  imports: [NgbDropdownItem, ConfirmActionDirective, RouterLink, RouterModule, TranslocoDirective, TranslocoPipe],
   templateUrl: './test-contextual-menu.html',
   styleUrl: './test-contextual-menu.scss',
 })

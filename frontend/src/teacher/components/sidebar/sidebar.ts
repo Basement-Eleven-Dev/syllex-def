@@ -41,6 +41,7 @@ import { FormsModule } from '@angular/forms';
 import { Materia, MateriaObject } from '../../../services/materia';
 import { SubjectSettingsModal } from '../subject-settings-modal/subject-settings-modal';
 import { HelpChat } from '../help-chat/help-chat';
+import { TranslocoDirective, TranslocoPipe } from '@jsverse/transloco';
 
 interface SidebarRoute {
   path: string;
@@ -57,6 +58,8 @@ interface SidebarRoute {
     NgbCollapseModule,
     FormsModule,
     TourAnchorNgBootstrapDirective,
+    TranslocoDirective,
+    TranslocoPipe,
   ],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.scss',
@@ -121,12 +124,12 @@ export class Sidebar {
   mainRoutes: SidebarRoute[] = [
     {
       path: 'dashboard',
-      label: 'Home',
+      label: 'home',
       icon: faGauge,
     },
     {
       path: 'tests',
-      label: 'Test',
+      label: 'tests',
       icon: faBallotCheck,
       tourAnchor: 'teacher-tests',
     },
@@ -137,23 +140,23 @@ export class Sidebar {
     }, */
     {
       path: 'banca',
-      label: 'Banca Domande',
+      label: 'banca',
       icon: faClipboardQuestion,
       tourAnchor: 'teacher-banca',
     },
     {
       path: 'classi',
-      label: 'Classi',
+      label: 'classes',
       icon: faUsers,
     },
     {
       path: 'risorse',
-      label: 'File e Risorse',
+      label: 'resources',
       icon: faFile,
     },
     {
       path: 'calendario',
-      label: 'Calendario',
+      label: 'calendar',
       icon: faCalendarAlt,
     },
   ];

@@ -1,3 +1,4 @@
+<ng-container *transloco="let t; read: 'materiali.card'">
 <div
   class="p-4 h-100 syllexCard position-relative"
   [class]="isFolder ? 'folder-card' : 'materiale-card'"
@@ -14,7 +15,7 @@
     style="z-index: 1; background: rgba(255, 255, 255, 0.4)"
   >
     <div class="spinner-border spinner-border-sm text-secondary" role="status">
-      <span class="visually-hidden">Elaborazione in corso…</span>
+      <span class="visually-hidden">{{ t('processing') }}</span>
     </div>
   </div>
   }
@@ -38,7 +39,7 @@
           class="spinner-border spinner-border-sm text-secondary"
           role="status"
         >
-          <span class="visually-hidden">Elaborazione in corso…</span>
+          <span class="visually-hidden">{{ t('processing') }}</span>
         </div>
         } @else {
         <div class="d-flex flex-row align-items-center justify-content-between">
@@ -62,7 +63,7 @@
               {{ item.name }}
             </p>
             @if (highlightedItemId === item._id) {
-              <app-syllex-badge label="Nuovo" color="green" />
+              <app-syllex-badge [label]="t('new')" color="green" />
             }
           </div>
         </div>
@@ -76,16 +77,15 @@
       <div class="d-flex flex-row gap-2 align-items-center">
         @if(isFolder){
         <small class="text-muted"
-          >{{ folderContentLength }} element{{ folderContentLength !== 1 ? 'i' :
-          'o' }}</small
+          >{{ folderContentLength !== 1 ? t('elements_count', { count: folderContentLength }) : t('element_count', { count: folderContentLength }) }}</small
         >
         | }
         <a
           class="text-muted small"
           (click)="$event.stopPropagation(); requestAssignToClass()"
           ><fa-icon [icon]="ShareNodesIcon"></fa-icon>@if(item.classIds?.length
-          === 0 || !item.classIds){ Non condiviso } @else { {{
-          item.classIds.length }} class{{ item.classIds.length !== 1 ? 'i' : 'e'
+          === 0 || !item.classIds){ {{ t('not_shared') }} } @else { {{
+          item.classIds.length !== 1 ? t('shared_classes', { count: item.classIds.length }) : t('shared_class', { count: item.classIds.length })
           }} }</a
         >
       </div>
@@ -97,7 +97,7 @@
         <button
           class="btn btn-light circle-btn btn-sm"
           (click)="downloadFile($event)"
-          title="Scarica file"
+          [title]="t('download')"
         >
           <fa-icon [icon]="DownloadIcon"></fa-icon>
         </button>
@@ -125,3 +125,4 @@
     </div>
   </div>
 </div>
+</ng-container>

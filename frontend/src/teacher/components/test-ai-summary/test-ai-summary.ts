@@ -2,6 +2,7 @@ import { Component, inject, signal, input, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TestsService } from '../../../services/tests-service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   faLightbulb,
   faMagic,
@@ -13,14 +14,15 @@ import { FeedbackService } from '../../../services/feedback-service';
 @Component({
   selector: 'app-test-ai-summary',
   standalone: true,
-  imports: [CommonModule, FontAwesomeModule],
+  imports: [CommonModule, FontAwesomeModule, TranslocoDirective, TranslocoPipe],
   template: `
+    <ng-container *transloco="let t; read: 'test_ai_summary'">
     <div class="card border-0 shadow-sm rounded-4" style="background-color: #f7fee7 !important;">
       <div class="card-body p-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h5 class="fw-bold mb-0" style="color: #3f6212 !important;">
             <fa-icon [icon]="icons.faLightbulb" class="me-2"></fa-icon>
-            {{ mode() === 'test' ? 'Analisi IA della Classe' : 'Feedback IA' }}
+            {{ mode() === 'test' ? t('title_class') : t('title_student') }}
           </h5>
           <button
             (click)="generateInsight()"
@@ -36,7 +38,7 @@ import { FeedbackService } from '../../../services/feedback-service';
             } @else {
               <fa-icon [icon]="icons.faMagic" class="me-1"></fa-icon>
             }
-            {{ insight() ? 'Aggiorna' : 'Genera' }}
+            {{ insight() ? t('btn_update') : t('btn_generate') }}
           </button>
         </div>
 
@@ -46,7 +48,7 @@ import { FeedbackService } from '../../../services/feedback-service';
               class="spinner-grow spinner-grow-sm me-2 text-primary"
               role="status"
             ></div>
-            <span class="text-muted">L'IA sta elaborando i dati...</span>
+            <span class="text-muted">{{ t('loading') }}</span>
           </div>
         } @else if (error()) {
           <div class="py-3 text-center text-danger">
@@ -56,7 +58,7 @@ import { FeedbackService } from '../../../services/feedback-service';
               class="btn btn-link btn-sm text-primary p-0 ms-2"
               (click)="generateInsight()"
             >
-              Riprova
+              {{ t('retry') }}
             </button>
           </div>
         } @else if (insight()) {
@@ -75,14 +77,15 @@ import { FeedbackService } from '../../../services/feedback-service';
             <p class="mb-0 small">
               {{
                 mode() === 'test'
-                  ? "L'IA analizzerà le risposte di tutta la classe per identificare punti di forza e aree di miglioramento."
-                  : 'Ottieni un suggerimento personalizzato basato sulle risposte e la velocità dello studente.'
+                  ? t('desc_class')
+                  : t('desc_student')
               }}
             </p>
           </div>
         }
       </div>
     </div>
+    </ng-container>
   `,
   styles: [
     `
@@ -100,6 +103,7 @@ export class TestAiSummaryComponent {
 
   private testsService = inject(TestsService);
   private feedbackService = inject(FeedbackService);
+  private translocoService = inject(TranslocoService);
 
   insight = signal<string | null>(null);
 
@@ -131,7 +135,7 @@ export class TestAiSummaryComponent {
     });
 
     if (!this.id()) {
-      this.error.set('ID mancante per la generazione.');
+      this.error.set(this.translocoService.translate('test_ai_summary.err_id'));
       return;
     }
 
@@ -150,10 +154,10 @@ export class TestAiSummaryComponent {
       },
       error: (err) => {
         console.error('AI Insight Error:', err);
-        this.error.set('Servizio temporaneamente non disponibile.');
+        this.error.set(this.translocoService.translate('test_ai_summary.err_service'));
         this.loading.set(false);
         this.feedbackService.showFeedback(
-          'Errore durante la generazione IA',
+          this.translocoService.translate('test_ai_summary.err_gen'),
           false,
         );
       },

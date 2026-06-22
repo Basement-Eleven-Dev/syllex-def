@@ -29,6 +29,7 @@ import { SyllexSearchInput } from '../../components/UI/syllex-search-input/sylle
 import { SyllexClearButton } from '../../components/UI/syllex-clear-button/syllex-clear-button';
 import { SyllexSelectInput } from '../../components/UI/syllex-select-input/syllex-select-input';
 import { SyllexEmptyState } from '../../components/UI/syllex-empty-state/syllex-empty-state';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-classi',
@@ -44,6 +45,8 @@ import { SyllexEmptyState } from '../../components/UI/syllex-empty-state/syllex-
     SyllexClearButton,
     SyllexSelectInput,
     SyllexEmptyState,
+    TranslocoDirective,
+    TranslocoPipe,
   ],
   templateUrl: './classi.html',
   styleUrl: './classi.scss',
@@ -67,6 +70,7 @@ export class Classi {
   // Dependency Injection
   protected readonly materiaService = inject(Materia);
   protected readonly classiService = inject(ClassiService);
+  private readonly translocoService = inject(TranslocoService);
 
   // View Type
   viewType: ViewType = this.loadViewTypePreference('classi') || 'grid';
@@ -102,8 +106,10 @@ export class Classi {
   KpiClassi = computed<KpiCardData[]>(() =>
     this.PaginatedClassi().map((classe) => ({
       value: classe.name,
-      label: `${classe.students.length} student${classe.students.length === 1 ? 'e' : 'i'}`,
-      buttonLabel: 'Visualizza',
+      label: classe.students.length === 1 
+        ? this.translocoService.translate('classi.student_count', { count: 1 })
+        : this.translocoService.translate('classi.students_count', { count: classe.students.length }),
+      buttonLabel: this.translocoService.translate('classi.view_button'),
       buttonLink: ['/t/classi', classe._id],
     })),
   );

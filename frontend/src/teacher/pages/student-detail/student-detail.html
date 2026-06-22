@@ -1,3 +1,4 @@
+<ng-container *transloco="let t; read: 'student_detail'">
 <div class="container-fluid py-4">
   @if (loading()) {
   <div
@@ -5,13 +6,13 @@
     style="min-height: 400px"
   >
     <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Caricamento...</span>
+      <span class="visually-hidden">{{ t('loading') }}</span>
     </div>
   </div>
   } @else if (studentData(); as data) {
   <app-back-to
     [path]="classId() ? '/t/classi/' + classId() : '/t/dashboard'"
-    [label]="'Torna alla classe'"
+    [label]="t('back')"
   />
 
   <div class="row mt-4">
@@ -36,7 +37,7 @@
               [icon]="icons.faChartLine"
               class="text-primary me-2"
             ></fa-icon>
-            Andamento Test (Ultimi 10)
+            {{ t('chart_perf_title') }}
           </h6>
           <app-student-performance-chart
             [data]="data.performanceByTest"
@@ -53,7 +54,7 @@
               [icon]="icons.faChartLine"
               class="text-primary me-2"
             ></fa-icon>
-            Performance per Argomento
+            {{ t('chart_topics_title') }}
           </h6>
           <app-student-performance-chart
             [data]="data.performanceByTopic"
@@ -72,7 +73,8 @@
   </div>
   } @else {
   <div class="alert alert-warning">
-    Impossibile caricare i dati dello studente.
+    {{ t('error_load') }}
   </div>
   }
 </div>
+</ng-container>

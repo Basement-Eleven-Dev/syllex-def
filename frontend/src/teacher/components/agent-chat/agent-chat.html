@@ -1,303 +1,316 @@
-<div
-  class="agent-chat-wrapper d-flex h-100 w-100 overflow-hidden position-relative"
->
-  <!-- AREA PRINCIPALE -->
+<ng-container *transloco="let t; read: 'agent_chat'">
   <div
-    class="main-content flex-fill d-flex flex-column position-relative h-100 overflow-hidden"
+    class="agent-chat-wrapper d-flex h-100 w-100 overflow-hidden position-relative"
   >
-    <!-- MOBILE HEADER -->
+    <!-- AREA PRINCIPALE -->
     <div
-      class="d-flex d-lg-none align-items-center justify-content-between px-3 py-3 bg-white shadow-sm agent-mobile-header"
-      style="z-index: 20"
+      class="main-content flex-fill d-flex flex-column position-relative h-100 overflow-hidden"
     >
-      <h6 class="mb-0 fw-bold text-primary d-flex align-items-center gap-2">
-        <fa-icon [icon]="faSparkles" class="text-warning"></fa-icon> Alex
-      </h6>
-      <button
-        class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center"
-        style="width: 36px; height: 36px"
-        (click)="mobileHistoryOpen.set(true)"
-      >
-        <fa-icon [icon]="faBars"></fa-icon>
-      </button>
-    </div>
-
-    <!-- MESSAGGI / INTRO (sempre visibile) -->
-    <div
-      #scrollContent
-      class="flex-fill overflow-auto d-flex flex-column p-2 p-md-4"
-    >
-      @if (messages().length === 0 && !voiceModeActive()) {
+      <!-- MOBILE HEADER -->
       <div
-        class="intro-welcome d-flex flex-column align-items-center justify-content-center mx-auto"
+        class="d-flex d-lg-none align-items-center justify-content-between px-3 py-3 bg-white shadow-sm agent-mobile-header"
+        style="z-index: 20"
       >
-        <app-alex-mascot [variant]="userRole() === 'teacher' ? 'teacher' : 'student'"></app-alex-mascot>
-
-        <h2 class="fw-bold mb-2 text-center intro-welcome__title">
-          Ciao, sono Alex!
-        </h2>
-        <p
-          class="text-muted mb-3 text-center intro-welcome__subtitle"
-          style="max-width: 580px; line-height: 1.6"
+        <h6 class="mb-0 fw-bold text-primary d-flex align-items-center gap-2">
+          <fa-icon [icon]="faSparkles" class="text-warning"></fa-icon> Alex
+        </h6>
+        <button
+          class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center"
+          style="width: 36px; height: 36px"
+          (click)="mobileHistoryOpen.set(true)"
         >
-          Sono il tuo Assistente Didattico Personale in Syllex. Sono pronto ad
-          aiutarti a <strong>riassumere i tuoi materiali</strong>, trovare le
-          <strong>risposte chiave</strong> o metterti alla prova con
-          <strong>quiz personalizzati</strong>.
-        </p>
-        <h4
-          class="fw-semibold text-primary mb-5 text-center intro-welcome__prompt"
-        >
-          Come posso aiutarti oggi?
-        </h4>
-
-        <!-- Riga superiore: 2 bottoni -->
-        <div
-          class="d-flex flex-column flex-md-row gap-2 gap-md-3 mb-3 justify-content-center w-100"
-        >
-          <button
-            class="btn btn-quick-action quick-btn-responsive"
-            (click)="inputMessage = 'Fammi un riassunto sintetico'; sendMessage('text')"
-          >
-            <fa-icon [icon]="faLightbulb" class="me-2"></fa-icon>Riassunto
-            sintetico
-          </button>
-          <button
-            class="btn btn-quick-action quick-btn-responsive"
-            (click)="inputMessage = 'Quali sono gli argomenti principali?'; sendMessage('text')"
-          >
-            <fa-icon [icon]="faBookOpen" class="me-2"></fa-icon>Argomenti
-            principali
-          </button>
-        </div>
-        <!-- Riga inferiore: 1 bottone centrato -->
-        <div class="d-flex justify-content-center w-100">
-          <button
-            class="btn btn-quick-action quick-btn-responsive"
-            (click)="inputMessage = 'Mettimi alla prova con un quiz di tre domande'; sendMessage('text')"
-          >
-            <fa-icon [icon]="faSparkles" class="me-2"></fa-icon>Mettimi alla
-            prova con un quiz
-          </button>
-        </div>
+          <fa-icon [icon]="faBars"></fa-icon>
+        </button>
       </div>
-      } @else { @for (msg of messages(); track $index) {
+
+      <!-- MESSAGGI / INTRO (sempre visibile) -->
       <div
-        class="d-flex mb-3"
-        [class.justify-content-end]="msg.role === 'user'"
+        #scrollContent
+        class="flex-fill overflow-auto d-flex flex-column p-2 p-md-4"
       >
+        @if (messages().length === 0 && !voiceModeActive()) {
         <div
-          class="msg-line rounded-4 px-3 px-md-4 py-2 py-md-3"
-          [class.msg-line--user]="msg.role === 'user'"
+          class="intro-welcome d-flex flex-column align-items-center justify-content-center mx-auto"
         >
-          <markdown [data]="msg.content"></markdown>
-        </div>
-      </div>
-      } @if (isLoading()) {
-      <div class="typing-dots p-3 bg-light rounded-4 align-self-start mb-4">
-        <span></span><span></span><span></span>
-      </div>
-      } }
-    </div>
+          <app-alex-mascot
+            [variant]="userRole() === 'teacher' ? 'teacher' : 'student'"
+          ></app-alex-mascot>
 
-    <!-- ORB AREA: visibile solo in modalità vocale -->
-    <div class="voice-orb-area" [class.visible]="voiceModeActive()">
-      <div
-        class="voice-orb-mini"
-        [class.pulse]="(isRecording() && !isMuted()) || geminiLiveService.isSpeaking()"
-        [class.muted]="isMuted() && !geminiLiveService.isSpeaking()"
-        [class.user-speaking]="isRecording() && !isMuted()"
-        [class.ai-speaking]="geminiLiveService.isSpeaking()"
-      ></div>
-    </div>
+          <h2 class="fw-bold mb-2 text-center intro-welcome__title">
+            {{ t('welcome_title') }}
+          </h2>
+          <p
+            class="text-muted mb-3 text-center intro-welcome__subtitle"
+            style="max-width: 580px; line-height: 1.6"
+          >
+            {{ t('welcome_subtitle') }}
+          </p>
+          <h4
+            class="fw-semibold text-primary mb-5 text-center intro-welcome__prompt"
+          >
+            {{ t('welcome_prompt') }}
+          </h4>
 
-    <!-- INPUT BAR -->
-    <div
-      class="input-area-container px-2 px-md-4 pb-3 pt-2 bg-transparent"
-      [class.is-voice]="voiceModeActive()"
-    >
-      <div class="input-bar-row">
-        <!-- Switcher -->
-        <div
-          class="mode-switcher"
-          [class.mode-switcher--voice]="voiceModeActive()"
-        >
-          @if (!voiceModeActive()) {
-          <!-- Text mode: tastiera attiva, click waveform entra in vocale -->
-          <span class="mode-switcher__icon mode-switcher__icon--active">
-            <fa-icon [icon]="faKeyboard" />
-          </span>
-          <span
-            class="mode-switcher__icon"
-            (click)="toggleVoiceInput()"
-            style="cursor: pointer"
+          <!-- Riga superiore: 2 bottoni -->
+          <div
+            class="d-flex flex-column flex-md-row gap-2 gap-md-3 mb-3 justify-content-center w-100"
           >
-            <fa-icon [icon]="faWaveformLines" />
-          </span>
-          } @else {
-          <!-- Voice mode: click tastiera esce -->
-          <span
-            class="mode-switcher__icon"
-            (click)="exitVoiceMode()"
-            style="cursor: pointer"
-            title="Torna alla tastiera"
-          >
-            <fa-icon [icon]="faKeyboard" />
-          </span>
-          }
-        </div>
-
-        <!-- Input pill (collassa verso destra in voice mode) o pulsanti Voice Mode -->
-        @if (!voiceModeActive()) {
-        <div
-          class="input-pill-mock d-flex align-items-center px-3 px-md-4 py-2 border shadow-sm"
-        >
-          <textarea
-            class="form-control border-0 shadow-none bg-transparent"
-            [(ngModel)]="inputMessage"
-            (keydown)="onKeydown($event)"
-            placeholder="Scrivi qui..."
-            rows="1"
-          ></textarea>
-          <button
-            class="btn-send-new ms-3"
-            (click)="sendMessage('text')"
-            [disabled]="!inputMessage.trim() || isLoading()"
-          >
-            <fa-icon [icon]="SendIcon" />
-          </button>
-        </div>
-        } @else {
-        <!-- Pulsanti Voice Mode al posto della barra di input -->
-        @if (isRecording() && !isMuted()) {
-        <!-- Dynamic Listening Status + Stop Action Pill -->
-        <div
-          class="voice-input-pill d-flex align-items-center justify-content-between px-3 py-2 shadow-sm"
-        >
-          <div class="voice-input-pill__status d-flex align-items-center gap-2">
-            <div class="voice-input-pill__dot"></div>
-            <span class="fw-semibold small text-primary"
-              >Ti sto ascoltando...</span
+            <button
+              class="btn btn-quick-action quick-btn-responsive"
+              (click)="inputMessage = t('summary_btn') === 'Quick summary' ? 'Summarize my materials' : 'Fammi un riassunto sintetico'; sendMessage('text')"
             >
+              <fa-icon [icon]="faLightbulb" class="me-2"></fa-icon>{{
+              t('summary_btn') }}
+            </button>
+            <button
+              class="btn btn-quick-action quick-btn-responsive"
+              (click)="inputMessage = t('topics_btn') === 'Main topics' ? 'What are the main topics?' : 'Quali sono gli argomenti principali?'; sendMessage('text')"
+            >
+              <fa-icon [icon]="faBookOpen" class="me-2"></fa-icon>{{
+              t('topics_btn') }}
+            </button>
           </div>
-          <div class="voice-input-pill__divider"></div>
-          <button
-            class="voice-input-pill__btn fw-bold small"
-            (click)="finishTurn()"
-            title="Fai rispondere Alex ora"
-          >
-            <fa-icon [icon]="faStop"></fa-icon>
-            Ho finito
-          </button>
+          <!-- Riga inferiore: 1 bottone centrato -->
+          <div class="d-flex justify-content-center w-100">
+            <button
+              class="btn btn-quick-action quick-btn-responsive"
+              (click)="inputMessage = t('quiz_btn') === 'Test me with a quiz' ? 'Test me with a 3-question quiz' : 'Mettimi alla prova con un quiz di tre domande'; sendMessage('text')"
+            >
+              <fa-icon [icon]="faSparkles" class="me-2"></fa-icon>{{
+              t('quiz_btn') }}
+            </button>
+          </div>
         </div>
-        } @else {
+        } @else { @for (msg of messages(); track $index) {
         <div
-          class="voice-ai-responding-pill d-flex align-items-center justify-content-center gap-2"
+          class="d-flex mb-3"
+          [class.justify-content-end]="msg.role === 'user'"
         >
-          <div class="voice-ai-responding-pill__dot"></div>
-          <span class="fw-bold small text-truncate">
-            @if (geminiLiveService.isSpeaking()) { Alex sta rispondendo... }
-            @else if (geminiLiveService.isSearching()) { Sto cercando nei
-            materiali... } @else { Alex sta pensando... }
-          </span>
+          <div
+            class="msg-line rounded-4 px-3 px-md-4 py-2 py-md-3"
+            [class.msg-line--user]="msg.role === 'user'"
+          >
+            <markdown [data]="msg.content"></markdown>
+          </div>
+        </div>
+        } @if (isLoading()) {
+        <div class="typing-dots p-3 bg-light rounded-4 align-self-start mb-4">
+          <span></span><span></span><span></span>
         </div>
         } }
       </div>
-    </div>
-  </div>
 
-  <!-- SIDEBAR DESTRA: CRONOLOGIA CONVERSAZIONI -->
-  <div
-    class="chat-sidebar flex-column d-flex"
-    [class.mobile-hidden]="!mobileHistoryOpen()"
-    [class.collapsed]="!sidebarOpen()"
-    [class.mobile-open]="mobileHistoryOpen()"
-  >
-    <!-- Mobile header for sidebar -->
-    @if (mobileHistoryOpen()) {
-    <div
-      class="d-flex d-lg-none justify-content-between align-items-center p-3 border-bottom bg-white mobile-sidebar-header"
-    >
-      <h6 class="mb-0 fw-bold text-primary mobile-sidebar-title">Le tue Chat</h6>
-      <button
-        class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center btn-close-mobile-history"
-        style="width: 36px; height: 36px"
-        (click)="mobileHistoryOpen.set(false)"
-      >
-        <fa-icon [icon]="faTimes"></fa-icon>
-      </button>
-    </div>
-    }
-
-    <!-- Toggle button (Desktop only) -->
-    <button
-      class="sidebar-toggle-btn d-none d-lg-flex"
-      (click)="sidebarOpen.set(!sidebarOpen())"
-      [title]="sidebarOpen() ? 'Chiudi cronologia' : 'Apri cronologia'"
-    >
-      <fa-icon
-        [icon]="sidebarOpen() ? faChevronRight : faChevronLeft"
-      ></fa-icon>
-    </button>
-
-    @if (sidebarOpen() || mobileHistoryOpen()) {
-    <div class="p-3 pb-2 d-grid">
-      <app-syllex-button
-        [props]="newChatBtnProps"
-        (clicked)="startNewChat()"
-      ></app-syllex-button>
-    </div>
-
-    <div class="tiny fw-bold px-3 pb-1 pt-2 sidebar-section-label">
-      Cronologia
-    </div>
-
-    <div class="flex-fill overflow-auto px-2 pb-3">
-      @for (conv of conversations(); track conv.id) {
-      <div
-        class="history-item-container mb-1"
-        [class.active]="currentConversationId() === conv.id"
-        (click)="selectConversation(conv.id)"
-      >
-        <div class="history-item-left">
-          <fa-icon [icon]="faComment" class="history-item-icon"></fa-icon>
-          <span class="history-item-title text-truncate">
-            {{ conv.title || 'Conversazione' }}
-          </span>
-        </div>
-
+      <!-- ORB AREA: visibile solo in modalità vocale -->
+      <div class="voice-orb-area" [class.visible]="voiceModeActive()">
         <div
-          class="history-item-right"
-          [class.is-confirming]="pendingDeleteId() === conv.id"
-          (click)="$event.stopPropagation()"
-        >
-          @if (pendingDeleteId() === conv.id) {
-          <span class="delete-confirm-label">Elimina?</span>
-          <button
-            class="btn-confirm-yes"
-            (click)="deleteConversation(conv.id, $event)"
+          class="voice-orb-mini"
+          [class.pulse]="(isRecording() && !isMuted()) || geminiLiveService.isSpeaking()"
+          [class.muted]="isMuted() && !geminiLiveService.isSpeaking()"
+          [class.user-speaking]="isRecording() && !isMuted()"
+          [class.ai-speaking]="geminiLiveService.isSpeaking()"
+        ></div>
+      </div>
+
+      <!-- INPUT BAR -->
+      <div
+        class="input-area-container px-2 px-md-4 pb-3 pt-2 bg-transparent"
+        [class.is-voice]="voiceModeActive()"
+      >
+        <div class="input-bar-row">
+          <!-- Switcher -->
+          <div
+            class="mode-switcher"
+            [class.mode-switcher--voice]="voiceModeActive()"
           >
-            Sì
-          </button>
-          <button class="btn-confirm-no" (click)="cancelDelete($event)">
-            No
-          </button>
+            @if (!voiceModeActive()) {
+            <!-- Text mode: tastiera attiva, click waveform entra in vocale -->
+            <span class="mode-switcher__icon mode-switcher__icon--active">
+              <fa-icon [icon]="faKeyboard" />
+            </span>
+            <span
+              class="mode-switcher__icon"
+              (click)="toggleVoiceInput()"
+              style="cursor: pointer"
+            >
+              <fa-icon [icon]="faWaveformLines" />
+            </span>
+            } @else {
+            <!-- Voice mode: click tastiera esce -->
+            <span
+              class="mode-switcher__icon"
+              (click)="exitVoiceMode()"
+              style="cursor: pointer"
+              [title]="t('keyboard_tooltip') || 'Torna alla tastiera'"
+            >
+              <fa-icon [icon]="faKeyboard" />
+            </span>
+            }
+          </div>
+
+          <!-- Input pill (collassa verso destra in voice mode) o pulsanti Voice Mode -->
+          @if (!voiceModeActive()) {
+          <div
+            class="input-pill-mock d-flex align-items-center px-3 px-md-4 py-2 border shadow-sm"
+          >
+            <textarea
+              class="form-control border-0 shadow-none bg-transparent"
+              [(ngModel)]="inputMessage"
+              (keydown)="onKeydown($event)"
+              [placeholder]="t('write_placeholder')"
+              rows="1"
+            ></textarea>
+            <button
+              class="btn-send-new ms-3"
+              (click)="sendMessage('text')"
+              [disabled]="!inputMessage.trim() || isLoading()"
+            >
+              <fa-icon [icon]="SendIcon" />
+            </button>
+          </div>
           } @else {
-          <span class="tiny conversation-date">
-            {{ formatConversationDate(conv.timestamp) }}
-          </span>
-          <button
-            class="btn-delete-conv"
-            (click)="requestDeleteConversation(conv.id, $event)"
-            title="Elimina conversazione"
+          <!-- Pulsanti Voice Mode al posto della barra di input -->
+          @if (isRecording() && !isMuted()) {
+          <!-- Dynamic Listening Status + Stop Action Pill -->
+          <div
+            class="voice-input-pill d-flex align-items-center justify-content-between px-3 py-2 shadow-sm"
           >
-            <fa-icon [icon]="faTrash"></fa-icon>
-          </button>
-          }
+            <div
+              class="voice-input-pill__status d-flex align-items-center gap-2"
+            >
+              <div class="voice-input-pill__dot"></div>
+              <span class="fw-semibold small text-primary"
+                >{{ t('listening_status') }}</span
+              >
+            </div>
+            <div class="voice-input-pill__divider"></div>
+            <button
+              class="voice-input-pill__btn fw-bold small"
+              (click)="finishTurn()"
+              [title]="t('finish_btn')"
+            >
+              <fa-icon [icon]="faStop"></fa-icon>
+              {{ t('finish_btn') }}
+            </button>
+          </div>
+          } @else {
+          <div
+            class="voice-ai-responding-pill d-flex align-items-center justify-content-center gap-2"
+          >
+            <div class="voice-ai-responding-pill__dot"></div>
+            <span class="fw-bold small text-truncate">
+              @if (geminiLiveService.isSpeaking()) { {{ t('responding_status')
+              }} } @else if (geminiLiveService.isSearching()) { {{
+              t('searching_status') }} } @else { {{ t('thinking_status') }} }
+            </span>
+          </div>
+          } }
         </div>
+      </div>
+    </div>
+
+    <!-- SIDEBAR DESTRA: CRONOLOGIA CONVERSAZIONI -->
+    <div
+      class="chat-sidebar flex-column d-flex"
+      [class.mobile-hidden]="!mobileHistoryOpen()"
+      [class.collapsed]="!sidebarOpen()"
+      [class.mobile-open]="mobileHistoryOpen()"
+    >
+      <!-- Mobile header for sidebar -->
+      @if (mobileHistoryOpen()) {
+      <div
+        class="d-flex d-lg-none justify-content-between align-items-center p-3 border-bottom bg-white mobile-sidebar-header"
+      >
+        <h6 class="mb-0 fw-bold text-primary mobile-sidebar-title">
+          {{ t('history_label') }}
+        </h6>
+        <button
+          class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center btn-close-mobile-history"
+          style="width: 36px; height: 36px"
+          (click)="mobileHistoryOpen.set(false)"
+        >
+          <fa-icon [icon]="faTimes"></fa-icon>
+        </button>
+      </div>
+      }
+
+      <!-- Toggle button (Desktop only) -->
+      <button
+        class="sidebar-toggle-btn d-none d-lg-flex"
+        (click)="sidebarOpen.set(!sidebarOpen())"
+        [title]="sidebarOpen() ? t('close_history') || 'Chiudi cronologia' : t('open_history') || 'Apri cronologia'"
+      >
+        <fa-icon
+          [icon]="sidebarOpen() ? faChevronRight : faChevronLeft"
+        ></fa-icon>
+      </button>
+
+      @if (sidebarOpen() || mobileHistoryOpen()) {
+      <div class="p-3 pb-2 d-grid">
+        <button
+          class="btn btn-primary d-flex align-items-center justify-content-center gap-2 py-2"
+          style="
+            background-color: var(--celestine-primary);
+            border: none;
+            border-radius: var(--syllex-radius-medium);
+          "
+          (click)="startNewChat()"
+        >
+          <fa-icon [icon]="faPlus"></fa-icon>
+          {{ t('new_chat_btn') }}
+        </button>
+      </div>
+
+      <div class="tiny fw-bold px-3 pb-1 pt-2 sidebar-section-label">
+        {{ t('history_label') }}
+      </div>
+
+      <div class="flex-fill overflow-auto px-2 pb-3">
+        @for (conv of conversations(); track conv.id) {
+        <div
+          class="history-item-container mb-1"
+          [class.active]="currentConversationId() === conv.id"
+          (click)="selectConversation(conv.id)"
+        >
+          <div class="history-item-left">
+            <fa-icon [icon]="faComment" class="history-item-icon"></fa-icon>
+            <span class="history-item-title text-truncate">
+              {{ conv.title || 'Conversazione' }}
+            </span>
+          </div>
+
+          <div
+            class="history-item-right"
+            [class.is-confirming]="pendingDeleteId() === conv.id"
+            (click)="$event.stopPropagation()"
+          >
+            @if (pendingDeleteId() === conv.id) {
+            <span class="delete-confirm-label">{{ t('delete_confirm') }}</span>
+            <button
+              class="btn-confirm-yes"
+              (click)="deleteConversation(conv.id, $event)"
+            >
+              {{ t('yes') }}
+            </button>
+            <button class="btn-confirm-no" (click)="cancelDelete($event)">
+              {{ t('no') }}
+            </button>
+            } @else {
+            <span class="tiny conversation-date">
+              {{ formatConversationDate(conv.timestamp) }}
+            </span>
+            <button
+              class="btn-delete-conv"
+              (click)="requestDeleteConversation(conv.id, $event)"
+              [title]="t('delete_tooltip')"
+            >
+              <fa-icon [icon]="faTrash"></fa-icon>
+            </button>
+            }
+          </div>
+        </div>
+        }
       </div>
       }
     </div>
-    }
   </div>
-</div>
+</ng-container>

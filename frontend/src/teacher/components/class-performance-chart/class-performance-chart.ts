@@ -19,12 +19,10 @@ import {
   Filler,
 } from 'chart.js';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { catchError, of, startWith, switchMap } from 'rxjs';
-import {
-  AttemptInterface,
-  TestsService,
-} from '../../../services/tests-service';
+import { catchError, from, of, startWith, switchMap } from 'rxjs';
+import { AttemptInterface, TestsService } from '../../../services/tests-service';
 import { computed, inject, input } from '@angular/core';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 // Register Chart.js components
 Chart.register(
@@ -56,12 +54,13 @@ const SCHOOL_MONTHS = [8, 9, 10, 11, 0, 1, 2, 3, 4, 5];
 
 @Component({
   selector: 'app-class-performance-chart',
-  imports: [],
+  imports: [TranslocoDirective, TranslocoPipe],
   templateUrl: './class-performance-chart.html',
   styleUrl: './class-performance-chart.scss',
 })
 export class ClassPerformanceChart {
   private readonly testsService = inject(TestsService);
+  private readonly translocoService = inject(TranslocoService);
   readonly classId = input.required<string>();
 
   readonly attemptsData = toSignal(
@@ -136,10 +135,10 @@ export class ClassPerformanceChart {
     const config: ChartConfiguration = {
       type: 'line',
       data: {
-        labels: SCHOOL_MONTH_LABELS,
+        labels: this.translocoService.translate<string[]>('class_detail.months'),
         datasets: [
           {
-            label: 'Performance (%)',
+            label: this.translocoService.translate('class_detail.chart_perf_label'),
             data,
             borderColor: '#3931CE',
             borderWidth: 2.5,
@@ -176,8 +175,8 @@ export class ClassPerformanceChart {
             callbacks: {
               label: (context) =>
                 context.parsed.y != null
-                  ? `Performance: ${context.parsed.y}%`
-                  : 'Nessun dato',
+                  ? this.translocoService.translate('class_detail.chart_perf_tooltip', { val: context.parsed.y })
+                  : this.translocoService.translate('class_detail.chart_perf_no_data'),
             },
           },
         },

@@ -57,6 +57,7 @@ import { SyllexButton } from '../UI/syllex-button/syllex-button';
 import { MaterialiFacadeService } from '../../../services/materiali/materiali-facade.service';
 import { MaterialInterface } from '../../../services/materiali/materiali-service';
 import { SyllexErrorModalComponent } from '../../../directives/syllex-error-modal.component';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 interface ReviewQuestion {
   readonly TempId: string;
@@ -76,6 +77,8 @@ interface ReviewQuestion {
     AiOverlay,
     TourAnchorNgBootstrapDirective,
     SyllexButton,
+    TranslocoDirective,
+    TranslocoPipe,
   ],
   templateUrl: './gen-ai-contents.html',
   styleUrl: './gen-ai-contents.scss',
@@ -100,6 +103,7 @@ export class GenAiContents implements OnInit {
   @Optional() readonly activeOffcanvas = inject(NgbActiveOffcanvas, {
     optional: true,
   });
+  private readonly translocoService = inject(TranslocoService);
 
   private readonly destroyRef = inject(DestroyRef);
   readonly formInvalid = signal<boolean>(true);
@@ -146,21 +150,21 @@ export class GenAiContents implements OnInit {
     const reasons: string[] = [];
 
     if (this.selectedMaterials().length === 0) {
-      reasons.push('Seleziona almeno una risorsa o materiale di riferimento.');
+      reasons.push(this.translocoService.translate('gen_ai_contents.err_materials'));
     }
 
     if (
       this.TypeMode() === 'questions' &&
       !this.genForm.get('topicId')?.value
     ) {
-      reasons.push('Seleziona un argomento per le domande.');
+      reasons.push(this.translocoService.translate('gen_ai_contents.err_topic'));
     }
 
     if (this.formInvalid()) {
       const topicInvalid =
         this.TypeMode() === 'questions' && !this.genForm.get('topicId')?.value;
       if (!topicInvalid) {
-        reasons.push('Compila correttamente tutti i parametri richiesti.');
+        reasons.push(this.translocoService.translate('gen_ai_contents.err_params'));
       }
     }
 
@@ -168,8 +172,8 @@ export class GenAiContents implements OnInit {
   });
   readonly submitButtonProps = computed(() => ({
     label: this.IsGenerating()
-      ? 'Generazione in corso...'
-      : 'Genera ' + this.getSelectedTypeName(),
+      ? this.translocoService.translate('gen_ai_contents.btn_generating')
+      : this.translocoService.translate('gen_ai_contents.btn_generate', { type: this.getSelectedTypeName() }),
     variant: 'primary' as const,
     size: 'large' as const,
     disabled:
@@ -211,11 +215,23 @@ export class GenAiContents implements OnInit {
 
   ngOnInit(): void {
     this.IsOffcanvasMode.set(!!this.activeOffcanvas);
-    this.Types.set(
-      this.TypeMode() === 'materials'
+    const updateTypes = () => {
+      const rawTypes = this.TypeMode() === 'materials'
         ? MATERIAL_TYPE_OPTIONS
-        : QUESTION_TYPE_OPTIONS,
-    );
+        : QUESTION_TYPE_OPTIONS;
+      this.Types.set(
+        rawTypes.map(t => ({
+          ...t,
+          label: this.translocoService.translate(`gen_ai_contents.types.${t.value.replace(/ |-/g, '_')}.label`),
+          description: this.translocoService.translate(`gen_ai_contents.types.${t.value.replace(/ |-/g, '_')}.desc`)
+        }))
+      );
+    };
+
+    updateTypes();
+    this.translocoService.langChanges$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => updateTypes());
     const firstType = this.Types()[0].value;
     this.SelectedType.set(firstType);
     this.genForm.controls['selectedType'].setValue(firstType);
@@ -322,7 +338,7 @@ export class GenAiContents implements OnInit {
       );
 
     if (!generated.length) {
-      throw new Error('Nessuna domanda generata con successo.');
+      throw new Error(this.translocoService.translate('gen_ai_contents.err_no_questions'));
     }
 
     this.PartialGenerationWarning.set(failedCount);
@@ -409,13 +425,13 @@ export class GenAiContents implements OnInit {
         this.IsSaving.set(false);
         if (this.IsOffcanvasMode()) {
           this.feedbackService.showFeedback(
-            `${questionsWithPoints.length} ${questionsWithPoints.length === 1 ? 'domanda aggiunta' : 'domande aggiunte'} al test`,
+            this.translocoService.translate('gen_ai_contents.msg_added', { count: questionsWithPoints.length }),
             true,
           );
           this.activeOffcanvas?.close(questionsWithPoints);
         } else {
           this.feedbackService.showFeedback(
-            `${questionsWithPoints.length} ${questionsWithPoints.length === 1 ? 'domanda salvata' : 'domande salvate'} nella banca domande`,
+            this.translocoService.translate('gen_ai_contents.msg_saved', { count: questionsWithPoints.length }),
             true,
           );
           this.onBackToForm();
@@ -424,7 +440,7 @@ export class GenAiContents implements OnInit {
       error: () => {
         this.IsSaving.set(false);
         this.feedbackService.showFeedback(
-          'Errore durante il salvataggio delle domande',
+          this.translocoService.translate('gen_ai_contents.err_saving'),
           false,
         );
       },

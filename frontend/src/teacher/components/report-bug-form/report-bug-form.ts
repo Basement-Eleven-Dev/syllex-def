@@ -5,16 +5,18 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faSpinnerThird } from '@fortawesome/pro-solid-svg-icons';
 import { FeedbackService } from '../../../services/feedback-service';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-report-bug-form',
-  imports: [ReactiveFormsModule, FontAwesomeModule],
+  imports: [ReactiveFormsModule, FontAwesomeModule, TranslocoDirective, TranslocoPipe],
   templateUrl: './report-bug-form.html',
   styleUrl: './report-bug-form.scss',
 })
 export class ReportBugForm {
   private readonly reportsService = inject(ReportsService);
   private readonly feedbackService = inject(FeedbackService);
+  private readonly translocoService = inject(TranslocoService);
   readonly activeModal = inject(NgbActiveModal);
 
   readonly SpinnerIcon = faSpinnerThird;
@@ -46,7 +48,7 @@ export class ReportBugForm {
       .subscribe({
         next: () => {
           this.feedbackService.showFeedback(
-            'Segnalazione inviata con successo. Grazie per il tuo feedback!',
+            this.translocoService.translate('report_bug.success'),
             true,
           );
           this.activeModal.close('submitted');
@@ -54,7 +56,7 @@ export class ReportBugForm {
         error: (err) => {
           console.error("Errore durante l'invio del report:", err);
           this.errorMessage.set(
-            'Si è verificato un errore. Riprova più tardi.',
+            this.translocoService.translate('report_bug.error'),
           );
           this.isSubmitting.set(false);
         },

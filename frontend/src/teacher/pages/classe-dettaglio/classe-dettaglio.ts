@@ -27,6 +27,7 @@ import { TestsService } from '../../../services/tests-service';
 
 import { BackTo } from '../../components/back-to/back-to';
 import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-page-header';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-class-detail',
@@ -38,6 +39,8 @@ import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-
     SyllexKpiRow,
     BackTo,
     SyllexPageHeader,
+    TranslocoDirective,
+    TranslocoPipe,
   ],
   templateUrl: './classe-dettaglio.html',
   styleUrl: './classe-dettaglio.scss',
@@ -48,6 +51,7 @@ export class ClasseDettaglio {
   private readonly classService = inject(ClassiService);
   private readonly testsService = inject(TestsService);
   private readonly statisticsService = inject(ClassStatisticsService);
+  private readonly translocoService = inject(TranslocoService);
 
   // Icons
   readonly ArrowLeftIcon = faArrowLeft;
@@ -70,26 +74,26 @@ export class ClasseDettaglio {
 
     return [
       {
-        label: 'Numero Studenti',
+        label: this.translocoService.translate('class_detail.kpi_students'),
         value: this.StudentsData().length,
       },
       {
-        label: 'Performance Media',
+        label: this.translocoService.translate('class_detail.kpi_perf'),
         requirePercentage: true,
         value: this.AveragePerformance(),
       },
       {
-        label: 'Test Assegnati',
+        label: this.translocoService.translate('class_detail.kpi_assigned'),
         value: this.AssignedTestsCount(),
         buttonLink: '/t/tests/new',
         buttonQueryParams: { assign: classData._id },
-        buttonLabel: 'Nuovo test',
+        buttonLabel: this.translocoService.translate('class_detail.btn_new_test'),
       },
       {
-        label: 'Test Consegnati',
+        label: this.translocoService.translate('class_detail.kpi_submitted'),
         value: this.SubmittedTestsCount(),
         buttonLink: ['/t/tests'],
-        buttonLabel: 'Vedi tutti',
+        buttonLabel: this.translocoService.translate('class_detail.btn_see_all'),
       },
     ];
   });
@@ -169,7 +173,7 @@ export class ClasseDettaglio {
       }),
       catchError((error) => {
         console.error('Unexpected error loading class data:', error);
-        this.ErrorMessage.set('Errore nel caricamento dei dati della classe');
+        this.ErrorMessage.set(this.translocoService.translate('class_detail.err_load'));
         this.IsLoading.set(false);
         return of(null);
       }),

@@ -1,7 +1,8 @@
+<ng-container *transloco="let t; read: 'laboratorio_ai'">
 <app-syllex-page-header
   tourAnchor="laboratorio_ai_header"
-  title="Crea con l'AI di Syllex"
-  description="Genera materiali didattici e domande per i test in pochi passi."
+  [title]="t('title')"
+  [description]="t('description')"
 ></app-syllex-page-header>
 
 @if (!InitialChoice()) {
@@ -17,8 +18,8 @@
         (keydown.enter)="onSelectInitialType('materials')"
       >
         <app-syllex-card
-          title="Materiale di studio"
-          description="Genera slides, riassunti, glossari e mappe concettuali dai tuoi file"
+          [title]="t('card_study_title')"
+          [description]="t('card_study_desc')"
           [icon]="MaterialsIcon"
           variant="ai"
           [showArrow]="true"
@@ -35,8 +36,8 @@
         (keydown.enter)="onSelectInitialType('questions')"
       >
         <app-syllex-card
-          title="Domande dei Test"
-          description="Crea domande per la banca domande in modalità guidata"
+          [title]="t('card_questions_title')"
+          [description]="t('card_questions_desc')"
           [icon]="QuestionsIcon"
           variant="filled"
           color="purple"
@@ -60,12 +61,12 @@
         @stepIn
         tourAnchor="gen_ai_type_selector"
       >
-        <h5 class="wizard-step-title">Che materiale vuoi creare?</h5>
+        <h5 class="wizard-step-title">{{ t('title_step1') }}</h5>
         <p class="wizard-step-subtitle">
-          Scegli il formato e l'AI farà il resto.
+          {{ t('desc_step1') }}
         </p>
         <div class="row g-3 mt-1">
-          @for (type of MaterialTypes; track type.value) {
+          @for (type of MaterialTypes(); track type.value) {
           <div class="col-12 col-sm-6">
             <div
               class="method-card"
@@ -98,10 +99,10 @@
         <div class="form-section d-flex flex-column gap-3">
           <div class="mb-2">
             <h5 class="wizard-step-title mb-1">
-              Materiali di riferimento
+              {{ t('title_step2') }}
             </h5>
             <p class="wizard-step-subtitle mb-0">
-              Scegli i file base e l'argomento per la generazione.
+              {{ t('desc_step2') }}
             </p>
           </div>
           @if (SelectedMaterialIds().length > 0) {
@@ -110,7 +111,7 @@
               class="badge rounded-pill bg-primary"
               style="font-size: 0.72rem"
             >
-              {{ SelectedMaterialIds().length }} selezionati
+              {{ SelectedMaterialIds().length }} {{ t('selected') }}
             </span>
             <button
               type="button"
@@ -118,7 +119,7 @@
               style="font-size: 0.78rem"
               (click)="onDeselectAllMaterials()"
             >
-              Deseleziona tutti
+              {{ t('deselect_all') }}
             </button>
           </div>
           }
@@ -130,14 +131,14 @@
           @if (materiaService.materiaSelected()?.topics?.length) {
           <div [formGroup]="genForm">
             <label class="wizard-field-label"
-              >Argomento
-              <span class="text-muted fw-normal">(opzionale)</span></label
+              >{{ t('topic') }}
+              <span class="text-muted fw-normal">{{ t('optional') }}</span></label
             >
             <select
               class="form-select custom-input"
               formControlName="topicId"
             >
-              <option value="">Tutti gli argomenti</option>
+              <option value="">{{ t('all_topics') }}</option>
               @for (topic of materiaService.materiaSelected()!.topics; track
               topic._id) {
               <option [value]="topic._id">{{ topic.name }}</option>
@@ -146,7 +147,7 @@
           </div>
           } @if (SelectedMaterialIds().length === 0) {
           <p class="text-muted small mb-0">
-            Seleziona almeno un file per continuare.
+            {{ t('select_file_warning') }}
           </p>
           }
         </div>
@@ -158,13 +159,13 @@
       <div class="wizard-step-content" @stepIn tourAnchor="gen_ai_instructions">
         <div [formGroup]="genForm" class="form-section d-flex flex-column gap-3">
           <div class="mb-2">
-            <h5 class="wizard-step-title mb-1">Come vuoi le tue slide?</h5>
+            <h5 class="wizard-step-title mb-1">{{ t('title_step3_slides') }}</h5>
             <p class="wizard-step-subtitle mb-0">
-              Scegli lo stile e l'AI adatterà la densità e il tono del testo.
+              {{ t('desc_step3_slides') }}
             </p>
           </div>
           <div class="row g-3">
-            @for (opt of StyleOptions; track opt.value) {
+            @for (opt of StyleOptions(); track opt.value) {
             <div class="col-12 col-sm-4">
               <div
                 class="style-preset-card h-100"
@@ -173,7 +174,7 @@
                 role="button"
               >
                 @if (opt.recommended) {
-                <span class="badge bg-primary preset-badge">Consigliata</span>
+                <span class="badge bg-primary preset-badge">{{ t('recommended') }}</span>
                 }
                 <span class="preset-icon">
                   <fa-icon [icon]="opt.icon" />
@@ -190,15 +191,15 @@
           </div>
           <div>
             <label class="wizard-field-label">
-              Vuoi aggiungere qualcosa?
-              <span class="text-muted fw-normal">(opzionale)</span>
+              {{ t('add_instructions') }}
+              <span class="text-muted fw-normal">{{ t('optional') }}</span>
             </label>
             <textarea
               class="form-control custom-input"
               formControlName="instructions"
               rows="3"
               style="resize: none"
-              placeholder="Es. includi esempi pratici, usa un tono formale, evidenzia le definizioni..."
+              [placeholder]="t('instructions_placeholder')"
             ></textarea>
           </div>
         </div>
@@ -215,14 +216,14 @@
         <div [formGroup]="genForm" class="form-section d-flex flex-column gap-3">
           <div class="mb-2">
             <h5 class="wizard-step-title mb-1">
-              Personalizza il {{ SelectedMaterialTypeName() }}
+              {{ t('title_step3_other', { type: SelectedMaterialTypeName() }) }}
             </h5>
             <p class="wizard-step-subtitle mb-0">
-              Indica la lingua e aggiungi istruzioni specifiche per l'AI.
+              {{ t('desc_step3_other') }}
             </p>
           </div>
           <div>
-            <label class="wizard-field-label">In che lingua?</label>
+            <label class="wizard-field-label">{{ t('language_label') }}</label>
             <select class="form-select custom-input" formControlName="language" aria-label="Lingua">
               @for (lang of LanguageOptions; track lang.value) {
                 <option [value]="lang.value">{{ lang.label }}</option>
@@ -231,15 +232,15 @@
           </div>
           <div>
             <label class="wizard-field-label">
-              Istruzioni particolari
-              <span class="text-muted fw-normal">(opzionale)</span>
+              {{ t('instructions_particular') }}
+              <span class="text-muted fw-normal">{{ t('optional') }}</span>
             </label>
             <textarea
               class="form-control custom-input"
               formControlName="instructions"
               rows="4"
               style="resize: none"
-              placeholder="Es. usa un tono formale, includi esempi pratici, evidenzia le definizioni..."
+              [placeholder]="t('instructions_placeholder')"
             ></textarea>
           </div>
         </div>
@@ -253,15 +254,15 @@
           <div class="mb-2">
             <h5 class="wizard-step-title mb-1">
               <fa-icon [icon]="SparklesIcon" class="me-2 text-primary"></fa-icon>
-              Ultimi dettagli
+              {{ t('title_step4') }}
             </h5>
             <p class="wizard-step-subtitle mb-0">
-              Quante slide, in che lingua e il formato di output.
+              {{ t('desc_step4') }}
             </p>
           </div>
           <div class="row g-3">
             <div class="col-6">
-              <label class="wizard-field-label">Quante slide?</label>
+              <label class="wizard-field-label">{{ t('slides_count') }}</label>
               <input
                 type="number"
                 class="form-control custom-input"
@@ -272,13 +273,13 @@
                 aria-label="Numero di slide"
               />
               @if (genForm.get('numberOfSlides')?.hasError('max')) {
-                <div class="invalid-feedback d-block mt-1">Massimo 30 slide alla volta.</div>
+                <div class="invalid-feedback d-block mt-1">{{ t('slides_max_err') }}</div>
               } @if (genForm.get('numberOfSlides')?.hasError('min')) {
-                <div class="invalid-feedback d-block mt-1">Minimo 3 slide.</div>
+                <div class="invalid-feedback d-block mt-1">{{ t('slides_min_err') }}</div>
               }
             </div>
             <div class="col-6">
-              <label class="wizard-field-label">In che lingua?</label>
+              <label class="wizard-field-label">{{ t('language_label') }}</label>
               <select class="form-select custom-input" formControlName="language" aria-label="Lingua">
                 @for (lang of LanguageOptions; track lang.value) {
                   <option [value]="lang.value">{{ lang.label }}</option>
@@ -287,7 +288,7 @@
             </div>
           </div>
           <div>
-            <label class="wizard-field-label">Formato di output</label>
+            <label class="wizard-field-label">{{ t('output_format') }}</label>
             <div class="d-flex gap-2">
               <label
                 class="rounded-syllex typeCard p-3 d-flex align-items-center gap-2 flex-fill"
@@ -305,7 +306,7 @@
                 <div>
                   <div class="fw-semibold small">PDF</div>
                   <div class="text-muted" style="font-size: 0.75rem">
-                    Documento statico
+                    {{ t('format_static') }}
                   </div>
                 </div>
               </label>
@@ -325,7 +326,7 @@
                 <div>
                   <div class="fw-semibold small">Power Point</div>
                   <div class="text-muted" style="font-size: 0.75rem">
-                    PPTX modificabile
+                    {{ t('format_editable') }}
                   </div>
                 </div>
               </label>
@@ -390,7 +391,7 @@
               [icon]="IsGenerating() ? SpinnerIcon : SparklesIcon"
               [animation]="IsGenerating() ? 'spin' : undefined"
             ></fa-icon>
-            <span>{{ IsGenerating() ? 'Generazione...' : 'Genera ' + SelectedMaterialTypeName() }}</span>
+            <span>{{ IsGenerating() ? t('btn_generating') : t('btn_generate_type', { type: SelectedMaterialTypeName() }) }}</span>
           </button>
         </div>
         }
@@ -401,7 +402,7 @@
         <div class="wizard-footer__left d-flex justify-content-start" style="flex: 1;">
           <app-syllex-button
             [props]="{
-              label: 'Indietro',
+              label: t('btn_back'),
               leftIcon: ArrowLeftIcon,
               variant: 'outline',
               color: 'dark',
@@ -423,7 +424,7 @@
           <div [class.d-none]="!ShowNextArrow()">
             <app-syllex-button
               [props]="{
-                label: 'Avanti',
+                label: t('btn_next'),
                 rightIcon: ArrowRightIcon,
                 variant: 'primary',
                 size: 'medium',
@@ -444,7 +445,7 @@
               [icon]="IsGenerating() ? SpinnerIcon : SparklesIcon"
               [animation]="IsGenerating() ? 'spin' : undefined"
             ></fa-icon>
-            <span>{{ IsGenerating() ? 'Generazione in corso...' : 'Genera ' + SelectedMaterialTypeName() }}</span>
+            <span>{{ IsGenerating() ? t('btn_generating_long') : t('btn_generate_type', { type: SelectedMaterialTypeName() }) }}</span>
           </button>
         </div>
       </div>
@@ -457,10 +458,11 @@
 <app-ai-overlay
   [visible]="IsGenerating()"
   [success]="GenerationSuccess()"
-  loadingTitle="Generazione in corso..."
-  loadingSubtitle="Non tornare indietro e non chiudere la pagina,&#10;altrimenti la generazione andrà perduta."
-  successTitle="Materiale generato!"
-  successMessage="Il tuo materiale è pronto e disponibile in File e Risorse."
-  ctaLabel="Vai ai materiali"
+  [loadingTitle]="t('overlay_loading_title')"
+  [loadingSubtitle]="t('overlay_loading_sub')"
+  [successTitle]="t('overlay_success_title')"
+  [successMessage]="t('overlay_success_sub')"
+  [ctaLabel]="t('overlay_cta')"
   (ctaClick)="onReturnToResources()"
 ></app-ai-overlay>
+</ng-container>

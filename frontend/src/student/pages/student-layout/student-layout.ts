@@ -1,4 +1,12 @@
-import { Component, signal, ViewChild, HostListener, inject, OnInit, computed } from '@angular/core';
+import {
+  Component,
+  signal,
+  ViewChild,
+  HostListener,
+  inject,
+  OnInit,
+  computed,
+} from '@angular/core';
 import { RouterOutlet, RouterModule, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -13,7 +21,7 @@ import {
   faXmark,
   faRightFromBracket,
   faGrip,
-  faSparkles
+  faSparkles,
 } from '@fortawesome/pro-solid-svg-icons';
 import {
   NgbDropdown,
@@ -26,7 +34,11 @@ import { StudentUserContextualMenu } from '../../components/student-user-context
 import { HelpChat } from '../../../teacher/components/help-chat/help-chat';
 import { Auth, User } from '../../../services/auth';
 import { Materia } from '../../../services/materia';
-import { SelectOption, SyllexSelectInput } from '../../../teacher/components/UI/syllex-select-input/syllex-select-input';
+import {
+  SelectOption,
+  SyllexSelectInput,
+} from '../../../teacher/components/UI/syllex-select-input/syllex-select-input';
+import { TranslocoDirective, TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-student-layout',
@@ -44,6 +56,8 @@ import { SelectOption, SyllexSelectInput } from '../../../teacher/components/UI/
     StudentUserContextualMenu,
     HelpChat,
     SyllexSelectInput,
+    TranslocoDirective,
+    TranslocoPipe,
   ],
   templateUrl: './student-layout.html',
   styleUrl: './student-layout.scss',
@@ -71,7 +85,9 @@ export class StudentLayout implements OnInit {
   });
 
   onSubjectChange(subjectId: string) {
-    const subject = this.materiaService.allMaterie().find((m) => m._id === subjectId);
+    const subject = this.materiaService
+      .allMaterie()
+      .find((m) => m._id === subjectId);
     if (subject) {
       this.materiaService.setSelectedSubject(subject);
     }
@@ -91,22 +107,22 @@ export class StudentLayout implements OnInit {
   mainRoutes = [
     {
       path: 'dashboard',
-      label: 'Home',
+      labelKey: 'home',
       icon: faHouse,
     },
     {
       path: 'tests',
-      label: 'Test',
+      labelKey: 'tests',
       icon: faFileLines,
     },
     {
       path: 'risorse',
-      label: 'File e Risorse',
+      labelKey: 'resources',
       icon: faFile,
     },
     {
       path: 'calendario',
-      label: 'Calendario',
+      labelKey: 'calendar',
       icon: faCalendar,
     },
   ];

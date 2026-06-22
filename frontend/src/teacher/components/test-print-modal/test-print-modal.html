@@ -1,5 +1,6 @@
+<ng-container *transloco="let t; read: 'test_print_modal'">
 <div class="modal-header border-0 pb-0">
-  <h4 class="modal-title fw-bold text-dark">Anteprima di Stampa</h4>
+  <h4 class="modal-title fw-bold text-dark">{{ t('title') }}</h4>
   <button type="button" class="btn-close" (click)="activeModal.dismiss()"></button>
 </div>
 
@@ -8,20 +9,20 @@
     <!-- Form settings -->
     <div class="col-12 col-lg-5 no-print">
       <div class="card bg-light border-0 rounded-4 p-3 mb-4">
-        <h6 class="fw-bold mb-3">Opzioni Stampa</h6>
+        <h6 class="fw-bold mb-3">{{ t('options_title') }}</h6>
         
         <div class="mb-3">
-          <label class="form-label small text-muted">Istruzioni aggiuntive</label>
-          <textarea class="form-control custom-input" rows="6" [(ngModel)]="instructions" placeholder="Inserisci qui le istruzioni per gli studenti..."></textarea>
+          <label class="form-label small text-muted">{{ t('options_label') }}</label>
+          <textarea class="form-control custom-input" rows="6" [(ngModel)]="instructions" [placeholder]="t('options_placeholder')"></textarea>
         </div>
       </div>
       
       <div class="d-grid gap-2">
         <button class="btn btn-primary btn-lg rounded-pill" (click)="onPrint()">
-          <fa-icon [icon]="PrintIcon" class="me-2"></fa-icon> Stampa / Salva PDF
+          <fa-icon [icon]="PrintIcon" class="me-2"></fa-icon> {{ t('btn_print') }}
         </button>
         <p class="text-center text-muted small mt-2">
-          Usa la funzione di stampa del browser per salvare come PDF.
+          {{ t('browser_hint') }}
         </p>
       </div>
     </div>
@@ -34,22 +35,22 @@
           <div class="d-flex justify-content-between align-items-start mb-4">
             <div>
               <h2 class="fw-bold text-dark mb-1">{{ test.name }}</h2>
-              <p class="text-muted mb-0">Test di valutazione</p>
+              <p class="text-muted mb-0">{{ t('subtitle') }}</p>
             </div>
             <div class="text-end">
-              <p class="mb-1"><strong>Data:</strong> ___________________</p>
-              <p class="mb-0"><strong>Classe:</strong> _________</p>
+              <p class="mb-1"><strong>{{ t('date') }}</strong> ___________________</p>
+              <p class="mb-0"><strong>{{ t('class') }}</strong> _________</p>
             </div>
           </div>
           
           <div class="student-info-box border p-3 rounded-3 mb-4 d-flex gap-4">
-            <div class="flex-fill"><strong>Nome:</strong> ___________________________</div>
-            <div class="flex-fill"><strong>Cognome:</strong> ________________________</div>
+            <div class="flex-fill"><strong>{{ t('name') }}</strong> ___________________________</div>
+            <div class="flex-fill"><strong>{{ t('lastname') }}</strong> ________________________</div>
           </div>
 
           @if (instructions) {
             <div class="instructions-box">
-              <h6 class="fw-bold mb-2">Istruzioni:</h6>
+              <h6 class="fw-bold mb-2">{{ t('instructions') }}</h6>
               <p class="mb-0 text-dark" style="white-space: pre-wrap;">{{ instructions }}</p>
             </div>
           }
@@ -70,10 +71,10 @@
                   @if (q.type === 'vero falso') {
                     <div class="d-flex gap-4">
                       <div class="d-flex align-items-start gap-2">
-                        <div class="checkbox-box"></div> <span>Vero</span>
+                        <div class="checkbox-box"></div> <span>{{ t('true_cap') }}</span>
                       </div>
                       <div class="d-flex align-items-start gap-2">
-                        <div class="checkbox-box"></div> <span>Falso</span>
+                        <div class="checkbox-box"></div> <span>{{ t('false_cap') }}</span>
                       </div>
                     </div>
                   } @else {
@@ -105,3 +106,4 @@
     </div>
   </div>
 </div>
+</ng-container>

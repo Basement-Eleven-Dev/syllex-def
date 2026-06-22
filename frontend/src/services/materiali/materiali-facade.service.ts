@@ -14,6 +14,7 @@ import { MaterialInterface, MaterialiService } from './materiali-service';
 import { MaterialeSearchService } from './materiale-search.service';
 import { MaterialeSelectionService } from './materiale-selection.service';
 import { Materia } from '../materia';
+import { TranslocoService } from '@jsverse/transloco';
 
 /**
  * Facade that coordinates MaterialiService, SearchService, SelectionService
@@ -26,6 +27,7 @@ export class MaterialiFacadeService {
   private readonly searchService = inject(MaterialeSearchService);
   private readonly selectionService = inject(MaterialeSelectionService);
   private readonly fileService = inject(FilesService);
+  private readonly translocoService = inject(TranslocoService);
 
   private static readonly ROOT_FOLDER: Readonly<
     Pick<MaterialInterface, '_id' | 'name' | 'type' | 'createdAt'>
@@ -197,7 +199,7 @@ export class MaterialiFacadeService {
   createFolder(): Observable<MaterialInterface> {
     const folder: MaterialInterface = {
       _id: `temp-id-${Date.now()}`,
-      name: 'Nuova Cartella',
+      name: this.translocoService.translate('materiali.new_folder'),
       type: 'folder',
       content: [],
     };

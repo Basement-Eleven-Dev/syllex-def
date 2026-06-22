@@ -1,4 +1,4 @@
-import { APIGatewayProxyEvent } from "aws-lambda";
+import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { connectDatabase } from "../../_helpers/getDatabase";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import createError from "http-errors";
@@ -7,7 +7,10 @@ import { correctStudentQuestion } from "../../_helpers/AI/correctStudentQuestion
 import { Attempt } from "../../models/schemas/attempt.schema";
 import { Test } from "../../models/schemas/test.schema";
 
-const correctAttemptWithAI = async (request: APIGatewayProxyEvent) => {
+const correctAttemptWithAI = async (
+  request: APIGatewayProxyEvent,
+  context: Context,
+) => {
   const attemptId = request.pathParameters?.attemptId;
   const questionId = request.pathParameters?.questionId;
 
@@ -51,12 +54,16 @@ const correctAttemptWithAI = async (request: APIGatewayProxyEvent) => {
 
   const question = attempt.questions[questionIndex];
 
+  const language = context.language || "it";
+
   // 5. Chiamata all'AI con il maxScore reale preso dal Test
-  const { score, explanation, aiProbability } = await correctStudentQuestion(
-    question.answer || '',
-    maxScore,
-    question.question.explanation || '',
-  );
+  const { score, explanation, aiProbability, aiMarkers } =
+    await correctStudentQuestion(
+      question.answer || "",
+      maxScore,
+      question.question.explanation || "",
+      language,
+    );
 
   // 6. Update Atomico del tentativo
   await Attempt.updateOne(
@@ -65,8 +72,10 @@ const correctAttemptWithAI = async (request: APIGatewayProxyEvent) => {
       $set: {
         [`questions.${questionIndex}.score`]: score,
         [`questions.${questionIndex}.teacherComment`]: explanation,
-        [`questions.${questionIndex}.status`]: score >= (maxScore / 2) ? "correct" : "wrong",
+        [`questions.${questionIndex}.status`]:
+          score >= maxScore / 2 ? "correct" : "wrong",
         [`questions.${questionIndex}.aiProbability`]: aiProbability,
+        [`questions.${questionIndex}.aiMarkers`]: aiMarkers,
         updatedAt: new Date(),
       },
     },
@@ -77,7 +86,8 @@ const correctAttemptWithAI = async (request: APIGatewayProxyEvent) => {
     score,
     explanation,
     maxScore, // Lo restituiamo per debug o UI
-    aiProbability
+    aiProbability,
+    aiMarkers,
   };
 };
 

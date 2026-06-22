@@ -41,6 +41,7 @@ import { StudentComunicazioneCard } from '../../components/student-comunicazione
 import { StatCardData } from '../../../teacher/components/stat-card/stat-card';
 import { SyllexButton } from '../../../teacher/components/UI/syllex-button/syllex-button';
 import { AlexMascot } from '../../../app/shared/components/alex-mascot/alex-mascot';
+import { TranslocoDirective } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-dashbaord',
@@ -53,6 +54,7 @@ import { AlexMascot } from '../../../app/shared/components/alex-mascot/alex-masc
     StudentComunicazioneCard,
     SyllexButton,
     AlexMascot,
+    TranslocoDirective,
   ],
   templateUrl: './student-dashboard.html',
   styleUrl: './student-dashboard.scss',

@@ -1,189 +1,186 @@
-<app-back-to [path]="'/s/tests'" [label]="'Torna ai test'" />
+<ng-container *transloco="let t; read: 'student_test_execution'">
+  <app-back-to [path]="'/s/tests'" [label]="t('back_to_tests')" />
 
-@if (IsLoading()) {
-<div class="d-flex justify-content-center align-items-center py-5">
-  <fa-icon
-    [icon]="SpinnerIcon"
-    [animation]="'spin'"
-    [size]="'3x'"
-    class="text-primary"
-  ></fa-icon>
-</div>
-} @else if (Error()) {
-<div class="alert alert-danger" role="alert">{{ Error() }}</div>
-} @else if (TestData() && !TestStarted()) {
-<!-- Pre-start screen -->
-<div class="test-start-container d-flex flex-column align-items-center justify-content-center py-5 text-center">
-  
-  <!-- Graduation Cap Icon -->
-  <div class="test-start-icon-container mb-3">
-    <fa-icon [icon]="GraduationIcon" class="test-start-icon"></fa-icon>
+  @if (IsLoading()) {
+  <div class="d-flex justify-content-center align-items-center py-5">
+    <fa-icon
+      [icon]="SpinnerIcon"
+      [animation]="'spin'"
+      [size]="'3x'"
+      class="text-primary"
+    ></fa-icon>
   </div>
+  } @else if (Error()) {
+  <div class="alert alert-danger" role="alert">{{ Error() }}</div>
+  } @else if (TestData() && !TestStarted()) {
+  <!-- Pre-start screen -->
+  <div
+    class="test-start-container d-flex flex-column align-items-center justify-content-center py-5 text-center"
+  >
+    <!-- Graduation Cap Icon -->
+    <div class="test-start-icon-container mb-3">
+      <fa-icon [icon]="GraduationIcon" class="test-start-icon"></fa-icon>
+    </div>
 
-  <!-- Subtitle -->
-  <div class="test-start-subtitle mb-2">
-    @if (IsResuming()) {
-      Hai un tentativo in corso per un {{ IsAutoEval() ? 'test di autovalutazione' : 'test del docente' }}
-    } @else {
-      Stai svolgendo un {{ IsAutoEval() ? 'test di autovalutazione' : 'test del docente' }}
-    }
-  </div>
+    <!-- Subtitle -->
+    <div class="test-start-subtitle mb-2">
+      @if (IsResuming()) { {{ IsAutoEval() ? t('has_pending_attempt_self') :
+      t('has_pending_attempt_teacher') }} } @else { {{ IsAutoEval() ?
+      t('taking_test_self') : t('taking_test_teacher') }} }
+    </div>
 
-  <!-- Title -->
-  <h1 class="test-start-title mb-3">{{ TestData()!.name }}</h1>
+    <!-- Title -->
+    <h1 class="test-start-title mb-3">{{ TestData()!.name }}</h1>
 
-  <!-- Badge Info (Domande / Tempo) -->
-  <div class="test-start-badge mb-5">
-    <span>Domande: {{ Questions().length }}</span>
-    @if (HasTimeLimit()) {
+    <!-- Badge Info (Domande / Tempo) -->
+    <div class="test-start-badge mb-5">
+      <span>{{ t('questions_label', { count: Questions().length }) }}</span>
+      @if (HasTimeLimit()) {
       <span class="mx-2">&middot;</span>
-      <span>Tempo: {{ TestData()!.timeLimit }} min</span>
-    }
-  </div>
+      <span>{{ t('time_label', { count: TestData()!.timeLimit }) }}</span>
+      }
+    </div>
 
-  <!-- Password Protected Form -->
-  @if (IsPasswordProtected() && !IsResuming()) {
+    <!-- Password Protected Form -->
+    @if (IsPasswordProtected() && !IsResuming()) {
     <div class="test-start-password-container mb-5">
-      <label class="form-label text-white-50 small fw-semibold d-flex justify-content-center align-items-center gap-2 mb-2">
+      <label
+        class="form-label text-white-50 small fw-semibold d-flex justify-content-center align-items-center gap-2 mb-2"
+      >
         <fa-icon [icon]="LockIcon"></fa-icon>
-        Questo test è protetto da password
+        {{ t('password_protected_label') }}
       </label>
       <input
         type="password"
         class="form-control test-start-password-input mx-auto"
         [class.is-invalid]="PasswordError()"
-        placeholder="Inserisci la password del test"
+        [placeholder]="t('password_placeholder')"
         [value]="PasswordInput()"
         (input)="PasswordInput.set($any($event.target).value); PasswordError.set(null)"
       />
       @if (PasswordError()) {
-        <div class="invalid-feedback text-center mt-2 d-block">{{ PasswordError() }}</div>
+      <div class="invalid-feedback text-center mt-2 d-block">
+        {{ PasswordError() }}
+      </div>
       }
     </div>
-  }
+    }
 
-  <!-- Deadline Warning -->
-  @if (HasDeadline()) {
+    <!-- Deadline Warning -->
+    @if (HasDeadline()) {
     <div class="test-start-deadline mb-4 text-warning small">
       <fa-icon [icon]="ClockIcon" class="me-1"></fa-icon>
-      Questo test va consegnato entro il {{ DeadlineDate() | date: "d MMMM y HH:mm" }}
+      {{ t('deadline_warning', { date: DeadlineDate() | date: "d MMMM y HH:mm"
+      }) }}
     </div>
-  }
+    }
 
-  <!-- Action Cards -->
-  <div class="test-start-cards-grid d-flex flex-column flex-sm-row gap-4 justify-content-center align-items-stretch">
-    
-    <!-- Avvia / Riprendi Card -->
-    <button
-      class="test-action-card card-start d-flex flex-column justify-content-between p-4"
-      (click)="onStartTest()"
-      [disabled]="IsStarting() || (IsPasswordProtected() && !PasswordInput().trim())"
+    <!-- Action Cards -->
+    <div
+      class="test-start-cards-grid d-flex flex-column flex-sm-row gap-4 justify-content-center align-items-stretch"
     >
-      <div class="card-title text-start">
-        @if (IsStarting()) {
-          Avvio in...
-        } @else if (IsResuming()) {
-          Riprendi Test
-        } @else {
-          Avvia Test
-        }
-      </div>
-      <div class="card-icon align-self-end">
-        @if (IsStarting()) {
+      <!-- Avvia / Riprendi Card -->
+      <button
+        class="test-action-card card-start d-flex flex-column justify-content-between p-4"
+        (click)="onStartTest()"
+        [disabled]="IsStarting() || (IsPasswordProtected() && !PasswordInput().trim())"
+      >
+        <div class="card-title text-start">
+          @if (IsStarting()) { {{ t('starting_btn') }} } @else if (IsResuming())
+          { {{ t('resume_btn') }} } @else { {{ t('start_btn') }} }
+        </div>
+        <div class="card-icon align-self-end">
+          @if (IsStarting()) {
           <fa-icon [icon]="SpinnerIcon" [animation]="'spin'"></fa-icon>
-        } @else {
+          } @else {
           <fa-icon [icon]="RocketIcon"></fa-icon>
-        }
-      </div>
-    </button>
+          }
+        </div>
+      </button>
 
-    <!-- Lo faccio più tardi Card -->
-    <button
-      class="test-action-card card-back d-flex flex-column justify-content-between p-4"
-      (click)="onGoBack()"
-      [disabled]="IsStarting()"
+      <!-- Lo faccio più tardi Card -->
+      <button
+        class="test-action-card card-back d-flex flex-column justify-content-between p-4"
+        (click)="onGoBack()"
+        [disabled]="IsStarting()"
+      >
+        <div class="card-title text-start">{{ t('do_it_later') }}</div>
+        <div class="card-icon align-self-end">
+          <fa-icon [icon]="UndoIcon"></fa-icon>
+        </div>
+      </button>
+    </div>
+  </div>
+  } @else if (TestData() && TestStarted()) {
+  <!-- Header -->
+  <div class="d-flex flex-row justify-content-between align-items-start mb-4">
+    <div>
+      <h1 class="text-dark fw-medium mb-2 display-6">{{ TestData()!.name }}</h1>
+      <p class="text-muted mb-0">
+        {{ t('questions_count', { count: Questions().length }) }} &middot; {{
+        t('answers_count', { count: AnsweredCount() }) }}
+      </p>
+    </div>
+    @if (HasTimeLimit()) {
+    <div
+      class="timer-badge d-flex align-items-center gap-2 px-4 py-2 rounded-pill fs-4 fw-semibold"
+      [class.timer-danger]="RemainingSeconds() <= 60 && !TimerExpired()"
+      [class.timer-expired]="TimerExpired()"
     >
-      <div class="card-title text-start">Lo faccio più tardi</div>
-      <div class="card-icon align-self-end">
-        <fa-icon [icon]="UndoIcon"></fa-icon>
-      </div>
-    </button>
-
+      <fa-icon [icon]="ClockIcon"></fa-icon>
+      {{ FormattedTime() }}
+    </div>
+    }
   </div>
 
-</div>
-} @else if (TestData() && TestStarted()) {
-<!-- Header -->
-<div class="d-flex flex-row justify-content-between align-items-start mb-4">
-  <div>
-    <h1 class="text-dark fw-medium mb-2 display-6">{{ TestData()!.name }}</h1>
-    <p class="text-muted mb-0">
-      {{ Questions().length }} domande &middot; {{ AnsweredCount() }} risposte
-    </p>
+  @if (TestData()?.oneShotAnswers) {
+  <div class="alert alert-warning d-flex align-items-center gap-2 mb-4">
+    <fa-icon [icon]="LockIcon"></fa-icon>
+    <span>
+      <strong>{{ t('one_shot_active_label') }}</strong> {{ t('one_shot_desc') }}
+    </span>
   </div>
-  @if (HasTimeLimit()) {
+  } @if (TimerExpired()) {
   <div
-    class="timer-badge d-flex align-items-center gap-2 px-4 py-2 rounded-pill fs-4 fw-semibold"
-    [class.timer-danger]="RemainingSeconds() <= 60 && !TimerExpired()"
-    [class.timer-expired]="TimerExpired()"
+    class="alert alert-warning d-flex align-items-center gap-2 mb-4"
+    role="alert"
   >
     <fa-icon [icon]="ClockIcon"></fa-icon>
-    {{ FormattedTime() }}
+    <span>{{ t('time_expired_msg') }}</span>
   </div>
   }
-</div>
 
-@if (TestData()?.oneShotAnswers) {
-<div class="alert alert-warning d-flex align-items-center gap-2 mb-4">
-  <fa-icon [icon]="LockIcon"></fa-icon>
-  <span>
-    <strong>Modalità One-Shot attiva:</strong> Per le domande chiuse, la prima risposta data sarà definitiva e non potrai più modificarla.
-  </span>
-</div>
-}
+  <!-- Questions -->
+  <div class="d-flex flex-column gap-3 mb-4">
+    @for (question of Questions(); track question._id; let i = $index) {
+    <div
+      app-question-card
+      [question]="question"
+      [index]="i"
+      [showIndex]="true"
+      mode="student"
+      [locked]="isQuestionLocked(question)"
+      [dimmed]="isQuestionLocked(question)"
+      [showCorrectness]="false"
+      [selectedAnswer]="Answers()[question._id]"
+      (answerChange)="onAnswerChange(question._id, $event)"
+    ></div>
+    }
+  </div>
 
-@if (TimerExpired()) {
-<div
-  class="alert alert-warning d-flex align-items-center gap-2 mb-4"
-  role="alert"
->
-  <fa-icon [icon]="ClockIcon"></fa-icon>
-  <span
-    >Tempo scaduto! Non puoi più modificare le risposte. Consegna il test.</span
-  >
-</div>
-}
-
-<!-- Questions -->
-<div class="d-flex flex-column gap-3 mb-4">
-  @for (question of Questions(); track question._id; let i = $index) {
-  <div
-    app-question-card
-    [question]="question"
-    [index]="i"
-    [showIndex]="true"
-    mode="student"
-    [locked]="isQuestionLocked(question)"
-    [dimmed]="isQuestionLocked(question)"
-    [showCorrectness]="false"
-    [selectedAnswer]="Answers()[question._id]"
-    (answerChange)="onAnswerChange(question._id, $event)"
-  ></div>
-  }
-</div>
-
-<!-- Submit -->
-<div class="d-flex justify-content-end mb-5">
-  <app-syllex-button
-    [props]="{
-      label: 'Consegna test',
+  <!-- Submit -->
+  <div class="d-flex justify-content-end mb-5">
+    <app-syllex-button
+      [props]="{
+      label: t('submit_test_btn'),
       variant: 'primary',
       size: 'large',
       disabled: IsSubmitting(),
       leftIcon: IsSubmitting() ? SpinnerIcon : undefined,
       animation: IsSubmitting() ? 'spin' : undefined
     }"
-    (clicked)="onSubmit()"
-  ></app-syllex-button>
-</div>
-}
+      (clicked)="onSubmit()"
+    ></app-syllex-button>
+  </div>
+  }
+</ng-container>

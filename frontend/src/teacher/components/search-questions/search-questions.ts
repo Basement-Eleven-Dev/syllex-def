@@ -7,7 +7,7 @@ import {
   input,
   signal,
 } from '@angular/core';
-import { CdkDrag, DragDropModule } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDropList, DragDropModule } from '@angular/cdk/drag-drop';
 import { Subject, takeUntil, debounceTime } from 'rxjs';
 import { QuestionCard } from '../question-card/question-card';
 import { QuestionsSearchFilters } from '../questions-search-filters/questions-search-filters';
@@ -17,11 +17,20 @@ import {
 } from '../../../services/questions';
 import { SyllexPagination } from '../syllex-pagination/syllex-pagination';
 import { FeedbackService } from '../../../services/feedback-service';
+import { TranslocoDirective, TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-search-questions',
   standalone: true,
-  imports: [DragDropModule, CdkDrag, QuestionCard, SyllexPagination],
+  imports: [
+    DragDropModule,
+    CdkDropList,
+    CdkDrag,
+    QuestionCard,
+    SyllexPagination,
+    TranslocoDirective,
+    TranslocoPipe,
+  ],
   templateUrl: './search-questions.html',
   styleUrl: './search-questions.scss',
 })

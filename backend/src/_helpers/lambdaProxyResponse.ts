@@ -12,6 +12,7 @@ declare module "aws-lambda" {
   interface Context {
     user?: User | null;
     subjectId?: Types.ObjectId;
+    language?: string;
   }
 }
 
@@ -26,6 +27,17 @@ export const lambdaRequest = (handler: Handler) => {
           ? new mongo.ObjectId(subjectIdHeader as string)
           : undefined;
         request.context.user = await getCurrentUser(request.event);
+
+        const langHeader =
+          request.event.headers["Accept-Language"] ||
+          request.event.headers["accept-language"] ||
+          "it";
+        const cleanLang = String(langHeader)
+          .split(",")[0]
+          .split("-")[0]
+          .trim()
+          .toLowerCase();
+        request.context.language = cleanLang || "it";
       },
     })
     .use(
@@ -42,7 +54,7 @@ export const lambdaRequest = (handler: Handler) => {
     .use(
       cors({
         origin: "*",
-        headers: AUTHORIZED_API_HEADERS.join(','),
+        headers: AUTHORIZED_API_HEADERS.join(","),
       }),
     )
     .use(httpErrorHandler());
@@ -64,9 +76,8 @@ export const lambdaPublicRequest = (handler: Handler) => {
     .use(
       cors({
         origin: "*",
-        headers: AUTHORIZED_API_HEADERS.join(','),
+        headers: AUTHORIZED_API_HEADERS.join(","),
       }),
     )
     .use(httpErrorHandler());
 };
-

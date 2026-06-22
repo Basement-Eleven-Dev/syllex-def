@@ -23,6 +23,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FeedbackService } from '../../../services/feedback-service';
 import { SyllexButton } from '../../components/UI/syllex-button/syllex-button';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-create-edit-comunicazione',
@@ -37,6 +38,8 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
     MaterialiSelector,
     ConfirmActionDirective,
     SyllexButton,
+    TranslocoDirective,
+    TranslocoPipe,
   ],
   templateUrl: './create-edit-comunicazione.html',
   styleUrl: './create-edit-comunicazione.scss',
@@ -49,6 +52,7 @@ export class CreateEditComunicazione implements OnInit {
   private readonly comunicazioniService = inject(ComunicazioniService);
   private readonly feedbackService = inject(FeedbackService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly translocoService = inject(TranslocoService);
   readonly activeModal = inject(NgbActiveModal, { optional: true });
 
   // Icons
@@ -65,12 +69,12 @@ export class CreateEditComunicazione implements OnInit {
   // Computed
   readonly IsEditMode = computed(() => !!this.comunicazioneId);
   readonly PageTitle = computed(() =>
-    this.IsEditMode() ? 'Modifica' : 'Nuova',
+    this.IsEditMode() ? this.translocoService.translate('com_modal.title_edit') : this.translocoService.translate('com_modal.title_new'),
   );
   readonly PageDescription = computed(() =>
     this.IsEditMode()
-      ? 'Modifica comunicazione ai tuoi studenti.'
-      : 'Crea una nuova comunicazione ai tuoi studenti.',
+      ? this.translocoService.translate('com_modal.desc_edit')
+      : this.translocoService.translate('com_modal.desc_new'),
   );
 
   readonly ComunicazioneForm: FormGroup = new FormGroup({
@@ -110,7 +114,7 @@ export class CreateEditComunicazione implements OnInit {
         error: (error) => {
           console.error('Error loading communication:', error);
           this.feedbackService.showFeedback(
-            'Errore nel caricamento della comunicazione',
+            this.translocoService.translate('com_modal.error_load'),
             false,
           );
           this.IsLoading.set(false);
@@ -145,7 +149,7 @@ export class CreateEditComunicazione implements OnInit {
       .subscribe({
         next: () => {
           this.feedbackService.showFeedback(
-            'Comunicazione eliminata con successo',
+            this.translocoService.translate('com_modal.success_delete'),
             true,
           );
           if (this.activeModal) {
@@ -157,7 +161,7 @@ export class CreateEditComunicazione implements OnInit {
         error: (error) => {
           console.error('Error deleting communication:', error);
           this.feedbackService.showFeedback(
-            "Errore durante l'eliminazione della comunicazione",
+            this.translocoService.translate('com_modal.error_delete'),
             false,
           );
           this.IsLoading.set(false);
@@ -184,8 +188,8 @@ export class CreateEditComunicazione implements OnInit {
       next: () => {
         this.feedbackService.showFeedback(
           this.IsEditMode()
-            ? 'Comunicazione aggiornata con successo'
-            : 'Comunicazione creata con successo',
+            ? this.translocoService.translate('com_modal.success_update')
+            : this.translocoService.translate('com_modal.success_create'),
           true,
         );
         if (this.activeModal) {
@@ -197,7 +201,7 @@ export class CreateEditComunicazione implements OnInit {
       error: (error) => {
         console.error('Error saving communication:', error);
         this.feedbackService.showFeedback(
-          'Errore durante il salvataggio della comunicazione',
+          this.translocoService.translate('com_modal.error_save'),
           false,
         );
         this.IsLoading.set(false);

@@ -1,82 +1,84 @@
-<app-syllex-page-header
-  [title]="'Ciao, ' + authService.user?.firstName"
-  [description]="'scopri le azioni che puoi fare oggi.'"
-/>
+<ng-container *transloco="let t; read: 'dashboard'">
+  <app-syllex-page-header
+    [title]="t('welcome_name', { name: authService.user?.firstName })"
+    [description]="t('discover_actions')"
+  />
 
-<div class="row g-3 mb-4">
-  <div class="col-12 col-md-6 col-xl-3">
-    <app-syllex-card
-      title="Carica materiali"
-      description="Upload rapido di PDF, file, immagini e appunti tramite drag & drop."
-      [icon]="UploadIcon"
-      variant="filled"
-      color="primary"
-      link="/t/risorse"
-    ></app-syllex-card>
-  </div>
-  <div class="col-12 col-md-6 col-xl-3">
-    <app-syllex-card
-      title="Genera un materiale con AI"
-      description="Scegli tra diverse opzioni per creare contenuti personalizzati."
-      [icon]="AiIcon"
-      variant="filled"
-      color="purple"
-      link="/t/laboratorio-ai"
-    ></app-syllex-card>
-  </div>
-  <div class="col-12 col-xl-6 p-4">
-    <div
-      class="d-flex justify-content-between align-items-center text-primary fw-bold fs-4"
-    >
-      <p class="m-0 fs-2">Comunica con i tuoi studenti</p>
-      <fa-icon [icon]="faBell"></fa-icon>
+  <div class="row g-3 mb-4">
+    <div class="col-12 col-md-6 col-xl-3">
+      <app-syllex-card
+        [title]="t('upload_materials_title')"
+        [description]="t('upload_materials_desc')"
+        [icon]="UploadIcon"
+        variant="filled"
+        color="primary"
+        link="/t/risorse"
+      ></app-syllex-card>
     </div>
-    <p class="m-0 text-muted mb-5">
-      I tuoi studenti sono pronti a ricevere le tue comunicazioni.
-    </p>
+    <div class="col-12 col-md-6 col-xl-3">
+      <app-syllex-card
+        [title]="t('generate_material_ai_title')"
+        [description]="t('generate_material_ai_desc')"
+        [icon]="AiIcon"
+        variant="filled"
+        color="purple"
+        link="/t/laboratorio-ai"
+      ></app-syllex-card>
+    </div>
+    <div class="col-12 col-xl-6 p-4">
+      <div
+        class="d-flex justify-content-between align-items-center text-primary fw-bold fs-4"
+      >
+        <p class="m-0 fs-2">{{ t('communicate_students_title') }}</p>
+        <fa-icon [icon]="faBell"></fa-icon>
+      </div>
+      <p class="m-0 text-muted mb-5">
+        {{ t('communicate_students_desc') }}
+      </p>
 
-    <app-syllex-button
-      [props]="{
-          label: 'Nuova comunicazione',
-          variant: 'primary',
-          size: 'large'
-        }"
-      (clicked)="openNuovaComunicazioneModal()"
-    ></app-syllex-button>
+      <app-syllex-button
+        [props]="{
+            label: t('new_communication'),
+            variant: 'primary',
+            size: 'large'
+          }"
+        (clicked)="openNuovaComunicazioneModal()"
+      ></app-syllex-button>
+    </div>
   </div>
-</div>
 
-<div class="row g-3 mb-5">
-  <div class="col-12 col-xl-6">
-    <app-syllex-banner
-      [title]="bannerTitle"
-      buttonText="Provalo subito"
-      buttonLink="/t/agente"
-      bgImage="/images/sfondo_palle.png"
-      bgSize="cover"
-      bgPosition="right"
-    >
-    </app-syllex-banner>
+  <div class="row g-3 mb-5">
+    <div class="col-12 col-xl-6">
+      <app-syllex-banner
+        [title]="bannerTitle"
+        [buttonText]="t('try_it_now')"
+        buttonLink="/t/agente"
+        bgImage="/images/sfondo_palle.png"
+        bgSize="cover"
+        bgPosition="right"
+      >
+      </app-syllex-banner>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+      <app-syllex-card
+        [title]="t('tests_to_grade_count', { count: testsToGradeCount })"
+        [description]="testsToGradeCount > 0 ? t('tests_to_grade_desc_positive', { subject: selectedMateriaName }) : t('tests_to_grade_desc_zero', { subject: selectedMateriaName })"
+        [titleTextSize]="'large'"
+        [icon]="UsersIcon"
+        variant="outline"
+        color="primary"
+        link="/t/tests"
+      ></app-syllex-card>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+      <app-syllex-card
+        [title]="t('generate_test_ai_title')"
+        [description]="t('generate_test_ai_desc')"
+        [icon]="AiIcon"
+        variant="filled"
+        color="blue"
+        link="/t/tests/new"
+      ></app-syllex-card>
+    </div>
   </div>
-  <div class="col-12 col-md-6 col-xl-3">
-    <app-syllex-card
-      [title]="testsToGradeCount + ' test da correggere'"
-      [description]="testsToGradeCount > 0 ? 'Hai ancora delle verifiche da correggere per ' + selectedMateriaName : 'Nessuna verifica in attesa di correzione per ' + selectedMateriaName"
-      [titleTextSize]="'large'"
-      [icon]="UsersIcon"
-      variant="outline"
-      color="primary"
-      link="/t/tests"
-    ></app-syllex-card>
-  </div>
-  <div class="col-12 col-md-6 col-xl-3">
-    <app-syllex-card
-      title="Genera un test con AI"
-      description="Scegli materia, argomento e difficoltà."
-      [icon]="AiIcon"
-      variant="filled"
-      color="blue"
-      link="/t/tests/new"
-    ></app-syllex-card>
-  </div>
-</div>
+</ng-container>

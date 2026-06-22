@@ -64,6 +64,7 @@ import { SyllexPageHeader } from '../../components/UI/syllex-page-header/syllex-
 import { SyllexSearchInput } from '../../components/UI/syllex-search-input/syllex-search-input';
 import { SyllexClearButton } from '../../components/UI/syllex-clear-button/syllex-clear-button';
 import { SyllexEmptyState } from '../../components/UI/syllex-empty-state/syllex-empty-state';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-materiali',
@@ -85,6 +86,8 @@ import { SyllexEmptyState } from '../../components/UI/syllex-empty-state/syllex-
     TourAnchorNgBootstrapDirective,
     SyllexPageHeader,
     SyllexEmptyState,
+    TranslocoDirective,
+    TranslocoPipe,
   ],
   templateUrl: './materiali.html',
   styleUrl: './materiali.scss',
@@ -100,6 +103,7 @@ export class Materiali implements OnInit {
   private readonly confirmService = inject(ConfirmService);
   private readonly modalService = inject(NgbModal);
   private readonly feedbackService = inject(FeedbackService);
+  private readonly translocoService = inject(TranslocoService);
 
   constructor() {
     effect(() => {
@@ -187,7 +191,7 @@ export class Materiali implements OnInit {
 
     if (!isFileExtensionAllowed(file.name)) {
       alert(
-        `Formato file non supportato. Estensioni consentite: ${getAllowedExtensionsLabel()}`,
+        this.translocoService.translate('materiali.alert_format', { extensions: getAllowedExtensionsLabel() }),
       );
       input.value = '';
       return;
@@ -203,7 +207,7 @@ export class Materiali implements OnInit {
         console.error('Errore durante il caricamento:', err);
         this.isUploading.set(false);
         this.feedbackService.showFeedback(
-          'Errore durante il caricamento del file',
+          this.translocoService.translate('materiali.error_upload'),
           false,
         );
       },
@@ -218,7 +222,7 @@ export class Materiali implements OnInit {
 
   protected async onRequestDeleteItem(item: MaterialInterface): Promise<void> {
     const confirmed = await this.confirmService.confirm(
-      `Sei sicuro di voler eliminare "${item.name}"?`,
+      this.translocoService.translate('materiali.confirm_delete_item', { name: item.name }),
     );
     if (!confirmed) return;
 
@@ -230,7 +234,7 @@ export class Materiali implements OnInit {
     if (count === 0) return;
 
     const confirmed = await this.confirmService.confirm(
-      `Sei sicuro di voler eliminare i ${count} elementi selezionati?`,
+      this.translocoService.translate('materiali.confirm_delete_multiple', { count }),
     );
     if (!confirmed) return;
 
@@ -334,10 +338,10 @@ export class Materiali implements OnInit {
 
   protected getItemType(item: MaterialInterface): string {
     if (item.type === 'folder') {
-      return `Cartella (${item.content?.length || 0})`;
+      return this.translocoService.translate('materiali.type_folder', { count: item.content?.length || 0 });
     }
     const ext = getFileExtension(item.name);
-    return ext ? ext.toUpperCase() : 'File';
+    return ext ? ext.toUpperCase() : this.translocoService.translate('materiali.type_file');
   }
 
   protected getItemSize(item: MaterialInterface): string {
@@ -376,13 +380,13 @@ export class Materiali implements OnInit {
     this.facade.addSuggestedTopic(topic).subscribe({
       next: () =>
         this.feedbackService.showFeedback(
-          `Argomento "${topic}" aggiunto con successo`,
+          this.translocoService.translate('materiali.topic_added_success', { topic }),
           true,
         ),
       error: (err) => {
         console.error(`Errore nell'aggiunta dell'argomento "${topic}":`, err);
         this.feedbackService.showFeedback(
-          `Errore nell'aggiunta dell'argomento`,
+          this.translocoService.translate('materiali.topic_added_error'),
           false,
         );
       },

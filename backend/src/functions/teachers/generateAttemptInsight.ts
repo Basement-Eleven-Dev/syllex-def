@@ -20,28 +20,27 @@ const generateAttemptInsight = async (
   const attemptObjectId = new mongo.ObjectId(attemptId);
 
   // 1. Get Attempt Info with Test and Student Details
-  const result = await Attempt
-    .aggregate([
-      { $match: { _id: attemptObjectId } },
-      {
-        $lookup: {
-          from: "tests",
-          localField: "testId",
-          foreignField: "_id",
-          as: "testInfo",
-        },
+  const result = await Attempt.aggregate([
+    { $match: { _id: attemptObjectId } },
+    {
+      $lookup: {
+        from: "tests",
+        localField: "testId",
+        foreignField: "_id",
+        as: "testInfo",
       },
-      { $unwind: "$testInfo" },
-      {
-        $lookup: {
-          from: "users",
-          localField: "studentId",
-          foreignField: "_id",
-          as: "studentInfo",
-        },
+    },
+    { $unwind: "$testInfo" },
+    {
+      $lookup: {
+        from: "users",
+        localField: "studentId",
+        foreignField: "_id",
+        as: "studentInfo",
       },
-      { $unwind: "$studentInfo" },
-    ])
+    },
+    { $unwind: "$studentInfo" },
+  ]);
 
   const attempt = result[0];
   if (!attempt) {
@@ -49,17 +48,16 @@ const generateAttemptInsight = async (
   }
 
   // 2. Get Class Averages for context
-  const classStats = await Attempt
-    .aggregate([
-      { $match: { testId: attempt.testId, status: "reviewed" } },
-      {
-        $group: {
-          _id: "$testId",
-          avgScore: { $avg: "$score" },
-          avgTime: { $avg: "$timeSpent" },
-        },
+  const classStats = await Attempt.aggregate([
+    { $match: { testId: attempt.testId, status: "reviewed" } },
+    {
+      $group: {
+        _id: "$testId",
+        avgScore: { $avg: "$score" },
+        avgTime: { $avg: "$timeSpent" },
       },
-    ])
+    },
+  ]);
 
   const averages = classStats[0] || {
     avgScore: attempt.score,
@@ -109,7 +107,7 @@ const generateAttemptInsight = async (
   try {
     const ai = await getGeminiClient();
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: "gemini-3.1-flash-lite",
       contents: [
         {
           role: "user",
@@ -128,11 +126,10 @@ const generateAttemptInsight = async (
 
     // 4. Save insight to DB
     if (response.text) {
-      await Attempt
-        .updateOne(
-          { _id: attemptObjectId },
-          { $set: { aiInsight: response.text, updatedAt: new Date() } },
-        );
+      await Attempt.updateOne(
+        { _id: attemptObjectId },
+        { $set: { aiInsight: response.text, updatedAt: new Date() } },
+      );
     }
 
     return {

@@ -6,11 +6,12 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Calendario } from '../../../teacher/components/calendario/calendario';
 import { RouterModule } from '@angular/router';
 import { ReportBugForm } from '../../../teacher/components/report-bug-form/report-bug-form';
+import { TranslocoDirective } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-student-user-contextual-menu',
   standalone: true,
-  imports: [FontAwesomeModule, RouterModule],
+  imports: [FontAwesomeModule, RouterModule, TranslocoDirective],
   templateUrl: './student-user-contextual-menu.html',
   styleUrl: './student-user-contextual-menu.scss',
 })

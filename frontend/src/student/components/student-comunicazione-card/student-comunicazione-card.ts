@@ -5,11 +5,12 @@ import { faClock, faArrowRight } from '@fortawesome/pro-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ComunicazioneInterface } from '../../../services/comunicazioni-service';
 import { StudentComunicazioneDetailModal } from '../student-comunicazione-detail-modal/student-comunicazione-detail-modal';
+import { TranslocoDirective } from '@jsverse/transloco';
 
 @Component({
   selector: 'div[app-student-comunicazione-card]',
   standalone: true,
-  imports: [DatePipe, FontAwesomeModule],
+  imports: [DatePipe, FontAwesomeModule, TranslocoDirective],
   templateUrl: './student-comunicazione-card.html',
   styleUrl: './student-comunicazione-card.scss',
 })

@@ -15,11 +15,12 @@ import {
 import { MaterialInterface } from '../../../services/materiali/materiali-service';
 import { FileViewer } from '../../../teacher/components/file-viewer/file-viewer';
 import { getFileIcon } from '../../../app/_utils/file-icons';
+import { TranslocoDirective } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-student-comunicazione-detail-modal',
   standalone: true,
-  imports: [DatePipe, FontAwesomeModule],
+  imports: [DatePipe, FontAwesomeModule, TranslocoDirective],
   templateUrl: './student-comunicazione-detail-modal.html',
   styleUrl: './student-comunicazione-detail-modal.scss',
 })

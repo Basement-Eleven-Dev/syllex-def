@@ -38,6 +38,7 @@ import { MaterialeContextualMenu } from '../materiale-contextual-menu/materiale-
 import { MaterialInterface } from '../../../services/materiali/materiali-service';
 import { FileViewer } from '../file-viewer/file-viewer';
 import { SyllexBadge } from '../UI/syllex-badge/syllex-badge';
+import { TranslocoDirective, TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-materiale-card',
@@ -49,6 +50,8 @@ import { SyllexBadge } from '../UI/syllex-badge/syllex-badge';
     NgbDropdownToggle,
     NgbDropdownMenu,
     SyllexBadge,
+    TranslocoDirective,
+    TranslocoPipe,
   ],
   templateUrl: './materiale-card.html',
   styleUrl: './materiale-card.scss',

@@ -3,11 +3,12 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPrint, faTimes } from '@fortawesome/pro-solid-svg-icons';
 import { DatePipe } from '@angular/common';
+import { TranslocoDirective, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-test-results-print-modal',
   standalone: true,
-  imports: [FontAwesomeModule, DatePipe],
+  imports: [FontAwesomeModule, DatePipe, TranslocoDirective, TranslocoPipe],
   templateUrl: './test-results-print-modal.html',
   styleUrl: './test-results-print-modal.scss',
 })
@@ -17,6 +18,7 @@ export class TestResultsPrintModal {
   @Input() maxScore: number = 0;
 
   activeModal = inject(NgbActiveModal);
+  translocoService = inject(TranslocoService);
 
   PrintIcon = faPrint;
   CloseIcon = faTimes;
@@ -82,8 +84,8 @@ export class TestResultsPrintModal {
       .map((a, i) => {
         const name = `${a.studentLastName ?? ''} ${a.studentName ?? ''}`.trim();
         const delivered =
-          a.status === 'delivered' || a.status === 'reviewed' ? 'Sì' : 'No';
-        const corrected = a.status === 'reviewed' ? 'Sì' : 'No';
+          a.status === 'delivered' || a.status === 'reviewed' ? this.translocoService.translate('test_results_print_modal.yes') : this.translocoService.translate('test_results_print_modal.no');
+        const corrected = a.status === 'reviewed' ? this.translocoService.translate('test_results_print_modal.yes') : this.translocoService.translate('test_results_print_modal.no');
         const score =
           a.score != null ? `${a.score} / ${a.maxScore ?? this.maxScore}` : '-';
 
@@ -153,34 +155,34 @@ export class TestResultsPrintModal {
     <div class="header" style="display:flex;justify-content:space-between;align-items:flex-start;">
       <div>
         <h1>${this.testName}</h1>
-        <p class="subtitle">Riepilogo risultati</p>
+        <p class="subtitle">${this.translocoService.translate('test_results_print_modal.subtitle')}</p>
       </div>
-      <div class="date"><strong>Stampato il</strong> ${today}</div>
+      <div class="date"><strong>${this.translocoService.translate('test_results_print_modal.printed_on')}</strong> ${today}</div>
     </div>
 
     <div class="summary">
-      <div class="summary-item"><strong>${this.attempts.length}</strong> Assegnati</div>
-      <div class="summary-item"><strong>${this.delivered.length}</strong> Consegnati</div>
-      <div class="summary-item"><strong>${this.reviewed.length}</strong> Corretti</div>
-      <div class="summary-item"><strong>${this.averageScore}</strong> Media voto</div>
-      <div class="summary-item"><strong>${this.maxObtainedScore}</strong> Voto max</div>
-      <div class="summary-item"><strong>${this.minObtainedScore}</strong> Voto min</div>
+      <div class="summary-item"><strong>${this.attempts.length}</strong> ${this.translocoService.translate('test_results_print_modal.assigned')}</div>
+      <div class="summary-item"><strong>${this.delivered.length}</strong> ${this.translocoService.translate('test_results_print_modal.delivered')}</div>
+      <div class="summary-item"><strong>${this.reviewed.length}</strong> ${this.translocoService.translate('test_results_print_modal.reviewed')}</div>
+      <div class="summary-item"><strong>${this.averageScore}</strong> ${this.translocoService.translate('test_results_print_modal.avg_score')}</div>
+      <div class="summary-item"><strong>${this.maxObtainedScore}</strong> ${this.translocoService.translate('test_results_print_modal.max_score')}</div>
+      <div class="summary-item"><strong>${this.minObtainedScore}</strong> ${this.translocoService.translate('test_results_print_modal.min_score')}</div>
     </div>
 
     <table>
       <thead>
         <tr>
           <th>#</th>
-          <th>Studente</th>
-          <th>Consegnato</th>
-          <th>Corretto</th>
-          <th>Punteggio</th>
+          <th>${this.translocoService.translate('test_results_print_modal.col_student')}</th>
+          <th>${this.translocoService.translate('test_results_print_modal.col_delivered')}</th>
+          <th>${this.translocoService.translate('test_results_print_modal.col_reviewed')}</th>
+          <th>${this.translocoService.translate('test_results_print_modal.col_score')}</th>
         </tr>
       </thead>
       <tbody>${rowsHtml}</tbody>
     </table>
 
-    <div class="footer">Documento generato automaticamente</div>
+    <div class="footer">${this.translocoService.translate('test_results_print_modal.doc_generated')}</div>
   </div>
   <script>window.onload = function() { window.print(); };</script>
 </body>

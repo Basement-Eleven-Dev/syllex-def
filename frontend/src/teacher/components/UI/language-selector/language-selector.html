@@ -1,0 +1,18 @@
+<div ngbDropdown class="d-inline-block">
+  <button
+    ngbDropdownToggle
+    class="btn d-flex align-items-center justify-content-center border-0 p-0 rounded-circle text-white"
+    style="width: 34px; height: 34px; background-color: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2); transition: all 0.2s;"
+    title="Change Language"
+  >
+    <span class="text-uppercase" style="font-size: 0.75rem; font-weight: bold;">{{ currentLanguage }}</span>
+  </button>
+  <div ngbDropdownMenu class="dropdown-menu-dark shadow border-0" style="min-width: 120px; background-color: #252bb1;">
+    <button ngbDropdownItem (click)="changeLanguage('it')" [class.active]="currentLanguage === 'it'" class="text-white d-flex align-items-center gap-2">
+      <span style="font-size: 1.2rem;">🇮🇹</span> Italiano
+    </button>
+    <button ngbDropdownItem (click)="changeLanguage('en')" [class.active]="currentLanguage === 'en'" class="text-white d-flex align-items-center gap-2">
+      <span style="font-size: 1.2rem;">🇬🇧</span> English
+    </button>
+  </div>
+</div>

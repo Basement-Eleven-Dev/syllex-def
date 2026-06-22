@@ -5,7 +5,7 @@ import { getGeminiClient } from "../../_helpers/AI/getClient";
 import { User } from "../../models/schemas/user.schema";
 import { Attempt } from "../../models/schemas/attempt.schema";
 import { connectDatabase } from "../../_helpers/getDatabase";
-import { mongo } from 'mongoose'
+import { mongo } from "mongoose";
 const generateStudentInsight = async (
   request: APIGatewayProxyEvent,
   context: Context,
@@ -27,28 +27,27 @@ const generateStudentInsight = async (
   }
 
   // 3. Get Student Attempts with Test Names
-  const attempts = await Attempt
-    .aggregate([
-      {
-        $match: {
-          subjectId: subjectId,
-          studentId: studentObjectId,
-          status: "reviewed",
-          source: { $ne: "self-evaluation" }
-        }
+  const attempts = await Attempt.aggregate([
+    {
+      $match: {
+        subjectId: subjectId,
+        studentId: studentObjectId,
+        status: "reviewed",
+        source: { $ne: "self-evaluation" },
       },
-      {
-        $lookup: {
-          from: "tests",
-          localField: "testId",
-          foreignField: "_id",
-          as: "testData",
-        },
+    },
+    {
+      $lookup: {
+        from: "tests",
+        localField: "testId",
+        foreignField: "_id",
+        as: "testData",
       },
-      { $unwind: "$testData" },
-      { $sort: { deliveredAt: -1 } },
-      { $limit: 15 },
-    ])
+    },
+    { $unwind: "$testData" },
+    { $sort: { deliveredAt: -1 } },
+    { $limit: 15 },
+  ]);
 
   if (attempts.length === 0) {
     return {
@@ -79,7 +78,7 @@ const generateStudentInsight = async (
     const ai = await getGeminiClient();
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash", // Using flash as it is stable and fast for summaries
+      model: "gemini-3.1-flash-lite", // Using flash as it is stable and fast for summaries
       contents: [
         {
           role: "user",

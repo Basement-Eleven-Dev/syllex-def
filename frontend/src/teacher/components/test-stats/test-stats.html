@@ -1,9 +1,10 @@
+<ng-container *transloco="let t; read: 'test_stats'">
 <app-syllex-select-input
   class="mb-4"
   [value]="classSelected"
   (valueChange)="onClassChange($event)"
   style="max-width: 220px"
-  placeholder="Tutte le classi"
+  [placeholder]="t('all_classes')"
   [options]="classOptions"
 />
 
@@ -11,13 +12,13 @@
   <div class="col-12 d-flex flex-column">
     <div class="card card-celeste-light p-3 mb-4 flex-fill">
       <div class="card-body h-100">
-        <h5 class="text-dark fw-semibold mb-3">Performance per argomento</h5>
+        <h5 class="text-dark fw-semibold mb-3">{{ t('perf_topic') }}</h5>
         <div class="mb-3">
           <app-syllex-select-input
             [value]="selectedTopic"
             (valueChange)="selectedTopic = $event; onTopicChange()"
             style="max-width: 260px"
-            placeholder="Tutti gli argomenti"
+            [placeholder]="t('all_topics')"
             [options]="topicOptions"
           />
         </div>
@@ -31,17 +32,17 @@
 
 <div class="card card-lime-light p-3">
   <div class="card-body">
-    <h5 class="text-dark fw-semibold mb-3">Performance singole domande</h5>
+    <h5 class="text-dark fw-semibold mb-3">{{ t('perf_question') }}</h5>
     <div class="table-responsive">
       <table class="table table-striped table-hover align-middle">
         <thead>
           <tr>
             <th>#</th>
-            <th class="text-muted fw-light">Domanda</th>
-            <th class="text-center text-muted fw-light">Corrette</th>
-            <th class="text-center text-muted fw-light">Errate</th>
-            <th class="text-center text-muted fw-light">Vuote</th>
-            <th class="text-center text-muted fw-light">Successo (%)</th>
+            <th class="text-muted fw-light">{{ t('col_question') }}</th>
+            <th class="text-center text-muted fw-light">{{ t('col_correct') }}</th>
+            <th class="text-center text-muted fw-light">{{ t('col_wrong') }}</th>
+            <th class="text-center text-muted fw-light">{{ t('col_blank') }}</th>
+            <th class="text-center text-muted fw-light">{{ t('col_success') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -84,7 +85,8 @@
     style="width: auto"
     [(ngModel)]="pageSize"
   >
-    <option [ngValue]="5">5 per pagina</option>
-    <option [ngValue]="10">10 per pagina</option>
+    <option [ngValue]="5">{{ t('per_page_5') }}</option>
+    <option [ngValue]="10">{{ t('per_page_10') }}</option>
   </select>
 </div>
+</ng-container>

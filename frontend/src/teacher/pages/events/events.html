@@ -1,10 +1,11 @@
+<ng-container *transloco="let t; read: 'events'">
 <app-syllex-page-header
-  [title]="'Benvenuto in Calendario,'"
-  [description]="'qui puoi trovare tutti gli eventi e le comunicazioni della tua classe.'"
+  [title]="t('header_title')"
+  [description]="t('header_desc')"
 >
   <app-syllex-button
     [props]="{
-          label: 'Nuovo Evento',
+          label: t('btn_new_event'),
           variant: 'secondary',
           size: 'medium'
         }"
@@ -12,7 +13,7 @@
   />
   <app-syllex-button
     [props]="{
-          label: 'Nuova Comunicazione',
+          label: t('btn_new_com'),
           variant: 'primary',
           color: 'celestine',
           size: 'medium'
@@ -23,13 +24,13 @@
 @if (Comunicazioni().length === 0) {
 <div class="mb-5">
   <div class="mb-3">
-    <h2 class="fs-2 fw-semibold mb-0">Comunicazioni recenti</h2>
+    <h2 class="fs-2 fw-semibold mb-0">{{ t('recent_coms') }}</h2>
   </div>
   <app-syllex-empty-state
-    title="Nessuna comunicazione presente"
-    description="Condividi novità, compiti o notizie importanti con i tuoi studenti per tenerli sempre aggiornati in tempo reale."
+    [title]="t('empty_title')"
+    [description]="t('empty_desc')"
     [icon]="MessageIcon"
-    actionLabel="Invia la tua prima Comunicazione"
+    [actionLabel]="t('empty_action')"
     [actionIcon]="PlusIcon"
     (actionClicked)="openComunicazioneModal()"
   ></app-syllex-empty-state>
@@ -37,7 +38,7 @@
 } @else {
 <div class="com-wrapper mb-5" style="padding-top: 35px">
   <div class="mb-3 flex-shrink-0 px-3 px-lg-4 text-white com-title">
-    <h2 class="fs-2 fw-semibold mb-0">Comunicazioni recenti</h2>
+    <h2 class="fs-2 fw-semibold mb-0">{{ t('recent_coms') }}</h2>
   </div>
   <div
     class="com-scroll"
@@ -53,7 +54,7 @@
         class="p-4 rounded-5 h-100 communication-item-card bg-white com-card d-flex flex-column shadow-sm"
       >
         <p class="fs-4 m-0 com-item-title">
-          {{ com.title.substring(0, 18) + "..." | titlecase }}
+          {{ com.title.substring(0, 18) + (com.title.length > 18 ? "..." : "") | titlecase }}
         </p>
         <p class="mb-2 ellipsis-3-lines flex-grow-1 text-muted com-desc">
           {{ com.content }}
@@ -63,20 +64,19 @@
             <span
               class="border-0 px-2 py-1 rounded-pill d-inline-block small text-primary com-date"
             >
-              {{ com.createdAt | date:'d MMM yyyy' : '' : 'it' }}
+              {{ com.createdAt | date:'d MMM yyyy' : '' : (translocoService.getActiveLang() === 'it' ? 'it' : 'en-US') }}
             </span>
             @if (com.readCount !== undefined) {
             <span
               class="badge bg-light text-primary border small"
-              title="Studenti che hanno letto"
+              [title]="t('readers')"
             >
-              {{ com.readCount }} {{ com.readCount === 1 ? 'lettura' : 'letture'
-              }}
+              {{ com.readCount !== 1 ? t('reads_count', {count: com.readCount}) : t('read_count', {count: com.readCount}) }}
             </span>
             }
           </div>
           <app-syllex-button
-            [props]="{ label: 'Apri', variant: 'primary', size: 'small' }"
+            [props]="{ label: t('btn_open'), variant: 'primary', size: 'small' }"
             (clicked)="openComunicazioneModal(com._id)"
           />
         </div>
@@ -91,3 +91,4 @@
 <section class="calendar-section pb-4">
   <app-calendario [showHeadings]="false" [readonly]="false"></app-calendario>
 </section>
+</ng-container>

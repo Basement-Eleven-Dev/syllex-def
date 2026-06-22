@@ -1,5 +1,6 @@
+<ng-container *transloco="let t; read: 'test_results_print_modal'">
 <div class="modal-header border-0 pb-0">
-  <h4 class="modal-title fw-bold text-dark">Anteprima Risultati</h4>
+  <h4 class="modal-title fw-bold text-dark">{{ t('title') }}</h4>
   <button
     type="button"
     class="btn-close"
@@ -12,22 +13,22 @@
     <!-- Azioni -->
     <div class="col-12 col-lg-4 no-print">
       <div class="card bg-light border-0 rounded-4 p-3 mb-4">
-        <h6 class="fw-bold mb-3">Riepilogo</h6>
+        <h6 class="fw-bold mb-3">{{ t('summary') }}</h6>
         <ul class="list-unstyled small mb-0">
           <li class="mb-2">
-            <span class="text-muted">Assegnati:</span>
+            <span class="text-muted">{{ t('assigned') }}:</span>
             <strong class="ms-1">{{ attempts.length }}</strong>
           </li>
           <li class="mb-2">
-            <span class="text-muted">Consegnati:</span>
+            <span class="text-muted">{{ t('delivered') }}:</span>
             <strong class="ms-1">{{ delivered.length }}</strong>
           </li>
           <li class="mb-2">
-            <span class="text-muted">Corretti:</span>
+            <span class="text-muted">{{ t('reviewed') }}:</span>
             <strong class="ms-1">{{ reviewed.length }}</strong>
           </li>
           <li class="mb-2">
-            <span class="text-muted">Media voto:</span>
+            <span class="text-muted">{{ t('avg_score') }}:</span>
             <strong class="ms-1">{{ averageScore }}</strong>
           </li>
         </ul>
@@ -35,10 +36,10 @@
 
       <div class="d-grid gap-2">
         <button class="btn btn-primary btn-lg rounded-pill" (click)="onPrint()">
-          <fa-icon [icon]="PrintIcon" class="me-2"></fa-icon> Stampa / Salva PDF
+          <fa-icon [icon]="PrintIcon" class="me-2"></fa-icon> {{ t('btn_print') }}
         </button>
         <p class="text-center text-muted small mt-2">
-          Usa la funzione di stampa del browser per salvare come PDF.
+          {{ t('browser_hint') }}
         </p>
       </div>
     </div>
@@ -53,11 +54,11 @@
           <div class="d-flex justify-content-between align-items-start">
             <div>
               <h2 class="fw-bold text-dark mb-1">{{ testName }}</h2>
-              <p class="text-muted mb-0 small">Riepilogo risultati</p>
+              <p class="text-muted mb-0 small">{{ t('subtitle') }}</p>
             </div>
             <div class="text-end small text-muted">
               <p class="mb-0">
-                <strong>Stampato il</strong> {{ today | date: 'd MMMM y' }}
+                <strong>{{ t('printed_on') }}</strong> {{ today | date: 'd MMMM y' }}
               </p>
             </div>
           </div>
@@ -67,27 +68,27 @@
         <div class="row row-cols-3 g-3 mb-4 pb-3 border-bottom">
           <div class="col text-center">
             <div class="fw-bold fs-5">{{ attempts.length }}</div>
-            <div class="text-muted small">Assegnati</div>
+            <div class="text-muted small">{{ t('assigned') }}</div>
           </div>
           <div class="col text-center">
             <div class="fw-bold fs-5">{{ delivered.length }}</div>
-            <div class="text-muted small">Consegnati</div>
+            <div class="text-muted small">{{ t('delivered') }}</div>
           </div>
           <div class="col text-center">
             <div class="fw-bold fs-5">{{ reviewed.length }}</div>
-            <div class="text-muted small">Corretti</div>
+            <div class="text-muted small">{{ t('reviewed') }}</div>
           </div>
           <div class="col text-center">
             <div class="fw-bold fs-5">{{ averageScore }}</div>
-            <div class="text-muted small">Media voto</div>
+            <div class="text-muted small">{{ t('avg_score') }}</div>
           </div>
           <div class="col text-center">
             <div class="fw-bold fs-5">{{ maxObtainedScore }}</div>
-            <div class="text-muted small">Voto max</div>
+            <div class="text-muted small">{{ t('max_score') }}</div>
           </div>
           <div class="col text-center">
             <div class="fw-bold fs-5">{{ minObtainedScore }}</div>
-            <div class="text-muted small">Voto min</div>
+            <div class="text-muted small">{{ t('min_score') }}</div>
           </div>
         </div>
 
@@ -96,10 +97,10 @@
           <thead>
             <tr>
               <th class="text-muted fw-normal">#</th>
-              <th class="text-muted fw-normal">Studente</th>
-              <th class="text-muted fw-normal">Consegnato</th>
-              <th class="text-muted fw-normal">Corretto</th>
-              <th class="text-muted fw-normal">Punteggio</th>
+              <th class="text-muted fw-normal">{{ t('col_student') }}</th>
+              <th class="text-muted fw-normal">{{ t('col_delivered') }}</th>
+              <th class="text-muted fw-normal">{{ t('col_reviewed') }}</th>
+              <th class="text-muted fw-normal">{{ t('col_score') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -109,16 +110,16 @@
               <td>{{ a.studentLastName }} {{ a.studentName }}</td>
               <td>
                 @if (a.status === 'delivered' || a.status === 'reviewed') {
-                <span class="text-success">Sì</span>
+                <span class="text-success">{{ t('yes') }}</span>
                 } @else {
-                <span class="text-danger">No</span>
+                <span class="text-danger">{{ t('no') }}</span>
                 }
               </td>
               <td>
                 @if (a.status === 'reviewed') {
-                <span class="text-success">Sì</span>
+                <span class="text-success">{{ t('yes') }}</span>
                 } @else {
-                <span class="text-muted">No</span>
+                <span class="text-muted">{{ t('no') }}</span>
                 }
               </td>
               <td>
@@ -133,3 +134,4 @@
     </div>
   </div>
 </div>
+</ng-container>

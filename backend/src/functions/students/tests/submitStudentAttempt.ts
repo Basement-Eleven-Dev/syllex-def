@@ -59,13 +59,21 @@ const submitStudentAttempt = async (
           const answerBool = answer === "Vero";
           score = answerBool === correctBool ? maxPoints : 0;
         } else if (type === "risposta aperta") {
+          const language = context.language || "it";
           const result = await correctStudentQuestion(
             answer ?? "",
             maxPoints,
             q.question?.explanation ?? "",
+            language,
           );
-          score = result.score;
-          teacherComment = result.explanation;
+          return {
+            index: i,
+            score: result.score,
+            teacherComment: result.explanation,
+            status: result.score > 0 ? "correct" : "incorrect",
+            aiProbability: result.aiProbability,
+            aiMarkers: result.aiMarkers,
+          };
         }
 
         return {
@@ -73,6 +81,8 @@ const submitStudentAttempt = async (
           score,
           teacherComment,
           status: score > 0 ? "correct" : "incorrect",
+          aiProbability: undefined,
+          aiMarkers: undefined,
         };
       }),
     );
@@ -86,10 +96,23 @@ const submitStudentAttempt = async (
     };
 
     let totalScore = 0;
-    for (const { index, score, teacherComment, status } of corrections) {
+    for (const {
+      index,
+      score,
+      teacherComment,
+      status,
+      aiProbability,
+      aiMarkers,
+    } of corrections) {
       $set[`questions.${index}.score`] = score;
       $set[`questions.${index}.teacherComment`] = teacherComment;
       $set[`questions.${index}.status`] = status;
+      if (aiProbability !== undefined) {
+        $set[`questions.${index}.aiProbability`] = aiProbability;
+      }
+      if (aiMarkers !== undefined) {
+        $set[`questions.${index}.aiMarkers`] = aiMarkers;
+      }
       totalScore += score;
     }
     $set.score = totalScore;
