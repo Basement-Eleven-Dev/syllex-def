@@ -275,7 +275,15 @@ export class AgentChat implements OnInit, OnDestroy {
     );
     this.pendingSaves.push(savePromise);
     savePromise
-      .then(() => {
+      .then((res) => {
+        // Backfill dell'_id sul messaggio locale dalla risposta del salvataggio.
+        // Serve al TTS "Ascolta" dopo l'uscita dalla voce. Sostituisce il vecchio
+        // polling a 1 Hz che ricaricava l'intera cronologia solo per questo.
+        if (res?._id) {
+          this.messages.update((msgs) =>
+            msgs.map((m) => (m === newMsg ? { ...m, _id: res._id } : m)),
+          );
+        }
         this.pendingSaves = this.pendingSaves.filter((p) => p !== savePromise);
       })
       .catch((err) => {
@@ -308,6 +316,18 @@ export class AgentChat implements OnInit, OnDestroy {
           this.startNewChat();
         }
       },
+    });
+  }
+
+  /**
+   * Aggiorna la sola lista in sidebar (preview/titoli/nuove conversazioni),
+   * SENZA la logica di reset di loadConversationsList: così una conversazione
+   * appena iniziata compare subito in cronologia senza ricaricare la pagina.
+   */
+  private refreshConversations() {
+    this.agentService.listConversations().subscribe({
+      next: (res) => this.conversations.set(res),
+      error: () => {},
     });
   }
 
@@ -422,6 +442,9 @@ export class AgentChat implements OnInit, OnDestroy {
           this.isLoading.set(false);
           this.scrollToBottom();
 
+          // Aggiorna la cronologia in sidebar (nuova conversazione / preview)
+          this.refreshConversations();
+
           // Auto-play TTS solo se l'input era vocale (modalità classica)
           if (inputType === 'voice' && response._id) {
             this.autoPlayResponse(response._id, response.aiResponse);
@@ -470,7 +493,6 @@ export class AgentChat implements OnInit, OnDestroy {
       }
 
       this.voiceModeActive.set(false);
-      this.stopPollingMessages();
 
       // Ricarica lo storico dal DB per garantire che il modello testuale
       // veda TUTTI i messaggi vocali appena salvati
@@ -478,10 +500,11 @@ export class AgentChat implements OnInit, OnDestroy {
       if (convId) {
         this.initializeChatHistory(convId);
       }
+      // La conversazione (eventualmente nuova, iniziata in voce) compare in sidebar
+      this.refreshConversations();
     } else {
       this.voiceModeActive.set(true);
       this.startRealtimeVoice();
-      this.startPollingMessages();
     }
   }
 
@@ -498,53 +521,6 @@ export class AgentChat implements OnInit, OnDestroy {
 
     // 3. Invia il segnale nativo di fine turno al WebSocket (latenza zero)
     this.geminiLiveService.sendEndOfTurn();
-  }
-
-  private pollingInterval: any;
-  private startPollingMessages() {
-    this.stopPollingMessages();
-    this.pollingInterval = setInterval(() => {
-      const convId = this.currentConversationId();
-      if (convId && this.voiceModeActive()) {
-        this.agentService
-          .getConversationHistory(convId)
-          .subscribe((response: any[]) => {
-            if (response && response.length > 0) {
-              const history: ChatMessage[] = response.map((msg: any) => ({
-                _id: msg._id,
-                role: msg.role,
-                content: msg.content,
-                timestamp: msg.timestamp,
-                audioUrl: msg.audioUrl || null,
-                inputType: msg.inputType || 'text',
-              }));
-
-              // Aggiorna se il DB ha più messaggi OPPURE se l'ultimo messaggio locale
-              // non ha ancora _id (salvataggio appena arrivato nel DB)
-              const lastLocal = this.messages()[this.messages().length - 1];
-              const lastDb = history[history.length - 1];
-              const needsUpdate =
-                history.length > this.messages().length ||
-                (history.length === this.messages().length &&
-                  lastDb?.content !== lastLocal?.content) ||
-                (history.length === this.messages().length &&
-                  !lastLocal?._id &&
-                  !!lastDb?._id);
-
-              if (needsUpdate) {
-                this.messages.set(history);
-              }
-            }
-          });
-      }
-    }, 1000); // Controlla ogni secondo
-  }
-
-  private stopPollingMessages() {
-    if (this.pollingInterval) {
-      clearInterval(this.pollingInterval);
-      this.pollingInterval = null;
-    }
   }
 
   public async startRealtimeVoice() {
@@ -699,6 +675,7 @@ export class AgentChat implements OnInit, OnDestroy {
     if (convId) {
       this.initializeChatHistory(convId);
     }
+    this.refreshConversations();
   }
 
   public toggleInputMode() {
@@ -731,7 +708,6 @@ export class AgentChat implements OnInit, OnDestroy {
     this.lastSavedAiText = '';
 
     this.geminiLiveService.disconnect();
-    this.stopPollingMessages();
     if (this.recognition) {
       this.recognition.stop();
       this.recognition = null;

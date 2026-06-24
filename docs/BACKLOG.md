@@ -23,17 +23,26 @@
 - **Fatto:** nuovo endpoint batch `POST attempts/batch` (`backend/src/functions/students/tests/getStudentAttemptsBatch.ts`, role student) che ritorna in 1 query il tentativo più recente per una lista di testId, con payload leggero (solo status/score/maxScore + questions{score,points,status}, niente populate). Service: `getAttemptsByTestIds()` in `student-tests.service.ts`. Aggiornati `student-dashboard.ts` e `student-tests-list.ts` (1 sola chiamata, stessa logica stati/score, error handler aggiunto). L'endpoint singolo `getStudentAttempt` resta per esecuzione/revisione.
 - **Da verificare a runtime:** login studente → dashboard e lista test mostrano stati e punteggi corretti; filtri "Da fare"/"Autovalutazioni" invariati.
 
-### 3. Polling 1Hz dei messaggi durante le sessioni vocali
+### 3. Polling 1Hz dei messaggi durante le sessioni vocali — ✅ RISOLTO (su `feature/logging`, 2026-06-24)
 
-- **Dove:** `frontend/src/teacher/components/agent-chat/agent-chat.ts` → `startPollingMessages()` (~504), start ~484 / stop ~473; chiama `agentService.getConversationHistory()` (= `GET messages?conversationId=...`, in `frontend/src/services/agent.service.ts`).
-- **Sintomo:** durante la voce, una `GET messages` **al secondo** verso Mongo anche senza novità.
-- **Fix (idee da validare):** pollare solo dopo un turno completato (esistono `turnCompleteEvent`/`userTurnCompleteEvent` in `gemini-live-service.ts`) invece che a intervallo fisso; backoff; stop quando l'ultimo messaggio locale ha già `_id`.
-- **⚠️ Attenzione massima:** il flusso chat **testo/voce** va prima ANALIZZATO e CAPITO, poi ottimizzato con estrema cautela — è intricato (WebSocket Gemini Live, trascrizioni input/output, turni, salvataggio asincrono `saveLiveMessage`/`messages/save`, allineamento messaggi locali↔DB). Non rompere nulla. Testare una sessione vocale end-to-end.
-- **Perché:** spreco di risorse e log gonfiati.
+- **Sintomo era:** durante la voce, una `GET messages` al secondo verso Mongo anche senza novità (`setInterval(1000)` in `agent-chat.ts`).
+- **Causa reale:** il polling serviva solo a "ridare l'`_id`" ai messaggi vocali aggiunti in locale senza `_id` (l'`_id` serve al TTS dopo l'uscita dalla voce).
+- **Fatto:** `saveVoiceMessage()` ora prende l'`_id` dalla risposta di `saveLiveMessage()` e patcha il messaggio locale; rimossi `setInterval`/`startPollingMessages`/`stopPollingMessages`. Il reload finale `initializeChatHistory()` all'uscita dalla voce resta come rete di sicurezza. Da ~60 GET/min per sessione → 0.
+- **Da verificare a runtime:** sessione vocale → 2-3 scambi → passa a testo (messaggi tutti presenti e in ordine, "Ascolta"/TTS funziona) → torna in voce (contesto mantenuto).
+
+### 4. Ordine messaggi chat rotto dopo voce→testo + salvataggi lentissimi — ✅ RISOLTO (su `feature/logging`, 2026-06-24)
+
+- **Sintomo era:** dopo una sessione vocale, ricaricando la chat i messaggi apparivano tutti gli AI sopra e tutti gli utente sotto; inoltre `messages/save` arrivava a 30s+.
+- **Causa:** in `saveMessage` il `timestamp` veniva assegnato all'insert, DOPO l'`await` della generazione AI del titolo (lenta). I messaggi utente (primi 3 turni) venivano rallentati e ricevevano un timestamp posteriore agli AI → `buildConversationHistory` (sort by timestamp) li metteva in fondo.
+- **Fatto:** in `backend/src/_helpers/DB/messages/saveMessage.ts` il timestamp è catturato a inizio funzione e la generazione AI del titolo è stata RIMOSSA dal salvataggio.
+- **Cronologia/sidebar (stessa area, fatto):** `listConversations` ora ordina per timestamp prima del group e ricava il titolo dal **primo messaggio dell'utente** (troncato), ignorando i vecchi titoli AI salvati (es. "Saluto iniziale" su una chat poi diventata altro). Il frontend (`agent-chat.ts`) aggiorna la sidebar (`refreshConversations()`) dopo il primo messaggio testo e all'uscita dalla voce → la conversazione appena iniziata compare senza ricaricare la pagina.
+- **Da verificare a runtime:** hard refresh → sessione voce + testo mista → ordine cronologico corretto, salvataggi rapidi, nuova conversazione visibile subito in cronologia col titolo = prima richiesta dell'utente.
 
 ---
 
 ## 🧹 Pulizie / codice morto
+
+- **Titolo conversazione AI ora codice morto:** dopo il fix #4, `backend/src/_helpers/AI/generateConversationTitle.ts` (`generateConversationSummaryTitle`, `generateConversationTitleGemini`) non è più chiamato (c'è anche un duplicato `generateConversationTitleGemini` in `generateResponse.ts:249`). Decidere: rimuoverlo, **oppure** riusarlo per rigenerare i titoli AI in modo NON bloccante (endpoint dedicato chiamato fire-and-forget dal client, fuori dal hot path del salvataggio) se si vogliono i titoli "smart" in sidebar.
 
 - **Impersonation:** rimuovere `x-impersonate-user` in `getAuthCognitoUser.ts` (era per test).
 - **Lambda non instradate** (mai esposte in `functions-declarations.config.ts`): `countPublishedTests`, `getStudents`, `updateSettings`, `executeTest`, `listenTomessage` → rimuovere.
@@ -55,6 +64,9 @@ CSV/JSON/descrittivo). Restano:
 - **Ripulire i log pre-24/06** (opzionale): record con "utente sconosciuto" e durata 0 generati prima del fix `enterWith → storage.run`.
 - **A scala (quando il volume cresce):** valutare un TTL/retention sulla collection `activity_logs` e ridurre il rumore ad alta frequenza (health check, poll messaggi) per contenere indici e storage.
 - **Filtro date in ora locale** (opzionale): oggi i confini giornata sono in UTC; per la semantica "giornata italiana" esatta far inviare al frontend gli ISO completi in ora locale.
+- **Leggibilità log — separare azioni utente dal sotto-cofano:** in `/a/logs` aggiungere un toggle "Solo azioni utente" (filtra `category=client`: navigazione, apertura materiali, voce) per ricostruire al volo il percorso umano senza il rumore delle chiamate http automatiche.
+- **Non loggare l'endpoint `/telemetry` in sé:** oggi ogni invio di telemetria genera anche una riga http "Telemetria client" oltre agli eventi client che trasporta → rumore. Skip nel middleware di logging (`lambdaProxyResponse.ts`) per quella route.
+- **Cache profilo/organizzazione in navigazione:** ogni navigata su `/s/tests` ricarica anche `Consultazione profilo` e `Dettaglio organizzazione` → caricarli una volta e cacharli (meno chiamate, meno rumore nei log).
 
 ---
 

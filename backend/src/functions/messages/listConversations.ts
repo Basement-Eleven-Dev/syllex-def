@@ -16,14 +16,27 @@ const listConversations = async (
 
   await connectDatabase();
 
-  // Troviamo tutte le conversazioni uniche per questo utente e materia
+  // Conversazioni uniche per utente+materia. Ordiniamo per timestamp PRIMA del
+  // group così $first/$last sono deterministici. Il titolo è il PRIMO messaggio
+  // dell'utente (ciò che ha chiesto), non i vecchi titoli AI (ormai non più
+  // generati) né eventuali saluti/risposte dell'assistente.
   const conversations = await Message.aggregate([
     { $match: { subjectId: subjectId, userId: userId } },
+    { $sort: { timestamp: 1, _id: 1 } },
     {
       $group: {
         _id: "$conversationId",
-        firstMessage: { $first: "$content" },
-        conversationTitle: { $max: "$conversationTitle" },
+        firstContent: { $first: "$content" },
+        // Solo i contenuti dei messaggi UTENTE (troncati), null per gli altri
+        userContents: {
+          $push: {
+            $cond: [
+              { $eq: ["$role", "user"] },
+              { $substrCP: ["$content", 0, 80] },
+              null,
+            ],
+          },
+        },
         lastMessage: { $last: "$content" },
         timestamp: { $last: "$timestamp" },
       },
@@ -32,15 +45,15 @@ const listConversations = async (
   ]);
 
   return conversations.map((c) => {
-    // Pulisce e tronca il titolo di fallback se è una vecchia chat senza riassunto
-    let displayTitle = c.conversationTitle || c.firstMessage || "Nuova conversazione";
-    if (!c.conversationTitle && displayTitle.length > 36) {
-      displayTitle = displayTitle.slice(0, 35) + "...";
+    const firstUserMessage = (c.userContents || []).find((x: string) => x);
+    let title = (firstUserMessage || c.firstContent || "Nuova conversazione").trim();
+    if (title.length > 40) {
+      title = title.slice(0, 40) + "…";
     }
 
     return {
       id: c._id,
-      title: displayTitle,
+      title,
       preview: c.lastMessage,
       timestamp: c.timestamp,
     };
