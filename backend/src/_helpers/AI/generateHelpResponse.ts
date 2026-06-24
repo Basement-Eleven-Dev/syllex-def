@@ -2,6 +2,7 @@ import { getGeminiClient } from "./getClient";
 import { retrieveRelevantSyllexKnowledge } from "./embeddings/retrieveRelevantSyllexKnowledge";
 import { buildHelpAgent } from "./buildHelpAgent";
 import { getSitemapForRole } from "./helpSitemap";
+import { trackedGenerateContent } from "./trackedGeneration";
 
 /**
  * Generatore di risposte per la chat di assistenza Syllex.
@@ -43,7 +44,7 @@ export async function generateHelpResponseGemini(
     );
 
     // 3. Generazione Risposta con Gemini
-    const response = await ai.models.generateContent({
+    const response = await trackedGenerateContent(ai, {
       model: "gemini-3-flash-preview",
       contents: [
         {
@@ -55,7 +56,7 @@ export async function generateHelpResponseGemini(
         systemInstruction: systemPrompt,
         temperature: 0.1, // Più basso per maggiore precisione tecnica
       },
-    });
+    }, "ai.help_chat");
 
     let text =
       response.text ||

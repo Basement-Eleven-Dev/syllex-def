@@ -121,6 +121,26 @@ const ADMIN_ROUTES: FunctionIntegration[] = [
     role: "admin",
   },
 
+  // activity logs / audit
+  {
+    apiRoute: "admin/logs",
+    functionPath: "admin/logs/getActivityLogs.ts",
+    method: "get",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/logs/cost-summary",
+    functionPath: "admin/logs/getLogsCostSummary.ts",
+    method: "get",
+    role: "admin",
+  },
+  {
+    apiRoute: "admin/logs/export",
+    functionPath: "admin/logs/getLogsExport.ts",
+    method: "get",
+    role: "admin",
+  },
+
   //syllex knowledge
   {
     apiRoute: "admin/knowledge-source",
@@ -289,6 +309,13 @@ const MISC_ROUTES: FunctionIntegration[] = [
     functionPath: "status.ts",
     method: "get",
     role: "open",
+  },
+  {
+    // Telemetria client (apertura materiali, sessione vocale, navigazione)
+    apiRoute: "telemetry",
+    functionPath: "telemetry/recordTelemetry.ts",
+    method: "post",
+    role: "logged",
   },
   {
     apiRoute: "organizations/{organizationId}",
@@ -669,6 +696,13 @@ const ATTEMPTS_ROUTES: FunctionIntegration[] = [
     apiRoute: "attempts/questions-count",
     functionPath: "students/selfEvaluation/countQuestions.ts",
     method: "get",
+    role: "student",
+  },
+  {
+    // Batch: tentativo più recente per una lista di testId (1 query, no N+1)
+    apiRoute: "attempts/batch",
+    functionPath: "students/tests/getStudentAttemptsBatch.ts",
+    method: "post",
     role: "student",
   },
   {

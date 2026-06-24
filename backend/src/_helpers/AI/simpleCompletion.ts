@@ -3,6 +3,7 @@ import { ZodType } from "zod";
 import { Part } from "@google/genai";
 import { fetchBuffer } from "../fetchBuffer";
 import { Material } from "../../models/schemas/material.schema";
+import { trackedGenerateContent } from "./trackedGeneration";
 
 const MAX_RETRIES = 3;
 const BASE_DELAY_MS = 2000;
@@ -71,7 +72,7 @@ const askStrucuredGemini = async <T>(
 
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     try {
-      const response = await client.models.generateContent({
+      const response = await trackedGenerateContent(client, {
         model: model,
 
         contents: [
@@ -92,7 +93,7 @@ const askStrucuredGemini = async <T>(
           topP: topP,
           topK: topK,
         },
-      });
+      }, "ai.material_generate");
       return structure.parse(JSON.parse(response.text!));
     } catch (error: any) {
       if (error?.status === 429 && attempt < MAX_RETRIES) {

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable, map, of } from 'rxjs';
 import { QuestionInterface } from './questions';
 
 export interface SelfEvaluationPayload {
@@ -52,6 +52,24 @@ export interface AttemptQuestionData {
     | 'pending';
 }
 
+/**
+ * Versione compatta del tentativo restituita dall'endpoint batch
+ * (`attempts/batch`): solo i campi usati da dashboard e lista test, per
+ * mostrare stato e punteggio senza scaricare l'intero tentativo.
+ */
+export interface StudentAttemptSummaryQuestion {
+  score?: number;
+  points?: number;
+  status?: string;
+}
+export interface StudentAttemptSummary {
+  testId: string;
+  status: 'in-progress' | 'delivered' | 'reviewed';
+  score?: number | null;
+  maxScore?: number | null;
+  questions: StudentAttemptSummaryQuestion[];
+}
+
 export interface StudentAttemptInterface {
   _id?: string;
   testId: string;
@@ -101,6 +119,22 @@ export class StudentTestsService {
         attempt: StudentAttemptInterface | null;
       }>(`test/${testId}/attempt`)
       .pipe(map((res) => res.attempt ?? null));
+  }
+
+  /**
+   * Batch: per una lista di testId ritorna il tentativo più recente di ciascuno,
+   * in UNA sola chiamata (evita la cascata N+1 di getAttemptByTestId).
+   * Mappa testId → tentativo compatto.
+   */
+  getAttemptsByTestIds(
+    testIds: string[],
+  ): Observable<Record<string, StudentAttemptSummary>> {
+    if (!testIds.length) return of({});
+    return this.http
+      .post<{
+        attempts: Record<string, StudentAttemptSummary>;
+      }>('attempts/batch', { testIds })
+      .pipe(map((res) => res.attempts ?? {}));
   }
 
   createAttempt(

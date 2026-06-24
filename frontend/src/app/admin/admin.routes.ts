@@ -62,6 +62,12 @@ export const adminRoutes: Routes = [
       import('./pages/admin-stats/admin-stats').then((m) => m.AdminStats),
   },
   {
+    path: 'logs',
+    loadComponent: () =>
+      import('./pages/admin-logs/admin-logs').then((m) => m.AdminLogs),
+    canActivate: [superadminGuard],
+  },
+  {
     path: 'reports',
     loadComponent: () =>
       import('./pages/admin-reports/admin-reports').then((m) => m.AdminReports),

@@ -6,8 +6,6 @@ import {
   effect,
   HostListener,
 } from '@angular/core';
-import { forkJoin, from, of } from 'rxjs';
-import { map, mergeMap, toArray, catchError } from 'rxjs/operators';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
@@ -230,40 +228,35 @@ export class StudentTestsList {
 
     this.IsCheckingStatuses.set(true);
 
-    from(toCheck)
-      .pipe(
-        mergeMap(
-          (t) =>
-            this.testsService.getAttemptByTestId(t._id).pipe(
-              catchError(() => of(null)),
-              map((attempt) => ({ testId: t._id, attempt })),
-            ),
-          5, // MAX 5 CONCURRENT REQUESTS
-        ),
-        toArray(),
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe((results) => {
-        const statusMap = new Map(this.AttemptStatusMap());
-        const resultMap = new Map(this.AttemptResultMap());
+    // Stati e risultati in UNA sola chiamata batch (niente più cascata N+1)
+    this.testsService
+      .getAttemptsByTestIds(toCheck.map((t) => t._id))
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        error: () => this.IsCheckingStatuses.set(false),
+        next: (attemptsByTest) => {
+          const statusMap = new Map(this.AttemptStatusMap());
+          const resultMap = new Map(this.AttemptResultMap());
 
-        for (const { testId, attempt } of results) {
-          if (attempt) {
-            statusMap.set(testId, attempt.status);
-            const correct = attempt.questions.filter(
-              (q) => q.status === 'correct',
-            ).length;
-            const wrong = attempt.questions.filter(
-              (q) =>
-                q.status && q.status !== 'correct' && q.status !== 'pending',
-            ).length;
-            resultMap.set(testId, { correct, wrong });
+          for (const t of toCheck) {
+            const attempt = attemptsByTest[t._id];
+            if (attempt) {
+              statusMap.set(t._id, attempt.status);
+              const correct = attempt.questions.filter(
+                (q) => q.status === 'correct',
+              ).length;
+              const wrong = attempt.questions.filter(
+                (q) =>
+                  q.status && q.status !== 'correct' && q.status !== 'pending',
+              ).length;
+              resultMap.set(t._id, { correct, wrong });
+            }
           }
-        }
 
-        this.AttemptStatusMap.set(statusMap);
-        this.AttemptResultMap.set(resultMap);
-        this.IsCheckingStatuses.set(false);
+          this.AttemptStatusMap.set(statusMap);
+          this.AttemptResultMap.set(resultMap);
+          this.IsCheckingStatuses.set(false);
+        },
       });
   }
 }

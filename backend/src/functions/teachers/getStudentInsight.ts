@@ -2,6 +2,7 @@ import { APIGatewayProxyEvent, Context } from "aws-lambda";
 import createError from "http-errors";
 import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import { getGeminiClient } from "../../_helpers/AI/getClient";
+import { trackedGenerateContent } from "../../_helpers/AI/trackedGeneration";
 import { User } from "../../models/schemas/user.schema";
 import { Attempt } from "../../models/schemas/attempt.schema";
 import { connectDatabase } from "../../_helpers/getDatabase";
@@ -77,7 +78,7 @@ const generateStudentInsight = async (
   try {
     const ai = await getGeminiClient();
 
-    const response = await ai.models.generateContent({
+    const response = await trackedGenerateContent(ai, {
       model: "gemini-3.1-flash-lite", // Using flash as it is stable and fast for summaries
       contents: [
         {
@@ -90,7 +91,7 @@ const generateStudentInsight = async (
         temperature: 0.7,
         maxOutputTokens: 500,
       },
-    });
+    }, "ai.student_insight");
 
     return {
       insight: response.text || "Impossibile generare il riassunto al momento.",

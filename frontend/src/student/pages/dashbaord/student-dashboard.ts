@@ -11,10 +11,8 @@ import { Auth, User } from '../../../services/auth';
 import {
   StudentTestsService,
   StudentTestInterface,
-  StudentAttemptInterface,
+  StudentAttemptSummary,
 } from '../../../services/student-tests.service';
-import { forkJoin, of, from } from 'rxjs';
-import { catchError, mergeMap, toArray, map } from 'rxjs/operators';
 import {
   ComunicazioniService,
   ComunicazioneInterface,
@@ -155,25 +153,18 @@ export class StudentDashboard implements OnInit {
 
         this.CompletedTests.set(selfEvalTests.slice(0, 3));
 
-        // Fetch all attempts in parallel but limit concurrency to 5 to prevent AWS API Gateway rate limiting
+        // Tentativi in UNA sola chiamata batch (niente più cascata N+1)
         if (allTests.length > 0) {
-          from(allTests)
-            .pipe(
-              mergeMap(
-                (test, index) =>
-                  this.testsService.getAttemptByTestId(test._id).pipe(
-                    catchError(() => of(null)),
-                    map((attempt) => ({ index, attempt })),
-                  ),
-                5, // MAX 5 CONCURRENT REQUESTS
-              ),
-              toArray(),
-              map((results) =>
-                results.sort((a, b) => a.index - b.index).map((r) => r.attempt),
-              ),
-              takeUntilDestroyed(this.destroyRef),
-            )
-            .subscribe((attempts) => {
+          this.testsService
+            .getAttemptsByTestIds(allTests.map((t) => t._id))
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+              error: () => this.isLoadingData.set(false),
+              next: (attemptsByTest) => {
+              const attempts = allTests.map(
+                (t) => attemptsByTest[t._id] ?? null,
+              );
+
               const newStatusMap = new Map<
                 string,
                 'in-progress' | 'delivered' | 'reviewed'
@@ -219,6 +210,7 @@ export class StudentDashboard implements OnInit {
               // Generate Subject Statistics
               this.computeSubjectStats(allTests, attempts);
               this.isLoadingData.set(false);
+              },
             });
         } else {
           this.computeSubjectStats([], []);
@@ -237,7 +229,7 @@ export class StudentDashboard implements OnInit {
 
   private computeSubjectStats(
     allTests: StudentTestInterface[],
-    attempts: (StudentAttemptInterface | null)[],
+    attempts: (StudentAttemptSummary | null)[],
   ) {
     const subjects = this.materiaService.allMaterie();
     const stats: StatCardData[] = [];

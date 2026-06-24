@@ -2,6 +2,7 @@ import { FileEmbedding } from "../../../models/schemas/file-embedding.schema";
 import { Subject } from "../../../models/schemas/subject.schema";
 import { connectDatabase } from "../../getDatabase";
 import { getGeminiClient } from "../getClient";
+import { trackedEmbedContent } from "../trackedGeneration";
 import { Types } from "mongoose";
 
 interface RelevantDocument {
@@ -24,14 +25,14 @@ export async function retrieveRelevantDocumentsWithGemini(
 
     const embedStart = performance.now();
     // 1. Genera l'embedding della QUERY con Gemini
-    const response = await ai.models.embedContent({
+    const response = await trackedEmbedContent(ai, {
       model: "gemini-embedding-001",
       contents: [query],
       config: {
         taskType: "RETRIEVAL_QUERY",
         outputDimensionality: 768,
       },
-    });
+    }, "ai.embed_query");
 
     const queryEmbedding = response.embeddings?.[0]?.values;
     const embedEnd = performance.now();

@@ -1,6 +1,7 @@
 import { KnowledgeManualEmbedding } from "../../../models/schemas/knowledge-manual-embedding.schema";
 import { connectDatabase } from "../../getDatabase";
 import { getGeminiClient } from "../getClient";
+import { trackedEmbedContent } from "../trackedGeneration";
 
 interface RelevantDocument {
   text: string;
@@ -24,14 +25,14 @@ export async function retrieveRelevantSyllexKnowledge(
     const enrichedQuery = `Syllex Manual: ${query}`;
 
     // 2. Genera l'embedding della QUERY con Gemini
-    const response = await ai.models.embedContent({
+    const response = await trackedEmbedContent(ai, {
       model: "gemini-embedding-001",
       contents: [enrichedQuery],
       config: {
         taskType: "RETRIEVAL_QUERY",
         outputDimensionality: 768,
       },
-    });
+    }, "ai.embed_query");
 
     const queryEmbedding = response.embeddings?.[0]?.values;
 

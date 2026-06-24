@@ -1,14 +1,15 @@
 import { getGeminiClient } from "./getClient";
+import { trackedGenerateContent } from "./trackedGeneration";
 
 export async function generateConversationTitleGemini(query: string): Promise<string> {
   try {
     const ai = await getGeminiClient();
     const prompt = `Genera un titolo riassuntivo estremamente sintetico (massimo 4 parole) in italiano per descrivere l'argomento principale di questa richiesta: "${query}". Rispondi SOLO con il titolo, senza virgolette, senza punteggiatura, e capitalizza la prima lettera.`;
     
-    const response = await ai.models.generateContent({
+    const response = await trackedGenerateContent(ai, {
       model: "gemini-3-flash-preview",
       contents: [{ role: "user", parts: [{ text: prompt }] }],
-    });
+    }, "ai.conversation_title");
 
     let text: string | undefined;
     try {
@@ -44,10 +45,10 @@ export async function generateConversationSummaryTitle(
       
     const prompt = `Genera un titolo riassuntivo estremamente sintetico (massimo 4 parole) in italiano che rappresenti l'argomento principale di questi messaggi dell'utente in una chat didattica:\n- ${userPrompts}\n\nRispondi SOLO con il titolo, senza virgolette, senza punteggiatura, e capitalizza la prima lettera.`;
     
-    const response = await ai.models.generateContent({
+    const response = await trackedGenerateContent(ai, {
       model: "gemini-3-flash-preview",
       contents: [{ role: "user", parts: [{ text: prompt }] }],
-    });
+    }, "ai.conversation_title");
 
     let text: string | undefined;
     try {

@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 import { firstValueFrom } from 'rxjs';
 import { Materia } from './materia';
+import { TelemetryService } from './telemetry-service';
 
 @Injectable({
   providedIn: 'root',
@@ -10,6 +11,11 @@ import { Materia } from './materia';
 export class GeminiLiveService {
   private http = inject(HttpClient);
   private materiaService = inject(Materia); // Per ottenere l'ID della materia corrente
+  private telemetry = inject(TelemetryService);
+
+  // Telemetria sessione vocale: inizio (ms) e numero di turni completati.
+  private sessionStartedAt = 0;
+  private sessionTurns = 0;
 
   // --- STATO REATTIVO (Signals) ---
   public isConnected = signal<boolean>(false);
@@ -102,6 +108,10 @@ export class GeminiLiveService {
 
   public async connect(): Promise<void> {
     if (this.wsSubject) return;
+
+    // Avvio misura sessione vocale (telemetria client).
+    this.sessionStartedAt = Date.now();
+    this.sessionTurns = 0;
 
     try {
       const token = await this.getToken();
@@ -201,8 +211,33 @@ export class GeminiLiveService {
     });
   }
 
+  /**
+   * Emette l'evento di telemetria della sessione vocale (durata + turni).
+   * Idempotente: il guard su sessionStartedAt evita doppi invii quando
+   * convergono cleanupState() e disconnect().
+   */
+  private emitVoiceSessionTelemetry(): void {
+    if (this.sessionStartedAt === 0) return;
+    const durationMs = Date.now() - this.sessionStartedAt;
+    this.sessionStartedAt = 0;
+    // Sessioni-fantasma (connessione fallita prima del primo turno): non loggare.
+    if (durationMs < 1000 && this.sessionTurns === 0) return;
+    this.telemetry.track({
+      action: 'voice.session',
+      durationMs,
+      model: this.resolvedModel || this.LIVE_MODEL,
+      modality: 'audio',
+      payload: {
+        turns: this.sessionTurns,
+        subjectId: this.materiaService.materiaSelected()?._id ?? '',
+      },
+    });
+    this.sessionTurns = 0;
+  }
+
   // Pulizia stato senza tentare di inviare messaggi su un socket già chiuso
   private cleanupState(): void {
+    this.emitVoiceSessionTelemetry();
     this.wsSubject = null;
     this.isConnected.set(false);
     this.isReady.set(false);
@@ -219,6 +254,7 @@ export class GeminiLiveService {
 
   // Aggiunto un flag "isClean" per evitare crash durante una chiusura per errore
   public disconnect(isClean = true): void {
+    this.emitVoiceSessionTelemetry();
     if (this.wsSubject) {
       if (isClean) {
         try {
@@ -533,6 +569,7 @@ ${lines}`;
 
       if (content.turnComplete) {
         console.log('🏁 [TURN COMPLETE]');
+        this.sessionTurns++;
         this.hasOutputTranscription = false;
         this.isSpeaking.set(false);
         // NON azzeriamo aiTranscript qui — resta visibile finché

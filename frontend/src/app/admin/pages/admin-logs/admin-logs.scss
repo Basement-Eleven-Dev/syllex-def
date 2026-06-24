@@ -1,0 +1,125 @@
+.admin-logs {
+  // --- Tabella costi: compatta ---
+  .cost-table {
+    th,
+    td {
+      padding-top: 0.35rem;
+      padding-bottom: 0.35rem;
+    }
+  }
+
+  // --- Tabella eventi ---
+  .logs-table {
+    th {
+      font-weight: 600;
+      white-space: nowrap;
+      border-bottom: 2px solid var(--bs-border-color);
+    }
+
+    td {
+      vertical-align: middle;
+    }
+
+    .action-cell {
+      max-width: 340px;
+    }
+
+    .payload-hint {
+      font-size: 11px;
+      max-width: 300px;
+    }
+
+    // Riga principale cliccabile
+    .log-row {
+      cursor: pointer;
+      transition: background-color 0.12s ease;
+
+      // Accento colore per categoria sul bordo sinistro
+      td:first-child {
+        border-left: 3px solid transparent;
+      }
+      &[data-cat='http'] td:first-child {
+        border-left-color: var(--bs-primary);
+      }
+      &[data-cat='ai'] td:first-child {
+        border-left-color: var(--bs-info);
+      }
+      &[data-cat='system'] td:first-child {
+        border-left-color: var(--bs-secondary);
+      }
+      &[data-cat='client'] td:first-child {
+        border-left-color: var(--bs-warning);
+      }
+
+      &:hover {
+        background-color: var(--bs-tertiary-bg, rgba(0, 0, 0, 0.03));
+      }
+
+      &.expanded {
+        background-color: var(--bs-tertiary-bg, rgba(0, 0, 0, 0.04));
+        td {
+          border-bottom-color: transparent;
+        }
+      }
+
+      &.is-error {
+        background-color: var(--bs-danger-bg-subtle, #f8d7da);
+        &:hover {
+          background-color: var(--bs-danger-bg-subtle, #f5c2c7);
+        }
+      }
+    }
+
+    .chevron {
+      font-size: 11px;
+      transition: transform 0.15s ease;
+      &.open {
+        transform: rotate(180deg);
+      }
+    }
+
+    // --- Riga di dettaglio espansa ---
+    .detail-row > td {
+      background-color: var(--bs-tertiary-bg, rgba(0, 0, 0, 0.02));
+      padding-top: 0.5rem;
+      padding-bottom: 0.85rem;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 0.5rem 1.25rem;
+
+      .wide {
+        grid-column: 1 / -1;
+      }
+
+      .k {
+        display: block;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: var(--bs-secondary-color, #6c757d);
+        margin-bottom: 1px;
+      }
+
+      .v {
+        font-size: 13px;
+        word-break: break-word;
+      }
+
+      .mono {
+        font-family: var(--bs-font-monospace, monospace);
+        font-size: 12px;
+      }
+    }
+  }
+
+  .badge {
+    font-weight: 500;
+  }
+
+  .export-menu {
+    min-width: 280px;
+  }
+}

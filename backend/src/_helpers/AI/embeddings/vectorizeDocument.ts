@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import { FileEmbedding } from "../../../models/schemas/file-embedding.schema";
 import { connectDatabase } from "../../getDatabase";
 import { getGeminiClient } from "../getClient";
+import { trackedEmbedContent } from "../trackedGeneration";
 
 export interface VectorizeDocumentParams {
   materialId: Types.ObjectId;
@@ -68,14 +69,14 @@ export async function vectorizeDocumentWithGemini(
     // 3. Esecuzione Parallela Controllata
     // Usiamo Promise.all per inviare i batch contemporaneamente (occhio ai rate limit se i documenti sono enormi)
     const embeddingPromises = batches.map(async (batch) => {
-      const response = await ai.models.embedContent({
+      const response = await trackedEmbedContent(ai, {
         model: "gemini-embedding-001",
         contents: batch,
         config: {
           taskType: "RETRIEVAL_DOCUMENT", // Fondamentale per la qualità della ricerca
           outputDimensionality: 768,
         },
-      });
+      }, "ai.embed_document");
 
       if (!response.embeddings) return [];
 
