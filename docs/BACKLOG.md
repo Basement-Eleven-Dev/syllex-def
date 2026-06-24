@@ -64,9 +64,11 @@ CSV/JSON/descrittivo). Restano:
 - **Ripulire i log pre-24/06** (opzionale): record con "utente sconosciuto" e durata 0 generati prima del fix `enterWith → storage.run`.
 - **A scala (quando il volume cresce):** valutare un TTL/retention sulla collection `activity_logs` e ridurre il rumore ad alta frequenza (health check, poll messaggi) per contenere indici e storage.
 - **Filtro date in ora locale** (opzionale): oggi i confini giornata sono in UTC; per la semantica "giornata italiana" esatta far inviare al frontend gli ISO completi in ora locale.
-- **Leggibilità log — separare azioni utente dal sotto-cofano:** in `/a/logs` aggiungere un toggle "Solo azioni utente" (filtra `category=client`: navigazione, apertura materiali, voce) per ricostruire al volo il percorso umano senza il rumore delle chiamate http automatiche.
-- **Non loggare l'endpoint `/telemetry` in sé:** oggi ogni invio di telemetria genera anche una riga http "Telemetria client" oltre agli eventi client che trasporta → rumore. Skip nel middleware di logging (`lambdaProxyResponse.ts`) per quella route.
+- ✅ **Leggibilità log — FATTO (2026-06-24):** `/a/logs` ridisegnata — viste segmentate (Tutto / Solo azioni utente=`category client` / AI / Errori), preset temporali (Ultima ora/Oggi/7gg/Tutto) + range custom con data e ora, ora prominente in tabella, statistiche in chip, dettaglio costi collassabile, paginazione "Carica altri" (50/volta, più recenti in cima), riga espandibile col dettaglio tecnico.
+- ✅ **Stop logging `/telemetry` — FATTO (2026-06-24):** `activityLogger.ts` non scrive più la riga http per la route `telemetry` (gli eventi client restano).
 - **Cache profilo/organizzazione in navigazione:** ogni navigata su `/s/tests` ricarica anche `Consultazione profilo` e `Dettaglio organizzazione` → caricarli una volta e cacharli (meno chiamate, meno rumore nei log).
+- **Super-admin senza email nei log (`utente sconosciuto (admin)`):** le richieste del super-admin loggano il ruolo ma non `userEmail` → verificare perché l'utente admin non ha email popolata (schema/Cognito) o se il middleware non la risolve per quel ruolo. Emerso dall'export del 2026-06-24.
+- **`Accettazione delle policy` (PATCH profile/policies) a ogni accesso:** compare a ogni landing di docente/studente → verificare se è una scrittura inutile ripetuta a ogni login (dovrebbe avvenire solo quando l'utente accetta davvero) o un'etichetta fuorviante. Possibile chiamata sprecata + rumore nei log.
 
 ---
 

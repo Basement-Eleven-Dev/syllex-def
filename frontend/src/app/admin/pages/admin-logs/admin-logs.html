@@ -1,16 +1,15 @@
 <div class="admin-logs p-4">
   <!-- Header -->
-  <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+  <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
     <div class="d-flex align-items-center gap-3">
       <fa-icon [icon]="HistoryIcon" class="fs-3 text-primary"></fa-icon>
       <div>
         <h3 class="mb-0 fw-bold">Log attività</h3>
-        <span class="text-muted small">Fonte di verità: ogni azione, chi, quando, costo</span>
+        <span class="text-muted small">Chi ha fatto cosa, quando, con che esito e costo</span>
       </div>
     </div>
 
     <div class="d-flex align-items-center gap-2">
-      <!-- Export: un solo menu, voci auto-esplicative -->
       <div ngbDropdown class="d-inline-block">
         <button
           class="btn btn-outline-primary btn-sm d-flex align-items-center gap-2"
@@ -23,47 +22,48 @@
         <div ngbDropdownMenu class="dropdown-menu-end shadow-sm export-menu">
           <button class="dropdown-item d-flex gap-2 py-2" (click)="exportAs('descriptive')">
             <fa-icon [icon]="ReportIcon" class="text-primary mt-1"></fa-icon>
-            <span>
-              Report leggibile
-              <small class="d-block text-muted">Pagina stampabile / PDF — per enti e non tecnici</small>
-            </span>
+            <span>Report leggibile<small class="d-block text-muted">Pagina stampabile / PDF — per enti</small></span>
           </button>
           <button class="dropdown-item d-flex gap-2 py-2" (click)="exportAs('csv')">
             <fa-icon [icon]="CsvIcon" class="text-success mt-1"></fa-icon>
-            <span>
-              CSV
-              <small class="d-block text-muted">Foglio di calcolo — per analisi tecniche</small>
-            </span>
+            <span>CSV<small class="d-block text-muted">Foglio di calcolo</small></span>
           </button>
           <button class="dropdown-item d-flex gap-2 py-2" (click)="exportAs('json')">
             <fa-icon [icon]="JsonIcon" class="text-info mt-1"></fa-icon>
-            <span>
-              JSON
-              <small class="d-block text-muted">Dati grezzi del database</small>
-            </span>
+            <span>JSON<small class="d-block text-muted">Dati grezzi</small></span>
           </button>
         </div>
       </div>
-
       <button class="btn btn-primary btn-sm d-flex align-items-center gap-2" (click)="load()" [disabled]="isLoading()">
-        <fa-icon [icon]="RefreshIcon"></fa-icon>
+        <fa-icon [icon]="RefreshIcon" [class.fa-spin]="isLoading()"></fa-icon>
         Aggiorna
       </button>
     </div>
   </div>
 
-  <!-- Riepilogo costi AI -->
-  <div class="card mb-3 border-0 shadow-sm">
-    <div class="card-body py-3">
-      <div class="d-flex align-items-center justify-content-between">
-        <h6 class="mb-0 fw-semibold text-muted d-flex align-items-center gap-2">
-          <fa-icon [icon]="CoinsIcon" class="text-warning"></fa-icon>
-          Costi AI <span class="fw-normal small">(token reali, nel periodo filtrato)</span>
-        </h6>
-        <span class="fs-4 fw-bold text-success">{{ formatCost(totalCostUsd()) }}</span>
-      </div>
-      @if (costModels().length > 0) {
-        <div class="table-responsive mt-2">
+  <!-- Strip statistiche -->
+  <div class="stats-strip d-flex flex-wrap gap-2 mb-3">
+    <div class="stat-chip">
+      <span class="stat-label">Eventi mostrati</span>
+      <span class="stat-value">{{ logs().length }}</span>
+    </div>
+    <div class="stat-chip" [class.danger]="errorCount() > 0">
+      <span class="stat-label">Errori</span>
+      <span class="stat-value">{{ errorCount() }}</span>
+    </div>
+    <button class="stat-chip cost clickable" (click)="toggleCostDetail()">
+      <span class="stat-label"><fa-icon [icon]="CoinsIcon" class="me-1 text-warning"></fa-icon>Costo AI (periodo)</span>
+      <span class="stat-value text-success">{{ formatCost(totalCostUsd()) }}
+        <fa-icon [icon]="ChevronIcon" class="ms-1 small chevron" [class.open]="showCostDetail()"></fa-icon>
+      </span>
+    </button>
+  </div>
+
+  <!-- Dettaglio costi (collassabile) -->
+  @if (showCostDetail()) {
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body py-2">
+        @if (costModels().length > 0) {
           <table class="table table-sm align-middle mb-0 cost-table">
             <thead>
               <tr class="text-muted small">
@@ -72,7 +72,7 @@
                 <th class="text-end">Token in</th>
                 <th class="text-end">Token out</th>
                 <th class="text-end">Errori</th>
-                <th class="text-end">Rate limit</th>
+                <th class="text-end">429</th>
                 <th class="text-end">Costo</th>
               </tr>
             </thead>
@@ -90,125 +90,97 @@
               }
             </tbody>
           </table>
-        </div>
-      } @else {
-        <span class="text-muted small">Nessun dato AI nel periodo selezionato.</span>
-      }
+        } @else {
+          <span class="text-muted small">Nessun dato AI nel periodo selezionato.</span>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Barra controlli -->
+  <div class="controls d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+    <!-- Viste rapide -->
+    <div class="segmented" role="group">
+      <button [class.active]="viewMode() === 'all'" (click)="setView('all')">Tutto</button>
+      <button [class.active]="viewMode() === 'client'" (click)="setView('client')">Solo azioni utente</button>
+      <button [class.active]="viewMode() === 'ai'" (click)="setView('ai')">AI</button>
+      <button [class.active]="viewMode() === 'error'" (click)="setView('error')">Errori</button>
+    </div>
+
+    <!-- Preset temporali -->
+    <div class="d-flex align-items-center gap-2">
+      <div class="segmented subtle" role="group">
+        <button [class.active]="timePreset() === '1h'" (click)="setTimePreset('1h')">Ultima ora</button>
+        <button [class.active]="timePreset() === 'today'" (click)="setTimePreset('today')">Oggi</button>
+        <button [class.active]="timePreset() === '7d'" (click)="setTimePreset('7d')">7 giorni</button>
+        <button [class.active]="timePreset() === 'all'" (click)="setTimePreset('all')">Tutto</button>
+      </div>
+      <button class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-2" (click)="toggleAdvanced()" [class.active]="showAdvanced()">
+        <fa-icon [icon]="SlidersIcon"></fa-icon>
+        Filtri
+      </button>
     </div>
   </div>
 
-  <!-- Filtri -->
-  <div class="card mb-3 border-0 shadow-sm">
-    <div class="card-body py-3">
-      <div class="d-flex align-items-center gap-2 mb-3 text-muted">
-        <fa-icon [icon]="FilterIcon"></fa-icon>
-        <span class="fw-semibold small text-uppercase">Filtri</span>
-      </div>
+  <!-- Filtri avanzati (collassabile) -->
+  @if (showAdvanced()) {
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body py-3">
+        <div class="row g-2 align-items-end">
+          <div class="col-md-3">
+            <label class="form-label small text-muted mb-1">Utente</label>
+            <input type="text" class="form-control form-control-sm" [(ngModel)]="filters.userEmail" list="userEmailList" placeholder="email utente" />
+            <datalist id="userEmailList">
+              @for (e of userEmailOptions(); track e) { <option [value]="e"></option> }
+            </datalist>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small text-muted mb-1">Azione</label>
+            <input type="text" class="form-control form-control-sm" [(ngModel)]="filters.action" list="actionList" placeholder="tipo di azione" />
+            <datalist id="actionList">
+              @for (o of actionOptions(); track o.action) { <option [value]="o.action" [label]="o.label"></option> }
+            </datalist>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small text-muted mb-1">Trace ID</label>
+            <input type="text" class="form-control form-control-sm" [(ngModel)]="filters.traceId" placeholder="trace di una singola azione" />
+          </div>
+          <div class="col-md-3 d-flex gap-2">
+            <button class="btn btn-primary btn-sm flex-grow-1 d-flex align-items-center justify-content-center gap-2" (click)="applyFilters()" [disabled]="isLoading()">
+              <fa-icon [icon]="SearchIcon"></fa-icon> Applica
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" (click)="resetFilters()" [disabled]="isLoading()">Azzera</button>
+          </div>
 
-      <div class="row g-2 align-items-end">
-        <div class="col-md-3">
-          <label class="form-label small text-muted mb-1">Utente</label>
-          <input
-            type="text"
-            class="form-control form-control-sm"
-            [(ngModel)]="filters.userEmail"
-            list="userEmailList"
-            placeholder="email utente"
-          />
-          <datalist id="userEmailList">
-            @for (e of userEmailOptions(); track e) {
-              <option [value]="e"></option>
-            }
-          </datalist>
-        </div>
-        <div class="col-md-3">
-          <label class="form-label small text-muted mb-1">Azione</label>
-          <input
-            type="text"
-            class="form-control form-control-sm"
-            [(ngModel)]="filters.action"
-            list="actionList"
-            placeholder="tipo di azione"
-          />
-          <datalist id="actionList">
-            @for (o of actionOptions(); track o.action) {
-              <option [value]="o.action" [label]="o.label"></option>
-            }
-          </datalist>
-        </div>
-        <div class="col-md-2">
-          <label class="form-label small text-muted mb-1">Categoria</label>
-          <select class="form-select form-select-sm" [(ngModel)]="filters.category">
-            <option value="">Tutte</option>
-            <option value="http">HTTP</option>
-            <option value="ai">AI</option>
-            <option value="system">Sistema</option>
-            <option value="client">Client</option>
-          </select>
-        </div>
-        <div class="col-md-2">
-          <label class="form-label small text-muted mb-1">Stato</label>
-          <select class="form-select form-select-sm" [(ngModel)]="filters.status">
-            <option value="">Tutti</option>
-            <option value="success">Successo</option>
-            <option value="error">Errore</option>
-          </select>
-        </div>
-        <div class="col-md-2">
-          <label class="form-label small text-muted mb-1">Limite</label>
-          <input type="number" class="form-control form-control-sm" [(ngModel)]="filters.limit" min="1" max="1000" />
-        </div>
-
-        <div class="col-md-2">
-          <label class="form-label small text-muted mb-1">Da</label>
-          <input type="date" class="form-control form-control-sm" [(ngModel)]="filters.from" />
-        </div>
-        <div class="col-md-2">
-          <label class="form-label small text-muted mb-1">A</label>
-          <input type="date" class="form-control form-control-sm" [(ngModel)]="filters.to" />
-        </div>
-        <div class="col-md-4">
-          <label class="form-label small text-muted mb-1">Trace ID</label>
-          <input type="text" class="form-control form-control-sm" [(ngModel)]="filters.traceId" placeholder="trace di una singola azione" />
-        </div>
-        <div class="col-md-4 d-flex gap-2">
-          <button class="btn btn-primary btn-sm flex-grow-1 d-flex align-items-center justify-content-center gap-2" (click)="load()" [disabled]="isLoading()">
-            <fa-icon [icon]="SearchIcon"></fa-icon>
-            Applica filtri
-          </button>
-          <button class="btn btn-outline-secondary btn-sm" (click)="resetFilters()" [disabled]="isLoading()">
-            Azzera
-          </button>
+          <div class="col-md-4">
+            <label class="form-label small text-muted mb-1">Da (data e ora)</label>
+            <input type="datetime-local" class="form-control form-control-sm" [(ngModel)]="customFrom" />
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small text-muted mb-1">A (data e ora)</label>
+            <input type="datetime-local" class="form-control form-control-sm" [(ngModel)]="customTo" />
+          </div>
+          <div class="col-md-4 d-flex align-items-end">
+            <button class="btn btn-outline-primary btn-sm" (click)="applyCustomRange()" [disabled]="isLoading()">Applica intervallo</button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  }
 
   <!-- Eventi -->
   <div class="card border-0 shadow-sm">
     <div class="card-body">
-      <div class="d-flex align-items-center justify-content-between mb-3">
-        <h6 class="mb-0 fw-semibold text-muted text-uppercase small">
-          Eventi <span class="badge bg-light text-dark ms-1">{{ logs().length }}</span>
-        </h6>
-        @if (errorCount() > 0) {
-          <span class="badge bg-danger-subtle text-danger d-flex align-items-center gap-1">
-            <fa-icon [icon]="ErrorIcon"></fa-icon>
-            {{ errorCount() }} errori
-          </span>
-        }
-      </div>
-
       @if (isLoading()) {
         <div class="text-center py-5 text-muted">Caricamento…</div>
       } @else if (logs().length === 0) {
-        <div class="text-center py-5 text-muted">Nessun log trovato con i filtri correnti.</div>
+        <div class="text-center py-5 text-muted">Nessun evento con i filtri correnti.</div>
       } @else {
         <div class="table-responsive">
           <table class="table align-middle mb-0 logs-table">
             <thead>
               <tr class="text-muted small">
-                <th style="width: 30px;"></th>
+                <th style="width: 28px;"></th>
                 <th>Quando</th>
                 <th>Utente</th>
                 <th>Categoria</th>
@@ -230,7 +202,10 @@
                   <td class="text-center text-muted">
                     <fa-icon [icon]="ChevronIcon" class="chevron" [class.open]="isExpanded(log._id)"></fa-icon>
                   </td>
-                  <td class="small text-nowrap">{{ formatDate(log.startedAt) }}</td>
+                  <td class="when text-nowrap">
+                    <span class="time">{{ formatTime(log.startedAt) }}</span>
+                    <span class="day">{{ formatDay(log.startedAt) }}</span>
+                  </td>
                   <td class="small">
                     <div class="fw-medium">{{ log.userEmail || '—' }}</div>
                     @if (log.userRole) { <div class="text-muted">{{ log.userRole }}</div> }
@@ -249,13 +224,9 @@
                   </td>
                   <td>
                     <span [class]="statusBadgeClass(log.status)">{{ log.status }}</span>
-                    @if (log.rateLimited) {
-                      <span class="badge bg-warning text-dark ms-1">429</span>
-                    }
+                    @if (log.rateLimited) { <span class="badge bg-warning text-dark ms-1">429</span> }
                   </td>
-                  <td class="text-end small text-nowrap">
-                    {{ log.durationMs ?? '—' }}<span class="text-muted" *ngIf="log.durationMs != null"> ms</span>
-                  </td>
+                  <td class="text-end small text-nowrap">{{ log.durationMs ?? '—' }}<span class="text-muted" *ngIf="log.durationMs != null"> ms</span></td>
                   <td class="text-end small">{{ log.costUsd != null ? formatCost(log.costUsd) : '—' }}</td>
                 </tr>
 
@@ -264,6 +235,7 @@
                     <td></td>
                     <td colspan="7">
                       <div class="detail-grid">
+                        <div><span class="k">Timestamp</span><span class="v">{{ formatDate(log.startedAt) }}</span></div>
                         @if (log.action) { <div><span class="k">Azione (tecnica)</span><span class="v mono">{{ log.action }}</span></div> }
                         @if (log.route) { <div><span class="k">Route</span><span class="v mono">{{ log.httpMethod }} {{ log.route }}</span></div> }
                         @if (log.httpStatusCode) { <div><span class="k">HTTP status</span><span class="v">{{ log.httpStatusCode }}</span></div> }
@@ -285,6 +257,14 @@
             </tbody>
           </table>
         </div>
+
+        @if (hasMore()) {
+          <div class="text-center mt-3">
+            <button class="btn btn-outline-primary btn-sm" (click)="loadMore()" [disabled]="isLoading()">
+              Carica altri {{ logs().length }}+
+            </button>
+          </div>
+        }
       }
     </div>
   </div>

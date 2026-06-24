@@ -89,6 +89,8 @@ const ACTION_LABELS: Record<string, string> = {
   "post test/{testId}/attempt/{attemptId}/submit": "Consegna del tentativo",
   "get test/{testId}/attempts-details": "Dettagli tentativi del test",
   "post attempts": "Autovalutazione / avvio tentativo",
+  "get attempts": "Compiti da correggere (conteggio)",
+  "post attempts/batch": "Stato tentativi (batch)",
   "get attempts/questions-count": "Conteggio domande tentativi",
   "get attempts/{attemptId}/details": "Dettaglio tentativo",
   "get attempts/{attemptId}/insight": "Insight AI del tentativo",

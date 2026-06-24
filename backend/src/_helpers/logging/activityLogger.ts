@@ -60,6 +60,11 @@ export const flushRequestLog = async (
       appVersion: http.appVersion,
     };
 
+    // L'endpoint /telemetry è solo un trasporto: gli eventi "client" che porta
+    // sono già scritti da recordTelemetry. Non logghiamo la sua riga http (rumore).
+    const isTelemetry =
+      http.route === "telemetry" || http.route === "/telemetry";
+
     const aiDocs = (store?.aiEvents ?? []).map((e) => ({
       ...shared,
       category: "ai" as const,
@@ -79,8 +84,11 @@ export const flushRequestLog = async (
       errorMessage: e.errorMessage,
     }));
 
+    const docs = isTelemetry ? aiDocs : [httpDoc, ...aiDocs];
+    if (docs.length === 0) return;
+
     await connectDatabase();
-    await ActivityLog.insertMany([httpDoc, ...aiDocs], { ordered: false });
+    await ActivityLog.insertMany(docs, { ordered: false });
   } catch (err) {
     // Mai propagare: il log è best-effort.
     console.error("[activityLogger] flush fallito:", err);
