@@ -1,4 +1,6 @@
 import { Component, ViewChild, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { firstValueFrom } from 'rxjs';
 import {
   FormControl,
   FormGroup,
@@ -112,6 +114,30 @@ export class LaboratorioAi {
   private readonly materialiFacade = inject(MaterialiFacadeService);
   private readonly translocoService = inject(TranslocoService);
 
+  // Si incrementa quando le traduzioni del lang attivo vengono caricate/cambiate.
+  // Le computed sotto lo leggono per RICALCOLARSI a load avvenuto: altrimenti, se
+  // valutate prima del caricamento, "congelerebbero" le chiavi grezze.
+  private readonly i18nVersion = signal(0);
+
+  constructor() {
+    this.translocoService.events$
+      .pipe(takeUntilDestroyed())
+      .subscribe((e) => {
+        if (e.type === 'translationLoadSuccess') {
+          this.i18nVersion.update((n) => n + 1);
+        }
+      });
+  }
+
+  /**
+   * Lettura traduzione ASYNC-SAFE: attende il caricamento del file di lingua e
+   * restituisce sempre il testo tradotto (mai la chiave grezza). Da usare quando
+   * il valore finisce nel form/nel prompt inviato al backend.
+   */
+  private translate(key: string): Promise<string> {
+    return firstValueFrom(this.translocoService.selectTranslate(key));
+  }
+
   // Icons
   readonly QuestionsIcon = faCheckDouble;
   readonly MaterialsIcon = faBooks;
@@ -124,7 +150,9 @@ export class LaboratorioAi {
   readonly ArrowRightIcon = faArrowRight;
 
   // Options
-  readonly MaterialTypes = computed(() => [
+  readonly MaterialTypes = computed(() => {
+    this.i18nVersion();
+    return [
     {
       label: this.translocoService.translate('laboratorio_ai.types.slides.label'),
       description: this.translocoService.translate('laboratorio_ai.types.slides.desc'),
@@ -149,7 +177,8 @@ export class LaboratorioAi {
       icon: faChartDiagram,
       value: 'mappe-concettuali',
     },
-  ]);
+    ];
+  });
 
   readonly LanguageOptions = [
     { value: 'italiano', label: 'Italiano' },
@@ -159,7 +188,9 @@ export class LaboratorioAi {
     { value: 'tedesco', label: 'Deutsch' },
   ];
 
-  readonly StyleOptions = computed<StyleOption[]>(() => [
+  readonly StyleOptions = computed<StyleOption[]>(() => {
+    this.i18nVersion();
+    return [
     {
       value: 'schematica',
       label: this.translocoService.translate('laboratorio_ai.style_options.schematica.label'),
@@ -179,7 +210,8 @@ export class LaboratorioAi {
       description: this.translocoService.translate('laboratorio_ai.style_options.descrittiva.desc'),
       icon: faFileLines,
     },
-  ]);
+    ];
+  });
 
   // State
   readonly InitialChoice = signal<'materials' | null>(null);
@@ -194,6 +226,7 @@ export class LaboratorioAi {
   readonly MaxStep = computed(() => (this.IsSlides() ? 4 : 3));
 
   readonly StepDefs = computed<StepDef[]>(() => {
+    this.i18nVersion();
     if (this.IsSlides()) {
       return [
         { n: 1, label: this.translocoService.translate('laboratorio_ai.step_type') },
@@ -250,8 +283,8 @@ export class LaboratorioAi {
       if (this.IsSlides() && nextStep === 3) {
         const style = this.genForm.controls['slideStyle'].value as SlideStyle;
         if (style) {
-          this.genForm.controls['instructions'].setValue(
-            this.translocoService.translate(`laboratorio_ai.style_prefills.${style}`),
+          this.translate(`laboratorio_ai.style_prefills.${style}`).then((v) =>
+            this.genForm.controls['instructions'].setValue(v),
           );
         }
       }
@@ -286,8 +319,8 @@ export class LaboratorioAi {
     this.genForm.controls['selectedType'].setValue(type);
     // Reset instructions to type-appropriate default
     if (type === 'slides') {
-      this.genForm.controls['instructions'].setValue(
-        this.translocoService.translate('laboratorio_ai.style_prefills.bilanciata'),
+      this.translate('laboratorio_ai.style_prefills.bilanciata').then((v) =>
+        this.genForm.controls['instructions'].setValue(v),
       );
     } else {
       this.genForm.controls['instructions'].setValue('');
@@ -311,8 +344,8 @@ export class LaboratorioAi {
 
   onStyleSelect(value: SlideStyle): void {
     this.genForm.controls['slideStyle'].setValue(value);
-    this.genForm.controls['instructions'].setValue(
-      this.translocoService.translate(`laboratorio_ai.style_prefills.${value}`),
+    this.translate(`laboratorio_ai.style_prefills.${value}`).then((v) =>
+      this.genForm.controls['instructions'].setValue(v),
     );
   }
 
@@ -342,7 +375,7 @@ export class LaboratorioAi {
       let additionalInstructions: string | undefined;
       if (this.IsSlides()) {
         const styleInstruction = slideStyle
-          ? this.translocoService.translate(`laboratorio_ai.style_instructions.${slideStyle}`)
+          ? await this.translate(`laboratorio_ai.style_instructions.${slideStyle}`)
           : '';
         const parts = [topicInstruction, styleInstruction, instructions].filter(
           Boolean,

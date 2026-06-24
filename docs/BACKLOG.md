@@ -9,13 +9,11 @@
 
 ## 🐞 Bug noti
 
-### 1. Transloco — chiavi grezze nella generazione slide
+### 1. Transloco — chiavi grezze nella generazione slide — ✅ RISOLTO (su `feature/logging`, 2026-06-24)
 
-- **Dove:** `frontend/src/teacher/pages/laboratorio-ai/laboratorio-ai.ts` (~righe 254, 290, 315, 345). Le chiavi corrette esistono in `frontend/public/assets/i18n/it.json` ed `en.json` (blocco `laboratorio_ai`, ~righe 1197/1202).
-- **Sintomo:** nel flusso "come vuoi le tue slide" si vedono/inviano chiavi grezze (`laboratorio_ai.style_prefills.bilanciata`) invece del testo tradotto.
-- **Causa:** `translocoService.translate()` sincrono ritorna la chiave se la traduzione non è ancora caricata.
-- **Fix:** prima provare hard refresh / restart dev server (possibile cache vecchio `it.json`); se persiste usare `selectTranslate()` o garantire il load prima della lettura.
-- **Perché:** difetto visibile all'utente in un flusso delicato (testare la generazione slide end-to-end).
+- **Causa:** `translocoService.translate()` sincrono ritornava la chiave grezza se il file di lingua non era ancora caricato. I prefill (`style_prefills`) finivano così nel form e venivano inviati al prompt AI.
+- **Fatto** in `frontend/src/teacher/pages/laboratorio-ai/laboratorio-ai.ts`: i 4 punti che finiscono nel backend (instructions + style_instructions) ora usano un helper `translate()` async-safe (`firstValueFrom(selectTranslate(...))`, attende il load → mai la chiave). Le `computed()` dei label reagiscono a un signal `i18nVersion` bumpato su `translationLoadSuccess` → si ricalcolano a load avvenuto invece di "congelare" le chiavi.
+- **Da verificare a runtime:** wizard slide end-to-end (label corretti, prefill tradotto nel textarea, prompt inviato senza chiavi grezze) in IT ed EN.
 
 ### 2. N+1 chiamate "attempt" al login studente — ✅ RISOLTO (su `feature/logging`, 2026-06-24)
 
@@ -67,8 +65,8 @@ CSV/JSON/descrittivo). Restano:
 - ✅ **Leggibilità log — FATTO (2026-06-24):** `/a/logs` ridisegnata — viste segmentate (Tutto / Solo azioni utente=`category client` / AI / Errori), preset temporali (Ultima ora/Oggi/7gg/Tutto) + range custom con data e ora, ora prominente in tabella, statistiche in chip, dettaglio costi collassabile, paginazione "Carica altri" (50/volta, più recenti in cima), riga espandibile col dettaglio tecnico.
 - ✅ **Stop logging `/telemetry` — FATTO (2026-06-24):** `activityLogger.ts` non scrive più la riga http per la route `telemetry` (gli eventi client restano).
 - **Cache profilo/organizzazione in navigazione:** ogni navigata su `/s/tests` ricarica anche `Consultazione profilo` e `Dettaglio organizzazione` → caricarli una volta e cacharli (meno chiamate, meno rumore nei log).
-- **Super-admin senza email nei log (`utente sconosciuto (admin)`):** le richieste del super-admin loggano il ruolo ma non `userEmail` → verificare perché l'utente admin non ha email popolata (schema/Cognito) o se il middleware non la risolve per quel ruolo. Emerso dall'export del 2026-06-24.
-- **`Accettazione delle policy` (PATCH profile/policies) a ogni accesso:** compare a ogni landing di docente/studente → verificare se è una scrittura inutile ripetuta a ogni login (dovrebbe avvenire solo quando l'utente accetta davvero) o un'etichetta fuorviante. Possibile chiamata sprecata + rumore nei log.
+- **Super-admin senza email nei log (`utente sconosciuto (admin)`):** le richieste del super-admin (email reale `giulia@convivostudio.it`) loggano il ruolo ma non `userEmail` → verificare come è stato creato quell'utente admin (probabilmente manca `email` sul record o è su un altro campo) o se il middleware non la risolve per quel ruolo. Emerso dall'export del 2026-06-24.
+- **`Accettazione delle policy` a ogni accesso — probabilmente NON un bug:** appariva perché si stava testando in scheda in incognito (sessione fresca → accettazione legittima). Da verificare SOLO se ricapita in una sessione normale (utente che ha già accettato).
 
 ---
 
