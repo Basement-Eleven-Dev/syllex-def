@@ -11,9 +11,13 @@
 
 ### 1. Transloco — chiavi grezze nella generazione slide — ✅ RISOLTO (su `feature/logging`, 2026-06-24)
 
-- **Causa:** `translocoService.translate()` sincrono ritornava la chiave grezza se il file di lingua non era ancora caricato. I prefill (`style_prefills`) finivano così nel form e venivano inviati al prompt AI.
-- **Fatto** in `frontend/src/teacher/pages/laboratorio-ai/laboratorio-ai.ts`: i 4 punti che finiscono nel backend (instructions + style_instructions) ora usano un helper `translate()` async-safe (`firstValueFrom(selectTranslate(...))`, attende il load → mai la chiave). Le `computed()` dei label reagiscono a un signal `i18nVersion` bumpato su `translationLoadSuccess` → si ricalcolano a load avvenuto invece di "congelare" le chiavi.
-- **Da verificare a runtime:** wizard slide end-to-end (label corretti, prefill tradotto nel textarea, prompt inviato senza chiavi grezze) in IT ed EN.
+- **Causa REALE:** i blocchi `laboratorio_ai.style_prefills` e `laboratorio_ai.style_instructions` NON esistevano in `it.json`/`en.json` (la nota originale era sbagliata) → `translate()` tornava la chiave perché la chiave mancava, non per timing.
+- **Fatto:** aggiunti i due blocchi in `frontend/public/assets/i18n/it.json` ed `en.json`. `style_prefills` = prompt precompilati che l'utente dà all'AI (vengono inseriti nel campo "instructions" inviato al modello), scritti come richieste ("Genera le slide in modo schematico: …"); `style_instructions` = direttiva di stile rinforzata, appesa al prompt in `onGenerate`.
+- **Migliorie aggiunte (2026-06-24):**
+  - **Prompt più ricchi:** `style_prefills` ora sono prompt di alcune righe, funzionali (densità, tono, scopo).
+  - **Lo stile arriva DAVVERO a Gamma:** prima `textOptions.amount` era hardcoded "medium". Ora il frontend invia `slideStyle` e il backend (`createAiGenMaterial.ts`) lo mappa su `amount` (schematica→brief, bilanciata→medium, descrittiva→detailed). Lo stile incideva solo sul testo dell'LLM, ora anche sulla densità del deck.
+  - **Traduzione reattiva:** label (computed) e prefill ora si ri-traducono al cambio lingua via evento transloco `langChanged` (signal `i18nVersion`); il prefill si ri-traduce solo se non editato dall'utente. (Il tentativo precedente usava l'evento sbagliato `translationLoadSuccess` → regressione, ora corretto.)
+- **Da verificare a runtime:** wizard slide IT/EN — label e prefill nella lingua giusta e che cambiano col selettore lingua; generazione con densità Gamma coerente allo stile.
 
 ### 2. N+1 chiamate "attempt" al login studente — ✅ RISOLTO (su `feature/logging`, 2026-06-24)
 

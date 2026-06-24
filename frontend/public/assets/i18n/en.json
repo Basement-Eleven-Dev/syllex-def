@@ -1132,6 +1132,16 @@
         "desc": "Extended explanations with examples"
       }
     },
+    "style_prefills": {
+      "schematica": "Generate the slides in a schematic style, meant for quick review. For each slide use a clear title and 3-5 short, essential bullet points made of keywords or minimal phrases. Avoid paragraphs, long sentences and unnecessary detail: prioritise synthesis and fast memorisation of the main concepts.",
+      "bilanciata": "Generate the slides in a balanced style, suitable for both study and presentation. For each slide include the key points along with a short one or two line explanation, combining synthesis and clarity. Keep the balance between essential concepts and the details needed to understand the topic, without overloading.",
+      "descrittiva": "Generate the slides in a descriptive style, meant for in-depth study. For each slide develop the concepts fully, with extended explanations, concrete examples and clear definitions. Each slide must be understandable on its own, like a small study handout, taking nothing for granted."
+    },
+    "style_instructions": {
+      "schematica": "Schematic style: only titles and essential key points, no paragraphs.",
+      "bilanciata": "Balanced style: key points with a short explanation.",
+      "descrittiva": "Descriptive style: extended explanations with examples and definitions."
+    },
     "student_detail": {
       "loading": "Loading...",
       "back": "Back to class",
