@@ -20,6 +20,12 @@ export type AiUsageEvent = {
   errorType?: string;
   errorMessage?: string;
   startedAt: Date;
+  // Contenuto effettivo della chiamata, catturato per indagini su materiale
+  // illecito/anomalo prodotto FUORI dalla chat (materiali, insight, RAG…).
+  // Solo testo, documenti allegati (base64) esclusi, troncato a un cap.
+  promptContent?: string;
+  responseContent?: string;
+  finishReason?: string; // es. STOP, MAX_TOKENS, SAFETY — spiega un output vuoto/bloccato
 };
 
 /**

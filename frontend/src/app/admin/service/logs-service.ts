@@ -28,6 +28,11 @@ export interface ActivityLog {
   cachedTokens?: number;
   totalTokens?: number;
   costUsd?: number;
+  // Contenuto AI catturato (solo eventi 'ai'): prompt + risposta del modello,
+  // per indagini su materiale illecito/anomalo generato fuori dalla chat.
+  promptContent?: string;
+  responseContent?: string;
+  finishReason?: string;
   traceId?: string;
   userAgent?: string;
   stage?: string;

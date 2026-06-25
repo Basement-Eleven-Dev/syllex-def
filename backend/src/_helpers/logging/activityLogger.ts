@@ -82,6 +82,9 @@ export const flushRequestLog = async (
       retryCount: e.retryCount,
       errorType: e.errorType,
       errorMessage: e.errorMessage,
+      promptContent: e.promptContent,
+      responseContent: e.responseContent,
+      finishReason: e.finishReason,
     }));
 
     const docs = isTelemetry ? aiDocs : [httpDoc, ...aiDocs];

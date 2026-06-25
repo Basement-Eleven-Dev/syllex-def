@@ -245,6 +245,19 @@
                           <div><span class="k">Token</span><span class="v">in {{ formatTokens(log.inputTokens) }} · out {{ formatTokens(log.outputTokens) }}@if (log.cachedTokens) { · cached {{ formatTokens(log.cachedTokens) }} }@if (log.totalTokens) { · tot {{ formatTokens(log.totalTokens) }} }</span></div>
                         }
                         @if (log.payload) { <div class="wide"><span class="k">Dettagli</span><span class="v">{{ formatPayload(log.payload) }}</span></div> }
+                        @if (log.finishReason) { <div><span class="k">Finish reason</span><span class="v" [class.text-danger]="log.finishReason === 'SAFETY'">{{ log.finishReason }}</span></div> }
+                        @if (log.promptContent) {
+                          <div class="wide">
+                            <span class="k">Prompt inviato all'AI</span>
+                            <pre class="content-block">{{ log.promptContent }}</pre>
+                          </div>
+                        }
+                        @if (log.responseContent) {
+                          <div class="wide">
+                            <span class="k">Risposta dell'AI</span>
+                            <pre class="content-block">{{ log.responseContent }}</pre>
+                          </div>
+                        }
                         @if (log.errorMessage) { <div class="wide"><span class="k text-danger">Errore</span><span class="v text-danger">{{ log.errorType }}: {{ log.errorMessage }}</span></div> }
                         @if (log.traceId) { <div class="wide"><span class="k">Trace ID</span><span class="v mono">{{ log.traceId }}</span></div> }
                         @if (log.userAgent) { <div class="wide"><span class="k">User-Agent</span><span class="v mono small">{{ log.userAgent }}</span></div> }

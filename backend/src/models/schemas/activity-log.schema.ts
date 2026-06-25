@@ -53,6 +53,15 @@ const activityLogSchema = new Schema(
     cachedTokens: { type: Number },
     totalTokens: { type: Number },
 
+    // --- CONTENUTO AI (solo eventi 'ai', per indagini su materiale illecito/anomalo) ---
+    // Catturato al chokepoint trackedGenerateContent: copre ogni generazione
+    // server-side FUORI dalla chat (materiali, insight, RAG) e anche la chat-testo.
+    // La voce realtime (Gemini Live) NON passa di qui → resta nei `messages`.
+    // Solo testo, documenti allegati esclusi, troncato a 50k caratteri.
+    promptContent: { type: String },
+    responseContent: { type: String },
+    finishReason: { type: String }, // STOP | MAX_TOKENS | SAFETY | …
+
     // --- CORRELAZIONE ---
     traceId: { type: String }, // lega tutti gli eventi della stessa azione utente
     requestId: { type: String }, // l'invocazione Lambda
