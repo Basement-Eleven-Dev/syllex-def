@@ -70,7 +70,7 @@ CSV/JSON/descrittivo). Restano:
 - ✅ **Stop logging `/telemetry` — FATTO (2026-06-24):** `activityLogger.ts` non scrive più la riga http per la route `telemetry` (gli eventi client restano).
 - **Cache profilo/organizzazione in navigazione:** ogni navigata su `/s/tests` ricarica anche `Consultazione profilo` e `Dettaglio organizzazione` → caricarli una volta e cacharli (meno chiamate, meno rumore nei log).
 - **Super-admin senza email nei log (`utente sconosciuto (admin)`):** le richieste del super-admin (email reale `giulia@convivostudio.it`) loggano il ruolo ma non `userEmail` → verificare come è stato creato quell'utente admin (probabilmente manca `email` sul record o è su un altro campo) o se il middleware non la risolve per quel ruolo. Emerso dall'export del 2026-06-24.
-- **`Accettazione delle policy` a ogni accesso — probabilmente NON un bug:** appariva perché si stava testando in scheda in incognito (sessione fresca → accettazione legittima). Da verificare SOLO se ricapita in una sessione normale (utente che ha già accettato).
+- ✅ **`Accettazione delle policy` a ogni refresh — RISOLTO (2026-06-25):** ERA un bug vero. Causa: due costanti `TERMS_VERSION` separate (FE `frontend/src/app/_utils/terms-version.ts` + BE `backend/src/_helpers/termsVersion.ts`); `acceptTerms.ts` salvava la versione BE ignorando il body vuoto → dopo il bump FE a 1.1 il DB restava 1.0 e il confronto in `app.ts` falliva sempre. Fix: il FE manda `{ version }` nel PATCH (auth.ts), il BE salva `body.version` (FE = fonte di verità unica), BE allineato a 1.1 come fallback. Inoltre il modale mostrava i termini STUDENTE al superadmin (ruolo `admin`): logica `role==='teacher'?…` corretta in `role==='student'?studente:docente`.
 
 ---
 
