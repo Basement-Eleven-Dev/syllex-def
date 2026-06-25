@@ -58,6 +58,9 @@ const activityLogSchema = new Schema(
     // server-side FUORI dalla chat (materiali, insight, RAG) e anche la chat-testo.
     // La voce realtime (Gemini Live) NON passa di qui → resta nei `messages`.
     // Solo testo, documenti allegati esclusi, troncato a 50k caratteri.
+    // TODO compliance: retention 24 mesi sui SOLI campi contenuto (preferibile un
+    // $unset schedulato, non un TTL index che cancella anche i metadati).
+    // Razionale e opzioni: docs/compliance/logging-contenuti-gdpr.md §4.
     promptContent: { type: String },
     responseContent: { type: String },
     finishReason: { type: String }, // STOP | MAX_TOKENS | SAFETY | …

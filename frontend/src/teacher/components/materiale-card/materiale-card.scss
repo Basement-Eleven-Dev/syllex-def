@@ -61,3 +61,12 @@
 ::ng-deep .circle-btn.dropdown-toggle::after {
   display: none;
 }
+
+// Marcatore "contenuto generato con AI" (trasparenza AI Act, Art. 50):
+// la stellina-Gemini è il segno riconosciuto, qui resa chiaramente visibile
+// e spiegata via tooltip + aria-label, non più solo decorativa.
+.ai-generated-icon {
+  color: var(--bs-primary);
+  opacity: 0.85;
+  cursor: help;
+}

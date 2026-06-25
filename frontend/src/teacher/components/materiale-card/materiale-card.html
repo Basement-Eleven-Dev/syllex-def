@@ -51,7 +51,10 @@
           @if (isAIGenerated && showAiBadge) {
           <fa-icon
             [icon]="SparklesIcon"
-            style="color: var(--bs-dark); opacity: 0.5"
+            class="ai-generated-icon"
+            [ngbTooltip]="t('ai_generated')"
+            [attr.aria-label]="t('ai_generated')"
+            role="img"
           ></fa-icon>
           }
         </div>

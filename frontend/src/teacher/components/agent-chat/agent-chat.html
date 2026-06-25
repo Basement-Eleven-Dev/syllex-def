@@ -13,6 +13,11 @@
       >
         <h6 class="mb-0 fw-bold text-primary d-flex align-items-center gap-2">
           <fa-icon [icon]="faSparkles" class="text-warning"></fa-icon> Alex
+          <app-syllex-badge
+            label="AI"
+            color="purple"
+            [ngbTooltip]="t('ai_badge_tooltip')"
+          />
         </h6>
         <button
           class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center"
@@ -109,6 +114,10 @@
           [class.user-speaking]="isRecording() && !isMuted()"
           [class.ai-speaking]="geminiLiveService.isSpeaking()"
         ></div>
+        <!-- Avviso trasparenza AI Act (Art. 50): interazione con un'AI -->
+        <p class="voice-ai-notice small text-muted mt-3 mb-0 text-center">
+          <fa-icon [icon]="faSparkles" class="me-1"></fa-icon>{{ t('voice_ai_notice') }}
+        </p>
       </div>
 
       <!-- INPUT BAR -->

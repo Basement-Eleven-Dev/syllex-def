@@ -40,6 +40,8 @@ import { GeminiLiveService } from '../../../services/gemini-live-service';
 import { Materia } from '../../../services/materia';
 import { firstValueFrom } from 'rxjs';
 import { SyllexButton } from '../UI/syllex-button/syllex-button';
+import { SyllexBadge } from '../UI/syllex-badge/syllex-badge';
+import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule } from '@angular/common';
 import { AlexMascot } from '../../../app/shared/components/alex-mascot/alex-mascot';
 import { TranslocoDirective, TranslocoPipe } from '@jsverse/transloco';
@@ -63,6 +65,8 @@ export interface ChatMessage {
     MarkdownComponent,
     AlexMascot,
     TranslocoDirective,
+    SyllexBadge,
+    NgbTooltip,
   ],
   templateUrl: './agent-chat.html',
   styleUrl: './agent-chat.scss',

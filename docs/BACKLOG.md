@@ -74,13 +74,21 @@ CSV/JSON/descrittivo). Restano:
 
 ---
 
-## 📑 Compliance / legale (sistema di logging AI)
+## 📑 Compliance / legale (AI Act + GDPR)
 
 > Non è parere legale: da far validare a un DPO / legale, soprattutto per i clienti enti pubblici.
+> 📂 **Dettaglio e razionale: [`docs/compliance/`](compliance/README.md)** (mappa "dove siamo parati").
 
-- **Base giuridica + retention** del trattamento "log attività" da formalizzare (legittimo interesse / obbligo legale; la retention illimitata va giustificata o limitata).
-- **Informativa privacy:** aggiungere il paragrafo sui log di attività (metadati raccolti, finalità, durata, diritti).
-- **Registro dei trattamenti (ROPA, Art. 30):** inserire la voce.
-- **DPA con gli enti (Art. 28):** Syllex è responsabile del trattamento, l'ente è titolare.
-- **DPIA:** probabilmente necessaria (AI alto rischio in ambito educativo + dati di **minori**).
-- **Avviso di trasparenza AI (Art. 50):** indicare nell'interfaccia che chat e tutor vocale sono AI.
+**Fatto (2026-06-25):**
+- ✅ **Log contenuti AI** (input/output) per indagini, con minimizzazione (no documenti, cap 50k, voce esclusa) → `docs/compliance/logging-contenuti-gdpr.md`.
+- ✅ **Trasparenza AI Act §1a — materiali**: marcatore "Generato con AI" reso esplicito (stellina + tooltip + `aria-label`) su `materiale-card`.
+- ✅ Chiarito **perché non siamo "alto rischio"**: valutazione assistita con finalizzazione umana (esenzione Art. 6(3)) → `docs/compliance/ai-act.md`.
+- ✅ **Informativa aggiornata nei Termini** (docente + studente): chat/voce = AI, correzione assistita con validazione umana, logging contenuti AI per sicurezza; `TERMS_VERSION` 1.0 → **1.1** (ri-mostra il modale a tutti).
+- ✅ **Disclosure in-app chat/voce** (Art. 50 al punto di interazione): badge "AI" + sottotitolo esplicito nella chat, avviso "stai parlando con un'AI" sotto l'orb vocale (`agent-chat`, copre docente e studente).
+
+**Da fare:**
+- [ ] ⚠️ **TTL 24 mesi** sui campi contenuto dei log (preferibile `$unset` schedulato, non TTL index) → `docs/compliance/logging-contenuti-gdpr.md` §4.
+- [ ] **Nota Art. 6(4)** ("non è alto rischio"), **LIA**, **DPIA**: documenti interni da redigere → `docs/compliance/`.
+- [ ] **ROPA (Art. 30)** e **DPA con gli enti (Art. 28)**: Syllex responsabile, ente titolare.
+
+> Nota: l'app **non** è accessibile ai minori (dichiarato dal titolare) → è ciò che consente il logging contenuti generalizzato; se cambiasse, rivedere LIA/DPIA.

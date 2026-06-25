@@ -13,6 +13,15 @@ const acceptTerms = async (request: APIGatewayProxyEvent, context: Context) => {
 
   await connectDatabase();
 
+  // La versione autoritativa è quella mostrata dal frontend (= ciò che l'utente
+  // ha effettivamente accettato). TERMS_VERSION resta solo come fallback difensivo
+  // se il body non la porta, per non salvare un valore vuoto.
+  const body = JSON.parse(request.body || "{}");
+  const version =
+    typeof body.version === "string" && body.version.trim()
+      ? body.version.trim()
+      : TERMS_VERSION;
+
   await User.updateOne(
     { _id: user._id },
     {
@@ -20,7 +29,7 @@ const acceptTerms = async (request: APIGatewayProxyEvent, context: Context) => {
         termsAcceptation: {
           accepted: true,
           timestamp: new Date(),
-          version: TERMS_VERSION,
+          version,
         },
       },
     },

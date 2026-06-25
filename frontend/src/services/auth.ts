@@ -516,7 +516,9 @@ export class Auth {
     version: string,
   ): Promise<{ success: boolean; message: string }> {
     try {
-      await firstValueFrom(this.http.patch('profile/terms', {}));
+      // Mandiamo la versione effettivamente mostrata e accettata: è il FE la
+      // fonte di verità su "quale versione dei termini ha visto l'utente".
+      await firstValueFrom(this.http.patch('profile/terms', { version }));
 
       const currentUser = this.user$.value;
       if (currentUser) {

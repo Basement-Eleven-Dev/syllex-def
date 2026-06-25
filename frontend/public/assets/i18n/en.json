@@ -185,7 +185,8 @@
       "not_shared": "Not shared",
       "shared_classes": "{{count}} classes",
       "shared_class": "{{count}} class",
-      "download": "Download file"
+      "download": "Download file",
+      "ai_generated": "Generated with artificial intelligence"
     },
     "menu": {
       "created_at": "Created on {{date}}",
@@ -1179,13 +1180,15 @@
   },
   "agent_chat": {
     "welcome_title": "Hi, I'm Alex!",
-    "welcome_subtitle": "I'm your Personal Learning Assistant in Syllex. I'm ready to help you summarize your materials, find key answers or test your knowledge with personalized quizzes.",
+    "welcome_subtitle": "I'm your Personal Learning Assistant powered by artificial intelligence. I'm ready to help you summarize your materials, find key answers or test your knowledge with personalized quizzes.",
     "welcome_prompt": "How can I help you today?",
     "summary_btn": "Quick summary",
     "topics_btn": "Main topics",
     "quiz_btn": "Test me with a quiz",
     "write_placeholder": "Type here...",
     "listening_status": "I'm listening...",
+    "voice_ai_notice": "You are talking to an artificial intelligence assistant",
+    "ai_badge_tooltip": "Artificial intelligence assistant",
     "finish_btn": "I'm done",
     "responding_status": "Alex is responding...",
     "searching_status": "Searching materials...",

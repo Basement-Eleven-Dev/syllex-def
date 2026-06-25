@@ -33,6 +33,7 @@ import {
   NgbDropdownToggle,
   NgbDropdownMenu,
   NgbModal,
+  NgbTooltip,
 } from '@ng-bootstrap/ng-bootstrap';
 import { MaterialeContextualMenu } from '../materiale-contextual-menu/materiale-contextual-menu';
 import { MaterialInterface } from '../../../services/materiali/materiali-service';
@@ -50,6 +51,7 @@ import { TelemetryService } from '../../../services/telemetry-service';
     NgbDropdown,
     NgbDropdownToggle,
     NgbDropdownMenu,
+    NgbTooltip,
     SyllexBadge,
     TranslocoDirective,
     TranslocoPipe,

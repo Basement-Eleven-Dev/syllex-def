@@ -185,7 +185,8 @@
       "not_shared": "Non condiviso",
       "shared_classes": "{{count}} classi",
       "shared_class": "{{count}} classe",
-      "download": "Scarica file"
+      "download": "Scarica file",
+      "ai_generated": "Generato con l'intelligenza artificiale"
     },
     "menu": {
       "created_at": "Creato il {{date}}",
@@ -1179,13 +1180,15 @@
   },
   "agent_chat": {
     "welcome_title": "Ciao, sono Alex!",
-    "welcome_subtitle": "Sono il tuo Assistente Didattico Personale in Syllex. Sono pronto ad aiutarti a riassumere i tuoi materiali, trovare le risposte chiave o metterti alla prova con quiz personalizzati.",
+    "welcome_subtitle": "Sono il tuo Assistente Didattico Personale basato sull'intelligenza artificiale. Sono pronto ad aiutarti a riassumere i tuoi materiali, trovare le risposte chiave o metterti alla prova con quiz personalizzati.",
     "welcome_prompt": "Come posso aiutarti oggi?",
     "summary_btn": "Riassunto sintetico",
     "topics_btn": "Argomenti principali",
     "quiz_btn": "Mettimi alla prova con un quiz",
     "write_placeholder": "Scrivi qui...",
     "listening_status": "Ti sto ascoltando...",
+    "voice_ai_notice": "Stai parlando con un assistente di intelligenza artificiale",
+    "ai_badge_tooltip": "Assistente di intelligenza artificiale",
     "finish_btn": "Ho finito",
     "responding_status": "Alex sta rispondendo...",
     "searching_status": "Sto cercando nei materiali...",
