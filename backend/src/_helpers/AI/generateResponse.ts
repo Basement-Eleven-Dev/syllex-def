@@ -4,6 +4,7 @@ import { connectDatabase } from "../getDatabase";
 import { getGeminiClient } from "./getClient";
 import { Types } from "mongoose";
 import { Material } from "../../models/schemas/material.schema";
+import { trackedGenerateContent } from "./trackedGeneration";
 
 // Estrae il testo dalla risposta, gestendo thinking models (thought parts) e .text accessor
 function extractText(response: any): string | undefined {
@@ -118,14 +119,14 @@ export async function generateAIResponseGemini(
     let currentContents: any[] = contents;
 
     for (let iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
-      const response = await ai.models.generateContent({
+      const response = await trackedGenerateContent(ai, {
         model: "gemini-3-flash-preview",
         contents: currentContents,
         config: {
           systemInstruction: systemPrompt,
           tools: toolsConfig as any,
         },
-      });
+      }, "ai.chat_response");
 
       const candidate = response.candidates?.[0];
       const functionCall = candidate?.content?.parts?.find(
@@ -251,10 +252,10 @@ export async function generateConversationTitleGemini(
   try {
     const ai = await getGeminiClient();
     const prompt = `Genera un titolo riassuntivo estremamente sintetico (massimo 4 parole) in italiano per descrivere l'argomento principale di questa domanda: "${query}". Rispondi SOLO con il titolo, senza virgolette, senza punteggiatura, e capitalizza la prima lettera.`;
-    const response = await ai.models.generateContent({
+    const response = await trackedGenerateContent(ai, {
       model: "gemini-3-flash-preview",
       contents: [{ role: "user", parts: [{ text: prompt }] }],
-    });
+    }, "ai.conversation_title");
     const text = extractText(response);
     return text ? text.trim().replace(/["']/g, "") : "";
   } catch (error) {

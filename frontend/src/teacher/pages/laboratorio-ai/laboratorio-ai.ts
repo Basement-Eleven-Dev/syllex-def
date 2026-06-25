@@ -1,4 +1,5 @@
 import { Component, ViewChild, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   FormControl,
   FormGroup,
@@ -112,6 +113,43 @@ export class LaboratorioAi {
   private readonly materialiFacade = inject(MaterialiFacadeService);
   private readonly translocoService = inject(TranslocoService);
 
+  // Si incrementa SOLO al cambio di lingua attiva (evento transloco `langChanged`,
+  // che scatta a traduzione caricata). Le computed dei label lo leggono per
+  // ricalcolarsi nella nuova lingua (translate() non è di per sé reattivo).
+  private readonly i18nVersion = signal(0);
+  // Ultimo prefill che abbiamo impostato noi: serve a ri-tradurlo al cambio
+  // lingua solo se l'utente non l'ha modificato.
+  private lastSetPrefill = '';
+
+  constructor() {
+    this.translocoService.events$
+      .pipe(takeUntilDestroyed())
+      .subscribe((e) => {
+        if (e.type === 'langChanged') {
+          this.i18nVersion.update((n) => n + 1);
+          this.retranslatePrefill();
+        }
+      });
+  }
+
+  /** Imposta il prefill del campo istruzioni tenendone traccia (per la ri-traduzione). */
+  private setPrefill(value: string): void {
+    this.genForm.controls['instructions'].setValue(value);
+    this.lastSetPrefill = value;
+  }
+
+  /** Al cambio lingua ri-traduce il prefill, ma solo se l'utente non l'ha editato. */
+  private retranslatePrefill(): void {
+    if (!this.IsSlides()) return;
+    const current = this.genForm.controls['instructions'].value ?? '';
+    if (current !== this.lastSetPrefill) return; // editato dall'utente → non toccare
+    const style = this.genForm.controls['slideStyle'].value as SlideStyle;
+    if (!style) return;
+    this.setPrefill(
+      this.translocoService.translate(`laboratorio_ai.style_prefills.${style}`),
+    );
+  }
+
   // Icons
   readonly QuestionsIcon = faCheckDouble;
   readonly MaterialsIcon = faBooks;
@@ -124,7 +162,9 @@ export class LaboratorioAi {
   readonly ArrowRightIcon = faArrowRight;
 
   // Options
-  readonly MaterialTypes = computed(() => [
+  readonly MaterialTypes = computed(() => {
+    this.i18nVersion();
+    return [
     {
       label: this.translocoService.translate('laboratorio_ai.types.slides.label'),
       description: this.translocoService.translate('laboratorio_ai.types.slides.desc'),
@@ -149,7 +189,8 @@ export class LaboratorioAi {
       icon: faChartDiagram,
       value: 'mappe-concettuali',
     },
-  ]);
+    ];
+  });
 
   readonly LanguageOptions = [
     { value: 'italiano', label: 'Italiano' },
@@ -159,7 +200,9 @@ export class LaboratorioAi {
     { value: 'tedesco', label: 'Deutsch' },
   ];
 
-  readonly StyleOptions = computed<StyleOption[]>(() => [
+  readonly StyleOptions = computed<StyleOption[]>(() => {
+    this.i18nVersion();
+    return [
     {
       value: 'schematica',
       label: this.translocoService.translate('laboratorio_ai.style_options.schematica.label'),
@@ -179,7 +222,8 @@ export class LaboratorioAi {
       description: this.translocoService.translate('laboratorio_ai.style_options.descrittiva.desc'),
       icon: faFileLines,
     },
-  ]);
+    ];
+  });
 
   // State
   readonly InitialChoice = signal<'materials' | null>(null);
@@ -194,6 +238,7 @@ export class LaboratorioAi {
   readonly MaxStep = computed(() => (this.IsSlides() ? 4 : 3));
 
   readonly StepDefs = computed<StepDef[]>(() => {
+    this.i18nVersion();
     if (this.IsSlides()) {
       return [
         { n: 1, label: this.translocoService.translate('laboratorio_ai.step_type') },
@@ -250,7 +295,7 @@ export class LaboratorioAi {
       if (this.IsSlides() && nextStep === 3) {
         const style = this.genForm.controls['slideStyle'].value as SlideStyle;
         if (style) {
-          this.genForm.controls['instructions'].setValue(
+          this.setPrefill(
             this.translocoService.translate(`laboratorio_ai.style_prefills.${style}`),
           );
         }
@@ -286,11 +331,12 @@ export class LaboratorioAi {
     this.genForm.controls['selectedType'].setValue(type);
     // Reset instructions to type-appropriate default
     if (type === 'slides') {
-      this.genForm.controls['instructions'].setValue(
+      this.setPrefill(
         this.translocoService.translate('laboratorio_ai.style_prefills.bilanciata'),
       );
     } else {
       this.genForm.controls['instructions'].setValue('');
+      this.lastSetPrefill = '';
     }
     if (this.CurrentStep() === 1) {
       setTimeout(() => this.CurrentStep.set(2), 280);
@@ -311,7 +357,7 @@ export class LaboratorioAi {
 
   onStyleSelect(value: SlideStyle): void {
     this.genForm.controls['slideStyle'].setValue(value);
-    this.genForm.controls['instructions'].setValue(
+    this.setPrefill(
       this.translocoService.translate(`laboratorio_ai.style_prefills.${value}`),
     );
   }
@@ -362,6 +408,7 @@ export class LaboratorioAi {
         format: this.IsSlides() ? (format as 'pptx' | 'pdf') : undefined,
         additionalInstructions,
         language: language ?? 'italiano',
+        slideStyle: this.IsSlides() ? (slideStyle ?? undefined) : undefined,
       });
 
       this.GenerationSuccess.set(true);

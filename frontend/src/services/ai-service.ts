@@ -54,6 +54,7 @@ export interface GenerateMaterialRequest {
   format?: 'pdf' | 'pptx';
   additionalInstructions?: string;
   language?: string;
+  slideStyle?: string;
 }
 
 export interface GeneratedMaterial {
@@ -153,6 +154,7 @@ export class AiService {
     format?: 'pdf' | 'pptx';
     additionalInstructions?: string;
     language?: string;
+    slideStyle?: string;
   }): Promise<GeneratedMaterial> {
     const payload: GenerateMaterialRequest = {
       type: MATERIAL_TYPE_MAP[data.type],
@@ -161,6 +163,7 @@ export class AiService {
       format: data.format,
       additionalInstructions: data.additionalInstructions || undefined,
       language: data.language,
+      slideStyle: data.slideStyle,
     };
     try {
       const response = await firstValueFrom(

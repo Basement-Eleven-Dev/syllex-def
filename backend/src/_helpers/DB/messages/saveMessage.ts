@@ -1,8 +1,21 @@
 import { Types } from "mongoose";
 import { connectDatabase } from "../../getDatabase";
 import { Message } from "../../../models/schemas/message.schema";
-import { generateConversationTitleGemini, generateConversationSummaryTitle } from "../../AI/generateConversationTitle";
 
+/**
+ * Persiste un messaggio della chat (testo o voce).
+ *
+ * Due scelte deliberate:
+ * 1. Il `timestamp` è catturato SUBITO, prima di qualsiasi `await`: garantisce
+ *    l'ordine cronologico corretto. (Prima veniva assegnato all'insert, DOPO la
+ *    generazione AI del titolo: i messaggi utente, rallentati da quella, finivano
+ *    con un timestamp posteriore agli AI → in voce l'ordine si scombinava
+ *    sistematicamente, tutti gli AI sopra e gli utente sotto.)
+ * 2. Nessuna generazione AI del titolo qui dentro: bloccava il salvataggio per
+ *    secondi/decine di secondi (la `messages/save` arrivava a 30s+) e costava una
+ *    chiamata Gemini per ogni conversazione. La sidebar (listConversations) usa
+ *    già come fallback il primo messaggio troncato → titolo immediato e gratuito.
+ */
 export async function saveMessage(
   subjectId: Types.ObjectId,
   userId: Types.ObjectId,
@@ -11,51 +24,18 @@ export async function saveMessage(
   inputType: "text" | "voice" = "text",
   conversationId: string,
 ) {
+  const timestamp = new Date();
+
   await connectDatabase();
 
-  // Check if this is the first message in this conversation to generate a summary title
-  const count = await Message.countDocuments({ conversationId });
-  let conversationTitle: string | undefined = undefined;
-
-  // Retrieve existing user messages to build an evolving summary of their real intent
-  const userMessages = await Message.find({ conversationId, role: "user" }).select("content").lean();
-  const allUserContents = [...userMessages.map(m => m.content), content];
-
-  if (role === "user" && allUserContents.length <= 3) {
-    try {
-      console.log(`[saveMessage] Evolving summary title for user prompts: ${allUserContents.length} turns`);
-      const mappedMessages = allUserContents.map(c => ({ role: "user", content: c }));
-      const newTitle = await generateConversationSummaryTitle(mappedMessages);
-      console.log(`[saveMessage] Evolved title: "${newTitle}"`);
-
-      if (newTitle) {
-        if (count === 0) {
-          // Set directly on the first message
-          conversationTitle = newTitle;
-        } else {
-          // Update the first message's title dynamically in the background!
-          const firstMsg = await Message.findOne({ conversationId }).sort({ timestamp: 1 });
-          if (firstMsg) {
-            firstMsg.conversationTitle = newTitle;
-            await firstMsg.save();
-            console.log(`[saveMessage] Updated first message title to: "${newTitle}"`);
-          }
-        }
-      }
-    } catch (err) {
-      console.error("Error generating/updating title in saveMessage:", err);
-    }
-  }
-
   const message = {
-    subjectId: subjectId,
-    userId: userId,
+    subjectId,
+    userId,
     conversationId,
     role,
     content,
     inputType,
-    timestamp: new Date(),
-    conversationTitle,
+    timestamp,
   };
   const result = await Message.insertOne(message);
   return result._id;

@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import { KnowledgeManualEmbedding } from "../../../models/schemas/knowledge-manual-embedding.schema";
 import { connectDatabase } from "../../getDatabase";
 import { getGeminiClient } from "../getClient";
+import { trackedEmbedContent } from "../trackedGeneration";
 
 export interface VectorizeKnowledgeParams {
   documentId: Types.ObjectId;
@@ -64,14 +65,14 @@ export async function vectorizeKnowledgeManualWithGemini(
 
     // 3. Parallel Execution
     const embeddingPromises = batches.map(async (batch) => {
-      const response = await ai.models.embedContent({
+      const response = await trackedEmbedContent(ai, {
         model: "gemini-embedding-001",
         contents: batch,
         config: {
           taskType: "RETRIEVAL_DOCUMENT",
           outputDimensionality: 768,
         },
-      });
+      }, "ai.embed_document");
 
       if (!response.embeddings) return [];
 

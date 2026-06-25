@@ -28,6 +28,18 @@ export type AIGenMaterialInput = {
   format?: "pptx" | "pdf";
   additionalInstructions?: string;
   language?: string;
+  slideStyle?: "schematica" | "bilanciata" | "descrittiva";
+};
+
+// Mappa lo stile scelto sulla densità di testo di Gamma: così lo stile incide
+// davvero sul deck generato, non solo sul testo prodotto dall'LLM.
+const STYLE_TO_GAMMA_AMOUNT: Record<
+  string,
+  "brief" | "medium" | "detailed" | "extensive"
+> = {
+  schematica: "brief",
+  bilanciata: "medium",
+  descrittiva: "detailed",
 };
 
 const getPrompt = (
@@ -140,6 +152,7 @@ const createAIGenMaterial = async (
     format,
     additionalInstructions,
     language,
+    slideStyle,
   } = JSON.parse(request.body || "{}") as AIGenMaterialInput;
   console.log(JSON.stringify(JSON.parse(request.body || "{}"), null, 2), "Received request body");
   //error handling
@@ -281,7 +294,8 @@ const createAIGenMaterial = async (
         source: "pictographic",
       },
       textOptions: {
-        amount: "medium",
+        amount:
+          (slideStyle && STYLE_TO_GAMMA_AMOUNT[slideStyle]) || "medium",
       },
       cardOptions: {
         headerFooter: {

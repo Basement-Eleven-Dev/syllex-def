@@ -4,6 +4,7 @@ import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import { connectDatabase } from "../../_helpers/getDatabase";
 import { Types, mongo } from "mongoose";
 import { getGeminiClient } from "../../_helpers/AI/getClient";
+import { trackedGenerateContent } from "../../_helpers/AI/trackedGeneration";
 import { Test } from "../../models/schemas/test.schema";
 import { Attempt } from "../../models/schemas/attempt.schema";
 
@@ -94,7 +95,7 @@ const generateTestInsight = async (
 
   try {
     const ai = await getGeminiClient();
-    const response = await ai.models.generateContent({
+    const response = await trackedGenerateContent(ai, {
       model: "gemini-3.1-flash-lite",
       contents: [
         { role: "user", parts: [{ text: "Genera l'analisi della classe." }] },
@@ -104,7 +105,7 @@ const generateTestInsight = async (
         temperature: 0.7,
         maxOutputTokens: 600,
       },
-    });
+    }, "ai.test_insight");
 
     return {
       insight: response.text || "Impossibile generare l'analisi al momento.",

@@ -4,6 +4,7 @@ import { lambdaRequest } from "../../_helpers/lambdaProxyResponse";
 import { connectDatabase } from "../../_helpers/getDatabase";
 import { Types, mongo } from "mongoose";
 import { getGeminiClient } from "../../_helpers/AI/getClient";
+import { trackedGenerateContent } from "../../_helpers/AI/trackedGeneration";
 import { Attempt } from "../../models/schemas/attempt.schema";
 
 const generateAttemptInsight = async (
@@ -106,7 +107,7 @@ const generateAttemptInsight = async (
 
   try {
     const ai = await getGeminiClient();
-    const response = await ai.models.generateContent({
+    const response = await trackedGenerateContent(ai, {
       model: "gemini-3.1-flash-lite",
       contents: [
         {
@@ -119,7 +120,7 @@ const generateAttemptInsight = async (
         temperature: 0.7,
         maxOutputTokens: 500,
       },
-    });
+    }, "ai.attempt_insight");
 
     const insightContent =
       response.text || "Impossibile generare l'analisi individuale al momento.";

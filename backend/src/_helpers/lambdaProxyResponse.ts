@@ -7,6 +7,13 @@ import { getCurrentUser } from "./getAuthCognitoUser";
 import { AUTHORIZED_API_HEADERS } from "../env";
 import { mongo, Types } from "mongoose";
 import { User } from "../models/schemas/user.schema";
+import { randomUUID } from "crypto";
+import {
+  getRequestContext,
+  runWithRequestContext,
+  RequestContextStore,
+} from "./logging/requestContext";
+import { flushRequestLog } from "./logging/activityLogger";
 
 declare module "aws-lambda" {
   interface Context {
@@ -16,8 +23,86 @@ declare module "aws-lambda" {
   }
 }
 
+/**
+ * Middleware di logging: copre AUTOMATICAMENTE ogni Lambda che passa da qui.
+ * - `before`: popola lo store (già attivo via storage.run) con i dati dell'utente.
+ * - `after` / `onError`: scarica a DB l'evento HTTP + gli eventi AI bufferizzati.
+ * Tutto best-effort: non rompe né rallenta la risposta.
+ */
+const activityLogMiddleware = (): middy.MiddlewareObj => {
+  const buildHttp = (request: any, status: "success" | "error") => {
+    const store = getRequestContext();
+    const event = request.event ?? {};
+    const headers = event.headers ?? {};
+    const rc = event.requestContext ?? {};
+    const startedAt = store?.startedAt ?? new Date();
+    const httpMethod = event.httpMethod ?? rc.httpMethod;
+    const route = rc.resourcePath ?? event.resource;
+    const error = request.error as any;
+
+    return {
+      action:
+        httpMethod && route ? `${httpMethod} ${route}` : route || "unknown",
+      route,
+      httpMethod,
+      functionName: request.context?.functionName,
+      startedAt,
+      durationMs: Date.now() - startedAt.getTime(),
+      status,
+      httpStatusCode:
+        request.response?.statusCode ?? error?.statusCode ?? error?.status,
+      errorType: error?.name,
+      errorMessage: error?.message,
+      rateLimited: error?.status === 429 || error?.statusCode === 429,
+      userAgent: headers["User-Agent"] || headers["user-agent"],
+      appVersion: headers["X-App-Version"] || headers["x-app-version"],
+      stage: process.env.STAGE,
+    };
+  };
+
+  return {
+    before: async (request) => {
+      // Lo store è già attivo (creato in runWithRequestContext): lo popoliamo.
+      const store = getRequestContext();
+      if (store) {
+        store.userId = request.context?.user?._id as Types.ObjectId | undefined;
+        store.userEmail = request.context?.user?.email;
+        store.userRole = request.context?.user?.role;
+        store.organizationId = request.context?.user
+          ?.organizationIds?.[0] as Types.ObjectId | undefined;
+        store.subjectId = request.context?.subjectId;
+      }
+    },
+    after: async (request) => {
+      await flushRequestLog(getRequestContext(), buildHttp(request, "success"));
+    },
+    onError: async (request) => {
+      await flushRequestLog(getRequestContext(), buildHttp(request, "error"));
+    },
+  };
+};
+
+/**
+ * Crea uno store fresco per l'invocazione e avvolge l'intero handler middy in
+ * storage.run, così il contesto (chi/traceId/buffer AI) è isolato e sopravvive
+ * a tutti gli await interni, anche con richieste concorrenti.
+ */
+const withRequestContext =
+  (middyHandler: Handler): Handler =>
+  (event: any, context: any, callback: any) => {
+    const store: RequestContextStore = {
+      traceId: context?.awsRequestId || randomUUID(),
+      requestId: context?.awsRequestId,
+      startedAt: new Date(),
+      aiEvents: [],
+    };
+    return runWithRequestContext(store, () =>
+      middyHandler(event, context, callback),
+    );
+  };
+
 export const lambdaRequest = (handler: Handler) => {
-  return middy(handler)
+  const middyHandler = middy(handler)
     .use({
       before: async (request) => {
         const subjectIdHeader =
@@ -40,6 +125,7 @@ export const lambdaRequest = (handler: Handler) => {
         request.context.language = cleanLang || "it";
       },
     })
+    .use(activityLogMiddleware())
     .use(
       httpResponseSerializer({
         serializers: [
@@ -58,10 +144,13 @@ export const lambdaRequest = (handler: Handler) => {
       }),
     )
     .use(httpErrorHandler());
+
+  return withRequestContext(middyHandler as unknown as Handler);
 };
 
 export const lambdaPublicRequest = (handler: Handler) => {
-  return middy(handler)
+  const middyHandler = middy(handler)
+    .use(activityLogMiddleware())
     .use(
       httpResponseSerializer({
         serializers: [
@@ -80,4 +169,6 @@ export const lambdaPublicRequest = (handler: Handler) => {
       }),
     )
     .use(httpErrorHandler());
+
+  return withRequestContext(middyHandler as unknown as Handler);
 };

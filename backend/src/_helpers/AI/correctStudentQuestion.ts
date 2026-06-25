@@ -1,4 +1,5 @@
 import { getGeminiClient } from "./getClient";
+import { trackedGenerateContent } from "./trackedGeneration";
 
 export async function correctStudentQuestion(
   answer: string,
@@ -54,7 +55,7 @@ IMPORTANTE: Rispondi SOLO con un oggetto JSON valido nel seguente formato, senza
   try {
     const ai = await getGeminiClient();
 
-    const response = await ai.models.generateContent({
+    const response = await trackedGenerateContent(ai, {
       model: "gemini-3.1-flash-lite",
       contents: [
         {
@@ -68,7 +69,7 @@ IMPORTANTE: Rispondi SOLO con un oggetto JSON valido nel seguente formato, senza
         maxOutputTokens: 500,
         responseMimeType: "application/json",
       },
-    });
+    }, "ai.correct_student_question");
 
     const text = response.text || "";
     console.log("Gemini correction response:", text);

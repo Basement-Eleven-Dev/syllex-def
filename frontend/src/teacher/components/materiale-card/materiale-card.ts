@@ -39,6 +39,7 @@ import { MaterialInterface } from '../../../services/materiali/materiali-service
 import { FileViewer } from '../file-viewer/file-viewer';
 import { SyllexBadge } from '../UI/syllex-badge/syllex-badge';
 import { TranslocoDirective, TranslocoPipe } from '@jsverse/transloco';
+import { TelemetryService } from '../../../services/telemetry-service';
 
 @Component({
   selector: 'app-materiale-card',
@@ -76,6 +77,7 @@ export class MaterialeCard implements OnInit, OnDestroy, OnChanges {
 
   modalService = inject(NgbModal);
   elementRef = inject(ElementRef);
+  private telemetry = inject(TelemetryService);
 
   readonly ThreeDotsIcon = faEllipsisVertical;
   readonly RobotIcon = faRobot;
@@ -165,6 +167,15 @@ export class MaterialeCard implements OnInit, OnDestroy, OnChanges {
     if (this.isFolder) {
       this.openItem.emit(this.item);
     } else {
+      this.telemetry.track({
+        action: 'material.open',
+        materialId: this.item._id,
+        payload: {
+          extension: this.item.extension ?? '',
+          aiGenerated: this.item.aiGenerated === true,
+          isMap: this.item.isMap === true,
+        },
+      });
       let modalRef = this.modalService.open(FileViewer, {
         centered: true,
         size: 'lg',
@@ -179,6 +190,15 @@ export class MaterialeCard implements OnInit, OnDestroy, OnChanges {
   downloadFile(event: Event): void {
     event.stopPropagation();
     if (!this.item.url) return;
+
+    this.telemetry.track({
+      action: 'material.download',
+      materialId: this.item._id,
+      payload: {
+        extension: this.item.extension ?? '',
+        aiGenerated: this.item.aiGenerated === true,
+      },
+    });
 
     fetch(this.item.url)
       .then((res) => res.blob())

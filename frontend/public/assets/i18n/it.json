@@ -1132,6 +1132,16 @@
         "desc": "Spiegazioni estese con esempi"
       }
     },
+    "style_prefills": {
+      "schematica": "Genera le slide in stile schematico, pensato per il ripasso veloce. Per ogni slide usa un titolo chiaro e 3-5 punti elenco brevi ed essenziali, fatti di parole chiave o frasi minime. Evita paragrafi, frasi lunghe e dettagli superflui: privilegia la sintesi e la memorizzazione rapida dei concetti principali.",
+      "bilanciata": "Genera le slide in stile bilanciato, adatto sia allo studio sia alla presentazione. Per ogni slide riporta i punti chiave accompagnati da una breve spiegazione di una o due righe, unendo sintesi e chiarezza. Mantieni l'equilibrio tra i concetti essenziali e i dettagli utili a comprendere l'argomento, senza appesantire.",
+      "descrittiva": "Genera le slide in stile descrittivo, pensato per lo studio approfondito. Per ogni slide sviluppa i concetti in modo completo, con spiegazioni estese, esempi concreti e definizioni chiare. Ogni slide deve essere comprensibile da sola, come piccolo materiale di studio, senza dare nulla per scontato."
+    },
+    "style_instructions": {
+      "schematica": "Stile schematico: solo titoli e punti chiave essenziali, niente paragrafi.",
+      "bilanciata": "Stile bilanciato: punti chiave con una breve spiegazione.",
+      "descrittiva": "Stile descrittivo: spiegazioni estese con esempi e definizioni."
+    },
     "student_detail": {
       "loading": "Caricamento...",
       "back": "Torna alla classe",

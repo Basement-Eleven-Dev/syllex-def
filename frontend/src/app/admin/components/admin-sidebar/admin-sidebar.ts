@@ -18,6 +18,7 @@ import {
   faChartBar,
   faBug,
   faClipboardList,
+  faClockRotateLeft,
 } from '@fortawesome/pro-solid-svg-icons';
 
 interface AdminNavRoute {
@@ -45,6 +46,7 @@ export class AdminSidebar {
       route: '/a/organizzazioni',
     },
     { label: 'Statistiche', icon: faChartBar, route: '/a/stats' },
+    { label: 'Log attività', icon: faClockRotateLeft, route: '/a/logs' },
     { label: 'Knowledge Source', icon: faBook, route: '/a/knowledge-source' },
     { label: 'Questionari', icon: faClipboardList, route: '/a/surveys' },
     { label: 'Segnalazioni Bug', icon: faBug, route: '/a/reports' },
@@ -58,7 +60,7 @@ export class AdminSidebar {
     const orgId = this.auth.user?.organizationId || this.auth.user?.organizationIds?.[0];
 
     return this.rawRoutes
-      .filter(r => r.route !== '/a/onboarding')
+      .filter(r => r.route !== '/a/onboarding' && r.route !== '/a/logs')
       .map(r => {
         if (r.route === '/a/organizzazioni') {
           return {
