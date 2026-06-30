@@ -109,6 +109,7 @@ const onboardingHandler = async (
     const userResult = await User.insertOne({
       cognitoId,
       email: staff.email.toLowerCase(),
+      username: staff.email.toLowerCase(),
       firstName: staff.firstName,
       lastName: staff.lastName,
       role: staff.role,
@@ -165,6 +166,7 @@ const onboardingHandler = async (
       const userResult = await User.insertOne({
         cognitoId,
         email: std.email.toLowerCase(),
+        username: std.email.toLowerCase(),
         firstName: std.firstName,
         lastName: std.lastName,
         role: 'student',
